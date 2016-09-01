@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
-using umbraco.BusinessLogic;
-
-namespace Umbraco.Web.Mvc
+﻿namespace Umbraco.Web.Mvc
 {
     /// <summary>
-	/// A base MVC controller for use in the back office that ensures that every call to it authorizes the current user.
+    /// Provides a base class for authorized Umbraco controllers.
 	/// </summary>
 	/// <remarks>
 	/// This controller essentially just uses a global UmbracoAuthorizeAttribute, inheritors that require more granular control over the 
@@ -19,7 +10,5 @@ namespace Umbraco.Web.Mvc
 	[UmbracoAuthorize]
     [DisableBrowserCache]
     public abstract class UmbracoAuthorizedController : UmbracoController
-	{
-
-	}
+	{ }
 }

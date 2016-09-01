@@ -8,52 +8,25 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class CompilationDebugCheck : AbstractConfigCheck
     {
-        private readonly ILocalizedTextService _textService;
+        public CompilationDebugCheck(ILocalizedTextService textService)
+            : base(textService)
+        { }
 
-        public CompilationDebugCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
-        {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
-        }
+        public override string FilePath => "~/Web.config";
 
-        public override string FilePath
-        {
-            get { return "~/Web.config"; }
-        }
+        public override string XPath => "/configuration/system.web/compilation/@debug";
 
-        public override string XPath
-        {
-            get { return "/configuration/system.web/compilation/@debug"; }
-        }
+        public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
-        public override ValueComparisonType ValueComparisonType
+        public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
-            get { return ValueComparisonType.ShouldEqual; }
-        }
+            new AcceptableConfiguration { IsRecommended = true, Value = bool.FalseString.ToLower() }
+        };
 
-        public override IEnumerable<AcceptableConfiguration> Values
-        {
-            get
-            {
-                return new List<AcceptableConfiguration>
-                {
-                    new AcceptableConfiguration { IsRecommended = true, Value = bool.FalseString.ToLower() }
-                };
-            }
-        }
-        
-        public override string CheckSuccessMessage
-        {
-            get { return _textService.Localize("healthcheck/compilationDebugCheckSuccessMessage"); }
-        }
+        public override string CheckSuccessMessage => TextService.Localize("healthcheck/compilationDebugCheckSuccessMessage");
 
-        public override string CheckErrorMessage
-        {
-            get { return _textService.Localize("healthcheck/compilationDebugCheckErrorMessage"); }
-        }
+        public override string CheckErrorMessage => TextService.Localize("healthcheck/compilationDebugCheckErrorMessage");
 
-        public override string RectifySuccessMessage
-        {
-            get { return _textService.Localize("healthcheck/compilationDebugCheckRectifySuccessMessage"); }
-        }
+        public override string RectifySuccessMessage => TextService.Localize("healthcheck/compilationDebugCheckRectifySuccessMessage");
     }
 }

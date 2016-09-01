@@ -24,8 +24,10 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
+using Umbraco.Core.Services;
 using Umbraco.Web.DependencyInjection;
 using UmbracoExamine;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -100,7 +102,8 @@ namespace Umbraco.Tests.TestHelpers
             Container.RegisterFrom<WebModelMappersCompositionRoot>();
 
             Container.Register<IServiceContainer>(factory => Container);
-            Container.Register<PluginManager>(factory => PluginManager.Current);
+            var pluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger); //?
+            Container.RegisterInstance(pluginManager);
 
             //Default Datalayer/Repositories/SQL/Database/etc...
             Container.RegisterFrom<RepositoryCompositionRoot>();
@@ -166,7 +169,7 @@ namespace Umbraco.Tests.TestHelpers
                     var mappers = Container.GetAllInstances<ModelMapperConfiguration>();
                     foreach (var mapper in mappers)
                     {
-                        mapper.ConfigureMappings(configuration, ApplicationContext);
+                        mapper.ConfigureMappings(configuration);
                     }
                 });
             }
@@ -205,41 +208,41 @@ namespace Umbraco.Tests.TestHelpers
         
         private void SetupApplicationContext()
         {
-            var applicationContext = CreateApplicationContext();
-            Container.Register<ApplicationContext>(_ => applicationContext);
+            //var applicationContext = CreateApplicationContext();
+            //Container.Register<ApplicationContext>(_ => applicationContext);
         }
 
         /// <summary>
         /// Inheritors can override this if they wish to create a custom application context
         /// </summary>
-        protected virtual ApplicationContext CreateApplicationContext()
-        {
-            var evtMsgs = new TransientEventMessagesFactory();
-            var dbFactory = new DefaultDatabaseFactory(
-                Core.Configuration.GlobalSettings.UmbracoConnectionName,
-                TestObjects.GetDefaultSqlSyntaxProviders(Logger),
-                Logger, new TestUmbracoDatabaseAccessor(),
-                Mock.Of<IMapperCollection>());
-            dbFactory.ResetForTests();
-            var applicationContext = new ApplicationContext(
-                // assign the db context
-                new DatabaseContext(dbFactory, Logger),
-                // assign the service context
-                TestObjects.GetServiceContext(
-                    Container.GetInstance<RepositoryFactory>(),
-                    TestObjects.GetDatabaseUnitOfWorkProvider(Logger),
-                    new FileUnitOfWorkProvider(),
-                    CacheHelper,
-                    Logger,
-                    evtMsgs,
-                    Enumerable.Empty<IUrlSegmentProvider>()),
-                CacheHelper,
-                ProfilingLogger)
-            {
-                IsReady = true
-            };
-            return applicationContext;
-        }
+        //protected virtual ApplicationContext CreateApplicationContext()
+        //{
+        //    var evtMsgs = new TransientEventMessagesFactory();
+        //    var dbFactory = new DefaultDatabaseFactory(
+        //        Core.Configuration.GlobalSettings.UmbracoConnectionName,
+        //        TestObjects.GetDefaultSqlSyntaxProviders(Logger),
+        //        Logger, new TestUmbracoDatabaseAccessor(),
+        //        Mock.Of<IMapperCollection>());
+        //    dbFactory.ResetForTests();
+        //    var applicationContext = new ApplicationContext(
+        //        // assign the db context
+        //        new DatabaseContext(dbFactory, Logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
+        //        // assign the service context
+        //        TestObjects.GetServiceContext(
+        //            Container.GetInstance<RepositoryFactory>(),
+        //            TestObjects.GetDatabaseUnitOfWorkProvider(Logger),
+        //            new FileUnitOfWorkProvider(),
+        //            CacheHelper,
+        //            Logger,
+        //            evtMsgs,
+        //            Enumerable.Empty<IUrlSegmentProvider>()),
+        //        CacheHelper,
+        //        ProfilingLogger)
+        //    {
+        //        //IsReady = true
+        //    };
+        //    return applicationContext;
+        //}
 
         /// <summary>
         /// Inheritors can override this if they wish to setup the plugin manager differenty (i.e. specify certain assemblies to load)
@@ -268,8 +271,6 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void FreezeResolution()
         { }
-
-        protected ApplicationContext ApplicationContext => ApplicationContext.Current;
 
         protected ILogger Logger => ProfilingLogger.Logger;
 

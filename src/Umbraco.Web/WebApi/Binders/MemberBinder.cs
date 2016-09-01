@@ -21,19 +21,6 @@ namespace Umbraco.Web.WebApi.Binders
 {
     internal class MemberBinder : ContentItemBaseBinder<IMember, MemberSave>
     {
-        public MemberBinder(ApplicationContext applicationContext)
-            : base(applicationContext)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public MemberBinder()
-            : this(ApplicationContext.Current)
-        {
-        }
-
         protected override ContentItemValidationHelper<IMember, MemberSave> GetValidationHelper()
         {
             return new MemberValidationHelper();
@@ -46,7 +33,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// <returns></returns>
         protected override IMember GetExisting(MemberSave model)
         {
-            var scenario = ApplicationContext.Services.MemberService.GetMembershipScenario();
+            var scenario = Services.MemberService.GetMembershipScenario();
             var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             switch (scenario)
             {
@@ -71,12 +58,12 @@ namespace Umbraco.Web.WebApi.Binders
                     //    {
                     //        var existing = GetExisting(model.Key);
                     //        FilterContentTypeProperties(existing.ContentType, existing.ContentType.PropertyTypes.Select(x => x.Alias).ToArray());
-                    //    }    
+                    //    }
                     //}
 
                     //generate a member for a generic membership provider
                     //NOTE: We don't care about the password here, so just generate something
-                    //var member = MemberService.CreateGenericMembershipProviderMember(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"));                    
+                    //var member = MemberService.CreateGenericMembershipProviderMember(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"));
 
                     //var convertResult = membershipUser.ProviderUserKey.TryConvertTo<Guid>();
                     //if (convertResult.Success == false)
@@ -93,7 +80,7 @@ namespace Umbraco.Web.WebApi.Binders
 
         private IMember GetExisting(Guid key)
         {
-            var member = ApplicationContext.Services.MemberService.GetByKey(key);
+            var member = Services.MemberService.GetByKey(key);
             if (member == null)
             {
                 throw new InvalidOperationException("Could not find member with key " + key);
@@ -125,7 +112,7 @@ namespace Umbraco.Web.WebApi.Binders
 
             if (provider.IsUmbracoMembershipProvider())
             {
-                var contentType = ApplicationContext.Services.MemberTypeService.Get(model.ContentTypeAlias);
+                var contentType = Services.MemberTypeService.Get(model.ContentTypeAlias);
                 if (contentType == null)
                 {
                     throw new InvalidOperationException("No member type found wth alias " + model.ContentTypeAlias);
@@ -146,7 +133,7 @@ namespace Umbraco.Web.WebApi.Binders
 
                 //If the default Member type exists, we'll use that to create the IMember - that way we can associate the custom membership
                 // provider to our data - eventually we can support editing custom properties with a custom provider.
-                var memberType = ApplicationContext.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
+                var memberType = Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 if (memberType != null)
                 {
                     FilterContentTypeProperties(memberType, memberType.PropertyTypes.Select(x => x.Alias).ToArray());
@@ -203,7 +190,7 @@ namespace Umbraco.Web.WebApi.Binders
             /// </summary>
             /// <param name="postedItem"></param>
             /// <param name="actionContext"></param>
-            /// <returns></returns>           
+            /// <returns></returns>
             protected override bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
             {
                 var memberSave = (MemberSave)postedItem;
@@ -212,14 +199,14 @@ namespace Umbraco.Web.WebApi.Binders
                 {
                     actionContext.ModelState.AddPropertyError(
                             new ValidationResult("Invalid user name", new[] { "value" }),
-                            string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));    
+                            string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
                 }
 
                 if (memberSave.Email.IsNullOrWhiteSpace() || new EmailAddressAttribute().IsValid(memberSave.Email) == false)
                 {
                     actionContext.ModelState.AddPropertyError(
                             new ValidationResult("Invalid email", new[] { "value" }),
-                            string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));    
+                            string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
                 }
 
                 //default provider!

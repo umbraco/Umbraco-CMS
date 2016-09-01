@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -144,7 +145,7 @@ namespace umbraco.cms.businesslogic.packager
                     //foreach (var exportedId in allExportedIds)
                     //{                            
                     //    allContentTags.AddRange(
-                    //        ApplicationContext.Current.Services.TagService.GetTagsForEntity(exportedId));
+                    //        Current.Services.TagService.GetTagsForEntity(exportedId));
                     //}
 
                     ////This is pretty round-about but it works. Essentially we need to get the properties that are tagged
@@ -153,7 +154,7 @@ namespace umbraco.cms.businesslogic.packager
                     //foreach (var group in allContentTags.Select(x => x.Group).Distinct())
                     //{
                     //    allTaggedEntities.AddRange(
-                    //        ApplicationContext.Current.Services.TagService.GetTaggedContentByTagGroup(group));
+                    //        Current.Services.TagService.GetTaggedContentByTagGroup(group));
                     //}
 
                     ////Now, we have all property Ids/Aliases and their referenced document Ids and tags
@@ -252,7 +253,7 @@ namespace umbraco.cms.businesslogic.packager
             {
                 if (int.TryParse(dictionaryId, out outInt))
                 {
-                    var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(outInt);
+                    var di = Current.Services.LocalizationService.GetDictionaryItemById(outInt);
                     var entitySerializer = new EntityXmlSerializer();
                     var xmlNode = entitySerializer.Serialize(di).GetXmlNode(_packageManifest);                    
                     dictionaryItems.AppendChild(xmlNode);

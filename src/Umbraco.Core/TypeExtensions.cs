@@ -426,6 +426,34 @@ namespace Umbraco.Core
                 assemblyName.FullName.StartsWith("App_Code.") ? "App_Code" : assemblyName.Name);
 		}
 
+        /// <summary>
+        /// Determines whether an instance of a specified type can be assigned to the current type instance.
+        /// </summary>
+        /// <param name="type">The current type.</param>
+        /// <param name="c">The type to compare with the current type.</param>
+        /// <returns>A value indicating whether an instance of the specified type can be assigned to the current type instance.</returns>
+        /// <remarks>This extended version supports the current type being a generic type definition, and will
+        /// consider that eg <c>List{int}</c> is "assignable to" <c>IList{}</c>.</remarks>
+        public static bool IsAssignableFromGtd(this Type type, Type c)
+        {
+            // type *can* be a generic type definition
+            // c is a real type, cannot be a generic type definition
+
+            if (type.IsGenericTypeDefinition == false)
+                return type.IsAssignableFrom(c);
+
+            if (c.IsInterface == false)
+            {
+                var t = c;
+                while (t != typeof(object))
+                {
+                    if (t.IsGenericType && t.GetGenericTypeDefinition() == type) return true;
+                    t = t.BaseType;
+                }
+            }
+
+            return c.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == type);
+        }
 
 
     }

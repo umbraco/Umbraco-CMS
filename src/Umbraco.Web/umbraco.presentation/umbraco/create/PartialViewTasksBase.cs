@@ -6,6 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.UI;
 using Umbraco.Core;
+using Umbraco.Web;
 using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
@@ -44,8 +45,8 @@ namespace umbraco
             }
 
             var model = new PartialView(fileName);
-            var fileService = (FileService)ApplicationContext.Current.Services.FileService;
-            var macroService = ApplicationContext.Current.Services.MacroService;
+            var fileService = (FileService)Current.Services.FileService;
+            var macroService = Current.Services.MacroService;
 
             if (IsPartialViewMacro == false)
             {
@@ -74,7 +75,7 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
-            var fileService = (FileService)ApplicationContext.Current.Services.FileService;
+            var fileService = (FileService)Current.Services.FileService;
 
             if (IsPartialViewMacro == false)
             {

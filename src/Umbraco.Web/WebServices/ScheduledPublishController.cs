@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Mvc;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
@@ -7,13 +8,19 @@ using Umbraco.Web.Mvc;
 namespace Umbraco.Web.WebServices
 {
     /// <summary>
-    /// A REST controller used for running the scheduled publishing, this is called from the background worker timer
+    /// Represents a REST controller used for running the scheduled publishing.
     /// </summary>
     [AdminTokenAuthorize]
     public class ScheduledPublishController : UmbracoController
     {
         private static bool _isPublishingRunning;
         private static readonly object Locker = new object();
+        private readonly IRuntimeState _runtime;
+
+        public ScheduledPublishController(IRuntimeState runtime)
+        {
+            _runtime = runtime;
+        }
 
         [HttpPost]
         public JsonResult Index()
@@ -28,7 +35,7 @@ namespace Umbraco.Web.WebServices
             try
             {
                 // ensure we have everything we need
-                if (ApplicationContext.IsReady == false) return null;
+                if (_runtime.Level != RuntimeLevel.Run) return null;
                 Services.ContentService.WithResult().PerformScheduledPublish();
                 return Json(new { success = true });
             }

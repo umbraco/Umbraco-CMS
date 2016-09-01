@@ -28,23 +28,6 @@ namespace Umbraco.Web.Editors
         private ICultureDictionary _cultureDictionary;
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        protected ContentTypeControllerBase()
-            : this(UmbracoContext.Current)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        protected ContentTypeControllerBase(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
-
-        /// <summary>
         /// Returns the available composite content types for a given content type
         /// </summary>
         /// <param name="type"></param>
@@ -355,7 +338,7 @@ namespace Umbraco.Web.Editors
             where TPropertyType : PropertyTypeBasic
             where TContentTypeDisplay : ContentTypeCompositionDisplay
         {
-            var service = ApplicationContext.Services.GetContentTypeService<TContentType>();
+            var service = Services.GetContentTypeService<TContentType>();
             var validateAttempt = service.ValidateComposition(composition);
             if (validateAttempt == false)
             {

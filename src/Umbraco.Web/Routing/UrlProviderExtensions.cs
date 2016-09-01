@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using umbraco;
-using Umbraco.Core;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Routing
 {
     internal static class UrlProviderExtensions
     {
+        // fixme inject
+        private static ILocalizedTextService TextService => Current.Services.TextService;
+        private static IContentService ContentService => Current.Services.ContentService;
+
         /// <summary>
         /// Gets the URLs for the content item
         /// </summary>
@@ -21,14 +23,14 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public static IEnumerable<string> GetContentUrls(this IContent content, UmbracoContext umbracoContext)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
 
             var urls = new List<string>();
 
             if (content.HasPublishedVersion == false)
             {
-                urls.Add(umbracoContext.Application.Services.TextService.Localize("content/itemNotPublished"));
+                urls.Add(TextService.Localize("content/itemNotPublished"));
                 return urls;
             }
 
@@ -41,14 +43,13 @@ namespace Umbraco.Web.Routing
                 var parent = content;
                 do
                 {
-                    parent = parent.ParentId > 0 ? parent.Parent(umbracoContext.Application.Services.ContentService) : null;
+                    parent = parent.ParentId > 0 ? parent.Parent(ContentService) : null;
                 }
                 while (parent != null && parent.Published);
-
-                if (parent == null) // oops - internal error
-                    urls.Add(umbracoContext.Application.Services.TextService.Localize("content/parentNotPublishedAnomaly"));
-                else
-                    urls.Add(umbracoContext.Application.Services.TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
+                
+                urls.Add(parent == null 
+                    ? TextService.Localize("content/parentNotPublishedAnomaly") // oops - internal error
+                    : TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
             }
             else if (url.StartsWith("#err-"))
             {
@@ -72,7 +73,7 @@ namespace Umbraco.Web.Routing
                     s = "/" + string.Join("/", l) + " (id=" + id + ")";
 
                 }
-                urls.Add(umbracoContext.Application.Services.TextService.Localize("content/routeError", s));
+                urls.Add(TextService.Localize("content/routeError", s));
             }
             else
             {

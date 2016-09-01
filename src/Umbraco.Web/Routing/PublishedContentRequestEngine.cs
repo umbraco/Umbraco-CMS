@@ -45,9 +45,9 @@ namespace Umbraco.Web.Routing
 			//if (umbracoContext.PublishedContentRequest != _pcr) throw new ArgumentException("PublishedContentRequest confusion.");
 		}
 
-        protected ProfilingLogger ProfilingLogger => _routingContext.UmbracoContext.Application.ProfilingLogger;
+        protected ProfilingLogger ProfilingLogger => Current.ProfilingLogger; // fixme inject
 
-	    protected ServiceContext Services => _routingContext.UmbracoContext.Application.Services;
+	    protected ServiceContext Services => Current.Services; // fixme inject
 
 	    #region Public
 
@@ -623,7 +623,7 @@ namespace Umbraco.Web.Routing
 				if (templateId > 0)
 				{
 					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
-					var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateId);
+					var template = Current.Services.FileService.GetTemplate(templateId);
 					if (template == null)
 						throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
 					_pcr.TemplateModel = template;
@@ -646,7 +646,7 @@ namespace Umbraco.Web.Routing
 					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
 				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => altTemplate);
 
-				var template = ApplicationContext.Current.Services.FileService.GetTemplate(altTemplate);
+				var template = Current.Services.FileService.GetTemplate(altTemplate);
 				if (template != null)
 				{
 					_pcr.TemplateModel = template;

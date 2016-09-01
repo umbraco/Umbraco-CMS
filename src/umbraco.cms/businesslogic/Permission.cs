@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Events;
 using umbraco.cms.businesslogic;
 using System.Collections.Generic;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -32,7 +33,7 @@ namespace umbraco.BusinessLogic
         {
             var asArray = nodes.ToArray();
 
-            ApplicationContext.Current.Services.UserService.AssignUserPermission(user.Id, permissionKey, asArray.Select(x => x.Id).ToArray());
+            Current.Services.UserService.AssignUserPermission(user.Id, permissionKey, asArray.Select(x => x.Id).ToArray());
 
         }        
 
@@ -43,7 +44,7 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static IEnumerable<Permission> GetUserPermissions(IUser user)
         {
-            var permissions = ApplicationContext.Current.Services.UserService.GetPermissions(user);
+            var permissions = Current.Services.UserService.GetPermissions(user);
 
             return permissions.SelectMany(
                 entityPermission => entityPermission.AssignedPermissions,
@@ -63,10 +64,10 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static IEnumerable<Permission> GetNodePermissions(CMSNode node)
         {
-            var content = ApplicationContext.Current.Services.ContentService.GetById(node.Id);
+            var content = Current.Services.ContentService.GetById(node.Id);
             if (content == null) return Enumerable.Empty<Permission>();
 
-            var permissions = ApplicationContext.Current.Services.ContentService.GetPermissionsForEntity(content);
+            var permissions = Current.Services.ContentService.GetPermissionsForEntity(content);
 
             return permissions.SelectMany(
                 entityPermission => entityPermission.AssignedPermissions,
@@ -85,7 +86,7 @@ namespace umbraco.BusinessLogic
         /// <param name="node"></param>
         public static void DeletePermissions(IUser user, CMSNode node)
         {
-            ApplicationContext.Current.Services.UserService.RemoveUserPermissions(user.Id, node.Id);
+            Current.Services.UserService.RemoveUserPermissions(user.Id, node.Id);
         }
         
         /// <summary>
@@ -94,13 +95,13 @@ namespace umbraco.BusinessLogic
         /// <param name="user"></param>
         public static void DeletePermissions(IUser user)
         {
-            ApplicationContext.Current.Services.UserService.RemoveUserPermissions(user.Id);
+            Current.Services.UserService.RemoveUserPermissions(user.Id);
 
         }
 
         public static void DeletePermissions(int iUserID, int[] iNodeIDs)
         {
-            ApplicationContext.Current.Services.UserService.RemoveUserPermissions(iUserID, iNodeIDs);
+            Current.Services.UserService.RemoveUserPermissions(iUserID, iNodeIDs);
 
         }
         public static void DeletePermissions(int iUserID, int iNodeID)
@@ -114,13 +115,13 @@ namespace umbraco.BusinessLogic
         /// <param name="node"></param>
         public static void DeletePermissions(CMSNode node)
         {
-            ApplicationContext.Current.Services.ContentService.RemoveContentPermissions(node.Id);
+            Current.Services.ContentService.RemoveContentPermissions(node.Id);
             
         }
 
         public static void UpdateCruds(IUser user, CMSNode node, string permissions)
         {
-            ApplicationContext.Current.Services.UserService.ReplaceUserPermissions(
+            Current.Services.UserService.ReplaceUserPermissions(
                 user.Id, 
                 permissions.ToCharArray(), 
                 node.Id);

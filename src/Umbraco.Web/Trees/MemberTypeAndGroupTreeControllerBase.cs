@@ -24,7 +24,7 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                // root actions              
+                // root actions
                 menu.Items.Add<CreateChildEntity, ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;

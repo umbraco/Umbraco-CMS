@@ -8,6 +8,7 @@ using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 
@@ -43,7 +44,7 @@ namespace umbraco.cms.businesslogic.web
             SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text,
                 allowAtRoot, isContainer, Alias,icon,thumbnail,description,
                 templateNodeId, IsDefault
-            FROM umbracoNode 
+            FROM umbracoNode
             INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId
             LEFT OUTER JOIN cmsDocumentType ON cmsContentType.nodeId = cmsDocumentType.contentTypeNodeId
             WHERE nodeObjectType = @nodeObjectType";
@@ -72,7 +73,7 @@ namespace umbraco.cms.businesslogic.web
         {
             try
             {
-                var contentType = ApplicationContext.Current.Services.ContentTypeService.Get(Alias);
+                var contentType = Current.Services.ContentTypeService.Get(Alias);
                 return new DocumentType(contentType.Id);
             }
             catch
@@ -85,7 +86,7 @@ namespace umbraco.cms.businesslogic.web
         public static DocumentType MakeNew(IUser u, string Text)
         {
             var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "icon-folder", Icon = "icon-folder" };
-            ApplicationContext.Current.Services.ContentTypeService.Save(contentType, u.Id);
+            Current.Services.ContentTypeService.Save(contentType, u.Id);
             var newDt = new DocumentType(contentType);
 
 
@@ -104,7 +105,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetAllContentTypes()", false)]
         public static List<DocumentType> GetAllAsList()
         {
-            var contentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAll();
+            var contentTypes = Current.Services.ContentTypeService.GetAll();
             var documentTypes = contentTypes.Select(x => new DocumentType(x));
 
             return documentTypes.OrderBy(x => x.Text).ToList();
@@ -120,7 +121,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 if (_hasChildrenInitialized == false)
                 {
-                    HasChildren = ApplicationContext.Current.Services.ContentTypeService.HasChildren(Id);
+                    HasChildren = Current.Services.ContentTypeService.HasChildren(Id);
                 }
                 return _hasChildren;
             }
@@ -142,7 +143,7 @@ namespace umbraco.cms.businesslogic.web
 
                 if (_defaultTemplate != 0)
                 {
-                    var template = ApplicationContext.Current.Services.FileService.GetTemplate(_defaultTemplate);
+                    var template = Current.Services.FileService.GetTemplate(_defaultTemplate);
                     ContentType.SetDefaultTemplate(template);
                 }
             }
@@ -173,7 +174,7 @@ namespace umbraco.cms.businesslogic.web
                 var templates = new List<ITemplate>();
                 foreach (template.Template t in value)
                 {
-                    var template = ApplicationContext.Current.Services.FileService.GetTemplate(t.Id);
+                    var template = Current.Services.FileService.GetTemplate(t.Id);
                     templates.Add(template);
 
                     _templateIds.Add(t.Id);
@@ -265,14 +266,14 @@ namespace umbraco.cms.businesslogic.web
                             childContentTypeIds.Add(reader.GetInt("childContentTypeId"));
                         }
                     }
-      
+
                 }
 
-                currentContentTypeIds = childContentTypeIds.ToArray();       
-                
+                currentContentTypeIds = childContentTypeIds.ToArray();
+
             }
             return ids;
-        } 
+        }
 
 
         /// <summary>
@@ -294,26 +295,26 @@ namespace umbraco.cms.businesslogic.web
                 {
                     //Remove all items from the cmsContentXml table that are of this current content type
                     SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                        (SELECT DISTINCT cmsContent.nodeId FROM cmsContent 
-                                            INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId 
+                                        (SELECT DISTINCT cmsContent.nodeId FROM cmsContent
+                                            INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId
                                             WHERE cmsContentType.nodeId = @contentTypeId)",
                                               SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId));
 
                     //lookup the child content types if there are any and add the ids to the content type ids array
                     using (var reader = SqlHelper.ExecuteReader("SELECT childContentTypeId FROM cmsContentType2ContentType WHERE parentContentTypeId=@contentTypeId",
                                                                 SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
-                    {                        
+                    {
                         while (reader.Read())
                         {
                             childContentTypeIds.Add(reader.GetInt("childContentTypeId"));
-                        }                        
-                    }      
+                        }
+                    }
 
                 }
 
-                currentContentTypeIds = childContentTypeIds.ToArray();                          
+                currentContentTypeIds = childContentTypeIds.ToArray();
             }
-        } 
+        }
 
         #endregion
 
@@ -338,7 +339,7 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <exception cref="ArgumentException">Throws an exception if trying to delete a document type that is assigned as a master document type</exception>
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.Delete()", false)]
@@ -349,8 +350,8 @@ namespace umbraco.cms.businesslogic.web
             {
                 throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
             }
-                
-            ApplicationContext.Current.Services.ContentTypeService.Delete(ContentType);
+
+            Current.Services.ContentTypeService.Delete(ContentType);
 
             clearTemplates();
 
@@ -366,8 +367,8 @@ namespace umbraco.cms.businesslogic.web
         {
             var exporter = new EntityXmlSerializer();
             var xml = exporter.Serialize(
-                ApplicationContext.Current.Services.DataTypeService,
-                ApplicationContext.Current.Services.ContentTypeService,
+                Current.Services.DataTypeService,
+                Current.Services.ContentTypeService,
                 ContentType);
 
             //convert the Linq to Xml structure to the old .net xml structure
@@ -395,8 +396,8 @@ namespace umbraco.cms.businesslogic.web
         public override void Save()
         {
             var current = Thread.CurrentPrincipal != null ? Thread.CurrentPrincipal.Identity as UmbracoBackOfficeIdentity : null;
-            var userId = current == null ? Attempt<int>.Fail() : current.Id.TryConvertTo<int>();                
-            ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId.Success ? userId.Result : 0);
+            var userId = current == null ? Attempt<int>.Fail() : current.Id.TryConvertTo<int>();
+            Current.Services.ContentTypeService.Save(ContentType, userId.Success ? userId.Result : 0);
 
             base.Save();
         }
@@ -423,8 +424,8 @@ namespace umbraco.cms.businesslogic.web
 
         protected override void setupNode()
         {
-            var contentType = ApplicationContext.Current.Services.ContentTypeService.Get(Id);
-            
+            var contentType = Current.Services.ContentTypeService.Get(Id);
+
             // If it's null, it's probably a folder
             if (contentType != null)
                 SetupNode(contentType);

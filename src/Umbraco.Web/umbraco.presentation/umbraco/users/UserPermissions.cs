@@ -36,7 +36,7 @@ namespace umbraco.cms.presentation.user
             var lstNoPermissions = new List<int>();
             foreach (var nodeId in nodeIDs)
             {
-                var nodeActions = ApplicationContext.Current.Services.UserService.GetPermissions(UmbracoContext.Current.Security.CurrentUser, GetNodePath(nodeId));
+                var nodeActions = Current.Services.UserService.GetPermissions(UmbracoContext.Current.Security.CurrentUser, GetNodePath(nodeId));
                 
                 var lstActions = Action.FromEntityPermission(nodeActions);
                 if (lstActions == null || !lstActions.Contains(ActionRights.Instance))
@@ -67,14 +67,14 @@ namespace umbraco.cms.presentation.user
             //if permissions are to be assigned, then assign them
             if (permissions.Count > 0)
             {
-                ApplicationContext.Current.Services.UserService.ReplaceUserPermissions(
+                Current.Services.UserService.ReplaceUserPermissions(
                     _user.Id, permissions.Select(x => x.Letter), allNodes.ToArray());
             }
             else
             {
                 //If there are NO permissions for this node, we need to assign the ActionNull permission otherwise
                 //the node will inherit from it's parent.
-                ApplicationContext.Current.Services.UserService.ReplaceUserPermissions(
+                Current.Services.UserService.ReplaceUserPermissions(
                     _user.Id, new[] { ActionNull.Instance.Letter }, allNodes.ToArray());
             }            
 
@@ -92,7 +92,7 @@ namespace umbraco.cms.presentation.user
             {
                 //get the user and their permissions
 
-                var permissions = ApplicationContext.Current.Services.UserService.GetPermissions(_user, path);
+                var permissions = Current.Services.UserService.GetPermissions(_user, path);
                 return Action.FromEntityPermission(permissions);
             }
             return null;

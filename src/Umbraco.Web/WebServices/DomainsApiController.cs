@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Web.Http;
-using System.Web.Services.Description;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
-using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 //using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web._Legacy.Actions;
 
@@ -30,7 +25,7 @@ namespace Umbraco.Web.WebServices
         // can't pass multiple complex args in json post request...
         public PostBackModel SaveLanguageAndDomains(PostBackModel model)
         {
-            var node = ApplicationContext.Current.Services.ContentService.GetById(model.NodeId);
+            var node = Services.ContentService.GetById(model.NodeId);
 
             if (node == null)
             {

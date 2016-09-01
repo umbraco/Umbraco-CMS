@@ -12,12 +12,12 @@ namespace Umbraco.Web._Legacy.UI
     /// An abstract class that is used to implement all secure ITasks
     /// </summary>
     /// <remarks>
-    /// In the near future we will overhaul how create dialogs work and how deletions work as well. In the meantime 
-    /// if you ever need to create an ITask you should just inherit from this class and do not manually implement 
+    /// In the near future we will overhaul how create dialogs work and how deletions work as well. In the meantime
+    /// if you ever need to create an ITask you should just inherit from this class and do not manually implement
     /// ITask or ITaskReturnUrl. If you do, you MUST also implement IAppTask which associates an ITask to an app
-    /// so we can validate the current user's security with the implementation. If you do not do this then your 
-    /// implementation will not be secure. It means that if someone is logged in and doesn't have access to a 
-    /// specific app, they'd still be able to execute code to create/delete for any ITask regardless of what app 
+    /// so we can validate the current user's security with the implementation. If you do not do this then your
+    /// implementation will not be secure. It means that if someone is logged in and doesn't have access to a
+    /// specific app, they'd still be able to execute code to create/delete for any ITask regardless of what app
     /// they have access to.
     /// </remarks>
     [Obsolete("ITask is used for legacy webforms back office editors, change to using the v7 angular approach")]
@@ -26,7 +26,7 @@ namespace Umbraco.Web._Legacy.UI
         public virtual int ParentID { get; set; }
         public int TypeID { get; set; }
         public string Alias { get; set; }
-        
+
         /// <summary>
         /// Base class first performs authentication for the current app before proceeding
         /// </summary>
@@ -35,7 +35,7 @@ namespace Umbraco.Web._Legacy.UI
         {
             if (ValidateUserForApplication())
             {
-                return PerformSave();                
+                return PerformSave();
             }
             throw new AuthenticationException("The current user does not have access to the required application that this task belongs to");
         }
@@ -70,7 +70,7 @@ namespace Umbraco.Web._Legacy.UI
         /// </summary>
         int ITask.UserId
         {
-            set { User = ApplicationContext.Current.Services.UserService.GetUserById(value); }
+            set { User = Current.Services.UserService.GetUserById(value); }
         }
 
         /// <summary>

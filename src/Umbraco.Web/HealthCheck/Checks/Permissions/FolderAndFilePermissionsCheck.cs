@@ -28,9 +28,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
     {
         private readonly ILocalizedTextService _textService;
 
-        public FolderAndFilePermissionsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        public FolderAndFilePermissionsCheck(ILocalizedTextService textService)
         {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _textService = textService;
         }
 
         /// <summary>

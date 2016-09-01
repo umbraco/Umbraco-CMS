@@ -22,14 +22,14 @@ namespace Umbraco.Web.Security
     public class WebSecurity : DisposableObject
     {
         private HttpContextBase _httpContext;
-        private ApplicationContext _applicationContext;
+        private readonly IUserService _userService;
 
-        public WebSecurity(HttpContextBase httpContext, ApplicationContext applicationContext)
+        public WebSecurity(HttpContextBase httpContext, IUserService userService)
         {
             _httpContext = httpContext;
-            _applicationContext = applicationContext;
+            _userService = userService;
         }
-        
+
         /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided
         /// </summary>
@@ -45,11 +45,11 @@ namespace Umbraco.Web.Security
             IEnumerable<string> allowGroups = null,
             IEnumerable<int> allowMembers = null)
         {
-            if (HttpContext.Current == null || ApplicationContext.Current == null)
+            if (HttpContext.Current == null || Current.RuntimeState.Level != RuntimeLevel.Run)
             {
                 return false;
             }
-            var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+            var helper = new MembershipHelper(new HttpContextWrapper(HttpContext.Current));
             return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
         }
 
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Security
                     {
                         return null;
                     }
-                    _currentUser = _applicationContext.Services.UserService.GetUserById(id);
+                    _currentUser = _userService.GetUserById(id);
                 }
 
                 return _currentUser;
@@ -124,7 +124,7 @@ namespace Umbraco.Web.Security
             var owinCtx = _httpContext.GetOwinContext();
             //ensure it's done for owin too
             owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
-            
+
             var user = UserManager.FindByIdAsync(userId).Result;
             var userData = Mapper.Map<UserData>(user);
             _httpContext.SetPrincipalForRequest(userData);
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Security
         [Obsolete("This method should not be used, login is performed by the OWIN pipeline, use the overload that returns double and accepts a UserId instead")]
         public virtual FormsAuthenticationTicket PerformLogin(IUser user)
         {
-            //clear the external cookie - we do this first without owin context because we're writing cookies directly to httpcontext 
+            //clear the external cookie - we do this first without owin context because we're writing cookies directly to httpcontext
             // and cookie handling is different with httpcontext vs webapi and owin, normally we'd just do:
             //_httpContext.GetOwinContext().Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
 
@@ -184,7 +184,7 @@ namespace Umbraco.Web.Security
             var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
-        
+
         /// <summary>
         /// Returns the MembershipUser from the back office membership provider
         /// </summary>
@@ -204,7 +204,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         /// <remarks>
         /// This will return an Iuser instance no matter what membership provider is installed for the back office, it will automatically
-        /// create any missing Iuser accounts if one is not found and a custom membership provider is being used. 
+        /// create any missing Iuser accounts if one is not found and a custom membership provider is being used.
         /// </remarks>
         internal IUser GetBackOfficeUser(string username)
         {
@@ -221,7 +221,7 @@ namespace Umbraco.Web.Security
             }
 
             //regarldess of the membership provider used, see if this user object already exists in the umbraco data
-            var user = _applicationContext.Services.UserService.GetByUsername(membershipUser.UserName);
+            var user = _userService.GetByUsername(membershipUser.UserName);
 
             //we're using the built-in membership provider so the user will already be available
             if (provider.IsUmbracoUsersProvider())
@@ -239,8 +239,8 @@ namespace Umbraco.Web.Security
             if (user != null) return user;
 
             //we need to create an Umbraco IUser of a 'writer' type with access to only content - this was how v6 operates.
-            var writer = _applicationContext.Services.UserService.GetUserTypeByAlias("writer");
-            
+            var writer = _userService.GetUserTypeByAlias("writer");
+
             var email = membershipUser.Email;
             if (email.IsNullOrWhiteSpace())
             {
@@ -262,7 +262,7 @@ namespace Umbraco.Web.Security
             };
             user.AddAllowedSection("content");
 
-            _applicationContext.Services.UserService.Save(user);
+            _userService.Save(user);
 
             return user;
         }
@@ -276,9 +276,9 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool ValidateUserNodeTreePermissions(IUser umbracoUser, string path, string action)
         {
-            
+
             //we only want permissions for the last node in the pat
-            var permission = _applicationContext.Services.UserService.GetPermissions(umbracoUser, path);
+            var permission = _userService.GetPermissions(umbracoUser, path);
             if (permission == null) throw new InvalidOperationException("No permissions found");
 
             if (permission.AssignedPermissions.Contains(action, StringComparer.Ordinal) && (path.Contains("-20") || ("," + path + ",").Contains("," + umbracoUser.StartContentId + ",")))
@@ -303,7 +303,7 @@ namespace Umbraco.Web.Security
             }
             return CurrentUser.AllowedSections.Any(uApp => uApp.InvariantEquals(app));
         }
-        
+
         /// <summary>
         /// Gets the user id.
         /// </summary>
@@ -311,7 +311,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         [Obsolete("This method is no longer used, use the GetUserId() method without parameters instead")]
         public int GetUserId(string umbracoUserContextId)
-        {           
+        {
             return GetUserId();
         }
 
@@ -357,7 +357,7 @@ namespace Umbraco.Web.Security
         public virtual bool ValidateCurrentUser()
         {
             var result = ValidateCurrentUser(false);
-            return result == ValidateRequestAttempt.Success; 
+            return result == ValidateRequestAttempt.Success;
         }
 
         /// <summary>
@@ -368,10 +368,10 @@ namespace Umbraco.Web.Security
         internal ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions)
         {
             //This will first check if the current user is already authenticated - which should be the case in nearly all circumstances
-            // since the authentication happens in the Module, that authentication also checks the ticket expiry. We don't 
+            // since the authentication happens in the Module, that authentication also checks the ticket expiry. We don't
             // need to check it a second time because that requires another decryption phase and nothing can tamper with it during the request.
 
-            if (IsAuthenticated() == false) 
+            if (IsAuthenticated() == false)
             {
                 //There is no user
                 if (throwExceptions) throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
@@ -426,7 +426,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool UserHasAppAccess(string app, string username)
         {
-            var user = _applicationContext.Services.UserService.GetByUsername(username);
+            var user = _userService.GetByUsername(username);
             if (user == null)
             {
                 return false;
@@ -439,7 +439,7 @@ namespace Umbraco.Web.Security
         {
             get
             {
-                return _httpContext.GetUmbracoAuthTicket() == null ? "" : GetSessionId();                
+                return _httpContext.GetUmbracoAuthTicket() == null ? "" : GetSessionId();
             }
             set
             {
@@ -459,7 +459,5 @@ namespace Umbraco.Web.Security
         {
             _httpContext = null;
         }
-
-        
     }
 }

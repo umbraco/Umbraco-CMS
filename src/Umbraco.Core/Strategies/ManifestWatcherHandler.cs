@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 
@@ -9,7 +10,7 @@ namespace Umbraco.Core.Strategies
     {
         private ManifestWatcher _mw;
 
-        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication)
         {
             UmbracoApplicationBase.ApplicationEnd += app_ApplicationEnd;
         }
@@ -22,9 +23,9 @@ namespace Umbraco.Core.Strategies
             }
         }
 
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
         {
-            _mw = new ManifestWatcher(applicationContext.ProfilingLogger.Logger);
+            _mw = new ManifestWatcher(Current.ProfilingLogger.Logger);
             _mw.Start(Directory.GetDirectories(IOHelper.MapPath("~/App_Plugins/")));
         }
     }

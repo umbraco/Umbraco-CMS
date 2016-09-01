@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AutoMapper;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
@@ -25,13 +20,28 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MediaModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
+        private readonly ILocalizedTextService _textService;
+        private readonly IUserService _userService;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly IMediaService _mediaService;
+        private readonly ILogger _logger;
+
+        public MediaModelMapper(IUserService userService, ILocalizedTextService textService, IDataTypeService dataTypeService, IMediaService mediaService, ILogger logger)
+        {
+            _userService = userService;
+            _textService = textService;
+            _dataTypeService = dataTypeService;
+            _mediaService = mediaService;
+            _logger = logger;
+        }
+
+        public override void ConfigureMappings(IMapperConfiguration config)
         {
             //FROM IMedia TO MediaItemDisplay
             config.CreateMap<IMedia, MediaItemDisplay>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IMedia>(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new OwnerResolver<IMedia>(_userService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -53,17 +63,14 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
-                .AfterMap((media, display) => AfterMap(
-                    media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, 
-                    applicationContext.ProfilingLogger.Logger,
-                    applicationContext.Services.MediaService));
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(_textService)))
+                .AfterMap((media, display) => AfterMap(media, display, _dataTypeService, _textService, _logger, _mediaService));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IMedia>(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new OwnerResolver<IMedia>(_userService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -81,7 +88,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMedia, ContentItemDto<IMedia>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IMedia>(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new OwnerResolver<IMedia>(_userService)))
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())

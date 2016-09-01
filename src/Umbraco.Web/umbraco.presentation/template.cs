@@ -287,7 +287,7 @@ namespace umbraco
 
                                 try
                                 {
-                                    var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
+                                    var renderer = new MacroRenderer(Current.ProfilingLogger);
                                     var c = renderer.Render(tempMacro, umbPage.Elements, umbPage.PageID, attributes).GetAsControl();
                                     if (c != null)
                                         pageContent.Controls.Add(c);
@@ -445,7 +445,7 @@ namespace umbraco
         {
             HttpContext.Current.Trace.Write("umbracoTemplate", "Starting macro (" + macroId + ")");
             // it's all obsolete anyways...
-            var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(macroId);
+            var macro = Current.Services.MacroService.GetByAlias(macroId);
             return macro == null ? null : new MacroModel(macro);
         }
 
@@ -472,10 +472,10 @@ namespace umbraco
         {
             var tId = templateID;
 
-            var t = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<template>(
+            var t = Current.ApplicationCache.RuntimeCache.GetCacheItem<template>(
                string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
                {
-                   var templateData = ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<dynamic>(
+                   var templateData = Current.DatabaseContext.Database.FirstOrDefault<dynamic>(
                        @"select nodeId, alias, node.parentID as master, text, design
 from cmsTemplate
 inner join umbracoNode node on (node.id = cmsTemplate.nodeId)

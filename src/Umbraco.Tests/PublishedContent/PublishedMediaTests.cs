@@ -2,7 +2,6 @@ using System.Web;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Lucene.Net.Store;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -10,18 +9,15 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.UmbracoExamine;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using System.Linq;
 using System.Xml;
 using Examine.Session;
-using LightInject;
 using Umbraco.Core.Cache;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using UmbracoExamine;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -51,7 +47,7 @@ namespace Umbraco.Tests.PublishedContent
         /// <returns></returns>
         internal IPublishedContent GetNode(int id, UmbracoContext umbracoContext)
         {
-            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null), umbracoContext.Application.Services.MediaService, umbracoContext.Application.Services.UserService, new StaticCacheProvider(), ContentTypesCache);
+            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null), Current.Services.MediaService, Current.Services.UserService, new StaticCacheProvider(), ContentTypesCache);
             var doc = cache.GetById(id);
             Assert.IsNotNull(doc);
             return doc;

@@ -10,9 +10,9 @@ namespace umbraco.presentation
 {
     public class EnsureSystemPathsApplicationStartupHandler : ApplicationEventHandler
     {
-        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication)
         {
-            base.ApplicationInitialized(umbracoApplication, applicationContext);
+            base.ApplicationInitialized(umbracoApplication);
 
             IOHelper.EnsurePathExists("~/App_Data");
             IOHelper.EnsurePathExists(SystemDirectories.Media);

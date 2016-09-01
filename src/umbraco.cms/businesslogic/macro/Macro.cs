@@ -15,20 +15,21 @@ using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Linq;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Xml;
 
 namespace umbraco.cms.businesslogic.macro
 {
 	/// <summary>
 	/// The Macro component are one of the umbraco essentials, used for drawing dynamic content in the public website of umbraco.
-	/// 
+	///
 	/// A Macro is a placeholder for either a xsl transformation, a custom .net control or a .net usercontrol.
-	/// 
+	///
 	/// The Macro is representated in templates and content as a special html element, which are being parsed out and replaced with the
 	/// output of either the .net control or the xsl transformation when a page is being displayed to the visitor.
-	/// 
+	///
 	/// A macro can have a variety of properties which are used to transfer userinput to either the usercontrol/custom control or the xsl
-	/// 
+	///
 	/// </summary>
     [Obsolete("This is no longer used, use the IMacroService and related models instead")]
 	public class Macro
@@ -44,15 +45,15 @@ namespace umbraco.cms.businesslogic.macro
 		/// <summary>
 		/// id
 		/// </summary>
-		public int Id 
+		public int Id
 		{
 			get { return MacroEntity.Id; }
 		}
-		
+
 		/// <summary>
 		/// If set to true, the macro can be inserted on documents using the richtexteditor.
 		/// </summary>
-		public bool UseInEditor 
+		public bool UseInEditor
 		{
             get { return MacroEntity.UseInEditor; }
 			set { MacroEntity.UseInEditor = value; }
@@ -61,7 +62,7 @@ namespace umbraco.cms.businesslogic.macro
 		/// <summary>
 		/// The cache refreshrate - the maximum amount of time the macro should remain cached in the umbraco
 		/// runtime layer.
-		/// 
+		///
 		/// The macro caches are refreshed whenever a document is changed
 		/// </summary>
 		public int RefreshRate
@@ -80,7 +81,7 @@ namespace umbraco.cms.businesslogic.macro
 			get { return MacroEntity.Alias; }
 			set { MacroEntity.Alias = value; }
 		}
-		
+
 		/// <summary>
 		/// The userfriendly name
 		/// </summary>
@@ -104,7 +105,7 @@ namespace umbraco.cms.businesslogic.macro
 
 		/// <summary>
 		/// The xsl file used to transform content
-		/// 
+		///
 		/// Umbraco assumes that the xslfile is present in the "/xslt" folder
 		/// </summary>
 		public string Xslt
@@ -114,7 +115,7 @@ namespace umbraco.cms.businesslogic.macro
 		}
 
 	    /// <summary>
-	    /// This field is used to store the file value for any scripting macro such as python, ruby, razor macros or Partial View Macros        
+	    /// This field is used to store the file value for any scripting macro such as python, ruby, razor macros or Partial View Macros
 	    /// </summary>
 	    /// <remarks>
 	    /// Depending on how the file is stored depends on what type of macro it is. For example if the file path is a full virtual path
@@ -129,7 +130,7 @@ namespace umbraco.cms.businesslogic.macro
 
 	    /// <summary>
 	    /// The python file used to be executed
-	    /// 
+	    ///
 	    /// Umbraco assumes that the python file is present in the "/python" folder
 	    /// </summary>
 	    public bool RenderContent
@@ -175,7 +176,7 @@ namespace umbraco.cms.businesslogic.macro
 	                }).ToArray();
 	        }
 	    }
-        
+
 		/// <summary>
 		/// Macro initializer
 		/// </summary>
@@ -211,15 +212,15 @@ namespace umbraco.cms.businesslogic.macro
 	    /// </summary>
 	    public virtual void Save()
 	    {
-            ApplicationContext.Current.Services.MacroService.Save(MacroEntity);
+            Current.Services.MacroService.Save(MacroEntity);
         }
 
 	    /// <summary>
 		/// Deletes the current macro
 		/// </summary>
-		public void Delete() 
+		public void Delete()
 		{
-            ApplicationContext.Current.Services.MacroService.Delete(MacroEntity);
+            Current.Services.MacroService.Delete(MacroEntity);
         }
 
         //TODO: Fix this, this should wrap a new API!
@@ -229,7 +230,7 @@ namespace umbraco.cms.businesslogic.macro
             var alias = XmlHelper.GetNodeValue(n.SelectSingleNode("alias"));
             //check to see if the macro alreay exists in the system
             //it's better if it does and we keep using it, alias *should* be unique remember
-            
+
             var m = Macro.GetByAlias(alias);
 
 
@@ -307,7 +308,7 @@ namespace umbraco.cms.businesslogic.macro
 
 		private void Setup(int id)
 		{
-            var macro = ApplicationContext.Current.Services.MacroService.GetById(id);
+            var macro = Current.Services.MacroService.GetById(id);
 
             if (macro == null)
                 throw new ArgumentException(string.Format("No Macro exists with id '{0}'", id));
@@ -317,7 +318,7 @@ namespace umbraco.cms.businesslogic.macro
 
         private void Setup(string alias)
         {
-            var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
+            var macro = Current.Services.MacroService.GetByAlias(alias);
 
             if (macro == null)
                 throw new ArgumentException(string.Format("No Macro exists with alias '{0}'", alias));
@@ -339,7 +340,7 @@ namespace umbraco.cms.businesslogic.macro
 
 	    [Obsolete("This does nothing")]
         public void RefreshProperties()
-        {           
+        {
         }
 
 		#region STATICS
@@ -349,7 +350,7 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		/// <param name="Name">Userfriendly name</param>
 		/// <returns>The newly macro</returns>
-		public static Macro MakeNew(string Name) 
+		public static Macro MakeNew(string Name)
 		{
 		    var macro = new Umbraco.Core.Models.Macro
 		        {
@@ -357,10 +358,10 @@ namespace umbraco.cms.businesslogic.macro
                     Alias = Name.Replace(" ", String.Empty)
 		        };
 
-		    ApplicationContext.Current.Services.MacroService.Save(macro);
+		    Current.Services.MacroService.Save(macro);
 
             var newMacro = new Macro(macro);
-           
+
             return newMacro;
 		}
 
@@ -370,7 +371,7 @@ namespace umbraco.cms.businesslogic.macro
 		/// <returns>A list of all macroes</returns>
 		public static Macro[] GetAll()
 		{
-		    return ApplicationContext.Current.Services.MacroService.GetAll()
+		    return Current.Services.MacroService.GetAll()
 		                             .Select(x => new Macro(x))
 		                             .ToArray();
 		}
@@ -382,12 +383,12 @@ namespace umbraco.cms.businesslogic.macro
 		/// <returns>If the macro with the given alias exists, it returns the macro, else null</returns>
         public static Macro GetByAlias(string alias)
 		{
-		    return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Macro>(
+		    return Current.ApplicationCache.RuntimeCache.GetCacheItem<Macro>(
 		        GetCacheKey(alias),
 		        timeout:        TimeSpan.FromMinutes(30),
 		        getCacheItem:   () =>
 		            {
-                        var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
+                        var macro = Current.Services.MacroService.GetByAlias(alias);
 		                if (macro == null) return null;
 		                return new Macro(macro);
 		            });
@@ -395,19 +396,19 @@ namespace umbraco.cms.businesslogic.macro
 
         public static Macro GetById(int id)
         {
-            return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Macro>(
+            return Current.ApplicationCache.RuntimeCache.GetCacheItem<Macro>(
                 GetCacheKey(string.Format("macro_via_id_{0}", id)),
                 timeout:        TimeSpan.FromMinutes(30),
                 getCacheItem:   () =>
                     {
-                        var macro = ApplicationContext.Current.Services.MacroService.GetById(id);
+                        var macro = Current.Services.MacroService.GetById(id);
                         if (macro == null) return null;
                         return new Macro(macro);
                     });
         }
 
         #region Macro Refactor
-        
+
         private static string GetCacheKey(string alias)
         {
             return CacheKeys.MacroCacheKey + alias;

@@ -2,6 +2,7 @@ using System;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using umbraco.DataLayer;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.task
@@ -10,7 +11,7 @@ namespace umbraco.cms.businesslogic.task
     /// An umbraco task is currently only used with the translation workflow in umbraco. But is extendable to cover other taskbased system as well.
     /// A task represent a simple job, it will always be assigned to a user, related to a node, and contain a comment about the task.
     /// The user attached to the task can complete the task, and the author of the task can reopen tasks that are not complete correct.
-    /// 
+    ///
     /// Tasks can in umbraco be used for setting up simple workflows, and contains basic controls structures to determine if the task is completed or not.
     /// </summary>
     [Obsolete("Use Umbraco.Core.Service.ITaskService instead")]
@@ -30,7 +31,7 @@ namespace umbraco.cms.businesslogic.task
             get { return TaskEntity.Id; }
             set { TaskEntity.Id = value; }
         }
-        
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="Task"/> is closed.
         /// </summary>
@@ -40,7 +41,7 @@ namespace umbraco.cms.businesslogic.task
             get { return TaskEntity.Closed; }
             set { TaskEntity.Closed = value; }
         }
-	
+
 
         private CMSNode _node;
 
@@ -76,7 +77,7 @@ namespace umbraco.cms.businesslogic.task
                 };
             }
         }
-	
+
 
         private IUser _parentUser;
 
@@ -86,14 +87,14 @@ namespace umbraco.cms.businesslogic.task
         /// <value>The parent user.</value>
         public IUser ParentUser
         {
-            get { return _parentUser ?? (_parentUser = ApplicationContext.Current.Services.UserService.GetUserById(TaskEntity.OwnerUserId)); }
+            get { return _parentUser ?? (_parentUser = Current.Services.UserService.GetUserById(TaskEntity.OwnerUserId)); }
             set
             {
                 _parentUser = value;
                 TaskEntity.OwnerUserId = _parentUser.Id;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the comment.
         /// </summary>
@@ -103,7 +104,7 @@ namespace umbraco.cms.businesslogic.task
             get { return TaskEntity.Comment; }
             set { TaskEntity.Comment = value; }
         }
-	
+
         /// <summary>
         /// Gets or sets the date.
         /// </summary>
@@ -113,7 +114,7 @@ namespace umbraco.cms.businesslogic.task
             get { return TaskEntity.CreateDate; }
             set { TaskEntity.CreateDate = value; }
         }
-	
+
         private IUser _user;
 
         /// <summary>
@@ -122,7 +123,7 @@ namespace umbraco.cms.businesslogic.task
         /// <value>The user.</value>
         public IUser User
         {
-            get { return _user ?? (_user = ApplicationContext.Current.Services.UserService.GetUserById(TaskEntity.AssigneeUserId)); }
+            get { return _user ?? (_user = Current.Services.UserService.GetUserById(TaskEntity.AssigneeUserId)); }
             set
             {
                 _user = value;
@@ -161,7 +162,7 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="TaskId">The task id.</param>
         public Task(int TaskId)
         {
-            TaskEntity = ApplicationContext.Current.Services.TaskService.GetTaskById(TaskId);
+            TaskEntity = Current.Services.TaskService.GetTaskById(TaskId);
             if (TaskEntity == null) throw new NullReferenceException("No task found with id " + TaskId);
         }
 
@@ -175,7 +176,7 @@ namespace umbraco.cms.businesslogic.task
         /// </summary>
         public void Delete()
         {
-            ApplicationContext.Current.Services.TaskService.Delete(TaskEntity);
+            Current.Services.TaskService.Delete(TaskEntity);
         }
 
         /// <summary>
@@ -183,7 +184,7 @@ namespace umbraco.cms.businesslogic.task
         /// </summary>
         public void Save()
         {
-            ApplicationContext.Current.Services.TaskService.Save(TaskEntity);
+            Current.Services.TaskService.Save(TaskEntity);
         }
 
         #endregion
@@ -197,11 +198,11 @@ namespace umbraco.cms.businesslogic.task
         /// <returns></returns>
         public static Tasks GetTasksByType(int taskType)
         {
-            var foundTaskType = ApplicationContext.Current.Services.TaskService.GetTaskTypeById(taskType);
+            var foundTaskType = Current.Services.TaskService.GetTaskTypeById(taskType);
             if (foundTaskType == null) return null;
 
             var result = new Tasks();
-            var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(taskTypeAlias: foundTaskType.Alias);
+            var tasks = Current.Services.TaskService.GetTasks(taskTypeAlias: foundTaskType.Alias);
             foreach (var task in tasks)
             {
                 result.Add(new Task(task));
@@ -218,7 +219,7 @@ namespace umbraco.cms.businesslogic.task
         public static Tasks GetTasks(int nodeId)
         {
             var result = new Tasks();
-            var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(itemId:nodeId);
+            var tasks = Current.Services.TaskService.GetTasks(itemId:nodeId);
             foreach (var task in tasks)
             {
                 result.Add(new Task(task));
@@ -233,10 +234,10 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="User">The User who have the tasks assigned</param>
         /// <param name="IncludeClosed">If true both open and closed tasks will be returned</param>
         /// <returns>A collections of tasks</returns>
-        public static Tasks GetTasks(IUser User, bool IncludeClosed) 
+        public static Tasks GetTasks(IUser User, bool IncludeClosed)
         {
             var result = new Tasks();
-            var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(assignedUser:User.Id, includeClosed:IncludeClosed);
+            var tasks = Current.Services.TaskService.GetTasks(assignedUser:User.Id, includeClosed:IncludeClosed);
             foreach (var task in tasks)
             {
                 result.Add(new Task(task));
@@ -251,10 +252,10 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="User">The User who have the tasks assigned</param>
         /// <param name="IncludeClosed">If true both open and closed tasks will be returned</param>
         /// <returns>A collections of tasks</returns>
-        public static Tasks GetOwnedTasks(IUser User, bool IncludeClosed) 
+        public static Tasks GetOwnedTasks(IUser User, bool IncludeClosed)
         {
             var result = new Tasks();
-            var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(ownerUser:User.Id, includeClosed: IncludeClosed);
+            var tasks = Current.Services.TaskService.GetTasks(ownerUser:User.Id, includeClosed: IncludeClosed);
             foreach (var task in tasks)
             {
                 result.Add(new Task(task));

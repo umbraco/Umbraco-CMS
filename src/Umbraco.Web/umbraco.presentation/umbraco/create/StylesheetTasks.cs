@@ -1,6 +1,7 @@
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web;
 using Umbraco.Web.UI;
 using Umbraco.Web._Legacy.UI;
 
@@ -13,11 +14,11 @@ namespace umbraco
             //normalize path
             Alias = Alias.Replace("/", "\\");
 
-            var sheet = ApplicationContext.Current.Services.FileService.GetStylesheetByName(Alias);
+            var sheet = Current.Services.FileService.GetStylesheetByName(Alias);
             if (sheet == null)
             {
                 sheet = new Stylesheet(Alias.EnsureEndsWith(".css"));
-                ApplicationContext.Current.Services.FileService.SaveStylesheet(sheet);
+                Current.Services.FileService.SaveStylesheet(sheet);
             }
 
             _returnUrl = string.Format("settings/stylesheet/editStylesheet.aspx?id={0}", HttpUtility.UrlEncode(sheet.Path));
@@ -32,7 +33,7 @@ namespace umbraco
         }
 
         private string _returnUrl = "";
-        
+
         public override string ReturnUrl
         {
             get { return _returnUrl; }

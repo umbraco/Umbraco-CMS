@@ -44,12 +44,12 @@ namespace umbraco.dialogs
             node = Services.EntityService.Get(int.Parse(Request.GetItemAsString("id")));
 
             var actionList = Current.Actions;
-            
+
             foreach (var a in actionList)
             {
                 if (a.ShowInNotifier)
                 {
-                   
+
                     CheckBox c = new CheckBox();
                     c.ID = a.Letter.ToString();
 
@@ -63,12 +63,12 @@ namespace umbraco.dialogs
                     pp.Controls.Add(c);
 
                     pane_form.Controls.Add(pp);
-                    
+
                     actions.Add(c);
-                 
+
                 }
             }
-          
+
         }
 
         /// <summary>
@@ -93,8 +93,8 @@ namespace umbraco.dialogs
                     notifications += c.ID;
             }
 
-            ApplicationContext.Current.Services.NotificationService.SetNotifications(Security.CurrentUser, node, notifications.ToCharArray().Select(x => x.ToString()).ToArray());
-            
+            Current.Services.NotificationService.SetNotifications(Security.CurrentUser, node, notifications.ToCharArray().Select(x => x.ToString()).ToArray());
+
             var feedback = new umbraco.uicontrols.Feedback();
             feedback.Text = Services.TextService.Localize("notifications") + " " + Services.TextService.Localize("ok") + "</p><p><a href='#' class='btn btn-primary' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
             feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;

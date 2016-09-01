@@ -38,7 +38,7 @@ namespace Umbraco.Web.Strategies.Migrations
         /// </summary>
         /// <param name="umbracoApplication"></param>
         /// <param name="applicationContext"></param>
-        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication)
         {
             MigrationRunner.Migrated += MigrationRunner_Migrated;
         }

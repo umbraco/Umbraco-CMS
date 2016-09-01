@@ -5,6 +5,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Models;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Routing
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Tests.Routing
         {
             var template = new Template(alias, alias);
             template.Content = ""; // else saving throws with a dirty internal error
-            ApplicationContext.Services.FileService.SaveTemplate(template);
+            Current.Services.FileService.SaveTemplate(template);
             return template;
         }
 

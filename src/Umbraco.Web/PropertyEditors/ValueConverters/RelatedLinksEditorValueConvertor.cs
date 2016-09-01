@@ -4,21 +4,27 @@ using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
     public class RelatedLinksEditorValueConvertor : PropertyValueConverterBase
     {
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ServiceContext _services;
+        private readonly CacheHelper _appCache;
 
-        public RelatedLinksEditorValueConvertor(UmbracoContext umbracoContext)
+        public RelatedLinksEditorValueConvertor(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache)
         {
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _services = services;
+            _appCache = appCache;
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -40,6 +46,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             if (source == null) return null;
             var sourceString = source.ToString();
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
             if (sourceString.DetectIsJson())
             {
@@ -47,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var obj = JsonConvert.DeserializeObject<JArray>(sourceString);
                     //update the internal links if we have a context
-                    var helper = new UmbracoHelper(_umbracoContext);
+                    var helper = new UmbracoHelper(umbracoContext, _services, _appCache);
                     foreach (var a in obj)
                     {
                         var type = a.Value<string>("type");

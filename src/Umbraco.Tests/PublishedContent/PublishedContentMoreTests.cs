@@ -14,6 +14,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Core.DependencyInjection;
+using Current = Umbraco.Core.DependencyInjection.Current;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.PublishedContent
             base.Initialize();
 
             // this is so the model factory looks into the test assembly
-            _pluginManager = PluginManager.Current;
+            _pluginManager = Current.PluginManager;
             Core.DependencyInjection.Current.PluginManager = new PluginManager(new NullCacheProvider(), ProfilingLogger, false)
                 {
                     AssembliesToScan = _pluginManager.AssembliesToScan
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             PropertyValueConverterCollectionBuilder.Register(Container);
 
-            var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
+            var types = Current.PluginManager.ResolveTypes<PublishedContentModel>();
             Container.RegisterSingleton<IPublishedContentModelFactory>(_ => new PublishedContentModelFactory(types));
 
             base.FreezeResolution();
@@ -63,9 +64,9 @@ namespace Umbraco.Tests.PublishedContent
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
             var ctx = UmbracoContext.CreateContext(
-                httpContext, ApplicationContext,
+                httpContext,
                 facadeService.Object,
-                new WebSecurity(httpContext, ApplicationContext),
+                new WebSecurity(httpContext, Current.Services.UserService),
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>());
 

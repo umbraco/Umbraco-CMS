@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Globalization;
 using System.Linq;
-using System.Net.Http.Formatting;
-using System.Threading;
-using System.Web.Security;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
@@ -24,16 +15,6 @@ namespace Umbraco.Web.Trees
         {
             Initialize();
         }
-
-        protected TreeController(UmbracoContext umbracoContext) : base(umbracoContext)
-        {
-            Initialize();
-        }
-
-        protected TreeController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper) : base(umbracoContext, umbracoHelper)
-        {
-            Initialize();
-        }        
 
         /// <summary>
         /// The name to display on the root node

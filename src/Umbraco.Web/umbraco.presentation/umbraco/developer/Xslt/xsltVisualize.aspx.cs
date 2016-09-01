@@ -16,7 +16,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt
 {
     [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
     public partial class xsltVisualize : UmbracoEnsuredPage
-    {        
+    {
         private const string XsltVisualizeCookieName = "UMB_XSLTVISPG";
 
         protected void Page_Load(object sender, EventArgs e)
@@ -27,7 +27,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt
 				// zb-00004 #29956 : refactor cookies names & handling
 				if (Request.HasCookieValue(XsltVisualizeCookieName))
                     contentPicker.Value = Request.GetCookieValue(XsltVisualizeCookieName);
-            }            
+            }
 
         }
 
@@ -56,7 +56,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt
             string xsltResult;
             try
             {
-                xsltResult = Umbraco.Web.Macros.XsltMacroEngine.TestXsltTransform(ApplicationContext.Current.ProfilingLogger, xslt, pageId);
+                xsltResult = Umbraco.Web.Macros.XsltMacroEngine.TestXsltTransform(Current.ProfilingLogger, xslt, pageId);
             }
             catch (Exception ee)
             {

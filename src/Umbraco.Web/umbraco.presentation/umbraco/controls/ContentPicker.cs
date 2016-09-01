@@ -2,6 +2,7 @@ using System;
 using umbraco.uicontrols.TreePicker;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 
 namespace umbraco.controls
 {
@@ -43,7 +44,7 @@ namespace umbraco.controls
         {
             get
             {
-                return ApplicationContext.Current.Services.TextService.Localize("general/choose") + " " + ApplicationContext.Current.Services.TextService.Localize("sections/" + TreeAlias.ToLower());
+                return Current.Services.TextService.Localize("general/choose") + " " + Current.Services.TextService.Localize("sections/" + TreeAlias.ToLower());
             }
         }
 
@@ -58,7 +59,7 @@ namespace umbraco.controls
                 }
                 else
                 {
-                    tempTitle = (!string.IsNullOrEmpty(TreeAlias) ? ApplicationContext.Current.Services.TextService.Localize(TreeAlias) : ApplicationContext.Current.Services.TextService.Localize(AppAlias));
+                    tempTitle = (!string.IsNullOrEmpty(TreeAlias) ? Current.Services.TextService.Localize(TreeAlias) : Current.Services.TextService.Localize(AppAlias));
 
                 }
             }

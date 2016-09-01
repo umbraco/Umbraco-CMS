@@ -54,7 +54,7 @@ namespace Umbraco.Tests.TestHelpers
         //Used to flag if its the first test in the current fixture
         private bool _isFirstTestInFixture;
 
-        private ApplicationContext _appContext;
+        //private ApplicationContext _appContext;
         private IFacadeService _facadeService;
         private IDatabaseUnitOfWorkProvider _uowProvider;
 
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register(_ => manifestBuilder);
 
             PropertyEditorCollectionBuilder.Register(Container)
-                .AddProducer(() => PluginManager.Current.ResolvePropertyEditors());
+                .AddProducer(() => Current.PluginManager.ResolvePropertyEditors());
         }
 
         private CacheHelper _disabledCacheHelper;
@@ -94,75 +94,75 @@ namespace Umbraco.Tests.TestHelpers
 
         protected IDatabaseUnitOfWorkProvider UowProvider => _uowProvider;
 
-        protected override ApplicationContext CreateApplicationContext()
-        {
-            var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
+        //protected override ApplicationContext CreateApplicationContext()
+        //{
+        //    var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
 
-            // create the database if required
-            // note: must do before instanciating the database factory else it will
-            // not find the database and will remain un-configured.
-            using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Create database."))
-            {
-                //TODO make it faster
-                CreateSqlCeDatabase();
-            }
+        //    // create the database if required
+        //    // note: must do before instanciating the database factory else it will
+        //    // not find the database and will remain un-configured.
+        //    using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Create database."))
+        //    {
+        //        //TODO make it faster
+        //        CreateSqlCeDatabase();
+        //    }
 
-            // ensure the configuration matches the current version for tests
-            SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+        //    // ensure the configuration matches the current version for tests
+        //    SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
 
-            // create the database factory - if the test does not require an actual database,
-            // use a mock factory; otherwise use a real factory.
-            IDatabaseFactory databaseFactory;
-            if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture)
-            {
-                databaseFactory = TestObjects.GetIDatabaseFactoryMock();
-            }
-            else
-            {
-                var f = new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestUmbracoDatabaseAccessor(), Mappers);
-                f.ResetForTests();
-                databaseFactory = f;
-            }
+        //    // create the database factory - if the test does not require an actual database,
+        //    // use a mock factory; otherwise use a real factory.
+        //    IDatabaseFactory databaseFactory;
+        //    if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture)
+        //    {
+        //        databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+        //    }
+        //    else
+        //    {
+        //        var f = new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestUmbracoDatabaseAccessor(), Mappers);
+        //        f.ResetForTests();
+        //        databaseFactory = f;
+        //    }
 
-            // so, using the above code to create a mock IDatabaseFactory if we don't have a real database
-            // but, that will NOT prevent _appContext from NOT being configured, because it cannot connect
-            // to the database to check the migrations ;-(
+        //    // so, using the above code to create a mock IDatabaseFactory if we don't have a real database
+        //    // but, that will NOT prevent _appContext from NOT being configured, because it cannot connect
+        //    // to the database to check the migrations ;-(
 
-            var evtMsgs = new TransientEventMessagesFactory();
-            var databaseContext = new DatabaseContext(databaseFactory, Logger);
-            var repositoryFactory = Container.GetInstance<RepositoryFactory>();
-            var serviceContext = TestObjects.GetServiceContext(
-                repositoryFactory,
-                _uowProvider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory),
-                new FileUnitOfWorkProvider(),
-                CacheHelper,
-                Logger,
-                evtMsgs,
-                Enumerable.Empty<IUrlSegmentProvider>());
+        //    var evtMsgs = new TransientEventMessagesFactory();
+        //    var databaseContext = new DatabaseContext(databaseFactory, Logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
+        //    var repositoryFactory = Container.GetInstance<RepositoryFactory>();
+        //    var serviceContext = TestObjects.GetServiceContext(
+        //        repositoryFactory,
+        //        _uowProvider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory),
+        //        new FileUnitOfWorkProvider(),
+        //        CacheHelper,
+        //        Logger,
+        //        evtMsgs,
+        //        Enumerable.Empty<IUrlSegmentProvider>());
 
-            // if the test does not require an actual database, or runs with an empty database, the application
-            // context will not be able to check the migration status in the database, so we have to force it
-            // to think it is configured.
-            var appContextMock = new Mock<ApplicationContext>(databaseContext, serviceContext, CacheHelper, ProfilingLogger);
-            if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture // no db at all
-                || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest) // empty db
-                appContextMock.Setup(x => x.IsConfigured).Returns(true);
-            _appContext = appContextMock.Object;
+        //    // if the test does not require an actual database, or runs with an empty database, the application
+        //    // context will not be able to check the migration status in the database, so we have to force it
+        //    // to think it is configured.
+        //    var appContextMock = new Mock<ApplicationContext>(databaseContext, serviceContext, CacheHelper, ProfilingLogger);
+        //    //if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture // no db at all
+        //    //    || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest) // empty db
+        //    //    appContextMock.Setup(x => x.IsConfigured).Returns(true);
+        //    _appContext = appContextMock.Object;
 
-            // initialize the database if required
-            // note: must do after creating the application context as
-            // it is using it
-            using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Initialize database."))
-            {
-                // TODO make it faster
-                InitializeDatabase(_appContext);
-            }
+        //    // initialize the database if required
+        //    // note: must do after creating the application context as
+        //    // it is using it
+        //    using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Initialize database."))
+        //    {
+        //        // TODO make it faster
+        //        InitializeDatabase(_appContext);
+        //    }
 
-            // application is ready
-            _appContext.IsReady = true;
+        //    // application is ready
+        //    //_appContext.IsReady = true;
 
-            return _appContext;
-        }
+        //    return _appContext;
+        //}
 
         /// <summary>
         /// The database behavior to use for the test/fixture
@@ -274,19 +274,19 @@ namespace Umbraco.Tests.TestHelpers
                 var enableRepositoryEvents = behavior != null && behavior.EnableRepositoryEvents;
 
                 ContentTypesCache = new PublishedContentTypeCache(
-                        ApplicationContext.Services.ContentTypeService,
-                        ApplicationContext.Services.MediaTypeService, 
-                        ApplicationContext.Services.MemberTypeService);
+                        Current.Services.ContentTypeService,
+                        Current.Services.MediaTypeService,
+                        Current.Services.MemberTypeService);
 
                 // testing=true so XmlStore will not use the file nor the database
                 var facadeAccessor = new TestFacadeAccessor();
                 var service = new FacadeService(
-                    ApplicationContext.Services,
-                    _uowProvider, 
-                    cache, facadeAccessor, ContentTypesCache, true, enableRepositoryEvents);
+                    Current.Services,
+                    _uowProvider,
+                    cache, facadeAccessor, ContentTypesCache, null, true, enableRepositoryEvents);
 
                 // initialize PublishedCacheService content with an Xml source
-                service.XmlStore.GetXmlDocument = () => 
+                service.XmlStore.GetXmlDocument = () =>
                 {
                     var doc = new XmlDocument();
                     doc.LoadXml(GetXmlContent(0));
@@ -302,7 +302,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <summary>
         /// Creates the tables and data for the database
         /// </summary>
-        protected virtual void InitializeDatabase(ApplicationContext appContext)
+        protected virtual void InitializeDatabase()
         {
             if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest)
                 return;
@@ -317,10 +317,10 @@ namespace Umbraco.Tests.TestHelpers
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
             {
-                var database = appContext.DatabaseContext.Database;
+                var database = Current.DatabaseContext.Database;
                 var schemaHelper = new DatabaseSchemaHelper(database, Logger);
                 //Create the umbraco database and its base data
-                schemaHelper.CreateDatabaseSchema(appContext);
+                schemaHelper.CreateDatabaseSchema(Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
 
                 //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the
                 // damn db for each test
@@ -333,7 +333,7 @@ namespace Umbraco.Tests.TestHelpers
         [TestFixtureTearDown]
         public void FixtureTearDown()
         {
-            RemoveDatabaseFile(ApplicationContext.Current?.DatabaseContext.Database);
+            RemoveDatabaseFile(Current.DatabaseContext.Database);
         }
 
         [TearDown]
@@ -345,7 +345,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
                 {
-                    RemoveDatabaseFile(ApplicationContext.Current?.DatabaseContext.Database);
+                    RemoveDatabaseFile(Current.DatabaseContext.Database);
                 }
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
@@ -413,9 +413,9 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected ServiceContext ServiceContext => ApplicationContext.Services;
+        protected ServiceContext ServiceContext => Current.Services;
 
-        protected DatabaseContext DatabaseContext => ApplicationContext.DatabaseContext;
+        protected DatabaseContext DatabaseContext => Current.DatabaseContext;
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
@@ -435,9 +435,8 @@ namespace Umbraco.Tests.TestHelpers
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
             var ctx = UmbracoContext.CreateContext(
                 httpContext,
-                ApplicationContext,
                 service,
-                new WebSecurity(httpContext, ApplicationContext),
+                new WebSecurity(httpContext, Current.Services.UserService),
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>());
 

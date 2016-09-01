@@ -41,7 +41,7 @@ namespace Umbraco.Web.Trees
             var nodes = new TreeNodeCollection();
 
             var createdPackages = CreatedPackage.GetAllCreatedPackages();
-            
+
             if (id == "created")
             {
                 nodes.AddRange(
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Trees
                             var node = CreateTreeNode(dt.Data.Id.ToString(), id, queryStrings, dt.Data.Name, "icon-inbox", false,
                                 string.Format("/{0}/framed/{1}",
                                     queryStrings.GetValue<string>("application"),
-                                    Uri.EscapeDataString("developer/Packages/EditPackage.aspx?id=" + dt.Data.Id)));                            
+                                    Uri.EscapeDataString("developer/Packages/EditPackage.aspx?id=" + dt.Data.Id)));
                             return node;
                         }));
             }
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Trees
                     createdPackages.Count > 0,
                     string.Empty);
 
-                
+
 
                 //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
                 node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Trees
                 nodes.Add(node);
             }
 
-            
+
 
             return nodes;
         }

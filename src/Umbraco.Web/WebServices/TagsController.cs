@@ -1,10 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using Examine;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebApi;
 

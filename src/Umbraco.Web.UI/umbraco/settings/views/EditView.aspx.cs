@@ -55,7 +55,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 		}
 
         protected string TemplateTreeSyncPath { get; private set; }
-	    
+
         /// <summary>
         /// This view is shared between different trees so we'll look for the query string
         /// </summary>
@@ -122,7 +122,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					//configure editor for editing a file....
 
 					NameTxt.Text = OriginalFileName;
-				    var svce = ApplicationContext.Current.Services.FileService;
+				    var svce = Current.Services.FileService;
                     var file = EditorType == ViewEditorType.PartialView
 				        ? svce.GetPartialView(OriginalFileName)
                         : svce.GetPartialViewMacro(OriginalFileName);
@@ -132,9 +132,9 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
                     PathPrefix.Text = string.Format(prefixFormat, EditorType == ViewEditorType.PartialView
 				        ? "Partials/"
 				        : "MacroPartials/");
-				}							
+				}
 			}
-            
+
             ClientTools
                 .SetActiveTreeType(CurrentTreeType)
                 .SyncTree(TemplateTreeSyncPath, false);
@@ -164,7 +164,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			{
 				throw new InvalidOperationException("Cannot render the editor without a supplied templateId or a file");
 			}
-			
+
 			Panel1.hasMenu = true;
             var editor = Panel1.NewTabPage(Services.TextService.Localize("template"));
             editor.Controls.Add(Pane8);
@@ -222,9 +222,9 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			}
 			else
 			{
-				InitializeEditorForTemplate();	
+				InitializeEditorForTemplate();
 			}
-			
+
 		}
 
 		protected override void OnPreRender(EventArgs e)
@@ -233,7 +233,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
 			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
 		}
-		
+
 		/// <summary>
 		/// Configure the editor for partial view editing
 		/// </summary>

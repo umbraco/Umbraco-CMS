@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LightInject;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.Components
 
             var thing = new BootLoader(container);
             Composed.Clear();
-            thing.Boot(new [] { typeof (Component1), typeof (Component2), typeof (Component3), typeof (Component4) });
+            thing.Boot(new [] { typeof (Component1), typeof (Component2), typeof (Component3), typeof (Component4) }, RuntimeLevel.Unknown);
             Assert.AreEqual(4, Composed.Count);
             Assert.AreEqual(typeof(Component1), Composed[0]);
             Assert.AreEqual(typeof(Component4), Composed[1]);
@@ -62,7 +63,7 @@ namespace Umbraco.Tests.Components
             Composed.Clear();
             try
             {
-                thing.Boot(new[] { typeof(Component1), typeof(Component2), typeof(Component3) });
+                thing.Boot(new[] { typeof(Component1), typeof(Component2), typeof(Component3) }, RuntimeLevel.Unknown);
                 Assert.Fail("Expected exception.");
             }
             catch (Exception e)
@@ -87,7 +88,7 @@ namespace Umbraco.Tests.Components
 
             var thing = new BootLoader(container);
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component1), typeof(Component5) });
+            thing.Boot(new[] { typeof(Component1), typeof(Component5) }, RuntimeLevel.Unknown);
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Component1), Composed[0]);
             Assert.AreEqual(typeof(Component5), Composed[1]);
@@ -109,7 +110,7 @@ namespace Umbraco.Tests.Components
 
             var thing = new BootLoader(container);
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component6), typeof(Component7), typeof(Component8) });
+            thing.Boot(new[] { typeof(Component6), typeof(Component7), typeof(Component8) }, RuntimeLevel.Unknown);
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Component6), Composed[0]);
             Assert.AreEqual(typeof(Component8), Composed[1]);
@@ -129,7 +130,7 @@ namespace Umbraco.Tests.Components
 
             var thing = new BootLoader(container);
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) });
+            thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) }, RuntimeLevel.Unknown);
             Assert.AreEqual(3, Composed.Count);
             Assert.AreEqual(typeof(Component4), Composed[0]);
             Assert.AreEqual(typeof(Component2), Composed[1]);
@@ -150,21 +151,21 @@ namespace Umbraco.Tests.Components
 
             var thing = new BootLoader(container);
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component10) });
+            thing.Boot(new[] { typeof(Component10) }, RuntimeLevel.Unknown);
             Assert.AreEqual(1, Composed.Count);
             Assert.AreEqual(typeof(Component10), Composed[0]);
 
             thing = new BootLoader(container);
             Composed.Clear();
-            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component11) }));
+            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component11) }, RuntimeLevel.Unknown));
 
             thing = new BootLoader(container);
             Composed.Clear();
-            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component2) }));
+            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component2) }, RuntimeLevel.Unknown));
 
             thing = new BootLoader(container);
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component12) });
+            thing.Boot(new[] { typeof(Component12) }, RuntimeLevel.Unknown);
             Assert.AreEqual(1, Composed.Count);
             Assert.AreEqual(typeof(Component12), Composed[0]);
         }
@@ -183,7 +184,7 @@ namespace Umbraco.Tests.Components
 
             var thing = new BootLoader(container);
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component6), typeof(Component8) }); // 8 disables 7 which is not in the list
+            thing.Boot(new[] { typeof(Component6), typeof(Component8) }, RuntimeLevel.Unknown); // 8 disables 7 which is not in the list
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Component6), Composed[0]);
             Assert.AreEqual(typeof(Component8), Composed[1]);

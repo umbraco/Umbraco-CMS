@@ -22,7 +22,7 @@ namespace Umbraco.Tests
         [Test]
         public void Is_Configured()
         {
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.GetSemanticVersion().ToSemanticString());
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.SemanticVersion.ToSemanticString());
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
             migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))
@@ -32,19 +32,20 @@ namespace Umbraco.Tests
             var logger = Mock.Of<ILogger>();
             var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
-            var appCtx = new ApplicationContext(
-                dbCtx.Object,
-                new ServiceContext(migrationEntryService:migrationEntryService.Object),
-                CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //    dbCtx.Object,
+            //    new ServiceContext(migrationEntryService:migrationEntryService.Object),
+            //    CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(logger, Mock.Of<IProfiler>()));
 
-            Assert.IsTrue(appCtx.IsConfigured);
+            //Assert.IsTrue(appCtx.IsConfigured);
+            Assert.Fail("Must rewrite the test with Runtime!");
         }
 
         [Test]
         public void Is_Not_Configured_By_Migration_Not_Found()
         {
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.GetSemanticVersion().ToSemanticString());
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.SemanticVersion.ToSemanticString());
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
             migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))
@@ -54,13 +55,14 @@ namespace Umbraco.Tests
             var logger = Mock.Of<ILogger>();
             var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
-            var appCtx = new ApplicationContext(
-                dbCtx.Object,
-                new ServiceContext(migrationEntryService: migrationEntryService.Object),
-                CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //    dbCtx.Object,
+            //    new ServiceContext(migrationEntryService: migrationEntryService.Object),
+            //    CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(logger, Mock.Of<IProfiler>()));
 
-            Assert.IsFalse(appCtx.IsConfigured);
+            //Assert.IsFalse(appCtx.IsConfigured);
+            Assert.Fail("Must rewrite the test with Runtime!");
         }
 
         [Test]
@@ -74,13 +76,14 @@ namespace Umbraco.Tests
             var logger = Mock.Of<ILogger>();
             var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
-            var appCtx = new ApplicationContext(
-                dbCtx.Object,
-                new ServiceContext(migrationEntryService: migrationEntryService.Object),
-                CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //    dbCtx.Object,
+            //    new ServiceContext(migrationEntryService: migrationEntryService.Object),
+            //    CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(logger, Mock.Of<IProfiler>()));
 
-            Assert.IsFalse(appCtx.IsConfigured);
+            //Assert.IsFalse(appCtx.IsConfigured);
+            Assert.Fail("Must rewrite the test with Runtime!");
         }
 
         [Test]
@@ -94,13 +97,14 @@ namespace Umbraco.Tests
             var logger = Mock.Of<ILogger>();
             var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
-            var appCtx = new ApplicationContext(
-                dbCtx.Object,
-                new ServiceContext(migrationEntryService: migrationEntryService.Object),
-                CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //    dbCtx.Object,
+            //    new ServiceContext(migrationEntryService: migrationEntryService.Object),
+            //    CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
-            Assert.IsFalse(appCtx.IsConfigured);
+            //Assert.IsFalse(appCtx.IsConfigured);
+            Assert.Fail("Must rewrite the test with Runtime!");
         }
 
         [Test]
@@ -114,13 +118,14 @@ namespace Umbraco.Tests
             var logger = Mock.Of<ILogger>();
             var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
-            var appCtx = new ApplicationContext(
-                dbCtx.Object,
-                new ServiceContext(migrationEntryService: migrationEntryService.Object),
-                CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //    dbCtx.Object,
+            //    new ServiceContext(migrationEntryService: migrationEntryService.Object),
+            //    CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
-            Assert.IsFalse(appCtx.IsConfigured);
+            //Assert.IsFalse(appCtx.IsConfigured);
+            Assert.Fail("Must rewrite the test with Runtime!");
         }
     }
 }

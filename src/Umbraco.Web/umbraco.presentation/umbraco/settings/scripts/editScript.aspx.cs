@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
+using Umbraco.Web;
 
 namespace umbraco.cms.presentation.settings.scripts
 {
@@ -46,7 +47,7 @@ namespace umbraco.cms.presentation.settings.scripts
             // also scrapping the code that added .cshtml and .vbhtml extensions, and
             // ~/Views directory - we're not using editScript.aspx for views anymore.
 
-            var svce = ApplicationContext.Current.Services.FileService;
+            var svce = Current.Services.FileService;
             var script = svce.GetScriptByName(filename);
             if (script == null) // not found
                 throw new FileNotFoundException("Could not find file '" + filename + "'.");
@@ -110,7 +111,7 @@ namespace umbraco.cms.presentation.settings.scripts
                 umbDictionary.ImageURL = GlobalSettings.Path + "/images/editor/dictionaryItem.gif";
                 umbDictionary.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", Services.TextService.Localize("template/insertDictionaryItem"), 640, 550);
                 umbDictionary.AltText = "Insert umbraco dictionary item";
-                
+
                 // Help
                 Panel1.Menu.InsertSplitter();
 

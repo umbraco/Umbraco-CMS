@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using UmbracoExamine;
 
@@ -92,7 +93,7 @@ namespace Umbraco.Tests.Runtimes
                 container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault());
                 container.Register<DatabaseContext>(factory => new DatabaseContext(
                     factory.GetInstance<IDatabaseFactory>(),
-                    factory.GetInstance<ILogger>()), new PerContainerLifetime());
+                    factory.GetInstance<ILogger>(), Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()), new PerContainerLifetime());
                 container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
 
                 Composed = true;
@@ -132,17 +133,17 @@ namespace Umbraco.Tests.Runtimes
             public static bool Started;
             public static bool HasBeenDisposed;
 
-            public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication)
             {
                 Initialized = true;
             }
 
-            public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication)
             {
                 Starting = true;
             }
 
-            public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication)
             {
                 Started = true;
             }

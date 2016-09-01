@@ -46,7 +46,7 @@ namespace umbraco
 		/// <returns></returns>
 		private static UmbracoHelper GetUmbracoHelper()
 		{
-			return new UmbracoHelper(Umbraco.Web.UmbracoContext.Current);
+			return new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache);
 		}
 
         #region Declarations
@@ -316,7 +316,7 @@ namespace umbraco
             {
                 if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration > 0)
                 {
-                    var xml = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
+                    var xml = Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
                         $"{CacheKeys.MediaCacheKey}_{MediaId}_{deep}",
                         timeout:        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
                         getCacheItem:   () => GetMediaDo(MediaId, deep).Item1);
@@ -349,13 +349,13 @@ namespace umbraco
 
         private static Tuple<XElement, string> GetMediaDo(int mediaId, bool deep)
         {
-            var media = ApplicationContext.Current.Services.MediaService.GetById(mediaId);
+            var media = Current.Services.MediaService.GetById(mediaId);
             if (media == null) return null;
             var serializer = new EntityXmlSerializer();
             var serialized = serializer.Serialize(
-                ApplicationContext.Current.Services.MediaService,
-                ApplicationContext.Current.Services.DataTypeService,
-                ApplicationContext.Current.Services.UserService,
+                Current.Services.MediaService,
+                Current.Services.DataTypeService,
+                Current.Services.UserService,
                 Current.UrlSegmentProviders,
                 media,
                 deep);
@@ -375,7 +375,7 @@ namespace umbraco
             {
                 if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration > 0)
                 {
-                    var xml = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
+                    var xml = Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
                         string.Format(
                             "{0}_{1}", CacheKeys.MemberLibraryCacheKey, MemberId),
                         timeout:        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
@@ -405,11 +405,11 @@ namespace umbraco
 
         private static XElement GetMemberDo(int MemberId)
         {
-            var member = ApplicationContext.Current.Services.MemberService.GetById(MemberId);
+            var member = Current.Services.MemberService.GetById(MemberId);
             if (member == null) return null;
             var serializer = new EntityXmlSerializer();
             var serialized = serializer.Serialize(
-                ApplicationContext.Current.Services.DataTypeService, member);
+                Current.Services.DataTypeService, member);
             return serialized;
         }
 
@@ -453,7 +453,7 @@ namespace umbraco
 
         private static string[] GetAccessingMembershipRoles(int documentId, string path)
         {
-            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(path.EnsureEndsWith("," + documentId));
+            var entry = Current.Services.PublicAccessService.GetEntryForContent(path.EnsureEndsWith("," + documentId));
             if (entry == null) return new string[] { };
 
             var memberGroupRoleRules = entry.Rules.Where(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType);
@@ -1106,7 +1106,7 @@ namespace umbraco
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<preValues/>");
 
-            foreach (var dr in ApplicationContext.Current.DatabaseContext.Database.Query<dynamic>(
+            foreach (var dr in Current.DatabaseContext.Database.Query<dynamic>(
                 "Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
                 new { dataTypeId = DataTypeId }))
             {
@@ -1128,7 +1128,7 @@ namespace umbraco
         {
             try
             {
-                return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                return Current.DatabaseContext.Database.ExecuteScalar<string>(
                     "select [value] from cmsDataTypePreValues where id = @id",
                     new {id = Id});
             }
@@ -1158,13 +1158,13 @@ namespace umbraco
                 //int languageId = GetCurrentLanguageId();
                 int languageId = Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentUICulture.Name).id;
 
-                var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(Key);
+                var di = Current.Services.LocalizationService.GetDictionaryItemByKey(Key);
                 if (di == null)
                 {
                     return xd.CreateNavigator().Select("/");
                 }
 
-                var children = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemChildren(di.Key);
+                var children = Current.Services.LocalizationService.GetDictionaryItemChildren(di.Key);
                 foreach (var item in children)
                 {
                     XmlNode xe;
@@ -1630,7 +1630,7 @@ namespace umbraco
 
         public static IRelation[] GetRelatedNodes(int nodeId)
         {
-            return ApplicationContext.Current.Services.RelationService.GetByParentOrChildId(nodeId).ToArray();
+            return Current.Services.RelationService.GetByParentOrChildId(nodeId).ToArray();
         }
 
         /// <summary>
@@ -1650,7 +1650,7 @@ namespace umbraco
 
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<relations/>");
-            var rels = ApplicationContext.Current.Services.RelationService.GetByParentOrChildId(NodeId);
+            var rels = Current.Services.RelationService.GetByParentOrChildId(NodeId);
             foreach (var r in rels)
             {
                 XmlElement n = xd.CreateElement("relation");
@@ -1664,26 +1664,26 @@ namespace umbraco
                 // Append the node that isn't the one we're getting the related nodes from
                 if (NodeId == r.ChildId)
                 {
-                    var parent = ApplicationContext.Current.Services.ContentService.GetById(r.ParentId);
+                    var parent = Current.Services.ContentService.GetById(r.ParentId);
                     if (parent != null)
                     {
                         var x = xmlSerializer.Serialize(
-                            ApplicationContext.Current.Services.ContentService,
-                            ApplicationContext.Current.Services.DataTypeService,
-                            ApplicationContext.Current.Services.UserService,
+                            Current.Services.ContentService,
+                            Current.Services.DataTypeService,
+                            Current.Services.UserService,
                             Current.UrlSegmentProviders, parent).GetXmlNode(xd);
                         n.AppendChild(x);
                     }
                 }
                 else
                 {
-                    var child = ApplicationContext.Current.Services.ContentService.GetById(r.ChildId);
+                    var child = Current.Services.ContentService.GetById(r.ChildId);
                     if (child != null)
                     {
                         var x = xmlSerializer.Serialize(
-                            ApplicationContext.Current.Services.ContentService,
-                            ApplicationContext.Current.Services.DataTypeService,
-                            ApplicationContext.Current.Services.UserService,
+                            Current.Services.ContentService,
+                            Current.Services.DataTypeService,
+                            Current.Services.UserService,
                             Current.UrlSegmentProviders, child).GetXmlNode(xd);
                         n.AppendChild(x);
                     }

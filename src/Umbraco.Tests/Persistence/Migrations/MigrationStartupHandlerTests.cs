@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Migrations
 
             var changed1 = new Args { CountExecuted = 0 };
             var testHandler1 = new TestMigrationHandler(changed1);
-            testHandler1.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>(), new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(logger, Mock.Of<IProfiler>())));
+            testHandler1.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>());
 
             var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
             var migrationContext = new MigrationContext(db, logger);
@@ -50,11 +50,11 @@ namespace Umbraco.Tests.Persistence.Migrations
 
             var changed1 = new Args { CountExecuted = 0};
             var testHandler1 = new TestMigrationHandler("Test1", changed1);
-            testHandler1.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>(), new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(logger, Mock.Of<IProfiler>())));
+            testHandler1.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>());
 
             var changed2 = new Args { CountExecuted = 0 };
             var testHandler2 = new TestMigrationHandler("Test2", changed2);
-            testHandler2.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>(), new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(logger, Mock.Of<IProfiler>())));
+            testHandler2.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>());
 
             var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
             var migrationContext = new MigrationContext(db, logger);

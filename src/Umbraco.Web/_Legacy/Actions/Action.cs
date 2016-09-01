@@ -48,7 +48,7 @@ namespace Umbraco.Web._Legacy.Actions
             lock (Lock)
             {
                 // this will reset the collection
-                Current.ActionCollectionBuilder.SetProducer(() => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
+                Current.ActionCollectionBuilder.SetProducer(() => TypeFinder.FindClassesOfType<IAction>(Current.PluginManager.AssembliesToScan));
             }
         }
 
@@ -103,7 +103,7 @@ namespace Umbraco.Web._Legacy.Actions
                             icon = "images/" + icon;
 
                         _actionJsList += string.Format(",\n\tmenuItem(\"{0}\", \"{1}\", \"{2}\", \"{3}\")",
-                            action.Letter, icon, ApplicationContext.Current.Services.TextService.Localize("actions/"+ action.Alias, new[] { language }), action.JsFunctionName);
+                            action.Letter, icon, Current.Services.TextService.Localize("actions/"+ action.Alias, new[] { language }), action.JsFunctionName);
                     }
                     catch (Exception ee)
                     {

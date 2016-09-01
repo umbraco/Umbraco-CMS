@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Management.Instrumentation;
 using System.Net;
 using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Mvc;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
@@ -15,8 +12,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-
-using umbraco;
 
 namespace Umbraco.Web.Trees
 {
@@ -39,11 +34,11 @@ namespace Umbraco.Web.Trees
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //find all tree definitions that have the current application alias
-            var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application, true).ToArray();
+            var appTrees = Current.Services.ApplicationTreeService.GetApplicationTrees(application, true).ToArray();
 
             if (appTrees.Length == 1 || string.IsNullOrEmpty(tree) == false )
             {
-                var apptree = string.IsNullOrEmpty(tree) == false 
+                var apptree = string.IsNullOrEmpty(tree) == false
                     ? appTrees.SingleOrDefault(x => x.Alias == tree)
                     : appTrees.SingleOrDefault();
 
@@ -52,7 +47,7 @@ namespace Umbraco.Web.Trees
                 var result = await GetRootForSingleAppTree(
                     apptree,
                     Constants.System.Root.ToString(CultureInfo.InvariantCulture),
-                    queryStrings, 
+                    queryStrings,
                     application);
 
                 return result;
@@ -67,7 +62,7 @@ namespace Umbraco.Web.Trees
                 //This could be null if the tree decides not to return it's root (i.e. the member type tree does this when not in umbraco membership mode)
                 if (rootNode != null)
                 {
-                    collection.Add(rootNode);     
+                    collection.Add(rootNode);
                 }
             }
 
@@ -122,9 +117,9 @@ namespace Umbraco.Web.Trees
                 }
 
                 var sectionRoot = SectionRootNode.CreateSingleTreeSectionRoot(
-                    rootId, 
-                    rootNode.Result.ChildNodesUrl, 
-                    rootNode.Result.MenuUrl, 
+                    rootId,
+                    rootNode.Result.ChildNodesUrl,
+                    rootNode.Result.MenuUrl,
                     rootNode.Result.Name,
                     byControllerAttempt.Result);
 
@@ -148,16 +143,16 @@ namespace Umbraco.Web.Trees
                    "", //TODO: I think we'll need this in this situation!
                    legacyAttempt.Result);
 
-                
+
                 sectionRoot.AdditionalData.Add("treeAlias", configTree.Alias);
                 return sectionRoot;
             }
 
             throw new ApplicationException("Could not render a tree for type " + configTree.Alias);
         }
-        
+
 
     }
 
-    
+
 }

@@ -104,7 +104,7 @@ namespace Umbraco.Web
             if (alias == null) throw new ArgumentNullException("alias");
             if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
 
-            var m = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
+            var m = Current.Services.MacroService.GetByAlias(alias);
             if (m == null)
                 throw new KeyNotFoundException("Could not find macro with alias " + alias);
 
@@ -131,14 +131,14 @@ namespace Umbraco.Web
             var macroProps = new Hashtable();
             foreach (var i in parameters)
             {
-                //TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs 
+                //TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs
                 // looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
 
 
                 //NOTE: the value could have html encoded values, so we need to deal with that
                 macroProps.Add(i.Key.ToLowerInvariant(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             }
-            var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
+            var renderer = new MacroRenderer(Current.ProfilingLogger);
             var macroControl = renderer.Render(m, umbracoPage.Elements, _umbracoContext.PageId.Value, macroProps).GetAsControl();
 
             string html;
@@ -164,9 +164,9 @@ namespace Umbraco.Web
                     // within Razor since it will never be inserted into the page pipeline (which may even not exist at all
                     // if we're running MVC).
                     //
-                    // I'm sure there's more things that will get lost with this context changing but I guess we'll figure 
+                    // I'm sure there's more things that will get lost with this context changing but I guess we'll figure
                     // those out as we go along. One thing we lose is the content type response output.
-                    // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So 
+                    // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So
                     // here we'll save the content type response and reset it after execute is called.
 
                     var contentType = _umbracoContext.HttpContext.Response.ContentType;
@@ -272,7 +272,7 @@ namespace Umbraco.Web
                 LegacyAttributes = attributesForItem
             };
 
-            //here we are going to check if we are in the context of an Umbraco routed page, if we are we 
+            //here we are going to check if we are in the context of an Umbraco routed page, if we are we
             //will leave the NodeId empty since the underlying ItemRenderer will work ever so slightly faster
             //since it already knows about the current page. Otherwise, we'll assign the id based on our
             //currently assigned node. The PublishedContentRequest will be null if:

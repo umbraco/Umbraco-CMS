@@ -16,6 +16,7 @@ using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Lucene.Net.Analysis;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using UmbracoExamine.LocalStorage;
 using Directory = Lucene.Net.Store.Directory;
@@ -24,12 +25,12 @@ using Directory = Lucene.Net.Store.Directory;
 namespace UmbracoExamine
 {
     /// <summary>
-    /// An Examine searcher which uses Lucene.Net as the 
+    /// An Examine searcher which uses Lucene.Net as the
     /// </summary>
     public class UmbracoExamineSearcher : LuceneSearcher
     {
 
-        private Lazy<Directory> _localTempDirectory;        
+        private Lazy<Directory> _localTempDirectory;
         private LocalStorageType _localStorageType = LocalStorageType.Sync;
         private string _name;
         private readonly bool _configBased = false;
@@ -67,7 +68,7 @@ namespace UmbracoExamine
         }
 
         /// <summary>
-        /// we override name because we need to manually set it if !CanInitialize() 
+        /// we override name because we need to manually set it if !CanInitialize()
         /// since we cannot call base.Initialize in that case.
         /// </summary>
         public override string Name
@@ -158,20 +159,13 @@ namespace UmbracoExamine
         /// <summary>
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
-        /// <returns></returns>
 
         protected bool CanInitialize()
         {
-            //We need to check if we actually can initialize, if not then don't continue
-            if (_configBased
-                && (ApplicationContext.Current == null
-                || ApplicationContext.Current.IsConfigured == false
-                || ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured == false))
-            {
-                return false;
-            }
-            return true;
-        }    
+            // only affects indexers that are config file based, if an index was created via code then
+            // this has no effect, it is assumed the index would not be created if it could not be initialized
+            return _configBased == false || Current.RuntimeState.Level == RuntimeLevel.Run;
+        }
 
         /// <summary>
         /// Returns a list of fields to search on, this will also exclude the IndexPathFieldName and node type alias
@@ -185,12 +179,12 @@ namespace UmbracoExamine
                 .Where(x => x != LuceneIndexer.NodeTypeAliasFieldName)
                 .ToArray();
         }
-        
+
         protected override Directory GetLuceneDirectory()
         {
             //local temp storage is not enabled, just return the default
-            return _localTempDirectory.IsValueCreated == false 
-                ? base.GetLuceneDirectory() 
+            return _localTempDirectory.IsValueCreated == false
+                ? base.GetLuceneDirectory()
                 : _localTempDirectory.Value;
         }
     }

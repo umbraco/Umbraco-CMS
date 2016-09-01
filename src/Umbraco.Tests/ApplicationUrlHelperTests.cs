@@ -1,3 +1,4 @@
+using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -47,9 +48,11 @@ namespace Umbraco.Tests
         [Test]
         public void NoApplicationUrlByDefault()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            Assert.IsNull(appCtx._umbracoApplicationUrl);
+            //var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //Assert.IsNull(appCtx._umbracoApplicationUrl);
+            var state = new RuntimeState(Mock.Of<ILogger>(), new Lazy<IServerRegistrar>(Mock.Of<IServerRegistrar>), new Lazy<MainDom>(Mock.Of<MainDom>));
+            Assert.IsNull(state.ApplicationUrl);
         }
 
         [Test]
@@ -59,21 +62,23 @@ namespace Umbraco.Tests
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
                 section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
-                && section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string)null)
+                && section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null)
                 && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>());
 
             ApplicationUrlHelper.ApplicationUrlProvider = request => "http://server1.com/umbraco";
 
             Initialize(settings);
 
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var state = new RuntimeState(Mock.Of<ILogger>(), new Lazy<IServerRegistrar>(Mock.Of<IServerRegistrar>), new Lazy<MainDom>(Mock.Of<MainDom>));
+            //var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true"); // does not make a diff here
 
-            ApplicationUrlHelper.EnsureApplicationUrl(appCtx, settings: settings);
+            //ApplicationUrlHelper.EnsureApplicationUrl(appCtx, settings: settings);
+            state.EnsureApplicationUrl(settings: settings);
 
-            Assert.AreEqual("http://server1.com/umbraco", appCtx._umbracoApplicationUrl);
+            Assert.AreEqual("http://server1.com/umbraco", state.ApplicationUrl);
         }
 
         [Test]
@@ -88,15 +93,12 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true"); // does not make a diff here
 
-            ApplicationUrlHelper.TrySetApplicationUrl(appCtx, settings);
+            var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>());
 
             // still NOT set
-            Assert.IsNull(appCtx._umbracoApplicationUrl);
+            Assert.IsNull(url);
         }
 
         [Test]
@@ -116,14 +118,11 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true");
 
-            ApplicationUrlHelper.TrySetApplicationUrl(appCtx, settings);
+            var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>());
 
-            Assert.AreEqual("http://server1.com:80/umbraco", appCtx._umbracoApplicationUrl);
+            Assert.AreEqual("http://server1.com:80/umbraco", url);
 
             var role = _registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Master, role);
@@ -146,14 +145,11 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true");
 
-            ApplicationUrlHelper.TrySetApplicationUrl(appCtx, settings);
+            var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>());
 
-            Assert.AreEqual("http://server1.com:80/umbraco", appCtx._umbracoApplicationUrl);
+            Assert.AreEqual("http://server1.com:80/umbraco", url);
 
             var role = _registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Slave, role);
@@ -176,14 +172,11 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true");
 
-            ApplicationUrlHelper.TrySetApplicationUrl(appCtx, settings);
+            var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>());
 
-            Assert.IsNull(appCtx._umbracoApplicationUrl);
+            Assert.IsNull(url);
 
             var role = _registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Single, role);
@@ -250,14 +243,11 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "false");
 
-            ApplicationUrlHelper.TrySetApplicationUrl(appCtx, settings);
+            var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>());
 
-            Assert.AreEqual("http://mycoolhost.com/umbraco", appCtx._umbracoApplicationUrl);
+            Assert.AreEqual("http://mycoolhost.com/umbraco", url);
         }
 
         [Test]
@@ -270,14 +260,11 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true");
 
-            ApplicationUrlHelper.TrySetApplicationUrl(appCtx, settings);
+            var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>());
 
-            Assert.AreEqual("https://mycoolhost.com/umbraco", appCtx._umbracoApplicationUrl);
+            Assert.AreEqual("https://mycoolhost.com/umbraco", url);
         }
 
         [Test]
@@ -290,14 +277,11 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true"); // does not make a diff here
 
-            ApplicationUrlHelper.TrySetApplicationUrl(appCtx, settings);
+            var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>());
 
-            Assert.AreEqual("httpx://whatever.com/umbraco", appCtx._umbracoApplicationUrl);
+            Assert.AreEqual("httpx://whatever.com/umbraco", url);
         }
     }
 }

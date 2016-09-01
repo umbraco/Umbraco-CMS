@@ -2,6 +2,7 @@
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 
@@ -17,8 +18,8 @@ namespace Umbraco.Core.Models
         public static XElement ToXml(this Property property)
         {
             var xmlSerializer = new EntityXmlSerializer();
-            return xmlSerializer.Serialize(ApplicationContext.Current.Services.DataTypeService, property);
+            return xmlSerializer.Serialize(Current.Services.DataTypeService, property);
         }
-        
+
     }
 }

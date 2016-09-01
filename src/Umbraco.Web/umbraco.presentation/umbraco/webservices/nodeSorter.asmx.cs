@@ -53,7 +53,7 @@ namespace umbraco.presentation.webservices
 
                     var parent = new SortNode { Id = asInt };
 
-                    var entityService = base.ApplicationContext.Services.EntityService;
+                    var entityService = Services.EntityService;
 
                     // Root nodes?
                     if (asInt == -1)
@@ -120,7 +120,7 @@ namespace umbraco.presentation.webservices
 
         private void SortMedia(string[] ids)
         {
-            var mediaService = base.ApplicationContext.Services.MediaService;
+            var mediaService = Services.MediaService;
             var sortedMedia = new List<IMedia>();
             try
             {
@@ -165,7 +165,7 @@ namespace umbraco.presentation.webservices
 
         private void SortContent(string[] ids, int parentId)
         {
-            var contentService = ApplicationContext.Services.ContentService;
+            var contentService = Services.ContentService;
             try
             {
                 var intIds = ids.Select(int.Parse).ToArray();
@@ -182,7 +182,7 @@ namespace umbraco.presentation.webservices
                 //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
                 if (parentId > 0)
                 {
-                    ApplicationContext.Services.NotificationService.SendNotification(contentService.GetById(parentId), ActionSort.Instance, UmbracoContext, ApplicationContext);
+                    Services.NotificationService.SendNotification(contentService.GetById(parentId), ActionSort.Instance, UmbracoContext);
                 }
 
             }

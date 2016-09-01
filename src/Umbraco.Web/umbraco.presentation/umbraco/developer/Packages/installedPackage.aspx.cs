@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.web;
 using System.Xml;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Web;
 using Umbraco.Web.UI.Pages;
 using BizLogicAction = Umbraco.Web._Legacy.Actions.Action;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
@@ -45,7 +46,7 @@ namespace umbraco.presentation.developer.packages
 
                 if (!Page.IsPostBack)
                 {
-                    //temp list to contain failing items... 
+                    //temp list to contain failing items...
                     var tempList = new List<string>();
 
                     foreach (var str in _pack.Data.Documenttypes)
@@ -121,8 +122,8 @@ namespace umbraco.presentation.developer.packages
                             {
                                 var m = new Macro(tId);
                                 if (!string.IsNullOrEmpty(m.Name))
-                                { 
-                                    //Macros need an extra check to see if they actually exists. For some reason the macro does not return null, if the id is not found... 
+                                {
+                                    //Macros need an extra check to see if they actually exists. For some reason the macro does not return null, if the id is not found...
                                     var li = new ListItem(m.Name, m.Id.ToString());
                                     li.Selected = true;
                                     macros.Items.Add(li);
@@ -144,7 +145,7 @@ namespace umbraco.presentation.developer.packages
                     foreach (var str in _pack.Data.Files)
                     {
                         try
-                        {                            
+                        {
                             if (!string.IsNullOrEmpty(str) && System.IO.File.Exists(IOHelper.MapPath(str) ))
                             {
                                 var li = new ListItem(str, str);
@@ -234,7 +235,7 @@ namespace umbraco.presentation.developer.packages
                     {
                         try
                         {
-                            
+
                             _repo = cms.businesslogic.packager.repositories.Repository.getByGuid(_pack.Data.RepositoryGuid);
 
                             if (_repo != null)
@@ -254,7 +255,7 @@ namespace umbraco.presentation.developer.packages
                                     lt_upgradeReadme.Text = repoPackage.UpgradeReadMe;
                                     bt_gotoUpgrade.OnClientClick = "window.location.href = 'browseRepository.aspx?url=" + repoPackage.Url + "'; return true;";
                                 }
-                                
+
                                 if (!string.IsNullOrEmpty(repoPackage.Demo))
                                 {
                                     lb_demoLink.OnClientClick = "openDemo(this, '" + _pack.Data.PackageGuid + "'); return false;";
@@ -390,10 +391,10 @@ namespace umbraco.presentation.developer.packages
 
                     if (int.TryParse(li.Value, out nId))
                     {
-                        var found = ApplicationContext.Services.FileService.GetTemplate(nId);
+                        var found = Services.FileService.GetTemplate(nId);
                         if (found != null)
                         {
-                            ApplicationContext.Services.FileService.DeleteTemplate(found.Alias, Security.CurrentUser.Id);
+                            Services.FileService.DeleteTemplate(found.Alias, Security.CurrentUser.Id);
                         }
                         _pack.Data.Templates.Remove(nId.ToString());
                     }
@@ -411,7 +412,7 @@ namespace umbraco.presentation.developer.packages
                     {
                         var s = new Macro(nId);
                         if (!string.IsNullOrEmpty(s.Name))
-                        {                            
+                        {
                             s.Delete();
                         }
 
@@ -419,10 +420,10 @@ namespace umbraco.presentation.developer.packages
                     }
                 }
             }
-            
+
             //Remove Document Types
             var contentTypes = new List<IContentType>();
-            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            var contentTypeService = Current.Services.ContentTypeService;
             foreach (ListItem li in documentTypes.Items)
             {
                 if (li.Selected)
@@ -446,7 +447,7 @@ namespace umbraco.presentation.developer.packages
             if (contentTypes.Any())
             {
                 var orderedTypes = (from contentType in contentTypes
-                                    orderby contentType.ParentId descending, contentType.Id descending 
+                                    orderby contentType.ParentId descending, contentType.Id descending
                                     select contentType);
 
                 foreach (var contentType in orderedTypes)
@@ -500,7 +501,7 @@ namespace umbraco.presentation.developer.packages
             }
             else
             {
-                
+
                 // uninstall actions
                 try
                 {
@@ -567,7 +568,7 @@ namespace umbraco.presentation.developer.packages
             TreeDefinitionCollection.Instance.ReRegisterTrees();
 
             BizLogicAction.ReRegisterActionsAndHandlers();
-            
+
         }
 
         private bool IsManifestEmpty()
@@ -587,7 +588,7 @@ namespace umbraco.presentation.developer.packages
                     _pack.Data.Macros,
                     _pack.Data.Stylesheets,
                     _pack.Data.Templates,
-                    _pack.Data.DictionaryItems, 
+                    _pack.Data.DictionaryItems,
                     _pack.Data.DataTypes
                 };
 

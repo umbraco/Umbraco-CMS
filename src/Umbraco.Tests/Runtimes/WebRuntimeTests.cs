@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Runtimes
 					new PluginViewEngine()
 				};
 
-			WebRuntime.WrapViewEngines(engines);
+			WebRuntimeComponent.WrapViewEngines(engines);
 
 			Assert.That(engines.Count, Is.EqualTo(2));
 			Assert.That(engines[0], Is.InstanceOf<ProfilingViewEngine>());
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Runtimes
 					new PluginViewEngine()
 				};
 
-			WebRuntime.WrapViewEngines(engines);
+            WebRuntimeComponent.WrapViewEngines(engines);
 
 			Assert.That(engines.Count, Is.EqualTo(2));
 			Assert.That(((ProfilingViewEngine)engines[0]).Inner, Is.InstanceOf<RenderViewEngine>());
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Runtimes
 					profiledEngine
 				};
 
-			WebRuntime.WrapViewEngines(engines);
+            WebRuntimeComponent.WrapViewEngines(engines);
 
 			Assert.That(engines[0], Is.SameAs(profiledEngine));
 		}
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Runtimes
 		public void WrapViewEngines_CollectionIsNull_DoesNotThrow()
 		{
 			IList<IViewEngine> engines = null;
-			Assert.DoesNotThrow(() => WebRuntime.WrapViewEngines(engines));
+			Assert.DoesNotThrow(() => WebRuntimeComponent.WrapViewEngines(engines));
 			Assert.That(engines, Is.Null);
 		}
 

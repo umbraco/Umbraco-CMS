@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http.Formatting;
-using System.Web;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -11,7 +10,6 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
 using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
@@ -105,7 +103,7 @@ namespace Umbraco.Web.Trees
                     return menu;
                 }
 
-                // root actions         
+                // root actions
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
                 menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "media", "media");
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Language = umbraco.cms.businesslogic.language.Language;
 
@@ -15,12 +16,12 @@ namespace umbraco.cms.businesslogic.web
     public class Domain
     {
         public IDomain DomainEntity { get; set; }
-       
+
 		/// <summary>
 		/// Empty ctor used for unit tests to create a custom domain
 		/// </summary>
 		internal Domain()
-		{			
+		{
 		}
 
         internal Domain(IDomain domain)
@@ -30,7 +31,7 @@ namespace umbraco.cms.businesslogic.web
 
         public Domain(int Id)
         {
-            DomainEntity = ApplicationContext.Current.Services.DomainService.GetById(Id);
+            DomainEntity = Current.Services.DomainService.GetById(Id);
             if (DomainEntity == null)
             {
                 throw new Exception(string.Format("Domain name '{0}' does not exists", Id));
@@ -39,7 +40,7 @@ namespace umbraco.cms.businesslogic.web
 
         public Domain(string DomainName)
         {
-            DomainEntity = ApplicationContext.Current.Services.DomainService.GetByName(DomainName);
+            DomainEntity = Current.Services.DomainService.GetByName(DomainName);
             if (DomainEntity == null)
             {
                 throw new Exception(string.Format("Domain name '{0}' does not exists", DomainName));
@@ -57,7 +58,7 @@ namespace umbraco.cms.businesslogic.web
             get
             {
                 if (DomainEntity.LanguageId.HasValue == false) return null;
-                var lang = ApplicationContext.Current.Services.LocalizationService.GetLanguageById(DomainEntity.LanguageId.Value);
+                var lang = Current.Services.LocalizationService.GetLanguageById(DomainEntity.LanguageId.Value);
                 if (lang == null) throw new InvalidOperationException("No language exists with id " + DomainEntity.LanguageId.Value);
                 return new Language(lang);
             }
@@ -80,13 +81,13 @@ namespace umbraco.cms.businesslogic.web
 
         public void Delete()
         {
-            ApplicationContext.Current.Services.DomainService.Delete(DomainEntity);
+            Current.Services.DomainService.Delete(DomainEntity);
 
         }
 
         public void Save()
         {
-            ApplicationContext.Current.Services.DomainService.Save(DomainEntity);
+            Current.Services.DomainService.Save(DomainEntity);
 
         }
 
@@ -100,39 +101,39 @@ namespace umbraco.cms.businesslogic.web
 
         public static IEnumerable<Domain> GetDomains(bool includeWildcards)
         {
-            return ApplicationContext.Current.Services.DomainService.GetAll(includeWildcards)
+            return Current.Services.DomainService.GetAll(includeWildcards)
                 .Select(x => new Domain(x));
         }
 
         public static Domain GetDomain(string DomainName)
         {
-            var found = ApplicationContext.Current.Services.DomainService.GetByName(DomainName);
+            var found = Current.Services.DomainService.GetByName(DomainName);
             return found == null ? null : new Domain(found);
         }
 
         public static int GetRootFromDomain(string DomainName)
         {
-            var found = ApplicationContext.Current.Services.DomainService.GetByName(DomainName);
+            var found = Current.Services.DomainService.GetByName(DomainName);
             return found == null ? -1 : found.RootContentId ?? -1;
         }
 
         public static Domain[] GetDomainsById(int nodeId)
         {
-            return ApplicationContext.Current.Services.DomainService.GetAssignedDomains(nodeId, true)
+            return Current.Services.DomainService.GetAssignedDomains(nodeId, true)
                 .Select(x => new Domain(x))
                 .ToArray();
         }
 
         public static Domain[] GetDomainsById(int nodeId, bool includeWildcards)
         {
-            return ApplicationContext.Current.Services.DomainService.GetAssignedDomains(nodeId, includeWildcards)
+            return Current.Services.DomainService.GetAssignedDomains(nodeId, includeWildcards)
                 .Select(x => new Domain(x))
                 .ToArray();
         }
 
         public static bool Exists(string DomainName)
         {
-            return ApplicationContext.Current.Services.DomainService.Exists(DomainName);
+            return Current.Services.DomainService.Exists(DomainName);
         }
 
         public static void MakeNew(string DomainName, int RootNodeId, int LanguageId)
@@ -142,12 +143,12 @@ namespace umbraco.cms.businesslogic.web
                 RootContentId = RootNodeId,
                 LanguageId = LanguageId
             };
-            ApplicationContext.Current.Services.DomainService.Save(domain);
+            Current.Services.DomainService.Save(domain);
         }
 
         #endregion
 
-      
+
 
         #region Pipeline Refactoring
 

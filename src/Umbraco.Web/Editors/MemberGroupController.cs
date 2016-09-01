@@ -19,22 +19,10 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with member groups
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]    
+    [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
-        public MemberGroupController()
-            : this(UmbracoContext.Current)
-        {
-            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-        }
-
-        public MemberGroupController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-        }
-
-        private readonly MembershipProvider _provider;
+        private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
         public MemberGroupDisplay GetById(int id)
         {
@@ -67,7 +55,7 @@ namespace Umbraco.Web.Editors
             if (_provider.IsUmbracoMembershipProvider())
             {
                 return Services.MemberGroupService.GetAll()
-                    .Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);    
+                    .Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);
             }
 
             return Enumerable.Empty<MemberGroupDisplay>();
@@ -81,7 +69,7 @@ namespace Umbraco.Web.Editors
 
         public MemberGroupDisplay PostSave(MemberGroupSave saveModel)
         {
-            var service = ApplicationContext.Services.MemberGroupService;
+            var service = Services.MemberGroupService;
 
             var id = int.Parse(saveModel.Id.ToString());
             var memberGroup = id > 0 ? service.GetById(id) : new MemberGroup();

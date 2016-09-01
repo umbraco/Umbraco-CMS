@@ -13,7 +13,6 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
 using System.Globalization;
 using Umbraco.Web._Legacy.Actions;
 
@@ -21,7 +20,6 @@ namespace Umbraco.Web.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController
     {
-
         #region Actions
 
         /// <summary>
@@ -57,7 +55,7 @@ namespace Umbraco.Web.Trees
         protected abstract TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings);
 
         /// <summary>
-        /// Returns the 
+        /// Returns the
         /// </summary>
         protected abstract int RecycleBinId { get; }
 
@@ -76,7 +74,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         protected virtual TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
@@ -91,17 +89,17 @@ namespace Umbraco.Web.Trees
                 id = altStartId;
 
                 //we need to verify that the user has access to view this node, otherwise we'll render an empty tree collection
-                // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access                
+                // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
                 if (HasPathAccess(id, queryStrings) == false)
                 {
                     LogHelper.Warn<ContentTreeControllerBase>("The user " + Security.CurrentUser.Username + " does not have access to the tree node " + id);
                     return new TreeNodeCollection();
                 }
-                
+
                 // So there's an alt id specified, it's not the root node and the user has access to it, great! But there's one thing we
-                // need to consider: 
+                // need to consider:
                 // If the tree is being rendered in a dialog view we want to render only the children of the specified id, but
-                // when the tree is being rendered normally in a section and the current user's start node is not -1, then 
+                // when the tree is being rendered normally in a section and the current user's start node is not -1, then
                 // we want to include their start node in the tree as well.
                 // Therefore, in the latter case, we want to change the id to -1 since we want to render the current user's root node
                 // and the GetChildEntities method will take care of rendering the correct root node.
@@ -111,7 +109,7 @@ namespace Umbraco.Web.Trees
                     id = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
                 }
             }
-            
+
             var entities = GetChildEntities(id);
             nodes.AddRange(entities.Select(entity => GetSingleTreeNode(entity, id, queryStrings)).Where(node => node != null));
             return nodes;
@@ -172,14 +170,14 @@ namespace Umbraco.Web.Trees
                 if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
                     altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
-                //check if a request has been made to render from a specific start node                
+                //check if a request has been made to render from a specific start node
                 if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
                 {
                     id = altStartId;
                 }
-                
+
                 var nodes = GetTreeNodesInternal(id, queryStrings);
-                
+
                 //only render the recycle bin if we are not in dialog and the start id id still the root
                 if (IsDialog(queryStrings) == false && id == Constants.System.Root.ToInvariantString())
                 {
@@ -283,7 +281,7 @@ namespace Umbraco.Web.Trees
         /// <param name="doc">The Document to check permissions against</param>
         /// <param name="allowedUserOptions">A list of MenuItems that the user has permissions to execute on the current document</param>
         /// <remarks>By default the user must have Browse permissions to see the node in the Content tree</remarks>
-        /// <returns></returns>        
+        /// <returns></returns>
         internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions)
         {
             return allowedUserOptions.Select(x => x.Action).OfType<ActionBrowse>().Any();

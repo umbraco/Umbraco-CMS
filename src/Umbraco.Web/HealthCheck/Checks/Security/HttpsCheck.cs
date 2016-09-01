@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck.Checks.Config;
@@ -16,12 +17,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class HttpsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
+        private readonly IRuntimeState _runtime;
 
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
-        public HttpsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        public HttpsCheck(ILocalizedTextService textService, IRuntimeState runtime)
         {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _textService = textService;
+            _runtime = runtime;
         }
 
         /// <summary>
@@ -54,9 +57,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var message = string.Empty;
             var success = false;
-            var url = HealthCheckContext.HttpContext.Request.Url;
+            var url = _runtime.ApplicationUrl;
 
-            // Attempt to access the site over HTTPS to see if it HTTPS is supported 
+            // Attempt to access the site over HTTPS to see if it HTTPS is supported
             // and a valid certificate has been configured
             var address = string.Format("https://{0}:{1}", url.Host.ToLower(), url.Port);
             var request = (HttpWebRequest)WebRequest.Create(address);
@@ -133,7 +136,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                     new[] {httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not"});
                 resultType = httpsSettingEnabled ? StatusResultType.Success: StatusResultType.Error;
             }
-            
+
             return
                 new HealthCheckStatus(resultMessage)
                 {

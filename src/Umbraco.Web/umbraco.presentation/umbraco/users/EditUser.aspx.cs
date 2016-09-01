@@ -99,14 +99,14 @@ namespace umbraco.cms.presentation.user
                     userType.Items.Add(li);
                 }
             }
-            
+
             var userCulture = UserExtensions.GetUserCulture(u.Language, Services.TextService);
 
             // Populate ui language lsit
             foreach (var lang in Services.TextService.GetSupportedCultures())
             {
                 var regionCode = Services.TextService.ConvertToRegionCodeFromSupportedCulture(lang);
-                
+
                 var li = new ListItem(lang.DisplayName, regionCode);
 
                 if (Equals(lang, userCulture))
@@ -182,7 +182,7 @@ namespace umbraco.cms.presentation.user
             ppAccess.addProperty(Services.TextService.Localize("user/noConsole"), NoConsole);
             ppAccess.addProperty(Services.TextService.Localize("user/disabled"), Disabled);
 
-            //access to which modules... 
+            //access to which modules...
             Pane ppModules = new Pane();
             ppModules.addProperty(Services.TextService.Localize("user/modules"), lapps);
             ppModules.addProperty(" ", sectionValidator);
@@ -255,7 +255,7 @@ namespace umbraco.cms.presentation.user
                         if (IsPostBack == false)
                         {
                             foreach (var tmp in uapps)
-                            { 
+                            {
                                 if (app.Alias == tmp) li.Selected = true;
                             }
                         }
@@ -274,7 +274,7 @@ namespace umbraco.cms.presentation.user
             lapps.RepeatDirection = RepeatDirection.Vertical;
         }
 
-     
+
         /// <summary>
         /// This handles changing the password
         /// </summary>
@@ -340,7 +340,7 @@ namespace umbraco.cms.presentation.user
                     //update the membership provider
                     UpdateMembershipProvider(membershipUser);
 
-                    //update the Umbraco user properties - even though we are updating some of these properties in the membership provider that is 
+                    //update the Umbraco user properties - even though we are updating some of these properties in the membership provider that is
                     // ok since the membership provider might be storing these details someplace totally different! But we want to keep our UI in sync.
                     u.Name = uname.Text.Trim();
                     u.Language = userLanguage.SelectedValue;
@@ -398,11 +398,11 @@ namespace umbraco.cms.presentation.user
 
         private void UpdateMembershipProvider(MembershipUser membershipUser)
         {
-            //SD: This check must be here for some reason but apparently we don't want to try to 
+            //SD: This check must be here for some reason but apparently we don't want to try to
             // update when the AD provider is active.
             if ((BackOfficeProvider is ActiveDirectoryMembershipProvider) == false)
             {
-                var membershipHelper = new MembershipHelper(ApplicationContext, new HttpContextWrapper(Context));
+                var membershipHelper = new MembershipHelper(new HttpContextWrapper(Context));
                 //set the writable properties that we are editing
                 membershipHelper.UpdateMember(membershipUser, BackOfficeProvider,
                                               email.Text.Trim(),

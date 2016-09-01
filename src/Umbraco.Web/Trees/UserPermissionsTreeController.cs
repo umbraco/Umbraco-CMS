@@ -24,11 +24,11 @@ namespace Umbraco.Web.Trees
             nodes.AddRange(
                 Services.UserService.GetAll(0, int.MaxValue, out totalUsers)
                     .Where(x => x.Id > 0 && x.IsApproved)
-                    .Select(x => CreateTreeNode(x.Id.ToString(), 
-                        id, 
-                        queryStrings, 
-                        x.Name, 
-                        "icon-user", 
+                    .Select(x => CreateTreeNode(x.Id.ToString(),
+                        id,
+                        queryStrings,
+                        x.Name,
+                        "icon-user",
                         false,
                         "/" + queryStrings.GetValue<string>("application") + "/framed/"
                         + Uri.EscapeDataString("users/PermissionEditor.aspx?id=" + x.Id))));
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                // root actions              
+                // root actions
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }

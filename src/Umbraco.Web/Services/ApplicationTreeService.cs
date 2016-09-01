@@ -108,7 +108,7 @@ namespace Umbraco.Web.Services
                                                         new XAttribute("initialize", tree.Initialize),
                                                         new XAttribute("sortOrder", tree.SortOrder),
                                                         new XAttribute("alias", tree.Alias),
-                                                        new XAttribute("application", tree.ApplicationAlias),                                                        
+                                                        new XAttribute("application", tree.ApplicationAlias),
                                                         new XAttribute("iconClosed", tree.IconClosed),
                                                         new XAttribute("iconOpen", tree.IconOpened),
                                                         new XAttribute("type", tree.Type)));
@@ -125,7 +125,7 @@ namespace Umbraco.Web.Services
                                     new XAttribute("iconOpen", tree.IconOpened),
                                     new XAttribute("type", tree.Type)));
                                                 }
-                                                
+
                                             }
                                 count++;
                             }
@@ -282,7 +282,7 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
-        /// Loads in the xml structure from disk if one is found, otherwise loads in an empty xml structure, calls the 
+        /// Loads in the xml structure from disk if one is found, otherwise loads in an empty xml structure, calls the
         /// callback with the xml document and saves the structure back to disk if saveAfterCallback is true.
         /// </summary>
         /// <param name="callback"></param>
@@ -300,7 +300,7 @@ namespace Umbraco.Web.Services
                     var hasChanges = callback.Invoke(doc);
 
                     if (saveAfterCallbackIfChanges && hasChanges
-                        //Don't save it if it is empty, in some very rare cases if the app domain get's killed in the middle of this process 
+                        //Don't save it if it is empty, in some very rare cases if the app domain get's killed in the middle of this process
                         // in some insane way the file saved will be empty. I'm pretty sure it's not actually anything to do with the xml doc and
                         // more about the IO trying to save the XML doc, but it doesn't hurt to check.
                         && doc.Root != null && doc.Root.Elements().Any())
@@ -349,8 +349,8 @@ namespace Umbraco.Web.Services
                     {
                         list.Add(new ApplicationTree(
                                      addElement.Attribute("initialize") == null || Convert.ToBoolean(addElement.Attribute("initialize").Value),
-                                     addElement.Attribute("sortOrder") != null 
-                                        ? Convert.ToByte(addElement.Attribute("sortOrder").Value) 
+                                     addElement.Attribute("sortOrder") != null
+                                        ? Convert.ToByte(addElement.Attribute("sortOrder").Value)
                                         : (byte)0,
                                      (string)addElement.Attribute("application"),
                                      (string)addElement.Attribute("alias"),
@@ -408,7 +408,7 @@ namespace Umbraco.Web.Services
                     var added = new List<string>();
 
                     // Load all Controller Trees by attribute
-                    var types = PluginManager.Current.ResolveTypesWithAttribute<TreeController, TreeAttribute>();
+                    var types = Current.PluginManager.ResolveTypesWithAttribute<TreeController, TreeAttribute>(); // fixme inject
                     //convert them to ApplicationTree instances
                     var items = types
                         .Select(x =>

@@ -4,39 +4,41 @@ using Semver;
 
 namespace Umbraco.Core.Configuration
 {
-    public class UmbracoVersion
+    /// <summary>
+    /// Represents the version of the executing code.
+    /// </summary>
+    public static class UmbracoVersion
     {
         // BEWARE!
         // This class is parsed and updated by the build scripts.
         // Do NOT modify it unless you understand what you are doing.
 
         /// <summary>
-        /// Gets the current version of Umbraco.
-        /// Version class with the specified major, minor, build (Patch), and revision numbers.
+        /// Gets the version of the executing code.
         /// </summary>
-        /// <remarks>
-        /// CURRENT UMBRACO VERSION ID.
-        /// </remarks>
         public static Version Current { get; } = new Version("8.0.0");
 
         /// <summary>
-        /// Gets the version comment (like beta or RC).
+        /// Gets the version comment of the executing code (eg "beta").
         /// </summary>
-        /// <value>The version comment.</value>
         public static string CurrentComment => "alpha0016";
 
-        // Get the version of the Umbraco.Core.dll by looking at a class in that dll
-        // Had to do it like this due to medium trust issues, see: http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx
+        /// <summary>
+        /// Gets the assembly version of Umbraco.Code.dll.
+        /// </summary>
+        /// <remarks>Get it by looking at a class in that dll, due to medium trust issues,
+        /// see http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx,
+        /// however fixme we don't support medium trust anymore?</remarks>
         public static string AssemblyVersion => new AssemblyName(typeof(UmbracoVersion).Assembly.FullName).Version.ToString();
 
-        public static SemVersion GetSemanticVersion()
-        {
-            return new SemVersion(
+        /// <summary>
+        /// Gets the semantic version of the executing code.
+        /// </summary>
+        public static SemVersion SemanticVersion => new SemVersion(
                 Current.Major,
                 Current.Minor,
                 Current.Build,
                 CurrentComment.IsNullOrWhiteSpace() ? null : CurrentComment,
                 Current.Revision > 0 ? Current.Revision.ToInvariantString() : null);
-        }
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Http;
 using Umbraco.Web.Editors;
 
@@ -12,16 +11,12 @@ namespace Umbraco.Web.HealthCheck
     /// </summary>
     public class HealthCheckController : UmbracoAuthorizedJsonController
     {
-        private readonly HealthCheckCollectionBuilder _builder;
+        private readonly HealthCheckCollection _checks;
 
-        public HealthCheckController()
+        public HealthCheckController(HealthCheckCollection checks)
         {
-            _builder = Current.HealthCheckCollectionBuilder;
-        }
-
-        public HealthCheckController(HealthCheckCollectionBuilder builder)
-        {
-            _builder = builder;
+            if (checks == null) throw new ArgumentNullException(nameof(checks));
+            _checks = checks;
         }
 
         /// <summary>
@@ -30,8 +25,7 @@ namespace Umbraco.Web.HealthCheck
         /// <returns>Returns a collection of anonymous objects representing each group.</returns>
         public object GetAllHealthChecks()
         {
-            var context = new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current);
-            var groups = _builder.CreateCollection(context)
+            var groups = _checks
                 .GroupBy(x => x.Group)
                 .OrderBy(x => x.Key);
             var healthCheckGroups = new List<HealthCheckGroup>();
@@ -52,8 +46,7 @@ namespace Umbraco.Web.HealthCheck
 
         public object GetStatus(Guid id)
         {
-            var context = new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current);
-            var check = _builder.CreateCollection(context).FirstOrDefault(x => x.Id == id);
+            var check = _checks.FirstOrDefault(x => x.Id == id);
             if (check == null) throw new InvalidOperationException("No health check found with ID " + id);
 
             return check.GetStatus();
@@ -62,8 +55,7 @@ namespace Umbraco.Web.HealthCheck
         [HttpPost]
         public HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
-            var context = new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current);
-            var check = _builder.CreateCollection(context).FirstOrDefault(x => x.Id == action.HealthCheckId);
+            var check = _checks.FirstOrDefault(x => x.Id == action.HealthCheckId);
             if (check == null) throw new InvalidOperationException("No health check found with id " + action.HealthCheckId);
 
             return check.ExecuteAction(action);

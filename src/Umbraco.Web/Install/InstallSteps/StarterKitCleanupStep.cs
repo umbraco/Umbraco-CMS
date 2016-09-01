@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using umbraco;
 using umbraco.cms.businesslogic.packager;
-using Umbraco.Core;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -13,13 +10,6 @@ namespace Umbraco.Web.Install.InstallSteps
         "StarterKitCleanup", 32, "Almost done")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
-        private readonly ApplicationContext _applicationContext;
-
-        public StarterKitCleanupStep(ApplicationContext applicationContext)
-        {
-            _applicationContext = applicationContext;
-        }
-
         public override InstallSetupResult Execute(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();

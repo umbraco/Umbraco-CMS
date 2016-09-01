@@ -1,16 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
-using System.Reflection;
-using System.Web;
-using System.Xml;
 using Umbraco.Core;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Routing
 {
@@ -21,11 +15,13 @@ namespace Umbraco.Web.Routing
 	{
 	    
         private readonly ILogger _logger;
+	    private readonly IEntityService _entityService;
 	    private readonly IContentSection _contentConfigSection;
 
-	    public ContentFinderByLegacy404(ILogger logger, IContentSection contentConfigSection)
+	    public ContentFinderByLegacy404(ILogger logger, IEntityService entityService, IContentSection contentConfigSection)
 	    {
 	        _logger = logger;
+	        _entityService = entityService;
 	        _contentConfigSection = contentConfigSection;
 	    }
 
@@ -66,7 +62,7 @@ namespace Umbraco.Web.Routing
 
 		    var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentConfigSection.Error404Collection.ToArray(),
-                pcr.RoutingContext.UmbracoContext.Application.Services.EntityService,
+                _entityService,
                 new PublishedContentQuery(pcr.RoutingContext.UmbracoContext.ContentCache, pcr.RoutingContext.UmbracoContext.MediaCache),
                 errorCulture);
 

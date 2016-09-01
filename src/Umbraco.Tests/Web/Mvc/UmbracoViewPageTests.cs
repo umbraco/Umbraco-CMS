@@ -430,22 +430,22 @@ namespace Umbraco.Tests.Web.Mvc
 
             var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
 
-            var appCtx = new ApplicationContext(
-                new DatabaseContext(databaseFactory, logger),
-                svcCtx,
-                CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(logger, Mock.Of<IProfiler>())) { IsReady = true };
+            //var appCtx = new ApplicationContext(
+            //    new DatabaseContext(databaseFactory, logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
+            //    svcCtx,
+            //    CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(logger, Mock.Of<IProfiler>())) { /*IsReady = true*/ };
 
             var cache = new NullCacheProvider();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
-            _service = new FacadeService(svcCtx, provider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, true, false); // no events
+            _service = new FacadeService(svcCtx, provider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 
             var ctx = UmbracoContext.CreateContext(
-                GetHttpContextFactory(url, routeData).HttpContext, appCtx,
+                GetHttpContextFactory(url, routeData).HttpContext,
                 _service,
-                new WebSecurity(http, appCtx),
+                new WebSecurity(http, Current.Services.UserService),
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>());
 

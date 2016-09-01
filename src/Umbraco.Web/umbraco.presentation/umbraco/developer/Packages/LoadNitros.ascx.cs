@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
+using Umbraco.Web;
 
 namespace umbraco.presentation.developer.packages {
     public partial class LoadNitros : System.Web.UI.UserControl {
@@ -54,13 +55,13 @@ namespace umbraco.presentation.developer.packages {
                 //finally install the businesslogic
                 p.InstallBusinessLogic(pId, tempFile);
 
-                //cleanup.. 
+                //cleanup..
                 p.InstallCleanUp(pId, tempFile);
 
             }
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearAllCache();
-            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearAllCaches();
+            Current.ApplicationCache.RuntimeCache.ClearAllCache();
+            Current.ApplicationCache.IsolatedRuntimeCache.ClearAllCaches();
 
             // library.RefreshContent is obsolete, would need to RefreshAllFacade,
             // but it should be managed automatically by services and caches!
@@ -96,7 +97,7 @@ namespace umbraco.presentation.developer.packages {
                     cb_nitro.ID = nitro.RepoGuid.ToString();
                     cb_nitro.Enabled = !installed;
 
-                    cb_nitro.CssClass = "nitroCB";                   
+                    cb_nitro.CssClass = "nitroCB";
 
                     cb_nitro.Text = "<div class='nitro'><h3>" + nitro.Text;
 
@@ -104,7 +105,7 @@ namespace umbraco.presentation.developer.packages {
                         cb_nitro.CssClass = "nitroCB installed";
                         cb_nitro.Text += "<span><a href='#' onclick=\"openDemoModal('" + nitro.RepoGuid.ToString() + "','" + nitro.Text + "'); return false;\">Already installed</a></span>";
                     }
-                    
+
                     cb_nitro.Text += "</h3><small>" + nitro.Description + "<br/>";
 
                     if (!string.IsNullOrEmpty(nitro.Demo)) {

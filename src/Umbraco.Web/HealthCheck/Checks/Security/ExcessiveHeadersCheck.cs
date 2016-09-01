@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Security
@@ -15,10 +16,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class ExcessiveHeadersCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
+        private readonly IRuntimeState _runtime;
 
-        public ExcessiveHeadersCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        public ExcessiveHeadersCheck(ILocalizedTextService textService, IRuntimeState runtime)
         {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _textService = textService;
+            _runtime = runtime;
         }
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var message = string.Empty;
             var success = false;
-            var url = HealthCheckContext.HttpContext.Request.Url;
+            var url = _runtime.ApplicationUrl;
 
             // Access the site home page and check for the headers
             var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);

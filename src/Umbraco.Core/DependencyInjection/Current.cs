@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
@@ -29,7 +30,7 @@ namespace Umbraco.Core.DependencyInjection
                 if (_container == null) throw new Exception("No container has been set.");
                 return _container;
             }
-            set // ok to set - don't be stupid
+            set
             {
                 if (_container != null) throw new Exception("A container has already been set.");
                 _container = value;
@@ -39,6 +40,7 @@ namespace Umbraco.Core.DependencyInjection
         internal static bool HasContainer => _container != null;
 
         // for UNIT TESTS exclusively!
+        // resets *everything* that is 'current'
         internal static void Reset()
         {
             _container = null;
@@ -47,7 +49,7 @@ namespace Umbraco.Core.DependencyInjection
             _logger = null;
             _profiler = null;
             _profilingLogger = null;
-            _applicationContext = null;
+            _pluginManager = null; // fixme - some of our tests don't reset it?
 
             Resetted?.Invoke(null, EventArgs.Empty);
         }
@@ -56,17 +58,8 @@ namespace Umbraco.Core.DependencyInjection
 
         #region Getters
 
-        // fixme - refactor
-        // some of our tests want to *set* the current application context and bypass the container
-        // so for the time being we support it, however we should fix our tests
-
-        private static ApplicationContext _applicationContext;
-
-        public static ApplicationContext ApplicationContext
-        {
-            get { return _applicationContext ?? (_applicationContext = Container.GetInstance<ApplicationContext>()); }
-            set { _applicationContext = value; }
-        }
+        public static IRuntimeState RuntimeState
+            => Container.GetInstance<IRuntimeState>();
 
         // fixme - refactor
         // some of our tests did mess with the current plugin manager
@@ -76,7 +69,9 @@ namespace Umbraco.Core.DependencyInjection
 
         public static PluginManager PluginManager
         {
-            get { return _pluginManager ?? (_pluginManager = Container.TryGetInstance<PluginManager>() ?? PluginManager.Default); }
+            get { return _pluginManager 
+                    ?? (_pluginManager = Container.TryGetInstance<PluginManager>() 
+                        ?? new PluginManager(ApplicationCache.RuntimeCache, ProfilingLogger)); }
             set { _pluginManager = value; }
         }
 
@@ -122,7 +117,7 @@ namespace Umbraco.Core.DependencyInjection
         private static IShortStringHelper _shortStringHelper;
 
         public static IShortStringHelper ShortStringHelper
-            => _shortStringHelper ?? (_shortStringHelper = _container?.TryGetInstance<IShortStringHelper>() 
+            => _shortStringHelper ?? (_shortStringHelper = _container?.TryGetInstance<IShortStringHelper>()
                 ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(UmbracoConfig.For.UmbracoSettings())));
 
         private static ILogger _logger;
@@ -130,16 +125,25 @@ namespace Umbraco.Core.DependencyInjection
         private static ProfilingLogger _profilingLogger;
 
         public static ILogger Logger
-            => _logger ?? (_logger = _container?.TryGetInstance<ILogger>() 
+            => _logger ?? (_logger = _container?.TryGetInstance<ILogger>()
                 ?? new DebugDiagnosticsLogger());
 
         public static IProfiler Profiler
-            => _profiler ?? (_profiler = _container?.TryGetInstance<IProfiler>() 
+            => _profiler ?? (_profiler = _container?.TryGetInstance<IProfiler>()
                 ?? new LogProfiler(Logger));
 
         public static ProfilingLogger ProfilingLogger
             => _profilingLogger ?? (_profilingLogger = _container?.TryGetInstance<ProfilingLogger>())
                ?? new ProfilingLogger(Logger, Profiler);
+
+        public static CacheHelper ApplicationCache
+            => Container.GetInstance<CacheHelper>();
+
+        public static ServiceContext Services
+            => Container.GetInstance<ServiceContext>();
+
+        public static DatabaseContext DatabaseContext
+            => Container.GetInstance<DatabaseContext>();
 
         #endregion
     }

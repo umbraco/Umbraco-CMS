@@ -10,6 +10,7 @@ using System.Web.Security;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
@@ -19,12 +20,12 @@ namespace Umbraco.Core.Configuration
     //NOTE: Do not expose this class ever until we cleanup all configuration including removal of static classes, etc...
     // we have this two tasks logged:
     // http://issues.umbraco.org/issue/U4-58
-    // http://issues.umbraco.org/issue/U4-115	
+    // http://issues.umbraco.org/issue/U4-115
 
     //TODO:  Replace checking for if the app settings exist and returning an empty string, instead return the defaults!
 
     /// <summary>
-    /// The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information from  web.config appsettings 
+    /// The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information from  web.config appsettings
     /// </summary>
     [Obsolete("TODO: Need to move this configuration class into the proper configuration accesors for v8!")]
     public class GlobalSettings
@@ -72,7 +73,7 @@ namespace Umbraco.Core.Configuration
         public static string ReservedUrls
         {
             get
-            {                
+            {
                 if (_reservedUrls == null)
                 {
                     var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
@@ -80,7 +81,7 @@ namespace Umbraco.Core.Configuration
                                    : string.Empty;
 
                     //ensure the built on (non-changeable) reserved paths are there at all times
-                    _reservedUrls = StaticReservedUrls + urls;    
+                    _reservedUrls = StaticReservedUrls + urls;
                 }
                 return _reservedUrls;
             }
@@ -167,11 +168,11 @@ namespace Umbraco.Core.Configuration
         /// <remarks>
         /// THIS IS TEMPORARY AND SHOULD BE REMOVED WHEN WE MIGRATE/UPDATE THE CONFIG SETTINGS TO BE A REAL CONFIG SECTION
         /// AND SHOULD PROBABLY BE HANDLED IN A MORE ROBUST WAY.
-        /// 
+        ///
         /// This will return the MVC area that we will route all custom routes through like surface controllers, etc...
         /// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
         /// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
-		/// 
+		///
         /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
         /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
         /// </remarks>
@@ -233,12 +234,12 @@ namespace Umbraco.Core.Configuration
                 {
                     if (value.ToLower().Contains("SQLCE4Umbraco.SqlCEHelper".ToLower()))
                     {
-                        ApplicationContext.Current.DatabaseContext.ConfigureEmbeddedDatabaseConnection();
+                        Current.DatabaseContext.ConfigureEmbeddedDatabaseConnection();
                     }
                     else
                     {
-                        ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(value);
-                    } 
+                        Current.DatabaseContext.ConfigureDatabaseConnection(value);
+                    }
                 }
             }
         }
@@ -264,7 +265,7 @@ namespace Umbraco.Core.Configuration
                 SaveSetting("umbracoConfigurationStatus", value);
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the Umbraco members membership providers' useLegacyEncoding state. This will return a boolean
         /// </summary>
@@ -280,7 +281,7 @@ namespace Umbraco.Core.Configuration
                 SetMembershipProvidersLegacyEncoding(Constants.Conventions.Member.UmbracoMemberProviderName, value);
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the Umbraco users membership providers' useLegacyEncoding state. This will return a boolean
         /// </summary>
@@ -296,7 +297,7 @@ namespace Umbraco.Core.Configuration
                 SetMembershipProvidersLegacyEncoding(UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider, value);
             }
         }
-		
+
         /// <summary>
         /// Saves a setting into the configuration file.
         /// </summary>
@@ -337,7 +338,7 @@ namespace Umbraco.Core.Configuration
                 setting.Remove();
                 xml.Save(fileName, SaveOptions.DisableFormatting);
                 ConfigurationManager.RefreshSection("appSettings");
-            }        
+            }
         }
 
         private static void SetMembershipProvidersLegacyEncoding(string providerName, bool useLegacyEncoding)
@@ -359,16 +360,16 @@ namespace Umbraco.Core.Configuration
 
             var membershipConfigs = webConfigXml.XPathSelectElements("configuration/system.web/membership/providers/add").ToList();
 
-            if (membershipConfigs.Any() == false) 
+            if (membershipConfigs.Any() == false)
                 return;
 
             var provider = membershipConfigs.SingleOrDefault(c => c.Attribute("name") != null && c.Attribute("name").Value == providerName);
 
-            if (provider == null) 
+            if (provider == null)
                 return;
 
             provider.SetAttributeValue("useLegacyEncoding", useLegacyEncoding);
-            
+
             webConfigXml.Save(webConfigFilename, SaveOptions.DisableFormatting);
         }
 
@@ -381,7 +382,7 @@ namespace Umbraco.Core.Configuration
                 return false;
             }
 
-            return membershipProvider.UseLegacyEncoding;            
+            return membershipProvider.UseLegacyEncoding;
         }
 
         /// <summary>
@@ -410,36 +411,6 @@ namespace Umbraco.Core.Configuration
                     //go and get it from config directly
                     var section = ConfigurationManager.GetSection("system.web/compilation") as CompilationSection;
                     return section != null && section.Debug;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the current version of umbraco is configured.
-        /// </summary>
-        /// <value><c>true</c> if configured; otherwise, <c>false</c>.</value>
-        [Obsolete("Do not use this, it is no longer in use and will be removed from the codebase in future versions")]
-        internal static bool Configured
-        {
-            get
-            {
-                try
-                {
-                    string configStatus = ConfigurationStatus;
-                    string currentVersion = UmbracoVersion.GetSemanticVersion().ToSemanticString();
-
-
-                    if (currentVersion != configStatus)
-                    {
-                        LogHelper.Debug<GlobalSettings>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
-                    }
-
-
-                    return (configStatus == currentVersion);
                 }
                 catch
                 {
@@ -525,7 +496,7 @@ namespace Umbraco.Core.Configuration
             get
             {
                 //defaults to false
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLUseLocalTemp") 
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLUseLocalTemp")
                     && bool.Parse(ConfigurationManager.AppSettings["umbracoContentXMLUseLocalTemp"]); //default to false
             }
         }
@@ -597,7 +568,7 @@ namespace Umbraco.Core.Configuration
         [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string CurrentVersion
         {
-            get { return UmbracoVersion.GetSemanticVersion().ToSemanticString(); }
+            get { return UmbracoVersion.SemanticVersion.ToSemanticString(); }
         }
 
         /// <summary>
@@ -729,7 +700,7 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Determines whether the current request is reserved based on the route table and 
+        /// Determines whether the current request is reserved based on the route table and
         /// whether the specified URL is reserved or is inside a reserved path.
         /// </summary>
         /// <param name="url"></param>
@@ -768,7 +739,7 @@ namespace Umbraco.Core.Configuration
                         // store references to strings to determine changes
                         _reservedPathsCache = GlobalSettings.ReservedPaths;
                         _reservedUrlsCache = GlobalSettings.ReservedUrls;
-                        
+
                         // add URLs and paths to a new list
                         var newReservedList = new HashSet<string>();
                         foreach (var reservedUrlTrimmed in _reservedUrlsCache
@@ -810,7 +781,7 @@ namespace Umbraco.Core.Configuration
             return _reservedList.Any(x => pathPart.InvariantStartsWith(x));
         }
 
-      
+
 
     }
 

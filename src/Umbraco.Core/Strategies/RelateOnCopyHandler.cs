@@ -1,13 +1,14 @@
 ﻿using System;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Strategies
 {
-    //TODO: This should just exist in the content service/repo! 
+    //TODO: This should just exist in the content service/repo!
     public sealed class RelateOnCopyHandler : ApplicationEventHandler
     {
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
         {
             ContentService.Copied += ContentServiceCopied;
         }
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Strategies
         {
             if (e.RelateToOriginal)
             {
-                var relationService = ApplicationContext.Current.Services.RelationService;
+                var relationService = Current.Services.RelationService;
 
                 var relationType = relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
 
@@ -33,7 +34,7 @@ namespace Umbraco.Core.Strategies
                 var relation = new Relation(e.Original.Id, e.Copy.Id, relationType);
                 relationService.Save(relation);
 
-                ApplicationContext.Current.Services.AuditService.Add(
+                Current.Services.AuditService.Add(
                     AuditType.Copy,
                     string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
                         e.Copy.Id, e.Original.Id), e.Copy.WriterId, e.Copy.Id);

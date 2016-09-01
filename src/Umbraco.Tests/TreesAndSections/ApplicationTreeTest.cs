@@ -5,6 +5,7 @@ using Umbraco.Tests.TestHelpers;
 using System;
 using System.Linq;
 using Umbraco.Web.Services;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.TreesAndSections
 {
@@ -60,22 +61,22 @@ namespace Umbraco.Tests.TreesAndSections
             //create new app
             var appName = Guid.NewGuid().ToString("N");
             var treeName = Guid.NewGuid().ToString("N");
-            ApplicationContext.Services.SectionService.MakeNew(appName, appName, "icon.jpg");
+            Current.Services.SectionService.MakeNew(appName, appName, "icon.jpg");
 
             //check if it exists
-            var app = ApplicationContext.Services.SectionService.GetByAlias(appName);
+            var app = Current.Services.SectionService.GetByAlias(appName);
             Assert.IsNotNull(app);
 
             //create the new app tree assigned to the new app
-            ApplicationContext.Services.ApplicationTreeService.MakeNew(false, 0, app.Alias, treeName, treeName, "icon.jpg", "icon.jpg", "Umbraco.Web.Trees.ContentTreeController, umbraco");
-            var tree = ApplicationContext.Services.ApplicationTreeService.GetByAlias(treeName);
+            Current.Services.ApplicationTreeService.MakeNew(false, 0, app.Alias, treeName, treeName, "icon.jpg", "icon.jpg", "Umbraco.Web.Trees.ContentTreeController, umbraco");
+            var tree = Current.Services.ApplicationTreeService.GetByAlias(treeName);
             Assert.IsNotNull(tree);
 
             //now delete the app
-            ApplicationContext.Services.SectionService.DeleteSection(app);
+            Current.Services.SectionService.DeleteSection(app);
 
             //check that the tree is gone
-            Assert.AreEqual(0, ApplicationContext.Services.ApplicationTreeService.GetApplicationTrees(treeName).Count());
+            Assert.AreEqual(0, Current.Services.ApplicationTreeService.GetApplicationTrees(treeName).Count());
         }
 
 

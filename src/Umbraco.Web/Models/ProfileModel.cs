@@ -34,10 +34,10 @@ namespace Umbraco.Web.Models
             MemberProperties = new List<UmbracoProperty>();
             if (doLookup)
             {
-                var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+                var helper = new MembershipHelper(new HttpContextWrapper(HttpContext.Current));
                 var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
-            }   
+            }
         }
 
         [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.CreateProfileModel or the static ProfileModel.CreateModel() to create an empty model.")]
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Models
 
         /// <summary>
         /// The member's member type alias
-        /// </summary>        
+        /// </summary>
         [ReadOnly(true)]
         public string MemberTypeAlias { get; set; }
 

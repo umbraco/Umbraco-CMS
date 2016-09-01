@@ -36,7 +36,7 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(JsonPayload[] payloads)
         {
-            var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+            var runtimeCache = Current.ApplicationCache.RuntimeCache;
             runtimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
             foreach (var payload in payloads)
             {
@@ -61,12 +61,12 @@ namespace Umbraco.Web.Cache
             if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) || publishedChanged)
             {
                 // when a public version changes
-                ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+                Current.ApplicationCache.ClearPartialViewCache();
                 MacroCacheRefresher.ClearMacroContentCache(CacheHelper); // just the content
                 ClearXsltCache();
 
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+                Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+                Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
             }
 
             base.Refresh(payloads);
@@ -142,7 +142,7 @@ namespace Umbraco.Web.Cache
         {
             // todo: document where this is coming from
             if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration <= 0) return;
-            ApplicationContext.Current.ApplicationCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
+            Current.ApplicationCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
         }
 
         #endregion

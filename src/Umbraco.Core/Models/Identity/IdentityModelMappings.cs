@@ -4,12 +4,20 @@ using AutoMapper;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.Identity
 {
     public class IdentityModelMappings : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
+        private readonly ILocalizedTextService _textService;
+
+        public IdentityModelMappings(ILocalizedTextService textService)
+        {
+            _textService = textService;
+        }
+
+        public override void ConfigureMappings(IMapperConfiguration config)
         {
             config.CreateMap<IUser, BackOfficeIdentityUser>()
                 .ForMember(user => user.Email, expression => expression.MapFrom(user => user.Email))
@@ -17,7 +25,7 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.LockoutEndDateUtc, expression => expression.MapFrom(user => user.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?) null))
                 .ForMember(user => user.UserName, expression => expression.MapFrom(user => user.Username))
                 .ForMember(user => user.PasswordHash, expression => expression.MapFrom(user => GetPasswordHash(user.RawPasswordValue)))
-                .ForMember(user => user.Culture, expression => expression.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
+                .ForMember(user => user.Culture, expression => expression.MapFrom(user => user.GetUserCulture(_textService)))
                 .ForMember(user => user.Name, expression => expression.MapFrom(user => user.Name))
                 .ForMember(user => user.StartMediaId, expression => expression.MapFrom(user => user.StartMediaId))
                 .ForMember(user => user.StartContentId, expression => expression.MapFrom(user => user.StartContentId))

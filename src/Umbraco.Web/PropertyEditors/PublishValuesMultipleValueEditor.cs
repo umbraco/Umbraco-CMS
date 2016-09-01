@@ -26,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         public PublishValuesMultipleValueEditor(bool publishIds, PropertyValueEditor wrapped)
-            : this(publishIds, ApplicationContext.Current.Services.DataTypeService, wrapped)
+            : this(publishIds, Current.Services.DataTypeService, wrapped)
         {
         }
 

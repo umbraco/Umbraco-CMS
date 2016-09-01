@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-
-using umbraco.cms.businesslogic.template;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {

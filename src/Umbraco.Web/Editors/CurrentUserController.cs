@@ -17,16 +17,15 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
-
         /// <summary>
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
         /// </summary>
         /// <returns></returns>
         public IDictionary<string, object> GetMembershipProviderConfig()
         {
-            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();            
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return provider.GetConfiguration();
-        } 
+        }
 
         /// <summary>
         /// Changes the users password

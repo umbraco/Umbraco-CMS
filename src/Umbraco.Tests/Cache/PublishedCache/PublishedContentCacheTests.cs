@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
 		private string GetXml()
 		{
-			return @"<?xml version=""1.0"" encoding=""utf-8""?><!DOCTYPE root[ 
+			return @"<?xml version=""1.0"" encoding=""utf-8""?><!DOCTYPE root[
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
 
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             base.Initialize();
 
             _httpContextFactory = new FakeHttpContextFactory("~/Home");
-            
+
 		    var settings = SettingsForTests.GenerateMockSettings();
 
 		    SettingsForTests.ConfigureSettings(settings);
@@ -65,15 +65,15 @@ namespace Umbraco.Tests.Cache.PublishedCache
 		    var facade = new Facade(
 		        new PublishedContentCache(xmlStore, domainCache, cacheProvider, ContentTypesCache, null, null),
 		        new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, cacheProvider, ContentTypesCache),
-		        new PublishedMemberCache(null, cacheProvider, ApplicationContext.Services.MemberService, ContentTypesCache),
+		        new PublishedMemberCache(null, cacheProvider, Current.Services.MemberService, ContentTypesCache),
 		        domainCache);
 		    var facadeService = new Mock<IFacadeService>();
 		    facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
 
 		    _umbracoContext = UmbracoContext.CreateContext(
-		        _httpContextFactory.HttpContext, ApplicationContext,
+		        _httpContextFactory.HttpContext,
 		        facadeService.Object,
-		        new WebSecurity(_httpContextFactory.HttpContext, ApplicationContext),
+		        new WebSecurity(_httpContextFactory.HttpContext, Current.Services.UserService),
 		        settings,
 		        Enumerable.Empty<IUrlProvider>());
 
@@ -111,9 +111,9 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			Assert.AreEqual(nodeId, result.Id);
 		}
 
-	
 
-		[TestCase("/", 1046)]		
+
+		[TestCase("/", 1046)]
 		[TestCase("/sub1", 1173)]
 		[TestCase("/Sub1", 1173)]
 		public void Get_Node_By_Route_Hiding_Top_Level_Nodes(string route, int nodeId)

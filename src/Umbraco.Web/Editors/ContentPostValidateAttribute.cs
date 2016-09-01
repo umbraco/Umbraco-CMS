@@ -24,7 +24,7 @@ namespace Umbraco.Web.Editors
         private readonly IUserService _userService;
 
         public ContentPostValidateAttribute()
-        {            
+        {
         }
 
         public ContentPostValidateAttribute(IContentService contentService, IUserService userService, WebSecurity security)
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Editors
 
         private IContentService ContentService
         {
-            get { return _contentService ?? ApplicationContext.Current.Services.ContentService; }
+            get { return _contentService ?? Current.Services.ContentService; }
         }
 
         private WebSecurity Security
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
 
         private IUserService UserService
         {
-            get { return _userService ?? ApplicationContext.Current.Services.UserService; }
+            get { return _userService ?? Current.Services.UserService; }
         }
 
         public override bool AllowMultiple

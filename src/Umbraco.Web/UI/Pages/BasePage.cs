@@ -1,19 +1,12 @@
 using System;
-using System.Data;
 using System.Web;
-using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
-using umbraco.BusinessLogic;
-using umbraco.DataLayer;
 using System.Web.UI;
 
 namespace Umbraco.Web.UI.Pages
@@ -26,113 +19,56 @@ namespace Umbraco.Web.UI.Pages
     /// </summary>
     public class BasePage : Page
     {
-        
-        private ClientTools _clientTools;
-        
-
-        //We won't expose this... people should be using the DatabaseContext for custom queries if they need them.
-
-        ///// <summary>
-        ///// Gets the SQL helper.
-        ///// </summary>
-        ///// <value>The SQL helper.</value>
-        //protected ISqlHelper SqlHelper
-        //{
-        //    get { return global::umbraco.BusinessLogic.Application.SqlHelper; }
-        //}
-
-        /// <summary>
-        /// Returns an ILogger
-        /// </summary>
-        public ILogger Logger
-        {
-            get { return ProfilingLogger.Logger; }
-        }
-
-        /// <summary>
-        /// Returns a ProfilingLogger
-        /// </summary>
-        public ProfilingLogger ProfilingLogger
-        {
-            get { return _logger ?? (_logger = new ProfilingLogger(Current.Logger, Current.Profiler)); }
-        }
-
-        private ProfilingLogger _logger;
-        
-
-	    private UrlHelper _url;
-		/// <summary>
-		/// Returns a UrlHelper
-		/// </summary>
-		/// <remarks>
-		/// This URL helper is created without any route data and an empty request context
-		/// </remarks>
-	    public UrlHelper Url
-	    {
-		    get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
-	    }
-
+        private UrlHelper _url;
         private HtmlHelper _html;
+        private ClientTools _clientTools;
+
         /// <summary>
-        /// Returns a HtmlHelper
+        /// Gets the logger.
+        /// </summary>
+        public ILogger Logger => Current.Logger;
+
+        /// <summary>
+        /// Gets the profiling helper.
+        /// </summary>
+        public ProfilingLogger ProfilingLogger => Current.ProfilingLogger;
+
+        /// <summary>
+        /// Gets the Url helper.
+        /// </summary>
+        /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
+        public UrlHelper Url => _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData())));
+
+        /// <summary>
+        /// Gets the Html helper.
         /// </summary>        
-        /// <remarks>
-        /// This html helper is created with an empty context and page so it may not have all of the functionality expected.
-        /// </remarks>
-        public HtmlHelper Html
-        {
-            get { return _html ?? (_html = new HtmlHelper(new ViewContext(), new ViewPage())); }
-        }
+        /// <remarks>This html helper is created with an empty context and page so it may not have all of the functionality expected.</remarks>
+        public HtmlHelper Html => _html ?? (_html = new HtmlHelper(new ViewContext(), new ViewPage()));
 
         /// <summary>
-        /// Returns the current ApplicationContext
+        /// Gets the Umbraco context.
         /// </summary>
-        public ApplicationContext ApplicationContext
-        {
-            get { return ApplicationContext.Current; }
-        }
+        public UmbracoContext UmbracoContext => Current.UmbracoContext;
 
         /// <summary>
-        /// Returns the current UmbracoContext
+        /// Gets the web security helper.
         /// </summary>
-        public UmbracoContext UmbracoContext
-        {
-            get { return UmbracoContext.Current; }
-        }
+        public WebSecurity Security => UmbracoContext.Security;
 
         /// <summary>
-        /// Returns the current WebSecurity instance
+        /// Gets the services context.
         /// </summary>
-        public WebSecurity Security
-        {
-            get { return UmbracoContext.Security; }
-        }
+        public ServiceContext Services => Current.Services;
 
         /// <summary>
-        /// Returns a ServiceContext
+        /// Gets the database context.
         /// </summary>
-        public ServiceContext Services
-        {
-            get { return ApplicationContext.Services; }
-        }
+        public DatabaseContext DatabaseContext => Current.DatabaseContext;
 
         /// <summary>
-        /// Returns a DatabaseContext
+        /// Gets an instance of ClientTools for access to the pages client API.
         /// </summary>
-        public DatabaseContext DatabaseContext
-        {
-            get { return ApplicationContext.DatabaseContext; }
-        }
-
-        /// <summary>
-        /// Returns a refernce of an instance of ClientTools for access to the pages client API
-        /// </summary>
-        public ClientTools ClientTools
-        {
-            get { return _clientTools ?? (_clientTools = new ClientTools(this)); }
-        }
-        
-        
+        public ClientTools ClientTools => _clientTools ?? (_clientTools = new ClientTools(this));
 
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Load"></see> event.
@@ -142,12 +78,10 @@ namespace Umbraco.Web.UI.Pages
         {
             base.OnLoad(e);
 
-            if (!Request.IsSecureConnection && GlobalSettings.UseSSL)
-            {
-                string serverName = HttpUtility.UrlEncode(Request.ServerVariables["SERVER_NAME"]);
-                Response.Redirect(string.Format("https://{0}{1}", serverName, Request.FilePath));
-            }
-        }
+            if (Request.IsSecureConnection || GlobalSettings.UseSSL == false) return;
 
+            var serverName = HttpUtility.UrlEncode(Request.ServerVariables["SERVER_NAME"]);
+            Response.Redirect($"https://{serverName}{Request.FilePath}");
+        }
     }
 }

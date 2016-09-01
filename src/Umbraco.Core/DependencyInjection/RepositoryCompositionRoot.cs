@@ -20,6 +20,8 @@ namespace Umbraco.Core.DependencyInjection
 
         public void Compose(IServiceRegistry container)
         {
+            // fixme - moved these to CoreRuntime
+            /*
             // register syntax providers
             container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
             container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>("SqlCeSyntaxProvider");
@@ -31,8 +33,10 @@ namespace Umbraco.Core.DependencyInjection
             // until the database context configures it properly (eg when installing)
             container.RegisterSingleton<IDatabaseFactory, DefaultDatabaseFactory>();
 
-            // register a database accessor - will be replaced
+            // register a database accessor - will be replaced - fixme - what does this mean?
+            // by HybridUmbracoDatabaseAccessor in the web project - so what?
             container.RegisterSingleton<IUmbracoDatabaseAccessor, ThreadStaticUmbracoDatabaseAccessor>();
+            */
 
             // register database context
             container.RegisterSingleton<DatabaseContext>();
@@ -117,9 +121,10 @@ namespace Umbraco.Core.DependencyInjection
             var serviceContainer = container as IServiceContainer;
             if (serviceContainer == null) throw new Exception("Container is not IServiceContainer.");
 
+            // fixme fixme fixme more
             // register persistence mappers
-            MapperCollectionBuilder.Register(serviceContainer)
-                .AddProducer(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
+            //MapperCollectionBuilder.Register(serviceContainer)
+            //    .AddProducer(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
         }
     }
 }

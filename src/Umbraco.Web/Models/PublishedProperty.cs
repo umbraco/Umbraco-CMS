@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models
             Func<PublishedPropertyType, object, IPublishedProperty> map)
         {
             var propertyEditors = Current.PropertyEditors;
-            var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            var dataTypeService = Current.Services.DataTypeService;
 
             return propertyTypes.Select(x =>
                 {

@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using umbraco.DataLayer;
+using Umbraco.Core.DependencyInjection;
 
 
 namespace umbraco.cms.businesslogic.task
@@ -66,29 +67,29 @@ namespace umbraco.cms.businesslogic.task
         {
             TaskTypeEntity = tt;
         }
-        
+
         public TaskType()
         {
         }
 
         public TaskType(string TypeAlias)
         {
-            TaskTypeEntity = ApplicationContext.Current.Services.TaskService.GetTaskTypeByAlias(TypeAlias);
-            if (TaskTypeEntity == null) throw new NullReferenceException("No task type found by alias " + TypeAlias);            
+            TaskTypeEntity = Current.Services.TaskService.GetTaskTypeByAlias(TypeAlias);
+            if (TaskTypeEntity == null) throw new NullReferenceException("No task type found by alias " + TypeAlias);
         }
 
         public TaskType(int TaskTypeId)
         {
-            TaskTypeEntity = ApplicationContext.Current.Services.TaskService.GetTaskTypeById(TaskTypeId);
-            if (TaskTypeEntity == null) throw new NullReferenceException("No task type found by alias " + TaskTypeId);            
-        } 
-        #endregion      
+            TaskTypeEntity = Current.Services.TaskService.GetTaskTypeById(TaskTypeId);
+            if (TaskTypeEntity == null) throw new NullReferenceException("No task type found by alias " + TaskTypeId);
+        }
+        #endregion
 
         #region Public methods
 
         public void Save()
         {
-            ApplicationContext.Current.Services.TaskService.Save(TaskTypeEntity);
+            Current.Services.TaskService.Save(TaskTypeEntity);
         }
 
         /// <summary>
@@ -97,8 +98,8 @@ namespace umbraco.cms.businesslogic.task
         /// </summary>
         public void Delete()
         {
-            ApplicationContext.Current.Services.TaskService.Delete(TaskTypeEntity);
-        } 
+            Current.Services.TaskService.Delete(TaskTypeEntity);
+        }
 
         #endregion
 
@@ -109,10 +110,10 @@ namespace umbraco.cms.businesslogic.task
         /// <returns></returns>
         public static IEnumerable<TaskType> GetAll()
         {
-            return ApplicationContext.Current.Services.TaskService.GetAllTaskTypes()
+            return Current.Services.TaskService.GetAllTaskTypes()
                 .Select(x => new TaskType(x));
-        } 
+        }
         #endregion
-	
+
     }
 }

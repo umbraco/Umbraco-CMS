@@ -3,9 +3,10 @@ using System.Web.Security;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
-using Umbraco.Core.Security;
 using Umbraco.Core;
+using Umbraco.Web;
 using Umbraco.Web._Legacy.UI;
+using MembershipProviderExtensions = Umbraco.Core.Security.MembershipProviderExtensions;
 
 namespace umbraco
 {
@@ -63,16 +64,16 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                LogHelper.Error<userTasks>(string.Format("Failed to create the user. Error from provider: {0}", status.ToString()), ex);                
+                LogHelper.Error<userTasks>(string.Format("Failed to create the user. Error from provider: {0}", status.ToString()), ex);
                 return false;
             }
         }
 
         public override bool PerformDelete()
         {
-            var u = ApplicationContext.Current.Services.UserService.GetUserById(ParentID);
+            var u = Current.Services.UserService.GetUserById(ParentID);
             u.IsApproved = false;
-            ApplicationContext.Current.Services.UserService.Save(u);
+            Current.Services.UserService.Save(u);
             return true;
         }
     }

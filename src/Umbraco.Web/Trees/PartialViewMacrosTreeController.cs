@@ -1,6 +1,4 @@
-﻿using System.Text;
-using Umbraco.Core.IO;
-using umbraco.cms.presentation.Trees;
+﻿using Umbraco.Core.IO;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Trees
@@ -11,7 +9,7 @@ namespace Umbraco.Web.Trees
 	[Tree(Constants.Applications.Developer, Constants.Trees.PartialViewMacros, "Partial View Macro Files", sortOrder: 6)]
 	public class PartialViewMacrosTreeController : PartialViewsTreeController
 	{
-		protected override string FilePath
+	    protected override string FilePath
 		{
 			get { return SystemDirectories.MvcViews + "/MacroPartials/"; }
 		}

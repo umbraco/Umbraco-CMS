@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using umbraco.cms.businesslogic.packager;
-using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -12,11 +12,13 @@ namespace Umbraco.Web.Install.InstallSteps
         "StarterKitDownload", "starterKit", 30, "Adding a simple website to Umbraco, will make it easier for you to get started")]
     internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {
-        private readonly ApplicationContext _applicationContext;
+        private readonly InstallHelper _installHelper;
+        private readonly IContentService _contentService;
 
-        public StarterKitDownloadStep(ApplicationContext applicationContext)
+        public StarterKitDownloadStep(IContentService contentService, InstallHelper installHelper)
         {
-            _applicationContext = applicationContext;
+            _installHelper = installHelper;
+            _contentService = contentService;
         }
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
@@ -26,8 +28,7 @@ namespace Umbraco.Web.Install.InstallSteps
             //if there is no value assigned then use the default starter kit
             if (starterKitId.HasValue == false)
             {
-                var installHelper = new InstallHelper(UmbracoContext.Current);
-                var starterKits = installHelper.GetStarterKits().FirstOrDefault();
+                var starterKits = _installHelper.GetStarterKits().FirstOrDefault();
                 if (starterKits != null)
                     starterKitId = starterKits.Id;
                 else
@@ -96,7 +97,7 @@ namespace Umbraco.Web.Install.InstallSteps
             if (InstalledPackage.GetAllInstalledPackages().Count > 0)
                 return false;
 
-            if (_applicationContext.Services.ContentService.GetRootContent().Any())
+            if (_contentService.GetRootContent().Any())
                 return false;
 
             return true;

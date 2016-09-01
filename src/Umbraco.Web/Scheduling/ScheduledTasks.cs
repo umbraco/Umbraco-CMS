@@ -17,15 +17,15 @@ namespace Umbraco.Web.Scheduling
 
     internal class ScheduledTasks : RecurringTaskBase
     {
-        private readonly ApplicationContext _appContext;
+        private readonly IRuntimeState _runtime;
         private readonly IUmbracoSettingsSection _settings;
         private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
 
-        public ScheduledTasks(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
-            ApplicationContext appContext, IUmbracoSettingsSection settings)
+        public ScheduledTasks(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
+            IRuntimeState runtime, IUmbracoSettingsSection settings)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
-            _appContext = appContext;
+            _runtime = runtime;
             _settings = settings;
         }
 
@@ -88,9 +88,7 @@ namespace Umbraco.Web.Scheduling
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
-            if (_appContext == null) return true; // repeat...
-
-            switch (_appContext.GetCurrentServerRole())
+            switch (_runtime.ServerRole)
             {
                 case ServerRole.Slave:
                     LogHelper.Debug<ScheduledTasks>("Does not run on slave servers.");
@@ -101,7 +99,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_appContext.MainDom.IsMainDom == false)
+            if (_runtime.IsMainDom == false)
             {
                 LogHelper.Debug<ScheduledTasks>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down

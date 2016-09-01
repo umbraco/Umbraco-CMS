@@ -26,7 +26,7 @@ namespace Umbraco.Web.Redirects
         private const string ContextKey3 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.3";
 
         /// <inheritdoc />
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
         {
             // events are weird
             // on 'published' we 'could' get the old or the new route depending on event handlers order
@@ -163,7 +163,7 @@ namespace Umbraco.Web.Redirects
             var contentCache = UmbracoContext.Current.ContentCache;
             var newRoute = contentCache.GetRouteById(contentId);
             if (IsNotRoute(newRoute) || oldRoute == newRoute) return;
-            var redirectUrlService = ApplicationContext.Current.Services.RedirectUrlService;
+            var redirectUrlService = Current.Services.RedirectUrlService;
             redirectUrlService.Register(oldRoute, contentKey);
         }
 

@@ -17,13 +17,10 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public sealed class MemberAuthorizeAttribute : AuthorizeAttribute
     {
-
+        // see note in HttpInstallAuthorizeAttribute
         private readonly UmbracoContext _umbracoContext;
 
-        private UmbracoContext GetUmbracoContext()
-        {
-            return _umbracoContext ?? UmbracoContext.Current;
-        }
+        private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
@@ -83,7 +80,7 @@ namespace Umbraco.Web.Mvc
                 }
             }
 
-            return GetUmbracoContext().Security.IsMemberAuthorized(AllowAll,
+            return UmbracoContext.Security.IsMemberAuthorized(AllowAll,
                                                   AllowType.Split(','),
                                                   AllowGroup.Split(','),
                                                   members);

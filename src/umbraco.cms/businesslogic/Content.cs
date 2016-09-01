@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 using File = System.IO.File;
@@ -81,10 +82,10 @@ namespace umbraco.cms.businesslogic
         public static Content[] getContentOfContentType(ContentType ct)
         {
             var list = new List<Content>();
-            var content = ApplicationContext.Current.Services.ContentService.GetContentOfContentType(ct.Id);
+            var content = Current.Services.ContentService.GetContentOfContentType(ct.Id);
             list.AddRange(content.OrderBy(x => x.Name).Select(x => new Content(x)));
 
-            var media = ApplicationContext.Current.Services.MediaService.GetMediaOfMediaType(ct.Id);
+            var media = Current.Services.MediaService.GetMediaOfMediaType(ct.Id);
             list.AddRange(media.OrderBy(x => x.Name).Select(x => new Content(x)));
 
             return list.ToArray();
@@ -98,13 +99,13 @@ namespace umbraco.cms.businesslogic
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetByIdVersion() or Umbraco.Core.Services.MediaService.GetByIdVersion()", false)]
         public static Content GetContentFromVersion(Guid version)
         {
-            var content = ApplicationContext.Current.Services.ContentService.GetByVersion(version);
+            var content = Current.Services.ContentService.GetByVersion(version);
             if (content != null)
             {
                 return new Content(content);
             }
 
-            var media = ApplicationContext.Current.Services.MediaService.GetByVersion(version);
+            var media = Current.Services.MediaService.GetByVersion(version);
             return new Content(media);
         }
 
@@ -190,7 +191,7 @@ namespace umbraco.cms.businesslogic
                 if (_versionDateInitialized) return _versionDate;
 
                 // content & media have a version date in cmsContentVersion that is updated when saved - use it
-                var db = ApplicationContext.Current.DatabaseContext.Database;
+                var db = Current.DatabaseContext.Database;
                 _versionDate = db.ExecuteScalar<DateTime>("SELECT versionDate FROM cmsContentVersion WHERE versionId=@versionId",
                     new { @versionId = Version });
                 _versionDateInitialized = true;
@@ -251,7 +252,7 @@ namespace umbraco.cms.businesslogic
             // Delete all data associated with this content
             this.deleteAllProperties();
 
-            OnDeletedContent(new ContentDeleteEventArgs(ApplicationContext.Current.DatabaseContext.Database, Id));
+            OnDeletedContent(new ContentDeleteEventArgs(Current.DatabaseContext.Database, Id));
 
             // Delete version history
             SqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);

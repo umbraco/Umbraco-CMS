@@ -2,24 +2,16 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.UI.WebControls;
 using System.Xml;
-using System.Xml.Linq;
-using umbraco;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.packager;
 using umbraco.cms.businesslogic.packager.repositories;
-using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.presentation.developer.packages;
-using umbraco.webservices;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -34,7 +26,6 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
-using Settings = umbraco.cms.businesslogic.packager.Settings;
 using Version = System.Version;
 
 namespace Umbraco.Web.Editors
@@ -97,9 +88,7 @@ namespace Umbraco.Web.Editors
                 if (int.TryParse(item, out nId) == false) continue;
                 var found = Services.FileService.GetTemplate(nId);
                 if (found != null)
-                {
-                    ApplicationContext.Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId());
-                }
+                    Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId());
                 pack.Data.Templates.Remove(nId.ToString());
             }
 
@@ -541,7 +530,7 @@ namespace Umbraco.Web.Editors
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(ApplicationContext.ProfilingLogger.Logger);
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
 
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.

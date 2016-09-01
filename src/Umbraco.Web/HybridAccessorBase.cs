@@ -2,6 +2,7 @@ using System;
 
 namespace Umbraco.Web
 {
+    // fixme - must ensure that the ThreadStatic value is properly cleared!
     internal abstract class HybridAccessorBase<T>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -21,14 +22,14 @@ namespace Umbraco.Web
             get
             {
                 var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null) return _value; //throw new Exception("oops:httpContext");
+                if (httpContext == null) return _value;
                 return (T) httpContext.Items[HttpContextItemKey];
             }
 
             set
             {
                 var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null) //throw new Exception("oops:httpContext");
+                if (httpContext == null)
                 {
                     _value = value;
                     return;

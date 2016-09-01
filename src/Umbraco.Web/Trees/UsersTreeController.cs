@@ -74,7 +74,7 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                // Root actions              
+                // Root actions
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
                     .ConvertLegacyMenuItem(null, "users", queryStrings.GetValue<string>("application"));
 
@@ -91,7 +91,7 @@ namespace Umbraco.Web.Trees
             {
                 Name = Services.TextService.Localize("actions", "disable")
             });
-            
+
             return menu;
         }
     }

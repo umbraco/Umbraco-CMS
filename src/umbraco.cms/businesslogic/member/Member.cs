@@ -16,6 +16,7 @@ using System.Web.Security;
 using System.Text;
 using System.Security.Cryptography;
 using System.Linq;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Xml;
@@ -110,7 +111,7 @@ namespace umbraco.cms.businesslogic.member
         public static IEnumerable<Member> GetAllAsList()
         {
             long totalRecs;
-            return ApplicationContext.Current.Services.MemberService.GetAll(0, int.MaxValue, out totalRecs)
+            return Current.Services.MemberService.GetAll(0, int.MaxValue, out totalRecs)
                 .Select(x => new Member(x))
                 .ToArray();
         }
@@ -139,7 +140,7 @@ namespace umbraco.cms.businesslogic.member
 
             if (ids.Any())
             {
-                return ApplicationContext.Current.Services.MemberService.GetAllMembers(ids.ToArray())
+                return Current.Services.MemberService.GetAllMembers(ids.ToArray())
                     .Select(x => new Member(x))
                     .ToArray();
             }
@@ -156,7 +157,7 @@ namespace umbraco.cms.businesslogic.member
         {
             long totalRecs;
 
-            return ApplicationContext.Current.Services.MemberService.FindMembersByDisplayName(
+            return Current.Services.MemberService.FindMembersByDisplayName(
                 letter.ToString(CultureInfo.InvariantCulture), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith)
                                      .Select(x => new Member(x))
                                      .ToArray();
@@ -167,13 +168,13 @@ namespace umbraco.cms.businesslogic.member
             long totalRecs;
             if (matchByNameInsteadOfLogin)
             {
-                var found = ApplicationContext.Current.Services.MemberService.FindMembersByDisplayName(
+                var found = Current.Services.MemberService.FindMembersByDisplayName(
                     usernameToMatch, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith);
                 return found.Select(x => new Member(x)).ToArray();
             }
             else
             {
-                var found = ApplicationContext.Current.Services.MemberService.FindByUsername(
+                var found = Current.Services.MemberService.FindByUsername(
                     usernameToMatch, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith);
                 return found.Select(x => new Member(x)).ToArray();
             }
@@ -228,7 +229,7 @@ namespace umbraco.cms.businesslogic.member
             if (GetMemberFromLoginName(loginName) != null)
                 throw new Exception(string.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
-            var model = ApplicationContext.Current.Services.MemberService.CreateMemberWithIdentity(
+            var model = Current.Services.MemberService.CreateMemberWithIdentity(
                 loginName, Email.ToLower(), Name, mbt.MemberTypeItem);
 
             //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Saving' event has been cancelled, so we return null.
@@ -253,7 +254,7 @@ namespace umbraco.cms.businesslogic.member
         {
             Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
 
-            var found = ApplicationContext.Current.Services.MemberService.GetByUsername(loginName);
+            var found = Current.Services.MemberService.GetByUsername(loginName);
             if (found == null) return null;
 
             return new Member(found);
@@ -271,7 +272,7 @@ namespace umbraco.cms.businesslogic.member
             if (string.IsNullOrEmpty(email))
                 return null;
 
-            var found = ApplicationContext.Current.Services.MemberService.GetByEmail(email);
+            var found = Current.Services.MemberService.GetByEmail(email);
             if (found == null) return null;
 
             return new Member(found);
@@ -290,7 +291,7 @@ namespace umbraco.cms.businesslogic.member
                 return null;
 
             long totalRecs;
-            var found = ApplicationContext.Current.Services.MemberService.FindByEmail(
+            var found = Current.Services.MemberService.FindByEmail(
                 email, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
 
             return found.Select(x => new Member(x)).ToArray();
@@ -368,7 +369,7 @@ namespace umbraco.cms.businesslogic.member
         public static bool IsMember(string loginName)
         {
             Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
-            return ApplicationContext.Current.Services.MemberService.Exists(loginName);
+            return Current.Services.MemberService.Exists(loginName);
         }
 
         /// <summary>
@@ -381,7 +382,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="dt">The membertype which are being deleted</param>
         public static void DeleteFromType(MemberType dt)
         {
-            ApplicationContext.Current.Services.MemberService.DeleteMembersOfType(dt.Id);
+            Current.Services.MemberService.DeleteMembersOfType(dt.Id);
         }
 
         #endregion
@@ -547,7 +548,7 @@ namespace umbraco.cms.businesslogic.member
                 return;
             }
 
-            var content = ApplicationContext.Current.Services.MemberService.GetById(Id);
+            var content = Current.Services.MemberService.GetById(Id);
 
             if (content == null)
                 throw new ArgumentException(string.Format("No Member exists with id '{0}'", Id));
@@ -602,12 +603,12 @@ namespace umbraco.cms.businesslogic.member
         {
             if (MemberItem != null)
             {
-                ApplicationContext.Current.Services.MemberService.Delete(MemberItem);
+                Current.Services.MemberService.Delete(MemberItem);
             }
             else
             {
-                var member = ApplicationContext.Current.Services.MemberService.GetById(Id);
-                ApplicationContext.Current.Services.MemberService.Delete(member);
+                var member = Current.Services.MemberService.GetById(Id);
+                Current.Services.MemberService.Delete(member);
             }
 
             // Delete all content and cmsnode specific data!
@@ -676,7 +677,7 @@ namespace umbraco.cms.businesslogic.member
             {
                 while (dr.Read())
                 {
-                    var group = ApplicationContext.Current.Services.MemberGroupService.GetById(dr.GetInt("memberGroup"));
+                    var group = Current.Services.MemberGroupService.GetById(dr.GetInt("memberGroup"));
                     if (group != null)
                     {
                         temp.Add(dr.GetInt("memberGroup"), group);
@@ -720,7 +721,7 @@ namespace umbraco.cms.businesslogic.member
                 FormsAuthentication.SetAuthCookie(m.LoginName, true);
 
                 //cache the member
-                var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
+                var cachedMember = Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
                     GetCacheKey(m.Id),
                     timeout:        TimeSpan.FromMinutes(30),
                     getCacheItem:   () =>
@@ -761,7 +762,7 @@ namespace umbraco.cms.businesslogic.member
                 FormsAuthentication.SetAuthCookie(m.LoginName, !UseSession);
 
                 //cache the member
-                var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
+                var cachedMember = Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
                     GetCacheKey(m.Id),
                     timeout:        TimeSpan.FromMinutes(30),
                     getCacheItem:   () =>
@@ -798,7 +799,7 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Member cache is automatically cleared when members are updated")]
         public static void RemoveMemberFromCache(int NodeId)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(NodeId));
+            Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(NodeId));
         }
 
         /// <summary>
@@ -811,7 +812,7 @@ namespace umbraco.cms.businesslogic.member
         {
             var h = new Hashtable();
 
-            var items = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItemsByKeySearch<Member>(
+            var items = Current.ApplicationCache.RuntimeCache.GetCacheItemsByKeySearch<Member>(
                 CacheKeys.MemberBusinessLogicCacheKey);
             foreach (var i in items)
             {

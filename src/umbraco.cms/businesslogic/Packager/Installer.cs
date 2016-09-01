@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using System.Diagnostics;
 using Umbraco.Core.Models;
 using System.Security;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Xml;
 using File = System.IO.File;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
@@ -294,7 +295,7 @@ namespace umbraco.cms.businesslogic.packager
                 // log that a user has install files
                 if (_currentUserId > -1)
                 {
-                    ApplicationContext.Current.Services.AuditService.Add(AuditType.PackagerInstall,
+                    Current.Services.AuditService.Add(AuditType.PackagerInstall,
                                             string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid),
                                             _currentUserId, -1);                    
                 }
@@ -316,14 +317,14 @@ namespace umbraco.cms.businesslogic.packager
                 //bool saveNeeded = false;
 
                 // Get current user, with a fallback
-                var currentUser = ApplicationContext.Current.Services.UserService.GetUserById(0);
+                var currentUser = Current.Services.UserService.GetUserById(0);
 
                 //TODO: Get rid of this entire class! Until then all packages will be installed by the admin user
                 
 
                 //Xml as XElement which is used with the new PackagingService
                 var rootElement = Config.DocumentElement.GetXElement();
-                var packagingService = ApplicationContext.Current.Services.PackagingService;
+                var packagingService = Current.Services.PackagingService;
 
                 //Perhaps it would have been a good idea to put the following into methods eh?!?
 
@@ -541,7 +542,7 @@ namespace umbraco.cms.businesslogic.packager
                 var alias = n.SelectSingleNode("alias").InnerText;
                 if (!string.IsNullOrEmpty(alias))
                 {
-                    var m = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
+                    var m = Current.Services.MacroService.GetByAlias(alias);
                     if (m != null)
                     {
                         ContainsMacroConflict = true;

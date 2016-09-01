@@ -44,10 +44,9 @@ namespace Umbraco.Core.Persistence
         /// Safe method that is only able to create the schema in non-configured
         /// umbraco instances.
         /// </summary>
-        public void CreateDatabaseSchema(ApplicationContext applicationContext)
+        public void CreateDatabaseSchema(IRuntimeState runtime, IMigrationEntryService migrationEntryService)
         {
-            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
-            CreateDatabaseSchema(true, applicationContext);
+            CreateDatabaseSchema(runtime, migrationEntryService, true);
         }
 
         /// <summary>
@@ -55,24 +54,15 @@ namespace Umbraco.Core.Persistence
         /// with the option to guard the db from having the schema created
         /// multiple times.
         /// </summary>
+        /// <param name="migrationEntryService"></param>
         /// <param name="guardConfiguration"></param>
-        /// <param name="applicationContext"></param>
-        public void CreateDatabaseSchema(bool guardConfiguration, ApplicationContext applicationContext)
+        /// <param name="runtime"></param>
+        public void CreateDatabaseSchema(IRuntimeState runtime, IMigrationEntryService migrationEntryService, bool guardConfiguration)
         {
-            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
-
-            if (guardConfiguration && applicationContext.IsConfigured)
+            if (guardConfiguration && runtime.Level == RuntimeLevel.Run)
                 throw new Exception("Umbraco is already configured!");
 
-            CreateDatabaseSchemaDo(applicationContext.Services.MigrationEntryService);
-        }
-
-        internal void CreateDatabaseSchemaDo(bool guardConfiguration, ApplicationContext applicationContext)
-        {
-            if (guardConfiguration && applicationContext.IsConfigured)
-                throw new Exception("Umbraco is already configured!");
-
-            CreateDatabaseSchemaDo(applicationContext.Services.MigrationEntryService);
+            CreateDatabaseSchemaDo(migrationEntryService);
         }
 
         internal void CreateDatabaseSchemaDo(IMigrationEntryService migrationEntryService)

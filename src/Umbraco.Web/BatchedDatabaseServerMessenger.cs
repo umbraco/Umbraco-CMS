@@ -20,8 +20,10 @@ namespace Umbraco.Web
     /// </remarks>
     public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
-        public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(appContext, enableDistCalls, options)
+        public BatchedDatabaseServerMessenger(
+            IRuntimeState runtime, DatabaseContext dbContext, ILogger logger, ProfilingLogger proflog,
+            bool enableDistCalls, DatabaseServerMessengerOptions options)
+            : base(runtime, dbContext, logger, proflog, enableDistCalls, options)
         { }
 
         // invoked by BatchedDatabaseServerMessengerStartup which is an ApplicationEventHandler
@@ -32,9 +34,9 @@ namespace Umbraco.Web
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
             UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
 
-            if (ApplicationContext.DatabaseContext.CanConnect == false)
+            if (DatabaseContext.CanConnect == false)
             {
-                ApplicationContext.ProfilingLogger.Logger.Warn<BatchedDatabaseServerMessenger>(
+                Logger.Warn<BatchedDatabaseServerMessenger>(
                     "Cannot connect to the database, distributed calls will not be enabled for this server.");
             }
             else
@@ -68,11 +70,11 @@ namespace Umbraco.Web
 
         protected override void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {
-            var idsA = ids == null ? null : ids.ToArray();
+            var idsA = ids?.ToArray();
 
             Type arrayType;
             if (GetArrayType(idsA, out arrayType) == false)
-                throw new ArgumentException("All items must be of the same type, either int or Guid.", "ids");
+                throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
 
             BatchMessage(servers, refresher, messageType, idsA, arrayType, json);
         }
@@ -97,7 +99,7 @@ namespace Umbraco.Web
                 OriginIdentity = LocalIdentity
             };
 
-            ApplicationContext.DatabaseContext.Database.Insert(dto);
+            Database.Insert(dto);
         }
 
         protected ICollection<RefreshInstructionEnvelope> GetBatch(bool create)

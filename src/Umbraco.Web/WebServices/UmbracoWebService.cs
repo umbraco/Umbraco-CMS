@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Services;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
@@ -15,88 +16,64 @@ namespace Umbraco.Web.WebServices
     /// </summary>
     public abstract class UmbracoWebService : WebService
     {
-        protected UmbracoWebService()
-            : this(UmbracoContext.Current)
-        {
-
-        }
-
-        protected UmbracoWebService(UmbracoContext umbracoContext)
-        {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            UmbracoContext = umbracoContext;
-            Umbraco = new UmbracoHelper(umbracoContext);
-        }
-
-        /// <summary>
-        /// Returns the current ApplicationContext
-        /// </summary>
-        public ApplicationContext ApplicationContext
-        {
-            get { return UmbracoContext.Application; }
-        }
-
-        /// <summary>
-        /// Returns an ILogger
-        /// </summary>
-        public ILogger Logger
-        {
-            get { return ProfilingLogger.Logger; }
-        }
-
-        /// <summary>
-        /// Returns a ProfilingLogger
-        /// </summary>
-        public ProfilingLogger ProfilingLogger
-        {
-            get { return UmbracoContext.Application.ProfilingLogger; }
-        }
-
-        /// <summary>
-        /// Returns the current UmbracoContext
-        /// </summary>
-        public UmbracoContext UmbracoContext { get; private set; }
-
-        /// <summary>
-        /// Returns an UmbracoHelper object
-        /// </summary>
-        public UmbracoHelper Umbraco { get; private set; }
-
         private UrlHelper _url;
 
-        /// <summary>
-        /// Returns a UrlHelper
-        /// </summary>
-        /// <remarks>
-        /// This URL helper is created without any route data and an empty request context
-        /// </remarks>
-        public UrlHelper Url
+        protected UmbracoWebService()
+            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
+        { }
+
+        protected UmbracoWebService(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
         {
-            get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            UmbracoContext = umbracoContext;
+            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
+
+            // fixme inject somehow
+            Logger = Current.Logger;
+            ProfilingLogger = Current.ProfilingLogger;
+            DatabaseContext = Current.DatabaseContext;
+            Services = Current.Services;
         }
 
         /// <summary>
-        /// Returns a ServiceContext
+        /// Gets the logger.
         /// </summary>
-        public ServiceContext Services
-        {
-            get { return ApplicationContext.Services; }
-        }
+        public ILogger Logger { get; }
 
         /// <summary>
-        /// Returns a DatabaseContext
+        /// Gets the ProfilingLogger.
         /// </summary>
-        public DatabaseContext DatabaseContext
-        {
-            get { return ApplicationContext.DatabaseContext; }
-        }
+        public ProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
-        /// Returns a WebSecurity instance
+        /// Gets the Umbraco context.
         /// </summary>
-        public WebSecurity Security
-        {
-            get { return UmbracoContext.Security; }
-        }
+        public UmbracoContext UmbracoContext { get; }
+
+        /// <summary>
+        /// Gets the Umbraco helper.
+        /// </summary>
+        public UmbracoHelper Umbraco { get; }
+
+        /// <summary>
+        /// Gets the services context.
+        /// </summary>
+        public ServiceContext Services { get; }
+
+        /// <summary>
+        /// Gets the database context.
+        /// </summary>
+        public DatabaseContext DatabaseContext { get; }
+
+        /// <summary>
+        /// Gets the web security helper.
+        /// </summary>
+        public WebSecurity Security => UmbracoContext.Security;
+
+        /// <summary>
+        /// Gets the Url helper.
+        /// </summary>
+        /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
+        public UrlHelper Url => _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData())));
     }
 }

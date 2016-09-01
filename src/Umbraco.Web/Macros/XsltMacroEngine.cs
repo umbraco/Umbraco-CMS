@@ -525,7 +525,7 @@ namespace Umbraco.Web.Macros
         {
             //TODO: SD: Do we really need to cache this??
             var filepath = IOHelper.MapPath(SystemDirectories.Xslt.EnsureEndsWith('/') + filename);
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+            return Current.ApplicationCache.GetCacheItem(
                 CacheKeys.MacroXsltCacheKey + filename,
                 CacheItemPriority.Default,
                 new CacheDependency(filepath),

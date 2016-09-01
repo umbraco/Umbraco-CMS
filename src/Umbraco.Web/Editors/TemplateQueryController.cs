@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebApi;
 using System;
 using System.Diagnostics;
@@ -12,7 +10,7 @@ using Umbraco.Web.Models.TemplateQuery;
 
 namespace Umbraco.Web.Editors
 {
-    
+
 
     /// <summary>
     /// The API controller used for building content queries within the template
@@ -21,14 +19,6 @@ namespace Umbraco.Web.Editors
     [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {
-        public TemplateQueryController()
-        { }
-
-        public TemplateQueryController(UmbracoContext umbracoContext)
-            :base(umbracoContext)
-        { }
-
-
         private static readonly IEnumerable<OperathorTerm> Terms = new List<OperathorTerm>()
             {
                 new OperathorTerm("is", Operathor.Equals, new [] {"string"}),
@@ -59,16 +49,16 @@ namespace Umbraco.Web.Editors
 
         public QueryResultModel PostTemplateQuery(QueryModel model)
         {
-            var umbraco = new UmbracoHelper(UmbracoContext);
+            var umbraco = new UmbracoHelper(UmbracoContext, Services, ApplicationCache);
 
             var queryResult = new QueryResultModel();
 
             var sb = new StringBuilder();
-            
+
             sb.Append("CurrentPage.Site()");
-            
+
             var timer = new Stopwatch();
-            
+
             timer.Start();
 
             var currentPage = umbraco.ContentAtRoot().FirstOrDefault();
@@ -108,8 +98,8 @@ namespace Umbraco.Web.Editors
                     }
                 }
             }
-                
-            // TYPE to return if filtered by type            
+
+            // TYPE to return if filtered by type
             IEnumerable<IPublishedContent> contents;
             if (model != null && string.IsNullOrEmpty(model.ContentType.Alias) == false)
             {
@@ -142,7 +132,7 @@ namespace Umbraco.Web.Editors
                 {
                     if(string.IsNullOrEmpty( condition.ConstraintValue)) continue;
 
-                
+
 
                     var operation = condition.BuildCondition(token);
 
@@ -167,7 +157,7 @@ namespace Umbraco.Web.Editors
                     timer.Stop();
 
                     clause = string.Format("\"Visible && {0}\",{1}", clause,
-                        string.Join(",", model.Filters.Select(x => x.Property.Type == "string" ? 
+                        string.Join(",", model.Filters.Select(x => x.Property.Type == "string" ?
                                                                        string.Format("\"{0}\"", x.ConstraintValue) : x.ConstraintValue).ToArray()));
 
                     sb.AppendFormat(".Where({0})", clause);
@@ -245,12 +235,12 @@ namespace Umbraco.Web.Editors
                                ? contents.OrderBy(x => x.Id)
                                : contents.OrderByDescending(x => x.Id);
                 case "createDate" :
-               
+
                     return sortExpression.Direction == "ascending"
                                ? contents.OrderBy(x => x.CreateDate)
                                : contents.OrderByDescending(x => x.CreateDate);
                 case "publishDate":
-                   
+
                     return sortExpression.Direction == "ascending"
                                ? contents.OrderBy(x => x.UpdateDate)
                                : contents.OrderByDescending(x => x.UpdateDate);
@@ -266,11 +256,11 @@ namespace Umbraco.Web.Editors
 
             }
         }
-        
+
         private IEnumerable<string> GetChildContentTypeAliases(IPublishedContent targetNode, IPublishedContent current)
         {
             var aliases = new List<string>();
-    
+
             if (targetNode.Id == current.Id) return aliases;
             if (targetNode.Id != current.Id)
             {
@@ -289,11 +279,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
-            var contentTypes =
-                ApplicationContext.Services.ContentTypeService.GetAll()
-                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = x.Name })
-                    .OrderBy(x => x.Name).ToList();
-            contentTypes.Insert(0, new ContentTypeModel() { Alias = string.Empty, Name = "Everything" });
+            var contentTypes = Services.ContentTypeService.GetAll()
+                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = x.Name })
+                .OrderBy(x => x.Name).ToList();
+            contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = "Everything" });
 
             return contentTypes;
         }

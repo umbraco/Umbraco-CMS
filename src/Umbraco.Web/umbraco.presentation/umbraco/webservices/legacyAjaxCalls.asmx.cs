@@ -3,15 +3,10 @@ using System.Web;
 using System.Web.Services;
 using System.ComponentModel;
 using System.Web.Script.Services;
-using System.Xml;
-using System.Xml.Xsl;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Net;
-using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Web.UI;
 using Umbraco.Web;
 using Umbraco.Web.WebServices;
 using umbraco.cms.businesslogic.web;
@@ -249,7 +244,7 @@ namespace umbraco.presentation.webservices
                 try
                 {
                     if (UmbracoContext.ContentCache.HasContent())
-                        XsltMacroEngine.TestXsltTransform(ApplicationContext.ProfilingLogger, fileContents);
+                        XsltMacroEngine.TestXsltTransform(ProfilingLogger, fileContents);
 
                     /*
                     // Check if there's any documents yet

@@ -13,6 +13,7 @@ namespace Umbraco.Web.WebServices
 
         public NuCacheStatusController(IFacadeService facadeService)
         {
+            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
             _facadeService = facadeService;
         }
 

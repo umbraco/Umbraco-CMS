@@ -49,7 +49,7 @@ namespace umbraco.dialogs
             var sb = new StringBuilder();
             sb.Append("languages: [");
             var i = 0;
-            foreach (var language in ApplicationContext.Current.Services.LocalizationService.GetAllLanguages())
+            foreach (var language in Current.Services.LocalizationService.GetAllLanguages())
                 sb.AppendFormat("{0}{{ \"Id\": {1}, \"Code\": \"{2}\" }}", (i++ == 0 ? "" : ","), language.Id, language.IsoCode);
             sb.Append("]\r\n");
 

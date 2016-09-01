@@ -35,7 +35,7 @@ namespace Umbraco.Web.Editors
 
         private IMediaService MediaService
         {
-            get { return _mediaService ?? ApplicationContext.Current.Services.MediaService; }
+            get { return _mediaService ?? Current.Services.MediaService; }
         }
 
         private WebSecurity Security

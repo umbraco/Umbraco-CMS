@@ -19,7 +19,7 @@ namespace Umbraco.Web.Cache
     /// </summary>
     public class CacheRefresherEventHandler : ApplicationEventHandler
     {
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
         {
             LogHelper.Info<CacheRefresherEventHandler>("Initializing Umbraco internal event handlers for cache refreshing.");
             AddHandlers();

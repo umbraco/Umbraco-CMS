@@ -24,7 +24,7 @@ namespace Umbraco.Web.Trees
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                //Since we haven't implemented anything for relationtypes in angular, this needs to be converted to 
+                //Since we haven't implemented anything for relationtypes in angular, this needs to be converted to
                 //use the legacy format
                 .ConvertLegacyMenuItem(null, "initrelationTypes", queryStrings.GetValue<string>("application"));
                 //refresh action
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Trees
 
             //add delete option for all macros
             menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
-                //Since we haven't implemented anything for relationtypes in angular, this needs to be converted to 
+                //Since we haven't implemented anything for relationtypes in angular, this needs to be converted to
                 //use the legacy format
                 .ConvertLegacyMenuItem(new UmbracoEntity
                 {

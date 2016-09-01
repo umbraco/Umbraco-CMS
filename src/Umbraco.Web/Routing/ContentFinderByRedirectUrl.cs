@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Routing
 {
@@ -12,6 +13,13 @@ namespace Umbraco.Web.Routing
     /// </remarks>
     public class ContentFinderByRedirectUrl : IContentFinder
     {
+        private readonly IRedirectUrlService _redirectUrlService;
+
+        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService)
+        {
+            _redirectUrlService = redirectUrlService;
+        }
+
         /// <summary>
         /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
         /// </summary>
@@ -24,8 +32,7 @@ namespace Umbraco.Web.Routing
                 ? contentRequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(contentRequest.Domain.Uri, contentRequest.Uri.GetAbsolutePathDecoded())
                 : contentRequest.Uri.GetAbsolutePathDecoded();
 
-            var service = contentRequest.RoutingContext.UmbracoContext.Application.Services.RedirectUrlService;
-            var redirectUrl = service.GetMostRecentRedirectUrl(route);
+            var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route);
 
             if (redirectUrl == null)
             {

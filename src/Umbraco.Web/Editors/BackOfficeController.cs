@@ -4,8 +4,6 @@ using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,9 +23,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Plugins;
 using Umbraco.Core.Security;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models;
@@ -37,7 +33,6 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Security.Identity;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebServices;
 using Umbraco.Core.Services;
 using Action = Umbraco.Web._Legacy.Actions.Action;
@@ -51,12 +46,13 @@ namespace Umbraco.Web.Editors
     }
 
     /// <summary>
-    /// A controller to render out the default back office view and JS results
+    /// Represents a controller user to render out the default back office view and JS results.
     /// </summary>
     [UmbracoRequireHttps]
     [DisableClientCache]
     public class BackOfficeController : UmbracoController
     {
+        private readonly IRuntimeState _runtime;
         private BackOfficeUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
 
@@ -64,20 +60,16 @@ namespace Umbraco.Web.Editors
         private const string TokenPasswordResetCode = "PasswordResetCode";
         private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
-        protected BackOfficeSignInManager SignInManager
+        public BackOfficeController(IRuntimeState runtime)
         {
-            get { return _signInManager ?? (_signInManager = OwinContext.Get<BackOfficeSignInManager>()); }
+            _runtime = runtime;
         }
 
-        protected BackOfficeUserManager UserManager
-        {
-            get { return _userManager ?? (_userManager = OwinContext.GetUserManager<BackOfficeUserManager>()); }
-        }
+        protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.Get<BackOfficeSignInManager>());
 
-        protected IAuthenticationManager AuthenticationManager
-        {
-            get { return OwinContext.Authentication; }
-        }
+        protected BackOfficeUserManager UserManager => _userManager ?? (_userManager = OwinContext.GetUserManager<BackOfficeUserManager>());
+
+        protected IAuthenticationManager AuthenticationManager => OwinContext.Authentication;
 
         /// <summary>
         /// Render the default view
@@ -91,10 +83,10 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to 
+        /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to
         /// ensure the user is authenticated before the install takes place so we redirect here to show the standard login screen.
         /// </summary>
-        /// <returns></returns>      
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> AuthorizeUpgrade()
         {
@@ -172,7 +164,7 @@ namespace Umbraco.Web.Editors
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
                 ? getResult()
-                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<JArray>(
+                : ApplicationCache.RuntimeCache.GetCacheItem<JArray>(
                     typeof(BackOfficeController) + "GetManifestAssetList",
                     () => getResult(),
                     new TimeSpan(0, 10, 0));
@@ -186,7 +178,7 @@ namespace Umbraco.Web.Editors
         {
             var gridConfig = UmbracoConfig.For.GridConfig(
                 Logger,
-                ApplicationContext.ApplicationCache.RuntimeCache,
+                ApplicationCache.RuntimeCache,
                 new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
                 new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
                 HttpContext.IsDebuggingEnabled);
@@ -434,14 +426,14 @@ namespace Umbraco.Web.Editors
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
                 ? getResult()
-                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<string>(
+                : ApplicationCache.RuntimeCache.GetCacheItem<string>(
                     typeof(BackOfficeController) + "ServerVariables",
                     () => getResult(),
                     new TimeSpan(0, 10, 0));
 
             return JavaScript(result);
         }
-        
+
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -512,17 +504,17 @@ namespace Umbraco.Web.Editors
         private ManifestParser GetManifestParser()
         {
             var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-            var parser = new ManifestParser(Logger, plugins, ApplicationContext.ApplicationCache.RuntimeCache);
+            var parser = new ManifestParser(Logger, plugins, ApplicationCache.RuntimeCache);
             return parser;
         }
 
         /// <summary>
-        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info, 
+        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info,
         /// otherwise process the external login info.
         /// </summary>
-        /// <returns></returns>       
+        /// <returns></returns>
         private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(
-            Func<ActionResult> defaultResponse, 
+            Func<ActionResult> defaultResponse,
             Func<ActionResult> externalSignInResponse)
         {
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
@@ -532,7 +524,7 @@ namespace Umbraco.Web.Editors
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             foreach (var tempDataTokenName in TempDataTokenNames)
-            {                
+            {
                 if (TempData[tempDataTokenName] != null)
                 {
                     ViewData[tempDataTokenName] = TempData[tempDataTokenName];
@@ -562,10 +554,10 @@ namespace Umbraco.Web.Editors
             var user = await UserManager.FindAsync(loginInfo.Login);
             if (user != null)
             {
-                //TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we 
-                // wouldn't necessarily sign the user in here with the standard login, instead we'd update the 
+                //TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
+                // wouldn't necessarily sign the user in here with the standard login, instead we'd update the
                 // UseUmbracoBackOfficeExternalCookieAuthentication extension method to have the correct provider and claims factory,
-                // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure 
+                // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure
                 // that the ticket is created and stored and that the user is logged in.
 
                 //sign in
@@ -591,9 +583,9 @@ namespace Umbraco.Web.Editors
         private async Task<bool> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo)
         {
             //Here we can check if the provider associated with the request has been configured to allow
-            // new users (auto-linked external accounts). This would never be used with public providers such as 
+            // new users (auto-linked external accounts). This would never be used with public providers such as
             // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
-            // .... not likely! 
+            // .... not likely!
 
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
@@ -695,31 +687,28 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private Dictionary<string, object> GetApplicationState()
         {
-            if (ApplicationContext.IsConfigured == false)
+            if (_runtime.Level != RuntimeLevel.Run)
                 return null;
 
-            var app = new Dictionary<string, object>
-                {
-                    {"assemblyVersion", UmbracoVersion.AssemblyVersion}
-                };
-
-            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
-
-            app.Add("version", version);
-            app.Add("cdf", ClientDependencySettings.Instance.Version);
-            //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
-            app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
-
-            //add the server's GMT time offset in minutes
-            app.Add("serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes));
-
-            return app;
+            return new Dictionary<string, object>
+            {
+                // assembly version
+                { "assemblyVersion", UmbracoVersion.AssemblyVersion },
+                // Umbraco version
+                { "version", _runtime.SemanticVersion.ToSemanticString() },
+                // client dependency version,
+                { "cdf", ClientDependencySettings.Instance.Version },
+                // for dealing with virtual paths on the client side when hosted in virtual directories
+                { "applicationPath", _runtime.ApplicationVirtualPath.EnsureEndsWith('/') },
+                // server's GMT time offset in minutes
+                { "serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes) }
+            };
         }
-        
+
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {
-            var treeTypes = PluginManager.Current.ResolveAttributedTreeControllers();
+            var treeTypes = Current.PluginManager.ResolveAttributedTreeControllers(); // fixme inject
             //get all plugin trees with their attributes
             var treesWithAttributes = treeTypes.Select(x => new
             {
@@ -769,7 +758,7 @@ namespace Umbraco.Web.Editors
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
                 ? getResult()
-                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<string>(
+                : ApplicationCache.RuntimeCache.GetCacheItem<string>(
                     typeof(BackOfficeController) + "LegacyTreeJs",
                     () => getResult(),
                     new TimeSpan(0, 10, 0));

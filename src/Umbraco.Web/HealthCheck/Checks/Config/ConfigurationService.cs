@@ -21,7 +21,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             _configFilePath = configFilePath;
             _xPath = xPath;
-            _textService = UmbracoContext.Current.Application.Services.TextService;
+            _textService = Current.Services.TextService;
         }
 
         /// <summary>

@@ -2,7 +2,9 @@
 using System.Security;
 using Umbraco.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.WebServices
 {
@@ -12,14 +14,11 @@ namespace Umbraco.Web.WebServices
     public abstract class UmbracoAuthorizedWebService : UmbracoWebService
     {
         protected UmbracoAuthorizedWebService()
-            : base()
-        {
-        }
+        { }
 
-        protected UmbracoAuthorizedWebService(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
+        protected UmbracoAuthorizedWebService(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+            : base(umbracoContext, services, appCache)
+        { }
 
         private bool _hasValidated = false;
 

@@ -48,7 +48,7 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                // root actions              
+                // root actions
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
                     .ConvertLegacyMenuItem(null, "userTypes", queryStrings.GetValue<string>("application"));
 

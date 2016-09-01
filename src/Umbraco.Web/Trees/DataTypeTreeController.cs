@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Net.Http.Formatting;
-using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
@@ -27,8 +22,8 @@ namespace Umbraco.Web.Trees
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
-            if (intId == false) throw new InvalidOperationException("Id must be an integer");        
-            
+            if (intId == false) throw new InvalidOperationException("Id must be an integer");
+
             var nodes = new TreeNodeCollection();
 
             //Folders first
@@ -72,13 +67,13 @@ namespace Umbraco.Web.Trees
         {
             var systemIds = new[]
             {
-                Constants.DataTypes.DefaultContentListView, 
-                Constants.DataTypes.DefaultMediaListView, 
+                Constants.DataTypes.DefaultContentListView,
+                Constants.DataTypes.DefaultMediaListView,
                 Constants.DataTypes.DefaultMembersListView
             };
             return systemIds;
-        } 
-        
+        }
+
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
@@ -88,7 +83,7 @@ namespace Umbraco.Web.Trees
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                // root actions              
+                // root actions
                 menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
@@ -106,7 +101,7 @@ namespace Umbraco.Web.Trees
                 {
                     //can delete data type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
-                }                
+                }
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), hasSeparator: true);
             }
             else
@@ -120,7 +115,7 @@ namespace Umbraco.Web.Trees
 
                 menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), hasSeparator: true);
             }
-            
+
             return menu;
         }
     }

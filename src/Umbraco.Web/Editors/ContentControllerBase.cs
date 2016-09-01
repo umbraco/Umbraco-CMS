@@ -22,23 +22,6 @@ namespace Umbraco.Web.Editors
     [OutgoingDateTimeFormat]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        protected ContentControllerBase()
-            : this(UmbracoContext.Current)
-        {            
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        protected ContentControllerBase(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
-
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)
         {
             ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
@@ -47,12 +30,12 @@ namespace Umbraco.Web.Editors
                 ModelState);
             if (throwException)
             {
-                throw new HttpResponseException(errorResponse);    
+                throw new HttpResponseException(errorResponse);
             }
             return errorResponse;
         }
 
-        protected void UpdateName<TPersisted>(ContentBaseItemSave<TPersisted> contentItem) 
+        protected void UpdateName<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
             where TPersisted : IContentBase
         {
             //Don't update the name if it is empty
@@ -100,7 +83,7 @@ namespace Umbraco.Web.Editors
                 {
                     d.Add("files", files);
                 }
-                
+
                 var data = new ContentPropertyData(p.Value, p.PreValues, d);
 
                 //get the deserialized value from the property editor
@@ -113,7 +96,7 @@ namespace Umbraco.Web.Editors
                     var valueEditor = p.PropertyEditor.ValueEditor;
                     //don't persist any bound value if the editor is readonly
                     if (valueEditor.IsReadOnly == false)
-                    {                        
+                    {
                         var propVal = p.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);
                         var supportTagsAttribute = TagExtractor.GetAttribute(p.PropertyEditor);
                         if (supportTagsAttribute != null)
@@ -124,14 +107,14 @@ namespace Umbraco.Web.Editors
                         {
                             dboProperty.Value = propVal;
                         }
-                    }    
-                    
+                    }
+
                 }
             }
         }
 
-        protected void HandleInvalidModelState<T, TPersisted>(ContentItemDisplayBase<T, TPersisted> display) 
-            where TPersisted : IContentBase 
+        protected void HandleInvalidModelState<T, TPersisted>(ContentItemDisplayBase<T, TPersisted> display)
+            where TPersisted : IContentBase
             where T : ContentPropertyBasic
         {
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
@@ -160,7 +143,7 @@ namespace Umbraco.Web.Editors
             return Request.Properties.ContainsKey(typeof(TPersisted).ToString()) && Request.Properties[typeof(TPersisted).ToString()] != null
                 ? (TPersisted) Request.Properties[typeof (TPersisted).ToString()]
                 : getFromService();
-        } 
+        }
 
         /// <summary>
         /// Returns true if the action passed in means we need to create something new
@@ -172,8 +155,8 @@ namespace Umbraco.Web.Editors
             return (action.ToString().EndsWith("New"));
         }
 
-        protected void AddCancelMessage(INotificationModel display, 
-            string header = "speechBubbles/operationCancelledHeader",             
+        protected void AddCancelMessage(INotificationModel display,
+            string header = "speechBubbles/operationCancelledHeader",
             string message = "speechBubbles/operationCancelledText",
             bool localizeHeader = true,
             bool localizeMessage = true)

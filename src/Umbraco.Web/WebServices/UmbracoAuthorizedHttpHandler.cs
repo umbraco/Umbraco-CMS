@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Security;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Web.Security;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.WebServices
 {
     public abstract class UmbracoAuthorizedHttpHandler : UmbracoHttpHandler
     {
         protected UmbracoAuthorizedHttpHandler()
-            : base()
-        {
-        }
+        { }
 
-        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext)
-            : base(umbracoContext)
+        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+            : base(umbracoContext, services, appCache)
         {
         }
 

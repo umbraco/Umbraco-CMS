@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
 using AutoMapper;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -28,9 +20,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
 using Constants = Umbraco.Core.Constants;
-using Examine;
 
 namespace Umbraco.Web.Editors
 {
@@ -43,26 +33,7 @@ namespace Umbraco.Web.Editors
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public MemberController()
-            : this(UmbracoContext.Current)
-        {
-            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public MemberController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-        }
-
-        private readonly MembershipProvider _provider;
+        private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
         /// <summary>
         /// Returns the currently configured membership scenario for members in umbraco
@@ -213,7 +184,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets an empty content item for the 
+        /// Gets an empty content item for the
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
@@ -253,7 +224,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Saves member
         /// </summary>
-        /// <returns></returns>        
+        /// <returns></returns>
         [FileUploadCleanupFilter]
         public MemberDisplay PostSave(
             [ModelBinder(typeof(MemberBinder))]
@@ -297,7 +268,7 @@ namespace Umbraco.Web.Editors
             }
 
             //We're gonna look up the current roles now because the below code can cause
-            // events to be raised and developers could be manually adding roles to members in 
+            // events to be raised and developers could be manually adding roles to members in
             // their handlers. If we don't look this up now there's a chance we'll just end up
             // removing the roles they've assigned.
             var currRoles = Roles.GetRolesForUser(contentItem.PersistedContent.Username);
@@ -332,7 +303,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
 
-            //save the IMember - 
+            //save the IMember -
             //TODO: When we support the CustomProviderWithUmbracoLink scenario, we'll need to save the custom properties for that here too
             if (MembershipScenario == MembershipScenario.NativeUmbraco)
             {
@@ -360,7 +331,7 @@ namespace Umbraco.Web.Editors
             }
 
             //set the generated password (if there was one) - in order to do this we'll chuck the gen'd password into the
-            // additional data of the IUmbracoEntity of the persisted item - then we can retrieve this in the model mapper and set 
+            // additional data of the IUmbracoEntity of the persisted item - then we can retrieve this in the model mapper and set
             // the value to be given to the UI. Hooray for AdditionalData :)
             contentItem.PersistedContent.AdditionalData["GeneratedPassword"] = generatedPassword;
 
@@ -371,7 +342,7 @@ namespace Umbraco.Web.Editors
             HandleInvalidModelState(display);
 
             var localizedTextService = Services.TextService;
-            //put the correct msgs in 
+            //put the correct msgs in
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
@@ -431,7 +402,7 @@ namespace Umbraco.Web.Editors
 
                 if (requiredUpdating.Success)
                 {
-                    //re-map these values 
+                    //re-map these values
                     shouldReFetchMember = true;
                 }
             }
@@ -471,10 +442,10 @@ namespace Umbraco.Web.Editors
                 ModelState.AddModelError("custom", "An admin cannot lock a user");
             }
 
-            //password changes ?           
+            //password changes ?
             if (contentItem.Password == null)
             {
-                //If the provider has changed some values, these values need to be reflected in the member object 
+                //If the provider has changed some values, these values need to be reflected in the member object
                 //that will get mapped to the display object
                 if (shouldReFetchMember)
                 {
@@ -488,7 +459,7 @@ namespace Umbraco.Web.Editors
             var passwordChangeResult = Members.ChangePassword(membershipUser.UserName, contentItem.Password, _provider);
             if (passwordChangeResult.Success)
             {
-                //If the provider has changed some values, these values need to be reflected in the member object 
+                //If the provider has changed some values, these values need to be reflected in the member object
                 //that will get mapped to the display object
                 if (shouldReFetchMember)
                 {
@@ -566,7 +537,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Following a refresh of member data called during an update if the membership provider has changed some underlying data, 
+        /// Following a refresh of member data called during an update if the membership provider has changed some underlying data,
         /// we don't want to lose the provided, and potentiallly changed, username
         /// </summary>
         /// <param name="contentItem"></param>
@@ -584,18 +555,18 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// Depending on if the Umbraco membership provider is active or not, the process differs slightly:
-        /// 
-        /// * If the umbraco membership provider is used - we create the membership user first with the membership provider, since 
+        ///
+        /// * If the umbraco membership provider is used - we create the membership user first with the membership provider, since
         ///     it's the umbraco membership provider, this writes to the umbraco tables. When that is complete we re-fetch the IMember
         ///     model data from the db. In this case we don't care what the provider user key is.
-        /// * If we're using a non-umbraco membership provider - we check if there is a 'Member' member type - if so 
+        /// * If we're using a non-umbraco membership provider - we check if there is a 'Member' member type - if so
         ///     we create an empty IMember instance first (of type 'Member'), this gives us a unique ID (GUID)
-        ///     that we then use to create the member in the custom membership provider. This acts as the link between Umbraco data and 
+        ///     that we then use to create the member in the custom membership provider. This acts as the link between Umbraco data and
         ///     the custom membership provider data. This gives us the ability to eventually have custom membership properties but still use
         ///     a custom memberhip provider. If there is no 'Member' member type, then we will simply just create the membership provider member
         ///     with no link to our data.
-        /// 
-        /// If this is successful, it will go and re-fetch the IMember from the db because it will now have an ID because the Umbraco provider 
+        ///
+        /// If this is successful, it will go and re-fetch the IMember from the db because it will now have an ID because the Umbraco provider
         /// uses the umbraco data store - then of course we need to re-map it to the saved property values.
         /// </remarks>
         private MembershipUser CreateWithMembershipProvider(MemberSave contentItem, out MembershipCreateStatus status)
@@ -619,7 +590,7 @@ namespace Umbraco.Web.Editors
                     break;
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                     //We are using a custom membership provider, we'll create an empty IMember first to get the unique id to use
-                    // as the provider user key.                    
+                    // as the provider user key.
                     //create it - this persisted item has already been set in the MemberBinder based on the 'Member' member type:
                     Services.MemberService.Save(contentItem.PersistedContent);
 
@@ -731,7 +702,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        /// 
+        ///
         [HttpPost]
         public HttpResponseMessage DeleteByKey(Guid key)
         {

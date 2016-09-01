@@ -27,7 +27,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 if (ValidateFileExtension(fileName) == false)
                 {
-                    yield return new ValidationResult(ApplicationContext.Current.Services.TextService.Localize("errors/dissallowedMediaType"),
+                    yield return new ValidationResult(Current.Services.TextService.Localize("errors/dissallowedMediaType"),
                                                       new[]
                                                           {
                                                               //we only store a single value for this editor so the 'member' or 'field' 

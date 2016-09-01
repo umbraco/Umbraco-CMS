@@ -7,25 +7,24 @@ using Umbraco.Web.Security;
 namespace Umbraco.Web.Models
 {
     /// <summary>
-    /// The model representing the status of a logged in member 
+    /// The model representing the status of a logged in member.
     /// </summary>
     public class LoginStatusModel
     {
         /// <summary>
-        /// Creates a new empty LoginStatusModel
+        /// Creates a new empty LoginStatusModel.
         /// </summary>
         /// <returns></returns>
         public static LoginStatusModel CreateModel()
         {
-            var model = new LoginStatusModel(false);
-            return model;
+            return new LoginStatusModel(false);
         }
 
         private LoginStatusModel(bool doLookup)
         {
-            if (doLookup && HttpContext.Current != null && ApplicationContext.Current != null)
+            if (doLookup && HttpContext.Current != null)
             {
-                var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+                var helper = new MembershipHelper(new HttpContextWrapper(HttpContext.Current));
                 var model = helper.GetCurrentLoginStatus();
                 if (model != null)
                 {
@@ -43,9 +42,7 @@ namespace Umbraco.Web.Models
         [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.GetCurrentLoginStatus or the static LoginStatusModel.CreateModel() to create an empty model.")]
         public LoginStatusModel()
             : this(true)
-        {
-            
-        }
+        { }
 
         /// <summary>
         /// The name of the member

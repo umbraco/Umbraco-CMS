@@ -26,18 +26,8 @@ namespace Umbraco.Web.Install.Controllers
     [Obsolete("This is only used for the legacy way of installing starter kits in the back office")]
     public class InstallPackageController : ApiController
 	{
-		private readonly ApplicationContext _applicationContext;
-
 		public InstallPackageController()
-			: this(ApplicationContext.Current)
-		{
-			
-		}
-
-		public InstallPackageController(ApplicationContext applicationContext)
-		{
-			_applicationContext = applicationContext;
-		}
+		{ }
 
 		private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
@@ -115,7 +105,7 @@ namespace Umbraco.Web.Install.Controllers
 		[HttpPost]
         public HttpResponseMessage RestartAppPool()
 		{
-			_applicationContext.RestartApplicationPool(Request.TryGetHttpContext().Result);
+			Current.RestartAppPool(Request.TryGetHttpContext().Result);
 			return Json(new
 				{
 					success = true,
@@ -137,7 +127,7 @@ namespace Umbraco.Web.Install.Controllers
 			}
 
 			return Json(new
-				{					
+				{
 					percentage = 30,
                     success = true,
 				}, HttpStatusCode.OK);

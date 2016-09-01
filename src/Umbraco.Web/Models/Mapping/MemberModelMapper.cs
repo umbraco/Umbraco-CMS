@@ -11,9 +11,7 @@ using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using umbraco;
 using System.Linq;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 using Umbraco.Web.Trees;
 
@@ -24,7 +22,20 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MemberModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
+        private readonly IUserService _userService;
+        private readonly ILocalizedTextService _textService;
+        private readonly IMemberService _memberService;
+        private readonly IMemberTypeService _memberTypeService;
+
+        public MemberModelMapper(IUserService userService, ILocalizedTextService textService, IMemberTypeService memberTypeService, IMemberService memberService)
+        {
+            _userService = userService;
+            _textService = textService;
+            _memberTypeService = memberTypeService;
+            _memberService = memberService;
+        }
+
+        public override void ConfigureMappings(IMapperConfiguration config)
         {
             //FROM MembershipUser TO MediaItemDisplay - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, MemberDisplay>()
@@ -64,7 +75,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, MemberDisplay>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(_userService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -76,11 +87,11 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
                 .ForMember(display => display.Tabs,
-                    expression => expression.ResolveUsing(new MemberTabsAndPropertiesResolver(applicationContext.Services.TextService)))
+                    expression => expression.ResolveUsing(new MemberTabsAndPropertiesResolver(_textService)))
                 .ForMember(display => display.MemberProviderFieldMapping,
                     expression => expression.ResolveUsing<MemberProviderFieldMappingResolver>())
                 .ForMember(display => display.MembershipScenario,
-                    expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => applicationContext.Services.MemberTypeService))))
+                    expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => _memberTypeService))))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Published, expression => expression.Ignore())
@@ -90,13 +101,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
-                .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display, applicationContext.Services.TextService));
+                .AfterMap((member, display) => MapGenericCustomProperties(_memberService, member, display, _textService));
 
             //FROM IMember TO MemberBasic
             config.CreateMap<IMember, MemberBasic>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(_userService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -149,7 +160,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, ContentItemDto<IMember>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(_userService)))
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())

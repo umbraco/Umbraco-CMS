@@ -68,7 +68,6 @@
     </Compile>
     <Compile Include="ActivatorHelper.cs" />
     <Compile Include="ActivatorServiceProvider.cs" />
-    <Compile Include="ApplicationContext.cs" />
     <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="AsyncLock.cs" />
@@ -274,12 +273,13 @@
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Exceptions\DataOperationException.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
-    <Compile Include="Exceptions\UmbracoStartupFailedException.cs" />
+    <Compile Include="Exceptions\BootFailedException.cs" />
     <Compile Include="FileResources\Files.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Files.resx</DependentUpon>
     </Compile>
+    <Compile Include="IRuntimeState.cs" />
     <Compile Include="Macros\XsltExtensionCollection.cs" />
     <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
     <Compile Include="Models\DictionaryItemExtensions.cs" />
@@ -475,6 +475,8 @@
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\LabelValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
+    <Compile Include="RuntimeLevel.cs" />
+    <Compile Include="RuntimeState.cs" />
     <Compile Include="Serialization\ForceInt32Converter.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />

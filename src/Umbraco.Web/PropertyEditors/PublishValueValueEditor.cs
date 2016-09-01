@@ -26,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         public PublishValueValueEditor(PropertyValueEditor wrapped)
-            : this(ApplicationContext.Current.Services.DataTypeService, wrapped)
+            : this(Current.Services.DataTypeService, wrapped)
         {
         }
 

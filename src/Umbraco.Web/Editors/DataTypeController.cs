@@ -4,19 +4,15 @@ using System.Data;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
 using Constants = Umbraco.Core.Constants;
 using System.Net.Http;
 using System.Text;
@@ -75,7 +71,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            
+
             Services.DataTypeService.Delete(foundType, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -111,7 +107,7 @@ namespace Umbraco.Web.Editors
         public DataTypeDisplay PostCreateCustomListView(string contentTypeAlias)
         {
             var dt = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
-            
+
             //if it doesnt exist yet, we will create it.
             if (dt == null)
             {
@@ -120,7 +116,7 @@ namespace Umbraco.Web.Editors
                 Services.DataTypeService.Save(dt);
             }
 
-            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);    
+            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
         }
 
         /// <summary>
@@ -160,7 +156,7 @@ namespace Umbraco.Web.Editors
             }
 
             //these are new pre-values, so just return the field editors with default values
-            return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);            
+            return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);
         }
 
         /// <summary>
@@ -182,7 +178,7 @@ namespace Umbraco.Web.Editors
             var result = Services.DataTypeService.CreateContainer(parentId, name, Security.CurrentUser.Id);
 
             return result
-                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
@@ -197,9 +193,9 @@ namespace Umbraco.Web.Editors
             //If we've made it here, then everything has been wired up and validated by the attribute
 
             //finally we need to save the data type and it's pre-vals
-            var dtService = ApplicationContext.Services.DataTypeService;
+            var dtService = Services.DataTypeService;
 
-            //TODO: Check if the property editor has changed, if it has ensure we don't pass the 
+            //TODO: Check if the property editor has changed, if it has ensure we don't pass the
             // existing values to the new property editor!
 
             //get the prevalues, current and new
@@ -255,7 +251,7 @@ namespace Umbraco.Web.Editors
                 case MoveOperationStatusType.FailedParentNotFound:
                     return Request.CreateResponse(HttpStatusCode.NotFound);
                 case MoveOperationStatusType.FailedCancelledByEvent:
-                    //returning an object of INotificationModel will ensure that any pending 
+                    //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
@@ -274,7 +270,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
-        /// </remarks>    
+        /// </remarks>
         [UmbracoApplicationAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Developer)]
@@ -291,7 +287,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
-        /// </remarks>    
+        /// </remarks>
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Developer)]
@@ -324,14 +320,14 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
-        /// </remarks>    
+        /// </remarks>
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Developer)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
-            
+
             var propertyEditors = Current.PropertyEditors;
             foreach (var propertyEditor in propertyEditors)
             {
@@ -355,7 +351,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
-        /// </remarks>    
+        /// </remarks>
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Developer)]

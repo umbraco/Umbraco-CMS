@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Tests.TestHelpers;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Services.Importing
 {
@@ -317,7 +318,7 @@ namespace Umbraco.Tests.Services.Importing
                                 where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();
 
-            var database = ApplicationContext.DatabaseContext.Database;
+            var database = Current.DatabaseContext.Database;
             var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { dataTypeDefinitions.First().Id });
             int preValueId;
             int.TryParse(contents.First().GetValue<string>("testList"), out preValueId);

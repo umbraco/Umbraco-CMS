@@ -72,7 +72,7 @@ namespace Umbraco.Tests.PublishedContent
 		public void To_DataTable()
 		{	
 			var doc = GetContent(true, 1);
-			var dt = doc.ChildrenAsTable(ApplicationContext.Services);
+			var dt = doc.ChildrenAsTable(Current.Services);
 
 			Assert.AreEqual(11, dt.Columns.Count);
 			Assert.AreEqual(3, dt.Rows.Count);
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.PublishedContent
 			//change a doc type alias
 			((TestPublishedContent) doc.Children.ElementAt(0)).DocumentTypeAlias = "DontMatch";
 
-			var dt = doc.ChildrenAsTable(ApplicationContext.Services, "Child");
+			var dt = doc.ChildrenAsTable(Current.Services, "Child");
 
 			Assert.AreEqual(11, dt.Columns.Count);
 			Assert.AreEqual(2, dt.Rows.Count);
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.PublishedContent
 		public void To_DataTable_No_Rows()
 		{
 			var doc = GetContent(false, 1);			
-			var dt = doc.ChildrenAsTable(ApplicationContext.Services);
+			var dt = doc.ChildrenAsTable(Current.Services);
 			//will return an empty data table
 			Assert.AreEqual(0, dt.Columns.Count);
 			Assert.AreEqual(0, dt.Rows.Count);			

@@ -1,4 +1,5 @@
 ﻿using LightInject;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -21,7 +22,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
                 factory.GetInstance<CacheHelper>().RequestCache,
                 factory.GetAllInstances<IUrlSegmentProvider>(),
-                factory.GetInstance<IFacadeAccessor>()));
+                factory.GetInstance<IFacadeAccessor>(),
+                factory.GetInstance<MainDom>()));
         }
 
         public void Initialize(IFacadeService service)

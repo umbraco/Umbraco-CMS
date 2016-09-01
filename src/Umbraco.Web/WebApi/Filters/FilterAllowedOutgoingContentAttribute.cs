@@ -12,14 +12,14 @@ using Umbraco.Web._Legacy.Actions;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// This inspects the result of the action that returns a collection of content and removes 
+    /// This inspects the result of the action that returns a collection of content and removes
     /// any item that the current user doesn't have access to
     /// </summary>
     internal sealed class FilterAllowedOutgoingContentAttribute : FilterAllowedOutgoingMediaAttribute
     {
         private readonly char _permissionToCheck;
 
-        public FilterAllowedOutgoingContentAttribute(Type outgoingType) 
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType)
             : base(outgoingType)
         {
             _permissionToCheck = ActionBrowse.Instance.Letter;
@@ -41,7 +41,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             base.FilterItems(user, items);
 
-            FilterBasedOnPermissions(items, user, ApplicationContext.Current.Services.UserService);
+            FilterBasedOnPermissions(items, user, Current.Services.UserService);
         }
 
         protected override int GetUserStartNode(IUser user)

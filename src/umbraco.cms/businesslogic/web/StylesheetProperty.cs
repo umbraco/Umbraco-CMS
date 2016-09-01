@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web
@@ -8,7 +9,7 @@ namespace umbraco.cms.businesslogic.web
     [Obsolete("Do not use this, use the Umbraco.Core.Services.IFileService instead to manipulate stylesheets")]
     public class StylesheetProperty : CMSNode
     {
-     
+
         internal Umbraco.Core.Models.Stylesheet StylesheetItem;
         internal Umbraco.Core.Models.StylesheetProperty StylesheetProp;
 
@@ -35,7 +36,7 @@ namespace umbraco.cms.businesslogic.web
             web.StyleSheet.ThrowNotSupported<StylesheetProperty>();
         }
 
-        public StyleSheet StyleSheet() 
+        public StyleSheet StyleSheet()
         {
             return new StyleSheet(StylesheetItem);
         }
@@ -43,7 +44,7 @@ namespace umbraco.cms.businesslogic.web
         public void RefreshFromFile()
         {
             var name = StylesheetItem.Name;
-            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(name);
+            StylesheetItem = Current.Services.FileService.GetStylesheetByName(name);
             if (StylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}'", name));
 
             StylesheetProp = StylesheetItem.Properties.FirstOrDefault(x => x.Alias == StylesheetProp.Alias);
@@ -69,13 +70,13 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        public string Alias 
+        public string Alias
         {
             get { return StylesheetProp.Alias; }
             set { StylesheetProp.Alias = value; }
         }
 
-        public string value 
+        public string value
         {
             get { return StylesheetProp.Value; }
             set { StylesheetProp.Value = value; }
@@ -86,22 +87,22 @@ namespace umbraco.cms.businesslogic.web
             //we need to create it with a temp place holder!
             var prop = new Umbraco.Core.Models.StylesheetProperty(Text, "#" + Text.ToSafeAlias(), "");
             sheet.StylesheetEntity.AddProperty(prop);
-            ApplicationContext.Current.Services.FileService.SaveStylesheet(sheet.StylesheetEntity);
+            Current.Services.FileService.SaveStylesheet(sheet.StylesheetEntity);
 
             var ssp = new StylesheetProperty(sheet.StylesheetEntity, prop);
             return ssp;
         }
 
-        public override void delete() 
+        public override void delete()
         {
             StylesheetItem.RemoveProperty(Text);
-            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
+            Current.Services.FileService.SaveStylesheet(StylesheetItem);
 
         }
 
         public override void Save()
         {
-            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
+            Current.Services.FileService.SaveStylesheet(StylesheetItem);
         }
 
         public override string ToString()
@@ -115,6 +116,6 @@ namespace umbraco.cms.businesslogic.web
             web.StyleSheet.ThrowNotSupported<StylesheetProperty>();
             return null;
         }
-        
+
     }
 }

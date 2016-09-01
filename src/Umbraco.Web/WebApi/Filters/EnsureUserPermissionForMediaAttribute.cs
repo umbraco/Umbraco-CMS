@@ -15,7 +15,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// Auth filter to check if the current user has access to the content item
     /// </summary>
     /// <remarks>
-    /// Since media doesn't have permissions, this simply checks start node access    
+    /// Since media doesn't have permissions, this simply checks start node access
     /// </remarks>
     internal sealed class EnsureUserPermissionForMediaAttribute : ActionFilterAttribute
     {
@@ -42,16 +42,16 @@ namespace Umbraco.Web.WebApi.Filters
         {
             Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
             _paramName = paramName;
-            _source = DictionarySource.ActionArguments;            
+            _source = DictionarySource.ActionArguments;
         }
 
         public EnsureUserPermissionForMediaAttribute(string paramName, DictionarySource source)
         {
             Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
             _paramName = paramName;
-            _source = source;  
+            _source = source;
         }
-       
+
         public override bool AllowMultiple
         {
             get { return true; }
@@ -97,8 +97,8 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (MediaController.CheckPermissions(
                 actionContext.Request.Properties,
-                UmbracoContext.Current.Security.CurrentUser, 
-                ApplicationContext.Current.Services.MediaService, nodeId))
+                UmbracoContext.Current.Security.CurrentUser,
+                Current.Services.MediaService, nodeId))
             {
                 base.OnActionExecuting(actionContext);
             }
@@ -106,7 +106,7 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
-            
+
         }
 
         //private object GetValueFromSource(HttpActionContext actionContext, string key)
@@ -124,7 +124,7 @@ namespace Umbraco.Web.WebApi.Filters
         //    }
         //}
 
-        
+
 
     }
 }

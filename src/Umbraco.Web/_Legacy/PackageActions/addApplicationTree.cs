@@ -22,7 +22,7 @@ namespace Umbraco.Web._Legacy.PackageActions
         /// <param name="xmlData">The XML data.</param>
         /// <returns></returns>
         /// <example><code>
-        /// <Action runat="install" [undo="false"] alias="addApplicationTree" silent="[true/false]"  initialize="[true/false]" sortOrder="1" 
+        /// <Action runat="install" [undo="false"] alias="addApplicationTree" silent="[true/false]"  initialize="[true/false]" sortOrder="1"
         /// applicationAlias="appAlias" treeAlias="myTree" treeTitle="My Tree" iconOpened="folder_o.gif" iconClosed="folder.gif"
         /// assemblyName="umbraco" treeHandlerType="treeClass" action="alert('you clicked my tree')"/>
         /// </code></example>
@@ -37,8 +37,8 @@ namespace Umbraco.Web._Legacy.PackageActions
             string iconOpened = xmlData.Attributes["iconOpened"].Value;
             string iconClosed = xmlData.Attributes["iconClosed"].Value;
             string type = xmlData.Attributes["treeHandlerType"].Value;
-            
-            ApplicationContext.Current.Services.ApplicationTreeService.MakeNew(initialize, sortOrder, applicationAlias, treeAlias, treeTitle, iconClosed, iconOpened, type);
+
+            Current.Services.ApplicationTreeService.MakeNew(initialize, sortOrder, applicationAlias, treeAlias, treeTitle, iconClosed, iconOpened, type);
 
             return true;
         }
@@ -52,10 +52,10 @@ namespace Umbraco.Web._Legacy.PackageActions
         public bool Undo(string packageName, XmlNode xmlData)
         {
             string treeAlias = xmlData.Attributes["treeAlias"].Value;
-            var found = ApplicationContext.Current.Services.ApplicationTreeService.GetByAlias(treeAlias);
+            var found = Current.Services.ApplicationTreeService.GetByAlias(treeAlias);
             if (found != null)
             {
-                ApplicationContext.Current.Services.ApplicationTreeService.DeleteTree(found);
+                Current.Services.ApplicationTreeService.DeleteTree(found);
             }
             return true;
         }

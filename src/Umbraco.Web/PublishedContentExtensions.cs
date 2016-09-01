@@ -76,7 +76,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public static string GetTemplateAlias(this IPublishedContent content)
         {
-            var template = ApplicationContext.Current.Services.FileService.GetTemplate(content.TemplateId);
+            var template = Current.Services.FileService.GetTemplate(content.TemplateId);
 			return template == null ? string.Empty : template.Alias;
 		}
 
@@ -314,7 +314,7 @@ namespace Umbraco.Web
 
 		private static bool IsDocumentTypeRecursive(IPublishedContent content, string docTypeAlias)
 		{
-			var contentTypeService = UmbracoContext.Current.Application.Services.ContentTypeService;
+			var contentTypeService = Current.Services.ContentTypeService; // fixme - inject
 			var type = contentTypeService.Get(content.DocumentTypeAlias);
 			while (type != null && type.ParentId > 0)
 			{
@@ -1196,9 +1196,9 @@ namespace Umbraco.Web
         public static CultureInfo GetCulture(this IPublishedContent content, Uri current = null)
         {
             return Models.ContentExtensions.GetCulture(UmbracoContext.Current,
-                ApplicationContext.Current.Services.DomainService,
-                ApplicationContext.Current.Services.LocalizationService,
-                ApplicationContext.Current.Services.ContentService,
+                Current.Services.DomainService,
+                Current.Services.LocalizationService,
+                Current.Services.ContentService,
                 content.Id, content.Path,
                 current);
         }

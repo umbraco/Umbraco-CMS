@@ -6,16 +6,13 @@ using Umbraco.Core;
 namespace Umbraco.Web.HealthCheck
 {
     /// <summary>
-    /// The abstract health check class
+    /// Provides a base class for health checks.
     /// </summary>
     [DataContract(Name = "healtCheck", Namespace = "")]
     public abstract class HealthCheck
     {
-        protected HealthCheck(HealthCheckContext healthCheckContext)
+        protected HealthCheck()
         {
-            if (healthCheckContext == null) throw new ArgumentNullException(nameof(healthCheckContext));
-            HealthCheckContext = healthCheckContext;
-
             //Fill in the metadata
             var thisType = GetType();
             var meta = thisType.GetCustomAttribute<HealthCheckAttribute>(false);
@@ -26,9 +23,6 @@ namespace Umbraco.Web.HealthCheck
             Group = meta.Group;
             Id = meta.Id;
         }
-
-        [IgnoreDataMember]
-        public HealthCheckContext HealthCheckContext { get; private set; }
 
         [DataMember(Name = "id")]
         public Guid Id { get; private set; }

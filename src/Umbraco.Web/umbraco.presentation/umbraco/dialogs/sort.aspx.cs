@@ -50,7 +50,7 @@ namespace umbraco.cms.presentation
                 if (app == Constants.Applications.Media)
                 {
                     icon = "../images/umbraco/mediaPhoto.gif";
-                    var mediaService = ApplicationContext.Current.Services.MediaService;
+                    var mediaService = Current.Services.MediaService;
 
                     if (parentId == -1)
                     {
@@ -67,7 +67,7 @@ namespace umbraco.cms.presentation
 
                 if (app == Constants.Applications.Content)
                 {
-                    var contentService = ApplicationContext.Current.Services.ContentService;
+                    var contentService = Current.Services.ContentService;
 
                     if (parentId == -1)
                     {
@@ -81,7 +81,7 @@ namespace umbraco.cms.presentation
                             _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                 }
-                
+
                 bindNodesToList(string.Empty);
             }
             else
@@ -100,11 +100,11 @@ namespace umbraco.cms.presentation
 
                     var sort = 0;
                     foreach (var child in stylesheet.Properties)
-                    {                        
+                    {
                         _nodes.Add(CreateNode(child.Name, sort, child.Name, DateTime.Now, icon));
                         sort++;
                     }
-                    
+
                     bindNodesToList(string.Empty);
                 }
             }

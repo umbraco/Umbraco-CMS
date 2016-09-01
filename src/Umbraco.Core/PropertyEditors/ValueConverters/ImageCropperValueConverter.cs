@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -34,7 +35,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public ImageCropperValueConverter()
         {
-            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            _dataTypeService = Current.Services.DataTypeService;
         }
 
         public ImageCropperValueConverter(IDataTypeService dataTypeService)

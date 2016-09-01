@@ -36,7 +36,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl)
         {
-            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
+            var version = UmbracoVersion.SemanticVersion.ToSemanticString();
             var str = @"<script type=""text/javascript"">
                 var Umbraco = {};
                 Umbraco.Sys = {};

@@ -21,6 +21,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Core.DependencyInjection;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
             //var publishedMedia = PublishedMediaTests.GetNode(mRoot.Id, GetUmbracoContext("/test", 1234));
             var umbracoContext = GetUmbracoContext("/test", 1234);
-            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null), umbracoContext.Application.Services.MediaService, umbracoContext.Application.Services.UserService, new StaticCacheProvider(), ContentTypesCache);
+            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null), Current.Services.MediaService, Current.Services.UserService, new StaticCacheProvider(), ContentTypesCache);
             var publishedMedia = cache.GetById(mRoot.Id);
             Assert.IsNotNull(publishedMedia);
 

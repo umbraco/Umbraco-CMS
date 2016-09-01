@@ -36,7 +36,7 @@ namespace Umbraco.Web._Legacy.PackageActions
 				if (rootDoc.Text.Trim() == documentName.Trim() && rootDoc != null && rootDoc.ContentType != null)
 				{
 
-					rootDoc.PublishWithChildrenWithResult(ApplicationContext.Current.Services.UserService.GetUserById(0));
+					rootDoc.PublishWithChildrenWithResult(Current.Services.UserService.GetUserById(0));
 
 
 					break;

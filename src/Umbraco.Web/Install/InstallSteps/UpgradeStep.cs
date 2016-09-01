@@ -51,9 +51,9 @@ namespace Umbraco.Web.Install.InstallSteps
             var version = new SemVersion(0);
 
             //If we have a db context available, if we don't then we are not installed anyways
-            if (ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured && ApplicationContext.Current.DatabaseContext.CanConnect)
+            if (Current.DatabaseContext.IsDatabaseConfigured && Current.DatabaseContext.CanConnect)
             {
-                version = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema().DetermineInstalledVersionByMigrations(ApplicationContext.Current.Services.MigrationEntryService);
+                version = Current.DatabaseContext.ValidateDatabaseSchema().DetermineInstalledVersionByMigrations(Current.Services.MigrationEntryService);
             }
 
             return version;

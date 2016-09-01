@@ -43,7 +43,7 @@ namespace Umbraco.Web.Services
             _cache = cache;
             _allAvailableSections = new Lazy<IEnumerable<Section>>(() => new LazyEnumerableSections());
         }
-        
+
 
         /// <summary>
         /// gets/sets the application.config file path
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Services
             }
             set { _appConfig = value; }
         }
-        
+
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
@@ -74,15 +74,15 @@ namespace Umbraco.Web.Services
                 () =>
                     {
                         var list = ReadFromXmlAndSort();
-                        var hasChanges = false;                    
+                        var hasChanges = false;
                         var localCopyList = list;
 
                         LoadXml(doc =>
                         {
                             //Now, load in the xml structure and update it with anything that is not declared there and save the file.
-                            //NOTE: On the first iteration here, it will lazily scan all apps, etc... this is because this ienumerable is lazy                      
+                            //NOTE: On the first iteration here, it will lazily scan all apps, etc... this is because this ienumerable is lazy
                             //Get all the trees not registered in the config
-                            
+
                             var unregistered = _allAvailableSections.Value
                                 .Where(x => localCopyList.Any(l => l.Alias == x.Alias) == false)
                                 .ToArray();
@@ -149,7 +149,7 @@ namespace Umbraco.Web.Services
         /// <returns></returns>
         public IEnumerable<Section> GetAllowedSections(int userId)
         {
-            
+
             var user = _userService.GetUserById(userId);
             if (user == null)
             {
@@ -188,7 +188,7 @@ namespace Umbraco.Web.Services
         /// <param name="icon">The icon.</param>
         /// <param name="sortOrder">The sort order.</param>
         public void MakeNew(string name, string alias, string icon, int sortOrder)
-        {            
+        {
             if (GetSections().All(x => x.Alias != alias))
             {
                 LoadXml(doc =>
@@ -208,7 +208,7 @@ namespace Umbraco.Web.Services
 
         /// <summary>
         /// Deletes the section
-        /// </summary>        
+        /// </summary>
         public void DeleteSection(Section section)
         {
             lock (Locker)
@@ -237,8 +237,8 @@ namespace Umbraco.Web.Services
                 }, true);
 
                 //raise event
-                OnDeleted(section, new EventArgs());   
-            }            
+                OnDeleted(section, new EventArgs());
+            }
         }
 
         private List<Section> ReadFromXmlAndSort()
@@ -263,7 +263,7 @@ namespace Umbraco.Web.Services
             }, false);
 
             return tmp;
-        } 
+        }
 
         internal static event TypedEventHandler<Section, EventArgs> Deleted;
         private static void OnDeleted(Section app, EventArgs args)
@@ -295,10 +295,10 @@ namespace Umbraco.Web.Services
                     // Load all Applications by attribute and add them to the XML config
 
                     //don't cache the result of this because it is only used once during app startup, caching will just add a bit more mem overhead for no reason
-                    var types = PluginManager.Current.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>(cacheResult: false);
+                    var types = Current.PluginManager.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>(cacheResult: false); // fixme - inject
 
-                    //since applications don't populate their metadata from the attribute and because it is an interface, 
-                    //we need to interrogate the attributes for the data. Would be better to have a base class that contains 
+                    //since applications don't populate their metadata from the attribute and because it is an interface,
+                    //we need to interrogate the attributes for the data. Would be better to have a base class that contains
                     //metadata populated by the attribute. Oh well i guess.
                     var attrs = types.Select(x => x.GetCustomAttributes<ApplicationAttribute>(false).Single());
                     return Enumerable.ToArray<Section>(attrs.Select(x => new Section(x.Name, x.Alias, x.Icon, x.SortOrder)));

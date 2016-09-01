@@ -44,21 +44,21 @@ namespace Umbraco.Tests.Models.Mapping
 
             var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
 
-            //Create an app context using mocks
-            var appContext = new ApplicationContext(
-                new DatabaseContext(databaseFactory, logger),
+            ////Create an app context using mocks
+            //var appContext = new ApplicationContext(
+            //    new DatabaseContext(databaseFactory, logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
 
-                //Create service context using mocks
-                new ServiceContext(
+            //    //Create service context using mocks
+            //    new ServiceContext(
 
-                    contentService: _contentService.Object,
-                    contentTypeService:_contentTypeService.Object,
-                    dataTypeService:_dataTypeService.Object,
-                    entityService:_entityService.Object,
-                    fileService: _fileService.Object),
+            //        contentService: _contentService.Object,
+            //        contentTypeService:_contentTypeService.Object,
+            //        dataTypeService:_dataTypeService.Object,
+            //        entityService:_entityService.Object,
+            //        fileService: _fileService.Object),
 
-                nullCacheHelper,
-                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
+            //    nullCacheHelper,
+            //    new ProfilingLogger(logger, Mock.Of<IProfiler>()));
 
             // create a fake property editor collection to return fake property editors
             var editors = new PropertyEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>()), };
@@ -68,10 +68,10 @@ namespace Umbraco.Tests.Models.Mapping
             Mapper.Initialize(configuration =>
             {
                 //initialize our content type mapper
-                var mapper = new ContentTypeModelMapper(editorsMock.Object);
-                mapper.ConfigureMappings(configuration, appContext);
+                var mapper = new ContentTypeModelMapper(editorsMock.Object, Mock.Of<IDataTypeService>(), Mock.Of<IFileService>(), Mock.Of<IContentTypeService>(), Mock.Of<IMediaTypeService>());
+                mapper.ConfigureMappings(configuration);
                 var entityMapper = new EntityModelMapper();
-                entityMapper.ConfigureMappings(configuration, appContext);
+                entityMapper.ConfigureMappings(configuration);
             });
         }
 

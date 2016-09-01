@@ -29,7 +29,6 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class ContentTreeController : ContentTreeControllerBase
     {
-
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var node = base.CreateRootNode(queryStrings);

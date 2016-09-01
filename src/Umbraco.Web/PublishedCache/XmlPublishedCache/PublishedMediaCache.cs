@@ -877,14 +877,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	        if (_publishedMediaCacheEnabled == false)
 	            return func(id);
 
-	        var cache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+	        var cache = Current.ApplicationCache.RuntimeCache;
             var key = PublishedMediaCacheKey + id;
             return (CacheValues) cache.GetCacheItem(key, () => func(id), _publishedMediaCacheTimespan);
 	    }
 
 	    internal static void ClearCache(int id)
 	    {
-            var cache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+            var cache = Current.ApplicationCache.RuntimeCache;
 	        var sid = id.ToString();
             var key = PublishedMediaCacheKey + sid;
 

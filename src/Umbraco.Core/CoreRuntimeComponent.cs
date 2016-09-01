@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using LightInject;
@@ -11,6 +13,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -23,6 +26,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
+using IntegerValidator = Umbraco.Core.PropertyEditors.IntegerValidator;
 
 namespace Umbraco.Core
 {
@@ -38,9 +42,20 @@ namespace Umbraco.Core
             container.RegisterFrom<ServicesCompositionRoot>();
             container.RegisterFrom<CoreModelMappersCompositionRoot>();
 
+
+
+
+
+
+
+
+
+
+
+
             //TODO: Don't think we'll need this when the resolvers are all container resolvers
             container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
-            container.RegisterSingleton<ApplicationContext>();
+
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
 
             // fixme - should we capture Logger, etc here or use factory?
@@ -70,7 +85,7 @@ namespace Umbraco.Core
             container.RegisterSingleton(factory => UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled
                 ? (IServerRegistrar)new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings())
                 : (IServerRegistrar)new DatabaseServerRegistrar(
-                    new Lazy<IServerRegistrationService>(() => factory.GetInstance<ApplicationContext>().Services.ServerRegistrationService),
+                    new Lazy<IServerRegistrationService>(factory.GetInstance<IServerRegistrationService>),
                     new DatabaseServerRegistrarOptions()));
 
             // by default we'll use the database server messenger with default options (no callbacks),
@@ -78,7 +93,12 @@ namespace Umbraco.Core
             // fixme - painful, have to take care of lifetime! - we CANNOT ask users to remember!
             // fixme - same issue with PublishedContentModelFactory and many more, I guess!
             container.RegisterSingleton<IServerMessenger>(factory
-                => new DatabaseServerMessenger(factory.GetInstance<ApplicationContext>(), true, new DatabaseServerMessengerOptions()));
+                => new DatabaseServerMessenger(
+                    factory.GetInstance<IRuntimeState>(),
+                    factory.GetInstance<DatabaseContext>(),
+                    factory.GetInstance<ILogger>(),
+                    factory.GetInstance<ProfilingLogger>(),
+                    true, new DatabaseServerMessengerOptions()));
 
             CacheRefresherCollectionBuilder.Register(container)
                 .AddProducer(factory => factory.GetInstance<PluginManager>().ResolveCacheRefreshers());
@@ -103,27 +123,18 @@ namespace Umbraco.Core
             container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
         }
 
-        public void Initialize(IEnumerable<ModelMapperConfiguration> modelMapperConfigurations)
+        internal void Initialize(
+            IEnumerable<ModelMapperConfiguration> modelMapperConfigurations)
         {
             //TODO: Remove these for v8!
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
             LegacyParameterEditorAliasConverter.CreateMappingsForCoreEditors();
 
-            InitializeModelMappers(modelMapperConfigurations);
-
-        }
-
-        private void InitializeModelMappers(IEnumerable<ModelMapperConfiguration> modelMapperConfigurations)
-        {
+            // model mapper configurations have been registered & are created by the container
             Mapper.Initialize(configuration =>
             {
-                // fixme why ApplicationEventHandler?!
-                //foreach (var m in ApplicationEventsResolver.Current.ApplicationEventHandlers.OfType<IMapperConfiguration>())
                 foreach (var m in modelMapperConfigurations)
-                {
-                    //Logger.Debug<CoreRuntime>("FIXME " + m.GetType().FullName);
-                    m.ConfigureMappings(configuration, Current.ApplicationContext);
-                }
+                    m.ConfigureMappings(configuration);
             });
         }
     }

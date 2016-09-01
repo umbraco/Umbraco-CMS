@@ -57,18 +57,18 @@ namespace Umbraco.Tests.Routing
         public const int LangNlId = 337;
         public const int LangDkId = 338;
 
-        protected override ApplicationContext CreateApplicationContext()
-        {
-            var settings = SettingsForTests.GetDefault();
-            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
-            return new ApplicationContext(
-                new DatabaseContext(databaseFactory, Logger),
-                GetServiceContext(settings, Logger),
-                CacheHelper,
-                ProfilingLogger)
-            {
-                IsReady = true
-            };
-        }
+        //protected override ApplicationContext CreateApplicationContext()
+        //{
+        //    var settings = SettingsForTests.GetDefault();
+        //    var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+        //    return new ApplicationContext(
+        //        new DatabaseContext(databaseFactory, Logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
+        //        GetServiceContext(settings, Logger),
+        //        CacheHelper,
+        //        ProfilingLogger)
+        //    {
+        //        //IsReady = true
+        //    };
+        //}
     }
 }

@@ -39,7 +39,7 @@ namespace umbraco.controls.Tree
 			Dictionary<string, object> data = new Dictionary<string, object>();
 
 			data.Add("id", a.Letter);
-			data.Add("label", ApplicationContext.Current.Services.TextService.Localize(a.Alias));
+			data.Add("label", Current.Services.TextService.Localize(a.Alias));
 
 			if (a.Icon.StartsWith("."))
 			{

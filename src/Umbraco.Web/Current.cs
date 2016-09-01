@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Web;
 using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -10,6 +12,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
@@ -195,11 +198,32 @@ namespace Umbraco.Web
 
         #endregion
 
+        #region Web Actions
+
+        public static void RestartAppPool(HttpContextBase httpContext)
+        {
+            // we're going to put an application wide flag to show that the application is about to restart.
+            // we're doing this because if there is a script checking if the app pool is fully restarted, then
+            // it can check if this flag exists...  if it does it means the app pool isn't restarted yet.
+            httpContext.Application.Add("AppPoolRestarting", true);
+
+            // unload app domain - we must null out all identities otherwise we get serialization errors
+            // http://www.zpqrtbnk.net/posts/custom-iidentity-serialization-issue
+            httpContext.User = null;
+            if (HttpContext.Current != null)
+                HttpContext.Current.User = null;
+            Thread.CurrentPrincipal = null;
+
+            HttpRuntime.UnloadAppDomain();
+        }
+
+        #endregion
+
         #region Core Getters
 
         // proxy Core for convenience
 
-        public static ApplicationContext ApplicationContext => CoreCurrent.ApplicationContext;
+        public static IRuntimeState RuntimeState => CoreCurrent.RuntimeState;
 
         public static PluginManager PluginManager => CoreCurrent.PluginManager;
 
@@ -232,6 +256,12 @@ namespace Umbraco.Web
         public static IProfiler Profiler => CoreCurrent.Profiler;
 
         public static ProfilingLogger ProfilingLogger => CoreCurrent.ProfilingLogger;
+
+        public static CacheHelper ApplicationCache => CoreCurrent.ApplicationCache;
+
+        public static ServiceContext Services => CoreCurrent.Services;
+
+        public static DatabaseContext DatabaseContext => CoreCurrent.DatabaseContext;
 
         #endregion
     }

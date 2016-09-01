@@ -5,6 +5,7 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -48,9 +49,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(g => g.Properties, expression => expression.MapFrom(display => display.Properties.Select(Mapper.Map<TPropertyTypeDisplay>)));
         }
 
-        public static void AfterMapContentTypeSaveToEntity<TSource, TDestination>(
-            TSource source, TDestination dest,
-            ApplicationContext applicationContext)
+        public static void AfterMapContentTypeSaveToEntity<TSource, TDestination>(TSource source, TDestination dest, IContentTypeService contentTypeService)
             where TSource : ContentTypeSave
             where TDestination : IContentTypeComposition
         {
@@ -69,15 +68,13 @@ namespace Umbraco.Web.Models.Mapping
             foreach (var a in add)
             {
                 //TODO: Remove N+1 lookup
-                var addCt = applicationContext.Services.ContentTypeService.Get(a);
+                var addCt = contentTypeService.Get(a);
                 if (addCt != null)
                     dest.AddContentType(addCt);
             }
         }
 
-        public static void AfterMapMediaTypeSaveToEntity<TSource, TDestination>(
-            TSource source, TDestination dest,
-            ApplicationContext applicationContext)
+        public static void AfterMapMediaTypeSaveToEntity<TSource, TDestination>(TSource source, TDestination dest, IMediaTypeService mediaTypeService)
             where TSource : MediaTypeSave
             where TDestination : IContentTypeComposition
         {
@@ -96,7 +93,7 @@ namespace Umbraco.Web.Models.Mapping
             foreach (var a in add)
             {
                 //TODO: Remove N+1 lookup
-                var addCt = applicationContext.Services.MediaTypeService.Get(a);
+                var addCt = mediaTypeService.Get(a);
                 if (addCt != null)
                     dest.AddContentType(addCt);
             }
@@ -120,7 +117,8 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination, TPropertyTypeDisplay>(
-            this IMappingExpression<TSource, TDestination> mapping, ApplicationContext applicationContext, PropertyEditorCollection propertyEditors)
+            this IMappingExpression<TSource, TDestination> mapping, PropertyEditorCollection propertyEditors,
+            IDataTypeService dataTypeService, IContentTypeService contentTypeService)
             where TSource : IContentTypeComposition
             where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDisplay>
             where TPropertyTypeDisplay : PropertyTypeDisplay, new()
@@ -143,11 +141,11 @@ namespace Umbraco.Web.Models.Mapping
 
                 .ForMember(
                     dto => dto.LockedCompositeContentTypes,
-                    expression => expression.ResolveUsing(new LockedCompositionsResolver(applicationContext)))
+                    expression => expression.ResolveUsing(new LockedCompositionsResolver(contentTypeService)))
 
                 .ForMember(
                     dto => dto.Groups,
-                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver<TPropertyTypeDisplay>(applicationContext, propertyEditors)));
+                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver<TPropertyTypeDisplay>(propertyEditors, dataTypeService)));
         }
 
         /// <summary>
@@ -157,10 +155,9 @@ namespace Umbraco.Web.Models.Mapping
         /// <typeparam name="TDestination"></typeparam>
         /// <typeparam name="TSourcePropertyType"></typeparam>
         /// <param name="mapping"></param>
-        /// <param name="applicationContext"></param>
         /// <returns></returns>        
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToEntity<TSource, TSourcePropertyType, TDestination>(
-            this IMappingExpression<TSource, TDestination> mapping, ApplicationContext applicationContext)
+            this IMappingExpression<TSource, TDestination> mapping)
             //where TSource : ContentTypeCompositionDisplay
             where TSource : ContentTypeSave<TSourcePropertyType>
             where TDestination : IContentTypeComposition 

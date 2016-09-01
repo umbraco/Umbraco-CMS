@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
-using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Scheduling
@@ -12,36 +13,37 @@ namespace Umbraco.Web.Scheduling
     /// Used to do the scheduling for tasks, publishing, etc...
     /// </summary>
     /// <remarks>
-    /// All tasks are run in a background task runner which is web aware and will wind down the task correctly instead of killing it completely when
-    /// the app domain shuts down.
+    /// All tasks are run in a background task runner which is web aware and will wind down 
+    /// the task correctly instead of killing it completely when the app domain shuts down.
     /// </remarks>
-    internal sealed class Scheduler : ApplicationEventHandler
+    internal sealed class SchedulerComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
+        private IRuntimeState _runtime;
+        private IUserService _userService;
+        private IAuditService _auditService;
+
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
         private BackgroundTaskRunner<IBackgroundTask> _tasksRunner;
         private BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
-        private bool _started = false;
+
+        private bool _started;
         private object _locker = new object();
         private IBackgroundTask[] _tasks;
 
-        /// <summary>
-        /// Overridable method to execute when the ApplicationContext is created and other static objects that require initialization have been setup
-        /// </summary>
-        /// <param name="umbracoApplication"></param>
-        /// <param name="applicationContext"></param>
-        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void Initialize(IRuntimeState runtime, IUserService userService, IAuditService auditService, ILogger logger)
         {
-            if (umbracoApplication.Context == null)
-                return;
+            _runtime = runtime;
+            _userService = userService;
+            _auditService = auditService;
 
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
-            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", applicationContext.ProfilingLogger.Logger);
-            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", applicationContext.ProfilingLogger.Logger);
-            _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", applicationContext.ProfilingLogger.Logger);
-            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", applicationContext.ProfilingLogger.Logger);
+            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", logger);
+            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", logger);
+            _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", logger);
+            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", logger);
 
-            //We will start the whole process when a successful request is made
+            // we will start the whole process when a successful request is made
             UmbracoModule.RouteAttempt += UmbracoModuleRouteAttempt;
         }
 
@@ -58,20 +60,20 @@ namespace Umbraco.Web.Scheduling
 
         private void RegisterBackgroundTasks(UmbracoRequestEventArgs e)
         {
-            //remove handler, we're done
+            // remove handler, we're done
             UmbracoModule.RouteAttempt -= UmbracoModuleRouteAttempt;
 
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
-                LogHelper.Debug<Scheduler>(() => "Initializing the scheduler");
+                LogHelper.Debug<SchedulerComponent>(() => "Initializing the scheduler");
                 var settings = UmbracoConfig.For.UmbracoSettings();
 
                 var tasks = new List<IBackgroundTask>
                 {
-                    new KeepAlive(_keepAliveRunner, 60000, 300000, e.UmbracoContext.Application),
-                    new ScheduledPublishing(_publishingRunner, 60000, 60000, e.UmbracoContext.Application, settings),
-                    new ScheduledTasks(_tasksRunner, 60000, 60000, e.UmbracoContext.Application, settings),
-                    new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings), e.UmbracoContext.Application, settings)
+                    new KeepAlive(_keepAliveRunner, 60000, 300000, _runtime),
+                    new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _userService),
+                    new ScheduledTasks(_tasksRunner, 60000, 60000, _runtime, settings),
+                    new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings), _runtime, _auditService, settings)
                 };
 
                 // ping/keepalive

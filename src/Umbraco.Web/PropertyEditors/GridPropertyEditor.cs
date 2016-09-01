@@ -148,7 +148,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <summary>
             /// We're going to bind to the Examine events so we can ensure grid data is index nicely.
             /// </summary>        
-            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
             {
                 foreach (var i in _indexCollection.Indexes.Values.OfType<BaseUmbracoIndexer>())
                 {
@@ -157,20 +157,20 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication)
         {
             //wrap
-            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
+            _applicationStartup.OnApplicationInitialized(umbracoApplication);
         }
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication)
         {
             //wrap
-            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
+            _applicationStartup.OnApplicationStarting(umbracoApplication);
         }
-        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication)
         {
             //wrap
-            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);            
+            _applicationStartup.OnApplicationStarted(umbracoApplication);            
         }
         #endregion
     }

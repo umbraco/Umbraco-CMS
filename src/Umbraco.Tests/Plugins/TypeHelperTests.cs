@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Odbc;
@@ -9,11 +8,8 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Plugins;
-using Umbraco.Tests.DynamicsAndReflection;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Models;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Tests.Plugins
@@ -81,7 +77,7 @@ namespace Umbraco.Tests.Plugins
             Assert.AreEqual(typeof(PropertyAliasDto), t5.Result);
 
             var t6 = TypeHelper.GetLowestBaseType(typeof (IApplicationEventHandler),
-                                                  typeof (Scheduler),
+                                                  typeof (SchedulerComponent),
                                                   typeof(CacheRefresherEventHandler));
             Assert.IsTrue(t6.Success);
             Assert.AreEqual(typeof(IApplicationEventHandler), t6.Result);

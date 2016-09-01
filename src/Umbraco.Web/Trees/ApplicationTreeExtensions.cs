@@ -161,8 +161,9 @@ namespace Umbraco.Web.Trees
                 return Attempt<TreeNode>.Succeed(null);
             }
 
-            var legacyController = new LegacyTreeController(xmlTreeNodeAttempt.Result, appTree.Alias, currentSection, urlHelper);
-            var newRoot = legacyController.GetRootNode(formCollection);
+            //var temp = new LegacyTreeController(xmlTreeNodeAttempt.Result, appTree.Alias, currentSection, urlHelper);
+            var temp = new TreeControllerBaseStuffForLegacy(appTree.Alias, xmlTreeNodeAttempt.Result.Text, urlHelper);
+            var newRoot = temp.GetRootNode(formCollection);
 
             return Attempt.Succeed(newRoot);
             

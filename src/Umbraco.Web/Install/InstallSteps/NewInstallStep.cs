@@ -7,6 +7,7 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -24,12 +25,14 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class NewInstallStep : InstallSetupStep<UserModel>
     {
         private readonly HttpContextBase _http;
-        private readonly ApplicationContext _applicationContext;
+        private readonly IUserService _userService;
+        private readonly DatabaseContext _databaseContext;
 
-        public NewInstallStep(HttpContextBase http, ApplicationContext applicationContext)
+        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseContext databaseContext)
         {
             _http = http;
-            _applicationContext = applicationContext;
+            _userService = userService;
+            _databaseContext = databaseContext;
         }
 
         private MembershipProvider CurrentProvider
@@ -43,7 +46,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(UserModel user)
         {
-            var admin = _applicationContext.Services.UserService.GetUserById(0);
+            var admin = _userService.GetUserById(0);
             if (admin == null)
             {
                 throw new InvalidOperationException("Could not find the admi user!");
@@ -72,7 +75,7 @@ namespace Umbraco.Web.Install.InstallSteps
             admin.Name = user.Name.Trim();
             admin.Username = user.Email.Trim();
 
-            _applicationContext.Services.UserService.Save(admin);
+            _userService.Save(admin);
 
 
             if (user.SubscribeToNewsLetter)
@@ -124,11 +127,11 @@ namespace Umbraco.Web.Install.InstallSteps
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.
             if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
 
-            if (_applicationContext.DatabaseContext.IsConnectionStringConfigured(databaseSettings)
-                && _applicationContext.DatabaseContext.IsDatabaseConfigured)
+            if (_databaseContext.IsConnectionStringConfigured(databaseSettings)
+                && _databaseContext.IsDatabaseConfigured)
             {
                 //check if we have the default user configured already
-                var result = _applicationContext.DatabaseContext.Database.ExecuteScalar<int>(
+                var result = _databaseContext.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
                 if (result == 1)
                 {

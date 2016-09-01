@@ -1,16 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Web.Services.Description;
-using umbraco;
-using umbraco.cms.businesslogic.template;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
@@ -41,8 +34,8 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            var found = id == Constants.System.Root.ToInvariantString() 
-                ? Services.FileService.GetTemplates(-1) 
+            var found = id == Constants.System.Root.ToInvariantString()
+                ? Services.FileService.GetTemplates(-1)
                 : Services.FileService.GetTemplates(int.Parse(id));
 
             nodes.AddRange(found.Select(template => CreateTreeNode(
@@ -72,7 +65,7 @@ namespace Umbraco.Web.Trees
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    //Since we haven't implemented anything for templates in angular, this needs to be converted to 
+                    //Since we haven't implemented anything for templates in angular, this needs to be converted to
                     //use the legacy format
                     .ConvertLegacyMenuItem(null, "inittemplates", queryStrings.GetValue<string>("application"));
 
@@ -88,7 +81,7 @@ namespace Umbraco.Web.Trees
 
             //Create the create action for creating sub layouts
             menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                //Since we haven't implemented anything for templates in angular, this needs to be converted to 
+                //Since we haven't implemented anything for templates in angular, this needs to be converted to
                 //use the legacy format
                 .ConvertLegacyMenuItem(entity, "templates", queryStrings.GetValue<string>("application"));
 
@@ -97,14 +90,14 @@ namespace Umbraco.Web.Trees
             {
                 //add delete option if it doesn't have children
                 menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias), true)
-                    //Since we haven't implemented anything for languages in angular, this needs to be converted to 
+                    //Since we haven't implemented anything for languages in angular, this needs to be converted to
                     //use the legacy format
                     .ConvertLegacyMenuItem(entity, "templates", queryStrings.GetValue<string>("application"));
             }
 
             //add refresh
             menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
-            
+
 
             return menu;
         }

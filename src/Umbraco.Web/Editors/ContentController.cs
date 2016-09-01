@@ -40,14 +40,9 @@ namespace Umbraco.Web.Editors
     {
         private readonly IFacadeService _facadeService;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        /// <param name="facadeService"></param>
-        public ContentController(UmbracoContext umbracoContext, IFacadeService facadeService)
-            : base(umbracoContext)
+        public ContentController(IFacadeService facadeService)
         {
+            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
             _facadeService = facadeService;
         }
 

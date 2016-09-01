@@ -6,6 +6,7 @@ using System.Web.UI.HtmlControls;
 using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 
 namespace umbraco.controls
 {
@@ -62,9 +63,9 @@ namespace umbraco.controls
             table.Border = 0;
 
             HtmlTableRow header = new HtmlTableRow();
-            header.Controls.Add(new HtmlTableCell { InnerHtml = ApplicationContext.Current.Services.TextService.Localize("content/notmemberof") });
+            header.Controls.Add(new HtmlTableCell { InnerHtml = Current.Services.TextService.Localize("content/notmemberof") });
             header.Controls.Add(new HtmlTableCell { InnerHtml= "&nbsp;" });
-            header.Controls.Add(new HtmlTableCell { InnerHtml = ApplicationContext.Current.Services.TextService.Localize("content/memberof") });
+            header.Controls.Add(new HtmlTableCell { InnerHtml = Current.Services.TextService.Localize("content/memberof") });
             table.Controls.Add(header);
 
             HtmlTableRow row = new HtmlTableRow();

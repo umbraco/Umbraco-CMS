@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -16,23 +14,23 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class SetUmbracoVersionStep : InstallSetupStep<object>
     {
-        private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httpContext;
+        private readonly ILogger _logger;
+        private readonly InstallHelper _installHelper;
 
-        public SetUmbracoVersionStep(ApplicationContext applicationContext, HttpContextBase httpContext)
+        public SetUmbracoVersionStep(HttpContextBase httpContext, ILogger logger, InstallHelper installHelper)
         {
-            _applicationContext = applicationContext;
             _httpContext = httpContext;
+            _logger = logger;
+            _installHelper = installHelper;
         }
 
         public override InstallSetupResult Execute(object model)
         {
-            var ih = new InstallHelper(UmbracoContext.Current);
-
             //During a new install we'll log the default user in (which is id = 0).
             // During an upgrade, the user will already need to be logged in in order to run the installer.
 
-            var security = new WebSecurity(_httpContext, _applicationContext);
+            var security = new WebSecurity(_httpContext, Current.Services.UserService);
             //we do this check here because for upgrades the user will already be logged in, for brand new installs,
             // they will not be logged in, however we cannot check the current installation status because it will tell
             // us that it is in 'upgrade' because we already have a database conn configured and a database.
@@ -47,14 +45,14 @@ namespace Umbraco.Web.Install.InstallSteps
             DistributedCache.Instance.RefreshAllFacade();
 
             // Update configurationStatus
-            GlobalSettings.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();
+            GlobalSettings.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
 
             // Update ClientDependency version
-            var clientDependencyConfig = new ClientDependencyConfiguration(_applicationContext.ProfilingLogger.Logger);
+            var clientDependencyConfig = new ClientDependencyConfiguration(_logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
-            
-            //reports the ended install            
-            ih.InstallStatus(true, "");
+
+            //reports the ended install
+            _installHelper.InstallStatus(true, "");
 
             return null;
         }

@@ -23,10 +23,13 @@ namespace Umbraco.Web
 	/// </summary>
 	public class UmbracoHelper : IUmbracoComponentRenderer
     {
-		private readonly UmbracoContext _umbracoContext;
+        private static readonly HtmlStringUtilities StringUtilities = new HtmlStringUtilities();
+
+        private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
         private readonly IPublishedContentQuery _iQuery;
-        private readonly HtmlStringUtilities _stringUtilities = new HtmlStringUtilities();
+        private readonly ServiceContext _services;
+        private readonly CacheHelper _appCache;
 
         private IUmbracoComponentRenderer _componentRenderer;
         private PublishedContentQuery _query;
@@ -36,90 +39,22 @@ namespace Umbraco.Web
         private UrlProvider _urlProvider;
         private ICultureDictionary _cultureDictionary;
 
-        /// <summary>
-        /// Lazy instantiates the tag context
-        /// </summary>
-        public ITagQuery TagQuery => _tag ??
-            (_tag = new TagQuery(UmbracoContext.Application.Services.TagService,
-                _iQuery ?? ContentQuery));
-
-        /// <summary>
-        /// Lazy instantiates the query context if not specified in the constructor
-        /// </summary>
-        public PublishedContentQuery ContentQuery => _query ??
-            (_query = _iQuery != null
-                ? new PublishedContentQuery(_iQuery)
-                : new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
-
-        /// <summary>
-        /// Helper method to ensure an umbraco context is set when it is needed
-        /// </summary>
-        public UmbracoContext UmbracoContext
-        {
-            get
-            {
-                if (_umbracoContext == null)
-                {
-                    throw new NullReferenceException("No " + typeof(UmbracoContext) + " reference has been set for this " + typeof(UmbracoHelper) + " instance");
-                }
-                return _umbracoContext;
-            }
-        }
-
-        /// <summary>
-        /// Lazy instantiates the membership helper if not specified in the constructor
-        /// </summary>
-        public MembershipHelper MembershipHelper => _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext));
-
-        /// <summary>
-        /// Lazy instantiates the UrlProvider if not specified in the constructor
-        /// </summary>
-        public UrlProvider UrlProvider => _urlProvider ??
-            (_urlProvider = UmbracoContext.UrlProvider);
-
-        /// <summary>
-        /// Lazy instantiates the IDataTypeService if not specified in the constructor
-        /// </summary>
-        public IDataTypeService DataTypeService => _dataTypeService ??
-            (_dataTypeService = UmbracoContext.Application.Services.DataTypeService);
-
-        /// <summary>
-        /// Lazy instantiates the IUmbracoComponentRenderer if not specified in the constructor
-        /// </summary>
-        public IUmbracoComponentRenderer UmbracoComponentRenderer => _componentRenderer ??
-            (_componentRenderer = new UmbracoComponentRenderer(UmbracoContext));
-
         #region Constructors
-        /// <summary>
-        /// Empty constructor to create an umbraco helper for access to methods that don't have dependencies
-        /// </summary>
-        public UmbracoHelper()
-        {
-        }
 
         /// <summary>
-        /// Constructor accepting all dependencies
+        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class.
         /// </summary>
-        /// <param name="umbracoContext"></param>
-        /// <param name="content"></param>
-        /// <param name="query"></param>
-        /// <param name="tagQuery"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="urlProvider"></param>
-        /// <param name="cultureDictionary"></param>
-        /// <param name="componentRenderer"></param>
-        /// <param name="membershipHelper"></param>
-        /// <remarks>
-        /// This constructor can be used to create a testable UmbracoHelper
-        /// </remarks>
-        public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content,
+        /// <remarks>For tests.</remarks>
+        internal UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content,
             IPublishedContentQuery query,
             ITagQuery tagQuery,
             IDataTypeService dataTypeService,
             UrlProvider urlProvider,
             ICultureDictionary cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
-            MembershipHelper membershipHelper)
+            MembershipHelper membershipHelper,
+            ServiceContext services,
+            CacheHelper appCache)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             if (content == null) throw new ArgumentNullException(nameof(content));
@@ -130,6 +65,8 @@ namespace Umbraco.Web
             if (cultureDictionary == null) throw new ArgumentNullException(nameof(cultureDictionary));
             if (componentRenderer == null) throw new ArgumentNullException(nameof(componentRenderer));
             if (membershipHelper == null) throw new ArgumentNullException(nameof(membershipHelper));
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (appCache == null) throw new ArgumentNullException(nameof(appCache));
 
             _umbracoContext = umbracoContext;
             _tag = new TagQuery(tagQuery);
@@ -140,37 +77,107 @@ namespace Umbraco.Web
             _membershipHelper = membershipHelper;
             _currentPage = content;
             _iQuery = query;
+            _services = services;
+            _appCache = appCache;
         }
 
         /// <summary>
-        /// Custom constructor setting the current page to the parameter passed in
+        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class.
         /// </summary>
-        /// <param name="umbracoContext"></param>
-        /// <param name="content"></param>
-        public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content)
-            : this(umbracoContext)
+        /// <remarks>For tests - nothing is initialized.</remarks>
+        internal UmbracoHelper()
+        { }
+
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class with an Umbraco context
+        /// and a specific content item.
+        /// </summary>
+        /// <param name="umbracoContext">An Umbraco context.</param>
+        /// <param name="content">A content item.</param>
+        /// <param name="services">A services context.</param>
+        /// <param name="appCache">An application cache helper.</param>
+        /// <remarks>Sets the current page to the supplied content item.</remarks>
+        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache, IPublishedContent content)
+            : this(umbracoContext, services, appCache)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             _currentPage = content;
         }
 
         /// <summary>
-        /// Standard constructor setting the current page to the page that has been routed to
+        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class with an Umbraco context.
         /// </summary>
-        /// <param name="umbracoContext"></param>
-        public UmbracoHelper(UmbracoContext umbracoContext)
+        /// <param name="umbracoContext">An Umbraco context.</param>
+        /// <param name="services">A services context.</param>
+        /// <param name="appCache">An application cache helper.</param>
+        /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
+        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null");
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (appCache == null) throw new ArgumentNullException(nameof(appCache));
+            if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null.");
 
             _umbracoContext = umbracoContext;
             if (_umbracoContext.IsFrontEndUmbracoRequest)
-            {
                 _currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;
-            }
+            _services = services;
+            _appCache = appCache;
         }
 
         #endregion
+
+        /// <summary>
+        /// Gets the tag context.
+        /// </summary>
+        public ITagQuery TagQuery => _tag ??
+            (_tag = new TagQuery(_services.TagService, _iQuery ?? ContentQuery));
+
+        /// <summary>
+        /// Gets the query context.
+        /// </summary>
+        public PublishedContentQuery ContentQuery => _query ??
+            (_query = _iQuery != null
+                ? new PublishedContentQuery(_iQuery)
+                : new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
+
+        /// <summary>
+        /// Gets the Umbraco context.
+        /// </summary>
+        public UmbracoContext UmbracoContext
+        {
+            get
+            {
+                if (_umbracoContext == null)
+                    throw new NullReferenceException("UmbracoContext has not been set.");
+                return _umbracoContext;
+            }
+        }
+
+        /// <summary>
+        /// Gets the membership helper.
+        /// </summary>
+        public MembershipHelper MembershipHelper => _membershipHelper 
+            ?? (_membershipHelper = new MembershipHelper(UmbracoContext));
+
+        /// <summary>
+        /// Gets the url provider.
+        /// </summary>
+        public UrlProvider UrlProvider => _urlProvider 
+            ?? (_urlProvider = UmbracoContext.UrlProvider);
+
+        /// <summary>
+        /// Gets the datatype service.
+        /// </summary>
+        private IDataTypeService DataTypeService => _dataTypeService 
+            ?? (_dataTypeService = _services.DataTypeService);
+
+        /// <summary>
+        /// Gets the component renderer.
+        /// </summary>
+        public IUmbracoComponentRenderer UmbracoComponentRenderer => _componentRenderer 
+            ?? (_componentRenderer = new UmbracoComponentRenderer(UmbracoContext));
 
         /// <summary>
         /// Returns the current IPublishedContent item assigned to the UmbracoHelper
@@ -195,7 +202,7 @@ namespace Umbraco.Web
 	    }
 
 	    /// <summary>
-		/// Renders the template for the specified pageId and an optional altTemplateId
+		/// Renders the template for the specified pageId and an optional altTemplateId.
 		/// </summary>
 		/// <param name="pageId"></param>
 		/// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
@@ -256,19 +263,10 @@ namespace Umbraco.Web
         /// <summary>
         /// Returns the ICultureDictionary for access to dictionary items
         /// </summary>
-        public ICultureDictionary CultureDictionary
-        {
-            get
-            {
-                if (_cultureDictionary == null)
-                {
-                    _cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary();
-                }
-                return _cultureDictionary;
-            }
-        }
+        public ICultureDictionary CultureDictionary => _cultureDictionary 
+            ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
 
-		#endregion
+        #endregion
 
 		#region Membership
 
@@ -286,7 +284,7 @@ namespace Umbraco.Web
         /// <returns>True if the document object is protected</returns>
         public bool IsProtected(string path)
         {
-            return UmbracoContext.Application.Services.PublicAccessService.IsProtected(path);
+            return _services.PublicAccessService.IsProtected(path);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -306,7 +304,7 @@ namespace Umbraco.Web
             if (IsProtected(path))
             {
                 return MembershipHelper.IsLoggedIn()
-                       && UmbracoContext.Application.Services.PublicAccessService.HasAccess(path, GetCurrentMember(), Roles.Provider);
+                       && _services.PublicAccessService.HasAccess(path, GetCurrentMember(), Roles.Provider);
             }
             return true;
         }
@@ -316,12 +314,11 @@ namespace Umbraco.Web
         /// </summary>
         private MembershipUser GetCurrentMember()
         {
-            return UmbracoContext.Application.ApplicationCache.RequestCache
-                .GetCacheItem<MembershipUser>("UmbracoHelper.GetCurrentMember", () =>
-                {
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    return provider.GetCurrentUser();
-                });
+            return _appCache.RequestCache.GetCacheItem<MembershipUser>("UmbracoHelper.GetCurrentMember", () =>
+            {
+                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                return provider.GetCurrentUser();
+            });
         }
 
 		/// <summary>
@@ -683,7 +680,7 @@ namespace Umbraco.Web
 		/// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
 		public string ReplaceLineBreaksForHtml(string text)
 		{
-            return _stringUtilities.ReplaceLineBreaksForHtml(text);
+            return StringUtilities.ReplaceLineBreaksForHtml(text);
 		}
 
 		/// <summary>
@@ -709,7 +706,7 @@ namespace Umbraco.Web
 		/// </summary>
 		public HtmlString StripHtml(string html, params string[] tags)
 		{
-            return _stringUtilities.StripHtmlTags(html, tags);
+            return StringUtilities.StripHtmlTags(html, tags);
 		}
 
 		/// <summary>
@@ -717,7 +714,7 @@ namespace Umbraco.Web
 		/// </summary>
 		public string Coalesce(params object[] args)
 		{
-            return _stringUtilities.Coalesce(args);
+            return StringUtilities.Coalesce(args);
 		}
 
 		/// <summary>
@@ -725,7 +722,7 @@ namespace Umbraco.Web
 		/// </summary>
 		public string Concatenate(params object[] args)
 		{
-            return _stringUtilities.Concatenate(args);
+            return StringUtilities.Concatenate(args);
 		}
 
 		/// <summary>
@@ -733,7 +730,7 @@ namespace Umbraco.Web
 		/// </summary>
 		public string Join(string separator, params object[] args)
 		{
-            return _stringUtilities.Join(separator, args);
+            return StringUtilities.Join(separator, args);
 		}
 
 		/// <summary>
@@ -781,7 +778,7 @@ namespace Umbraco.Web
 		/// </summary>
 		public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
 		{
-            return _stringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
+            return StringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
 		}
 
 

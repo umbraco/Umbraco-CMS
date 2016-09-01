@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -10,16 +8,11 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Services;
-using Umbraco.Core.PropertyEditors;
 using System.Net.Http;
-using umbraco;
 using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Strings;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Editors
 {
@@ -36,23 +29,6 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public ContentTypeController()
-            : this(UmbracoContext.Current)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public ContentTypeController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
-
         public int GetCount()
         {
             return Services.ContentTypeService.Count();
@@ -99,7 +75,7 @@ namespace Umbraco.Web.Editors
             Constants.Trees.MemberTypes, Constants.Trees.Members)]
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
-            return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
+            return Services.ContentTypeService.GetAllPropertyTypeAliases();
         }
 
         /// <summary>
@@ -142,7 +118,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var preVals = UmbracoContext.Current.Application.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(id);
+            var preVals = Current.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(id);
             var editor = Current.PropertyEditors[dataTypeDiff.PropertyEditorAlias];
 
             return new ContentPropertyDisplay()

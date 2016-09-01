@@ -21,10 +21,10 @@ namespace umbraco.cms.presentation.Trees
 
         public static TreeDefinitionCollection Instance
         {
-            get 
+            get
             {
 				instance.EnsureTreesRegistered();
-                return instance; 
+                return instance;
             }
         }
 
@@ -128,7 +128,7 @@ namespace umbraco.cms.presentation.Trees
         /// <summary>
         /// Finds all instances of ITree in loaded assemblies, then finds their associated ApplicationTree and Application objects
         /// and stores them together in a TreeDefinition class and adds the definition to our list.
-        /// This will also store an instance of each tree object in the TreeDefinition class which should be 
+        /// This will also store an instance of each tree object in the TreeDefinition class which should be
         /// used when referencing all tree classes.
         /// </summary>
         private void EnsureTreesRegistered()
@@ -140,15 +140,15 @@ namespace umbraco.cms.presentation.Trees
                     if (_ensureTrees == false)
                     {
 
-                        var foundITrees = PluginManager.Current.ResolveTrees();
+                        var foundITrees = Current.PluginManager.ResolveTrees();
 
-                        var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetAll().ToList();
-                        var apps = ApplicationContext.Current.Services.SectionService.GetSections().ToList();
+                        var appTrees = Current.Services.ApplicationTreeService.GetAll().ToList();
+                        var apps = Current.Services.SectionService.GetSections().ToList();
 
                         foreach (var type in foundITrees)
                         {
 
-                            //find the Application tree's who's combination of assembly name and tree type is equal to 
+                            //find the Application tree's who's combination of assembly name and tree type is equal to
                             //the Type that was found's full name.
                             //Since a tree can exist in multiple applications we'll need to register them all.
 
@@ -184,6 +184,6 @@ namespace umbraco.cms.presentation.Trees
 
 
         }
-       
+
     }
 }

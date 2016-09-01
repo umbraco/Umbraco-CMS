@@ -9,11 +9,8 @@ using HtmlAgilityPack;
 namespace Umbraco.Web
 {
     /// <summary>
-    /// Utility class for working with strings and HTML in views
+    /// Provides utility methods for UmbracoHelper for working with strings and html in views.
     /// </summary>
-    /// <remarks>
-    /// The UmbracoHelper uses this class for it's string methods
-    /// </remarks>
     public sealed class HtmlStringUtilities
     {
         /// <summary>

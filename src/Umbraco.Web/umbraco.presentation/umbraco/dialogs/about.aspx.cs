@@ -16,7 +16,7 @@ namespace umbraco.dialogs
 		{
 		    // Put user code to initialize the page here
 			thisYear.Text = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
-		    version.Text = UmbracoVersion.GetSemanticVersion().ToSemanticString();
+		    version.Text = UmbracoVersion.SemanticVersion.ToSemanticString();
 		}
 
 	    #region Web Form Designer generated code

@@ -45,10 +45,10 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Create_Empty_App_Context()
         {
-            var appCtx = new ApplicationContext(
-               CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            Assert.Pass();
+            //var appCtx = new ApplicationContext(
+            //   CacheHelper.CreateDisabledCacheHelper(),
+            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //Assert.Pass();
         }
 
         [Test]
@@ -63,34 +63,19 @@ namespace Umbraco.Tests
         {
             var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
             var logger = Mock.Of<ILogger>();
-            var dbCtx = new DatabaseContext(databaseFactory, logger);
-            Assert.Pass();
-        }
-
-        [Test]
-        public void Can_Create_App_Context_With_Services()
-        {
-            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
-            var logger = Mock.Of<ILogger>();
-
-            var appCtx = new ApplicationContext(
-                new DatabaseContext(databaseFactory, logger),
-                TestObjects.GetServiceContextMock(),
-                CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
-
+            var dbCtx = new DatabaseContext(databaseFactory, logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
             Assert.Pass();
         }
 
         [Test]
         public void Can_Get_Umbraco_Context()
         {
-            var appCtx = new ApplicationContext(
-               CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //   CacheHelper.CreateDisabledCacheHelper(),
+            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var umbCtx = UmbracoContext.EnsureContext(
-                Mock.Of<HttpContextBase>(), appCtx,
+                Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
@@ -103,9 +88,9 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Mock_Umbraco_Helper()
         {
-            var appCtx = new ApplicationContext(
-               CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //   CacheHelper.CreateDisabledCacheHelper(),
+            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var facade = new Mock<IFacade>();
             facade.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
@@ -113,7 +98,7 @@ namespace Umbraco.Tests
             facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade.Object);
 
             var umbCtx = UmbracoContext.EnsureContext(
-                Mock.Of<HttpContextBase>(), appCtx,
+                Mock.Of<HttpContextBase>(),
                 facadeService.Object,
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
@@ -127,7 +112,9 @@ namespace Umbraco.Tests
                 Mock.Of<IDataTypeService>(),
                 new UrlProvider(umbCtx, new[] {Mock.Of<IUrlProvider>()}, UrlProviderMode.Auto), Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()));
+                new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()),
+                new ServiceContext(),
+                CacheHelper.CreateDisabledCacheHelper());
 
             Assert.Pass();
         }
@@ -135,9 +122,9 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Mock_Umbraco_Helper_Get_Url()
         {
-            var appCtx = new ApplicationContext(
-               CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //   CacheHelper.CreateDisabledCacheHelper(),
+            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var facade = new Mock<IFacade>();
             facade.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
@@ -145,7 +132,7 @@ namespace Umbraco.Tests
             facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade.Object);
 
             var umbCtx = UmbracoContext.EnsureContext(
-                Mock.Of<HttpContextBase>(), appCtx,
+                Mock.Of<HttpContextBase>(),
                 facadeService.Object,
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
@@ -166,7 +153,9 @@ namespace Umbraco.Tests
                     urlHelper.Object
                 }, UrlProviderMode.Auto), Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()));
+                new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()),
+                new ServiceContext(),
+                CacheHelper.CreateDisabledCacheHelper());
 
             Assert.AreEqual("/hello/world/1234", helper.Url(1234));
         }

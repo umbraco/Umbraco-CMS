@@ -156,7 +156,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
@@ -198,7 +197,6 @@
     <Compile Include="HealthCheck\Checks\Security\ClickJackingCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckAction.cs" />
     <Compile Include="HealthCheck\HealthCheckAttribute.cs" />
-    <Compile Include="HealthCheck\HealthCheckContext.cs" />
     <Compile Include="HealthCheck\HealthCheckController.cs" />
     <Compile Include="Macros\MacroPropertyModel.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
@@ -656,7 +654,7 @@
     <Compile Include="Strategies\Migrations\EnsureListViewDataTypeIsCreated.cs" />
     <Compile Include="Strategies\Migrations\MigrationStartupHandler.cs" />
     <Compile Include="Strategies\Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
-    <Compile Include="Strategies\NotificationsHandler.cs" />
+    <Compile Include="Strategies\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
@@ -939,7 +937,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
-    <Compile Include="Scheduling\Scheduler.cs" />
+    <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedRich.cs" />
@@ -988,7 +986,7 @@
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineEvents.cs" />
     <Compile Include="Strategies\Migrations\PublishAfterUpgradeToVersionSixth.cs" />
-    <Compile Include="Strategies\ServerRegistrationEventHandler.cs" />
+    <Compile Include="Strategies\DatabaseServerRegistrationComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />

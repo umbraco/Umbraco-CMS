@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web._Legacy.Actions;
@@ -19,7 +15,6 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, "Stylesheets", "icon-folder", "icon-folder", sortOrder: 3)]
     public class StylesheetsTreeController : FileSystemTreeController
     {
-        
         protected override string FilePath
         {
             get { return SystemDirectories.Css + "/"; }
@@ -39,14 +34,14 @@ namespace Umbraco.Web.Trees
         {
             get { return false; }
         }
-        
+
 
         protected override void OnBeforeRenderMenu(MenuItemCollection menu, string id, FormDataCollection queryStrings)
         {
             if (File.Exists((IOHelper.MapPath(FilePath + "/" + id))))
             {
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    //Since we haven't implemented anything for file systems in angular, this needs to be converted to 
+                    //Since we haven't implemented anything for file systems in angular, this needs to be converted to
                     //use the legacy format
                     .ConvertLegacyFileSystemMenuItem(id, "stylesheet", queryStrings.GetValue<string>("application"));
             }
@@ -74,7 +69,7 @@ namespace Umbraco.Web.Trees
             {
                 treeNode.HasChildren = styleSheet.Properties.Any();
             }
-            
+
         }
 
         protected override TreeNodeCollection GetTreeNodesForFile(string path, string id, FormDataCollection queryStrings)

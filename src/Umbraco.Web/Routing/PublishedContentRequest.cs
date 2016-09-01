@@ -343,7 +343,7 @@ namespace Umbraco.Web.Routing
             // NOTE - can we stil get it with whitespaces in it due to old legacy bugs?
             alias = alias.Replace(" ", "");
 
-            var model = ApplicationContext.Current.Services.FileService.GetTemplate(alias);
+            var model = Current.Services.FileService.GetTemplate(alias);
             if (model == null)
                 return false;
 

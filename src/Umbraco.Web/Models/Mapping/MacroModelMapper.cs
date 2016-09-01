@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -16,7 +14,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MacroModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config)
         {
             //FROM IMacro TO EntityBasic
             config.CreateMap<IMacro, EntityBasic>()

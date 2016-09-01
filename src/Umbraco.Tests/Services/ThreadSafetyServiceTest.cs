@@ -23,6 +23,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
+using Current = Umbraco.Core.DependencyInjection.Current;
 
 namespace Umbraco.Tests.Services
 {
@@ -32,6 +33,8 @@ namespace Umbraco.Tests.Services
 	{
 		private IDatabaseUnitOfWorkProvider _uowProvider;
 		private PerThreadSqlCeDatabaseFactory _dbFactory;
+	    private DatabaseContext _dbContext;
+	    private ServiceContext _services;
 
 		[SetUp]
 		public override void Initialize()
@@ -47,7 +50,7 @@ namespace Umbraco.Tests.Services
             _uowProvider = new NPocoUnitOfWorkProvider(_dbFactory, repositoryFactory);
 
             // overwrite the local object
-            ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory, Logger);
+            _dbContext = new DatabaseContext(_dbFactory, Logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
 
             //disable cache
 		    var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
@@ -56,7 +59,7 @@ namespace Umbraco.Tests.Services
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
 		    var evtMsgs = new TransientEventMessagesFactory();
-		    ApplicationContext.Services = TestObjects.GetServiceContext(
+		    _services = TestObjects.GetServiceContext(
                 repositoryFactory,
                 _uowProvider,
                 new FileUnitOfWorkProvider(),
@@ -74,6 +77,9 @@ namespace Umbraco.Tests.Services
 
             //replace some services
             Container.Register<IDatabaseFactory>(factory => _dbFactory);
+
+            Container.Register<DatabaseContext>(factory => _dbContext);
+            Container.Register<ServiceContext>(factory => _services);
         }
 
         [TearDown]

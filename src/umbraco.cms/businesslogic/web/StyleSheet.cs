@@ -5,6 +5,7 @@ using System.Xml;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Xml;
 
@@ -19,7 +20,7 @@ namespace umbraco.cms.businesslogic.web
         internal Stylesheet StylesheetEntity;
 
         public static Guid ModuleObjectType = new Guid(Constants.ObjectTypes.Stylesheet);
-        
+
         public string Filename
         {
             get
@@ -92,7 +93,7 @@ namespace umbraco.cms.businesslogic.web
             get { return StylesheetEntity.CreateDate; }
             set { StylesheetEntity.CreateDate = value; }
         }
-        
+
         /// <summary>
         /// Human readable name/label
         /// </summary>
@@ -107,7 +108,7 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         public override void Save()
         {
-            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetEntity);
+            Current.Services.FileService.SaveStylesheet(StylesheetEntity);
 
         }
 
@@ -123,7 +124,7 @@ namespace umbraco.cms.businesslogic.web
         {
             throw new NotSupportedException("The legacy " + typeof(T) + " API is no longer functional for retrieving stylesheets based on an integer ID. Stylesheets are no longer persisted in database tables. Use the new Umbraco.Core.Services.IFileSystem APIs instead of working with Umbraco stylesheets.");
         }
-    
+
         public static StyleSheet MakeNew(IUser user, string Text, string FileName, string Content)
         {
 
@@ -142,7 +143,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 Content = Content
             };
-            ApplicationContext.Current.Services.FileService.SaveStylesheet(newSheet);
+            Current.Services.FileService.SaveStylesheet(newSheet);
 
             var newCss = new StyleSheet(newSheet);
 
@@ -151,7 +152,7 @@ namespace umbraco.cms.businesslogic.web
 
         public static StyleSheet[] GetAll()
         {
-            var retval = ApplicationContext.Current.Services.FileService.GetStylesheets()
+            var retval = Current.Services.FileService.GetStylesheets()
                 //Legacy would appear to have only ever loaded the stylesheets at the root level (no sub folders)
                 .Where(x => x.Path.Split(new char[]{'\\'}, StringSplitOptions.RemoveEmptyEntries).Count() == 1)
                 .OrderBy(x => x.Alias)
@@ -160,7 +161,7 @@ namespace umbraco.cms.businesslogic.web
 
             return retval;
         }
-        
+
         public StylesheetProperty AddProperty(string Alias, IUser u)
         {
             return StylesheetProperty.MakeNew(Alias, this, u);
@@ -168,13 +169,13 @@ namespace umbraco.cms.businesslogic.web
 
         public override void delete()
         {
-            ApplicationContext.Current.Services.FileService.DeleteStylesheet(StylesheetEntity.Path);
+            Current.Services.FileService.DeleteStylesheet(StylesheetEntity.Path);
 
         }
 
         public void saveCssToFile()
         {
-            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetEntity);
+            Current.Services.FileService.SaveStylesheet(StylesheetEntity);
         }
 
         public XmlNode ToXml(XmlDocument xd)
@@ -192,12 +193,12 @@ namespace umbraco.cms.businesslogic.web
 
         [Obsolete("Stylesheet cache is automatically invalidated by Umbraco when a stylesheet is saved or deleted")]
         public void InvalidateCache()
-        {            
+        {
         }
 
         public static StyleSheet GetByName(string name)
         {
-            var found = ApplicationContext.Current.Services.FileService.GetStylesheetByName(name);
+            var found = Current.Services.FileService.GetStylesheetByName(name);
             if (found == null) return null;
             return new StyleSheet(found);
         }
@@ -240,7 +241,7 @@ namespace umbraco.cms.businesslogic.web
         }
 
 
-        
+
     }
 
 

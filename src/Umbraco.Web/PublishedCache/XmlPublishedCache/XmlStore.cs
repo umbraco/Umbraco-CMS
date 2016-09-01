@@ -59,17 +59,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <summary>
         /// Initializes a new instance of the <see cref="XmlStore"/> class.
         /// </summary>
-        /// <remarks>The default constructor will boot the cache, load data from file or database,
-        /// wire events in order to manage changes, etc.</remarks>
-        public XmlStore(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache, IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor)
-            : this(serviceContext, uowProvider, routesCache, contentTypeCache, segmentProviders, facadeAccessor, false, false)
+        /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
+        public XmlStore(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
+            IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, MainDom mainDom)
+            : this(serviceContext, uowProvider, routesCache, contentTypeCache, segmentProviders, facadeAccessor, mainDom, false, false)
         { }
 
         // internal for unit tests
         // no file nor db, no config check
         // fixme - er, we DO have a DB?
         internal XmlStore(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, bool testing, bool enableRepositoryEvents)
+            IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, MainDom mainDom,
+            bool testing, bool enableRepositoryEvents)
         {
             if (testing == false)
                 EnsureConfigurationIsValid();
@@ -88,7 +89,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
             else
             {
-                InitializeFilePersister();
+                InitializeFilePersister(mainDom);
             }
 
             Initialize(testing, enableRepositoryEvents);
@@ -126,7 +127,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _xmlMediaSerializer = m => exs.Serialize(_serviceContext.MediaService, _serviceContext.DataTypeService, _serviceContext.UserService, segmentProviders, m);
         }
 
-        private void InitializeFilePersister()
+        private void InitializeFilePersister(MainDom mainDom)
         {
             if (SyncToXmlFile == false) return;
 
@@ -144,7 +145,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // create (and add to runner)
             _persisterTask = new XmlStoreFilePersister(runner, this, logger);
 
-            var registered = ApplicationContext.Current.MainDom.Register(
+            var registered = mainDom.Register(
                 null,
                 () =>
                 {

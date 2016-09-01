@@ -22,10 +22,9 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         private const string CheckMediaXmlTableAction = "checkMediaXmlTable";
         private const string CheckMembersXmlTableAction = "checkMembersXmlTable";
 
-        public XmlDataIntegrityHealthCheck(HealthCheckContext healthCheckContext, IFacadeService facadeService) 
-            : base(healthCheckContext)
+        public XmlDataIntegrityHealthCheck(ILocalizedTextService textService, IFacadeService facadeService)
         {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _textService = textService;
 
             _facadeService = facadeService as PublishedCache.XmlPublishedCache.FacadeService;
             if (_facadeService == null)

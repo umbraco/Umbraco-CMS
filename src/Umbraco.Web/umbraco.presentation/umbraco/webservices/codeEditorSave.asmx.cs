@@ -2,25 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Script.Services;
 using System.Web.Services;
-using System.Web.UI;
-using System.Xml;
-using System.Xml.Xsl;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.WebServices;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.macro;
-using umbraco.cms.businesslogic.template;
-using umbraco.cms.businesslogic.web;
-using System.Net;
-using System.Collections;
 using Umbraco.Web.Macros;
 
 namespace umbraco.presentation.webservices
@@ -62,7 +49,7 @@ namespace umbraco.presentation.webservices
                     try
                     {
                         if (UmbracoContext.ContentCache.HasContent())
-                            XsltMacroEngine.TestXsltTransform(ApplicationContext.ProfilingLogger, fileContents);
+                            XsltMacroEngine.TestXsltTransform(ProfilingLogger, fileContents);
 
                         /*
                         // Check if there's any documents yet

@@ -70,7 +70,7 @@ namespace umbraco.presentation.webservices
 
             var userMgr = Context.GetOwinContext().GetUserManager<BackOfficeUserManager>();
             
-            var user = ApplicationContext.Current.Services.UserService.GetByUsername(login);
+            var user = Current.Services.UserService.GetByUsername(login);
             if (user == null) return false;
 
             var u = userMgr.FindById(user.Id);

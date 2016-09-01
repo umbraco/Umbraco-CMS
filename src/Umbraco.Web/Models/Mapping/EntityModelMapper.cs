@@ -5,7 +5,6 @@ using AutoMapper;
 using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
@@ -16,7 +15,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class EntityModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config)
         {
             config.CreateMap<UmbracoEntity, EntityBasic>()
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))

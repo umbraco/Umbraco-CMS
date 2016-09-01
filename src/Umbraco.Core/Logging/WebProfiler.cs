@@ -15,8 +15,7 @@ namespace Umbraco.Core.Logging
         ///Binds to application events to enable the MiniProfiler
         /// </summary>
         /// <param name="umbracoApplication"></param>
-        /// <param name="applicationContext"></param>
-        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication)
         {
             UmbracoApplicationBase.ApplicationInit += UmbracoApplicationApplicationInit;
         }

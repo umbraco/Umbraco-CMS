@@ -5,38 +5,34 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {
-    /// <summary>	
-	/// Ensures authorization is successful for a back office user
+    /// <summary>
+	/// Ensures authorization is successful for a back office user.
 	/// </summary>
 	public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
 	{
-        private readonly ApplicationContext _applicationContext;
+        // see note in HttpInstallAuthorizeAttribute
         private readonly UmbracoContext _umbracoContext;
+        private readonly IRuntimeState _runtimeState;
 
-        private ApplicationContext GetApplicationContext()
-        {
-            return _applicationContext ?? ApplicationContext.Current;
-        }
+        private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private UmbracoContext GetUmbracoContext()
-        {
-            return _umbracoContext ?? UmbracoContext.Current;
-        }
+        private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
 
-        /// <summary>
-        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext)
+	    /// <summary>
+	    /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+	    /// </summary>
+	    /// <param name="umbracoContext"></param>
+	    /// <param name="runtimeState"></param>
+	    public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
             _umbracoContext = umbracoContext;
-            _applicationContext = _umbracoContext.Application;
+            _runtimeState = runtimeState;
         }
 
         public UmbracoAuthorizeAttribute()
-        {
-        }
+        { }
 
 		/// <summary>
 		/// Ensures that the user must be in the Administrator or the Install role
@@ -45,21 +41,17 @@ namespace Umbraco.Web.Mvc
 		/// <returns></returns>
 		protected override bool AuthorizeCore(HttpContextBase httpContext)
 		{
-		    if (httpContext == null) throw new ArgumentNullException("httpContext");
-            
+		    if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+
 		    try
 			{
-                var appContext = GetApplicationContext();
-                var umbContext = GetUmbracoContext();
-
-				//we need to that the app is configured and that a user is logged in
-                if (!appContext.IsConfigured)
-					return false;
-
-                var isLoggedIn = umbContext.Security.ValidateCurrentUser();
-				return isLoggedIn;
-			}
-			catch (Exception)
+                // if not configured (install or upgrade) then we can continue
+                // otherwise we need to ensure that a user is logged in
+                return RuntimeState.Level == RuntimeLevel.Install
+                    || RuntimeState.Level == RuntimeLevel.Upgrade
+                    || UmbracoContext.Security.ValidateCurrentUser();
+            }
+            catch (Exception)
 			{
 				return false;
 			}
@@ -71,9 +63,9 @@ namespace Umbraco.Web.Mvc
         /// <param name="filterContext"></param>
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {
-            filterContext.Result = (ActionResult)new HttpUnauthorizedResult("You must login to view this resource.");
-            
-            //DON'T do a FormsAuth redirect... argh!! thankfully we're running .Net 4.5 :)
+            filterContext.Result = new HttpUnauthorizedResult("You must login to view this resource.");
+
+            // DON'T do a FormsAuth redirect... argh!! thankfully we're running .Net 4.5 :)
             filterContext.RequestContext.HttpContext.Response.SuppressFormsAuthenticationRedirect = true;
         }
 

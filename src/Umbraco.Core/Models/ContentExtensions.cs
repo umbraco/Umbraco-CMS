@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models.EntityBase;
@@ -233,7 +234,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IContent> Ancestors(this IContent content)
         {
-            return ApplicationContext.Current.Services.ContentService.GetAncestors(content);
+            return Current.Services.ContentService.GetAncestors(content);
         }
 
         /// <summary>
@@ -251,7 +252,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IContent> Children(this IContent content)
         {
-            return ApplicationContext.Current.Services.ContentService.GetChildren(content.Id);
+            return Current.Services.ContentService.GetChildren(content.Id);
         }
 
         /// <summary>
@@ -269,7 +270,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IContent> Descendants(this IContent content)
         {
-            return ApplicationContext.Current.Services.ContentService.GetDescendants(content);
+            return Current.Services.ContentService.GetDescendants(content);
         }
 
         /// <summary>
@@ -287,7 +288,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IContent Parent(this IContent content)
         {
-            return ApplicationContext.Current.Services.ContentService.GetById(content.ParentId);
+            return Current.Services.ContentService.GetById(content.ParentId);
         }
         #endregion
 
@@ -308,7 +309,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IMedia> Ancestors(this IMedia media)
         {
-            return ApplicationContext.Current.Services.MediaService.GetAncestors(media);
+            return Current.Services.MediaService.GetAncestors(media);
         }
 
         /// <summary>
@@ -326,7 +327,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IMedia> Children(this IMedia media)
         {
-            return ApplicationContext.Current.Services.MediaService.GetChildren(media.Id);
+            return Current.Services.MediaService.GetChildren(media.Id);
         }
 
         /// <summary>
@@ -344,7 +345,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IMedia> Descendants(this IMedia media)
         {
-            return ApplicationContext.Current.Services.MediaService.GetDescendants(media);
+            return Current.Services.MediaService.GetDescendants(media);
         }
 
         /// <summary>
@@ -362,7 +363,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IMedia Parent(this IMedia media)
         {
-            return ApplicationContext.Current.Services.MediaService.GetById(media.ParentId);
+            return Current.Services.MediaService.GetById(media.ParentId);
         }
         #endregion
 
@@ -528,7 +529,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
         {
-            content.SetValue(propertyTypeAlias, value, ApplicationContext.Current.Services.DataTypeService);
+            content.SetValue(propertyTypeAlias, value, Current.Services.DataTypeService);
         }
 
         /// <summary>
@@ -583,7 +584,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName, Stream fileStream)
         {
-            content.SetValue(propertyTypeAlias, fileName, fileStream, ApplicationContext.Current.Services.DataTypeService);
+            content.SetValue(propertyTypeAlias, fileName, fileStream, Current.Services.DataTypeService);
         }
 
         private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string filename, Stream fileStream, IDataTypeService dataTypeService)
@@ -676,12 +677,12 @@ namespace Umbraco.Core.Models
 
         #region User/Profile methods
 
-        
+
         [Obsolete("Use the overload that declares the IUserService to use")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IProfile GetCreatorProfile(this IMedia media)
         {
-            return ApplicationContext.Current.Services.UserService.GetProfileById(media.CreatorId);
+            return Current.Services.UserService.GetProfileById(media.CreatorId);
         }
 
         /// <summary>
@@ -691,12 +692,12 @@ namespace Umbraco.Core.Models
         {
             return userService.GetProfileById(media.CreatorId);
         }
-        
+
         [Obsolete("Use the overload that declares the IUserService to use")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IProfile GetCreatorProfile(this IContentBase content)
         {
-            return ApplicationContext.Current.Services.UserService.GetProfileById(content.CreatorId);
+            return Current.Services.UserService.GetProfileById(content.CreatorId);
         }
 
         /// <summary>
@@ -706,12 +707,12 @@ namespace Umbraco.Core.Models
         {
             return userService.GetProfileById(content.CreatorId);
         }
-        
+
         [Obsolete("Use the overload that declares the IUserService to use")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IProfile GetWriterProfile(this IContent content)
         {
-            return ApplicationContext.Current.Services.UserService.GetProfileById(content.WriterId);
+            return Current.Services.UserService.GetProfileById(content.WriterId);
         }
 
         /// <summary>
@@ -737,7 +738,7 @@ namespace Umbraco.Core.Models
 
         #region Tag methods
 
-       
+
 
         /// <summary>
         /// Sets tags for the property - will add tags to the tags table and set the property value to be the comma delimited value of the tags.
@@ -864,11 +865,11 @@ namespace Umbraco.Core.Models
             return packagingService.Export(content, true, raiseEvents: false);
         }
 
-     
+
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IContent content)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(content, raiseEvents: false);
+            return Current.Services.PackagingService.Export(content, raiseEvents: false);
         }
 
         /// <summary>
@@ -885,7 +886,7 @@ namespace Umbraco.Core.Models
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IMedia media)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(media, raiseEvents: false);
+            return Current.Services.PackagingService.Export(media, raiseEvents: false);
         }
 
         /// <summary>
@@ -935,7 +936,7 @@ namespace Umbraco.Core.Models
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IMember member)
         {
-            return ((PackagingService)(ApplicationContext.Current.Services.PackagingService)).Export(member);
+            return ((PackagingService)(Current.Services.PackagingService)).Export(member);
         }
 
         /// <summary>

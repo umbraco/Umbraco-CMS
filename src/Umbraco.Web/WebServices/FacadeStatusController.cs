@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Web.Http;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.WebApi;
 
@@ -11,6 +14,7 @@ namespace Umbraco.Web.WebServices
 
         public FacadeStatusController(IFacadeService facadeService)
         {
+            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
             _facadeService = facadeService;
         }
 

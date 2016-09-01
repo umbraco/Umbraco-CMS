@@ -25,6 +25,10 @@ namespace Umbraco.Core.DependencyInjection
             // in Umbraco we do NOT want to do property injection by default, so we have to disable it.
             // from the docs, the following line will cause the container to "now only try to inject
             // dependencies for properties that is annotated with the InjectAttribute."
+            //
+            // could not find it documented, but tests & code review shows that LightInject considers a
+            // property to be "injectable" when its setter exists and is not static, nor private, nor
+            // it is an index property. which means that eg protected or internal setters are OK.
             container.EnableAnnotatedPropertyInjection();
 
             // see notes in MixedScopeManagerProvider
@@ -203,6 +207,47 @@ namespace Umbraco.Core.DependencyInjection
         {
             foreach (var type in implementationTypes(container))
                 container.Register(type);
+        }
+
+        /// <summary>
+        /// Registers a base type for auto-registration.
+        /// </summary>
+        /// <typeparam name="T">The base type.</typeparam>
+        /// <param name="container">The container.</param>
+        /// <remarks>
+        /// <para>Any type that inherits/implements the base type will be auto-registered on-demand.</para>
+        /// <para>This methods works with actual types. Use the other overload for eg generic definitions.</para>
+        /// </remarks>
+        public static void RegisterAuto<T>(this IServiceContainer container)
+        {
+            container.RegisterFallback((serviceType, serviceName) =>
+            {
+                // https://github.com/seesharper/LightInject/issues/173
+                if (typeof(T).IsAssignableFrom(serviceType))
+                    container.Register(serviceType);
+                return false;
+            }, null);
+        }
+
+        /// <summary>
+        /// Registers a base type for auto-registration.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="type">The base type.</param>
+        /// <remarks>
+        /// <para>Any type that inherits/implements the base type will be auto-registered on-demand.</para>
+        /// <para>This methods works with actual types, as well as generic definitions eg <c>typeof(MyBase{})</c>.</para>
+        /// </remarks>
+        public static void RegisterAuto(this IServiceContainer container, Type type)
+        {
+            container.RegisterFallback((serviceType, serviceName) =>
+            {
+                //Current.Logger.Debug(typeof(LightInjectExtensions), $"Fallback for type {serviceType.FullName}.");
+                // https://github.com/seesharper/LightInject/issues/173
+                if (type.IsAssignableFromGtd(serviceType))
+                    container.Register(serviceType);
+                return false;
+            }, null);
         }
     }
 }

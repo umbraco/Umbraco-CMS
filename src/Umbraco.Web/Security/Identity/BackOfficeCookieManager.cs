@@ -6,7 +6,6 @@ using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -20,19 +19,20 @@ namespace Umbraco.Web.Security.Identity
     internal class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IRuntimeState _runtime;
         private readonly string[] _explicitPaths;
         private readonly string _getRemainingSecondsPath;
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor)
-            : this(umbracoContextAccessor, null)
-        {
-            
-        }
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IEnumerable<string> explicitPaths)
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime)
+            : this(umbracoContextAccessor, runtime, null)
+        { }
+
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
-            _explicitPaths = explicitPaths == null ? null : explicitPaths.ToArray();
-            _getRemainingSecondsPath = string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path);
+            _runtime = runtime;
+            _explicitPaths = explicitPaths?.ToArray();
+            _getRemainingSecondsPath = $"{GlobalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
         }
 
         /// <summary>
@@ -51,10 +51,10 @@ namespace Umbraco.Web.Security.Identity
             return ShouldAuthenticateRequest(
                 context, 
                 _umbracoContextAccessor.UmbracoContext.OriginalRequestUrl) == false 
-                //Don't auth request, don't return a cookie
-                ? null 
-                //Return the default implementation
-                : base.GetRequestCookie(context, key);
+                    //Don't auth request, don't return a cookie
+                    ? null 
+                    //Return the default implementation
+                    : GetRequestCookie(context, key);
         }
 
         /// <summary>
@@ -73,15 +73,14 @@ namespace Umbraco.Web.Security.Identity
         /// </remarks>
         internal bool ShouldAuthenticateRequest(IOwinContext ctx, Uri originalRequestUrl, bool checkForceAuthTokens = true)
         {
-            if (_umbracoContextAccessor.UmbracoContext.Application.IsConfigured == false
-                && _umbracoContextAccessor.UmbracoContext.Application.DatabaseContext.IsDatabaseConfigured == false)
-            {
-                //Do not authenticate the request if we don't have a db and we are not configured - since we will never need
-                // to know a current user in this scenario - we treat it as a new install. Without this we can have some issues
-                // when people have older invalid cookies on the same domain since our user managers might attempt to lookup a user
-                // and we don't even have a db.
+            // Do not authenticate the request if we are not running (don't have a db, are not configured) - since we will never need
+            // to know a current user in this scenario - we treat it as a new install. Without this we can have some issues
+            // when people have older invalid cookies on the same domain since our user managers might attempt to lookup a user
+            // and we don't even have a db.
+            // was: app.IsConfigured == false (equiv to !Run) && dbContext.IsDbConfigured == false (equiv to Install)
+            // so, we handle .Install here and NOT .Upgrade
+            if (_runtime.Level == RuntimeLevel.Install)
                 return false;
-            }
 
             var request = ctx.Request;
             var httpCtx = ctx.TryGetHttpContext();

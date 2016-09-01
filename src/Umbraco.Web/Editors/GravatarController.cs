@@ -17,7 +17,7 @@ namespace Umbraco.Web.Editors
             var user = userService.GetUserById(UmbracoContext.Security.CurrentUser.Id);
             var gravatarHash = user.Email.ToMd5();
             var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash;
-           
+
             // Test if we can reach this URL, will fail when there's network or firewall errors
             var request = (HttpWebRequest)WebRequest.Create(gravatarUrl);
             // Require response within 10 seconds

@@ -95,7 +95,7 @@ namespace Umbraco.Web.Macros
             // only if cache is enabled
             if (UmbracoContext.Current.InPreviewMode || model.CacheDuration <= 0) return null;
 
-            var cache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+            var cache = Current.ApplicationCache.RuntimeCache;
             var macroContent = cache.GetCacheItem<MacroContent>(CacheKeys.MacroContentCacheKey + model.CacheIdentifier);
 
             if (macroContent == null) return null;
@@ -157,7 +157,7 @@ namespace Umbraco.Web.Macros
             // remember when we cache the content
             macroContent.Date = DateTime.Now;
 
-            var cache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+            var cache = Current.ApplicationCache.RuntimeCache;
             cache.InsertCacheItem(
                 CacheKeys.MacroContentCacheKey + model.CacheIdentifier,
                 () => macroContent,
@@ -370,7 +370,7 @@ namespace Umbraco.Web.Macros
                 || UmbracoContext.Current.PublishedContentRequest.HasPublishedContent == false)
                 return Attempt.Fail(new MacroContent { Text = "[macro]" });
 
-            var textService = ApplicationContext.Current.Services.TextService;
+            var textService = Current.Services.TextService;
 
             switch (model.MacroType)
             {

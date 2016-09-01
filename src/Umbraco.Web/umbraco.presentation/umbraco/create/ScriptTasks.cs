@@ -1,25 +1,26 @@
 using Umbraco.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web;
 using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
     public class ScriptTasks : LegacyDialogTask
     {
-     
+
         public override bool PerformSave()
         {
             var scriptFileAr = Alias.Split('\u00A4');
 
             var fileName = scriptFileAr[0];
             var fileType = scriptFileAr[1];
-            
+
             var createFolder = ParentID;
 
             if (createFolder == 1)
             {
-                ApplicationContext.Current.Services.FileService.CreateScriptFolder(fileName);
+                Current.Services.FileService.CreateScriptFolder(fileName);
                 return true;
             }
 
@@ -31,14 +32,14 @@ namespace umbraco
             }
 
             var scriptPath = fileName + "." + fileType;
-            var found = ApplicationContext.Current.Services.FileService.GetScriptByName(scriptPath);
+            var found = Current.Services.FileService.GetScriptByName(scriptPath);
             if (found != null)
             {
                 _returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}", scriptPath.TrimStart('/'));
                 return true;
             }
             var script = new Script(fileName + "." + fileType);
-            ApplicationContext.Current.Services.FileService.SaveScript(script);
+            Current.Services.FileService.SaveScript(script);
             _returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}", scriptPath.TrimStart('/'));
             return true;
         }
@@ -48,11 +49,11 @@ namespace umbraco
             if (Alias.Contains(".") == false)
             {
                 //there is no extension so we'll assume it's a folder
-                ApplicationContext.Current.Services.FileService.DeleteScriptFolder(Alias.TrimStart('/'));
+                Current.Services.FileService.DeleteScriptFolder(Alias.TrimStart('/'));
             }
             else
             {
-                ApplicationContext.Current.Services.FileService.DeleteScript(Alias.TrimStart('/'), User.Id);    
+                Current.Services.FileService.DeleteScript(Alias.TrimStart('/'), User.Id);
             }
 
             return true;

@@ -423,7 +423,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 	    public static void ClearRequest()
 	    {
-	        ApplicationContext.Current.ApplicationCache.RequestCache.ClearCacheByKeySearch(CacheKeyPrefix);
+	        Current.ApplicationCache.RequestCache.ClearCacheByKeySearch(CacheKeyPrefix);
 	    }
 
 	    private const string CacheKeyPrefix = "CONTENTCACHE_XMLPUBLISHEDCONTENT_";

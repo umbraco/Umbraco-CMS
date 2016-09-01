@@ -120,10 +120,10 @@ namespace Umbraco.Tests.Models.Mapping
             AssertBasics(result, content);
             foreach (var p in content.Properties)
             {
-                AssertDisplayProperty(result, p, ApplicationContext);
+                AssertDisplayProperty(result, p);
             }            
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
-            Assert.IsTrue(result.Tabs.Any(x => x.Label == ApplicationContext.Services.TextService.Localize("general/properties")));
+            Assert.IsTrue(result.Tabs.Any(x => x.Label == Current.Services.TextService.Localize("general/properties")));
             Assert.IsTrue(result.Tabs.First().IsActive);
             Assert.IsTrue(result.Tabs.Except(new[] {result.Tabs.First()}).All(x => x.IsActive == false));
         }
@@ -166,16 +166,16 @@ namespace Umbraco.Tests.Models.Mapping
             AssertBasics(result, content);
             foreach (var p in content.Properties)
             {
-                AssertDisplayProperty(result, p, ApplicationContext);
+                AssertDisplayProperty(result, p);
             }
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
-            Assert.IsTrue(result.Tabs.Any(x => x.Label == ApplicationContext.Services.TextService.Localize("general/properties")));
-            Assert.AreEqual(2, result.Tabs.Where(x => x.Label == ApplicationContext.Services.TextService.Localize("general/properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
+            Assert.IsTrue(result.Tabs.Any(x => x.Label == Current.Services.TextService.Localize("general/properties")));
+            Assert.AreEqual(2, result.Tabs.Where(x => x.Label == Current.Services.TextService.Localize("general/properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
         }
 
         #region Assertions
 
-        private void AssertDisplayProperty<T, TPersisted>(ContentItemBasic<T, TPersisted> result, Property p, ApplicationContext applicationContext)
+        private void AssertDisplayProperty<T, TPersisted>(ContentItemBasic<T, TPersisted> result, Property p)
             where T : ContentPropertyDisplay
             where TPersisted : IContentBase
         {
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(p.PropertyType.ValidationRegExp, pDto.ValidationRegExp);
             Assert.AreEqual(p.PropertyType.Description, pDto.Description);
             Assert.AreEqual(p.PropertyType.Name, pDto.Label);
-            Assert.AreEqual(ApplicationContext.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId), pDto.DataType);
+            Assert.AreEqual(Current.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId), pDto.DataType);
             Assert.AreEqual(Current.PropertyEditors[p.PropertyType.PropertyEditorAlias], pDto.PropertyEditor);
         }
 

@@ -22,9 +22,9 @@ namespace Umbraco.Web.Models
         public static CultureInfo GetCulture(this IContent content, Uri current = null)
         {
             return GetCulture(UmbracoContext.Current,
-                ApplicationContext.Current.Services.DomainService,
-                ApplicationContext.Current.Services.LocalizationService,
-                ApplicationContext.Current.Services.ContentService,
+                Current.Services.DomainService,
+                Current.Services.LocalizationService,
+                Current.Services.ContentService,
                 content.Id, content.Path,
                 current);
         }

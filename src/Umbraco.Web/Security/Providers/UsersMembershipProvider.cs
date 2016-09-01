@@ -18,7 +18,7 @@ namespace Umbraco.Web.Security.Providers
     {
 
         public UsersMembershipProvider()
-            : this(ApplicationContext.Current.Services.UserService, ApplicationContext.Current.Services.MemberTypeService)
+            : this(Current.Services.UserService, Current.Services.MemberTypeService)
         {
         }
 

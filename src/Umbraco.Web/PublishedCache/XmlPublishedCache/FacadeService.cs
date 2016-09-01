@@ -37,8 +37,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             ICacheProvider requestCache, 
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IFacadeAccessor facadeAccessor,
+            MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
-            : this(serviceContext, uowProvider, requestCache, segmentProviders, facadeAccessor, null, testing, enableRepositoryEvents)
+            : this(serviceContext, uowProvider, requestCache, segmentProviders, facadeAccessor, null, mainDom, testing, enableRepositoryEvents)
         { }
 
         // used in some tests
@@ -47,8 +48,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             ICacheProvider requestCache,
             IFacadeAccessor facadeAccessor,
             PublishedContentTypeCache contentTypeCache, 
+            MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
-            : this(serviceContext, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), facadeAccessor, contentTypeCache, testing, enableRepositoryEvents)
+            : this(serviceContext, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), facadeAccessor, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
         private FacadeService(ServiceContext serviceContext, 
@@ -57,6 +59,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IFacadeAccessor facadeAccessor,
             PublishedContentTypeCache contentTypeCache, 
+            MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
             : base(facadeAccessor)
         {
@@ -64,7 +67,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService);
 
-            _xmlStore = new XmlStore(serviceContext, uowProvider, _routesCache, _contentTypeCache, segmentProviders, facadeAccessor, testing, enableRepositoryEvents);
+            _xmlStore = new XmlStore(serviceContext, uowProvider, _routesCache, _contentTypeCache, segmentProviders, facadeAccessor, mainDom, testing, enableRepositoryEvents);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;

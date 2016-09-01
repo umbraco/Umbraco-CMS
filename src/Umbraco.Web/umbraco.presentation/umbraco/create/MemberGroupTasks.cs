@@ -2,6 +2,7 @@ using System.Web.Security;
 using Umbraco.Web.UI;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
+using Umbraco.Web;
 using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
@@ -20,14 +21,14 @@ namespace umbraco
             // only built-in roles can be deleted
             if (Roles.Provider.Name == Constants.Conventions.Member.UmbracoRoleProviderName)
             {
-                var group = ApplicationContext.Current.Services.MemberGroupService.GetByName(Alias);
+                var group = Current.Services.MemberGroupService.GetByName(Alias);
                 if (group != null)
                 {
-                    ApplicationContext.Current.Services.MemberGroupService.Delete(group);
+                    Current.Services.MemberGroupService.Delete(group);
                 }
                 return true;
             }
-            return false;            
+            return false;
         }
 
         private string _returnUrl = "";

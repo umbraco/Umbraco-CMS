@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
@@ -19,15 +20,17 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class ClickJackingCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
+        private readonly IRuntimeState _runtime;
 
         private const string SetFrameOptionsHeaderInConfigActiobn = "setFrameOptionsHeaderInConfig";
 
         private const string XFrameOptionsHeader = "X-Frame-Options";
         private const string XFrameOptionsValue = "sameorigin"; // Note can't use "deny" as that would prevent Umbraco itself using IFRAMEs
 
-        public ClickJackingCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        public ClickJackingCheck(ILocalizedTextService textService, IRuntimeState runtime)
         {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _textService = textService;
+            _runtime = runtime;
         }
 
         /// <summary>
@@ -60,7 +63,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var message = string.Empty;
             var success = false;
-            var url = HealthCheckContext.HttpContext.Request.Url;
+            var url = _runtime.ApplicationUrl;
 
             // Access the site home page and check for the click-jack protection header or meta tag
             var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);

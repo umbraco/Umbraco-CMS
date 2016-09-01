@@ -28,24 +28,30 @@ namespace Umbraco.Core
     {
         private readonly IDatabaseFactory _factory;
         private readonly ILogger _logger;
+        private readonly IRuntimeState _runtime;
+        private readonly IMigrationEntryService _migrationEntryService;
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatabaseContext"/> class with a database factory and a logger.
+        /// Initializes a new instance of the <see cref="DatabaseContext"/> class.
         /// </summary>
         /// <param name="factory">A database factory.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="runtime"></param>
+        /// <param name="migrationEntryService"></param>
         /// <remarks>The database factory will try to configure itself but may fail eg if the default
         /// Umbraco connection string is not available because we are installing. In which case this
         /// database context must sort things out and configure the database factory before it can be
         /// used.</remarks>
-        public DatabaseContext(IDatabaseFactory factory, ILogger logger)
+        public DatabaseContext(IDatabaseFactory factory, ILogger logger, IRuntimeState runtime, IMigrationEntryService migrationEntryService)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             _factory = factory;
             _logger = logger;
+            _runtime = runtime;
+            _migrationEntryService = migrationEntryService;
         }
 
         /// <summary>
@@ -69,8 +75,8 @@ namespace Umbraco.Core
         public UmbracoDatabase Database => _factory.GetDatabase();
 
         /// <summary>
-        /// Gets a value indicating whether the database is configured, ie whether it exists
-        /// and can be reached. It does not necessarily mean that Umbraco is installed nor
+        /// Gets a value indicating whether the database is configured. It does not necessarily
+        /// mean that it is possible to connect, nor that Umbraco is installed, nor
         /// up-to-date.
         /// </summary>
         public bool IsDatabaseConfigured => _factory.Configured;
@@ -161,7 +167,7 @@ namespace Umbraco.Core
         /// <param name="databaseProvider">The name the provider (Sql, Sql Azure, Sql Ce, MySql).</param>
         /// <param name="providerName"></param>
         /// <returns>A connection string.</returns>
-        public string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
+        public static string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
         {
             providerName = Constants.DbProviderNames.SqlServer;
             var test = databaseProvider.ToLower();
@@ -195,7 +201,7 @@ namespace Umbraco.Core
         /// <param name="server">The name or address of the database server.</param>
         /// <param name="databaseName">The name of the database</param>
         /// <returns>A connection string.</returns>
-        public string GetIntegratedSecurityDatabaseConnectionString(string server, string databaseName)
+        public static string GetIntegratedSecurityDatabaseConnectionString(string server, string databaseName)
         {
             return $"Server={server};Database={databaseName};Integrated Security=true";
         }
@@ -208,7 +214,7 @@ namespace Umbraco.Core
         /// <param name="user">The user name.</param>
         /// <param name="password">The user password.</param>
         /// <returns>A connection string.</returns>
-        public string GetAzureConnectionString(string server, string databaseName, string user, string password)
+        public static string GetAzureConnectionString(string server, string databaseName, string user, string password)
         {
             if (server.Contains(".") && ServerStartsWithTcp(server) == false)
                 server = $"tcp:{server}";
@@ -358,7 +364,7 @@ namespace Umbraco.Core
             return _databaseSchemaValidationResult;
         }
 
-        internal Result CreateDatabaseSchemaAndData(ApplicationContext applicationContext)
+        internal Result CreateDatabaseSchemaAndData()
         {
             try
             {
@@ -398,7 +404,7 @@ namespace Umbraco.Core
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedSchemaVersion.Equals(new Version(0, 0, 0)))
                 {
                     var helper = new DatabaseSchemaHelper(database, _logger);
-                    helper.CreateDatabaseSchema(true, applicationContext);
+                    helper.CreateDatabaseSchema(_runtime, _migrationEntryService, true);
 
                     message = message + "<p>Installation completed!</p>";
 
@@ -487,7 +493,7 @@ namespace Umbraco.Core
 
                 //DO the upgrade!
 
-                var runner = new MigrationRunner(builder, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(builder, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.SemanticVersion, GlobalSettings.UmbracoMigrationName);
 
                 var migrationContext = new MigrationContext(database, _logger);
                 var upgraded = runner.Execute(migrationContext /*, true*/);

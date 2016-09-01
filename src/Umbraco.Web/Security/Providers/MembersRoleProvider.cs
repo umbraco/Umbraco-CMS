@@ -19,7 +19,7 @@ namespace Umbraco.Web.Security.Providers
         }
 
         public MembersRoleProvider()
-            : this(ApplicationContext.Current.Services.MemberService)
+            : this(Current.Services.MemberService)
         {            
         }
 

@@ -227,7 +227,7 @@ namespace Umbraco.Web.PropertyEditors
                         else if (p.Value is string)
                         {
                             var src = p.Value == null ? string.Empty : p.Value.ToString();
-                            var config = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
+                            var config = Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
                             var crops = string.IsNullOrEmpty(config) == false ? config : "[]";
                             p.Value = "{src: '" + p.Value + "', crops: " + crops + "}";
                             //Only provide the source path, not the whole JSON value
@@ -273,7 +273,7 @@ namespace Umbraco.Web.PropertyEditors
             /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
             /// if we find any attached to the current media item.
             /// </summary>
-            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
             {
                 MediaService.Saving += _imageCropperPropertyEditor.MediaServiceSaving;
                 MediaService.Created += _imageCropperPropertyEditor.MediaServiceCreated;
@@ -292,20 +292,20 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication)
         {
             //wrap
-            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
+            _applicationStartup.OnApplicationInitialized(umbracoApplication);
         }
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication)
         {
             //wrap
-            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
+            _applicationStartup.OnApplicationStarting(umbracoApplication);
         }
-        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication)
         {
             //wrap
-            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);
+            _applicationStartup.OnApplicationStarted(umbracoApplication);
         }
         #endregion
     }

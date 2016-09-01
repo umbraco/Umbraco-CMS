@@ -39,16 +39,16 @@ namespace Umbraco.Web.WebApi.Filters
                 return true;
             }
 
-            var apps = _treeAliases.Select(x => ApplicationContext.Current.Services.ApplicationTreeService
+            var apps = _treeAliases.Select(x => Current.Services.ApplicationTreeService
                 .GetByAlias(x))
                 .WhereNotNull()
                 .Select(x => x.ApplicationAlias)
                 .Distinct()
                 .ToArray();
 
-            return UmbracoContext.Current.Security.CurrentUser != null
-                   && apps.Any(app => UmbracoContext.Current.Security.UserHasAppAccess(
-                       app, UmbracoContext.Current.Security.CurrentUser));
+            return Current.UmbracoContext.Security.CurrentUser != null
+                   && apps.Any(app => Current.UmbracoContext.Security.UserHasAppAccess(
+                       app, Current.UmbracoContext.Security.CurrentUser));
         }
     }
 }

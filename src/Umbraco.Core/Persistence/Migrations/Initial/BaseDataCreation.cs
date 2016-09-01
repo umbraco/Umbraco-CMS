@@ -316,7 +316,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             {
                 Id = 1,
                 Name = GlobalSettings.UmbracoMigrationName,
-                Version = UmbracoVersion.GetSemanticVersion().ToString(),
+                Version = UmbracoVersion.SemanticVersion.ToString(),
                 CreateDate = DateTime.Now
             };
 

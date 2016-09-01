@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Text;
-using System.Threading.Tasks;
-using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web._Legacy.Actions;
@@ -114,20 +110,20 @@ namespace Umbraco.Web.Trees
         {
             return new TreeNodeCollection();
         }
-        
+
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
 
             var menu = new MenuItemCollection();
-            
+
             OnBeforeRenderMenu(menu, id, queryStrings);
 
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    //Since we haven't implemented anything for file systems in angular, this needs to be converted to 
+                    //Since we haven't implemented anything for file systems in angular, this needs to be converted to
                     //use the legacy format
                     .ConvertLegacyFileSystemMenuItem("", "init" + TreeAlias, queryStrings.GetValue<string>("application"));
 
@@ -138,14 +134,14 @@ namespace Umbraco.Web.Trees
                 return menu;
 
             }
-            
+
             if (Directory.Exists(IOHelper.MapPath(FilePath + "/" + id)))
             {
                 if (EnableCreateOnFolder)
                 {
                     //Create the normal create action
                     menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                        //Since we haven't implemented anything for file systems in angular, this needs to be converted to 
+                        //Since we haven't implemented anything for file systems in angular, this needs to be converted to
                         //use the legacy format
                         .ConvertLegacyFileSystemMenuItem(id, TreeAlias + "Folder",
                             queryStrings.GetValue<string>("application"));
@@ -173,7 +169,7 @@ namespace Umbraco.Web.Trees
 
         protected virtual void OnAfterRenderMenu(MenuItemCollection menu, string id, FormDataCollection queryStrings)
         {
-            
+
         }
     }
 }

@@ -1,28 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Configuration;
 using System.Threading.Tasks;
 using System.Threading;
-using AutoMapper;
 using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.Models.Mapping;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Plugins;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
-using Umbraco.Core.Strings;
-using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Core
 {
@@ -35,46 +29,7 @@ namespace Umbraco.Core
     public class CoreRuntime : IRuntime
     {
         private BootLoader _bootLoader;
-        private DisposableTimer _timer;
-
-        // fixme cleanup these
-        private IServiceContainer _appStartupEvtContainer;
-        private bool _isInitialized;
-        private bool _isStarted;
-        private bool _isComplete;
-
-
-        // what the UmbracoApplication does is...
-        // create the container and configure for core
-        // create and register a logger
-        // then:
-        //GetBootManager()
-        //    .Initialize()
-        //    .Startup(appContext => OnApplicationStarting(sender, e))
-        //    .Complete(appContext => OnApplicationStarted(sender, e));
-        //
-        // edit so it becomes:
-        //GetBootLoader()
-        //    .Boot();
-        //
-        // merge all RegisterX into one Register
-        //
-        // WebBootLoader should
-        // configure the container for web BUT that should be AFTER the components have initialized? OR?
-        //
-        // Startup runs all app event handler OnApplicationStarting methods
-        //  then triggers the OnApplicationStarting event of the app
-        // Complete
-        //   freezes resolution
-        //   ensures database connection (else?)
-        //   tells user service it is upgrading (?)
-        //   runs all app event handler OnApplicationStarted methods
-        //   then triggers the OnApplicationStarted event of the app
-        //   and sets Ready
-        //
-        // note: what's deciding whether install, upgrade, run?
-
-        private RuntimeState _state; // fixme what about web?!
+        private RuntimeState _state;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
@@ -89,16 +44,19 @@ namespace Umbraco.Core
         /// <inheritdoc/>
         public virtual void Boot(ServiceContainer container)
         {
-            // create and register essential stuff
+            Compose(container);
+
+            // prepare essential stuff
+
+            _state = (RuntimeState) container.GetInstance<IRuntimeState>();
+            _state.Level = RuntimeLevel.Boot;
 
             Logger = container.GetInstance<ILogger>();
-            container.RegisterInstance(Profiler = GetProfiler());
-            container.RegisterInstance(ProfilingLogger = new ProfilingLogger(Current.Logger, Profiler));
+            Profiler = container.GetInstance<IProfiler>();
+            ProfilingLogger = container.GetInstance<ProfilingLogger>();
 
-            container.RegisterInstance(_state = new RuntimeState());
-
-            // then compose
-            Compose(container);
+            // fixme - totally temp
+            container.RegisterInstance(UmbracoApplication);
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -109,32 +67,201 @@ namespace Umbraco.Core
             // are NOT disposed - which is not a big deal as long as they remain lightweight
             // objects.
 
-            _bootLoader = new BootLoader(container);
-            _bootLoader.Boot(GetComponentTypes());
+            using (ProfilingLogger.TraceDuration<CoreRuntime>($"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()} on {NetworkHelper.MachineName}.", "Booted."))
+            {
+                Logger.Debug<CoreRuntime>($"Runtime: {GetType().FullName}");
+
+                using (ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Aquired."))
+                {
+                    // become the main domain - before anything else
+                    var mainDom = container.GetInstance<MainDom>();
+                    mainDom.Acquire();
+                }
+
+                using (ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
+                {
+                    var dbfactory = container.GetInstance<IDatabaseFactory>();
+                    SetRuntimeStateLevel(_state, dbfactory, Logger);
+                }
+
+                Logger.Debug<CoreRuntime>($"Runtime level: {_state.Level}");
+
+                IEnumerable<Type> componentTypes;
+                using (ProfilingLogger.TraceDuration<CoreRuntime>("Resolving component types.", "Resolved."))
+                {
+                    componentTypes = GetComponentTypes();
+                }
+
+                // boot
+                _bootLoader = new BootLoader(container);
+                _bootLoader.Boot(componentTypes, _state.Level);
+            }
         }
 
+        /// <inheritdoc/>
         public virtual void Terminate()
         {
             _bootLoader?.Terminate();
         }
 
+        /// <inheritdoc/>
         public virtual void Compose(ServiceContainer container)
         {
-            // create and register essential stuff
+            container.RegisterSingleton<IProfiler, LogProfiler>();
+            container.RegisterSingleton<ProfilingLogger>();
+            container.RegisterSingleton<IRuntimeState, RuntimeState>();
 
-            var cache = GetApplicationCache();
-            container.RegisterInstance(cache);
-            container.RegisterInstance(cache.RuntimeCache);
+            container.RegisterSingleton(_ => new CacheHelper(
+                // we need to have the dep clone runtime cache provider to ensure
+                // all entities are cached properly (cloned in and cloned out)
+                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
+                new StaticCacheProvider(),
+                // we have no request based cache when not running in web-based context
+                new NullCacheProvider(),
+                new IsolatedRuntimeCache(type =>
+                    // we need to have the dep clone runtime cache provider to ensure
+                    // all entities are cached properly (cloned in and cloned out)
+                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
+            container.RegisterSingleton(factory => factory.GetInstance<CacheHelper>().RuntimeCache);
 
-            container.RegisterInstance(new PluginManager(cache.RuntimeCache, ProfilingLogger));
+            container.RegisterSingleton(factory => new PluginManager(factory.GetInstance<IRuntimeCacheProvider>(), factory.GetInstance<ProfilingLogger>()));
+
+            // register syntax providers
+            container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
+            container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>("SqlCeSyntaxProvider");
+            container.Register<ISqlSyntaxProvider, SqlServerSyntaxProvider>("SqlServerSyntaxProvider");
+
+            // register persistence mappers - means the only place the collection can be modified
+            // is in a runtime - afterwards it has been frozen and it is too late
+            MapperCollectionBuilder.Register(container)
+                .AddProducer(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
+
+            // register database factory
+            // will be initialized with syntax providers and a logger, and will try to configure
+            // from the default connection string name, if possible, else will remain non-configured
+            // until the database context configures it properly (eg when installing)
+            container.RegisterSingleton<IDatabaseFactory, DefaultDatabaseFactory>();
+
+            // register a database accessor - will be replaced
+            // by HybridUmbracoDatabaseAccessor in the web runtime
+            container.RegisterSingleton<IUmbracoDatabaseAccessor, ThreadStaticUmbracoDatabaseAccessor>();
+
+            // register MainDom
+            container.RegisterSingleton<MainDom>();
         }
 
-        /// <summary>
-        /// Gets the Umbraco HttpApplication.
-        /// </summary>
-        protected UmbracoApplicationBase UmbracoApplication { get; }
+        private static void SetRuntimeStateLevel(RuntimeState runtimeState, IDatabaseFactory databaseFactory, ILogger logger)
+        {
+            var localVersion = LocalVersion; // the local, files, version
+            var codeVersion = runtimeState.SemanticVersion; // the executing code version
+            var connect = false;
+
+            if (string.IsNullOrWhiteSpace(localVersion))
+            {
+                // there is no local version, we are not installed
+                logger.Debug<CoreRuntime>("No local version, need to install Umbraco.");
+                runtimeState.Level = RuntimeLevel.Install;
+            }
+            else if (localVersion != codeVersion)
+            {
+                // there *is* a local version, but it does not match the code version
+                // need to upgrade
+                logger.Debug<CoreRuntime>($"Local version \"{localVersion}\" != code version, need to upgrade Umbraco.");
+                runtimeState.Level = RuntimeLevel.Upgrade;
+            }
+            else if (databaseFactory.Configured == false)
+            {
+                // local version *does* match code version, but the database is not configured
+                // install (again? this is a weird situation...)
+                logger.Debug<CoreRuntime>("Database is not configured, need to install Umbraco.");
+                runtimeState.Level = RuntimeLevel.Install;
+            }
+
+            // anything other than install wants a database - see if we can connect
+            if (runtimeState.Level != RuntimeLevel.Install)
+            {
+                for (var i = 0; i < 5; i++)
+                {
+                    connect = databaseFactory.CanConnect;
+                    if (connect) break;
+                    logger.Debug<CoreRuntime>(i == 0
+                        ? "Could not immediately connect to database, trying again."
+                        : "Could not connect to database.");
+                    Thread.Sleep(1000);
+                }
+
+                if (connect == false)
+                {
+                    // cannot connect to configured database, this is bad, fail
+                    logger.Debug<CoreRuntime>("Could not connect to database.");
+                    runtimeState.Level = RuntimeLevel.Failed;
+
+                    // in fact, this is bad enough that we want to throw
+                    throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+                }
+            }
+
+            // if we cannot connect, cannot do more
+            if (connect == false) return;
+
+            // else
+            // look for a matching migration entry - bypassing services entirely - they are not 'up' yet
+            // fixme - in a LB scenario, ensure that the DB gets upgraded only once!
+            // fixme - eventually move to yol-style guid-based transitions
+            var database = databaseFactory.GetDatabase();
+            var codeVersionString = codeVersion.ToString();
+            var sql = database.Sql()
+                .Select<MigrationDto>()
+                .From<MigrationDto>()
+                .Where<MigrationDto>(x => x.Name.InvariantEquals(GlobalSettings.UmbracoMigrationName) && x.Version == codeVersionString);
+            bool exists;
+            try
+            {
+                exists = database.FirstOrDefault<MigrationDto>(sql) != null;
+            }
+            catch
+            {
+                // can connect to the database but cannot access the migration table... need to install
+                logger.Debug<CoreRuntime>("Could not check migrations, need to install Umbraco.");
+                runtimeState.Level = RuntimeLevel.Install;
+                return;
+            }
+
+            if (exists)
+            {
+                // the database version matches the code & files version, all clear, can run
+                runtimeState.Level = RuntimeLevel.Run;
+                return;
+            }
+
+            // the db version does not match... but we do have a migration table
+            // so, at least one valid table, so we quite probably are installed & need to upgrade
+
+            // although the files version matches the code version, the database version does not
+            // which means the local files have been upgraded but not the database - need to upgrade
+            logger.Debug<CoreRuntime>("Database migrations have not executed, need to upgrade Umbraco.");
+            runtimeState.Level = RuntimeLevel.Upgrade;
+        }
+
+        private static string LocalVersion
+        {
+            get
+            {
+                try
+                {
+                    // fixme - this should live in its own independent file! NOT web.config!
+                    return ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
+                }
+                catch
+                {
+                    return string.Empty;
+                }
+            }
+        }
 
         #region Locals
+
+        // fixme - we almost certainly DONT need these!
 
         protected ILogger Logger { get; private set; }
 
@@ -150,39 +277,32 @@ namespace Umbraco.Core
 
         protected virtual IEnumerable<Type> GetComponentTypes() => Current.PluginManager.ResolveTypes<IUmbracoComponent>();
 
-        protected virtual IProfiler GetProfiler() => new LogProfiler(Logger);
+        //protected virtual IProfiler GetProfiler() => new LogProfiler(Logger);
 
-        protected virtual CacheHelper GetApplicationCache() => new CacheHelper(
-                // we need to have the dep clone runtime cache provider to ensure
-                // all entities are cached properly (cloned in and cloned out)
-                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
-                new StaticCacheProvider(),
-                // we have no request based cache when not running in web-based context
-                new NullCacheProvider(),
-                new IsolatedRuntimeCache(type =>
-                    // we need to have the dep clone runtime cache provider to ensure
-                    // all entities are cached properly (cloned in and cloned out)
-                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+        //protected virtual CacheHelper GetApplicationCache() => new CacheHelper(
+        //        // we need to have the dep clone runtime cache provider to ensure
+        //        // all entities are cached properly (cloned in and cloned out)
+        //        new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
+        //        new StaticCacheProvider(),
+        //        // we have no request based cache when not running in web-based context
+        //        new NullCacheProvider(),
+        //        new IsolatedRuntimeCache(type =>
+        //            // we need to have the dep clone runtime cache provider to ensure
+        //            // all entities are cached properly (cloned in and cloned out)
+        //            new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
 
         #endregion
 
-        #region Core
+        // fixme - kill everything below!
 
-        // cannot run if the db is not there
-        // tries to connect to db (if configured)
-        private void EnsureDatabaseConnection()
-        {
-            if (Current.ApplicationContext.IsConfigured == false) return;
-            if (Current.ApplicationContext.DatabaseContext.IsDatabaseConfigured == false) return;
+        private IServiceContainer _appStartupEvtContainer;
+        private bool _isInitialized;
+        private bool _isStarted;
+        private bool _isComplete;
 
-            for (var i = 0; i < 5; i++)
-            {
-                if (Current.ApplicationContext.DatabaseContext.CanConnect) return;
-                Thread.Sleep(1000);
-            }
+        protected UmbracoApplicationBase UmbracoApplication { get; }
 
-            throw new UmbracoStartupFailedException("Umbraco cannot start: a connection string is configured but Umbraco could not connect to the database.");
-        }
+        protected ServiceContainer Container => Current.Container;
 
         /// <summary>
         /// Special method to extend the use of Umbraco by enabling the consumer to overwrite
@@ -195,24 +315,10 @@ namespace Umbraco.Core
             IOHelper.SetRootDirectory(rootPath);
         }
 
-        #endregion
-
-        // FIXME everything below needs to be sorted out!
-
-
-        protected ServiceContainer Container => Current.Container; // fixme kill
-
         public virtual IRuntime Initialize()
         {
             if (_isInitialized)
                 throw new InvalidOperationException("The boot manager has already been initialized");
-
-            //ApplicationCache = Container.GetInstance<CacheHelper>(); //GetApplicationCache();
-
-            _timer = ProfilingLogger.TraceDuration<CoreRuntime>(
-                string.Format("Umbraco {0} application starting on {1}", UmbracoVersion.GetSemanticVersion().ToSemanticString(), NetworkHelper.MachineName),
-                "Umbraco application startup complete");
-
 
             //now we need to call the initialize methods
             //Create a 'child'container which is a copy of all of the current registrations and begin a sub scope for it
@@ -220,8 +326,7 @@ namespace Umbraco.Core
             // completed at the end of the boot process to allow garbage collection
             // using (Container.BeginScope()) { } // fixme - throws
             _appStartupEvtContainer = Container.Clone(); // fixme - but WHY clone? because *then* it has its own scope?! bah ;-(
-            //using (_appStartupEvtContainer.BeginScope()) // fixme - works wtf?
-            _appStartupEvtContainer.BeginScope(); // fixme - but then attend to end a scope before all child scopes are completed wtf?!
+            _appStartupEvtContainer.BeginScope();
             _appStartupEvtContainer.RegisterCollection<PerScopeLifetime>(factory => factory.GetInstance<PluginManager>().ResolveApplicationStartupHandlers());
 
             // fixme - parallel? what about our dependencies?
@@ -235,7 +340,7 @@ namespace Umbraco.Core
                         //only log if more than 150ms
                         150))
                     {
-                        x.OnApplicationInitialized(UmbracoApplication, Current.ApplicationContext);
+                        x.OnApplicationInitialized(UmbracoApplication);
                     }
                 }
                 catch (Exception ex)
@@ -257,7 +362,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="afterStartup"></param>
         /// <returns></returns>
-        public virtual IRuntime Startup(Action<ApplicationContext> afterStartup)
+        public virtual IRuntime Startup(Action afterStartup)
         {
             if (_isStarted)
                 throw new InvalidOperationException("The boot manager has already been initialized");
@@ -273,7 +378,7 @@ namespace Umbraco.Core
                         //only log if more than 150ms
                         150))
                     {
-                        x.OnApplicationStarting(UmbracoApplication, Current.ApplicationContext);
+                        x.OnApplicationStarting(UmbracoApplication);
                     }
                 }
                 catch (Exception ex)
@@ -285,7 +390,7 @@ namespace Umbraco.Core
 
             if (afterStartup != null)
             {
-                afterStartup(ApplicationContext.Current);
+                afterStartup();
             }
 
             _isStarted = true;
@@ -298,22 +403,15 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="afterComplete"></param>
         /// <returns></returns>
-        public virtual IRuntime Complete(Action<ApplicationContext> afterComplete)
+        public virtual IRuntime Complete(Action afterComplete)
         {
             if (_isComplete)
                 throw new InvalidOperationException("The boot manager has already been completed");
 
-            Complete2();
-
-            //Here we need to make sure the db can be connected to
-		    EnsureDatabaseConnection();
-
-
             //This is a special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
             // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)
-            ((UserService) Current.ApplicationContext.Services.UserService).IsUpgrading = true;
-
-
+            // fixme - wtf? never going back to FALSE !
+            ((UserService) Current.Services.UserService).IsUpgrading = true;
 
             //call OnApplicationStarting of each application events handler
             Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
@@ -326,7 +424,7 @@ namespace Umbraco.Core
                         //only log if more than 150ms
                         150))
                     {
-                        x.OnApplicationStarted(UmbracoApplication, Current.ApplicationContext);
+                        x.OnApplicationStarted(UmbracoApplication);
                     }
                 }
                 catch (Exception ex)
@@ -345,20 +443,12 @@ namespace Umbraco.Core
 
             if (afterComplete != null)
             {
-                afterComplete(ApplicationContext.Current);
+                afterComplete();
             }
 
             _isComplete = true;
 
-            // we're ready to serve content!
-            Current.ApplicationContext.IsReady = true;
-
-            //stop the timer and log the output
-            _timer.Dispose();
             return this;
 		}
-
-        protected virtual void Complete2()
-        { }
     }
 }

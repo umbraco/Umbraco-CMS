@@ -30,7 +30,7 @@ namespace Umbraco.Web.Dictionary
         private readonly CultureInfo _specificCulture = null;
 
 	    public DefaultCultureDictionary()
-            : this(ApplicationContext.Current.Services.LocalizationService, ApplicationContext.Current.ApplicationCache.RequestCache)
+            : this(Current.Services.LocalizationService, Current.ApplicationCache.RequestCache)
 	    {
 	        
 	    }
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Dictionary
 	    }
 
         public DefaultCultureDictionary(CultureInfo specificCulture)
-            : this(ApplicationContext.Current.Services.LocalizationService, ApplicationContext.Current.ApplicationCache.RequestCache)
+            : this(Current.Services.LocalizationService, Current.ApplicationCache.RequestCache)
         {
             if (specificCulture == null) throw new ArgumentNullException("specificCulture");
             _specificCulture = specificCulture;

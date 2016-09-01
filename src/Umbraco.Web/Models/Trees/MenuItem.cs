@@ -195,7 +195,7 @@ namespace Umbraco.Web.Models.Trees
                 if (attempt2)
                 {
                     var view = attempt2.Result;
-                    var textService = ApplicationContext.Current.Services.TextService;
+                    var textService = Current.Services.TextService;
                     LaunchDialogView(view, textService.Localize("defaultdialogs/confirmdelete") + " '" + (item == null ? "" : item.Name) + "' ?");
                 }
             }
@@ -221,7 +221,7 @@ namespace Umbraco.Web.Models.Trees
                 if (attempt2)
                 {
                     var view = attempt2.Result;
-                    var textService = ApplicationContext.Current.Services.TextService;
+                    var textService = Current.Services.TextService;
                     LaunchDialogView(view, textService.Localize("defaultdialogs/confirmdelete") + " '" + path + "' ?");
                 }
             }

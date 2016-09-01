@@ -87,8 +87,8 @@ namespace Umbraco.Web.Media
 
         private static object GetContentFromCache(int nodeIdInt, string field)
         {
-            var content = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<object>(
-                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt.ToString(CultureInfo.InvariantCulture), field));            
+            var content = Current.ApplicationCache.RuntimeCache.GetCacheItem<object>(
+                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt.ToString(CultureInfo.InvariantCulture), field));
             return content;
         }
     }

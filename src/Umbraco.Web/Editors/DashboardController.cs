@@ -4,16 +4,13 @@ using Umbraco.Core.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
-using System.Xml;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
-  
     [PluginController("UmbracoApi")]
     public class DashboardController : UmbracoAuthorizedJsonController
     {
-
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
             var tabs = new List<Tab<DashboardControl>>();

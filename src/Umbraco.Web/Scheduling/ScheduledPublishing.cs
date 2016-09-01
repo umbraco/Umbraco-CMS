@@ -3,8 +3,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Mvc;
 
@@ -12,15 +12,15 @@ namespace Umbraco.Web.Scheduling
 {
     internal class ScheduledPublishing : RecurringTaskBase
     {
-        private readonly ApplicationContext _appContext;
-        private readonly IUmbracoSettingsSection _settings;
+        private readonly IRuntimeState _runtime;
+        private readonly IUserService _userService;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            ApplicationContext appContext, IUmbracoSettingsSection settings)
+            IRuntimeState runtime, IUserService userService)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
-            _appContext = appContext;
-            _settings = settings;
+            _runtime = runtime;
+            _userService = userService;
         }
 
         public override bool PerformRun()
@@ -29,10 +29,8 @@ namespace Umbraco.Web.Scheduling
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
-        {            
-            if (_appContext == null) return true; // repeat...
-
-            switch (_appContext.GetCurrentServerRole())
+        {
+            switch (_runtime.ServerRole)
             {
                 case ServerRole.Slave:
                     LogHelper.Debug<ScheduledPublishing>("Does not run on slave servers.");
@@ -43,7 +41,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_appContext.MainDom.IsMainDom == false)
+            if (_runtime.IsMainDom == false)
             {
                 LogHelper.Debug<ScheduledPublishing>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
@@ -55,7 +53,7 @@ namespace Umbraco.Web.Scheduling
 
                 try
                 {
-                    umbracoAppUrl = _appContext.UmbracoApplicationUrl;
+                    umbracoAppUrl = _runtime.ApplicationUrl.ToString();
                     if (umbracoAppUrl.IsNullOrWhiteSpace())
                     {
                         LogHelper.Warn<ScheduledPublishing>("No url for service (yet), skip.");
@@ -70,7 +68,7 @@ namespace Umbraco.Web.Scheduling
                             Content = new StringContent(string.Empty)
                         };
                         //pass custom the authorization header
-                        request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
+                        request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_userService);
 
                         var result = await wc.SendAsync(request, token);
                     }
@@ -88,7 +86,7 @@ namespace Umbraco.Web.Scheduling
         {
             get { return true; }
         }
-    
+
         public override bool RunsOnShutdown
         {
             get { return false; }

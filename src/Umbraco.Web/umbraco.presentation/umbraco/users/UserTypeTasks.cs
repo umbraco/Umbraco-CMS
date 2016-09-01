@@ -10,6 +10,7 @@ using System.Web.UI.HtmlControls;
 using Umbraco.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Web;
 using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.cms.presentation.user
@@ -21,22 +22,22 @@ namespace umbraco.cms.presentation.user
             try
             {
                 var u = new UserType(Alias, Alias);
-                ApplicationContext.Current.Services.UserService.SaveUserType(u);
+                Current.Services.UserService.SaveUserType(u);
                 _returnUrl = string.Format("users/EditUserType.aspx?id={0}", u.Id);
                 return true;
             }
-            catch 
+            catch
             {
                 return false;
-            }            
+            }
         }
 
         public override bool PerformDelete()
         {
-            var userType = ApplicationContext.Current.Services.UserService.GetUserTypeById(ParentID);
+            var userType = Current.Services.UserService.GetUserTypeById(ParentID);
             if (userType == null)
                 return false;
-            ApplicationContext.Current.Services.UserService.DeleteUserType(userType);
+            Current.Services.UserService.DeleteUserType(userType);
             return true;
         }
 

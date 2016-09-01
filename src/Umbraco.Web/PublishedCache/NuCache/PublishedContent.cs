@@ -53,14 +53,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private static string GetProfileNameByIdNoCache(int id)
         {
 #if DEBUG
-            var context = ApplicationContext.Current;
-            var servicesContext = context?.Services;
-            var userService = servicesContext?.UserService;
+            var userService = Current.Services?.UserService;
             if (userService == null) return "[null]"; // for tests
 #else
             // we don't want each published content to hold a reference to the service
-            // so where should they get the service from really? from the source...
-            var userService = ApplicationContext.Current.Services.UserService;
+            // so where should they get the service from really? from the locator...
+            var userService = Current.Services.UserService;
 #endif
             var user = userService.GetProfileById(id);
             return user?.Name;

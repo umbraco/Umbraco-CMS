@@ -2,44 +2,24 @@
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Web.Http.Routing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.cms.presentation.Trees;
 
 namespace Umbraco.Web.Trees
 {
-
     /// <summary>
     /// This is used to output JSON from legacy trees
     /// </summary>
-    [PluginController("UmbracoTrees")]
-    [LegacyTreeAuthorizeAttribute]
+    [PluginController("UmbracoTrees"), LegacyTreeAuthorizeAttribute]
     public class LegacyTreeController : TreeControllerBase
     {
         private readonly XmlTreeNode _xmlTreeNode;
-        private readonly string _treeAlias;
         private readonly string _currentSection;
-        private readonly string _rootDisplay;
-
-        public LegacyTreeController()
-        {
-            
-        }
-
-        public LegacyTreeController(XmlTreeNode xmlTreeNode, string treeAlias, string currentSection, UrlHelper urlHelper)
-        {
-            _xmlTreeNode = xmlTreeNode;
-            _treeAlias = treeAlias;
-            _currentSection = currentSection;
-            _rootDisplay = xmlTreeNode.Text;
-            Url = urlHelper;
-        }
 
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
@@ -47,8 +27,8 @@ namespace Umbraco.Web.Trees
                 _xmlTreeNode.NodeID,
                 _xmlTreeNode,
                 Url,
-                _currentSection, 
-                queryStrings, 
+                _currentSection,
+                queryStrings,
                 isRoot: true);
         }
 
@@ -110,18 +90,12 @@ namespace Umbraco.Web.Trees
                     menuItem.Name = Services.TextService.Localize("actions", menuItem.Alias);
                 }
                 return attempt.Result;
-            }                       
+            }
         }
 
-        public override string RootNodeDisplayName
-        {
-            get { return _rootDisplay; }
-        }
+        public override string RootNodeDisplayName { get; }
 
-        public override string TreeAlias
-        {
-            get { return _treeAlias; }
-        }
+        public override string TreeAlias { get; }
 
         private ApplicationTree GetTree(FormDataCollection queryStrings)
         {

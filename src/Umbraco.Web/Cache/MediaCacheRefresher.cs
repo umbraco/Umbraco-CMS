@@ -44,9 +44,9 @@ namespace Umbraco.Web.Cache
             {
                 var mediaCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMedia>();
 
-                ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+                Current.ApplicationCache.ClearPartialViewCache();
+                Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+                Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
                 foreach (var payload in payloads)
                 {
@@ -60,13 +60,13 @@ namespace Umbraco.Web.Cache
                     //
                     // this clears the non-deep xml for the current media
                     //
-                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
+                    Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
                         $"{CacheKeys.MediaCacheKey}_{payload.Id}_False");
 
                     // and then, for the entire path, we have to clear whatever might contain the media
                     // bearing in mind there are probably nasty race conditions here - this is all legacy
                     var k = $"{CacheKeys.MediaCacheKey}_{payload.Id}_";
-                    var x = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem(k)
+                    var x = Current.ApplicationCache.RuntimeCache.GetCacheItem(k)
                         as Tuple<XElement, string>;
                     if (x == null) continue;
                     var path = x.Item2;
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Cache
                     foreach (var pathId in path.Split(',').Skip(1).Select(int.Parse))
                     {
                         // this clears the deep xml for the medias in the path (skipping -1)
-                        ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
+                        Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
                             $"{CacheKeys.MediaCacheKey}_{pathId}_True");
                     }
 

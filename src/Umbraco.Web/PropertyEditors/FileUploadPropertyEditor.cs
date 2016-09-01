@@ -286,7 +286,7 @@ namespace Umbraco.Web.PropertyEditors
             /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
             /// if we find any attached to the current media item.
             /// </summary>
-            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
             {
                 MediaService.Saving += _fileUploadPropertyEditor.MediaServiceSaving;
                 MediaService.Created += _fileUploadPropertyEditor.MediaServiceCreating;
@@ -305,20 +305,20 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication)
         {
             //wrap
-            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
+            _applicationStartup.OnApplicationInitialized(umbracoApplication);
         }
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication)
         {
             //wrap
-            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
+            _applicationStartup.OnApplicationStarting(umbracoApplication);
         }
-        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication)
         {
             //wrap
-            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);
+            _applicationStartup.OnApplicationStarted(umbracoApplication);
         }
         #endregion
 

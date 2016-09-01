@@ -76,10 +76,9 @@ namespace Umbraco.Core
             _runtime.Boot(container);
 
             // this is extra that should get removed
-            _runtime
-                .Initialize()
-                .Startup(appContext => OnApplicationStarting(sender, evargs))
-                .Complete(appContext => OnApplicationStarted(sender, evargs));
+            ((CoreRuntime)_runtime).Initialize();
+            ((CoreRuntime)_runtime).Startup(() => OnApplicationStarting(sender, evargs));
+            ((CoreRuntime)_runtime).Complete(() => OnApplicationStarted(sender, evargs));
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

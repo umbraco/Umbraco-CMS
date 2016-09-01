@@ -2,9 +2,11 @@ using System;
 using System.Text;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -15,11 +17,15 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MacroContainerValueConverter : PropertyValueConverterBase
     {
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ServiceContext _services;
+        private readonly CacheHelper _appCache;
 
-        public MacroContainerValueConverter(UmbracoContext umbracoContext)
+        public MacroContainerValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache)
         {
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _services = services;
+            _appCache = appCache;
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -42,12 +48,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         // should never execute in // over the same UmbracoContext with
         // different preview modes.
         string RenderMacros(string source, bool preview)
-        {            
-            using (_umbracoContext.ForcedPreview(preview)) // force for macro rendering
+        {
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            using (umbracoContext.ForcedPreview(preview)) // force for macro rendering
             {
                 var sb = new StringBuilder();
 
-                var umbracoHelper = new UmbracoHelper(_umbracoContext);
+                var umbracoHelper = new UmbracoHelper(umbracoContext, _services, _appCache);
                 MacroTagParser.ParseMacros(
                     source,
                     //callback for when text block is found

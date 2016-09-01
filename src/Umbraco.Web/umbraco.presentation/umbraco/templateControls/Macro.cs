@@ -150,7 +150,7 @@ namespace umbraco.presentation.templateControls
                     throw new NotSupportedException("");
 
                 tempMacro.ScriptName = FileLocation;
-                tempMacro.MacroType = MacroTypes.PartialView;               
+                tempMacro.MacroType = MacroTypes.PartialView;
 
                 if (string.IsNullOrEmpty(Attributes["Cache"]) == false)
                 {
@@ -161,7 +161,7 @@ namespace umbraco.presentation.templateControls
                         Context.Trace.Warn("Template", "Cache attribute is in incorect format (should be an integer).");
                 }
 
-                var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
+                var renderer = new MacroRenderer(Current.ProfilingLogger);
                 var c = renderer.Render(tempMacro, (Hashtable) Context.Items["pageElements"], pageId).GetAsControl();
                 if (c != null)
                 {
@@ -171,17 +171,17 @@ namespace umbraco.presentation.templateControls
                 else
                 {
                     Context.Trace.Warn("Template", "Result of inline macro scripting is null");
-                }            
+                }
             }
             else
             {
-                var m = ApplicationContext.Current.Services.MacroService.GetByAlias(Alias);
+                var m = Current.Services.MacroService.GetByAlias(Alias);
                 if (m == null) return;
 
                 var tempMacro = new MacroModel(m);
                 try
                 {
-                    var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
+                    var renderer = new MacroRenderer(Current.ProfilingLogger);
                     var c = renderer.Render(tempMacro, (Hashtable)Context.Items["pageElements"], pageId, MacroAttributes).GetAsControl();
                     if (c != null)
                         Controls.Add(c);

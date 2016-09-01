@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -9,7 +10,7 @@ using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 namespace umbraco.cms.businesslogic.member
 {
 	/// MemberType
-	/// 
+	///
 	/// Due to the inheritance of the ContentType class, it enables definition of generic datafields on a Members.
     [Obsolete("Obsolete, Use the MemberTypeService and Umbraco.Core.Models.MemberType", false)]
 	public class MemberType : ContentType
@@ -53,7 +54,7 @@ namespace umbraco.cms.businesslogic.member
         #endregion
 
         #region Public Methods
-        
+
         /// <summary>
 		/// Get an true/false if the Member can edit the given data defined in the propertytype
 		/// </summary>
@@ -63,17 +64,17 @@ namespace umbraco.cms.businesslogic.member
         {
             return MemberTypeItem.MemberCanEditProperty(pt.Alias);
         }
-        
+
 		/// <summary>
 		/// Get an true/false if the given data defined in the propertytype, should be visible on the members profile page
 		/// </summary>
 		/// <param name="pt">Propertytype</param>
 		/// <returns>True if the data should be displayed on the profilepage</returns>
-		public bool ViewOnProfile(PropertyType pt) 
+		public bool ViewOnProfile(PropertyType pt)
 		{
             return MemberTypeItem.MemberCanViewProperty(pt.Alias);
 		}
-		
+
 		/// <summary>
 		/// Set if the member should be able to edit the data defined by its propertytype
 		/// </summary>
@@ -81,29 +82,29 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="value">True/False if Members of the type shoúld be able to edit the data</param>
         public void setMemberCanEdit(PropertyType pt, bool value)
 		{
-		    MemberTypeItem.SetMemberCanEditProperty(pt.Alias, value);            
+		    MemberTypeItem.SetMemberCanEditProperty(pt.Alias, value);
         }
-        
+
 		/// <summary>
 		/// Set if the data should be displayed on members of this type's profilepage
 		/// </summary>
 		/// <param name="pt">PropertyType</param>
 		/// <param name="value">True/False if the data should be displayed</param>
-        public void setMemberViewOnProfile(PropertyType pt, bool value) 
+        public void setMemberViewOnProfile(PropertyType pt, bool value)
 		{
-            MemberTypeItem.SetMemberCanViewProperty(pt.Alias, value);            
+            MemberTypeItem.SetMemberCanViewProperty(pt.Alias, value);
 		}
 
 		/// <summary>
 		/// Delete the current MemberType.
-		/// 
+		///
 		/// Deletes all Members of the type
-		/// 
+		///
 		/// Use with care
 		/// </summary>
-		public override void delete() 
+		public override void delete()
 		{
-		    ApplicationContext.Current.Services.MemberTypeService.Delete(MemberTypeItem);
+		    Current.Services.MemberTypeService.Delete(MemberTypeItem);
 
 		}
 
@@ -112,10 +113,10 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         public override void Save()
         {
-            ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
+            Current.Services.MemberTypeService.Save(MemberTypeItem);
             base.Save();
         }
-       
+
 
         #endregion
 
@@ -127,7 +128,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The MemberType with the given Alias</returns>
         public new static MemberType GetByAlias(string Alias)
         {
-            var result = ApplicationContext.Current.Services.MemberTypeService.Get(Alias);
+            var result = Current.Services.MemberTypeService.Get(Alias);
             return result == null ? null : new MemberType(result);
         }
 
@@ -148,7 +149,7 @@ namespace umbraco.cms.businesslogic.member
                 Icon = "icon-user",
                 Alias = alias
             };
-            ApplicationContext.Current.Services.MemberTypeService.Save(mt);
+            Current.Services.MemberTypeService.Save(mt);
             var legacy = new MemberType(mt);
             return legacy;
         }
@@ -160,7 +161,7 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                var result = ApplicationContext.Current.Services.MemberTypeService.GetAll();
+                var result = Current.Services.MemberTypeService.GetAll();
                 return result.Select(x => new MemberType(x)).ToArray();
             }
         }
@@ -170,7 +171,7 @@ namespace umbraco.cms.businesslogic.member
 
         protected override void setupNode()
         {
-            var memberType = ApplicationContext.Current.Services.MemberTypeService.Get(Id);
+            var memberType = Current.Services.MemberTypeService.Get(Id);
             SetupNode(memberType);
         }
 
@@ -180,7 +181,7 @@ namespace umbraco.cms.businesslogic.member
 
         private void SetupNode(IMemberType contentType)
         {
-            MemberTypeItem = contentType;            
+            MemberTypeItem = contentType;
 
             base.PopulateContentTypeFromContentTypeBase(MemberTypeItem);
             base.PopulateCMSNodeFromUmbracoEntity(MemberTypeItem, ObjectType);

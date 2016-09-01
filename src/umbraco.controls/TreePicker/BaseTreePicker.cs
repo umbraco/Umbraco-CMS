@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Services;
 
 namespace umbraco.uicontrols.TreePicker
@@ -21,7 +22,7 @@ namespace umbraco.uicontrols.TreePicker
     [ValidationProperty("Value")]
     public abstract class BaseTreePicker : Control, INamingContainer
     {
-        
+
         protected HiddenField ItemIdValue;
         protected HtmlAnchor DeleteLink;
         protected HtmlAnchor ChooseLink;
@@ -111,7 +112,7 @@ namespace umbraco.uicontrols.TreePicker
                     {
                         return ItemIdValue.Value;
                     }
-                    
+
                 }
                 catch (ArgumentException) { /*the node does not exist! we will ignore*/ }
             }
@@ -122,9 +123,9 @@ namespace umbraco.uicontrols.TreePicker
         /// Outputs the JavaScript instances used to make this control work
         /// </summary>
         protected virtual string GetJSScript()
-        {            
+        {
             /* 0 = this control's client id
-             * 1 = label 
+             * 1 = label
              * 2 = itemIdValueClientID
              * 3 = itemTitleClientID
              * 4 = itemPickerUrl
@@ -139,7 +140,7 @@ namespace umbraco.uicontrols.TreePicker
                  {
                     this.ClientID,
                     ModalWindowTitle,
-                    ItemIdValue.ClientID,                    
+                    ItemIdValue.ClientID,
                     ItemTitle.ClientID,
                     TreePickerUrl,
                     ModalWidth.ToString(),
@@ -191,7 +192,7 @@ namespace umbraco.uicontrols.TreePicker
             ItemIdValue.ID = "ContentIdValue";
             RootContainer.Controls.Add(ItemIdValue);
 
-            
+
             ButtonContainer = new HtmlGenericControl("span");
             ButtonContainer.ID = "btns";
 
@@ -205,12 +206,12 @@ namespace umbraco.uicontrols.TreePicker
             ButtonContainer.Controls.Add(new LiteralControl("&nbsp;"));
             ButtonContainer.Controls.Add(new LiteralControl("&nbsp;"));
 
-            //add the delete link with padding                
+            //add the delete link with padding
             DeleteLink = new HtmlAnchor();
             DeleteLink.HRef = "#"; //set on pre-render
             DeleteLink.Style.Add(HtmlTextWriterStyle.Color, "red");
-            DeleteLink.Title = ApplicationContext.Current.Services.TextService.Localize("delete");
-            DeleteLink.InnerText = ApplicationContext.Current.Services.TextService.Localize("delete");
+            DeleteLink.Title = Current.Services.TextService.Localize("delete");
+            DeleteLink.InnerText = Current.Services.TextService.Localize("delete");
             DeleteLink.Attributes.Add("class", "clear");
 
             ButtonContainer.Controls.Add(DeleteLink);
@@ -226,7 +227,7 @@ namespace umbraco.uicontrols.TreePicker
             //add choose link with padding
             ChooseLink = new HtmlAnchor();
             ChooseLink.HRef = "#"; //filled in on pre-render
-            ChooseLink.InnerText = ApplicationContext.Current.Services.TextService.Localize("choose") + "...";
+            ChooseLink.InnerText = Current.Services.TextService.Localize("choose") + "...";
             ChooseLink.Attributes.Add("data-section", this.TreePickerUrl);
             ChooseLink.Attributes.Add("class", "choose");
 
@@ -250,7 +251,7 @@ namespace umbraco.uicontrols.TreePicker
             {
                 ItemTitle.InnerText = GetItemTitle();
                 ItemTitle.Attributes.Add("title", GetItemBreadcrumbs());   // Adding full path/meta info (Issue U4-192)
-            }  
+            }
             /*
             ChooseLink.HRef = string.Format("javascript:mc_{0}.LaunchPicker();", this.ClientID);
             DeleteLink.HRef = string.Format("javascript:mc_{0}.ClearSelection();", this.ClientID);
@@ -270,6 +271,6 @@ namespace umbraco.uicontrols.TreePicker
 
         }
 
-        
+
     }
 }

@@ -18,6 +18,7 @@ using Examine.LuceneEngine.Faceting;
 using Examine.LuceneEngine.Indexing;
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Xml;
 using UmbracoExamine.LocalStorage;
@@ -34,7 +35,7 @@ namespace UmbracoExamine
         /// <summary>
         /// Used to store the path of a content object
         /// </summary>
-        public const string IndexPathFieldName = "__Path";        
+        public const string IndexPathFieldName = "__Path";
         public const string IconFieldName = "__Icon";
         public const string PublishedFieldName = "__Published";
         /// <summary>
@@ -48,7 +49,7 @@ namespace UmbracoExamine
         protected BaseUmbracoIndexer()
             : base()
         {
-            ProfilingLogger = ApplicationContext.Current.ProfilingLogger;
+            ProfilingLogger = Current.ProfilingLogger;
             _configBased = true;
         }
 
@@ -96,7 +97,7 @@ namespace UmbracoExamine
                 new StaticField( "nodeTypeAlias", FieldIndexTypes.ANALYZED, false, string.Empty),
                 new StaticField( "path", FieldIndexTypes.NOT_ANALYZED, false, string.Empty)
             };
-        
+
         protected ProfilingLogger ProfilingLogger { get; private set; }
 
         /// <summary>
@@ -150,11 +151,11 @@ namespace UmbracoExamine
         [Obsolete("This should not be used, it is used by the configuration based indexes but instead to disable Examine event handlers use the ExamineEvents class instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool EnableDefaultEventHandler { get; protected set; }
-        
+
         /// <summary>
         /// the supported indexable types
         /// </summary>
-        protected abstract IEnumerable<string> SupportedTypes { get; }        
+        protected abstract IEnumerable<string> SupportedTypes { get; }
 
         #region Initialize
 
@@ -166,9 +167,9 @@ namespace UmbracoExamine
         /// <param name="config"></param>
         /// <remarks>
         /// This is ONLY used for configuration based indexes
-        /// </remarks> 
+        /// </remarks>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
-        {                        
+        {
             EnableDefaultEventHandler = true; //set to true by default
             bool enabled;
             if (bool.TryParse(config["enableDefaultEventHandler"], out enabled))
@@ -176,7 +177,7 @@ namespace UmbracoExamine
                 EnableDefaultEventHandler = enabled;
             }
 
-            ProfilingLogger.Logger.Debug(GetType(), "{0} indexer initializing", () => name); 
+            ProfilingLogger.Logger.Debug(GetType(), "{0} indexer initializing", () => name);
 
             base.Initialize(name, config);
 
@@ -201,13 +202,13 @@ namespace UmbracoExamine
                         _localTempStorageIndexer.Initialize(config, configuredPath, fsDir, IndexingAnalyzer, attemptUseTempStorage.Result);
                     }
                 }
-               
+
             }
         }
 
         #endregion
-      
-        
+
+
         public override Directory GetLuceneDirectory()
         {
             //if temp local storage is configured use that, otherwise return the default
@@ -218,10 +219,10 @@ namespace UmbracoExamine
 
             return base.GetLuceneDirectory();
 
-        }        
+        }
 
         /// <summary>
-        /// override to check if we can actually initialize. 
+        /// override to check if we can actually initialize.
         /// </summary>
         /// <remarks>
         /// This check is required since the base examine lib will try to rebuild on startup
@@ -236,7 +237,7 @@ namespace UmbracoExamine
         }
 
         /// <summary>
-        /// override to check if we can actually initialize. 
+        /// override to check if we can actually initialize.
         /// </summary>
         /// <remarks>
         /// This check is required since the base examine lib will try to rebuild on startup
@@ -248,11 +249,11 @@ namespace UmbracoExamine
                 base.IndexAll(type);
             }
         }
-       
+
         public override void IndexItems(IEnumerable<ValueSet> nodes)
         {
             if (CanInitialize())
-            {               
+            {
                 base.IndexItems(nodes);
             }
         }
@@ -279,7 +280,7 @@ namespace UmbracoExamine
         }
 
         /// <summary>
-        /// override to check if we can actually initialize. 
+        /// override to check if we can actually initialize.
         /// </summary>
         /// <remarks>
         /// This check is required since the base examine lib will try to rebuild on startup
@@ -289,30 +290,19 @@ namespace UmbracoExamine
             if (CanInitialize())
             {
                 base.DeleteFromIndex(nodeId);
-            }            
+            }
         }
 
         /// <summary>
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// This only affects indexers that are config file based, if an index was created via code then 
-        /// this has no affect, it is assumed the index would not be created if it could not be initialized.
-        /// </remarks>
         protected bool CanInitialize()
         {
-            //We need to check if we actually can initialize, if not then don't continue
-            if (_configBased
-                && (ApplicationContext.Current == null
-                || ApplicationContext.Current.IsConfigured == false
-                || ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured == false))
-            {
-                return false;
-            }
-            return true;
+            // only affects indexers that are config file based, if an index was created via code then
+            // this has no effect, it is assumed the index would not be created if it could not be initialized
+            return _configBased == false || Current.RuntimeState.Level == RuntimeLevel.Run;
         }
-        
+
         /// <summary>
         /// Reindexes all supported types
         /// </summary>
@@ -323,7 +313,7 @@ namespace UmbracoExamine
                 IndexAll(t);
             }
         }
-      
+
         /// <summary>
         /// overridden for logging
         /// </summary>
@@ -360,7 +350,7 @@ namespace UmbracoExamine
                         f.Key,
                         f.Value[0].ToString(),
                         Field.Store.YES,
-                        Field.Index.NO, //don't index this field, we never want to search by it 
+                        Field.Index.NO, //don't index this field, we never want to search by it
                         Field.TermVector.NO));
                 }
             }
@@ -408,8 +398,8 @@ namespace UmbracoExamine
             {
                 e.IndexItem.ValueSet.Values[IndexPathFieldName] = new List<object> { e.OriginalValues["path"].First() };
             }
-            
-            //strip html of all users fields if we detect it has HTML in it. 
+
+            //strip html of all users fields if we detect it has HTML in it.
             //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
             //the value of the field 'as-is'.
             foreach (var originalValue in e.OriginalValues)
@@ -428,14 +418,14 @@ namespace UmbracoExamine
                             e.IndexItem.ValueSet.Values[originalValue.Key] = new List<object> { str.StripHtml() };
                         }
                     }
-                }                
+                }
             }
 
             //icon
             if (e.OriginalValues.ContainsKey("icon") && e.IndexItem.ValueSet.Values.ContainsKey(IconFieldName) == false)
             {
                 e.IndexItem.ValueSet.Values[IconFieldName] = new List<object> { e.OriginalValues["icon"] };
-            }            
+            }
         }
     }
 }

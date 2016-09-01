@@ -5,6 +5,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -12,13 +13,13 @@ namespace Umbraco.Web.Models.Mapping
     internal class PropertyTypeGroupResolver<TPropertyType> : ValueResolver<IContentTypeComposition, IEnumerable<PropertyGroupDisplay<TPropertyType>>> 
         where TPropertyType : PropertyTypeDisplay, new()
     {
-        private readonly ApplicationContext _applicationContext;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IDataTypeService _dataTypeService;
 
-        public PropertyTypeGroupResolver(ApplicationContext applicationContext, PropertyEditorCollection propertyEditors)
+        public PropertyTypeGroupResolver(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
         {
-            _applicationContext = applicationContext;
             _propertyEditors = propertyEditors;
+            _dataTypeService = dataTypeService;
         }
 
         /// <summary>
@@ -198,7 +199,7 @@ namespace Umbraco.Web.Models.Mapping
             foreach (var p in properties.Where(x => x.DataTypeDefinitionId != 0).OrderBy(x => x.SortOrder))
             {
                 var propertyEditor = _propertyEditors[p.PropertyEditorAlias];
-                var preValues = _applicationContext.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
+                var preValues = _dataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
 
                 if (propertyEditor == null) 
                     throw new InvalidOperationException("No property editor could be resolved with the alias: " + p.PropertyEditorAlias + ", ensure all packages are installed correctly.");

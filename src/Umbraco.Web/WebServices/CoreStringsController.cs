@@ -6,7 +6,7 @@ using Umbraco.Web.Mvc;
 namespace Umbraco.Web.WebServices
 {
     /// <summary>
-    /// A REST controller used for accessing Core.Strings services.
+    /// Represents a REST controller used for accessing Core.Strings services.
     /// </summary>
     public class CoreStringsController : UmbracoAuthorizedController
     {

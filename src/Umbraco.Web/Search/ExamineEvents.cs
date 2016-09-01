@@ -34,7 +34,7 @@ namespace Umbraco.Web.Search
 		/// <remarks>
 		/// We need to do this on the Started event as to guarantee that all resolvers are setup properly.
 		/// </remarks>
-		protected override void ApplicationStarted(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
+		protected override void ApplicationStarted(UmbracoApplicationBase httpApplication)
 		{
             LogHelper.Info<ExamineEvents>("Initializing Examine and binding to business logic events");
 
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Search
             switch (args.MessageType)
             {
                 case MessageType.RefreshById:
-                    var c1 = ApplicationContext.Current.Services.MemberService.GetById((int)args.MessageObject);
+                    var c1 = Current.Services.MemberService.GetById((int)args.MessageObject);
                     if (c1 != null)
                     {
                         ReIndexForMember(c1);
@@ -116,7 +116,7 @@ namespace Umbraco.Web.Search
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
-            var mediaService = ApplicationContext.Current.Services.MediaService;
+            var mediaService = Current.Services.MediaService;
 
 	        foreach (var payload in (MediaCacheRefresher.JsonPayload[]) args.MessageObject)
 	        {
@@ -162,7 +162,7 @@ namespace Umbraco.Web.Search
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
-	        var contentService = ApplicationContext.Current.Services.ContentService;
+	        var contentService = Current.Services.ContentService;
 
 	        foreach (var payload in (ContentCacheRefresher.JsonPayload[]) args.MessageObject)
 	        {

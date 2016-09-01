@@ -18,6 +18,7 @@ using Newtonsoft.Json.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.PublishedCache;
@@ -40,16 +41,7 @@ namespace Umbraco.Web.WebApi.Binders
         where TPersisted : class, IContentBase
         where TModelSave : ContentBaseItemSave<TPersisted>
     {
-        protected ApplicationContext ApplicationContext { get; private set; }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="applicationContext"></param>
-        internal ContentItemBaseBinder(ApplicationContext applicationContext)
-        {
-            ApplicationContext = applicationContext;
-        }
+        protected ServiceContext Services => Current.Services; // fixme - inject
 
         public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
@@ -212,7 +204,7 @@ namespace Umbraco.Web.WebApi.Binders
                 foreach (var propertyDto in dto.Properties)
                 {
                     if (propertyDto.Alias != p.Alias) continue;
-                    propertyDto.Value = p.Value;                        
+                    propertyDto.Value = p.Value;
                     break;
                 }
             }

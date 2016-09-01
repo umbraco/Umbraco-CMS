@@ -43,11 +43,11 @@ namespace UmbracoExamine
         public UmbracoContentIndexer()
             : base()
         {
-            ContentService = ApplicationContext.Current.Services.ContentService;
-            MediaService = ApplicationContext.Current.Services.MediaService;
-            UserService = ApplicationContext.Current.Services.UserService;
+            ContentService = Current.Services.ContentService;
+            MediaService = Current.Services.MediaService;
+            UserService = Current.Services.UserService;
             _urlSegmentProviders = Current.UrlSegmentProviders;
-            _queryFactory = ApplicationContext.Current.DatabaseContext.QueryFactory;
+            _queryFactory = Current.DatabaseContext.QueryFactory;
         }
 
         public UmbracoContentIndexer(
@@ -385,7 +385,7 @@ namespace UmbracoExamine
                 //NOTE: We are using a singleton here because: This is only ever used for configuration based scenarios, this is never
                 // used when the index is configured via code (the default), in which case IIndexCriteria is never used. When this is used
                 // the DI ctor is not used.
-                return indexSet.ToIndexCriteria(ApplicationContext.Current.Services.ContentTypeService);
+                return indexSet.ToIndexCriteria(Current.Services.ContentTypeService);
             }
             return base.GetIndexerData(indexSet);
         }

@@ -1,9 +1,5 @@
 using System;
 using System.Web.Http;
-using NPoco;
-using Umbraco.Core;
-using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.WebApi;
@@ -18,9 +14,9 @@ namespace Umbraco.Web.WebServices
 
         public XmlDataIntegrityController(IFacadeService facadeService)
         {
+            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
             _facadeService = facadeService as FacadeService;
-            if (_facadeService == null)
-                throw new NotSupportedException("Unsupported IFacadeService, only the Xml one is supported.");
+            if (_facadeService == null) throw new NotSupportedException("Unsupported IFacadeService, only the Xml one is supported.");
         }
 
         [HttpPost]

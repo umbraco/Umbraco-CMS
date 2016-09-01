@@ -16,6 +16,7 @@ using System.ComponentModel;
 using Umbraco.Core.IO;
 using System.Collections;
 using umbraco.cms.businesslogic.task;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.Membership;
 using File = System.IO.File;
 
@@ -270,7 +271,7 @@ namespace umbraco.cms.businesslogic
                 IEnumerable<Permission> permissions = Permission.GetNodePermissions(parent);
                 foreach (Permission p in permissions)
                 {
-                    Permission.MakeNew(ApplicationContext.Current.Services.UserService.GetUserById(p.UserId), retVal, p.PermissionId);
+                    Permission.MakeNew(Current.Services.UserService.GetUserById(p.UserId), retVal, p.PermissionId);
                 }
 
             }
@@ -638,7 +639,7 @@ order by level,sortOrder";
         {
             get
             {
-                return ApplicationContext.Current.Services.UserService.GetUserById(_userId);
+                return Current.Services.UserService.GetUserById(_userId);
             }
         }
 
@@ -672,7 +673,7 @@ order by level,sortOrder";
                 if (Level == 1) throw new ArgumentException("No newParent node");
                 if (_parent == null)
                 {
-                    _parent = ApplicationContext.Current.Services.EntityService.Get(_parentid);
+                    _parent = Current.Services.EntityService.Get(_parentid);
                 }
                 return new CMSNode(_parent);
             }

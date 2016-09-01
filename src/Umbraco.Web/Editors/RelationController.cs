@@ -17,16 +17,6 @@ namespace Umbraco.Web.Editors
 	[UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
     public class RelationController : UmbracoAuthorizedJsonController
 	{
-		public RelationController()
-			: this(UmbracoContext.Current)
-		{
-		}
-
-		public RelationController(UmbracoContext umbracoContext)
-			: base(umbracoContext)
-		{
-		}
-
         public Relation GetById(int id)
 		{
 			return Mapper.Map<IRelation, Relation>(Services.RelationService.GetById(id));

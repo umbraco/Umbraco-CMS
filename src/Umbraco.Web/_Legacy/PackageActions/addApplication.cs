@@ -29,18 +29,18 @@ namespace Umbraco.Web._Legacy.PackageActions
 			string alias = xmlData.Attributes["appAlias"].Value;
 			string icon = xmlData.Attributes["appIcon"].Value;
 
-		    ApplicationContext.Current.Services.SectionService.MakeNew(name, alias, icon);
-            
+		    Current.Services.SectionService.MakeNew(name, alias, icon);
+
 			return true;
 		}
 
 		public bool Undo(string packageName, XmlNode xmlData)
 		{
 			string alias = xmlData.Attributes["appAlias"].Value;
-		    var section = ApplicationContext.Current.Services.SectionService.GetByAlias(alias);
+		    var section = Current.Services.SectionService.GetByAlias(alias);
 		    if (section != null)
 		    {
-		        ApplicationContext.Current.Services.SectionService.DeleteSection(section);
+		        Current.Services.SectionService.DeleteSection(section);
 		    }
 			return true;
 		}

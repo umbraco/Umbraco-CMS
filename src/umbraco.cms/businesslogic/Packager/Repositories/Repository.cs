@@ -7,6 +7,7 @@ using System.IO;
 using System.Net;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -152,7 +153,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
         public string fetch(string packageGuid, int userId)
         {
             // log
-            ApplicationContext.Current.Services.AuditService.Add(AuditType.PackagerInstall,
+            Current.Services.AuditService.Add(AuditType.PackagerInstall,
                                     string.Format("Package {0} fetched from {1}", packageGuid, this.Guid),
                                     userId, -1);
             return fetch(packageGuid);

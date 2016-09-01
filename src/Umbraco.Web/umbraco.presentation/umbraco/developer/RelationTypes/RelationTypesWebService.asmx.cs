@@ -21,10 +21,10 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		public void DeleteRelationType(int relationTypeId)
 		{
 		    var user = UmbracoContext.Current.Security.CurrentUser;
-            
+
 			if (user.UserType.Name == "Administrators")
 			{
-                var relationService = ApplicationContext.Current.Services.RelationService;
+                var relationService = Current.Services.RelationService;
 			    var relationType = relationService.GetRelationTypeById(relationTypeId);
 			    relationService.Delete(relationType);
 			}

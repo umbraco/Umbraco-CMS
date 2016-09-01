@@ -12,19 +12,21 @@ namespace Umbraco.Web.Install.InstallSteps
         "DatabaseInstall", 11, "")]
     internal class DatabaseInstallStep : InstallSetupStep<object>
     {
-        private readonly ApplicationContext _applicationContext;
+        private readonly DatabaseContext _databaseContext;
+        private readonly IRuntimeState _runtime;
 
-        public DatabaseInstallStep(ApplicationContext applicationContext)
+        public DatabaseInstallStep(DatabaseContext databaseContext, IRuntimeState runtime)
         {
-            _applicationContext = applicationContext;
+            _databaseContext = databaseContext;
+            _runtime = runtime;
         }
 
         public override InstallSetupResult Execute(object model)
         {
-            if (_applicationContext.IsConfigured)
+            if (_runtime.Level == RuntimeLevel.Run)
                 throw new Exception("Umbraco is already configured!");
 
-            var result = _applicationContext.DatabaseContext.CreateDatabaseSchemaAndData(_applicationContext);
+            var result = _databaseContext.CreateDatabaseSchemaAndData();
 
             if (result.Success == false)
             {

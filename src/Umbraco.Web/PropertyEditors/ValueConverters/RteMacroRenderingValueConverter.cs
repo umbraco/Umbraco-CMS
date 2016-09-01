@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Macros;
 using Umbraco.Core.PropertyEditors;
@@ -10,6 +7,8 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Templates;
 using System.Linq;
 using HtmlAgilityPack;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -20,7 +19,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 	/// </summary>
     public class RteMacroRenderingValueConverter : TinyMceValueConverter
 	{
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ServiceContext _services;
+        private readonly CacheHelper _appCache;
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
         {
@@ -29,22 +30,25 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return PropertyCacheLevel.Facade;
         }
 
-        public RteMacroRenderingValueConverter(UmbracoContext umbracoContext)
+        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache)
         {
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _services = services;
+            _appCache = appCache;
         }
 
         // NOT thread-safe over a request because it modifies the
         // global UmbracoContext.Current.InPreviewMode status. So it
         // should never execute in // over the same UmbracoContext with
         // different preview modes.
-	    string RenderRteMacros(string source, bool preview)
-        {            
-	        using (_umbracoContext.ForcedPreview(preview)) // force for macro rendering
+        string RenderRteMacros(string source, bool preview)
+        {
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            using (umbracoContext.ForcedPreview(preview)) // force for macro rendering
             {
                 var sb = new StringBuilder();
 
-                var umbracoHelper = new UmbracoHelper(_umbracoContext);
+                var umbracoHelper = new UmbracoHelper(umbracoContext, _services, _appCache);
                 MacroTagParser.ParseMacros(
                     source,
                     //callback for when text block is found

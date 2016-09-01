@@ -47,7 +47,6 @@ namespace Umbraco.Web
         /// </remarks>
         public static UmbracoContext EnsureContext(
             HttpContextBase httpContext,
-            ApplicationContext applicationContext,
             IFacadeService facadeService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
@@ -55,7 +54,6 @@ namespace Umbraco.Web
             bool replaceContext)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
@@ -66,7 +64,7 @@ namespace Umbraco.Web
                 return umbracoContext;
 
             // create, assign the singleton, and return
-            umbracoContext = CreateContext(httpContext, applicationContext, facadeService, webSecurity, umbracoSettings, urlProviders);
+            umbracoContext = CreateContext(httpContext, facadeService, webSecurity, umbracoSettings, urlProviders);
             Web.Current.SetUmbracoContext(umbracoContext, replaceContext); // will dispose the one that is being replaced
             return umbracoContext;
         }
@@ -85,14 +83,12 @@ namespace Umbraco.Web
         /// </returns>
         internal static UmbracoContext CreateContext(
             HttpContextBase httpContext,
-            ApplicationContext applicationContext,
             IFacadeService facadeService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
@@ -100,7 +96,6 @@ namespace Umbraco.Web
             // create the context
             var umbracoContext = new UmbracoContext(
                 httpContext,
-                applicationContext,
                 facadeService,
                 webSecurity);
 
@@ -126,12 +121,10 @@ namespace Umbraco.Web
         }
 
         /// <param name="httpContext">An HttpContext.</param>
-        /// <param name="applicationContext">An Umbraco application context.</param>
         /// <param name="facadeService">A facade service.</param>
         /// <param name="webSecurity">A web security.</param>
         private UmbracoContext(
 			HttpContextBase httpContext,
-			ApplicationContext applicationContext,
             IFacadeService facadeService,
             WebSecurity webSecurity)
         {
@@ -146,13 +139,11 @@ namespace Umbraco.Web
             httpContext.DisposeOnPipelineCompleted(this);
 
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
 
             HttpContext = httpContext;
-            Application = applicationContext;
             Security = webSecurity;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
@@ -188,11 +179,6 @@ namespace Umbraco.Web
 		/// This is used internally for debugging and also used to define anything required to distinguish this request from another.
 		/// </summary>
 		internal Guid UmbracoRequestId { get; private set; }
-
-        /// <summary>
-        /// Gets the current ApplicationContext
-        /// </summary>
-        public ApplicationContext Application { get; private set; }
 
         /// <summary>
         /// Gets the WebSecurity class

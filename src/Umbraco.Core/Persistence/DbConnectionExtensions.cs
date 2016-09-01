@@ -38,13 +38,13 @@ namespace Umbraco.Core.Persistence
                 throw new NotSupportedException($"Provider \"{providerName}\" is not supported.");
 
             var factory = DbProviderFactories.GetFactory(providerName);
-            var conn = factory.CreateConnection();
+            var connection = factory.CreateConnection();
 
-            if (conn == null)
+            if (connection == null)
                 throw new InvalidOperationException($"Could not create a connection for provider \"{providerName}\".");
 
-            conn.ConnectionString = connectionString;
-            using (var connection = conn)
+            connection.ConnectionString = connectionString;
+            using (connection)
             {
                 return connection.IsAvailable();
             }
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence
             catch (DbException e)
             {
                 // Don't swallow this error, the exception is super handy for knowing "why" its not available
-                LogHelper.WarnWithException<IDbConnection>("Configured database is reporting as not being available!", e);
+                LogHelper.WarnWithException<IDbConnection>("Configured database is reporting as not being available.", e);
                 return false;
             }
 

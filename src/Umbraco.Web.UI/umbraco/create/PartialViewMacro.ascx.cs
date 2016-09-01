@@ -64,10 +64,10 @@ namespace Umbraco.Web.UI.Umbraco.Create
                 var name = fileName.Contains(".")
                     ? fileName.Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')
                     : fileName;
-                
+
                 name = name.SplitPascalCasing().ToFirstUpperInvariant();
 
-                var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(name);
+                var macro = Current.Services.MacroService.GetByAlias(name);
                 if (macro != null)
                 {
                     args.IsValid = false;

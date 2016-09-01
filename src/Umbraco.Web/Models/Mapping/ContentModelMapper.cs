@@ -6,7 +6,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AutoMapper;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -14,7 +13,6 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using Umbraco.Web.Routing;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Mapping
@@ -24,17 +22,32 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
+        private readonly IUserService _userService;
+        private readonly ILocalizedTextService _textService;
+        private readonly IContentService _contentService;
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IDataTypeService _dataTypeService;
+
+        public ContentModelMapper(IUserService userService, ILocalizedTextService textService, IContentService contentService, IContentTypeService contentTypeService, IDataTypeService dataTypeService)
+        {
+            _userService = userService;
+            _textService = textService;
+            _contentService = contentService;
+            _contentTypeService = contentTypeService;
+            _dataTypeService = dataTypeService;
+        }
+
+        public override void ConfigureMappings(IMapperConfiguration config)
         {
 
             //FROM IContent TO ContentItemDisplay
             config.CreateMap<IContent, ContentItemDisplay>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
                 .ForMember(
                     dto => dto.Updater,
-                    expression => expression.ResolveUsing(new CreatorResolver(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new CreatorResolver(_userService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -53,7 +66,7 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(
                     dto => dto.PublishDate,
-                    expression => expression.MapFrom(content => GetPublishedDate(content, applicationContext)))
+                    expression => expression.MapFrom(content => GetPublishedDate(_contentService, content)))
                 .ForMember(
                     dto => dto.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
                 .ForMember(
@@ -67,20 +80,20 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(_textService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
-                    new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
-                    applicationContext.Services.ContentTypeService, applicationContext.Services.ContentService));
+                    new ActionButtonsResolver(new Lazy<IUserService>(() => _userService))))
+                .AfterMap((media, display) => AfterMap(media, display, _dataTypeService, _textService,
+                    _contentTypeService, _contentService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
                 .ForMember(
                     dto => dto.Updater,
-                    expression => expression.ResolveUsing(new CreatorResolver(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new CreatorResolver(_userService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -96,7 +109,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IContent, ContentItemDto<IContent>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(applicationContext.Services.UserService)))
+                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Icon, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore());
@@ -257,10 +270,10 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Gets the published date value for the IContent object
         /// </summary>
+        /// <param name="contentService"></param>
         /// <param name="content"></param>
-        /// <param name="applicationContext"></param>
         /// <returns></returns>
-        private static DateTime? GetPublishedDate(IContent content, ApplicationContext applicationContext)
+        private static DateTime? GetPublishedDate(IContentService contentService, IContent content)
         {
             if (content.Published)
             {
@@ -268,7 +281,7 @@ namespace Umbraco.Web.Models.Mapping
             }
             if (content.HasPublishedVersion)
             {
-                var published = applicationContext.Services.ContentService.GetPublishedVersion(content.Id);
+                var published = contentService.GetPublishedVersion(content.Id);
                 return published.UpdateDate;
             }
             return null;

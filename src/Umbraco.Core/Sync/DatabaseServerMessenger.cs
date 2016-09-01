@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
+using LightInject;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPoco;
@@ -15,7 +16,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Sync
 {
@@ -29,34 +29,44 @@ namespace Umbraco.Core.Sync
     //
     public class DatabaseServerMessenger : ServerMessengerBase
     {
-        private readonly ApplicationContext _appContext;
+        private readonly IRuntimeState _runtime;
         private readonly DatabaseServerMessengerOptions _options;
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
-        private readonly ILogger _logger;
+        private readonly ProfilingLogger _profilingLogger;
         private int _lastId = -1;
         private DateTime _lastSync;
         private DateTime _lastPruned;
         private bool _initialized;
         private bool _syncing;
         private bool _released;
-        private readonly ProfilingLogger _profilingLogger;
 
-        protected ApplicationContext ApplicationContext { get { return _appContext; } }
-
-        public DatabaseServerMessenger(ApplicationContext appContext, bool distributedEnabled, DatabaseServerMessengerOptions options)
+        public DatabaseServerMessenger(
+            IRuntimeState runtime, DatabaseContext dbContext, ILogger logger, ProfilingLogger proflog,
+            bool distributedEnabled, DatabaseServerMessengerOptions options)
             : base(distributedEnabled)
         {
-            if (appContext == null) throw new ArgumentNullException("appContext");
-            if (options == null) throw new ArgumentNullException("options");
+            if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (proflog == null) throw new ArgumentNullException(nameof(proflog));
+            if (options == null) throw new ArgumentNullException(nameof(options));
 
-            _appContext = appContext;
+            DatabaseContext = dbContext;
+            Logger = logger;
+            _runtime = runtime;
+            _profilingLogger = proflog;
             _options = options;
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
-            _profilingLogger = appContext.ProfilingLogger;
-            _logger = appContext.ProfilingLogger.Logger;
         }
+
+        protected ILogger Logger { get; }
+
+        protected DatabaseContext DatabaseContext { get; }
+
+        protected UmbracoDatabase Database => DatabaseContext.Database;
+
+        protected Sql<SqlContext> Sql() => DatabaseContext.Sql();
 
         #region Messenger
 
@@ -74,11 +84,11 @@ namespace Umbraco.Core.Sync
             IEnumerable<object> ids = null,
             string json = null)
         {
-            var idsA = ids == null ? null : ids.ToArray();
+            var idsA = ids?.ToArray();
 
             Type idType;
             if (GetArrayType(idsA, out idType) == false)
-                throw new ArgumentException("All items must be of the same type, either int or Guid.", "ids");
+                throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
 
             var instructions = RefreshInstruction.GetInstructions(refresher, messageType, idsA, idType, json);
 
@@ -89,7 +99,7 @@ namespace Umbraco.Core.Sync
                 OriginIdentity = LocalIdentity
             };
 
-            ApplicationContext.DatabaseContext.Database.Insert(dto);
+            Database.Insert(dto);
         }
 
         #endregion
@@ -109,7 +119,9 @@ namespace Umbraco.Core.Sync
             // the service will *not* be able to properly handle our notifications anymore
             const int weight = 10;
 
-            var registered = ApplicationContext.MainDom.Register(
+            var runtime = _runtime as RuntimeState;
+            if (runtime == null) throw new NotSupportedException($"Unsupported IRuntimeState implementation {_runtime.GetType().FullName}, expecting {typeof(RuntimeState).FullName}.");
+            var registered = runtime.MainDom.Register(
                 () =>
                 {
                     lock (_locko)
@@ -146,7 +158,7 @@ namespace Umbraco.Core.Sync
                 {
                     // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
                     // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
-                    _logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install."
+                    Logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install."
                         + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
                         + " the database and maintain cache updates based on that Id.");
 
@@ -155,11 +167,11 @@ namespace Umbraco.Core.Sync
                 else
                 {
                     //check for how many instructions there are to process
-                    var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
+                    var count = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
                     if (count > _options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
-                        _logger.Warn<DatabaseServerMessenger>("The instruction count ({0}) exceeds the specified MaxProcessingInstructionCount ({1})."
+                        Logger.Warn<DatabaseServerMessenger>("The instruction count ({0}) exceeds the specified MaxProcessingInstructionCount ({1})."
                             + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
                             + " to the latest found in the database and maintain cache updates based on that Id.",
                             () => count, () => _options.MaxProcessingInstructionCount);
@@ -173,7 +185,7 @@ namespace Umbraco.Core.Sync
                     // go get the last id in the db and store it
                     // note: do it BEFORE initializing otherwise some instructions might get lost
                     // when doing it before, some instructions might run twice - not an issue
-                    var maxId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
+                    var maxId = Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
 
                     //if there is a max currently, or if we've never synced
                     if (maxId > 0 || _lastId < 0)
@@ -221,7 +233,7 @@ namespace Umbraco.Core.Sync
 
                     _lastPruned = _lastSync;
 
-                    switch (_appContext.GetCurrentServerRole())
+                    switch (Current.RuntimeState.ServerRole)
                     {
                         case ServerRole.Single:
                         case ServerRole.Master:
@@ -256,12 +268,12 @@ namespace Umbraco.Core.Sync
             //
             // FIXME not true if we're running on a background thread, assuming we can?
 
-            var sql = _appContext.DatabaseContext.Sql().SelectAll()
+            var sql = Sql().SelectAll()
                 .From<CacheInstructionDto>()
                 .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
                 .OrderBy<CacheInstructionDto>(dto => dto.Id);
 
-            var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
+            var dtos = Database.Fetch<CacheInstructionDto>(sql);
             if (dtos.Count <= 0) return;
 
             // only process instructions coming from a remote server, and ignore instructions coming from
@@ -287,7 +299,7 @@ namespace Umbraco.Core.Sync
                 }
                 catch (JsonException ex)
                 {
-                    _logger.Error<DatabaseServerMessenger>(string.Format("Failed to deserialize instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
+                    Logger.Error<DatabaseServerMessenger>(string.Format("Failed to deserialize instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
                     lastId = dto.Id; // skip
                     continue;
                 }
@@ -300,8 +312,8 @@ namespace Umbraco.Core.Sync
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseServerMessenger>(
-                        string.Format("DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({0}: \"{1}\"). Instruction is being skipped/ignored", dto.Id, dto.Instructions), ex);
+                    Logger.Error<DatabaseServerMessenger>(
+                        $"DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({dto.Id}: \"{dto.Instructions}\"). Instruction is being skipped/ignored", ex);
 
                     //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
                     // will be thrown over and over. The only thing we can do is ignore and move on.
@@ -327,12 +339,12 @@ namespace Umbraco.Core.Sync
 
             // using 2 queries is faster than convoluted joins
 
-            var maxId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction;");
+            var maxId = Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction;");
 
             var delete = new Sql().Append(@"DELETE FROM umbracoCacheInstruction WHERE utcStamp < @pruneDate AND id < @maxId",
                 new { pruneDate, maxId });
 
-            _appContext.DatabaseContext.Database.Execute(delete);
+            Database.Execute(delete);
         }
 
         /// <summary>
@@ -350,10 +362,10 @@ namespace Umbraco.Core.Sync
         {
             if (_lastId == 0)
             {
-                var sql = _appContext.DatabaseContext.Sql().Select("COUNT(*)")
+                var sql = Sql().Select("COUNT(*)")
                     .From<CacheInstructionDto>();
 
-                var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>(sql);
+                var count = Database.ExecuteScalar<int>(sql);
 
                 //if there are instructions but we haven't synced, then a cold boot is necessary
                 if (count > 0)
@@ -361,11 +373,11 @@ namespace Umbraco.Core.Sync
             }
             else
             {
-                var sql = _appContext.DatabaseContext.Sql().SelectAll()
+                var sql = Sql().SelectAll()
                     .From<CacheInstructionDto>()
                     .Where<CacheInstructionDto>(dto => dto.Id == _lastId);
 
-                var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
+                var dtos = Database.Fetch<CacheInstructionDto>(sql);
 
                 //if the last synced instruction is not found in the db, then a cold boot is necessary
                 if (dtos.Count == 0)

@@ -35,14 +35,14 @@ namespace umbraco.dialogs
                 if (int.TryParse(Request.QueryString["id"], out docId))
                 {
                     //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
-                    ApplicationContext.Services.NotificationService.SendNotification(
-                        ApplicationContext.Services.ContentService.GetById(docId), ActionToPublish.Instance, ApplicationContext);
+                    Services.NotificationService.SendNotification(
+                        Services.ContentService.GetById(docId), ActionToPublish.Instance);
                 }
 
             }
-            
+
 		}
 
-		
+
 	}
 }

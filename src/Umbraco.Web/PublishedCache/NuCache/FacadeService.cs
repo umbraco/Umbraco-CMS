@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Web.Hosting;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
@@ -75,7 +74,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public FacadeService(Options options, MainDom mainDom, ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, IFacadeAccessor facadeAccessor, ILogger logger)
+        public FacadeService(Options options, MainDom mainDom, IRuntimeState runtime, ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, IFacadeAccessor facadeAccessor, ILogger logger)
             : base(facadeAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -97,7 +96,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // Notifications" region), so
             // - notifications will be ignored
             // - trying to obtain a facade from the service will throw
-            if (ApplicationContext.Current.IsConfigured == false)
+            if (runtime.Level != RuntimeLevel.Run)
                 return;
 
             if (_options.IgnoreLocalDb == false)
@@ -935,7 +934,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             var facadeCache = _options.FacadeCacheIsApplicationRequestCache
-                ? ApplicationContext.Current.ApplicationCache.RequestCache
+                ? Current.ApplicationCache.RequestCache
                 : new StaticCacheProvider(); // assuming that's OK for tests, etc
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService);
 

@@ -1,4 +1,6 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Linq;
+using System.Web.Mvc;
 using System.Web.Routing;
 using LightInject;
 using Moq;
@@ -13,7 +15,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
-using Umbraco.Core.Plugins;
 using Umbraco.Core.Strings;
 using Umbraco.Core.DependencyInjection;
 using Current = Umbraco.Web.Current;
@@ -25,21 +26,19 @@ namespace Umbraco.Tests.Routing
 	public class RenderRouteHandlerTests : BaseRoutingTest
 	{
 		public override void Initialize()
-		{                       
+		{
 			base.Initialize();
 
 		    SettingsForTests.UmbracoPath = "~/umbraco";
-            
-			var webBoot = new TestRuntime(new UmbracoApplication());
-			//webBoot.Initialize();
-			//webBoot.Startup(null); -> don't call startup, we don't want any other application event handlers to bind for this test.
-			//webBoot.Complete(null);
-			webBoot.CreateRoutes();
+
+            WebRuntimeComponent.CreateRoutes(
+                new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
+                new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()));
 		}
 
 	    public class TestRuntime : WebRuntime
 	    {
-	        public TestRuntime(UmbracoApplicationBase umbracoApplication) 
+	        public TestRuntime(UmbracoApplicationBase umbracoApplication)
                 : base(umbracoApplication)
 	        { }
 
@@ -61,10 +60,10 @@ namespace Umbraco.Tests.Routing
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(PluginManager.Current.ResolveSurfaceControllers());
+            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Current.PluginManager.ResolveSurfaceControllers());
             Container.RegisterInstance(surfaceControllerTypes);
 
-            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(PluginManager.Current.ResolveUmbracoApiControllers());
+            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Current.PluginManager.ResolveUmbracoApiControllers());
             Container.RegisterInstance(umbracoApiControllerTypes);
 
             Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));
@@ -75,7 +74,7 @@ namespace Umbraco.Tests.Routing
 		public override void TearDown()
 		{
 			base.TearDown();
-            RouteTable.Routes.Clear();			
+            RouteTable.Routes.Clear();
 		}
 
         Template CreateTemplate(string alias)
@@ -84,7 +83,7 @@ namespace Umbraco.Tests.Routing
             var name = "Template";
             var template = new Template(name, alias);
             template.Content = ""; // else saving throws with a dirty internal error
-            ApplicationContext.Services.FileService.SaveTemplate(template);
+            Current.Services.FileService.SaveTemplate(template);
             return template;
         }
 
@@ -106,7 +105,7 @@ namespace Umbraco.Tests.Routing
 			};
 
 			var handler = new RenderRouteHandler(
-                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()), 
+                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()),
                 routingContext.UmbracoContext);
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
@@ -122,7 +121,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("home-page")]
         [TestCase("home-page")]
         [TestCase("home-page")]
-		[TestCase("Home-Page")] 
+		[TestCase("Home-Page")]
 		[TestCase("HomePage")]
 		[TestCase("homePage")]
         [TestCase("site1/template2")]
@@ -139,12 +138,12 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData, true);
 			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
 				{
-                    PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(1172), 
+                    PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(1172),
 					TemplateModel = template
 				};
 
 			var handler = new RenderRouteHandler(
-                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()), 
+                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()),
                 routingContext.UmbracoContext);
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
@@ -181,11 +180,7 @@ namespace Umbraco.Tests.Routing
 		/// </summary>
 		public class CustomDocumentController : RenderMvcController
 		{
-		    public CustomDocumentController(UmbracoContext umbracoContext) : base(umbracoContext)
-		    {
-		    }
-
-		    public ActionResult HomePage(ContentModel model)
+            public ActionResult HomePage(ContentModel model)
 			{
 				return View();
 			}

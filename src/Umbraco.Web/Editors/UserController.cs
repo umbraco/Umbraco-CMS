@@ -11,23 +11,6 @@ namespace Umbraco.Web.Editors
     public class UserController : UmbracoAuthorizedJsonController
     {
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public UserController()
-            : this(UmbracoContext.Current)
-        {            
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public UserController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {            
-        }
-
-        /// <summary>
         /// Disables the user with the given user id
         /// </summary>
         /// <param name="userId"></param>

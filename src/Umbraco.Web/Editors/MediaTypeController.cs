@@ -1,24 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web.Security;
 using AutoMapper;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using System.Web.Http;
 using System.Net;
-using Umbraco.Core.PropertyEditors;
-using System;
 using System.Net.Http;
-using System.Text;
 using Umbraco.Web.WebApi;
-using ContentType = System.Net.Mime.ContentType;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Editors
 {
@@ -34,24 +26,6 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public MediaTypeController()
-            : this(UmbracoContext.Current)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public MediaTypeController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-
-        }
-
         public int GetCount()
         {
             return Services.ContentTypeService.Count();

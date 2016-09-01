@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -50,12 +51,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     //TODO: Change all singleton access to use ctor injection in v8!!!
                     //TODO: That would mean that property value converters would need to be request lifespan, hrm....
                     var gridConfig = UmbracoConfig.For.GridConfig(
-                        ApplicationContext.Current.ProfilingLogger.Logger,
-                        ApplicationContext.Current.ApplicationCache.RuntimeCache,
+                        Current.ProfilingLogger.Logger,
+                        Current.ApplicationCache.RuntimeCache,
                         new DirectoryInfo(HttpContext.Current.Server.MapPath(SystemDirectories.AppPlugins)),
                         new DirectoryInfo(HttpContext.Current.Server.MapPath(SystemDirectories.Config)),
                         HttpContext.Current.IsDebuggingEnabled);
-                    
+
                     var sections = GetArray(obj, "sections");
                     foreach (var section in sections.Cast<JObject>())
                     {

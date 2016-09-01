@@ -10,6 +10,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.DependencyInjection;
+using Current = Umbraco.Core.DependencyInjection.Current;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.PublishedContent
             base.Initialize();
 
             // this is so the model factory looks into the test assembly
-            _pluginManager = PluginManager.Current;
+            _pluginManager = Current.PluginManager;
             Core.DependencyInjection.Current.PluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
             {
                 AssembliesToScan = _pluginManager.AssembliesToScan
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.PublishedContent
 
 	    protected override void FreezeResolution()
 	    {
-            var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
+            var types = Current.PluginManager.ResolveTypes<PublishedContentModel>();
             Container.RegisterSingleton<IPublishedContentModelFactory>(_ => new PublishedContentModelFactory(types));
 
             base.FreezeResolution();

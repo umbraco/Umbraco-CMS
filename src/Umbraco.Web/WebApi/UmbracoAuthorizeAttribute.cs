@@ -6,8 +6,8 @@ namespace Umbraco.Web.WebApi
 {
 
     /// <summary>
-    /// Ensures authorization is successful for a back office user
-    /// </summary>    
+    /// Ensures authorization is successful for a back office user.
+    /// </summary>
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
         /// <summary>
@@ -15,33 +15,29 @@ namespace Umbraco.Web.WebApi
         /// </summary>
         internal static bool Enable = true;
 
-        private readonly ApplicationContext _applicationContext;
+        // fixme - inject!
         private readonly UmbracoContext _umbracoContext;
+        private readonly IRuntimeState _runtimeState;
 
-        private ApplicationContext GetApplicationContext()
-        {
-            return _applicationContext ?? ApplicationContext.Current;
-        }
+        private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private UmbracoContext GetUmbracoContext()
-        {
-            return _umbracoContext ?? UmbracoContext.Current;
-        }
+        private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
         /// <param name="umbracoContext"></param>
-        public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext)
+        /// <param name="runtimeState"></param>
+        public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
             _umbracoContext = umbracoContext;
-            _applicationContext = _umbracoContext.Application;
+            _runtimeState = runtimeState;
         }
 
         public UmbracoAuthorizeAttribute()
-        {
-        }
+        { }
 
         protected override bool IsAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
@@ -52,16 +48,11 @@ namespace Umbraco.Web.WebApi
 
             try
             {
-                var appContext = GetApplicationContext();
-                var umbContext = GetUmbracoContext();
-
-                //we need to that the app is configured and that a user is logged in
-                if (appContext.IsConfigured == false)
-                    return false;
-
-                var isLoggedIn = umbContext.Security.ValidateCurrentUser();
-
-                return isLoggedIn;
+                // if not configured (install or upgrade) then we can continue
+                // otherwise we need to ensure that a user is logged in
+                return RuntimeState.Level == RuntimeLevel.Install
+                    || RuntimeState.Level == RuntimeLevel.Upgrade
+                    || UmbracoContext.Security.ValidateCurrentUser();
             }
             catch (Exception)
             {

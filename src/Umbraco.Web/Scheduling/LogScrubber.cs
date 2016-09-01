@@ -1,26 +1,26 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Caching;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
     internal class LogScrubber : RecurringTaskBase
     {
-        private readonly ApplicationContext _appContext;
+        private readonly IRuntimeState _runtime;
+        private readonly IAuditService _auditService;
         private readonly IUmbracoSettingsSection _settings;
 
-        public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
-            ApplicationContext appContext, IUmbracoSettingsSection settings)
+        public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
+            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
-            _appContext = appContext;
+            _runtime = runtime;
+            _auditService = auditService;
             _settings = settings;
         }
 
@@ -58,9 +58,7 @@ namespace Umbraco.Web.Scheduling
 
         public override bool PerformRun()
         {
-            if (_appContext == null) return true; // repeat...
-
-            switch (_appContext.GetCurrentServerRole())
+            switch (_runtime.ServerRole)
             {
                 case ServerRole.Slave:
                     LogHelper.Debug<LogScrubber>("Does not run on slave servers.");
@@ -71,7 +69,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_appContext.MainDom.IsMainDom == false)
+            if (_runtime.IsMainDom == false)
             {
                 LogHelper.Debug<LogScrubber>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
@@ -79,7 +77,7 @@ namespace Umbraco.Web.Scheduling
 
             using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
-                _appContext.Services.AuditService.CleanLogs(GetLogScrubbingMaximumAge(_settings));
+                _auditService.CleanLogs(GetLogScrubbingMaximumAge(_settings));
             }
 
             return true; // repeat

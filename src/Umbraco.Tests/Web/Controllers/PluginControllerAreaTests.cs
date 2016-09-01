@@ -50,34 +50,35 @@ namespace Umbraco.Tests.Web.Controllers
 		[PluginController("Area1")]
 		public class Plugin1Controller : PluginController
 		{
-			public Plugin1Controller(UmbracoContext umbracoContext) : base(umbracoContext)
+			public Plugin1Controller(UmbracoContext umbracoContext)
 			{
-			}
-		}
+                UmbracoContext = umbracoContext;
+            }
+        }
 
 		[PluginController("Area1")]
 		public class Plugin2Controller : PluginController
 		{
 			public Plugin2Controller(UmbracoContext umbracoContext)
-				: base(umbracoContext)
 			{
-			}
-		}
+                UmbracoContext = umbracoContext;
+            }
+        }
 
 		[PluginController("Area2")]
 		public class Plugin3Controller : PluginController
 		{
 			public Plugin3Controller(UmbracoContext umbracoContext)
-				: base(umbracoContext)
 			{
-			}
-		}
+                UmbracoContext = umbracoContext;
+            }
+        }
 
 		public class Plugin4Controller : PluginController
 		{
 			public Plugin4Controller(UmbracoContext umbracoContext)
-				: base(umbracoContext)
 			{
+			    UmbracoContext = umbracoContext;
 			}
 		}
 

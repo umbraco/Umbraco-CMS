@@ -32,13 +32,8 @@ namespace Umbraco.Web.Routing
         NotReady = 11,
 
         /// <summary>
-        /// Umbraco was not configured.
-        /// </summary>
-        NotConfigured = 12,
-
-        /// <summary>
         /// There was no content at all.
         /// </summary>
-        NoContent = 13
+        NoContent = 12
     }
 }

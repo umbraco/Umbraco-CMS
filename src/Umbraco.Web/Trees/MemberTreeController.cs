@@ -11,7 +11,6 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
 using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
@@ -45,7 +44,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
         public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
-        {   
+        {
             var node = GetSingleTreeNode(id, queryStrings);
 
             //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
@@ -105,10 +104,10 @@ namespace Umbraco.Web.Trees
                     "icon-user",
                     false);
 
-                return node;    
+                return node;
             }
 
-            
+
         }
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -144,7 +143,7 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                // root actions      
+                // root actions
                 if (_provider.IsUmbracoMembershipProvider())
                 {
                     //set default
@@ -162,7 +161,7 @@ namespace Umbraco.Web.Trees
                     createMenuItem.NavigateToRoute("/member/member/edit/-1?create=true");
                     menu.Items.Add(createMenuItem);
                 }
-                
+
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }

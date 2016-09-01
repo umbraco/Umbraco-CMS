@@ -58,7 +58,7 @@ namespace umbraco.developer
                         }
                     }
                     IOHelper.ValidateEditPath(fileName, SystemDirectories.UserControls);
-                    
+
                     if (System.IO.File.Exists(IOHelper.MapPath(fileName)))
                     {
                         var oControl = (UserControl)LoadControl(fileName);
@@ -108,7 +108,7 @@ namespace umbraco.developer
                                 li.Selected = true;
                         }
                     }
-        
+
                 }
             }
             catch (Exception err)
@@ -119,20 +119,20 @@ namespace umbraco.developer
             }
 
         }
-        
+
         protected void Button1_Click(object sender, EventArgs e)
         {
             var result = "";
 
             // Get the macro object
-            var macroObject = ApplicationContext.Current.Services.MacroService.GetById(Convert.ToInt32(Request.QueryString["macroID"]));
-            
+            var macroObject = Current.Services.MacroService.GetById(Convert.ToInt32(Request.QueryString["macroID"]));
+
             //// Load all macroPropertyTypes
             //var macroPropertyTypes = new Hashtable();
             //var macroPropertyIds = new Hashtable();
 
             //var macroPropTypes = ParameterEditorResolver.Current.ParameterEditors.ToArray();
-            
+
             //foreach (var mpt in macroPropTypes)
             //{
             //    macroPropertyIds.Add(mpt.Alias, mpt.Id.ToString());
@@ -151,7 +151,7 @@ namespace umbraco.developer
                     {
                         Name = SpaceCamelCasing(li.Text),
                         Alias = li.Text.Substring(0, li.Text.IndexOf(" ", StringComparison.Ordinal)),
-                        EditorAlias = macroPropertyTypeAlias                        
+                        EditorAlias = macroPropertyTypeAlias
                     });
 
                     changed = true;
@@ -164,7 +164,7 @@ namespace umbraco.developer
 
             if (changed)
             {
-                ApplicationContext.Current.Services.MacroService.Save(macroObject);    
+                Current.Services.MacroService.Save(macroObject);
             }
 
             ChooseProperties.Visible = false;
@@ -200,7 +200,7 @@ namespace umbraco.developer
                 case "Decimal":
                     //we previously only had an integer editor too! - this would of course
                     // fail if someone enters a real long number
-                    return Constants.PropertyEditors.IntegerAlias;                
+                    return Constants.PropertyEditors.IntegerAlias;
                 case "Boolean":
                     return Constants.PropertyEditors.TrueFalseAlias;
                 case "String":

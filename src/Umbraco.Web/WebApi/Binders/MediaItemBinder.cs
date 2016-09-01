@@ -8,28 +8,15 @@ using Umbraco.Web.Models.Mapping;
 namespace Umbraco.Web.WebApi.Binders
 {
     internal class MediaItemBinder : ContentItemBaseBinder<IMedia, MediaItemSave>
-    {        
-        public MediaItemBinder(ApplicationContext applicationContext)
-            : base(applicationContext)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public MediaItemBinder()
-            : this(ApplicationContext.Current)
-        {
-        }
-
+    {
         protected override IMedia GetExisting(MediaItemSave model)
         {
-            return ApplicationContext.Services.MediaService.GetById(Convert.ToInt32(model.Id));
+            return Services.MediaService.GetById(Convert.ToInt32(model.Id));
         }
 
         protected override IMedia CreateNew(MediaItemSave model)
         {
-            var contentType = ApplicationContext.Services.MediaTypeService.Get(model.ContentTypeAlias);
+            var contentType = Services.MediaTypeService.Get(model.ContentTypeAlias);
             if (contentType == null)
             {
                 throw new InvalidOperationException("No content type found wth alias " + model.ContentTypeAlias);

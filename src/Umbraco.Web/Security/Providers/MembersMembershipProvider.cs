@@ -21,7 +21,7 @@ namespace Umbraco.Web.Security.Providers
     public class MembersMembershipProvider : UmbracoMembershipProvider<IMembershipMemberService, IMember>, IUmbracoMemberTypeMembershipProvider
     {
         public MembersMembershipProvider()
-            : this(ApplicationContext.Current.Services.MemberService, ApplicationContext.Current.Services.MemberTypeService)
+            : this(Current.Services.MemberService, Current.Services.MemberTypeService)
         {
         }
 

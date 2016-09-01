@@ -100,17 +100,17 @@ namespace Umbraco.Tests.PropertyEditors
             var logger = Mock.Of<ILogger>();
             var textService = new Mock<ILocalizedTextService>();
             textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("blah");
-            var appContext = new ApplicationContext(
-                new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger),
-                new ServiceContext(
-                    localizedTextService: textService.Object
-                ),
-                Mock.Of<CacheHelper>(),
-                new ProfilingLogger(logger, Mock.Of<IProfiler>()))
-            {
-                IsReady = true
-            };
-            Current.ApplicationContext = appContext;
+            //var appContext = new ApplicationContext(
+            //    new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
+            //    new ServiceContext(
+            //        localizedTextService: textService.Object
+            //    ),
+            //    Mock.Of<CacheHelper>(),
+            //    new ProfilingLogger(logger, Mock.Of<IProfiler>()))
+            //{
+            //    //IsReady = true
+            //};
+            //Current.ApplicationContext = appContext;
 
             var defaultVals = new Dictionary<string, object>();
             var persisted = new PreValueCollection(new Dictionary<string, PreValue>

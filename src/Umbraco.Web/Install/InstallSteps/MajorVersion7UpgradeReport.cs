@@ -4,7 +4,6 @@ using System.Linq;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Install.Models;
@@ -15,22 +14,24 @@ namespace Umbraco.Web.Install.InstallSteps
         "MajorVersion7UpgradeReport", 1, "")]
     internal class MajorVersion7UpgradeReport : InstallSetupStep<object>
     {
-        private readonly ApplicationContext _applicationContext;
+        private readonly DatabaseContext _databaseContext;
+        private readonly IRuntimeState _runtime;
 
-        public MajorVersion7UpgradeReport(ApplicationContext applicationContext)
+        public MajorVersion7UpgradeReport(DatabaseContext databaseContext, IRuntimeState runtime)
         {
-            _applicationContext = applicationContext;
+            _databaseContext = databaseContext;
+            _runtime = runtime;
         }
 
         public override InstallSetupResult Execute(object model)
         {
             //we cannot run this step if the db is not configured.
-            if (_applicationContext.DatabaseContext.IsDatabaseConfigured == false)
+            if (_databaseContext.IsDatabaseConfigured == false)
             {
                 return null;
             }
 
-            var result = _applicationContext.DatabaseContext.ValidateDatabaseSchema();
+            var result = _databaseContext.ValidateDatabaseSchema();
             var determinedVersion = result.DetermineInstalledVersion();
 
             return new InstallSetupResult("version7upgradereport", 
@@ -45,15 +46,13 @@ namespace Umbraco.Web.Install.InstallSteps
         public override bool RequiresExecution(object model)
         {
             //if it's configured, then no need to run
-            if (_applicationContext.IsConfigured)
-            {
+            if (_runtime.Level == RuntimeLevel.Run)
                 return false;
-            }
 
             try
             {
                 //we cannot run this step if the db is not configured.
-                if (_applicationContext.DatabaseContext.IsDatabaseConfigured == false)
+                if (_databaseContext.IsDatabaseConfigured == false)
                 {
                     return false;
                 }
@@ -64,7 +63,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
-            var result = _applicationContext.DatabaseContext.ValidateDatabaseSchema();
+            var result = _databaseContext.ValidateDatabaseSchema();
             var determinedVersion = result.DetermineInstalledVersion();
             if ((string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false || determinedVersion.Equals(new Version(0, 0, 0)) == false)
                 && UmbracoVersion.Current.Major > determinedVersion.Major)
@@ -82,7 +81,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             var errorReport = new List<string>();
 
-            var sqlSyntax = _applicationContext.DatabaseContext.SqlSyntax;
+            var sqlSyntax = _databaseContext.SqlSyntax;
 
             var sql = new Sql();
             sql
@@ -95,7 +94,7 @@ namespace Umbraco.Web.Install.InstallSteps
                     sqlSyntax.GetQuotedColumn("cmsDataType", "nodeId") + " = " +
                     sqlSyntax.GetQuotedColumn("umbracoNode", "id"));
 
-            var list = _applicationContext.DatabaseContext.Database.Fetch<dynamic>(sql);
+            var list = _databaseContext.Database.Fetch<dynamic>(sql);
             foreach (var item in list)
             {
                 Guid legacyId = item.controlId;

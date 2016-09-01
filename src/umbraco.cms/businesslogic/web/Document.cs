@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using umbraco.DataLayer;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web
@@ -13,7 +14,7 @@ namespace umbraco.cms.businesslogic.web
     /// <summary>
     /// Document represents a webpage,
     /// type (umbraco.cms.businesslogic.web.DocumentType)
-    /// 
+    ///
     /// Pubished Documents are exposed to the runtime/the public website in a cached xml document.
     /// </summary>
     [Obsolete("Obsolete, Use Umbraco.Core.Models.Content", false)]
@@ -30,7 +31,7 @@ namespace umbraco.cms.businesslogic.web
 
         /// <summary>
         /// Initializes a new instance of the Document class.
-        /// You can set an optional flag noSetup, used for optimizing for loading nodes in the tree, 
+        /// You can set an optional flag noSetup, used for optimizing for loading nodes in the tree,
         /// therefor only data needed by the tree is initialized.
         /// </summary>
         /// <param name="id">Id of the document</param>
@@ -58,7 +59,7 @@ namespace umbraco.cms.businesslogic.web
         /// Initialize the document
         /// </summary>
         /// <param name="id">The id of the document</param>
-        public Document(Guid id) : base(id) { }      
+        public Document(Guid id) : base(id) { }
 
         /// <summary>
         /// Internal initialization of a legacy Document object using the new IUmbracoEntity object
@@ -83,7 +84,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Constants and Static members
-        
+
         private const string SqlOptimizedForPreview = @"
                 select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsDocument.versionId, cmsPreviewXml.xml, cmsDocument.published
                 from cmsDocument
@@ -123,7 +124,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Static Methods
-        
+
 
         /// <summary>
         /// Check if a node is a document
@@ -135,13 +136,13 @@ namespace umbraco.cms.businesslogic.web
         {
             bool isDoc = false;
 
-            var content = ApplicationContext.Current.Services.ContentService.GetById(nodeId);
+            var content = Current.Services.ContentService.GetById(nodeId);
             isDoc = content != null;
 
             return isDoc;
         }
 
-        
+
         /// <summary>
         /// Used to get the firstlevel/root documents of the hierachy
         /// </summary>
@@ -149,17 +150,17 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetRootContent()", false)]
         public static Document[] GetRootDocuments()
         {
-            var content = ApplicationContext.Current.Services.ContentService.GetRootContent().OrderBy(x => x.SortOrder);
+            var content = Current.Services.ContentService.GetRootContent().OrderBy(x => x.SortOrder);
             return content.Select(c => new Document(c)).ToArray();
         }
-        
+
 
         public static void RemoveTemplateFromDocument(int templateId)
         {
-            ApplicationContext.Current.DatabaseContext.Database.Execute(
+            Current.DatabaseContext.Database.Execute(
                 "update cmsDocument set templateId = NULL where templateId = @TemplateId", new {TemplateId = templateId});
             //We need to clear cache for Documents since this is touching the database directly
-            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContent>();
+            Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContent>();
         }
 
         /// <summary>
@@ -170,16 +171,16 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildren()", false)]
         public static Document[] GetChildrenForTree(int NodeId)
         {
-            var children = ApplicationContext.Current.Services.ContentService.GetChildren(NodeId);
+            var children = Current.Services.ContentService.GetChildren(NodeId);
             var list = children.Select(x => new Document(x));
             return list.ToArray();
         }
-        
+
 
         #endregion
 
         #region Public Properties
-        
+
         public override int sortOrder
         {
             get
@@ -298,7 +299,7 @@ namespace umbraco.cms.businesslogic.web
                     {
                         throw new NullReferenceException("Writer ID has not been specified for this document");
                     }
-                    _writer = ApplicationContext.Current.Services.UserService.GetUserById(_writerId.Value);
+                    _writer = Current.Services.UserService.GetUserById(_writerId.Value);
                 }
                 return _writer;
             }
@@ -325,7 +326,7 @@ namespace umbraco.cms.businesslogic.web
                 else
                 {
                     ContentEntity.ChangePublishedState(PublishedState.Unpublished);
-                    
+
                 }
             }
         }
@@ -338,7 +339,7 @@ namespace umbraco.cms.businesslogic.web
 		{
 			get
 			{
-				return ApplicationContext.Current.Services.ContentService.IsPublishable(ContentEntity);
+				return Current.Services.ContentService.IsPublishable(ContentEntity);
 			}
 		}
 
@@ -403,12 +404,12 @@ namespace umbraco.cms.businesslogic.web
 
         /// <summary>
         /// The id of the template associated to the document
-        /// 
+        ///
         /// When a document is created, it will get have default template given by it's documenttype,
         /// an editor is able to assign alternative templates (allowed by it's the documenttype)
-        /// 
+        ///
         /// You are always able to override the template in the runtime by appending the following to the querystring to the Url:
-        /// 
+        ///
         /// ?altTemplate=[templatealias]
         /// </summary>
         [Obsolete("Obsolete, Use Template property on Umbraco.Core.Models.Content", false)]
@@ -424,7 +425,7 @@ namespace umbraco.cms.businesslogic.web
                 }
                 else
                 {
-                    var template = ApplicationContext.Current.Services.FileService.GetTemplate(value);
+                    var template = Current.Services.FileService.GetTemplate(value);
                     ContentEntity.Template = template;
                 }
             }
@@ -449,25 +450,25 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Public Methods
-        
+
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(IUser u)
         {
-            var result = ApplicationContext.Current.Services.ContentService.PublishWithChildrenWithStatus(ContentEntity, u.Id, true);
+            var result = Current.Services.ContentService.PublishWithChildrenWithStatus(ContentEntity, u.Id, true);
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
             // do the same thing for the moment
             return result.Single(x => x.Result.ContentItem.Id == Id).Success;
         }
-        
+
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.UnPublish()", false)]
         public void UnPublish()
         {
-            _published = ApplicationContext.Current.Services.ContentService.UnPublish(ContentEntity);
-        }      
+            _published = Current.Services.ContentService.UnPublish(ContentEntity);
+        }
 
-        
+
         /// <summary>
         /// Puts the current document in the trash
         /// </summary>
@@ -507,7 +508,7 @@ namespace umbraco.cms.businesslogic.web
 
             return nodes;
         }
-        
+
         #endregion
 
         #region Protected Methods
@@ -521,8 +522,8 @@ namespace umbraco.cms.businesslogic.web
             }
 
             var content = Version == Guid.Empty
-                           ? ApplicationContext.Current.Services.ContentService.GetById(Id)
-                           : ApplicationContext.Current.Services.ContentService.GetByVersion(Version);
+                           ? Current.Services.ContentService.GetById(Id)
+                           : Current.Services.ContentService.GetByVersion(Version);
 
             if(content == null)
                 throw new ArgumentException(string.Format("No Document exists with id '{0}'", Id));
@@ -544,8 +545,8 @@ namespace umbraco.cms.businesslogic.web
                 Version = ContentEntity.Version;
 
             //Setting private properties from IContent replacing Document.setupNode()
-            _creator = ApplicationContext.Current.Services.UserService.GetUserById(ContentEntity.CreatorId);
-            _writer = ApplicationContext.Current.Services.UserService.GetUserById(ContentEntity.WriterId);
+            _creator = Current.Services.UserService.GetUserById(ContentEntity.CreatorId);
+            _writer = Current.Services.UserService.GetUserById(ContentEntity.WriterId);
             _updated = ContentEntity.UpdateDate;
 
             if (ContentEntity.Template != null)
@@ -585,7 +586,7 @@ namespace umbraco.cms.businesslogic.web
 
         #endregion
 
-        #region Private Methods       
+        #region Private Methods
 
         /// <summary>
         /// Used internally to permanently delete the data from the database
@@ -596,12 +597,12 @@ namespace umbraco.cms.businesslogic.web
         {
             if (ContentEntity != null)
             {
-                ApplicationContext.Current.Services.ContentService.Delete(ContentEntity);
+                Current.Services.ContentService.Delete(ContentEntity);
             }
             else
             {
-                ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(Id);
-                ApplicationContext.Current.Services.ContentService.Delete(ContentEntity);
+                ContentEntity = Current.Services.ContentService.GetById(Id);
+                Current.Services.ContentService.Delete(ContentEntity);
             }
 
             //Keeping the base.delete() as it looks to be clear 'private/internal cache'
@@ -620,18 +621,18 @@ namespace umbraco.cms.businesslogic.web
             UnPublish();
             if (ContentEntity != null)
             {
-                ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
+                Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
             }
             else
             {
-                ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(Id);
-                ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
+                ContentEntity = Current.Services.ContentService.GetById(Id);
+                Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
             }
             return true;
         }
 
         #endregion
-        
+
 
     }
 }

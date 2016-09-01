@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
                 var templateAlias = path.Substring(pos + 1);
                 path = pos == 0 ? "/" : path.Substring(0, pos);
 
-                var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateAlias);
+                var template = Current.Services.FileService.GetTemplate(templateAlias);
                 if (template != null)
                 {
                     Logger.Debug<ContentFinderByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);

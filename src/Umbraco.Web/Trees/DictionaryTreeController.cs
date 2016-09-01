@@ -20,7 +20,7 @@ namespace Umbraco.Web.Trees
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var node = base.CreateRootNode(queryStrings);
-            
+
             // For now, this is using the legacy webforms view but will need refactoring
             // when the dictionary has been converted to Angular.
             node.RoutePath = String.Format("{0}/framed/{1}", queryStrings.GetValue<string>("application"),
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                
+
                 var dictionaryItem = Services.LocalizationService.GetDictionaryItemById(intId);
                 var entity = new UmbracoEntity
                     {

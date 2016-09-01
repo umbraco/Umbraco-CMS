@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using LightInject;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Components
@@ -36,18 +37,15 @@ namespace Umbraco.Core.Components
             public int Weight = -1;
         }
 
-        public void Boot(IEnumerable<Type> componentTypes)
+        public void Boot(IEnumerable<Type> componentTypes, RuntimeLevel level)
         {
             if (_booted) throw new InvalidOperationException("Can not boot, has already booted.");
 
-            using (_proflog.TraceDuration<BootLoader>($"Booting Umbraco {UmbracoVersion.GetSemanticVersion().ToSemanticString()} on {NetworkHelper.MachineName}.", "Booted."))
-            {
-                var orderedComponentTypes = PrepareComponentTypes(componentTypes);
+            var orderedComponentTypes = PrepareComponentTypes(componentTypes);
 
-                InstanciateComponents(orderedComponentTypes);
-                ComposeComponents();
-                InitializeComponents();
-            }
+            InstanciateComponents(orderedComponentTypes);
+            ComposeComponents(level);
+            InitializeComponents();
 
             // rejoice!
             _booted = true;
@@ -175,7 +173,7 @@ namespace Umbraco.Core.Components
             }
         }
 
-        private void ComposeComponents()
+        private void ComposeComponents(RuntimeLevel level)
         {
             using (_proflog.DebugDuration<BootLoader>($"Composing components. (log when >{LogThresholdMilliseconds}ms)", "Composed components."))
             {
@@ -184,7 +182,7 @@ namespace Umbraco.Core.Components
                     var componentType = component.GetType();
                     using (_proflog.DebugDuration<BootLoader>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", LogThresholdMilliseconds))
                     {
-                        component.Compose(_container);
+                        component.Compose(_container, level);
                     }
                 }
             }
@@ -200,20 +198,27 @@ namespace Umbraco.Core.Components
                 foreach (var component in _components)
                 {
                     var componentType = component.GetType();
-                    var initializers = componentType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                    var initializers = componentType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                         .Where(x => x.Name == "Initialize" && x.IsGenericMethod == false);
                     using (_proflog.DebugDuration<BootLoader>($"Initializing {componentType.FullName}.", $"Initialised {componentType.FullName}.", LogThresholdMilliseconds))
                     {
                         foreach (var initializer in initializers)
                         {
                             var parameters = initializer.GetParameters()
-                                .Select(x => _container.GetInstance(x.ParameterType))
+                                .Select(x => GetParameter(componentType, x.ParameterType))
                                 .ToArray();
                             initializer.Invoke(component, parameters);
                         }
                     }
                 }
             }
+        }
+
+        private object GetParameter(Type componentType, Type parameterType)
+        {
+            var param = _container.TryGetInstance(parameterType);
+            if (param == null) throw new BootFailedException($"Could not get parameter of type {parameterType.FullName} for component {componentType.FullName}.");
+            return param;
         }
 
         public void Terminate()

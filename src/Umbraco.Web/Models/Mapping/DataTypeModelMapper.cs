@@ -16,9 +16,16 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class DataTypeModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
+        private readonly IDataTypeService _dataTypeService;
+
+        public DataTypeModelMapper(IDataTypeService dataTypeService)
         {
-            var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
+            _dataTypeService = dataTypeService;
+        }
+
+        public override void ConfigureMappings(IMapperConfiguration config)
+        {
+            var lazyDataTypeService = new Lazy<IDataTypeService>(() => _dataTypeService);
 
             config.CreateMap<PropertyEditor, PropertyEditorBasic>();                
 
@@ -62,8 +69,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
                 .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
-                .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
-                    new PreValueDisplayResolver(lazyDataTypeService)))
+                .ForMember(display => display.PreValues, expression => expression.ResolveUsing(new PreValueDisplayResolver(lazyDataTypeService)))
                 .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
                     definition => definition.PropertyEditorAlias.IsNullOrWhiteSpace() ? null : definition.PropertyEditorAlias))
                 .ForMember(x => x.HasPrevalues, expression => expression.Ignore())

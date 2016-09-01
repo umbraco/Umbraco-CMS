@@ -93,20 +93,6 @@ namespace Umbraco.Core.Plugins
             }
         }
 
-        public static PluginManager Current => DependencyInjection.Current.PluginManager;
-
-        internal static PluginManager Default
-        {
-            get
-            {
-                var appctx = ApplicationContext.Current;
-                var cacheProvider = appctx == null // fixme - should Current have an ApplicationCache?
-                    ? new NullCacheProvider()
-                    : appctx.ApplicationCache.RuntimeCache;
-                return new PluginManager(cacheProvider, DependencyInjection.Current.ProfilingLogger);
-            }
-        }
-
         #region Hash checking methods
 
         /// <summary>

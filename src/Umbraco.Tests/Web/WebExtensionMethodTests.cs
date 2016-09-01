@@ -35,13 +35,13 @@ namespace Umbraco.Tests.Web
         [Test]
         public void RouteDataExtensions_GetUmbracoContext()
         {
-            var appCtx = new ApplicationContext(
-               CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //   CacheHelper.CreateDisabledCacheHelper(),
+            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.CreateContext(
-                Mock.Of<HttpContextBase>(), appCtx,
+                Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
+                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
                 Mock.Of<IUmbracoSettingsSection>(),
                 new List<IUrlProvider>());
             var r1 = new RouteData();
@@ -54,13 +54,13 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_RouteValues()
         {
-            var appCtx = new ApplicationContext(
-               CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //   CacheHelper.CreateDisabledCacheHelper(),
+            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.CreateContext(
-                Mock.Of<HttpContextBase>(), appCtx,
+                Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
+                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
                 Mock.Of<IUmbracoSettingsSection>(),
                 new List<IUrlProvider>());
 
@@ -83,13 +83,13 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_Current()
         {
-            var appCtx = new ApplicationContext(
-               CacheHelper.CreateDisabledCacheHelper(),
-               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            //var appCtx = new ApplicationContext(
+            //   CacheHelper.CreateDisabledCacheHelper(),
+            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.CreateContext(
-                Mock.Of<HttpContextBase>(), appCtx,
+                Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
+                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
                 Mock.Of<IUmbracoSettingsSection>(),
                 new List<IUrlProvider>());
 

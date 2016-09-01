@@ -13,6 +13,7 @@ using Examine;
 using System.IO;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
 
@@ -32,7 +33,7 @@ namespace UmbracoExamine
         public UmbracoMemberIndexer()
             : base()
         {
-            _memberService = ApplicationContext.Current.Services.MemberService;
+            _memberService = Current.Services.MemberService;
         }
 
         /// <summary>
@@ -42,17 +43,17 @@ namespace UmbracoExamine
         /// <param name="luceneDirectory"></param>
         /// <param name="profilingLogger"></param>
         /// <param name="validator"></param>
-        /// <param name="memberService"></param>        
+        /// <param name="memberService"></param>
         /// <param name="analyzer"></param>
         public UmbracoMemberIndexer(
             IEnumerable<FieldDefinition> fieldDefinitions,
-            Directory luceneDirectory,                      
+            Directory luceneDirectory,
             Analyzer analyzer,
             ProfilingLogger profilingLogger,
             IValueSetValidator validator,
             IMemberService memberService) :
             base(fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
-        {            
+        {
             if (memberService == null) throw new ArgumentNullException("memberService");
             _memberService = memberService;
         }

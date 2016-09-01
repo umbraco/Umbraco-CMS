@@ -1,6 +1,5 @@
 ﻿using System;
 using AutoMapper;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Services;
@@ -14,9 +13,16 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
+        private readonly IDataTypeService _dataTypeService;
+
+        public ContentPropertyModelMapper(IDataTypeService dataTypeService)
         {
-            var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
+            _dataTypeService = dataTypeService;
+        }
+
+        public override void ConfigureMappings(IMapperConfiguration config)
+        {
+            var lazyDataTypeService = new Lazy<IDataTypeService>(() => _dataTypeService);
 
             //FROM Property TO ContentPropertyBasic
             config.CreateMap<PropertyGroup, Tab<ContentPropertyDisplay>>()

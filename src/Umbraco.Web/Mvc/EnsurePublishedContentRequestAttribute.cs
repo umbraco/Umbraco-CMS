@@ -78,18 +78,13 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Exposes the UmbracoContext
         /// </summary>
-        protected UmbracoContext UmbracoContext
-        {
-            get { return _umbracoContext ?? (_umbracoContext = UmbracoContext.Current); }
-        }
+        protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = UmbracoContext.Current);
 
         /// <summary>
         /// Exposes an UmbracoHelper
         /// </summary>
-        protected UmbracoHelper Umbraco
-        {
-            get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext.Current)); }
-        }
+        protected UmbracoHelper Umbraco => _helper 
+            ?? (_helper = new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache));
 
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {

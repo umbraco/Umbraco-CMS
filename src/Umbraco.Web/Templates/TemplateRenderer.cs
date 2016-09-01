@@ -12,6 +12,7 @@ using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.cms.businesslogic.language;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Templates
 {
@@ -23,6 +24,7 @@ namespace Umbraco.Web.Templates
 	/// </remarks>
 	internal class TemplateRenderer
 	{
+	    private readonly IFileService _fileService = Current.Services.FileService; // fixme inject
 		private readonly UmbracoContext _umbracoContext;
 		private object _oldPageId;
 		private object _oldPageElements;
@@ -82,8 +84,8 @@ namespace Umbraco.Web.Templates
 			contentRequest.PublishedContent = doc;
 			//set the template, either based on the AltTemplate found or the standard template of the doc
 			contentRequest.TemplateModel = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false
-                ? _umbracoContext.Application.Services.FileService.GetTemplate(doc.TemplateId)
-                : _umbracoContext.Application.Services.FileService.GetTemplate(AltTemplate.Value);
+                ? _fileService.GetTemplate(doc.TemplateId)
+                : _fileService.GetTemplate(AltTemplate.Value);
 
 			//if there is not template then exit
 			if (!contentRequest.HasTemplate)

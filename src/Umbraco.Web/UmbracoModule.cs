@@ -34,7 +34,7 @@ namespace Umbraco.Web
         static void BeginRequest(HttpContextBase httpContext)
 		{
             // ensure application url is initialized
-            ApplicationUrlHelper.EnsureApplicationUrl(ApplicationContext.Current, httpContext.Request);
+            ((RuntimeState)Current.RuntimeState).EnsureApplicationUrl(httpContext.Request);
 
             // do not process if client-side request
 			if (httpContext.Request.Url.IsClientSideRequest())
@@ -53,9 +53,9 @@ namespace Umbraco.Web
             // create the UmbracoContext singleton, one per request, and assign
             // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)
 		    UmbracoContext.EnsureContext(
-		        httpContext, ApplicationContext.Current,
+		        httpContext,
                 Current.FacadeService,
-		        new WebSecurity(httpContext, ApplicationContext.Current),
+		        new WebSecurity(httpContext, Current.Services.UserService),
 		        UmbracoConfig.For.UmbracoSettings(),
 		        Current.UrlProviders,
 		        true);
@@ -86,20 +86,18 @@ namespace Umbraco.Web
 
 			var umbracoContext = UmbracoContext.Current;
 
-            //re-write for the default back office path
+            // re-write for the default back office path
             if (httpContext.Request.Url.IsDefaultBackOfficeRequest())
             {
-                if (EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl))
-                {
+                if (EnsureRuntime(httpContext, umbracoContext.OriginalRequestUrl))
                     RewriteToBackOfficeHandler(httpContext);
-                }
                 return;
             }
 
-
 			// do not process if this request is not a front-end routable page
 		    var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
-            //raise event here
+
+            // raise event here
             OnRouteAttempt(new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));
 		    if (isRoutableAttempt.Success == false) return;
 
@@ -149,16 +147,12 @@ namespace Umbraco.Web
 			{
 			    reason = EnsureRoutableOutcome.NotDocumentRequest;
 			}
-			// ensure Umbraco is ready to serve documents
-			else if (EnsureIsReady(httpContext, uri) == false)
+            // ensure the runtime is in the proper state
+            // and deal with needed redirects, etc
+            else if (EnsureRuntime(httpContext, uri) == false)
 			{
 			    reason = EnsureRoutableOutcome.NotReady;
 			}
-			// ensure Umbraco is properly configured to serve documents
-			else if (EnsureIsConfigured(httpContext, uri) == false)
-            {
-                reason = EnsureRoutableOutcome.NotConfigured;
-            }
             // ensure Umbraco has documents to serve
             else if (EnsureHasContent(context, httpContext) == false)
             {
@@ -174,7 +168,7 @@ namespace Umbraco.Web
 		/// <param name="httpContext"></param>
 		/// <param name="uri"></param>
 		/// <returns></returns>
-		bool EnsureDocumentRequest(HttpContextBase httpContext, Uri uri)
+		private bool EnsureDocumentRequest(HttpContextBase httpContext, Uri uri)
 		{
 			var maybeDoc = true;
 			var lpath = uri.AbsolutePath.ToLowerInvariant();
@@ -221,31 +215,66 @@ namespace Umbraco.Web
 			return maybeDoc;
 		}
 
-		// ensures Umbraco is ready to handle requests
-		// if not, set status to 503 and transfer request, and return false
-		// if yes, return true
-	    static bool EnsureIsReady(HttpContextBase httpContext, Uri uri)
-		{
-			var ready = ApplicationContext.Current.IsReady;
+	    private static bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
+	    {
+	        var debug = Current.RuntimeState.Debug;
+	        var level = Current.RuntimeState.Level;
+            switch (level)
+            {
+                case RuntimeLevel.Unknown:
+                case RuntimeLevel.Boot:
+                    // not ready yet, but wait
+                    ReportRuntime(level, "Umbraco is booting.");
 
-			// ensure we are ready
-	        if (ready) return true;
-	        LogHelper.Warn<UmbracoModule>("Umbraco is not ready");
+                    // let requests pile up and wait for 10s then show the splash anyway
+                    if (UmbracoConfig.For.UmbracoSettings().Content.EnableSplashWhileLoading == false
+                        && ((RuntimeState) Current.RuntimeState).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
 
-	        if (UmbracoConfig.For.UmbracoSettings().Content.EnableSplashWhileLoading == false)
-	        {
-	            // let requests pile up and wait for 10s then show the splash anyway
-	            ready = ApplicationContext.Current.WaitForReady(10 * 1000);
-	        }
+                    // redirect to booting page
+                    httpContext.Response.StatusCode = 503; // temp not available
+                    const string bootUrl = "~/config/splashes/booting.aspx";
+                    httpContext.Response.AddHeader("Retry-After", debug ? "1" : "30"); // seconds
+                    httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
+                    return false; // cannot serve content
 
-	        if (ready) return true;
+                case RuntimeLevel.Failed:
+                    // redirect to death page
+                    ReportRuntime(level, "Umbraco has failed.");
 
-	        httpContext.Response.StatusCode = 503;
-	        const string bootUrl = "~/config/splashes/booting.aspx";
-	        httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
+                    httpContext.Response.StatusCode = 503; // temp not available
+                    const string deathUrl = "~/config/splashes/death.aspx";
+                    httpContext.Response.AddHeader("Retry-After", debug ? "1" : "300"); // seconds
+                    httpContext.RewritePath(UriUtility.ToAbsolute(deathUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
+                    return false; // cannot serve content
 
-	        return false;
-		}
+                case RuntimeLevel.Run:
+                    // ok
+                    return true;
+
+                case RuntimeLevel.Install:
+                case RuntimeLevel.Upgrade:
+                    // redirect to install
+                    ReportRuntime(level, "Umbraco must install or upgrade.");
+                    var installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
+                    var installUrl = $"{installPath}/?redir=true&url={HttpUtility.UrlEncode(uri.ToString())}";
+                    httpContext.Response.Redirect(installUrl, true);
+                    return false; // cannot serve content
+
+                default:
+                    throw new NotSupportedException($"Unexpected runtime level: {Current.RuntimeState.Level}.");
+            }
+        }
+
+        private static bool _reported;
+	    private static RuntimeLevel _reportedLevel;
+
+        private static void ReportRuntime(RuntimeLevel level, string message)
+	    {
+	        if (_reported && _reportedLevel == level) return;
+            _reported = true;
+	        _reportedLevel = level;
+            Current.Logger.Warn<UmbracoModule>(message);
+	    }
 
 		// ensures Umbraco has at least one published node
 		// if not, rewrites to splash and return false
@@ -260,30 +289,6 @@ namespace Umbraco.Web
 			const string noContentUrl = "~/config/splashes/noNodes.aspx";
 			httpContext.RewritePath(UriUtility.ToAbsolute(noContentUrl));
 
-			return false;
-		}
-
-	    private bool _notConfiguredReported;
-
-		// ensures Umbraco is configured
-		// if not, redirect to install and return false
-		// if yes, return true
-	    private bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
-	    {
-	        if (ApplicationContext.Current.IsConfigured)
-	            return true;
-
-	        if (_notConfiguredReported)
-	        {
-                // remember it's been reported so we don't flood the log
-                // no thread-safety so there may be a few log entries, doesn't matter
-                _notConfiguredReported = true;
-                LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
-            }
-
-			var installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
-			var installUrl = $"{installPath}/?redir=true&url={HttpUtility.UrlEncode(uri.ToString())}";
-			httpContext.Response.Redirect(installUrl, true);
 			return false;
 		}
 

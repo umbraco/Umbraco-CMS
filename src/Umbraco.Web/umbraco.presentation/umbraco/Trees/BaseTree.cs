@@ -11,6 +11,7 @@ using Umbraco.Web.Trees;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Web;
 using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.Trees
@@ -50,10 +51,10 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         public XmlTreeNode RootNode
         {
-            get 
+            get
             {
                 Initialize();
-                return m_initNode; 
+                return m_initNode;
             }
         }
 
@@ -127,7 +128,7 @@ namespace umbraco.cms.presentation.Trees
         }
 
         /// <summary>
-        /// The NodeKey is a string representation of the nodeID. Generally this is used for tree's whos node's unique key value is a string in instead 
+        /// The NodeKey is a string representation of the nodeID. Generally this is used for tree's whos node's unique key value is a string in instead
         /// of an integer such as folder names.
         /// </summary>
         public string NodeKey
@@ -153,16 +154,16 @@ namespace umbraco.cms.presentation.Trees
         #region ITree Members
 
         /// <summary>
-        /// The ID of the node to render. This is generally set before calling the render method of the tree. If it is not set then the 
+        /// The ID of the node to render. This is generally set before calling the render method of the tree. If it is not set then the
         /// StartNodeID property is used as the node ID to render.
         /// </summary>
-        public virtual int id 
-        { 
+        public virtual int id
+        {
             set { m_id = value; }
             get { return m_id; }
         }
-        public virtual string app 
-        { 
+        public virtual string app
+        {
             set { m_app = value; }
             get { return m_app; }
         }
@@ -187,10 +188,10 @@ namespace umbraco.cms.presentation.Trees
         protected XmlTreeNode m_initNode;
         private List<IAction> m_initActions = new List<IAction>();
         private List<IAction> m_allowedActions = new List<IAction>();
-        
+
         //these are the request parameters that can be specified.
         //since we want to remove the querystring/httpcontext dependency from
-        //our trees, we need to define these as properties.       
+        //our trees, we need to define these as properties.
         private bool m_showContextMenu = true;
         private bool m_isDialog = false;
         private TreeDialogModes m_dialogMode = TreeDialogModes.none;
@@ -206,7 +207,7 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         protected internal ServiceContext Services
         {
-            get { return ApplicationContext.Current.Services; }
+            get { return Current.Services; }
         }
 
         /// <summary>
@@ -220,7 +221,7 @@ namespace umbraco.cms.presentation.Trees
                 m_isInitialized = true;
 
                 CreateAllowedActions(); //first create the allowed actions
-                
+
                 //raise the event, allow developers to modify the collection
                 var nodeActions = new NodeActionsEventArgs(false, m_allowedActions);
                 OnNodeActionsCreated(nodeActions);
@@ -233,7 +234,7 @@ namespace umbraco.cms.presentation.Trees
                 m_initActions = rootActions.AllowedActions;
 
                 CreateRootNode(); //finally, create the root node itself
-            }            
+            }
         }
 
         /// <summary>
@@ -285,7 +286,7 @@ namespace umbraco.cms.presentation.Trees
             CreateAllowedActions(ref m_allowedActions);
         }
 
-		/// <summary>		
+		/// <summary>
 		/// A helper method to re-generate the root node for the current tree.
 		/// </summary>
 		/// <returns></returns>
@@ -342,7 +343,7 @@ namespace umbraco.cms.presentation.Trees
         {
 			// updated by NH to pass showcontextmenu, isdialog and dialogmode variables
 			TreeService treeSvc = new TreeService(id, TreeAlias, this.ShowContextMenu, this.IsDialog, this.DialogMode, "");
-			return treeSvc.GetServiceUrl();            
+			return treeSvc.GetServiceUrl();
         }
 
 		/// <summary>
@@ -399,10 +400,10 @@ namespace umbraco.cms.presentation.Trees
 			else
 				this.NodeKey = nodeId;
 
-			this.Render(ref xTree);            
+			this.Render(ref xTree);
 
 			return xTree.ToString();
-		} 
+		}
 
         /// <summary>
         /// Returns the default actions for a root node
@@ -425,12 +426,12 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public static string GetTreeHeader(string alias)
         {
-            string treeCaption = ApplicationContext.Current.Services.TextService.Localize(alias);
+            string treeCaption = Current.Services.TextService.Localize(alias);
             //this is a hack. the tree header title should be in the language files, however, if it is not, we're just
             //going to make it equal to what is specified in the db.
             if (treeCaption.Length > 0 && treeCaption.Substring(0, 1) == "[")
             {
-                var tree = ApplicationContext.Current.Services.ApplicationTreeService.GetByAlias(alias);
+                var tree = Current.Services.ApplicationTreeService.GetByAlias(alias);
                 if (tree != null)
                     return tree.Title.SplitPascalCasing().ToFirstUpperInvariant();
             }
@@ -439,10 +440,10 @@ namespace umbraco.cms.presentation.Trees
 
 
         #region Events
-        
+
         //These events are poorly designed because they cannot be implemented in the tree inheritance structure,
         //it would be up to the individual trees to ensure they launch the events which is not ideal.
-        //they are also named in appropriately in regards to standards and because everything is by ref, there is no need to 
+        //they are also named in appropriately in regards to standards and because everything is by ref, there is no need to
         //have 2 events, makes no difference if you want to modify the contents of the data.
         public delegate void BeforeNodeRenderEventHandler(ref XmlTree sender, ref XmlTreeNode node, EventArgs e);
         public delegate void AfterNodeRenderEventHandler(ref XmlTree sender, ref XmlTreeNode node, EventArgs e);
@@ -461,7 +462,7 @@ namespace umbraco.cms.presentation.Trees
             if (sender != null && node != null)
             {
                 if (BeforeNodeRender != null)
-                    BeforeNodeRender(ref sender, ref node, e);    
+                    BeforeNodeRender(ref sender, ref node, e);
             }
         }
 
@@ -544,7 +545,7 @@ namespace umbraco.cms.presentation.Trees
         //{
         //    TreeController.TreeNodesRendering += TreeController_TreeNodesRendering;
         //}
-        
+
         //static void TreeController_TreeNodesRendering(TreeController sender, TreeNodesRenderingEventArgs e)
         //{
         //    var baseTree = new NullTree("");
@@ -557,7 +558,7 @@ namespace umbraco.cms.presentation.Trees
         //        var xNode = XmlTreeNode.Create(baseTree);
         //        xNode.HasChildren = node.HasChildren;
         //        xNode.IconClass = node.Icon;
-        //        xNode.NodeID = node.NodeId;                
+        //        xNode.NodeID = node.NodeId;
         //        xNode.NodeType = sender.TreeAlias;
         //        xNode.Text = node.Title;
         //        xNode.TreeType = sender.TreeAlias;

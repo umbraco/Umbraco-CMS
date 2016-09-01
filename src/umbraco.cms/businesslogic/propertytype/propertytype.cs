@@ -10,7 +10,7 @@ using Umbraco.Core.Models;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-
+using Umbraco.Core.DependencyInjection;
 using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace umbraco.cms.businesslogic.propertytype
@@ -157,9 +157,9 @@ namespace umbraco.cms.businesslogic.propertytype
                         if (lang != null)
                         {
                             
-                            if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(_description.Substring(1, _description.Length - 1)))
+                            if (Current.Services.LocalizationService.DictionaryItemExists(_description.Substring(1, _description.Length - 1)))
                             {
-                                var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(_description.Substring(1, _description.Length - 1));
+                                var di = Current.Services.LocalizationService.GetDictionaryItemByKey(_description.Substring(1, _description.Length - 1));
                                 return di.GetTranslatedValue(lang.id);
                             }
                         }
@@ -225,9 +225,9 @@ namespace umbraco.cms.businesslogic.propertytype
                     if (lang != null)
                     {
                         
-                        if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(_name.Substring(1, _name.Length - 1)))
+                        if (Current.Services.LocalizationService.DictionaryItemExists(_name.Substring(1, _name.Length - 1)))
                         {
-                            var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(_name.Substring(1, _name.Length - 1));
+                            var di = Current.Services.LocalizationService.GetDictionaryItemByKey(_name.Substring(1, _name.Length - 1));
                             return di.GetTranslatedValue(lang.id);
                         }
                     }
@@ -394,24 +394,24 @@ namespace umbraco.cms.businesslogic.propertytype
         protected virtual void FlushCache()
         {
             // clear local cache
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(Id));
+            Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(Id));
 
             // clear cache in contentype
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + _contenttypeid);
+            Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + _contenttypeid);
 
             //Ensure that DocumentTypes are reloaded from db by clearing cache - this similar to the Save method on DocumentType.
             //NOTE Would be nice if we could clear cache by type instead of emptying the entire cache.
-            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContent>();
-            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContentType>();
-            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMedia>();
-            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMediaType>();
-            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMember>();
-            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMemberType>();
+            Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContent>();
+            Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContentType>();
+            Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMedia>();
+            Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMediaType>();
+            Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMember>();
+            Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMemberType>();
         }
 
         public static PropertyType GetPropertyType(int id)
         {
-            return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<PropertyType>(
+            return Current.ApplicationCache.RuntimeCache.GetCacheItem<PropertyType>(
                 GetCacheKey(id),
                 timeout:        TimeSpan.FromMinutes(30),
                 getCacheItem: () =>
@@ -429,7 +429,7 @@ namespace umbraco.cms.businesslogic.propertytype
 
         private void InvalidateCache()
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(Id));
+            Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(Id));
         }
 
         private static string GetCacheKey(int id)

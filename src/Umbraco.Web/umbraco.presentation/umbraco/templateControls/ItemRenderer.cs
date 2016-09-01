@@ -15,6 +15,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Web;
 
 namespace umbraco.presentation.templateControls
 {
@@ -79,7 +80,7 @@ namespace umbraco.presentation.templateControls
                 {
                     writer.Write(finalResult);
                 }
-                
+
             }
             catch (Exception renderException)
             {
@@ -118,7 +119,7 @@ namespace umbraco.presentation.templateControls
                     var c = Umbraco.Web.UmbracoContext.Current.ContentCache.GetById(tempNodeId.Value);
                     var itemPage = new page(c);
 
-                    tempElementContent = 
+                    tempElementContent =
                         new item(item.ContentItem, itemPage.Elements, item.LegacyAttributes).FieldContent;
                 }
             }
@@ -156,11 +157,11 @@ namespace umbraco.presentation.templateControls
         /// </summary>
         /// <param name="item">The item.</param>
         protected virtual void ParseMacros(Item item)
-        {  
+        {
             // do nothing if the macros have already been rendered
             if (item.Controls.Count > 0)
                 return;
-            
+
             var elementText = GetFieldContents(item);
 
             //Don't parse macros if there's a content item assigned since the content value
@@ -195,7 +196,7 @@ namespace umbraco.presentation.templateControls
                         });
                 }
             }
-            
+
         }
 
         /// <summary>
@@ -234,7 +235,7 @@ namespace umbraco.presentation.templateControls
                 using (var xslReader = new XmlTextReader(new StringReader(xslt)))
                 {
                     var transform = Umbraco.Web.Macros.XsltMacroEngine.GetXsltTransform(xslReader, false);
-                    return Umbraco.Web.Macros.XsltMacroEngine.ExecuteItemRenderer(ApplicationContext.Current.ProfilingLogger, transform, itemData);
+                    return Umbraco.Web.Macros.XsltMacroEngine.ExecuteItemRenderer(Current.ProfilingLogger, transform, itemData);
                 }
             }
             return itemData;

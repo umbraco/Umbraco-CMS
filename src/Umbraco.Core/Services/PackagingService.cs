@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -261,7 +262,7 @@ namespace Umbraco.Core.Services
                         {
 
                             //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
-                            var database = ApplicationContext.Current.DatabaseContext.Database;
+                            var database = Current.DatabaseContext.Database;
                             var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeDefinitionId });
 
                             var propertyValueList = new List<string>();

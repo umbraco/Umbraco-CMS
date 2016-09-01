@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -38,11 +39,11 @@ namespace umbraco.presentation.umbraco.dialogs
 
 		private void Page_Load(object sender, EventArgs e)
 		{
-			if (!IsPostBack) 
+			if (!IsPostBack)
 			{
 				submit.Text = Services.TextService.Localize("import");
 				import.Text = Services.TextService.Localize("import");
-			} 
+			}
 		}
 
 		#region Web Form Designer generated code
@@ -54,13 +55,13 @@ namespace umbraco.presentation.umbraco.dialogs
 			InitializeComponent();
 			base.OnInit(e);
 		}
-		
+
 		/// <summary>
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent()
-		{    
+		{
 			this.submit.Click += new System.EventHandler(this.submit_Click);
 			this.import.Click += new System.EventHandler(this.import_Click);
 			this.Load += new System.EventHandler(this.Page_Load);
@@ -76,7 +77,7 @@ namespace umbraco.presentation.umbraco.dialogs
 		    var userId = Security.GetUserId();
 
             var element = XElement.Parse(xd.InnerXml);
-		    var importContentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, userId);
+		    var importContentTypes = Current.Services.PackagingService.ImportContentTypes(element, userId);
 		    var contentType = importContentTypes.FirstOrDefault();
 		    if (contentType != null)
 		        dtNameConfirm.Text = contentType.Name;

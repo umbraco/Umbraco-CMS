@@ -10,8 +10,10 @@ using Examine.LuceneEngine.Providers;
 using Examine.Providers;
 using Lucene.Net.Search;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Plugins;
+using Umbraco.Core.Services;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -113,7 +115,7 @@ namespace Umbraco.Web.WebServices
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
-                
+
 
             if (query.IsNullOrWhiteSpace())
                 return LuceneSearchResults.Empty();
@@ -132,7 +134,7 @@ namespace Umbraco.Web.WebServices
                 }
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
-            throw new HttpResponseException(msg);            
+            throw new HttpResponseException(msg);
         }
 
         /// <summary>
@@ -178,7 +180,7 @@ namespace Umbraco.Web.WebServices
 
                 var cacheKey = "temp_indexing_op_" + indexer.Name;
                 //put temp val in cache which is used as a rudimentary way to know when the indexing is done
-                ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5), isSliding: false);
+                ApplicationCache.RuntimeCache.InsertCacheItem(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5), isSliding: false);
 
                 try
                 {
@@ -207,7 +209,7 @@ namespace Umbraco.Web.WebServices
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
 
             var cacheKey = "temp_indexing_op_" + indexer.Name;
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(cacheKey);
+            Current.ApplicationCache.RuntimeCache.ClearCacheItem(cacheKey);
         }
 
         /// <summary>
@@ -216,7 +218,7 @@ namespace Umbraco.Web.WebServices
         /// <param name="indexerName"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we 
+        /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
         /// have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
         /// </remarks>
         public ExamineIndexerModel PostCheckRebuildIndex(string indexerName)
@@ -226,10 +228,10 @@ namespace Umbraco.Web.WebServices
             if (msg.IsSuccessStatusCode)
             {
                 var cacheKey = "temp_indexing_op_" + indexerName;
-                var found = ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem(cacheKey);                
+                var found = ApplicationCache.RuntimeCache.GetCacheItem(cacheKey);
                 //if its still there then it's not done
                 return found != null
-                    ? null 
+                    ? null
                     : CreateModel(new KeyValuePair<string, IExamineIndexer>(indexerName, indexer));
             }
             throw new HttpResponseException(msg);
@@ -265,7 +267,7 @@ namespace Umbraco.Web.WebServices
                 //ignore these properties
                                   .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
                                   .OrderBy(x => x.Name);
-								  
+
             foreach (var p in props)
             {
                 var val = p.GetValue(indexer, null);
@@ -279,7 +281,7 @@ namespace Umbraco.Web.WebServices
 
             var luceneIndexer = indexer.Value as LuceneIndexer;
             if (luceneIndexer != null)
-            {                
+            {
                 indexerModel.IsLuceneIndex = true;
 
                 if (luceneIndexer.IndexExists())
@@ -330,11 +332,11 @@ namespace Umbraco.Web.WebServices
             indexer = null;
 
             if (ExamineManager.Instance.IndexProviders.ContainsKey(indexerName))
-            {                
+            {
                 //return Ok!
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-            
+
             var response = Request.CreateResponse(HttpStatusCode.BadRequest);
             response.Content = new StringContent(string.Format("No indexer found with name = {0}", indexerName));
             response.ReasonPhrase = "Indexer Not Found";

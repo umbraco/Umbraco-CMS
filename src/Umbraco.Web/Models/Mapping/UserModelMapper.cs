@@ -4,23 +4,30 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
-using umbraco;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Models.Mapping
 {
     internal class UserModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
+        private readonly ILocalizedTextService _textService;
+
+        public UserModelMapper(ILocalizedTextService textService)
+        {
+            _textService = textService;
+        }
+
+        public override void ConfigureMappings(IMapperConfiguration config)
         {
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
                 .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
                 .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
-                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
+                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(_textService)))
                 .ForMember(
                     detail => detail.EmailHash,
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
@@ -50,7 +57,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.StartContentNode, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaNode, opt => opt.MapFrom(user => user.StartMediaId))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
-                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
+                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(_textService)))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
             
         } 

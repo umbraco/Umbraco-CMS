@@ -44,25 +44,6 @@ namespace Umbraco.Core.Persistence
         private IQueryFactory _queryFactory;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
-        public bool Configured { get; private set; }
-        public ISqlSyntaxProvider SqlSyntax
-        {
-            get
-            {
-                EnsureConfigured();
-                return _sqlSyntax;
-            }
-        }
-
-        public IQueryFactory QueryFactory
-        {
-            get
-            {
-                EnsureConfigured();
-                return _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappers));
-            }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDatabaseFactory"/> with the default connection, and a logger.
         /// </summary>
@@ -100,8 +81,6 @@ namespace Umbraco.Core.Persistence
             _logger = logger;
             _umbracoDatabaseAccessor = umbracoDatabaseAccessor;
 
-            _logger.Debug<DefaultDatabaseFactory>("Created!");
-
             var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
             if (settings == null)
                 return; // not configured
@@ -111,7 +90,10 @@ namespace Umbraco.Core.Persistence
             var connectionString = settings.ConnectionString;
             var providerName = settings.ProviderName;
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
+            {
+                logger.Debug<DefaultDatabaseFactory>("Missing connection string or provider name, defer configuration.");
                 return; // not configured
+            }
 
             Configure(settings.ConnectionString, settings.ProviderName);
         }
@@ -138,19 +120,56 @@ namespace Umbraco.Core.Persistence
             _logger = logger;
             _umbracoDatabaseAccessor = umbracoDatabaseAccessor;
 
-            _logger.Debug<DefaultDatabaseFactory>("Created!");
-
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
+            {
+                logger.Debug<DefaultDatabaseFactory>("Missing connection string or provider name, defer configuration.");
                 return; // not configured
+            }
 
             Configure(connectionString, providerName);
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the database is configured (no connect test).
+        /// </summary>
+        /// <remarks></remarks>
+        public bool Configured { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether it is possible to connect to the database.
+        /// </summary>
+        public bool CanConnect => Configured && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
+
+        /// <summary>
+        /// Gets the database sql syntax provider.
+        /// </summary>
+        public ISqlSyntaxProvider SqlSyntax
+        {
+            get
+            {
+                EnsureConfigured();
+                return _sqlSyntax;
+            }
+        }
+
+        /// <summary>
+        /// Gets the database query factory.
+        /// </summary>
+        public IQueryFactory QueryFactory
+        {
+            get
+            {
+                EnsureConfigured();
+                return _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappers));
+            }
+        }
+
+        // will be configured by the database context
         public void Configure(string connectionString, string providerName)
         {
             using (new WriteLock(_lock))
             {
-                _logger.Debug<DefaultDatabaseFactory>("Configuring!");
+                _logger.Debug<DefaultDatabaseFactory>("Configuring.");
 
                 if (Configured) throw new InvalidOperationException("Already configured.");
 
@@ -186,9 +205,9 @@ namespace Umbraco.Core.Persistence
                     .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
                     .WithFluentConfig(config)); // with proper configuration
 
-                if (_databaseFactory == null) throw new NullReferenceException("The call to DatabaseFactory.Config yielded a null DatabaseFactory instance");
+                if (_databaseFactory == null) throw new NullReferenceException("The call to DatabaseFactory.Config yielded a null DatabaseFactory instance.");
 
-                _logger.Debug<DefaultDatabaseFactory>("Created _nonHttpInstance");
+                _logger.Debug<DefaultDatabaseFactory>("Configured.");
                 Configured = true;
             }
         }
@@ -208,12 +227,6 @@ namespace Umbraco.Core.Persistence
             // previously we'd try to return SqlServerSyntaxProvider by default but this is bad
             //provider = _syntaxProviders.FirstOrDefault(x => x.GetType() == typeof(SqlServerSyntaxProvider));
         }
-
-        /// <summary>
-        /// Gets a value indicating whether it is possible to connect to the database.
-        /// </summary>
-        /// <returns></returns>
-        public bool CanConnect => Configured && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
 
         private void EnsureConfigured()
         {

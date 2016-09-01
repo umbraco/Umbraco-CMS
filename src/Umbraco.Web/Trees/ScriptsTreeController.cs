@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -40,7 +39,7 @@ namespace Umbraco.Web.Trees
         {
             treeNode.Icon =
                 file.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase) ?
-                "icon-script" : 
+                "icon-script" :
                 "icon-code";
 
         }

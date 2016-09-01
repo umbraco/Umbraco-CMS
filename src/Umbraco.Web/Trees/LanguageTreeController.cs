@@ -1,13 +1,9 @@
 using System;
-using System.Data.SqlClient;
 using System.Globalization;
 using System.Net.Http.Formatting;
-using System.Web.Services.Description;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
-using umbraco.presentation.actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -63,15 +59,15 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
-            
+
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    //Since we haven't implemented anything for languages in angular, this needs to be converted to 
+                    //Since we haven't implemented anything for languages in angular, this needs to be converted to
                     //use the legacy format
                     .ConvertLegacyMenuItem(null, "initlanguages", queryStrings.GetValue<string>("application"));
-               
+
                 //refresh action
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
 
@@ -83,14 +79,14 @@ namespace Umbraco.Web.Trees
 
             //add delete option for all languages
             menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
-                //Since we haven't implemented anything for languages in angular, this needs to be converted to 
+                //Since we haven't implemented anything for languages in angular, this needs to be converted to
                 //use the legacy format
                 .ConvertLegacyMenuItem(new UmbracoEntity
                 {
                     Id = lang.Id,
                     Level = 1,
                     ParentId = -1,
-                    Name = lang.CultureInfo.DisplayName                    
+                    Name = lang.CultureInfo.DisplayName
                 }, "language", queryStrings.GetValue<string>("application"));
 
             return menu;
