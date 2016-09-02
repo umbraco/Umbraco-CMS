@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web.Hosting;
 using System.Web.Http;
 using System.Xml;
 using System.Collections.Generic;
@@ -25,7 +24,7 @@ namespace Umbraco.Web.Editors
         public IHttpActionResult GetEnableState()
         {
             var enabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
-            var admin = Umbraco.UmbracoContext.Security.CurrentUser.Id == 0; // fixme 
+            var admin = Umbraco.UmbracoContext.Security.CurrentUser.UserType.Alias == "admin"; // assuming this is what qualifies admins
             return Ok(new { enabled, admin });
         }
 
