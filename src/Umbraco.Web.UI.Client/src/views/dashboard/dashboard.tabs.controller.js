@@ -14,7 +14,40 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
         });
     };
 }
+
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
+
+
+function startUpDynamicContentController(dashboardResource, assetsService) {
+    var vm = this;
+    vm.loading = true;
+    vm.showDefault = false;
+    
+    //proxy remote css through the local server
+    assetsService.loadCss( dashboardResource.getRemoteDashboardCssUrl("content") );
+    dashboardResource.getRemoteDashboardContent("content").then(
+        function (data) {
+
+            vm.loading = false;
+
+            //test if we have received valid data
+            //we capture it like this, so we avoid UI errors - which automatically triggers ui based on http response code
+            if (data && data.sections) {
+                vm.dashboard = data;
+            } else{
+                vm.showDefault = true;
+            }
+
+        },
+
+        function (exception) {
+            console.error(exception);
+            vm.loading = false;
+            vm.showDefault = true;
+        });
+}
+
+angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
 
 
 function FormsController($scope, $route, $cookieStore, packageResource, localizationService) {
