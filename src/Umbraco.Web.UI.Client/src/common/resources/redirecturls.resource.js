@@ -41,13 +41,13 @@
                 'Failed to retrieve data for searching redirect urls');
         }
 
-        function isEnabled() {
+        function getEnableState() {
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "redirectUrlManagementApiBaseUrl",
-                        "IsEnabled")),
+                        "GetEnableState")),
                 'Failed to retrieve data to check if the 301 redirect is enabled');
         }
 
@@ -107,7 +107,7 @@
             searchRedirectUrls: searchRedirectUrls,
             deleteRedirectUrl: deleteRedirectUrl,
             toggleUrlTracker: toggleUrlTracker,
-            isEnabled: isEnabled
+            getEnableState: getEnableState
         };
 
         return resource;

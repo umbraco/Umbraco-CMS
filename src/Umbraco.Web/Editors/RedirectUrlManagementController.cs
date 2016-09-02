@@ -22,9 +22,11 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public bool IsEnabled()
+        public IHttpActionResult GetEnabledState()
         {
-            return UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
+            var enabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
+            var admin = Umbraco.UmbracoContext.Security.CurrentUser.Id == 0; // fixme 
+            return Ok(new { enabled, admin });
         }
 
         //add paging

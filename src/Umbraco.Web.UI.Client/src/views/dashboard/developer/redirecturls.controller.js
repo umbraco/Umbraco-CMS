@@ -14,7 +14,8 @@
         vm.dashboard = {
             searchTerm: "",
             loading: false,
-            urlTrackerDisabled: false
+            urlTrackerDisabled: false,
+            admin: false
         };
 
         vm.pagination = {
@@ -40,8 +41,9 @@
 
         function checkEnabled() {
             vm.dashboard.loading = true;
-            return redirectUrlsResource.isEnabled().then(function (response) {
-                vm.dashboard.urlTrackerDisabled = response !== "true";
+            return redirectUrlsResource.getEnableState().then(function (response) {
+                vm.dashboard.urlTrackerDisabled = response.enabled !== "true";
+                vm.dashboard.admin = response.admin;
                 vm.dashboard.loading = false;
             });
         }
