@@ -22,7 +22,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IHttpActionResult GetEnabledState()
+        public IHttpActionResult GetEnableState()
         {
             var enabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
             var admin = Umbraco.UmbracoContext.Security.CurrentUser.Id == 0; // fixme 

@@ -42,7 +42,7 @@
         function checkEnabled() {
             vm.dashboard.loading = true;
             return redirectUrlsResource.getEnableState().then(function (response) {
-                vm.dashboard.urlTrackerDisabled = response.enabled !== "true";
+                vm.dashboard.urlTrackerDisabled = response.enabled !== true;
                 vm.dashboard.admin = response.admin;
                 vm.dashboard.loading = false;
             });
