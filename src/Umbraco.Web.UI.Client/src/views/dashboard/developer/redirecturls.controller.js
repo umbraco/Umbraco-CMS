@@ -15,7 +15,7 @@
             searchTerm: "",
             loading: false,
             urlTrackerDisabled: false,
-            admin: false
+            userIsAdmin: false
         };
 
         vm.pagination = {
@@ -43,7 +43,7 @@
             vm.dashboard.loading = true;
             return redirectUrlsResource.getEnableState().then(function (response) {
                 vm.dashboard.urlTrackerDisabled = response.enabled !== true;
-                vm.dashboard.admin = response.admin;
+                vm.dashboard.userIsAdmin = response.userIsAdmin;
                 vm.dashboard.loading = false;
             });
         }
