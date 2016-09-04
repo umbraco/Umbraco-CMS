@@ -13,7 +13,7 @@
                     type="button"
                     class="umb-era-button umb-button--s"
                     ng-click="vm.disableUrlTracker()">
-                    <span>Disable URL Tracker</span>
+                    <span><localize key="redirectUrls_disableUrlTracker">Disable URL Tracker</localize></span>
                 </button>
 
                 <button
@@ -21,7 +21,7 @@
                     type="button"
                     class="umb-era-button umb-button--s -blue"
                     ng-click="vm.enableUrlTracker()">
-                    <span>Enable URL Tracker</span>
+                    <span><localize key="redirectUrls_enableUrlTracker">Enable URL Tracker</localize></span>
                 </button>
 
             </umb-editor-sub-header-section>
@@ -53,9 +53,9 @@
 
         <div class="umb-table-head">
             <div class="umb-table-row">
-                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b4">Original Url</div>
+                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b4"><localize key="redirectUrls_originalUrl">Original URL</localize></div>
                 <div class="umb-table-cell flx-s0 flx-g0" style="flex-basis: 20px;"></div>
-                <div class="umb-table-cell flx-s1 flx-g1 flx-b6">Redirected To</div>
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b6"><localize key="redirectUrls_redirectedTo">Redirected To</localize></div>
             </div>
         </div>
 
@@ -77,7 +77,7 @@
                         <a class="umb-table-body__link" href="{{redirectUrl.destinationUrl}}" target="_blank" title="{{redirectUrl.destinationUrl}}">{{redirectUrl.destinationUrl}}</a>
                     </div>
 
-                    <button type="button" class="umb-era-button -gray umb-button--s" ng-click="vm.removeRedirect(redirectUrl)">Remove</button>
+                    <button type="button" class="umb-era-button -gray umb-button--s" ng-click="vm.removeRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
                 </div>
 
             </div>
@@ -89,8 +89,8 @@
     <umb-empty-state
         ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length === 0 && !vm.dashboard.loading"
         position="center">
-        <div>No redirects have been made</div>
-        <small class="faded">When a published page gets renamed a redirect will automatically be made to the new page</small>
+        <div><localize key="redirectUrls_noRedirects">No redirects have been made</localize></div>
+        <small class="faded"><localize key="redirectUrls_noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page</localize></small>
     </umb-empty-state>
 
     <umb-empty-state
