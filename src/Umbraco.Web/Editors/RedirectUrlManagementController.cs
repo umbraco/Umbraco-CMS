@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Web.Hosting;
 using System.Web.Http;
 using System.Xml;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using umbraco.businesslogic.Exceptions;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -22,9 +24,11 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public bool IsEnabled()
+        public IHttpActionResult GetEnableState()
         {
-            return UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
+            var enabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
+            var userIsAdmin = Umbraco.UmbracoContext.Security.CurrentUser.IsAdmin();
+            return Ok(new { enabled, userIsAdmin });
         }
 
         //add paging
@@ -65,6 +69,15 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IHttpActionResult ToggleUrlTracker(bool disable)
         {
+            var userIsAdmin = Umbraco.UmbracoContext.Security.CurrentUser.IsAdmin();
+            if (userIsAdmin == false)
+            {
+                var errorMessage = string.Format("User of type {0} is not allowed to toggle the URL tracker", 
+                    Umbraco.UmbracoContext.Security.CurrentUser.UserType.Alias);
+                LogHelper.Debug<RedirectUrlManagementController>(errorMessage);
+                throw new UserAuthorizationException(errorMessage);
+            }
+
             var httpContext = TryGetHttpContext();
             if (httpContext.Success == false) throw new InvalidOperationException("Cannot acquire HttpContext");
             var configFilePath = httpContext.Result.Server.MapPath("~/config/umbracoSettings.config");
