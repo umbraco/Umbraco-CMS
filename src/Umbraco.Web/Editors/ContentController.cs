@@ -488,15 +488,18 @@ namespace Umbraco.Web.Editors
             try
             {
                 var contentService = Services.ContentService;
-                var content = new List<IContent>();
-                content.AddRange(Services.ContentService.GetByIds(sorted.IdSortOrder));
 
-                var sortedList = new List<int>(sorted.IdSortOrder);
-                var sortedContent = from o in sortedList
-                                    join con in content
-                                    on o equals con.Id
-                                    orderby sortedList.IndexOf(o)
-                                    select con;
+                // content service GetByIds does *not* order the content items
+                // so we need get them in the proper order here - no need to sort!
+                var content = contentService
+                    .GetByIds(sorted.IdSortOrder)
+                    .ToDictionary(x => x.Id, x => x);
+
+                var sortedContent = sorted.IdSortOrder.Select(x =>
+                {
+                    IContent c;
+                    return content.TryGetValue(x, out c) ? c : null;
+                }).WhereNotNull();
 
                 // Save content with new sort order and update content xml in db accordingly
                 if (contentService.Sort(sortedContent) == false)
