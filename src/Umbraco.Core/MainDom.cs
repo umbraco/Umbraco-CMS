@@ -25,7 +25,7 @@ namespace Umbraco.Core
         private readonly AsyncLock _asyncLock;
         private IDisposable _asyncLocker;
 
-        // event wait handle used to notify current main domain that it should 
+        // event wait handle used to notify current main domain that it should
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
 
@@ -52,10 +52,22 @@ namespace Umbraco.Core
             if (HostingEnvironment.ApplicationID != null)
                 appId = HostingEnvironment.ApplicationID.ReplaceNonAlphanumericChars(string.Empty);
 
-            var lockName = "UMBRACO-" + appId + "-MAINDOM-LCK";
+            // combining with the physical path because if running on eg IIS Express,
+            // two sites could have the same appId even though they are different.
+            //
+            // now what could still collide is... two sites, running in two different processes
+            // and having the same appId, and running on the same app physical path
+            //
+            // we *cannot* use the process ID here because when an AppPool restarts it is
+            // a new process for the same application path
+
+            var appPath = HostingEnvironment.ApplicationPhysicalPath;
+            var hash = (appId + ":::" + appPath).ToSHA1();
+
+            var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
             _asyncLock = new AsyncLock(lockName);
 
-            var eventName = "UMBRACO-" + appId + "-MAINDOM-EVT";
+            var eventName = "UMBRACO-" + hash + "-MAINDOM-EVT";
             _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
         }
 
@@ -109,7 +121,7 @@ namespace Umbraco.Core
                         _logger.Error<MainDom>("Error while running callback, remaining callbacks will not run.", e);
                         throw;
                     }
-                    
+
                 }
                 _logger.Debug<MainDom>("Stopped.");
             }
