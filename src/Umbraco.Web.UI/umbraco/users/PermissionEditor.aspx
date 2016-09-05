@@ -9,7 +9,6 @@
 	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="css/permissionsEditor.css" PathNameAlias="UmbracoRoot" />
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
 	<umb:JsInclude ID="JsInclude1"  runat="server" FilePath="PermissionsEditor.js" />
-	<umb:JsInclude ID="JsInclude2"  runat="server" FilePath="../lib/jquery-migrate/jquery-migrate.min.js" />	
 	
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
