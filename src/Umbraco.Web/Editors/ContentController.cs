@@ -467,7 +467,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Change the sort order for media
+        /// Change the sort order for content
         /// </summary>
         /// <param name="sorted"></param>
         /// <returns></returns>
@@ -485,23 +485,30 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            var contentService = Services.ContentService;
-            var sortedContent = new List<IContent>();
             try
             {
-                sortedContent.AddRange(Services.ContentService.GetByIds(sorted.IdSortOrder));
+                var contentService = Services.ContentService;
+                var content = new List<IContent>();
+                content.AddRange(Services.ContentService.GetByIds(sorted.IdSortOrder));
+
+                var sortedList = new List<int>(sorted.IdSortOrder);
+                var sortedContent = from o in sortedList
+                                    join con in content
+                                    on o equals con.Id
+                                    orderby sortedList.IndexOf(o)
+                                    select con;
 
                 // Save content with new sort order and update content xml in db accordingly
                 if (contentService.Sort(sortedContent) == false)
                 {
-                    LogHelper.Warn<MediaController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    LogHelper.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                LogHelper.Error<MediaController>("Could not update content sort order", ex);
+                LogHelper.Error<ContentController>("Could not update content sort order", ex);
                 throw;
             }
         }
