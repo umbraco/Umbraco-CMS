@@ -189,38 +189,38 @@
     <key alias="welcome">Welkom</key>
   </area>
   <area alias="prompt">
-    <key alias="stay">Stay</key>
-    <key alias="discardChanges">Discard changes</key>
-    <key alias="unsavedChanges">You have unsaved changes</key>
-    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="stay">Blijf op deze pagina</key>
+    <key alias="discardChanges">Negeer wijzigingen</key>
+    <key alias="unsavedChanges">Wijzigingen niet opgeslagen</key>
+    <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? - er zijn onopgeslagen wijzigingen</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
 
-    <key alias="deletedItem">Deleted %0% item</key>
-    <key alias="deletedItems">Deleted %0% items</key>
-    <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
-    <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
+    <key alias="deletedItem">%0% item verwijderd</key>
+    <key alias="deletedItems">%0% items verwijderd</key>
+    <key alias="deletedItemOfItem">Item %0% van de %1% verwijderd</key>
+    <key alias="deletedItemOfItems">Items %0% van de %1% verwijderd</key>
 
-    <key alias="publishedItem">Published %0% item</key>
-    <key alias="publishedItems">Published %0% items</key>
-    <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
-    <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
+    <key alias="publishedItem">%0% item gepubliceerd</key>
+    <key alias="publishedItems">%0% items gepubliceerd</key>
+    <key alias="publishedItemOfItem">Item %0% van de %1% gepubliceerd</key>
+    <key alias="publishedItemOfItems">Items %0% van de %1% gepubliceerd</key>
 
-    <key alias="unpublishedItem">Unpublished %0% item</key>
-    <key alias="unpublishedItems">Unpublished %0% items</key>
-    <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
-    <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
+    <key alias="unpublishedItem">%0% item gedepubliceerd</key>
+    <key alias="unpublishedItems">%0% items gedepubliceerd</key>
+    <key alias="unpublishedItemOfItem">Item %0% van de %1% gedepubliceerd</key>
+    <key alias="unpublishedItemOfItems">Items %0% van de %1% gedepubliceerd</key>
 
-    <key alias="movedItem">Moved %0% item</key>
-    <key alias="movedItems">Moved %0% items</key>
-    <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
-    <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
+    <key alias="movedItem">%0% item verplaatst</key>
+    <key alias="movedItems">%0% items verplaatst</key>
+    <key alias="movedItemOfItem">item %0% van de %1% verplaatst</key>
+    <key alias="movedItemOfItems">items %0% van de %1% verplaatst</key>
 
-    <key alias="copiedItem">Copied %0% item</key>
-    <key alias="copiedItems">Copied %0% items</key>
-    <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
-    <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
+    <key alias="copiedItem">%0% item gekopieerd</key>
+    <key alias="copiedItems">%0% items gekopieerd</key>
+    <key alias="copiedItemOfItem">item %0% van de %1% gekopieerd</key>
+    <key alias="copiedItemOfItems">item %0% van de %1% gekopieerd</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Naam</key>
@@ -431,7 +431,7 @@
     <key alias="showPageOnSend">Toon pagina bij versturen</key>
     <key alias="size">Formaat</key>
     <key alias="sort">Sorteren</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Verstuur</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type om te zoeken...</key>
     <key alias="up">Omhoog</key>
@@ -447,8 +447,8 @@
     <key alias="width">Breedte</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Map</key>
-    <key alias="reorder">Reorder</key>
-    <key alias="reorderDone">I am done reordering</key>
+    <key alias="reorder">Herschikken</key>
+    <key alias="reorderDone">Klaar met herschikken</key>
 
     <key alias="searchResults">Zoekresultaten</key>
   </area>
@@ -846,15 +846,15 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="grid">
     <key alias="insertControl">Item toevoegen</key>
-    <key alias="chooseLayout">Choose a layout</key>
-    <key alias="addRows">Een rij aan de lay-out toevoegen</key>
-    <key alias="addElement"><![CDATA[Klik om te starten op het <i class="icon icon-add blue"></i> teken onderaan en voeg je eerste item toe]]></key>
+    <key alias="chooseLayout">Kies de indeling</key>
+    <key alias="addRows">Kies een indeling voor deze pagina om content toe te kunnen voegen</key>
+    <key alias="addElement"><![CDATA[<i class="icon icon-add blue"></i> Plaats een (extra) content blok]]></key>
     <key alias="dropElement">Drop content</key>
-    <key alias="settingsApplied">Settings applied</key>
+    <key alias="settingsApplied">Instellingen toegepast</key>
 
-    <key alias="contentNotAllowed">This content is not allowed here</key>
-    <key alias="contentAllowed">This content is allowed here</key>
-
+    <key alias="contentNotAllowed">Deze content is hier niet toegestaan</key>
+    <key alias="contentAllowed">Deze content is hier toegestaan</key>
+      
     <key alias="clickToEmbed">Klik om een item te embedden</key>
     <key alias="clickToInsertImage">Klik om een afbeelding in te voegen</key>
     <key alias="placeholderImageCaption">Afbeelding ondertitel...</key>
