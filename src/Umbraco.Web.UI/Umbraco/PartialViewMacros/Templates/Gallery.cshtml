@@ -43,8 +43,8 @@
 @helper Render(dynamic item)
 {
     <li class="span2">
-        <a href="@item.umbracoFile" class="thumbnail">
-            <img src="@item.umbracoFile" alt="@item.Name" />
+        <a href="@item.umbracoFile.src" class="thumbnail">
+            <img src="@item.umbracoFile.src" alt="@item.Name" />
         </a>
     </li>
 }

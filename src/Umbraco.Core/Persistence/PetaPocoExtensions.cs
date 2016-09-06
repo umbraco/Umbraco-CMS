@@ -203,7 +203,8 @@ namespace Umbraco.Core.Persistence
             {
                 //if it is sql ce or it is a sql server version less than 2008, we need to do individual inserts.
                 var sqlServerSyntax = SqlSyntaxContext.SqlSyntaxProvider as SqlServerSyntaxProvider;
-                if ((sqlServerSyntax != null && (int)sqlServerSyntax.VersionName.Value < (int)SqlServerVersionName.V2008) 
+
+                if ((sqlServerSyntax != null && (int)sqlServerSyntax.GetVersionName(db) < (int)SqlServerVersionName.V2008) 
                     || SqlSyntaxContext.SqlSyntaxProvider is SqlCeSyntaxProvider)
                 {
                     //SqlCe doesn't support bulk insert statements!

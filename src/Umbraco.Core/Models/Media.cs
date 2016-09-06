@@ -118,17 +118,5 @@ namespace Umbraco.Core.Models
             //The Media Recycle Bin Id is -21 so we correct that here
             ParentId = parentId == -20 ? -21 : parentId;
         }
-
-        /// <summary>
-        /// Method to call when Entity is being saved
-        /// </summary>
-        /// <remarks>Created date is set and a Unique key is assigned</remarks>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            if (Key == Guid.Empty)
-                Key = Guid.NewGuid();
-        }
     }
 }

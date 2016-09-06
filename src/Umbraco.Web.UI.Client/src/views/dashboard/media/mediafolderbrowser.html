@@ -1,5 +1,3 @@
 <div ng-controller="Umbraco.Dashboard.MediaFolderBrowserDashboardController">
-    <umb-image-folder node-id="{{nodeId}}"
-                      on-upload-complete="onUploadComplete"></umb-image-folder>
+	<umb-editor ng-if="fakeProperty" model="fakeProperty"></umb-editor>
 </div>
-

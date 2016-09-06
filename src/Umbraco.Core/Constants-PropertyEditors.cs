@@ -11,7 +11,7 @@ namespace Umbraco.Core
         {
             /// <summary>
             /// Used to prefix generic properties that are internal content properties
-            /// </summary>            
+            /// </summary>
             public const string InternalGenericPropertiesPrefix = "_umb_";
 
             /// <summary>
@@ -74,7 +74,7 @@ namespace Umbraco.Core
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string DictionaryPicker = "17B70066-F764-407D-AB05-3717F1E1C513";
-            
+
             /// <summary>
             /// Guid for the Dropdown list datatype.
             /// </summary>
@@ -157,6 +157,11 @@ namespace Umbraco.Core
             /// Alias for the Integer datatype.
             /// </summary>
             public const string IntegerAlias = "Umbraco.Integer";
+
+            /// <summary>
+            /// Alias for the Decimal datatype.
+            /// </summary>
+            public const string DecimalAlias = "Umbraco.Decimal";
 
             /// <summary>
             /// Alias for the listview datatype.
@@ -310,13 +315,13 @@ namespace Umbraco.Core
             public const string TextboxAlias = "Umbraco.Textbox";
 
             /// <summary>
-            /// Guid for the Textbox multiple datatype.
+            /// Guid for the Textarea datatype.
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string TextboxMultiple = "67DB8357-EF57-493E-91AC-936D305E0F2A";
 
             /// <summary>
-            /// Alias for the Textbox multiple datatype.
+            /// Alias for the Textarea datatype.
             /// </summary>
             public const string TextboxMultipleAlias = "Umbraco.TextboxMultiple";
 
@@ -347,7 +352,7 @@ namespace Umbraco.Core
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string UltimatePicker = "CDBF0B5D-5CB2-445F-BC12-FCAAEC07CF2C";
-            
+
             /// <summary>
             /// Guid for the UltraSimpleEditor datatype.
             /// </summary>
@@ -364,7 +369,7 @@ namespace Umbraco.Core
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string UmbracoUserControlWrapper = "D15E1281-E456-4B24-AA86-1DDA3E4299D5";
-            
+
             /// <summary>
             /// Guid for the Upload field datatype.
             /// </summary>
@@ -414,6 +419,15 @@ namespace Umbraco.Core
             /// Alias for the email address property editor
             /// </summary>
             public const string EmailAddressAlias = "Umbraco.EmailAddress";
+
+            public static class PreValueKeys
+            {
+                /// <summary>
+                /// Pre-value name used to indicate a field that can be used to override the database field to which data for the associated
+                /// property is saved
+                /// </summary>
+                public const string DataValueType = "umbracoDataValueType";
+            }
         }
 	}
 }

@@ -22,7 +22,7 @@ namespace Umbraco.Core
 
     /// <summary>
     /// A utility class to find all classes of a certain type by reflection in the current bin folder
-    /// of the web application. 
+    /// of the web application.
     /// </summary>
     public static class TypeFinder
     {
@@ -34,7 +34,7 @@ namespace Umbraco.Core
         /// This is a modified version of: http://www.dominicpettifer.co.uk/Blog/44/how-to-get-a-reference-to-all-assemblies-in-the--bin-folder
         /// </summary>
         /// <remarks>
-        /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been 
+        /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been
         /// loaded in the CLR, not all assemblies.
         /// See these threads:
         /// http://issues.umbraco.org/issue/U5-198
@@ -136,7 +136,7 @@ namespace Umbraco.Core
         });
 
         /// <summary>
-        /// Return a list of found local Assemblies excluding the known assemblies we don't want to scan 
+        /// Return a list of found local Assemblies excluding the known assemblies we don't want to scan
         /// and exluding the ones passed in and excluding the exclusion list filter, the results of this are
         /// cached for perforance reasons.
         /// </summary>
@@ -190,6 +190,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <remarks>
         /// NOTE the comma vs period... comma delimits the name in an Assembly FullName property so if it ends with comma then its an exact name match
+        /// NOTE this means that "foo." will NOT exclude "foo.dll" but only "foo.*.dll"
         /// </remarks>
         internal static readonly string[] KnownAssemblyExclusionFilter = new[]
                 {
@@ -214,7 +215,7 @@ namespace Umbraco.Core
                     "RouteDebugger,",
                     "SqlCE4Umbraco,",
                     "umbraco.datalayer,",
-                    "umbraco.interfaces,",										
+                    "umbraco.interfaces,",
 					//"umbraco.providers,",
 					//"Umbraco.Web.UI,",
                     "umbraco.webservices",
@@ -230,9 +231,9 @@ namespace Umbraco.Core
                     "AutoMapper,",
                     "AutoMapper.",
                     "AzureDirectory,",
-                    "itextsharp,",            
+                    "itextsharp,",
                     "UrlRewritingNet.",
-                    "HtmlAgilityPack,",                 
+                    "HtmlAgilityPack,",
                     "MiniProfiler,",
                     "Moq,",
                     "nunit.framework,",
@@ -371,7 +372,7 @@ namespace Umbraco.Core
 
             var assemblyList = assemblies.ToArray();
 
-            //find all assembly references that are referencing the attribute type's assembly since we 
+            //find all assembly references that are referencing the attribute type's assembly since we
             //should only be scanning those assemblies because any other assembly will definitely not
             //contain a class that has this attribute.
             var referencedAssemblies = TypeHelper.GetReferencedAssemblies(attributeType, assemblyList);
@@ -418,7 +419,7 @@ namespace Umbraco.Core
                 foreach (var subTypesInAssembly in allAttributeTypes.GroupBy(x => x.Assembly))
                 {
 
-                    //So that we are not scanning too much, we need to group the sub types:    
+                    //So that we are not scanning too much, we need to group the sub types:
                     // * if there is more than 1 sub type in the same assembly then we should only search on the 'lowest base' type.
                     // * We should also not search for sub types if the type is sealed since you cannot inherit from a sealed class
                     // * We should not search for sub types if the type is static since you cannot inherit from them.
@@ -489,7 +490,7 @@ namespace Umbraco.Core
 
         /// <summary>
         /// Finds types that are assignable from the assignTypeFrom parameter and will scan for these types in the assembly
-        /// list passed in, however we will only scan assemblies that have a reference to the assignTypeFrom Type or any type 
+        /// list passed in, however we will only scan assemblies that have a reference to the assignTypeFrom Type or any type
         /// deriving from the base type.
         /// </summary>
         /// <param name="assignTypeFrom"></param>
@@ -513,7 +514,7 @@ namespace Umbraco.Core
 
             var assemblyList = assemblies.ToArray();
 
-            //find all assembly references that are referencing the current type's assembly since we 
+            //find all assembly references that are referencing the current type's assembly since we
             //should only be scanning those assemblies because any other assembly will definitely not
             //contain sub type's of the one we're currently looking for
             var referencedAssemblies = TypeHelper.GetReferencedAssemblies(assignTypeFrom, assemblyList);
@@ -560,7 +561,7 @@ namespace Umbraco.Core
                 foreach (var subTypesInAssembly in allSubTypes.GroupBy(x => x.Assembly))
                 {
 
-                    //So that we are not scanning too much, we need to group the sub types:    
+                    //So that we are not scanning too much, we need to group the sub types:
                     // * if there is more than 1 sub type in the same assembly then we should only search on the 'lowest base' type.
                     // * We should also not search for sub types if the type is sealed since you cannot inherit from a sealed class
                     // * We should not search for sub types if the type is static since you cannot inherit from them.
@@ -602,46 +603,82 @@ namespace Umbraco.Core
             return foundAssignableTypes;
         }
 
-        private static IEnumerable<Type> GetTypesWithFormattedException(Assembly a)
+        internal static IEnumerable<Type> GetTypesWithFormattedException(Assembly a)
         {
             //if the assembly is dynamic, do not try to scan it
             if (a.IsDynamic)
                 return Enumerable.Empty<Type>();
 
+            var getAll = a.GetCustomAttribute<AllowPartiallyTrustedCallersAttribute>() == null;
+
             try
             {
                 //we need to detect if an assembly is partially trusted, if so we cannot go interrogating all of it's types
                 //only its exported types, otherwise we'll get exceptions.
-                if (a.GetCustomAttribute<AllowPartiallyTrustedCallersAttribute>() == null)
-                {
-                    return a.GetTypes();
-                }
-                else
-                {
-                    return a.GetExportedTypes();
-                }
+                return getAll ? a.GetTypes() : a.GetExportedTypes();
             }
-            catch (ReflectionTypeLoadException ex)
+            catch (TypeLoadException ex) // GetExportedTypes *can* throw TypeLoadException!
             {
                 var sb = new StringBuilder();
-                sb.AppendLine("Could not load types from assembly " + a.FullName + ", errors:");
-                foreach (var loaderException in ex.LoaderExceptions.WhereNotNull())
-                {
-                    sb.AppendLine("Exception: " + loaderException);
-                }
-                throw new ReflectionTypeLoadException(ex.Types, ex.LoaderExceptions, sb.ToString());
+                AppendCouldNotLoad(sb, a, getAll);
+                AppendLoaderException(sb, ex);
+
+                // rethrow as ReflectionTypeLoadException (for consistency) with new message
+                throw new ReflectionTypeLoadException(new Type[0], new Exception[] { ex }, sb.ToString());
             }
+            catch (ReflectionTypeLoadException rex) // GetTypes throws ReflectionTypeLoadException
+            {
+                var sb = new StringBuilder();
+                AppendCouldNotLoad(sb, a, getAll);
+                foreach (var loaderException in rex.LoaderExceptions.WhereNotNull())
+                    AppendLoaderException(sb, loaderException);
+
+                // rethrow with new message
+                throw new ReflectionTypeLoadException(rex.Types, rex.LoaderExceptions, sb.ToString());
+            }
+        }
+
+        private static void AppendCouldNotLoad(StringBuilder sb, Assembly a, bool getAll)
+        {
+            sb.Append("Could not load ");
+            sb.Append(getAll ? "all" : "exported");
+            sb.Append(" types from \"");
+            sb.Append(a.FullName);
+            sb.AppendLine("\" due to LoaderExceptions, skipping:");
+        }
+
+        private static void AppendLoaderException(StringBuilder sb, Exception loaderException)
+        {
+            sb.Append(". ");
+            sb.Append(loaderException.GetType().FullName);
+
+            var tloadex = loaderException as TypeLoadException;
+            if (tloadex != null)
+            {
+                sb.Append(" on ");
+                sb.Append(tloadex.TypeName);
+            }
+
+            sb.Append(": ");
+            sb.Append(loaderException.Message);
+            sb.AppendLine();
         }
 
         #endregion
 
-        //TODO: This isn't very elegant, and will have issues since the AppDomain.CurrentDomain
-        // doesn't actualy load in all assemblies, only the types that have been referenced so far.
-        // However, in a web context, the BuildManager will have executed which will force all assemblies
-        // to be loaded so it's fine for now.
+
         public static Type GetTypeByName(string typeName)
         {
-            var type = Type.GetType(typeName);
+            var type = BuildManager.GetType(typeName, false);
+            if (type != null) return type;
+
+            //TODO: This isn't very elegant, and will have issues since the AppDomain.CurrentDomain
+            // doesn't actualy load in all assemblies, only the types that have been referenced so far.
+            // However, in a web context, the BuildManager will have executed which will force all assemblies
+            // to be loaded so it's fine for now.
+
+            //now try fall back procedures.
+            type = Type.GetType(typeName);
             if (type != null) return type;
             return AppDomain.CurrentDomain.GetAssemblies()
                 .Select(x => x.GetType(typeName))

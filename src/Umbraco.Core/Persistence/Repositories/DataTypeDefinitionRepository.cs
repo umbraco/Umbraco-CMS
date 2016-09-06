@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -24,17 +26,15 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
-        private readonly CacheHelper _cacheHelper;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax,
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax,
             IContentTypeRepository contentTypeRepository)
             : base(work, cache, logger, sqlSyntax)
         {
-            _cacheHelper = cacheHelper;
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);            
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -116,9 +116,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<DataTypeDto>()
-               .InnerJoin<NodeDto>()
-               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
+               .From<DataTypeDto>(SqlSyntax)
+               .InnerJoin<NodeDto>(SqlSyntax)
+               .On<DataTypeDto, NodeDto>(SqlSyntax, left => left.DataTypeId, right => right.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
@@ -146,6 +146,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((DataTypeDefinition)entity).AddingEntity();
 
+            //ensure a datatype has a unique name before creating it
+            entity.Name = EnsureUniqueNodeName(entity.Name);
+
+            //TODO: should the below be removed?
             //Cannot add a duplicate data type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
@@ -191,6 +195,8 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
         protected override void PersistUpdatedItem(IDataTypeDefinition entity)
         {
 
+            entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id);
+
             //Cannot change to a duplicate alias
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
@@ -231,7 +237,7 @@ AND umbracoNode.id <> @id",
 
             //NOTE: This is a special case, we need to clear the custom cache for pre-values here so they are not stale if devs
             // are querying for them in the Saved event (before the distributed call cache is clearing it)
-            _cacheHelper.RuntimeCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
+            RuntimeCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
 
             entity.ResetDirtyProperties();
         }
@@ -270,7 +276,7 @@ AND umbracoNode.id <> @id",
 
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
-            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
+            var cached = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
             if (cached != null && cached.Any())
             {
                 //return from the cache, ensure it's a cloned result
@@ -289,7 +295,7 @@ AND umbracoNode.id <> @id",
         {
             //We need to see if we can find the cached PreValueCollection based on the cache key above
 
-            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
+            var cached = RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
             if (cached != null && cached.Any())
             {
                 //return from the cache
@@ -323,6 +329,55 @@ AND umbracoNode.id <> @id",
             AddOrUpdatePreValues(dtd, values);
         }
 
+        public IEnumerable<MoveEventInfo<IDataTypeDefinition>> Move(IDataTypeDefinition toMove, EntityContainer container)
+        {
+            var parentId = -1;
+            if (container != null)
+            {
+                // Check on paths
+                if ((string.Format(",{0},", container.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
+                {
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath);
+                }
+                parentId = container.Id;
+            }
+
+            //used to track all the moved entities to be given to the event
+            var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>
+            {
+                new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)
+            };
+
+            var origPath = toMove.Path;
+
+            //do the move to a new parent
+            toMove.ParentId = parentId;
+
+            //set the updated path
+            toMove.Path = string.Concat(container == null ? parentId.ToInvariantString() : container.Path, ",", toMove.Id);
+
+            //schedule it for updating in the transaction
+            AddOrUpdate(toMove);
+
+            //update all descendants from the original path, update in order of level
+            var descendants = this.GetByQuery(
+                new Query<IDataTypeDefinition>().Where(type => type.Path.StartsWith(origPath + ",")));
+
+            var lastParent = toMove;
+            foreach (var descendant in descendants.OrderBy(x => x.Level))
+            {
+                moveInfo.Add(new MoveEventInfo<IDataTypeDefinition>(descendant, descendant.Path, descendant.ParentId));
+
+                descendant.ParentId = lastParent.Id;
+                descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
+
+                //schedule it for updating in the transaction
+                AddOrUpdate(descendant);
+            }
+
+            return moveInfo;
+        }
+
         public void AddOrUpdatePreValues(IDataTypeDefinition dataType, IDictionary<string, PreValue> values)
         {
             var currentVals = new DataTypePreValueDto[] { };
@@ -330,9 +385,9 @@ AND umbracoNode.id <> @id",
             {
                 //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
                 var sql = new Sql().Select("*")
-                                   .From<DataTypePreValueDto>()
+                                   .From<DataTypePreValueDto>(SqlSyntax)
                                    .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
-                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
+                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder, SqlSyntax);
                 currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 
@@ -408,13 +463,44 @@ AND umbracoNode.id <> @id",
                       + string.Join(",", collection.FormatAsDictionary().Select(x => x.Value.Id).ToArray());
 
             //store into cache
-            _cacheHelper.RuntimeCache.InsertCacheItem(key, () => collection,
+            RuntimeCache.InsertCacheItem(key, () => collection,
                 //30 mins
                 new TimeSpan(0, 0, 30),
                 //sliding is true
                 true);
 
             return collection;
+        }
+
+        private string EnsureUniqueNodeName(string nodeName, int id = 0)
+        {
+         
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<NodeDto>(SqlSyntax)
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
+
+            int uniqueNumber = 1;
+            var currentName = nodeName;
+
+            var dtos = Database.Fetch<NodeDto>(sql);
+            if (dtos.Any())
+            {
+                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
+                foreach (var dto in results)
+                {
+                    if (id != 0 && id == dto.NodeId) continue;
+
+                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
+                    {
+                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
+                        uniqueNumber++;
+                    }
+                }
+            }
+
+            return currentName;
         }
 
         /// <summary>
@@ -527,6 +613,8 @@ AND umbracoNode.id <> @id",
                 };
                 Database.Update(dto);
             }
+
+            
         }
 
         internal static class PreValueConverter

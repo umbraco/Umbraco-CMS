@@ -1,64 +1,75 @@
-﻿<form novalidate name="contentForm" 
-      ng-controller="Umbraco.Editors.Media.EditController" 
-      ng-show="loaded" 
+<div ng-controller="Umbraco.Editors.Media.EditController">
+
+   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+
+   <form novalidate name="contentForm"
       ng-submit="save()"
       val-form-manager>
-    <umb-panel umb-tabs ng-class="{'editor-breadcrumb': ancestors && ancestors.length > 0}">
-        <umb-header tabs="content.tabs">
 
-            <div class="span7">
-                <umb-content-name placeholder="@placeholders_entername"
-                                  ng-model="content.name" />
-            </div>
+      <umb-editor-view ng-if="!page.loading" umb-tabs>
 
-            <div class="span5">
-                <div class="btn-toolbar pull-right umb-btn-toolbar">
-                    <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">
-                        <p class="btn btn-link umb-status-label">{{formStatus}}</p>
-                    </div>
+         <umb-editor-header
+            name="content.name"
+            tabs="content.tabs"
+            menu="page.menu"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
+         </umb-editor-header>
 
-                    <umb-options-menu ng-show="currentNode"
-                                      current-node="currentNode"
-                                      current-section="{{currentSection}}">
-                    </umb-options-menu>
-                </div>
-            </div>
-        </umb-header>
+         <umb-editor-container>
 
-        <umb-tab-view>
-            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
+            <umb-tabs-content view="true" class="form-horizontal">
+               <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
 
-                <div class="umb-pane">
-                    <umb-property property="property"
-                                  ng-repeat="property in tab.properties">
+                  <umb-property property="property" ng-repeat="property in tab.properties">
+                     <umb-editor model="property"></umb-editor>
+                  </umb-property>
 
-                        <umb-editor model="property"></umb-editor>
-                    </umb-property>
+               </umb-tab>
+            </umb-tabs-content>
 
-                    <div class="umb-tab-buttons" detect-fold ng-class="{'umb-dimmed': busy}">
+         </umb-editor-container>
 
-                        <div class="btn-group" ng-show="listViewPath">
-                            <a class="btn" href="#{{listViewPath}}">
-                                <localize key="buttons_returnToList">Return to list</localize>
-                            </a>
-                        </div>
+         <umb-editor-footer>
 
-                        <div class="btn-group">
-                            <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                                <localize key="buttons_save">Save</localize>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <umb-editor-footer-content-left>
 
-            </umb-tab>
-        </umb-tab-view>
+               <umb-breadcrumbs
+                  ng-if="ancestors && ancestors.length > 0"
+                  ancestors="ancestors"
+                  entity-type="media">
+               </umb-breadcrumbs>
 
-        <ul class="umb-panel-footer-nav nav nav-pills" ng-if="ancestors && ancestors.length > 0">
-            <li ng-repeat="ancestor in ancestors">
-                <a href="#/media/media/edit/{{ancestor.id}}">{{ancestor.name}}</a>
-            </li>
-            <li></li>
-        </ul>
-    </umb-panel>
-</form>
+            </umb-editor-footer-content-left>
+
+
+            <umb-editor-footer-content-right>
+
+               <umb-button
+                  ng-if="page.listViewPath"
+                  type="link"
+                  href="#{{page.listViewPath}}"
+                  label="Return to list"
+                  label-key="buttons_returnToList">
+               </umb-button>
+
+               <umb-button
+                  type="submit"
+                  label="Save"
+                  label-key="buttons_save"
+                  button-style="success"
+                  shortcut="ctrl+s"
+                  state="page.saveButtonState">
+               </umb-button>
+
+            </umb-editor-footer-content-right>
+
+
+         </umb-editor-footer>
+
+
+      </umb-editor-view>
+
+   </form>
+<div>

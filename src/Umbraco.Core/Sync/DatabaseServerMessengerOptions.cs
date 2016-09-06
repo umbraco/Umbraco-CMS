@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Core.Sync
-{
+{   
     /// <summary>
     /// Provides options to the <see cref="DatabaseServerMessenger"/>.
     /// </summary>
@@ -14,8 +14,15 @@ namespace Umbraco.Core.Sync
         public DatabaseServerMessengerOptions()
         {
             DaysToRetainInstructions = 2; // 2 days
-            ThrottleSeconds = 5; // 5 seconds
+            ThrottleSeconds = 5; // 5 second
+            MaxProcessingInstructionCount = 1000;
+            PruneThrottleSeconds = 60; // 1 minute
         }
+
+        /// <summary>
+        /// The maximum number of instructions that can be processed at startup; otherwise the server cold-boots (rebuilds its caches).
+        /// </summary>
+        public int MaxProcessingInstructionCount { get; set; }
 
         /// <summary>
         /// A list of callbacks that will be invoked if the lastsynced.txt file does not exist.
@@ -35,5 +42,10 @@ namespace Umbraco.Core.Sync
         /// The number of seconds to wait between each sync operations.
         /// </summary>
         public int ThrottleSeconds { get; set; }
+
+        /// <summary>
+        /// The number of seconds to wait between each prune operations.
+        /// </summary>
+        public int PruneThrottleSeconds { get; set; }
     }
 }

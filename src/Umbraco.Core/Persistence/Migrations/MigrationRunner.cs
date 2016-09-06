@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,18 +28,21 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly IMigration[] _migrations;
 
         [Obsolete("Use the ctor that specifies all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationRunner(Version currentVersion, Version targetVersion, string productName)
             : this(LoggerResolver.Current.Logger, currentVersion, targetVersion, productName)
         {
         }
 
         [Obsolete("Use the ctor that specifies all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName)
             : this(logger, currentVersion, targetVersion, productName, null)
         {
         }
 
         [Obsolete("Use the ctor that specifies all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
             : this(ApplicationContext.Current.Services.MigrationEntryService, logger, new SemVersion(currentVersion), new SemVersion(targetVersion), productName, migrations)
         {
@@ -59,7 +63,7 @@ namespace Umbraco.Core.Persistence.Migrations
             _targetVersion = targetVersion;
             _productName = productName;
             //ensure this is null if there aren't any
-            _migrations = migrations.Length == 0 ? null : migrations;
+            _migrations = migrations == null || migrations.Length == 0 ? null : migrations;
         }
 
         /// <summary>
@@ -92,7 +96,7 @@ namespace Umbraco.Core.Persistence.Migrations
                                  : OrderedDowngradeMigrations(foundMigrations).ToList();
 
             
-            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, true), this))
+            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, _productName, true), this))
             {
                 _logger.Warn<MigrationRunner>("Migration was cancelled by an event");
                 return false;
@@ -121,7 +125,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 throw;
             }
 
-            Migrated.RaiseEvent(new MigrationEventArgs(migrations, migrationContext, _currentVersion, _targetVersion, false), this);
+            Migrated.RaiseEvent(new MigrationEventArgs(migrations, migrationContext, _currentVersion, _targetVersion, _productName, false), this);
 
             return true;
         }
@@ -289,7 +293,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 //NOTE: We CANNOT do this as part of the transaction!!! This is because when upgrading to 7.3, we cannot
                 // create the migrations table and then add data to it in the same transaction without issuing things like GO
                 // commands and since we need to support all Dbs, we need to just do this after the fact.
-                var exists = _migrationEntryService.FindEntry(GlobalSettings.UmbracoMigrationName, _targetVersion);
+                var exists = _migrationEntryService.FindEntry(_productName, _targetVersion);
                 if (exists == null)
                 {
                     _migrationEntryService.CreateEntry(_productName, _targetVersion);    

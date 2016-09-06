@@ -19,7 +19,11 @@ namespace Umbraco.Web.WebServices
         public JsonResult Index()
         {
             if (_isPublishingRunning)
+            {
+                Logger.Debug<ScheduledPublishController>(() => "Scheduled publishing is currently executing this request will exit");
                 return null;
+            }
+                
             _isPublishingRunning = true;
 
             try
@@ -28,7 +32,8 @@ namespace Umbraco.Web.WebServices
                 if (content.Instance.isInitializing == false)
                 {
                     var publisher = new ScheduledPublisher(Services.ContentService);
-                    publisher.CheckPendingAndProcess();
+                    var count = publisher.CheckPendingAndProcess();
+                    Logger.Debug<ScheduledPublishController>(() => string.Format("The scheduler processed {0} items", count));
                 }
 
                 return Json(new

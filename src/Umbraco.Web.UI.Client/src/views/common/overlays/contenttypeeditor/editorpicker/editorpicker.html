@@ -1,0 +1,117 @@
+<div class="umb-overlay-body" ng-controller="Umbraco.Overlays.EditorPickerOverlay as vm">
+
+	<!-- FILTER -->
+	<div class="umb-control-group -no-border">
+		<div class="form-search">
+			<i class="icon-search"></i>
+			<input type="text"
+				style="width: 100%"
+				ng-change="vm.filterItems()"
+				ng-model="vm.searchTerm"
+				class="umb-search-field search-query search-input input-block-level"
+				localize="placeholder"
+	            placeholder="@placeholders_filter"
+				umb-auto-focus>
+		</div>
+	</div>
+
+	<umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+	<!-- TABS -->
+	<div ng-if="vm.showTabs">
+
+		<umb-tabs-nav model="vm.tabs"></umb-tabs-nav>
+
+		<umb-tabs-content>
+
+			<umb-tab id="tab{{tab.id}}" ng-repeat="tab in vm.tabs" rel="{{tab.id}}">
+
+				<div ng-if="tab.alias==='Default'">
+					<div ng-repeat="(key,value) in tab.typesAndEditors">
+						<h5>{{key}}</h5>
+						<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+							<li	ng-repeat="systemDataType in value | orderBy:'name'"
+								ng-mouseover="vm.showDetailsOverlay(systemDataType)"
+								ng-click="vm.pickEditor(systemDataType)"
+								class="-four-in-row">
+								<a class="umb-card-grid-item" href="" title="{{ systemDataType.name }}">
+									<i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
+									{{ systemDataType.name }}
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div ng-if="tab.alias==='Reuse'">
+					<div ng-repeat="(key,value) in tab.userConfigured">
+						<h5>{{key}}</h5>
+						<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+							<li ng-repeat="dataType in value | orderBy:'name'"
+								ng-mouseover="vm.showDetailsOverlay(dataType)"
+								ng-click="vm.pickDataType(dataType)"
+								class="-four-in-row">
+								<a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
+									<i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+									{{ dataType.name }}
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</umb-tab>
+
+		</umb-tabs-content>
+
+	</div>
+
+	<!-- FILTER RESULTS -->
+	<div ng-if="vm.showFilterResult">
+
+		<h5 class="-border-bottom -black"><localize key="contentTypeEditor_reuse"></localize></h5>
+		<div ng-repeat="(key,value) in vm.userConfigured">
+			<div ng-if="(value | filter:vm.searchTerm).length > 0">
+				<h5>{{key}}</h5>
+				<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+					<li ng-repeat="dataType in value | orderBy:'name' | filter: vm.searchTerm"
+						ng-mouseover="vm.showDetailsOverlay(dataType)"
+						ng-click="vm.pickDataType(dataType)"
+						class="-four-in-row">
+						<a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
+							<i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+							{{ dataType.name }}
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<h5 class="-border-bottom -black"><localize key="contentTypeEditor_availableEditors"></localize></h5>
+		<div ng-repeat="(key,value) in vm.typesAndEditors">
+			<div ng-if="(value | filter:vm.searchTerm).length > 0">
+				<h5>{{key}}</h5>
+				<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+					<li	ng-repeat="systemDataType in value | orderBy:'name' | filter: vm.searchTerm"
+						ng-mouseover="vm.showDetailsOverlay(systemDataType)"
+						ng-click="vm.pickEditor(systemDataType)"
+						class="-four-in-row">
+						<a class="umb-card-grid-item" href="" title="{{ systemDataType.name }}">
+							<i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
+							{{ systemDataType.name }}
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+	</div>
+
+	<umb-overlay
+		ng-if="vm.editorSettingsOverlay.show"
+		model="vm.editorSettingsOverlay"
+		position="right"
+		view="vm.editorSettingsOverlay.view">
+	</umb-overlay>
+
+</div>

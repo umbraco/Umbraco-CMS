@@ -48,11 +48,19 @@ namespace Umbraco.Core.Models
             _allowedTemplates = new List<ITemplate>();
         }
 
-        private static readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
-        private static readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
+            public readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
+        }
 
         /// <summary>
         /// Gets or sets the alias of the default Template.
+        /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///     we should not store direct entity
         /// </summary>
         [IgnoreDataMember]
         public ITemplate DefaultTemplate
@@ -67,18 +75,14 @@ namespace Umbraco.Core.Models
         internal int DefaultTemplateId
         {
             get { return _defaultTemplate; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _defaultTemplate = value;
-                    return _defaultTemplate;
-                }, _defaultTemplate, DefaultTemplateSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, Ps.Value.DefaultTemplateSelector); }
         }
 
         /// <summary>
         /// Gets or Sets a list of Templates which are allowed for the ContentType
+        /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///     we should not store direct entity
         /// </summary>
         [DataMember]
         public IEnumerable<ITemplate> AllowedTemplates
@@ -86,11 +90,7 @@ namespace Umbraco.Core.Models
             get { return _allowedTemplates; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _allowedTemplates = value;
-                    return _allowedTemplates;
-                }, _allowedTemplates, AllowedTemplatesSelector,
+                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector,
                     //Custom comparer for enumerable
                     new DelegateEqualityComparer<IEnumerable<ITemplate>>(
                         (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
@@ -136,19 +136,6 @@ namespace Umbraco.Core.Models
 
             return result;
         }
-
-        /// <summary>
-        /// Method to call when Entity is being saved
-        /// </summary>
-        /// <remarks>Created date is set and a Unique key is assigned</remarks>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            if (Key == Guid.Empty)
-                Key = Guid.NewGuid();
-        }
-
 
         /// <summary>
         /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset

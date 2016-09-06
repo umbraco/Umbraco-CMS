@@ -1,0 +1,37 @@
+.umb-breadcrumbs {
+   list-style: none;
+   margin-bottom: 0;
+   margin-left: 0;
+   display: flex;
+   flex-wrap: wrap;
+}
+
+.umb-breadcrumbs__ancestor {
+   display: flex;
+}
+
+.umb-breadcrumbs__ancestor-link,
+.umb-breadcrumbs__ancestor-text {
+    font-size: 11px;
+    color: #555;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.umb-breadcrumbs__ancestor-link {
+   text-decoration: underline;
+}
+
+.umb-breadcrumbs__ancestor-link:hover {
+   color: #000;
+}
+
+.umb-breadcrumbs__seperator {
+   position: relative;
+   top: 1px;
+   margin-left: 5px;
+   margin-right: 5px;
+   color: #ccc;
+}

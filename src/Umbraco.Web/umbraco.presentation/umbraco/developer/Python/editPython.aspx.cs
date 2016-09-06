@@ -46,7 +46,7 @@ namespace umbraco.cms.presentation.developer
                 string file = Request.QueryString["file"];
                 string path = DeepLink.GetTreePathFromFilePath(file);
                 ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPython>().Tree.Alias)
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadDLRScripts>().Tree.Alias)
                     .SyncTree(path, false);
             }
         }

@@ -9,7 +9,6 @@
 // Core
 .btn {
   display: inline-block;
-  .ie7-inline-block();
   padding: 4px 12px;
   margin-bottom: 0; // For input.btn
   font-size: @baseFontSize;
@@ -20,53 +19,55 @@
   background: @btnBackground;
   color: @black;
   border: 1px solid @btnBorder;
-  *border: 0; // Remove the border to prevent IE7's black border on input:focus
-  .border-radius(@baseBorderRadius);
-  .ie7-restore-left-whitespace(); // Give IE7 some love
-  -webkit-box-shadow: none;
   box-shadow: none;
 
+    // Hover/focus state
+    &:hover,
+    &:focus {
+        background: @btnBackgroundHighlight;
+        color: @grayDark;
+        background-position: 0 -15px;
+        text-decoration: none;
 
-  // Hover/focus state
-  &:hover,
-  &:focus {
-    background: @btnBackgroundHighlight;
-    color: @grayDark;
-    text-decoration: none;
-    background-position: 0 -15px;
+        // transition is only when going to hover/focus, otherwise the background
+        // behind the gradient (there for IE<=9 fallback) gets mismatched
+        .transition(background-position .1s linear);
+    }
 
-    // transition is only when going to hover/focus, otherwise the background
-    // behind the gradient (there for IE<=9 fallback) gets mismatched
-    .transition(background-position .1s linear);
-  }
+    // Focus state for keyboard and accessibility
+    &:focus {
+        .tab-focus();
+    }
 
-  // Focus state for keyboard and accessibility
-  &:focus {
-    .tab-focus();
-  }
+    // Active state
+    &.active,
+    &:active {
+        background-image: none;
+        outline: 0;
+        .box-shadow(~"inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05)");
+    }
 
-  // Active state
-  &.active,
-  &:active {
-    background-image: none;
-    outline: 0;
-    .box-shadow(~"inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05)");
-  }
-
-  // Disabled state
-  &.disabled,
-  &[disabled] {
-    cursor: default;
-    background-image: none;
-    .opacity(65);
-    .box-shadow(none);
-  }
+    // Disabled state
+    &.disabled,
+    &[disabled],
+    &:disabled:hover {
+        cursor: default;
+        border-color: @btnBorder;
+        .opacity(65);
+        .box-shadow(none);
+    }
 
 }
 
 .btn-group>.btn+.dropdown-toggle {
     box-shadow: none;
     -webkit-box-shadow:none;
+}
+
+.btn-group > .btn:first-child,
+.btn-group > .btn:last-child,
+.btn-group > .dropdown-toggle {
+    border-radius: 0;
 }
 
 
@@ -78,11 +79,11 @@
 .btn-large {
   padding: @paddingLarge;
   font-size: @fontSizeLarge;
-  .border-radius(@borderRadiusLarge);
 }
 .btn-large [class^="icon-"],
 .btn-large [class*=" icon-"] {
   margin-top: 4px;
+  .border-radius(@borderRadiusLarge);
 }
 
 // Small
@@ -91,6 +92,7 @@
   font-size: @fontSizeSmall;
   .border-radius(@borderRadiusSmall);
 }
+
 .btn-small [class^="icon-"],
 .btn-small [class*=" icon-"] {
   margin-top: 0;
@@ -146,7 +148,6 @@ input[type="button"] {
   height: 32px;
   width: 32px;
   overflow: hidden;
-  text-decoration: none;
   display: inline-block;
   z-index: 6666;
 }
@@ -291,4 +292,13 @@ input[type="submit"].btn {
   &:focus{
     text-decoration:none;
   }
+}
+
+.btn-link.-underline {
+    display: inline-block;
+    text-decoration: underline;
+
+    &:hover {
+        text-decoration: none;
+    }
 }

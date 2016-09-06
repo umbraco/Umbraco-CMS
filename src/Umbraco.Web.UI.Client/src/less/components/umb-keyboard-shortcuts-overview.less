@@ -1,0 +1,100 @@
+
+/* ---------- OVERLAY ---------- */
+
+.umb-keyboard-shortcuts-overview__overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgb(255, 255, 255);
+  z-index: 1000;
+  animation: fadeIn 0.2s;
+  box-sizing: border-box;
+  padding-left: 440px;
+}
+
+.umb-keyboard-shortcuts-overview__overlay-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 25px;
+  border-radius: 20px;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  line-height: 1em;
+}
+
+.umb-keyboard-shortcuts-overview__overlay-close:hover {
+    background-color: @blue;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.umb-keyboard-shortcuts-overview__overlay-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.umb-keyboard-shortcuts-overview__keyboard-shortcuts-group {
+    width: 50%;
+    margin-bottom: 10px;
+}
+
+.umb-keyboard-shortcuts-overview__keyboard-shortcuts-group-name {
+  margin-bottom: 0;
+}
+
+.umb-keyboard-shortcuts-overview__keyboard-shortcut {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid @grayLight;
+}
+
+.umb-keyboard-shortcuts-overview__keyboard-shortcut.-no-air {
+   padding: 0;
+}
+
+.umb-keyboard-shortcuts-overview__keyboard-shortcut.-no-stroke {
+   border-bottom: none;
+}
+
+.umb-keyboard-shortcuts-overview__description {
+  font-weight: bold;
+  font-size: 13px;
+  margin-right: 10px;
+}
+
+/* ---------- KEYBOARD KEYS ---------- */
+
+.umb-keyboard-keys {
+  list-style: none;
+  display: flex;
+  font-size: 12px;
+  align-items: center;
+}
+
+.umb-keyboard-key-wrapper {
+  display: flex;
+  margin-right: 5px;
+  align-items: center;
+}
+
+.umb-keyboard-key {
+  background: #ffffff;
+  border: 1px solid @grayLight;
+  color: @gray;
+  border-radius: 5px;
+  margin-right: 5px;
+  padding: 1px 7px;
+}

@@ -8,16 +8,16 @@
 **/
 function valTab() {
     return {
-        require: "^form",
+        require: ['^form', '^valFormManager'],
         restrict: "A",
-        link: function (scope, element, attr, formCtrl) {
-            
-            var tabId = "tab" + scope.tab.id;
-                        
+        link: function (scope, element, attr, ctrs) {
+
+            var valFormManager = ctrs[1];
+            var tabId = "tab" + scope.tab.id;                        
             scope.tabHasError = false;
 
             //listen for form validation changes
-            scope.$on("valStatusChanged", function(evt, args) {
+            valFormManager.onValidationStatusChanged(function (evt, args) {
                 if (!args.form.$valid) {
                     var tabContent = element.closest(".umb-panel").find("#" + tabId);
                     //check if the validation messages are contained inside of this tabs 

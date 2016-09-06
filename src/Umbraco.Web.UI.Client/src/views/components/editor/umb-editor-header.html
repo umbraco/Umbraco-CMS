@@ -1,0 +1,81 @@
+﻿<div class="umb-editor-header umb-panel-header">
+
+    <div class="umb-panel-header-content-wrapper">
+
+        <div class="umb-panel-header-content">
+
+            <div class="umb-panel-header-left-side" ng-class="{'-top-position': tabs || !icon }">
+
+               <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}" title="{{$parent.icon}}">
+                   <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
+                   <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                       <localize key="settings_addIcon"></localize>
+                   </div>
+               </div>
+
+               <div class="umb-panel-header-title-wrapper">
+
+                   <ng-form name="headerNameForm">
+                       <input
+                        type="text"
+                        class="umb-panel-header-name-input"
+                        localize="placeholder"
+                        placeholder="@placeholders_entername"
+                        name="headerName"
+                        ng-show="!nameLocked"
+                        ng-model="name"
+                        ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
+                        umb-auto-focus
+                        required />
+                   </ng-form>
+
+                  <div class="umb-panel-header-name" ng-if="nameLocked">{{ name }}</div>
+
+                  <umb-generate-alias class="umb-panel-header-alias"
+                                      ng-if="!hideAlias"
+                                      alias="$parent.alias"
+                                      alias-from="$parent.name"
+                                      enable-lock="true"
+                                      server-validation-field="Alias"></umb-generate-alias>
+
+                  <input
+                    type="text"
+                    class="umb-panel-header-description"
+                    localize="placeholder"
+                    placeholder="@placeholders_enterDescription"
+                    ng-if="!hideDescription"
+                    ng-model="$parent.description" />
+
+               </div>
+
+                <umb-editor-menu
+                    class="umb-editor-header__actions-menu"
+                    ng-if="menu.currentNode"
+                    current-node="menu.currentNode"
+                    current-section="{{menu.currentSection}}">
+                </umb-editor-menu>
+
+            </div>
+
+            <umb-editor-navigation
+                ng-if="navigation"
+                navigation="navigation">
+            </umb-editor-navigation>
+
+        </div>
+
+        <umb-tabs-nav
+            ng-if="tabs"
+            model="tabs">
+        </umb-tabs-nav>
+
+    </div>
+
+    <umb-overlay
+      ng-if="dialogModel.show"
+      model="dialogModel"
+      position="right"
+      view="dialogModel.view">
+    </umb-overlay>
+
+</div>

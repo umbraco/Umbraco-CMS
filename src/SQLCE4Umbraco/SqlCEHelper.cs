@@ -40,15 +40,10 @@ namespace SqlCE4Umbraco
             var localConnection = new SqlCeConnection(ConnectionString);
             if (!System.IO.File.Exists(ReplaceDataDirectory(localConnection.Database)))
             {
-                var sqlCeEngine = new SqlCeEngine(ConnectionString);
-                sqlCeEngine.CreateDatabase();
-
-                // SD: Pretty sure this should be in a using clause but i don't want to cause unknown side-effects here
-                // since it's been like this for quite some time
-                //using (var sqlCeEngine = new SqlCeEngine(ConnectionString))
-                //{
-                //    sqlCeEngine.CreateDatabase();    
-                //}
+                using (var sqlCeEngine = new SqlCeEngine(ConnectionString))
+                {
+                    sqlCeEngine.CreateDatabase();
+                }
             }
         }
 

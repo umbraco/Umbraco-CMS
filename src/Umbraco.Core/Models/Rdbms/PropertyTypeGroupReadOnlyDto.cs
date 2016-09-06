@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence;
+﻿using System;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -10,9 +11,6 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("PropertyTypeGroupId")]
         public int? Id { get; set; }
 
-        [Column("parentGroupId")]
-        public int? ParentGroupId { get; set; }
-
         [Column("PropertyGroupName")]
         public string Text { get; set; }
 
@@ -21,5 +19,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("contenttypeNodeId")]
         public int ContentTypeNodeId { get; set; }
+
+        [Column("PropertyGroupUniqueID")]
+        public Guid UniqueId { get; set; }
     }
 }

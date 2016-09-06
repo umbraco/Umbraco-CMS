@@ -1,0 +1,51 @@
+<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.MediaTypes.MoveController">
+
+    <div class="umb-dialog-body">
+        <div class="umb-pane">
+
+            <p class="abstract" ng-hide="success">
+                    <localize key="contentTypeEditor_folderToMove">Select the folder to move</localize> <strong>{{currentNode.name}}</strong>&nbsp;<localize key="contentTypeEditor_structureBelow">to in the tree structure below</localize>
+            </p>
+
+            <div class="umb-loader-wrapper" ng-show="busy">
+                <div class="umb-loader"></div>
+            </div>
+
+            <div ng-show="error">
+                <h5 class="text-error">{{error.errorMsg}}</h5>
+                <p class="text-error">{{error.data.message}}</p>
+            </div>
+
+            <div ng-show="success">
+                <h5 class="text-success"><strong>{{currentNode.name}}</strong> <localize key="contentTypeEditor_movedUnderneath">was moved underneath</localize>&nbsp;<strong>{{target.name}}</strong></h5>
+                <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
+            </div>
+
+            <div ng-hide="success">
+
+                <div>
+                    <umb-tree section="settings"
+                              treealias="mediaTypes"
+                              customtreeparams="foldersonly=1"
+                              hideheader="false"
+                              hideoptions="true"
+                              isdialog="true"
+                              eventhandler="dialogTreeEventHandler"
+                              enablecheckboxes="true">
+                    </umb-tree>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
+        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-if="!busy">
+            <localize key="general_cancel">Cancel</localize>
+        </a>
+        <button class="btn btn-primary" ng-click="move()" ng-disabled="busy">
+            <localize key="actions_move">Move</localize>
+        </button>
+    </div>
+
+</div>

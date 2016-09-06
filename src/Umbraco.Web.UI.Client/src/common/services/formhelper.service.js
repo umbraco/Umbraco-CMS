@@ -7,7 +7,7 @@
  * A utility class used to streamline how forms are developed, to ensure that validation is check and displayed consistently and to ensure that the correct events
  * fire when they need to.
  */
-function formHelper(angularHelper, serverValidationManager, $timeout, notificationsService, dialogService) {
+function formHelper(angularHelper, serverValidationManager, $timeout, notificationsService, dialogService, localizationService) {
     return {
 
         /**
@@ -50,7 +50,7 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
             }
             
             //the first thing any form must do is broadcast the formSubmitting event
-            args.scope.$broadcast("formSubmitting", { scope: args.scope });
+            args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
             //then check if the form is valid
             if (!args.skipValidation) {                
@@ -157,8 +157,18 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
          * 
          * @param {object} err The error object returned from the http promise
          */
-        handleServerValidation: function(modelState) {
+        handleServerValidation: function (modelState) {
             for (var e in modelState) {
+
+                //This is where things get interesting....
+                // We need to support validation for all editor types such as both the content and content type editors.
+                // The Content editor ModelState is quite specific with the way that Properties are validated especially considering
+                // that each property is a User Developer property editor.
+                // The way that Content Type Editor ModelState is created is simply based on the ASP.Net validation data-annotations 
+                // system. 
+                // So, to do this (since we need to support backwards compat), we need to hack a little bit. For Content Properties,
+                // which are user defined, we know that they will exist with a prefixed ModelState of "_Properties.", so if we detect
+                // this, then we know it's a Property.
 
                 //the alias in model state can be in dot notation which indicates
                 // * the first part is the content property alias
@@ -167,7 +177,11 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                 //If it is not prefixed with "Properties" that means the error is for a field of the object directly.
 
                 var parts = e.split(".");
-                if (parts.length > 1) {
+
+                //Check if this is for content properties - specific to content/media/member editors because those are special 
+                // user defined properties with custom controls.
+                if (parts.length > 1 && parts[0] === "_Properties") {
+
                     var propertyAlias = parts[1];
 
                     //if it contains 2 '.' then we will wire it up to a property's field
@@ -182,12 +196,15 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
 
                 }
                 else {
-                    //the parts are only 1, this means its not a property but a native content property
-                    serverValidationManager.addFieldError(parts[0], modelState[e][0]);
+
+                    //Everthing else is just a 'Field'... the field name could contain any level of 'parts' though, for example:
+                    // Groups[0].Properties[2].Alias
+                    serverValidationManager.addFieldError(e, modelState[e][0]);
                 }
 
                 //add to notifications
                 notificationsService.error("Validation", modelState[e][0]);
+
             }
         }
     };

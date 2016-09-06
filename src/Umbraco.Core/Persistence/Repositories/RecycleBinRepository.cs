@@ -49,6 +49,10 @@ namespace Umbraco.Core.Persistence.Repositories
                     INNER JOIN umbracoNode as TB2 ON TB1.nodeId = TB2.id 
                     WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType)",
                 FormatDeleteStatement("umbracoAccess", "nodeId"),
+                @"DELETE FROM umbracoRedirectUrl WHERE umbracoRedirectUrl.id IN(
+                    SELECT TB1.id FROM umbracoRedirectUrl as TB1
+                    INNER JOIN umbracoNode as TB2 ON TB1.contentKey = TB2.uniqueId
+                    WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType)",
                 FormatDeleteStatement("umbracoRelation", "parentId"),
                 FormatDeleteStatement("umbracoRelation", "childId"),
                 FormatDeleteStatement("cmsTagRelationship", "nodeId"),

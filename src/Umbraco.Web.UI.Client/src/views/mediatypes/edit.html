@@ -1,0 +1,69 @@
+<div ng-controller="Umbraco.Editors.MediaTypes.EditController as vm">
+
+    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+
+    <form novalidate name="contentTypeForm" val-form-manager>
+
+        <umb-editor-view ng-if="!vm.page.loading">
+
+            <umb-editor-header
+                name="vm.contentType.name"
+                alias="vm.contentType.alias"
+                description="vm.contentType.description"
+                navigation="vm.page.navigation"
+                icon="vm.contentType.icon">
+            </umb-editor-header>
+
+            <umb-editor-container class="editors-document-type-container">
+
+                <div class="editors-document-type-canvas">
+                    <umb-editor-sub-views
+                        ng-if="!vm.page.loading"
+                        sub-views="vm.page.navigation"
+                        model="vm.contentType">
+                    </umb-editor-sub-views>
+                </div>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+
+                    <umb-keyboard-shortcuts-overview
+                        model="vm.page.keyboardShortcutsOverview">
+                    </umb-keyboard-shortcuts-overview>
+
+                </umb-editor-footer-content-left>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        ng-if="!vm.page.modelsBuilder"
+                        type="button"
+                        action="vm.save()"
+                        state="vm.page.saveButtonState"
+                        button-style="success"
+                        shortcut="ctrl+s"
+                        label="Save"
+                        label-key="buttons_save">
+                    </umb-button>
+
+                    <umb-button-group
+                        ng-if="vm.page.modelsBuilder"
+                        default-button="vm.page.defaultButton"
+                        sub-buttons="vm.page.subButtons"
+                        state="vm.page.saveButtonState"
+                        direction="up"
+                        float="right">
+                    </umb-button-group>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+</div>

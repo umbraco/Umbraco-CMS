@@ -4,15 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Services;
 using Umbraco.Tests.CodeFirst.TestModels.Composition;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
+
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class ContentTypeServiceTests : BaseServiceTest
@@ -274,6 +276,66 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Deleting_ContentType_Sends_Correct_Number_Of_DeletedEntities_In_Events()
+        {
+            var cts = ServiceContext.ContentTypeService;
+            var deletedEntities = 0;
+            var contentType = MockedContentTypes.CreateSimpleContentType("page", "Page");
+            cts.Save(contentType);
+
+            ContentTypeService.DeletedContentType += (sender, args) =>
+            {
+                deletedEntities += args.DeletedEntities.Count();
+            };
+
+            cts.Delete(contentType);
+
+            Assert.AreEqual(deletedEntities, 1);
+        }
+
+        [Test]
+        public void Deleting_Multiple_ContentTypes_Sends_Correct_Number_Of_DeletedEntities_In_Events()
+        {
+            var cts = ServiceContext.ContentTypeService;
+            var deletedEntities = 0;
+            var contentType = MockedContentTypes.CreateSimpleContentType("page", "Page");
+            cts.Save(contentType);
+            var contentType2 = MockedContentTypes.CreateSimpleContentType("otherPage", "Other page");
+            cts.Save(contentType2);
+
+            ContentTypeService.DeletedContentType += (sender, args) =>
+            {
+                deletedEntities += args.DeletedEntities.Count();
+            };
+
+            cts.Delete(contentType);
+            cts.Delete(contentType2);
+
+            Assert.AreEqual(2, deletedEntities);
+        }
+
+        [Test]
+        public void Deleting_ContentType_With_Child_Sends_Correct_Number_Of_DeletedEntities_In_Events()
+        {
+            var cts = ServiceContext.ContentTypeService;
+            var deletedEntities = 0;
+            var contentType = MockedContentTypes.CreateSimpleContentType("page", "Page");
+            cts.Save(contentType);
+            var contentType2 = MockedContentTypes.CreateSimpleContentType("subPage", "Sub page");
+            contentType2.ParentId = contentType.Id;
+            cts.Save(contentType2);
+
+            ContentTypeService.DeletedContentType += (sender, args) =>
+            {
+                deletedEntities += args.DeletedEntities.Count();
+            };
+
+            cts.Delete(contentType);
+
+            Assert.AreEqual(2, deletedEntities);
+        }
+
+        [Test]
         public void Can_Remove_ContentType_Composition_From_ContentType()
         {
             //Test for U4-2234
@@ -508,7 +570,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.That(added, Is.True);
-            Assert.Throws<Exception>(() => service.Save(composition));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(composition));
             Assert.DoesNotThrow(() => service.GetContentType("simpleChildPage"));
         }
 
@@ -554,9 +616,9 @@ namespace Umbraco.Tests.Services
             Assert.That(addedToMeta, Is.True);
             Assert.That(addedToSeo, Is.True);
 
-            Assert.Throws<Exception>(() => service.Save(basePage));
-            Assert.Throws<Exception>(() => service.Save(metaComposition));
-            Assert.Throws<Exception>(() => service.Save(seoComposition));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(basePage));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(metaComposition));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(seoComposition));
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
@@ -572,7 +634,7 @@ namespace Umbraco.Tests.Services
              * -- Content Page
              * ---- Advanced Page -> Content Meta
              * Content Meta :: Composition, has 'Title'
-             * 
+             *
              * Content Meta has 'Title' PropertyType
              * Adding 'Title' to BasePage should fail
             */
@@ -603,7 +665,7 @@ namespace Umbraco.Tests.Services
             };
             var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
             service.Save(contentPage);
-            
+
             var compositionAdded = advancedPage.AddContentType(contentMetaComposition);
             service.Save(advancedPage);
 
@@ -620,7 +682,7 @@ namespace Umbraco.Tests.Services
             Assert.That(titleAdded, Is.True);
             Assert.That(compositionAdded, Is.True);
 
-            Assert.Throws<Exception>(() => service.Save(basePage));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(basePage));
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
@@ -699,7 +761,7 @@ namespace Umbraco.Tests.Services
             Assert.That(seoCompositionAdded, Is.True);
             Assert.That(metaCompositionAdded, Is.True);
 
-            Assert.Throws<Exception>(() => service.Save(metaComposition));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(metaComposition));
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
@@ -762,7 +824,7 @@ namespace Umbraco.Tests.Services
             };
             var titleAdded = seoComposition.AddPropertyType(titlePropertyType, "Content");
             service.Save(seoComposition);
-            
+
             var seoCompositionAdded = advancedPage.AddContentType(seoComposition);
             var metaCompositionAdded = moreAdvancedPage.AddContentType(metaComposition);
             service.Save(advancedPage);
@@ -869,7 +931,7 @@ namespace Umbraco.Tests.Services
             var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
             var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "author")
             {
-                 Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 
+                 Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
             };
             var authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content");
             service.Save(basePage);
@@ -886,7 +948,7 @@ namespace Umbraco.Tests.Services
             Assert.That(titleAdded, Is.True);
             Assert.That(subtitleAdded, Is.True);
 
-            Assert.Throws<Exception>(() => service.Save(advancedPage));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(advancedPage));
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
@@ -943,7 +1005,7 @@ namespace Umbraco.Tests.Services
         public void Can_Rename_PropertyGroup_With_Inherited_PropertyGroups()
         {
             //Related the first issue in screencast from this post http://issues.umbraco.org/issue/U4-5986
-            
+
             // Arrange
             var service = ServiceContext.ContentTypeService;
 
@@ -984,7 +1046,9 @@ namespace Umbraco.Tests.Services
             Assert.That(contentType, Is.Not.Null);
 
             var compositionPropertyGroups = contentType.CompositionPropertyGroups;
-            Assert.That(compositionPropertyGroups.Count(x => x.Name.Equals("Content_")), Is.EqualTo(0));
+
+            // now it is still 1, because we don't propagate renames anymore
+            Assert.That(compositionPropertyGroups.Count(x => x.Name.Equals("Content_")), Is.EqualTo(1));
 
             var propertyTypeCount = contentType.PropertyTypes.Count();
             var compPropertyTypeCount = contentType.CompositionPropertyTypes.Count();
@@ -1057,7 +1121,9 @@ namespace Umbraco.Tests.Services
 
             var advancedPageReloaded = service.GetContentType("advancedPage");
             var contentUnderscoreTabExists = advancedPageReloaded.CompositionPropertyGroups.Any(x => x.Name.Equals("Content_"));
-            Assert.That(contentUnderscoreTabExists, Is.False);
+
+            // now is true, because we don't propagate renames anymore
+            Assert.That(contentUnderscoreTabExists, Is.True);
 
             var numberOfContentTabs = advancedPageReloaded.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
             Assert.That(numberOfContentTabs, Is.EqualTo(4));
@@ -1160,7 +1226,6 @@ namespace Umbraco.Tests.Services
 
             var contentType = service.GetContentType("contentPage");
             var propertyGroup = contentType.PropertyGroups["Content"];
-            Assert.That(propertyGroup.ParentId.HasValue, Is.False);
         }
 
         [Test]
@@ -1168,6 +1233,8 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.ContentTypeService;
             var basePage = (IContentType)MockedContentTypes.CreateBasicContentType();
+            basePage.AddPropertyGroup("Content");
+            basePage.AddPropertyGroup("Meta");
             service.Save(basePage);
 
             var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "author")
@@ -1179,6 +1246,16 @@ namespace Umbraco.Tests.Services
                 DataTypeDefinitionId = -88
             };
             var authorAdded = basePage.AddPropertyType(authorPropertyType, "Content");
+            var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "title")
+            {
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeDefinitionId = -88
+            };
+            var titleAdded = basePage.AddPropertyType(authorPropertyType, "Meta");
+
             service.Save(basePage);
 
             basePage = service.GetContentType(basePage.Id);
@@ -1201,8 +1278,8 @@ namespace Umbraco.Tests.Services
              * - Content Page
              * -- Advanced Page
              * Content Meta :: Composition
-            */ 
-            
+            */
+
             // Arrange
             var service = ServiceContext.ContentTypeService;
             var basePage = MockedContentTypes.CreateBasicContentType();
@@ -1245,7 +1322,6 @@ namespace Umbraco.Tests.Services
 
             var contentType = service.GetContentType("contentPage");
             var propertyGroup = contentType.PropertyGroups["Content"];
-            Assert.That(propertyGroup.ParentId.HasValue, Is.False);
 
             var numberOfContentTabs = contentType.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
             Assert.That(numberOfContentTabs, Is.EqualTo(3));
@@ -1264,7 +1340,6 @@ namespace Umbraco.Tests.Services
             var propertyGroupReloaded = contentPageReloaded.PropertyGroups["Content"];
             var hasDescriptionPropertyType = propertyGroupReloaded.PropertyTypes.Contains("description");
             Assert.That(hasDescriptionPropertyType, Is.True);
-            Assert.That(propertyGroupReloaded.ParentId.HasValue, Is.False);
 
             var descriptionPropertyTypeReloaded = propertyGroupReloaded.PropertyTypes["description"];
             Assert.That(descriptionPropertyTypeReloaded.PropertyGroupId.IsValueCreated, Is.False);

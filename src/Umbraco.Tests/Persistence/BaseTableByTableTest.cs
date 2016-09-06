@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Persistence
 
             var dbContext = new DatabaseContext(
                 new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, _logger),
-                _logger, SqlSyntaxProvider, "System.Data.SqlServerCe.4.0");
+                _logger, SqlSyntaxProvider, Constants.DatabaseProviders.SqlCe);
 
             var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());
 
@@ -305,7 +305,7 @@ namespace Umbraco.Tests.Persistence
                 DatabaseSchemaHelper.CreateTable<NodeDto>();
                 DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
                 DatabaseSchemaHelper.CreateTable<TemplateDto>();
-                DatabaseSchemaHelper.CreateTable<DocumentTypeDto>();
+                DatabaseSchemaHelper.CreateTable<ContentTypeTemplateDto>();
 
                 //transaction.Complete();
             }
@@ -575,6 +575,31 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<TaskTypeDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoDeployDependency_Table()
+        {
+
+            using (Transaction transaction = Database.GetTransaction())
+            {
+                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
+                DatabaseSchemaHelper.CreateTable<UmbracoDeployDependencyDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoDeployChecksum_Table()
+        {
+
+            using (Transaction transaction = Database.GetTransaction())
+            {
+                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
 
                 //transaction.Complete();
             }

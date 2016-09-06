@@ -14,6 +14,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using umbraco.interfaces;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Sync
 {
@@ -34,6 +35,7 @@ namespace Umbraco.Core.Sync
         private readonly ILogger _logger;
         private int _lastId = -1;
         private DateTime _lastSync;
+        private DateTime _lastPruned;
         private bool _initialized;
         private bool _syncing;
         private bool _released;
@@ -49,7 +51,7 @@ namespace Umbraco.Core.Sync
 
             _appContext = appContext;
             _options = options;
-            _lastSync = DateTime.UtcNow;
+            _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
             _profilingLogger = appContext.ProfilingLogger;
             _logger = appContext.ProfilingLogger.Logger;
@@ -59,7 +61,7 @@ namespace Umbraco.Core.Sync
 
         protected override bool RequiresDistributed(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType dispatchType)
         {
-            // we don't care if there's servers listed or not, 
+            // we don't care if there's servers listed or not,
             // if distributed call is enabled we will make the call
             return _initialized && DistributedEnabled;
         }
@@ -138,18 +140,43 @@ namespace Umbraco.Core.Sync
             {
                 if (_released) return;
 
+                var coldboot = false;
                 if (_lastId < 0) // never synced before
                 {
-                    // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new 
+                    // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
                     // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
-                    _logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install. The server will rebuild its caches and indexes and then adjust it's last synced id to the latest found in the database and will start maintaining cache updates based on that id");
+                    _logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install."
+                        + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
+                        + " the database and maintain cache updates based on that Id.");
 
+                    coldboot = true;
+                }
+                else
+                {
+                    //check for how many instructions there are to process
+                    var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
+                    if (count > _options.MaxProcessingInstructionCount)
+                    {
+                        //too many instructions, proceed to cold boot
+                        _logger.Warn<DatabaseServerMessenger>("The instruction count ({0}) exceeds the specified MaxProcessingInstructionCount ({1})."
+                            + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
+                            + " to the latest found in the database and maintain cache updates based on that Id.",
+                            () => count, () => _options.MaxProcessingInstructionCount);
+
+                        coldboot = true;
+                    }
+                }
+
+                if (coldboot)
+                {
                     // go get the last id in the db and store it
                     // note: do it BEFORE initializing otherwise some instructions might get lost
                     // when doing it before, some instructions might run twice - not an issue
-                    var lastId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
-                    if (lastId > 0)
-                        SaveLastSynced(lastId);
+                    var maxId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
+
+                    //if there is a max currently, or if we've never synced
+                    if (maxId > 0 || _lastId < 0)
+                        SaveLastSynced(maxId);
 
                     // execute initializing callbacks
                     if (_options.InitializingCallbacks != null)
@@ -168,13 +195,13 @@ namespace Umbraco.Core.Sync
         {
             lock (_locko)
             {
-                if (_syncing) 
+                if (_syncing)
                     return;
 
                 if (_released)
                     return;
 
-                if ((DateTime.UtcNow - _lastSync).Seconds <= _options.ThrottleSeconds)
+                if ((DateTime.UtcNow - _lastSync).TotalSeconds <= _options.ThrottleSeconds)
                     return;
 
                 _syncing = true;
@@ -187,6 +214,12 @@ namespace Umbraco.Core.Sync
                 using (_profilingLogger.DebugDuration<DatabaseServerMessenger>("Syncing from database..."))
                 {
                     ProcessDatabaseInstructions();
+
+                    if ((DateTime.UtcNow - _lastPruned).TotalSeconds <= _options.PruneThrottleSeconds)
+                        return;
+
+                    _lastPruned = _lastSync;
+
                     switch (_appContext.GetCurrentServerRole())
                     {
                         case ServerRole.Single:
@@ -209,12 +242,15 @@ namespace Umbraco.Core.Sync
         /// <remarks>
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// </remarks>
+        /// <returns>
+        /// Returns the number of processed instructions
+        /// </returns>
         private void ProcessDatabaseInstructions()
         {
             // NOTE
-            // we 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that 
+            // we 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
             // would be a good idea since instructions could keep getting added and then all other threads will probably get stuck from serving requests
-            // (depending on what the cache refreshers are doing). I think it's best we do the one time check, process them and continue, if there are 
+            // (depending on what the cache refreshers are doing). I think it's best we do the one time check, process them and continue, if there are
             // pending requests after being processed, they'll just be processed on the next poll.
             //
             // FIXME not true if we're running on a background thread, assuming we can?
@@ -277,31 +313,65 @@ namespace Umbraco.Core.Sync
         }
 
         /// <summary>
-        /// Remove old instructions from the database.
+        /// Remove old instructions from the database
         /// </summary>
+        /// <remarks>
+        /// Always leave the last (most recent) record in the db table, this is so that not all instructions are removed which would cause
+        /// the site to cold boot if there's been no instruction activity for more than DaysToRetainInstructions.
+        /// See: http://issues.umbraco.org/issue/U4-7643#comment=67-25085
+        /// </remarks>
         private void PruneOldInstructions()
         {
-            _appContext.DatabaseContext.Database.Delete<CacheInstructionDto>("WHERE utcStamp < @pruneDate", 
-                new { pruneDate = DateTime.UtcNow.AddDays(-_options.DaysToRetainInstructions) });
+            var pruneDate = DateTime.UtcNow.AddDays(-_options.DaysToRetainInstructions);
+
+            // using 2 queries is faster than convoluted joins
+
+            var maxId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction;");
+
+            var delete = new Sql().Append(@"DELETE FROM umbracoCacheInstruction WHERE utcStamp < @pruneDate AND id < @maxId",
+                new { pruneDate, maxId });
+
+            _appContext.DatabaseContext.Database.Execute(delete);
         }
 
         /// <summary>
         /// Ensure that the last instruction that was processed is still in the database.
         /// </summary>
-        /// <remarks>If the last instruction is not in the database anymore, then the messenger
+        /// <remarks>
+        /// If the last instruction is not in the database anymore, then the messenger
         /// should not try to process any instructions, because some instructions might be lost,
-        /// and it should instead cold-boot.</remarks>
+        /// and it should instead cold-boot.
+        /// However, if the last synced instruction id is '0' and there are '0' records, then this indicates
+        /// that it's a fresh site and no user actions have taken place, in this circumstance we do not want to cold
+        /// boot. See: http://issues.umbraco.org/issue/U4-8627
+        /// </remarks>
         private void EnsureInstructions()
         {
-            var sql = new Sql().Select("*")
+            if (_lastId == 0)
+            {
+                var sql = new Sql().Select("COUNT(*)")
+                    .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax);
+
+                var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>(sql);
+
+                //if there are instructions but we haven't synced, then a cold boot is necessary
+                if (count > 0)
+                    _lastId = -1;
+            }
+            else
+            {
+                var sql = new Sql().Select("*")
                 .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax)
                 .Where<CacheInstructionDto>(dto => dto.Id == _lastId);
 
-            var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
-            if (dtos.Count == 0)
-                _lastId = -1;
+                var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
+
+                //if the last synced instruction is not found in the db, then a cold boot is necessary
+                if (dtos.Count == 0)
+                    _lastId = -1;
+            }
         }
-    
+
         /// <summary>
         /// Reads the last-synced id from file into memory.
         /// </summary>
@@ -342,7 +412,7 @@ namespace Umbraco.Core.Sync
         /// <para>Practically, all we really need is the guid, the other infos are here for information
         /// and debugging purposes.</para>
         /// </remarks>
-        protected readonly static string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
+        protected static readonly string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
             + "/" + HttpRuntime.AppDomainAppId // eg /LM/S3SVC/11/ROOT
             + " [P" + Process.GetCurrentProcess().Id // eg 1234
             + "/D" + AppDomain.CurrentDomain.Id // eg 22

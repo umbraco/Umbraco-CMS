@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// An abstract class for implementing a basic cache provider
+    /// An interface for implementing a basic cache provider
     /// </summary>
     public interface ICacheProvider
     {

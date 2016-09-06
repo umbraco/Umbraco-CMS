@@ -3,7 +3,7 @@
 * @name umbraco.services.umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
-function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService, notificationsService) {
+function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService, notificationsService, eventsService) {
     return {
 
         /**
@@ -158,9 +158,10 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
                     //show a ysod dialog
                     if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
-                        dialogService.ysodDialog({
-                            errorMsg: result.errorMsg,
-                            data: result.data
+                        eventsService.emit('app.ysod',
+                        {
+                            errorMsg: 'An error occured',
+                            data: data
                         });
                     }
                     else {
@@ -169,16 +170,14 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     }
                     
                 }
-                else {
 
-                    //return an error object including the error message for UI
-                    deferred.reject({
-                        errorMsg: result.errorMsg,
-                        data: result.data,
-                        status: result.status
-                    });
+                //return an error object including the error message for UI
+                deferred.reject({
+                    errorMsg: result.errorMsg,
+                    data: result.data,
+                    status: result.status
+                });
 
-                }
 
             });
 
@@ -253,8 +252,9 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         }                        
                         else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                             //show a ysod dialog
-                            dialogService.ysodDialog({
-                                errorMsg: 'An error occurred',
+                            eventsService.emit('app.ysod',
+                            {
+                                errorMsg: 'An error occured',
                                 data: data
                             });
                         }
@@ -264,15 +264,14 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         }
                         
                     }
-                    else {
-
-                        //return an error object including the error message for UI
-                        deferred.reject({
-                            errorMsg: 'An error occurred',
-                            data: data,
-                            status: status
-                        });
-                    }
+                    
+                    //return an error object including the error message for UI
+                    deferred.reject({
+                        errorMsg: 'An error occurred',
+                        data: data,
+                        status: status
+                    });
+                   
 
                 });
 

@@ -26,7 +26,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             var propertyEditor = PropertyEditorResolver.Current.GetByAlias(propertyType.PropertyEditorAlias);
             if (propertyEditor == null) return false;
-            return propertyEditor.ValueEditor.ValueType.InvariantEquals("json");
+            return propertyEditor.ValueEditor.ValueType.InvariantEquals(PropertyEditorValueTypes.Json);
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
         }
-
+        
         /// <summary>
         /// This is called after an content type is saved and is used to update the content xml structures in the database
         /// if they are required to be updated.

@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -11,6 +13,9 @@ using System.Web.UI.HtmlControls;
 
 using umbraco.cms.businesslogic.web;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Core.Services;
+using Umbraco.Web;
 
 namespace umbraco.presentation.dialogs
 {
@@ -26,29 +31,24 @@ namespace umbraco.presentation.dialogs
 	    }
 		private void Page_Load(object sender, System.EventArgs e)
 		{
-			int documentTypeId = int.Parse(helper.Request("nodeID"));
-			if (documentTypeId > 0) 
+			int documentTypeId = Request.GetItemAs<int>("nodeID");
+			if (documentTypeId > 0)
 			{
-				cms.businesslogic.web.DocumentType dt = new cms.businesslogic.web.DocumentType(documentTypeId);
-				if (dt != null) 
-				{
-					Response.AddHeader("Content-Disposition", "attachment;filename=" + dt.Alias + ".udt");
-					Response.ContentType = "application/octet-stream";
+			    var contentType = Services.ContentTypeService.GetContentType(documentTypeId);
+                if (contentType == null) throw new NullReferenceException("No content type found with id " + documentTypeId);
+                
+                Response.AddHeader("Content-Disposition", "attachment;filename=" + contentType.Alias + ".udt");
+                Response.ContentType = "application/octet-stream";
 
-					XmlDocument doc = new XmlDocument();
-					doc.AppendChild(dt.ToXml(doc));
+			    var serializer = new EntityXmlSerializer();
+			    var xml = serializer.Serialize(
+                    Services.DataTypeService,
+                    Services.ContentTypeService,
+                    contentType);
 
-
-					XmlWriterSettings writerSettings = new XmlWriterSettings();
-					writerSettings.Indent = true;
-
-					XmlWriter xmlWriter = XmlWriter.Create(Response.OutputStream, writerSettings);
-					doc.Save(xmlWriter);
-
-					//Response.Write(editDataType.ToXml(new XmlDocument()).OuterXml);
-				}
-			}
-		}
+                xml.Save(Response.OutputStream);
+            }
+        }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)

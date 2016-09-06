@@ -30,7 +30,12 @@ namespace Umbraco.Core.Models
             MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MemberType, string>(x => x.Alias);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MemberType, string>(x => x.Alias);
+        }
 
         /// <summary>
         /// The Alias of the ContentType
@@ -50,13 +55,11 @@ namespace Umbraco.Core.Models
                 // .ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase)
                 // Need to ask Stephen
 
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _alias = value == "_umbracoSystemDefaultProtectType" 
-                        ? value 
-                        : (value == null ? string.Empty : value.ToSafeAlias() );
-                    return _alias;
-                }, _alias, AliasSelector);
+                var newVal = value == "_umbracoSystemDefaultProtectType"
+                        ? value
+                        : (value == null ? string.Empty : value.ToSafeAlias());
+
+                SetPropertyValueAndDetectChanges(newVal, ref _alias, Ps.Value.AliasSelector);
             }
         }
 
@@ -130,27 +133,6 @@ namespace Umbraco.Core.Models
                 var tuple = new MemberTypePropertyProfileAccess(value, false);
                 MemberTypePropertyTypes.Add(propertyTypeAlias, tuple);
             }
-        }
-
-        /// <summary>
-        /// Method to call when Entity is being saved
-        /// </summary>
-        /// <remarks>Created date is set and a Unique key is assigned</remarks>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            if (Key == Guid.Empty)
-                Key = Guid.NewGuid();
-        }
-
-        /// <summary>
-        /// Method to call when Entity is being updated
-        /// </summary>
-        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
-        internal override void UpdatingEntity()
-        {
-            base.UpdatingEntity();
         }
     }
 }

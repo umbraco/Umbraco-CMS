@@ -4,6 +4,13 @@
     if (!$scope.model.config.orientation) {
         $scope.model.config.orientation = "horizontal";
     }
+    if (!$scope.model.config.enableRange) {
+        $scope.model.config.enableRange = false;
+    }
+    else {
+        $scope.model.config.enableRange = $scope.model.config.enableRange === "1" ? true : false;
+    }
+
     if (!$scope.model.config.initVal1) {
         $scope.model.config.initVal1 = 0;
     }
@@ -34,6 +41,76 @@
     else {
         $scope.model.config.step = parseFloat($scope.model.config.step);
     }
+
+    if (!$scope.model.config.handle) {
+        $scope.model.config.handle = "round";
+    }
+
+    if (!$scope.model.config.reversed) {
+        $scope.model.config.reversed = false;
+    }
+    else {
+        $scope.model.config.reversed = $scope.model.config.reversed === "1" ? true : false;
+    }
+
+    if (!$scope.model.config.tooltip) {
+        $scope.model.config.tooltip = "show";
+    }
+
+    if (!$scope.model.config.tooltipSplit) {
+        $scope.model.config.tooltipSplit = false;
+    }
+    else {
+        $scope.model.config.tooltipSplit = $scope.model.config.tooltipSplit === "1" ? true : false;
+    }
+
+    if ($scope.model.config.tooltipFormat) {
+        $scope.model.config.formatter = function (value) {
+            if (angular.isArray(value) && $scope.model.config.enableRange) {
+                return $scope.model.config.tooltipFormat.replace("{0}", value[0]).replace("{1}", value[1]);
+            } else {
+                return $scope.model.config.tooltipFormat.replace("{0}", value);
+            }
+        }
+    }
+
+    if (!$scope.model.config.ticks) {
+        $scope.model.config.ticks = [];
+    }
+    else {
+        // returns comma-separated string to an array, e.g. [0, 100, 200, 300, 400]
+        $scope.model.config.ticks = _.map($scope.model.config.ticks.split(','), function (item) {
+            return parseInt(item.trim());
+        });
+    }
+
+    if (!$scope.model.config.ticksPositions) {
+        $scope.model.config.ticksPositions = [];
+    }
+    else {
+        // returns comma-separated string to an array, e.g. [0, 30, 60, 70, 90, 100]
+        $scope.model.config.ticksPositions = _.map($scope.model.config.ticksPositions.split(','), function (item) {
+            return parseInt(item.trim());
+        });
+        console.log($scope.model.config.ticksPositions);
+    }
+
+    if (!$scope.model.config.ticksLabels) {
+        $scope.model.config.ticksLabels = [];
+    }
+    else {
+        // returns comma-separated string to an array, e.g. ['$0', '$100', '$200', '$300', '$400']
+        $scope.model.config.ticksLabels = _.map($scope.model.config.ticksLabels.split(','), function (item) {
+            return item.trim();
+        });
+    }
+
+    if (!$scope.model.config.ticksSnapBounds) {
+        $scope.model.config.ticksSnapBounds = 0;
+    }
+    else {
+        $scope.model.config.ticksSnapBounds = parseFloat($scope.model.config.ticksSnapBounds);
+    }
     
     /** This creates the slider with the model values - it's called on startup and if the model value changes */
     function createSlider() {
@@ -42,9 +119,10 @@
         var sliderVal = null;
 
         //configure the model value based on if range is enabled or not
-        if ($scope.model.config.enableRange === "1") {
+        if ($scope.model.config.enableRange == true) {
             //If no value saved yet - then use default value
-            if (!$scope.model.value) {
+            //If it contains a single value - then also create a new array value
+            if (!$scope.model.value || $scope.model.value.indexOf(",") == -1) {
                 var i1 = parseFloat($scope.model.config.initVal1);
                 var i2 = parseFloat($scope.model.config.initVal2);
                 sliderVal = [
@@ -75,18 +153,30 @@
         }
 
         //initiate slider, add event handler and get the instance reference (stored in data)
-        var slider = $element.find('.slider-item').slider({
+        var slider = $element.find('.slider-item').bootstrapSlider({
             max: $scope.model.config.maxVal,
             min: $scope.model.config.minVal,
             orientation: $scope.model.config.orientation,
-            selection: "after",
+            selection: $scope.model.config.reversed ? "after" : "before",
             step: $scope.model.config.step,
-            tooltip: "show",
+            precision: $scope.model.config.precision,
+            tooltip: $scope.model.config.tooltip,
+            tooltip_split: $scope.model.config.tooltipSplit,
+            tooltip_position: $scope.model.config.tooltipPosition,
+            handle: $scope.model.config.handle,
+            reversed: $scope.model.config.reversed,
+            ticks: $scope.model.config.ticks,
+            ticks_positions: $scope.model.config.ticksPositions,
+            ticks_labels: $scope.model.config.ticksLabels,
+            ticks_snap_bounds: $scope.model.config.ticksSnapBounds,
+            formatter: $scope.model.config.formatter,
+            range: $scope.model.config.enableRange,
             //set the slider val - we cannot do this with data- attributes when using ranges
             value: sliderVal
-        }).on('slideStop', function () {
+        }).on('slideStop', function (e) {
+            var value = e.value;
             angularHelper.safeApply($scope, function () {
-                setModelValueFromSlider(slider.getValue());
+                setModelValueFromSlider(value);
             });
         }).data('slider');
     }
@@ -95,7 +185,7 @@
         the model with the currently selected slider value(s) **/
     function setModelValueFromSlider(sliderVal) {
         //Get the value from the slider and format it correctly, if it is a range we want a comma delimited value
-        if ($scope.model.config.enableRange === "1") {
+        if ($scope.model.config.enableRange == true) {
             $scope.model.value = sliderVal.join(",");
         }
         else {
@@ -122,7 +212,7 @@
         });
 
     //load the separate css for the editor to avoid it blocking our js loading
-    assetsService.loadCss("lib/slider/slider.css");
-
+    assetsService.loadCss("lib/slider/bootstrap-slider.css");
+    assetsService.loadCss("lib/slider/bootstrap-slider-custom.css");
 }
 angular.module("umbraco").controller("Umbraco.PropertyEditors.SliderController", sliderController);

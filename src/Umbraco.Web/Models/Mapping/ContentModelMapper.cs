@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AutoMapper;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -14,6 +15,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -55,17 +57,21 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
                 .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(
                     dto => dto.Urls,
                     expression => expression.MapFrom(content =>
                         UmbracoContext.Current == null
                             ? new[] {"Cannot generate urls without a current Umbraco Context"}
                             : content.GetContentUrls(UmbracoContext.Current)))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
+                .ForMember(display => display.AllowPreview, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
@@ -86,6 +92,9 @@ namespace Umbraco.Web.Models.Mapping
                     dto => dto.Trashed,
                     expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(
                     dto => dto.ContentTypeAlias,
                     expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(display => display.Alias, expression => expression.Ignore());
@@ -95,6 +104,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Owner,
                     expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Icon, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore());
@@ -159,29 +171,48 @@ namespace Umbraco.Web.Models.Mapping
 
             if (content.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService);
+                TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
             }
-
+            
             var properties = new List<ContentPropertyDisplay>
             {
                 new ContentPropertyDisplay
                 {
+                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/documentType"),
+                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
+                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                },
+                 new ContentPropertyDisplay
+                {
                     Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                },
+                    //Not editible for people without publish permission (U4-287)
+                    View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    Config = new Dictionary<string, object>
+                    {
+                        {"offsetTime", "1"}
+                    }
+                    //TODO: Fix up hard coded datepicker
+                } ,
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    //Not editible for people without publish permission (U4-287)
+                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    Config = new Dictionary<string, object>
+                    {
+                        {"offsetTime", "1"}
+                    }
+                    //TODO: Fix up hard coded datepicker
                 },
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = "Template", //TODO: localize this?
+                    Label = localizedText.Localize("template/template"),
                     Value = display.TemplateAlias,
                     View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
                     Config = new Dictionary<string, object>
@@ -198,22 +229,21 @@ namespace Umbraco.Web.Models.Mapping
                 }
             };
 
-            TabsAndPropertiesResolver.MapGenericProperties(content, display, properties.ToArray(),
+            TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText, properties.ToArray(),
                 genericProperties =>
                 {
                     //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
-                    //If this is a web request and debugging is enabled and there's a user signed in and the 
-                    // user has access tot he settings section, we will 
-                    if (HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled
-                        && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
+                    //If this is a web request and there's a user signed in and the 
+                    // user has access to the settings section, we will 
+                    if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                         && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                     {
                         var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
-                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : currentDocumentType.Name;
+                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Name);
 
                         var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
                         //TODO: Hard coding this is not good
-                        var docTypeLink = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+                        var docTypeLink = string.Format("#/settings/documenttypes/edit/{0}", currentDocumentTypeId);
 
                         //Replace the doc type property
                         var docTypeProp = genericProperties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
@@ -284,35 +314,9 @@ namespace Umbraco.Web.Models.Mapping
                     source.HasIdentity ? source.Id : source.ParentId)
                     .FirstOrDefault();
 
-                if (permissions == null)
-                {
-                    return Enumerable.Empty<char>();
-                }
-
-                var result = new List<char>();
-
-                //can they publish ?
-                if (permissions.AssignedPermissions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionPublish.Instance.Letter);
-                }
-                //can they send to publish ?
-                if (permissions.AssignedPermissions.Contains(ActionToPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionToPublish.Instance.Letter);
-                }
-                //can they save ?
-                if (permissions.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionUpdate.Instance.Letter);
-                }
-                //can they create ?
-                if (permissions.AssignedPermissions.Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionNew.Instance.Letter);
-                }
-
-                return result;
+                return permissions == null
+                    ? Enumerable.Empty<char>()
+                    : permissions.AssignedPermissions.Where(x => x.Length == 1).Select(x => x.ToUpperInvariant()[0]);
             }
         }
 

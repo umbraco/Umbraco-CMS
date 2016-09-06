@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Querying
             Assert.AreEqual(1, result.Arguments.Length);
             Assert.AreEqual("-1%", sql.Arguments[0]);
 
-            Console.WriteLine(strResult);
+            Debug.Print(strResult);
         }
 
         [Test]
@@ -56,7 +57,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var result = translator.Translate();
             var strResult = result.SQL;
 
-            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE ([umbracoNode].[parentID] = @0)";
+            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (([umbracoNode].[parentID] = @0))";
 
             // Assert
             Assert.That(strResult, Is.Not.Empty);
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Querying
             Assert.AreEqual(1, result.Arguments.Length);
             Assert.AreEqual(-1, sql.Arguments[0]);
 
-            Console.WriteLine(strResult);
+            Debug.Print(strResult);
         }
 
         [Test]
@@ -83,7 +84,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var result = translator.Translate();
             var strResult = result.SQL;
 
-            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE ([cmsContentType].[alias] = @0)";
+            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (([cmsContentType].[alias] = @0))";
 
             // Assert
             Assert.That(strResult, Is.Not.Empty);
@@ -91,7 +92,7 @@ namespace Umbraco.Tests.Persistence.Querying
             Assert.AreEqual(1, result.Arguments.Length);
             Assert.AreEqual("umbTextpage", sql.Arguments[0]);
 
-            Console.WriteLine(strResult);
+            Debug.Print(strResult);
         }
 
         [Test]
@@ -121,7 +122,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var strResult = result.SQL;
 
             // Assert
-            Console.WriteLine(strResult);
+            Debug.Print(strResult);
         }
     }
 }

@@ -12,7 +12,8 @@ using System.Web.UI.HtmlControls;
 namespace umbraco.presentation
 {
 
-    [Obsolete("This class is no longer used and will be removed in future versions.")]
+    [Obsolete("This class will be removed in future versions.")]
+	[EditorBrowsable(EditorBrowsableState.Never)]
     public partial class ping : System.Web.UI.Page
     {
         #region Web Form Designer generated code

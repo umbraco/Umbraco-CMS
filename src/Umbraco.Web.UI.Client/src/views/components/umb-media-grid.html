@@ -1,0 +1,28 @@
+<div class="umb-media-grid">
+    <div class="umb-media-grid__item" ng-click="clickItem(item, $event, $index)" ng-repeat="item in items | filter:filterBy" ng-style="item.flexStyle" ng-class="{'-selected': item.selected, '-file': !item.thumbnail, '-svg': item.extension == 'svg'}">
+        <div>
+            <i ng-show="item.selected" class="icon-check umb-media-grid__checkmark"></i>
+
+            <div class="umb-media-grid__item-overlay" ng-class="{'-locked': item.selected}" ng-click="clickItemName(item, $event, $index)">
+                <i ng-if="onDetailsHover" class="icon-info umb-media-grid__info" ng-mouseover="hoverItemDetails(item, $event, true)" ng-mouseleave="hoverItemDetails(item, $event, false)"></i>
+                <div class="umb-media-grid__item-name">{{item.name}}</div>
+            </div>
+
+            <!-- Check backgrund -->
+            <div class="umb-media-grid__image-background" ng-if="item.thumbnail || item.extension == 'svg'"></div>
+
+            <!-- Image thumbnail -->
+            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" draggable="false" />
+
+            <!-- SVG -->
+            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="!item.thumbnail && item.extension == 'svg'" ng-src="{{item.file}}" alt="{{item.name}}" draggable="false" />
+
+            <!-- Transparent image - fallback - used to keep image proportions on wrapper-->
+            <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail && item.extension != 'svg'" src="assets/img/transparent.png" alt="{{item.name}}" draggable="false" />
+
+            <!-- Icon for files -->
+            <i class="umb-media-grid__item-icon {{item.icon}}" ng-if="!item.thumbnail && item.extension != 'svg'"></i>
+
+        </div>
+    </div>
+</div>

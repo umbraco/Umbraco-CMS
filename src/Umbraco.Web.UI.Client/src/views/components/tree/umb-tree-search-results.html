@@ -1,0 +1,23 @@
+<ul class="umb-tree">
+
+    <li class="root">
+        <ul class="umb-search-group">
+
+            <li ng-repeat="result in results">
+
+                <div style="padding-left: 20px" ng-class="{'umb-tree-node-checked' : result.selected}">
+                    <a class="umb-search-group-item-link" ng-class="{first:$first}" ng-click="selectResultCallback($event, result)">
+                        <div class="umb-search-group-item-name">
+                            <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
+                            {{result.name}}
+                        </div>
+                        <small class="search-subtitle" ng-if="result.subTitle">{{result.subTitle}}</small>
+                    </a>
+                </div>
+
+            </li>
+
+        </ul>
+    </li>
+
+</ul>

@@ -1,0 +1,10 @@
+<ul class="umb-breadcrumbs">
+   <li class="umb-breadcrumbs__ancestor" ng-repeat="ancestor in ancestors">
+
+      <a ng-if="!$last" href="#/{{entityType}}/{{entityType}}/edit/{{ancestor.id}}" class="umb-breadcrumbs__ancestor-link" title="{{ancestor.name}}">{{ancestor.name}}</a>
+      <span ng-if="!$last" class="umb-breadcrumbs__seperator">&#47;</span>
+
+      <span class="umb-breadcrumbs__ancestor-text" ng-if="$last" title="{{ancestor.name}}">{{ancestor.name}}</span>
+
+   </li>
+</ul>

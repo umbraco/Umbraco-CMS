@@ -1,0 +1,77 @@
+.umb-folder-grid {
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+   width: 100%;
+   margin-bottom: 30px;
+}
+
+.umb-folder-grid__folder {
+   background: @grayLighter;
+   margin: 5px;
+   display: flex;
+   align-items: center;
+   padding: 10px 20px;
+   box-sizing: border-box;
+   flex: 1 1 200px;
+   border: 1px solid transparent;
+   transition: border 0.2s;
+   position: relative;
+   justify-content: space-between;
+   cursor: pointer;
+   user-select: none;
+}
+
+.umb-folder-grid__folder:focus,
+.umb-folder-grid__folder:active {
+   text-decoration: none;
+}
+
+.umb-folder-grid__folder:hover {
+   text-decoration: none;
+   background-color: darken(@grayLighter, 5%);
+}
+
+.umb-folder-grid__folder-description {
+   display: flex;
+   align-items: center;
+}
+
+.umb-folder-grid__folder-icon,
+.umb-folder-grid__folder-icon[class^="icon-"],
+.umb-folder-grid__folder-icon[class*=" icon-"] {
+   font-size: 20px;
+   margin-right: 15px;
+   color: @black;
+}
+
+.umb-folder-grid__folder-name {
+   font-size: 13px;
+   color: @black;
+   font-weight: bold;
+}
+
+.umb-folder-grid__folder-name:hover {
+   text-decoration: underline;
+}
+
+.umb-folder-grid__action {
+   opacity: 0;
+   border: 1px solid #ffffff;
+   width: 25px;
+   height: 25px;
+   background: rgba(0, 0, 0, 0.4);
+   border-radius: 50px;
+   box-sizing: border-box;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   color: #ffffff;
+   margin-left: 7px;
+   cursor: pointer;
+}
+
+.umb-folder-grid__action.-selected {
+   opacity: 1;
+   background: @blue;
+}

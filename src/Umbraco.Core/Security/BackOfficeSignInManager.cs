@@ -17,7 +17,7 @@ namespace Umbraco.Core.Security
         private readonly ILogger _logger;
         private readonly IOwinRequest _request;
 
-        public BackOfficeSignInManager(BackOfficeUserManager userManager, IAuthenticationManager authenticationManager, ILogger logger, IOwinRequest request)
+        public BackOfficeSignInManager(UserManager<BackOfficeIdentityUser, int> userManager, IAuthenticationManager authenticationManager, ILogger logger, IOwinRequest request)
             : base(userManager, authenticationManager)
         {
             if (logger == null) throw new ArgumentNullException("logger");
@@ -29,13 +29,13 @@ namespace Umbraco.Core.Security
 
         public override Task<ClaimsIdentity> CreateUserIdentityAsync(BackOfficeIdentityUser user)
         {
-            return user.GenerateUserIdentityAsync((BackOfficeUserManager)UserManager);
+            return user.GenerateUserIdentityAsync((BackOfficeUserManager<BackOfficeIdentityUser>)UserManager);
         }
 
         public static BackOfficeSignInManager Create(IdentityFactoryOptions<BackOfficeSignInManager> options, IOwinContext context, ILogger logger)
         {
             return new BackOfficeSignInManager(
-                context.GetUserManager<BackOfficeUserManager>(), 
+                context.GetBackOfficeUserManager(), 
                 context.Authentication,
                 logger,
                 context.Request);
@@ -46,13 +46,18 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="userName"/><param name="password"/><param name="isPersistent"/><param name="shouldLockout"/>
         /// <returns/>
-        public async override Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
+        public override async Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
         {
             var result = await base.PasswordSignInAsync(userName, password, isPersistent, shouldLockout);
 
             switch (result)
             {
                 case SignInStatus.Success:
+                    _logger.WriteCore(TraceEventType.Information, 0,
+                        string.Format(
+                            "User: {0} logged in from IP address {1}",
+                            userName,
+                            _request.RemoteIpAddress), null, null);
                     break;
                 case SignInStatus.LockedOut:
                     _logger.WriteCore(TraceEventType.Information, 0,

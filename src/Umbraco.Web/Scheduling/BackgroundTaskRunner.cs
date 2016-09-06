@@ -217,7 +217,11 @@ namespace Umbraco.Web.Scheduling
         {
             lock (_locker)
             {
-                if (_isCompleted) return false;
+                if (_isCompleted)
+                {
+                    _logger.Debug<BackgroundTaskRunner>(_logPrefix + "Task cannot be added {0}, the task runner is already shutdown", task.GetType);
+                    return false;
+                }
 
                 // add task
                 _logger.Debug<BackgroundTaskRunner>(_logPrefix + "Task added {0}", task.GetType);
@@ -301,7 +305,9 @@ namespace Umbraco.Web.Scheduling
 
             // tasks in the queue will be executed...
             if (wait == false) return;
-            _runningTask.Wait(); // wait for whatever is running to end...
+
+            if (_runningTask != null)
+                _runningTask.Wait(); // wait for whatever is running to end...
         }
 
         /// <summary>

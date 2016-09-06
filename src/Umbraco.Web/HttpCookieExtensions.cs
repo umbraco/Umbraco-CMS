@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
+using Microsoft.Owin;
 using Umbraco.Core;
 
 namespace Umbraco.Web
@@ -58,6 +59,16 @@ namespace Umbraco.Web
         /// <param name="request"></param>
         /// <returns></returns>
         public static bool HasPreviewCookie(this HttpRequestBase request)
+        {
+            return request.Cookies[Constants.Web.PreviewCookieName] != null;
+        }
+
+        /// <summary>
+        /// Does a preview cookie exist ?
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static bool HasPreviewCookie(this IOwinRequest request)
         {
             return request.Cookies[Constants.Web.PreviewCookieName] != null;
         }

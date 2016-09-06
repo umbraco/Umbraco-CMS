@@ -42,6 +42,9 @@ namespace Umbraco.Web.Editors
         {
             var dataType = (DataTypeSave)actionContext.ActionArguments["dataType"];
 
+            dataType.Name = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
+            dataType.Alias = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
+
             //Validate that the property editor exists
             var propertyEditor = PropertyEditorResolver.Current.GetByAlias(dataType.SelectedEditor);
             if (propertyEditor == null)
