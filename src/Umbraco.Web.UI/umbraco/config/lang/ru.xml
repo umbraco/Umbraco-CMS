@@ -863,7 +863,6 @@
     <key alias="returnToLogin">Вернуться к форме входа</key>
     <key alias="setPasswordInstruction">Пожалуйста укажите новый пароль</key>
     <key alias="setPasswordConfirmation">Ваш пароль обновлен</key>
-    <key alias="signInWith">Войти с помощью</key>
     <key alias="resetCodeExpired">Ссылка, по которой Вы попали сюда, неверна или устарела</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: сброс пароля</key>
     <key alias="resetPasswordEmailCopyFormat">
@@ -1064,6 +1063,23 @@
 		Вы можете опубликовать этот документ и все его дочерние документы, отметив опцию <em>Опубликовать все дочерние документы</em>.
 		Чтобы опубликовать ранее неопубликованные документы среди дочерних, отметьте опцию <em>Включая неопубликованные дочерние документы</em>.
 		]]></key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">Остановить отслеживание URL</key>
+    <key alias="enableUrlTracker">Запустить отслеживание URL</key>
+    <key alias="originalUrl">Первоначальный URL</key>
+    <key alias="redirectedTo">Перенаправлен в</key>
+    <key alias="noRedirects">На данный момент нет ни одного перенаправления</key>
+    <key alias="noRedirectsDescription">Если опубликованный документ переименовывается или меняет свое расположение в дереве, а следовательно, меняется адрес (URL), автоматически создается перенаправление на новое местоположение этого документа.</key>
+    <key alias="removeButton">Удалить</key>
+    <key alias="confirmRemove">Вы уверены, что хотите удалить перенаправление с '%0%' на '%1%'?</key>
+    <key alias="redirectRemoved">Перенаправление удалено.</key>
+    <key alias="redirectRemoveError">Ошибка удаления перенаправления.</key>
+    <key alias="confirmDisable">Вы уверены, что хотите остановить отслеживание URL?</key>
+    <key alias="disabledConfirm">Отслеживание URL в настоящий момент остановлено.</key>
+    <key alias="disableError">Ошибка остановки отслеживания URL, более подробные сведения находятся в системном журнале.</key>
+    <key alias="enabledConfirm">Отслеживание URL в настоящий момент запущено.</key>
+    <key alias="enableError">Ошибка запуска отслеживания URL, более подробные сведения находятся в системном журнале.</key>
   </area>
   <area alias="relatedlinks">
     <key alias="caption">Заголовок</key>
