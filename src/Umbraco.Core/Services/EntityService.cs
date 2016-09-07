@@ -132,7 +132,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.ROOT:
                         case UmbracoObjectTypes.Unknown:
                         default:
-                            throw new NotSupportedException();
+                            throw new NotSupportedException("Unsupported object type (" + umbracoObjectType + ").");
                     }
                 }
             });
