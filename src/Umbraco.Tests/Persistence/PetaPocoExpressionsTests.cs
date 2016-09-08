@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Tests.Persistence
 {
     [TestFixture]
-    public class PetaPocoExpresionsTests
+    public class PetaPocoExpressionsTests
     {
         [Test]
         public void WhereInValueFieldTest()
