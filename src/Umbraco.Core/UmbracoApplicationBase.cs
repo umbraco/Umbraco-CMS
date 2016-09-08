@@ -13,10 +13,6 @@ namespace Umbraco.Core
     /// <summary>
     /// Provides an abstract base class for the Umbraco HttpApplication.
     /// </summary>
-    /// <remarks>
-    /// This is exposed in Core so that we can have the IApplicationEventHandler in the core project so that
-    /// IApplicationEventHandler's can fire/execute outside of the web contenxt (i.e. in console applications). fixme wtf?
-    /// </remarks>
     public abstract class UmbracoApplicationBase : HttpApplication
     {
         private IRuntime _runtime;
@@ -34,16 +30,33 @@ namespace Umbraco.Core
             return Logger.CreateWithDefaultLog4NetConfiguration();
         }
 
-        #region Start
+        // events - in the order they trigger
 
-        // fixme? dont make much sense!
-        public event EventHandler ApplicationStarting;
-        public event EventHandler ApplicationStarted;
+        // were part of the BootManager architecture, would trigger only for the initial
+        // application, so they need not be static, and they would let ppl hook into the
+        // boot process... but I believe this can be achieved with components as well and
+        // we don't need these events.
+        //public event EventHandler ApplicationStarting;
+        //public event EventHandler ApplicationStarted;
+
+        // this event can only be static since there will be several instances of this class
+        // triggers for each application instance, ie many times per lifetime of the application
+        public static event EventHandler ApplicationInit;
+
+        // this event can only be static since there will be several instances of this class
+        // triggers once per error
+        public static event EventHandler ApplicationError;
+
+        // this event can only be static since there will be several instances of this class
+        // triggers once per lifetime of the application, before it is unloaded
+        public static event EventHandler ApplicationEnd;
+
+        #region Start
 
         // internal for tests
         internal void HandleApplicationStart(object sender, EventArgs evargs)
         {
-            // NOTE: THIS IS WHERE EVERYTHING BEGINS!
+            // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
             // create the container for the application, and configure.
             // the boot manager is responsible for registrations
@@ -74,11 +87,6 @@ namespace Umbraco.Core
             // get runtime & boot
             _runtime = GetRuntime();
             _runtime.Boot(container);
-
-            // this is extra that should get removed
-            ((CoreRuntime)_runtime).Initialize();
-            ((CoreRuntime)_runtime).Startup(() => OnApplicationStarting(sender, evargs));
-            ((CoreRuntime)_runtime).Complete(() => OnApplicationStarted(sender, evargs));
         }
 
         // called by ASP.NET (auto event wireup) once per app domain
@@ -94,20 +102,9 @@ namespace Umbraco.Core
 
         #region Init
 
-        // this event can only be static since there will be several instances of this class
-        public static event EventHandler ApplicationInit;
-
         private void OnApplicationInit(object sender, EventArgs evargs)
         {
-            try
-            {
-                ApplicationInit?.Invoke(sender, evargs);
-            }
-            catch (Exception ex)
-            {
-                Current.Logger.Error<UmbracoApplicationBase>("Exception in an ApplicationInit event handler.", ex);
-                throw;
-            }
+            TryInvoke(ApplicationInit, "ApplicationInit", sender, evargs);
         }
 
         // called by ASP.NET for every HttpApplication instance after all modules have been created
@@ -125,9 +122,6 @@ namespace Umbraco.Core
         #endregion
 
         #region End
-
-        // this event can only be static since there will be several instances of this class
-        public static event EventHandler ApplicationEnd;
 
         protected virtual void OnApplicationEnd(object sender, EventArgs evargs)
         {
@@ -187,9 +181,6 @@ namespace Umbraco.Core
 
         #region Error
 
-        // this event can only be static since there will be several instances of this class
-        public static event EventHandler ApplicationError;
-
         protected virtual void OnApplicationError(object sender, EventArgs evargs)
         {
             ApplicationError?.Invoke(this, EventArgs.Empty);
@@ -214,42 +205,22 @@ namespace Umbraco.Core
         }
 
         #endregion
+        
+        #region Utilities
 
-
-        /// <summary>
-        /// Developers can override this method to modify objects on startup
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="evargs"></param>
-        protected virtual void OnApplicationStarting(object sender, EventArgs evargs)
+        private static void TryInvoke(EventHandler handler, string name, object sender, EventArgs evargs)
         {
             try
             {
-                ApplicationStarting?.Invoke(sender, evargs);
+                handler?.Invoke(sender, evargs);
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarting event handler", ex);
+                Current.Logger.Error<UmbracoApplicationBase>($"Error in {name} handler.", ex);
                 throw;
             }
         }
 
-        /// <summary>
-        /// Developers can override this method to do anything they need to do once the application startup routine is completed.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="evargs"></param>
-        protected virtual void OnApplicationStarted(object sender, EventArgs evargs)
-        {
-            try
-            {
-                ApplicationStarted?.Invoke(sender, evargs);
-            }
-            catch (Exception ex)
-            {
-                Current.Logger.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarted event handler", ex);
-                throw;
-            }
-        }
+        #endregion
     }
 }

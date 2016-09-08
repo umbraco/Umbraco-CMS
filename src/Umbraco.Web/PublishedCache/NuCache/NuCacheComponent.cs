@@ -23,6 +23,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
                 factory.GetInstance<IFacadeAccessor>(),
                 factory.GetInstance<ILogger>()));
+
+            // add the NuCache health check (hidden from type finder)
+            // todo - no NuCache health check yet
+            //var builder = container.GetInstance<HealthCheckCollectionBuilder>();
+            //builder.Add<NuCacheIntegrityHealthCheck>();
         }
 
         public void Initialize(IFacadeService service)

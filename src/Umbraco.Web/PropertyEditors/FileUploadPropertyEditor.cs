@@ -1,15 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing;
-using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Xml;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -20,7 +14,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
-    public class FileUploadPropertyEditor : PropertyEditor, IApplicationEventHandler
+    public class FileUploadPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSettings;
@@ -29,14 +23,13 @@ namespace Umbraco.Web.PropertyEditors
         public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings, ILocalizedTextService textService)
             : base(logger)
         {
-            if (mediaFileSystem == null) throw new ArgumentNullException("mediaFileSystem");
-            if (contentSettings == null) throw new ArgumentNullException("contentSettings");
-            if (textService == null) throw new ArgumentNullException("textService");
-            _applicationStartup = new FileUploadPropertyEditorApplicationStartup(this);
+            if (mediaFileSystem == null) throw new ArgumentNullException(nameof(mediaFileSystem));
+            if (contentSettings == null) throw new ArgumentNullException(nameof(contentSettings));
+            if (textService == null) throw new ArgumentNullException(nameof(textService));
+
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings;
-            _textService = textService;
-            
+            _textService = textService;           
         }
 
         /// <summary>
@@ -59,7 +52,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Ensures any files associated are removed
         /// </summary>
         /// <param name="allPropertyData"></param>
-        IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
+        internal IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
         {
             var list = new List<string>();
             //Get all values for any image croppers found
@@ -81,7 +74,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Ensures any files associated are removed
         /// </summary>
         /// <param name="deletedEntities"></param>
-        IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
+        internal IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
         {
             var list = new List<string>();
             foreach (var property in deletedEntities.SelectMany(deletedEntity => deletedEntity
@@ -103,7 +96,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-         void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
+        internal void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
         {
             if (e.Original.Properties.Any(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias))
             {
@@ -142,12 +135,12 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        void MediaServiceCreating(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
+        internal void MediaServiceCreating(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
         {
             AutoFillProperties(e.Entity);
         }
 
-        void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
+        internal void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
         {
             foreach (var m in e.SavedEntities)
             {
@@ -265,62 +258,5 @@ namespace Umbraco.Web.PropertyEditors
                 }
             }
         }
-
-        #region Application event handler, used to bind to events on startup
-
-        private readonly FileUploadPropertyEditorApplicationStartup _applicationStartup;
-
-        /// <summary>
-        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
-        /// </summary>
-        private class FileUploadPropertyEditorApplicationStartup : ApplicationEventHandler
-        {
-            private FileUploadPropertyEditor _fileUploadPropertyEditor;
-
-            public FileUploadPropertyEditorApplicationStartup(FileUploadPropertyEditor fileUploadPropertyEditor)
-            {
-                this._fileUploadPropertyEditor = fileUploadPropertyEditor;
-            }
-
-            /// <summary>
-            /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
-            /// if we find any attached to the current media item.
-            /// </summary>
-            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
-            {
-                MediaService.Saving += _fileUploadPropertyEditor.MediaServiceSaving;
-                MediaService.Created += _fileUploadPropertyEditor.MediaServiceCreating;
-                ContentService.Copied += _fileUploadPropertyEditor.ContentServiceCopied;
-
-                MediaService.Deleted += (sender, args) =>
-                    args.MediaFilesToDelete.AddRange(_fileUploadPropertyEditor.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-                MediaService.EmptiedRecycleBin += (sender, args) =>
-                    args.Files.AddRange(_fileUploadPropertyEditor.ServiceEmptiedRecycleBin(args.AllPropertyData));
-                ContentService.Deleted += (sender, args) =>
-                    args.MediaFilesToDelete.AddRange(_fileUploadPropertyEditor.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-                ContentService.EmptiedRecycleBin += (sender, args) =>
-                    args.Files.AddRange(_fileUploadPropertyEditor.ServiceEmptiedRecycleBin(args.AllPropertyData));
-                MemberService.Deleted += (sender, args) =>
-                    args.MediaFilesToDelete.AddRange(_fileUploadPropertyEditor.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            }
-        }
-
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication)
-        {
-            //wrap
-            _applicationStartup.OnApplicationInitialized(umbracoApplication);
-        }
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication)
-        {
-            //wrap
-            _applicationStartup.OnApplicationStarting(umbracoApplication);
-        }
-        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication)
-        {
-            //wrap
-            _applicationStartup.OnApplicationStarted(umbracoApplication);
-        }
-        #endregion
-
     }
 }

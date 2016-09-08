@@ -3,11 +3,9 @@ using System;
 namespace Umbraco.Core.Plugins
 {
     /// <summary>
-    /// Used to notify the TypeFinder to ignore any class attributed with this during it's discovery
+    /// Notifies the TypeFinder that it should ignore the class marked with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class HideFromTypeFinderAttribute : Attribute
-    {
-        
-    }
+    { }
 }

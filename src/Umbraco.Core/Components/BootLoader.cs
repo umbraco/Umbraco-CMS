@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using LightInject;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 
@@ -225,7 +224,7 @@ namespace Umbraco.Core.Components
         {
             if (_booted == false) throw new InvalidOperationException("Cannot terminate, has not booted.");
 
-            using (_proflog.DebugDuration<BootLoader>($"Terminating Umbraco. (log components when >{LogThresholdMilliseconds}ms)", "Terminated Umbraco."))
+            using (_proflog.DebugDuration<BootLoader>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
             {
                 foreach (var component in _components)
                 {

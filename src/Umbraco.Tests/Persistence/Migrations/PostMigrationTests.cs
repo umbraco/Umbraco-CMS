@@ -1,22 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
-using NPoco;
+﻿using Moq;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Strategies.Migrations;
@@ -24,7 +12,7 @@ using Umbraco.Web.Strategies.Migrations;
 namespace Umbraco.Tests.Persistence.Migrations
 {
     [TestFixture]
-    public class MigrationStartupHandlerTests
+    public class PostMigrationTests
     {
         [Test]
         public void Executes_For_Any_Product_Name_When_Not_Specified()
@@ -33,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Migrations
 
             var changed1 = new Args { CountExecuted = 0 };
             var testHandler1 = new TestMigrationHandler(changed1);
-            testHandler1.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>());
+            MigrationRunner.Migrated += testHandler1.Migrated;
 
             var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
             var migrationContext = new MigrationContext(db, logger);
@@ -50,11 +38,11 @@ namespace Umbraco.Tests.Persistence.Migrations
 
             var changed1 = new Args { CountExecuted = 0};
             var testHandler1 = new TestMigrationHandler("Test1", changed1);
-            testHandler1.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>());
+            MigrationRunner.Migrated += testHandler1.Migrated;
 
             var changed2 = new Args { CountExecuted = 0 };
             var testHandler2 = new TestMigrationHandler("Test2", changed2);
-            testHandler2.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>());
+            MigrationRunner.Migrated += testHandler2.Migrated;
 
             var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
             var migrationContext = new MigrationContext(db, logger);
@@ -76,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Migrations
             public int CountExecuted { get; set; }
         }
 
-        public class TestMigrationHandler : MigrationStartupHandler
+        public class TestMigrationHandler : IPostMigration
         {
             private readonly string _prodName;
             private readonly Args _changed;
@@ -98,14 +86,10 @@ namespace Umbraco.Tests.Persistence.Migrations
                 _changed = changed;
             }
 
-            protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
+            public void Migrated(MigrationRunner sender, MigrationEventArgs args)
             {
+                if (_prodName.IsNullOrWhiteSpace() == false && args.ProductName != _prodName) return;
                 _changed.CountExecuted++;
-            }
-            
-            public override string[] TargetProductNames
-            {
-                get { return _prodName.IsNullOrWhiteSpace() ? new string[] {} : new[] {_prodName}; }
             }
         }
     }

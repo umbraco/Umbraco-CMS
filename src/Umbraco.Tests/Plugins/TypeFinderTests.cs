@@ -69,26 +69,26 @@ namespace Umbraco.Tests.Plugins
 			Assert.AreEqual(2, typesFound.Count());
 		}
 
-        [Test]
-        public void Find_Classes_Of_Type()
-        {
-            var typesFound = TypeFinder.FindClassesOfType<IApplicationEventHandler>(_assemblies);
-            var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationEventHandler>(_assemblies);
+        //[Test]
+        //public void Find_Classes_Of_Type()
+        //{
+        //    var typesFound = TypeFinder.FindClassesOfType<IApplicationEventHandler>(_assemblies);
+        //    var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationEventHandler>(_assemblies);
 
-            foreach (var type in typesFound)
-                Console.WriteLine(type);
-            Console.WriteLine();
-            foreach (var type in originalTypesFound)
-                Console.WriteLine(type);
+        //    foreach (var type in typesFound)
+        //        Console.WriteLine(type);
+        //    Console.WriteLine();
+        //    foreach (var type in originalTypesFound)
+        //        Console.WriteLine(type);
 
-            // 6 classes in _assemblies implement IApplicationEventHandler
-            Assert.AreEqual(6, typesFound.Count());
+        //    // 6 classes in _assemblies implement IApplicationEventHandler
+        //    Assert.AreEqual(6, typesFound.Count());
 
-            // however,
-            // Umbraco.Core.Profiling.WebProfiler is internal and is not returned by TypeFinderOriginal,
-            // that's a known issue of the legacy type finder, so we have to tweak the count here.
-            Assert.AreEqual(5, originalTypesFound.Count());
-        }
+        //    // however,
+        //    // Umbraco.Core.Profiling.WebProfiler is internal and is not returned by TypeFinderOriginal,
+        //    // that's a known issue of the legacy type finder, so we have to tweak the count here.
+        //    Assert.AreEqual(5, originalTypesFound.Count());
+        //}
 
         [Test]
         public void Find_Classes_With_Attribute()

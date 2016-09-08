@@ -208,7 +208,6 @@
     <Compile Include="Macros\XsltMacroEngine.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
-    <Compile Include="ManifestWatcherComponent.cs" />
     <Compile Include="Media\ImageUrlProviderCollection.cs" />
     <Compile Include="Media\ImageUrlProviderCollectionBuilder.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollection.cs" />
@@ -220,6 +219,7 @@
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedFragmentProperty.cs" />
     <Compile Include="PublishedCache\PublishedFragment.cs" />
@@ -277,6 +277,10 @@
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
     <Compile Include="SignalR\PreviewHub.cs" />
+    <Compile Include="Strategies\Migrations\IPostMigration.cs" />
+    <Compile Include="Strategies\Migrations\PostMigrationCollection.cs" />
+    <Compile Include="Strategies\Migrations\PostMigrationCollectionBuilder.cs" />
+    <Compile Include="Strategies\Migrations\PostMigrationComponent.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Models\ContentEditing\MemberGroupDisplay.cs" />
@@ -377,7 +381,7 @@
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
-    <Compile Include="Redirects\RedirectTrackingEventHandler.cs" />
+    <Compile Include="Redirects\RedirectTrackingComponent.cs" />
     <Compile Include="DefaultEventMessagesFactory.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
@@ -431,7 +435,7 @@
     <Compile Include="Cache\DictionaryCacheRefresher.cs" />
     <Compile Include="Cache\DistributedCache.cs" />
     <Compile Include="Cache\DistributedCacheExtensions.cs" />
-    <Compile Include="Cache\CacheRefresherEventHandler.cs" />
+    <Compile Include="Cache\CacheRefresherComponent.cs" />
     <Compile Include="Cache\DomainCacheRefresher.cs" />
     <Compile Include="Cache\LanguageCacheRefresher.cs" />
     <Compile Include="Cache\MacroCacheRefresher.cs" />
@@ -652,7 +656,6 @@
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\EnsureListViewDataTypeIsCreated.cs" />
-    <Compile Include="Strategies\Migrations\MigrationStartupHandler.cs" />
     <Compile Include="Strategies\Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
     <Compile Include="Strategies\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
@@ -855,7 +858,7 @@
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
     <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
-    <Compile Include="Strategies\PublicAccessEventHandler.cs" />
+    <Compile Include="Strategies\PublicAccessComponent.cs" />
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
@@ -984,7 +987,7 @@
     <Compile Include="Routing\UrlProvider.cs" />
     <Compile Include="Routing\WebServicesRouteConstraint.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
-    <Compile Include="Search\ExamineEvents.cs" />
+    <Compile Include="Search\ExamineComponent.cs" />
     <Compile Include="Strategies\Migrations\PublishAfterUpgradeToVersionSixth.cs" />
     <Compile Include="Strategies\DatabaseServerRegistrationComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
@@ -1106,7 +1109,6 @@
     <Compile Include="Routing\PublishedContentRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
-    <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Strategies.Migrations
@@ -17,17 +11,17 @@ namespace Umbraco.Web.Strategies.Migrations
     /// <summary>
     /// Creates the built in list view data types
     /// </summary>
-    public class EnsureDefaultListViewDataTypesCreated : MigrationStartupHandler
+    public class EnsureDefaultListViewDataTypesCreated : IPostMigration
     {
-        protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
+        public void Migrated(MigrationRunner sender, MigrationEventArgs args)
         {
-            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+            if (args.ProductName != GlobalSettings.UmbracoMigrationName) return;
 
             var target720 = new Version(7, 2, 0);
 
-            if (e.ConfiguredVersion <= target720)
+            if (args.ConfiguredVersion <= target720)
             {
-                EnsureListViewDataTypeCreated(e);
+                EnsureListViewDataTypeCreated(args);
 
             }
         }

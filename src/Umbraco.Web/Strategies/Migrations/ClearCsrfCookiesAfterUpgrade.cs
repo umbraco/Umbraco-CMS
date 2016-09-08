@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Web;
+﻿using System.Web;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Web.WebApi.Filters;
@@ -10,16 +9,14 @@ namespace Umbraco.Web.Strategies.Migrations
     /// <summary>
     /// After upgrade we clear out the csrf tokens
     /// </summary>
-    public class ClearCsrfCookiesAfterUpgrade : MigrationStartupHandler
+    public class ClearCsrfCookiesAfterUpgrade : IPostMigration
     {
-        protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
+        public void Migrated(MigrationRunner sender, MigrationEventArgs args)
         {
-            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
-
+            if (args.ProductName != GlobalSettings.UmbracoMigrationName) return;
             if (HttpContext.Current == null) return;
 
             var http = new HttpContextWrapper(HttpContext.Current);
-
             http.ExpireCookie(AngularAntiForgeryHelper.AngularCookieName);
             http.ExpireCookie(AngularAntiForgeryHelper.CsrfValidationCookieName);
         }

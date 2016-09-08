@@ -1,10 +1,10 @@
 ﻿using System.IO;
-using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 
-namespace Umbraco.Web
+namespace Umbraco.Core.Strategies
 {
     public class ManifestWatcherComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
@@ -14,8 +14,6 @@ namespace Umbraco.Web
 
         public void Initialize(IRuntimeState runtime)
         {
-            // BUT how can we tell that runtime is "ready enough"? need to depend on some sort of UmbracoRuntimeComponent?
-            // and... will this kind of dependency issue be repro everywhere?!
             if (runtime.Level < RuntimeLevel.Run || runtime.Debug == false) return;
 
             //if (ApplicationContext.Current.IsConfigured == false || GlobalSettings.DebugMode == false)

@@ -20,7 +20,6 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
@@ -33,7 +32,6 @@ using Umbraco.Web.DependencyInjection;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
-using Umbraco.Web.HealthCheck.Checks.DataIntegrity;
 using Umbraco.Web.Install;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
@@ -67,8 +65,6 @@ namespace Umbraco.Web
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
-            // fixme - move that one to runtime
-            //container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // replaces HttpContext.Current
             container.RegisterSingleton<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
             // register the 'current' umbraco context - transient - for eg controllers
@@ -80,11 +76,6 @@ namespace Umbraco.Web
 
             // register the facade accessor - the "current" facade is in the umbraco context
             container.RegisterSingleton<IFacadeAccessor, UmbracoContextFacadeAccessor>();
-
-            // register the umbraco database accessor
-            // have to use the hybrid thing...
-            // fixme moving to runtime
-            //container.RegisterSingleton<IUmbracoDatabaseAccessor, HybridUmbracoDatabaseAccessor>();
 
             // register a per-request UmbracoContext object
             // no real need to be per request but assuming it is faster
@@ -102,9 +93,6 @@ namespace Umbraco.Web
 
             container.RegisterSingleton<IExamineIndexCollectionAccessor, ExamineIndexCollectionAccessor>();
 
-            // fixme - still, doing it before we get the INITIALIZE scope is a BAD idea
-            // fixme - also note that whatever you REGISTER in a scope, stays registered => create the scope beforehand?
-            // fixme - BUT not enough, once per-request is enabled it WANTS per-request scope even though a scope already exists
             // IoC setup for LightInject for MVC/WebApi
             // see comments on MixedScopeManagerProvider for explainations of what we are doing here
             var smp = container.ScopeManagerProvider as MixedScopeManagerProvider;
@@ -186,16 +174,15 @@ namespace Umbraco.Web
 
             container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
+            // register *all* checks, except those marked [HideFromTypeFinder] of course
             HealthCheckCollectionBuilder.Register(container)
-                .AddProducer(() => pluginManager.ResolveTypes<HealthCheck.HealthCheck>())
-                .Exclude<XmlDataIntegrityHealthCheck>(); // fixme must remove else NuCache dies!
-            // but we should also have one for NuCache AND NuCache should be a component that does all this
+                .AddProducer(() => pluginManager.ResolveTypes<HealthCheck.HealthCheck>());
 
-            // fixme - will this work? others?
+            // auto-register views
             container.RegisterAuto(typeof(UmbracoViewPage<>));
         }
 
-        private void ComposeLegacyMessenger(ServiceContainer container, RuntimeLevel runtimeLevel, ILogger logger)
+        private static void ComposeLegacyMessenger(IServiceRegistry container, RuntimeLevel runtimeLevel, ILogger logger)
         {
             //set the legacy one by default - this maintains backwards compat
             container.Register<IServerMessenger>(factory =>
@@ -224,7 +211,7 @@ namespace Umbraco.Web
             }, new PerContainerLifetime());
         }
 
-        private void ComposeMessenger(ServiceContainer container, ILogger logger, ProfilingLogger proflog)
+        private static void ComposeMessenger(IServiceRegistry container, ILogger logger, ProfilingLogger proflog)
         {
             container.Register<IServerMessenger>(factory =>
             {
@@ -263,13 +250,10 @@ namespace Umbraco.Web
         }
 
         internal void Initialize(
-            UmbracoApplicationBase umbracoApplication,
             IRuntimeState runtime,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
-            // fixme - need to review & cleanup
-
             // setup mvc and webapi services
             SetupMvcAndWebApi();
 
@@ -308,7 +292,7 @@ namespace Umbraco.Web
 
             //before we do anything, we'll ensure the umbraco context
             //see: http://issues.umbraco.org/issue/U4-1717
-            var httpContext = new HttpContextWrapper(umbracoApplication.Context);
+            var httpContext = new HttpContextWrapper(HttpContext.Current);
             UmbracoContext.EnsureContext( // fixme - refactor! UmbracoContext & UmbracoRequestContext! + inject, accessor, etc
                 httpContext,
                 Current.FacadeService,

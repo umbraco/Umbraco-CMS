@@ -6,6 +6,8 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Web.HealthCheck;
+using Umbraco.Web.HealthCheck.Checks.DataIntegrity;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -24,6 +26,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 factory.GetAllInstances<IUrlSegmentProvider>(),
                 factory.GetInstance<IFacadeAccessor>(),
                 factory.GetInstance<MainDom>()));
+
+            // add the Xml cache health check (hidden from type finder)
+            var builder = container.GetInstance<HealthCheckCollectionBuilder>();
+            builder.Exclude<XmlDataIntegrityHealthCheck>();
         }
 
         public void Initialize(IFacadeService service)

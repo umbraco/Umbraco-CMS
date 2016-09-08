@@ -3,10 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -17,7 +14,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = PropertyEditorValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
-    public class ImageCropperPropertyEditor : PropertyEditor, IApplicationEventHandler
+    public class ImageCropperPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSettings;
@@ -25,10 +22,8 @@ namespace Umbraco.Web.PropertyEditors
         public ImageCropperPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings)
             : base(logger)
         {
-            if (mediaFileSystem == null) throw new ArgumentNullException("mediaFileSystem");
-            if (contentSettings == null) throw new ArgumentNullException("contentSettings");
-
-            _applicationStartup = new FileUploadPropertyEditorApplicationStartup(this);
+            if (mediaFileSystem == null) throw new ArgumentNullException(nameof(mediaFileSystem));
+            if (contentSettings == null) throw new ArgumentNullException(nameof(contentSettings));
 
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings;
@@ -60,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Ensures any files associated are removed
         /// </summary>
         /// <param name="allPropertyData"></param>
-        IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
+        internal IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
         {
             var list = new List<string>();
             //Get all values for any image croppers found
@@ -93,7 +88,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Ensures any files associated are removed
         /// </summary>
         /// <param name="deletedEntities"></param>
-        IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
+        internal IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
         {
             var list = new List<string>();
             foreach (var property in deletedEntities.SelectMany(deletedEntity => deletedEntity
@@ -126,7 +121,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
+        internal void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
         {
             if (e.Original.Properties.Any(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias))
             {
@@ -145,7 +140,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + property.Value.ToString(), ex);
+                        Logger.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + property.Value, ex);
                         continue;
                     }
 
@@ -170,8 +165,6 @@ namespace Umbraco.Web.PropertyEditors
                             isUpdated = true;
                         }
                     }
-
-                    
                 }
 
                 if (isUpdated)
@@ -182,12 +175,12 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
+        internal void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
         {
             AutoFillProperties(e.Entity);
         }
 
-        void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
+        internal void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
         {
             foreach (var m in e.SavedEntities)
             {
@@ -252,61 +245,5 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("crops", "Crop sizes", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
             public string Crops { get; set; }
         }
-
-        #region Application event handler, used to bind to events on startup
-
-        private readonly FileUploadPropertyEditorApplicationStartup _applicationStartup;
-
-        /// <summary>
-        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
-        /// </summary>
-        private class FileUploadPropertyEditorApplicationStartup : ApplicationEventHandler
-        {
-            private readonly ImageCropperPropertyEditor _imageCropperPropertyEditor;
-
-            public FileUploadPropertyEditorApplicationStartup(ImageCropperPropertyEditor imageCropperPropertyEditor)
-            {
-                _imageCropperPropertyEditor = imageCropperPropertyEditor;
-            }
-
-            /// <summary>
-            /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
-            /// if we find any attached to the current media item.
-            /// </summary>
-            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
-            {
-                MediaService.Saving += _imageCropperPropertyEditor.MediaServiceSaving;
-                MediaService.Created += _imageCropperPropertyEditor.MediaServiceCreated;
-                ContentService.Copied += _imageCropperPropertyEditor.ContentServiceCopied;
-
-                MediaService.Deleted += (sender, args) =>
-                    args.MediaFilesToDelete.AddRange(_imageCropperPropertyEditor.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-                MediaService.EmptiedRecycleBin += (sender, args) =>
-                    args.Files.AddRange(_imageCropperPropertyEditor.ServiceEmptiedRecycleBin(args.AllPropertyData));
-                ContentService.Deleted += (sender, args) =>
-                    args.MediaFilesToDelete.AddRange(_imageCropperPropertyEditor.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-                ContentService.EmptiedRecycleBin += (sender, args) =>
-                    args.Files.AddRange(_imageCropperPropertyEditor.ServiceEmptiedRecycleBin(args.AllPropertyData));
-                MemberService.Deleted += (sender, args) =>
-                    args.MediaFilesToDelete.AddRange(_imageCropperPropertyEditor.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            }
-        }
-
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication)
-        {
-            //wrap
-            _applicationStartup.OnApplicationInitialized(umbracoApplication);
-        }
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication)
-        {
-            //wrap
-            _applicationStartup.OnApplicationStarting(umbracoApplication);
-        }
-        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication)
-        {
-            //wrap
-            _applicationStartup.OnApplicationStarted(umbracoApplication);
-        }
-        #endregion
     }
 }

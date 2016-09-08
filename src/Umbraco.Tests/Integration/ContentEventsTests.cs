@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Integration
         {
             base.Initialize();
 
-            _h1 = new CacheRefresherEventHandler();
+            _h1 = new CacheRefresherComponent();
             _h1.AddHandlers();
 
             _events = new List<EventInstance>();
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Integration
             ContentCacheRefresher.CacheUpdated -= ContentCacheUpdated;
         }
 
-        private CacheRefresherEventHandler _h1;
+        private CacheRefresherComponent _h1;
         private IList<EventInstance> _events;
         private int _msgCount;
         private IContentType _contentType;

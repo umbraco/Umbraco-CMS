@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 
@@ -13,6 +14,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         "XML Data Integrity",
         Description = "Checks the integrity of the XML data in Umbraco",
         Group = "Data Integrity")]
+    [HideFromTypeFinder] // only if running the Xml cache! added by XmlCacheComponent!
     public class XmlDataIntegrityHealthCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;

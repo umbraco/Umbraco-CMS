@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core.Events;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -19,15 +15,15 @@ namespace Umbraco.Web.Strategies.Migrations
     /// files during the migration since other parts of the migration might fail. So once the migration is complete, we'll then copy over the temp
     /// files that this migration created over top of the developer's files. We'll also create a backup of their files.
     /// </summary>
-    public sealed class OverwriteStylesheetFilesFromTempFiles : MigrationStartupHandler
+    public sealed class OverwriteStylesheetFilesFromTempFiles : IPostMigration
     {
-        protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
+        public void Migrated(MigrationRunner sender, MigrationEventArgs args)
         {
-            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+            if (args.ProductName != GlobalSettings.UmbracoMigrationName) return;
 
             var target73 = new Version(7, 3, 0);
 
-            if (e.ConfiguredVersion <= target73)
+            if (args.ConfiguredVersion <= target73)
             {
                 var tempCssFolder = IOHelper.MapPath("~/App_Data/TEMP/CssMigration/");
                 var cssFolder = IOHelper.MapPath("~/css");
@@ -42,7 +38,7 @@ namespace Umbraco.Web.Strategies.Migrations
                         {
                             //backup
                             var targetPath = Path.Combine(tempCssFolder, relativePath.EnsureEndsWith(".bak"));
-                            e.MigrationContext.Logger.Info<OverwriteStylesheetFilesFromTempFiles>("CSS file is being backed up from {0}, to {1} before being migrated to new format", () => cssFilePath, () => targetPath);
+                            args.MigrationContext.Logger.Info<OverwriteStylesheetFilesFromTempFiles>("CSS file is being backed up from {0}, to {1} before being migrated to new format", () => cssFilePath, () => targetPath);
                             File.Copy(cssFilePath, targetPath, true);
                         }
 

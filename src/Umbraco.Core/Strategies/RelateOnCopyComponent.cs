@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Components;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -6,9 +7,9 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.Strategies
 {
     //TODO: This should just exist in the content service/repo!
-    public sealed class RelateOnCopyHandler : ApplicationEventHandler
+    public sealed class RelateOnCopyComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
+        public void Initialize()
         {
             ContentService.Copied += ContentServiceCopied;
         }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Threading.Tasks;
 using System.Threading;
 using LightInject;
+using Semver;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
@@ -38,15 +38,22 @@ namespace Umbraco.Core
         public CoreRuntime(UmbracoApplicationBase umbracoApplication)
         {
             if (umbracoApplication == null) throw new ArgumentNullException(nameof(umbracoApplication));
-            UmbracoApplication = umbracoApplication;
         }
 
         /// <inheritdoc/>
         public virtual void Boot(ServiceContainer container)
         {
+            // some components may want to initialize with the UmbracoApplicationBase
+            // well, they should not - let's not do this
+            //container.RegisterInstance(_app);
+
             Compose(container);
 
             // prepare essential stuff
+
+            var path = GetApplicationRootPath();
+            if (string.IsNullOrWhiteSpace(path) == false)
+                IOHelper.SetRootDirectory(path);
 
             _state = (RuntimeState) container.GetInstance<IRuntimeState>();
             _state.Level = RuntimeLevel.Boot;
@@ -54,9 +61,6 @@ namespace Umbraco.Core
             Logger = container.GetInstance<ILogger>();
             Profiler = container.GetInstance<IProfiler>();
             ProfilingLogger = container.GetInstance<ProfilingLogger>();
-
-            // fixme - totally temp
-            container.RegisterInstance(UmbracoApplication);
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -95,13 +99,26 @@ namespace Umbraco.Core
                 // boot
                 _bootLoader = new BootLoader(container);
                 _bootLoader.Boot(componentTypes, _state.Level);
+
+                // this was done in Complete() right before running the Started event handlers
+                // "special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
+                // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)"
+                //
+                // was *always* setting the value to true which is?! so using the runtime level
+                // and then, it is *never* resetted to false, meaning Umbraco has been running with IsUpgrading being true?
+                // fixme - this is... bad
+                ((UserService) Current.Services.UserService).IsUpgrading = _state.Level == RuntimeLevel.Upgrade;
+
             }
         }
 
         /// <inheritdoc/>
         public virtual void Terminate()
         {
-            _bootLoader?.Terminate();
+            using (ProfilingLogger.DebugDuration<CoreRuntime>("Terminating Umbraco.", "Terminated."))
+            {
+                _bootLoader?.Terminate();
+            }
         }
 
         /// <inheritdoc/>
@@ -150,11 +167,14 @@ namespace Umbraco.Core
             container.RegisterSingleton<MainDom>();
         }
 
-        private static void SetRuntimeStateLevel(RuntimeState runtimeState, IDatabaseFactory databaseFactory, ILogger logger)
+        private void SetRuntimeStateLevel(RuntimeState runtimeState, IDatabaseFactory databaseFactory, ILogger logger)
         {
             var localVersion = LocalVersion; // the local, files, version
             var codeVersion = runtimeState.SemanticVersion; // the executing code version
             var connect = false;
+
+            // we don't know yet
+            runtimeState.Level = RuntimeLevel.Unknown;
 
             if (string.IsNullOrWhiteSpace(localVersion))
             {
@@ -177,47 +197,44 @@ namespace Umbraco.Core
                 runtimeState.Level = RuntimeLevel.Install;
             }
 
+            // install? not going to test anything else
+            if (runtimeState.Level == RuntimeLevel.Install)
+                return;
+
+            // else, keep going,
             // anything other than install wants a database - see if we can connect
-            if (runtimeState.Level != RuntimeLevel.Install)
+            for (var i = 0; i < 5; i++)
             {
-                for (var i = 0; i < 5; i++)
-                {
-                    connect = databaseFactory.CanConnect;
-                    if (connect) break;
-                    logger.Debug<CoreRuntime>(i == 0
-                        ? "Could not immediately connect to database, trying again."
-                        : "Could not connect to database.");
-                    Thread.Sleep(1000);
-                }
-
-                if (connect == false)
-                {
-                    // cannot connect to configured database, this is bad, fail
-                    logger.Debug<CoreRuntime>("Could not connect to database.");
-                    runtimeState.Level = RuntimeLevel.Failed;
-
-                    // in fact, this is bad enough that we want to throw
-                    throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
-                }
+                connect = databaseFactory.CanConnect;
+                if (connect) break;
+                logger.Debug<CoreRuntime>(i == 0
+                    ? "Could not immediately connect to database, trying again."
+                    : "Could not connect to database.");
+                Thread.Sleep(1000);
             }
 
-            // if we cannot connect, cannot do more
-            if (connect == false) return;
+            if (connect == false)
+            {
+                // cannot connect to configured database, this is bad, fail
+                logger.Debug<CoreRuntime>("Could not connect to database.");
+                runtimeState.Level = RuntimeLevel.Failed;
+
+                // in fact, this is bad enough that we want to throw
+                throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+            }
+
+            // if we already know we want to upgrade, no need to look for migrations...
+            if (runtimeState.Level == RuntimeLevel.Upgrade)
+                return;
 
             // else
             // look for a matching migration entry - bypassing services entirely - they are not 'up' yet
             // fixme - in a LB scenario, ensure that the DB gets upgraded only once!
             // fixme - eventually move to yol-style guid-based transitions
-            var database = databaseFactory.GetDatabase();
-            var codeVersionString = codeVersion.ToString();
-            var sql = database.Sql()
-                .Select<MigrationDto>()
-                .From<MigrationDto>()
-                .Where<MigrationDto>(x => x.Name.InvariantEquals(GlobalSettings.UmbracoMigrationName) && x.Version == codeVersionString);
             bool exists;
             try
             {
-                exists = database.FirstOrDefault<MigrationDto>(sql) != null;
+                exists = EnsureMigration(databaseFactory, codeVersion);
             }
             catch
             {
@@ -243,6 +260,17 @@ namespace Umbraco.Core
             runtimeState.Level = RuntimeLevel.Upgrade;
         }
 
+        protected virtual bool EnsureMigration(IDatabaseFactory databaseFactory, SemVersion codeVersion)
+        {
+            var database = databaseFactory.GetDatabase();
+            var codeVersionString = codeVersion.ToString();
+            var sql = database.Sql()
+                .Select<MigrationDto>()
+                .From<MigrationDto>()
+                .Where<MigrationDto>(x => x.Name.InvariantEquals(GlobalSettings.UmbracoMigrationName) && x.Version == codeVersionString);
+            return database.FirstOrDefault<MigrationDto>(sql) != null;
+        }
+
         private static string LocalVersion
         {
             get
@@ -261,8 +289,6 @@ namespace Umbraco.Core
 
         #region Locals
 
-        // fixme - we almost certainly DONT need these!
-
         protected ILogger Logger { get; private set; }
 
         protected IProfiler Profiler { get; private set; }
@@ -277,178 +303,10 @@ namespace Umbraco.Core
 
         protected virtual IEnumerable<Type> GetComponentTypes() => Current.PluginManager.ResolveTypes<IUmbracoComponent>();
 
-        //protected virtual IProfiler GetProfiler() => new LogProfiler(Logger);
-
-        //protected virtual CacheHelper GetApplicationCache() => new CacheHelper(
-        //        // we need to have the dep clone runtime cache provider to ensure
-        //        // all entities are cached properly (cloned in and cloned out)
-        //        new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
-        //        new StaticCacheProvider(),
-        //        // we have no request based cache when not running in web-based context
-        //        new NullCacheProvider(),
-        //        new IsolatedRuntimeCache(type =>
-        //            // we need to have the dep clone runtime cache provider to ensure
-        //            // all entities are cached properly (cloned in and cloned out)
-        //            new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+        // by default, returns null, meaning that Umbraco should auto-detect the application root path.
+        // override and return the absolute path to the Umbraco site/solution, if needed
+        protected virtual string GetApplicationRootPath() => null;
 
         #endregion
-
-        // fixme - kill everything below!
-
-        private IServiceContainer _appStartupEvtContainer;
-        private bool _isInitialized;
-        private bool _isStarted;
-        private bool _isComplete;
-
-        protected UmbracoApplicationBase UmbracoApplication { get; }
-
-        protected ServiceContainer Container => Current.Container;
-
-        /// <summary>
-        /// Special method to extend the use of Umbraco by enabling the consumer to overwrite
-        /// the absolute path to the root of an Umbraco site/solution, which is used for stuff
-        /// like Umbraco.Core.IO.IOHelper.MapPath etc.
-        /// </summary>
-        /// <param name="rootPath">Absolute Umbraco root path.</param>
-        protected virtual void InitializeApplicationRootPath(string rootPath)
-        {
-            IOHelper.SetRootDirectory(rootPath);
-        }
-
-        public virtual IRuntime Initialize()
-        {
-            if (_isInitialized)
-                throw new InvalidOperationException("The boot manager has already been initialized");
-
-            //now we need to call the initialize methods
-            //Create a 'child'container which is a copy of all of the current registrations and begin a sub scope for it
-            // this child container will be used to manage the application event handler instances and the scope will be
-            // completed at the end of the boot process to allow garbage collection
-            // using (Container.BeginScope()) { } // fixme - throws
-            _appStartupEvtContainer = Container.Clone(); // fixme - but WHY clone? because *then* it has its own scope?! bah ;-(
-            _appStartupEvtContainer.BeginScope();
-            _appStartupEvtContainer.RegisterCollection<PerScopeLifetime>(factory => factory.GetInstance<PluginManager>().ResolveApplicationStartupHandlers());
-
-            // fixme - parallel? what about our dependencies?
-            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
-            {
-                try
-                {
-                    using (ProfilingLogger.DebugDuration<CoreRuntime>(
-                        $"Executing {x.GetType()} in ApplicationInitialized",
-                        $"Executed {x.GetType()} in ApplicationInitialized",
-                        //only log if more than 150ms
-                        150))
-                    {
-                        x.OnApplicationInitialized(UmbracoApplication);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ProfilingLogger.Logger.Error<CoreRuntime>("An error occurred running OnApplicationInitialized for handler " + x.GetType(), ex);
-                    throw;
-                }
-            });
-
-            _isInitialized = true;
-
-            return this;
-        }
-
-
-        /// <summary>
-        /// Fires after initialization and calls the callback to allow for customizations to occur &
-        /// Ensure that the OnApplicationStarting methods of the IApplicationEvents are called
-        /// </summary>
-        /// <param name="afterStartup"></param>
-        /// <returns></returns>
-        public virtual IRuntime Startup(Action afterStartup)
-        {
-            if (_isStarted)
-                throw new InvalidOperationException("The boot manager has already been initialized");
-
-            //call OnApplicationStarting of each application events handler
-            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
-            {
-                try
-                {
-                    using (ProfilingLogger.DebugDuration<CoreRuntime>(
-                        $"Executing {x.GetType()} in ApplicationStarting",
-                        $"Executed {x.GetType()} in ApplicationStarting",
-                        //only log if more than 150ms
-                        150))
-                    {
-                        x.OnApplicationStarting(UmbracoApplication);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ProfilingLogger.Logger.Error<CoreRuntime>("An error occurred running OnApplicationStarting for handler " + x.GetType(), ex);
-                    throw;
-                }
-            });
-
-            if (afterStartup != null)
-            {
-                afterStartup();
-            }
-
-            _isStarted = true;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Fires after startup and calls the callback once customizations are locked
-        /// </summary>
-        /// <param name="afterComplete"></param>
-        /// <returns></returns>
-        public virtual IRuntime Complete(Action afterComplete)
-        {
-            if (_isComplete)
-                throw new InvalidOperationException("The boot manager has already been completed");
-
-            //This is a special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
-            // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)
-            // fixme - wtf? never going back to FALSE !
-            ((UserService) Current.Services.UserService).IsUpgrading = true;
-
-            //call OnApplicationStarting of each application events handler
-            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
-            {
-                try
-                {
-                    using (ProfilingLogger.DebugDuration<CoreRuntime>(
-                        $"Executing {x.GetType()} in ApplicationStarted",
-                        $"Executed {x.GetType()} in ApplicationStarted",
-                        //only log if more than 150ms
-                        150))
-                    {
-                        x.OnApplicationStarted(UmbracoApplication);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ProfilingLogger.Logger.Error<CoreRuntime>("An error occurred running OnApplicationStarted for handler " + x.GetType(), ex);
-                    throw;
-                }
-            });
-
-            //end the current scope which was created to intantiate all of the startup handlers,
-            //this will dispose them if they're IDisposable
-            _appStartupEvtContainer.EndCurrentScope();
-            //NOTE: DO NOT Dispose this cloned container since it will also dispose of any instances
-            // resolved from the parent container
-            _appStartupEvtContainer = null;
-
-            if (afterComplete != null)
-            {
-                afterComplete();
-            }
-
-            _isComplete = true;
-
-            return this;
-		}
     }
 }

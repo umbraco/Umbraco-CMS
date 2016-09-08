@@ -68,7 +68,6 @@
     </Compile>
     <Compile Include="ActivatorHelper.cs" />
     <Compile Include="ActivatorServiceProvider.cs" />
-    <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="AsyncLock.cs" />
     <Compile Include="AttemptOfTResult.cs" />
@@ -280,6 +279,7 @@
       <DependentUpon>Files.resx</DependentUpon>
     </Compile>
     <Compile Include="IRuntimeState.cs" />
+    <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Macros\XsltExtensionCollection.cs" />
     <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
     <Compile Include="Models\DictionaryItemExtensions.cs" />
@@ -299,7 +299,6 @@
     <Compile Include="Persistence\ThreadStaticUmbracoDatabaseAccessor.cs" />
     <Compile Include="Plugins\HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
-    <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="DependencyInjection\LightInjectExtensions.cs" />
     <Compile Include="ListExtensions.cs" />
@@ -536,7 +535,7 @@
     <Compile Include="Services\OperationStatusType.cs" />
     <Compile Include="Services\ServiceWithResultExtensions.cs" />
     <Compile Include="Services\TaskService.cs" />
-    <Compile Include="Strategies\ManifestWatcherHandler.cs" />
+    <Compile Include="Strategies\ManifestWatcherComponent.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
     <Compile Include="Models\IPartialView.cs" />
     <Compile Include="Persistence\DatabaseSchemaHelper.cs" />
@@ -1227,8 +1226,8 @@
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="IO\ViewHelper.cs" />
-    <Compile Include="Strategies\RelateOnCopyHandler.cs" />
-    <Compile Include="Strategies\RelateOnTrashHandler.cs" />
+    <Compile Include="Strategies\RelateOnCopyComponent.cs" />
+    <Compile Include="Strategies\RelateOnTrashComponent.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Diff.cs" />
     <Compile Include="Sync\BatchedWebServiceServerMessenger.cs" />

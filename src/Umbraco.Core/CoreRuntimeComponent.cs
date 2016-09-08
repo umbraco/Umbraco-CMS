@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using LightInject;
 using Umbraco.Core.Cache;
@@ -13,7 +8,6 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -136,6 +130,14 @@ namespace Umbraco.Core
                 foreach (var m in modelMapperConfigurations)
                     m.ConfigureMappings(configuration);
             });
+
+            // ensure we have some essential directories
+            // every other component can then initialize safely
+            IOHelper.EnsurePathExists("~/App_Data");
+            IOHelper.EnsurePathExists(SystemDirectories.Media);
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews);
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
         }
     }
 }

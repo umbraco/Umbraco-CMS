@@ -232,7 +232,8 @@
     <Compile Include="DependencyInjection\TempTests.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
-    <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
+    <Compile Include="NUnitTests.cs" />
+    <Compile Include="Persistence\Migrations\PostMigrationTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />

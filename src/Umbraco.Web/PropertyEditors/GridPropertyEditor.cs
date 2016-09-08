@@ -12,18 +12,14 @@ using UmbracoExamine;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
-    public class GridPropertyEditor : PropertyEditor, IApplicationEventHandler
-    {   
-        /// <summary>
-        /// Constructor
-        /// </summary>        
-        public GridPropertyEditor(ILogger logger, IExamineIndexCollectionAccessor indexCollection) : base(logger)
-        {            
-            _applicationStartup = new GridPropertyEditorApplicationStartup(indexCollection);
-        }
+    [PropertyEditor(Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
+    public class GridPropertyEditor : PropertyEditor
+    {
+        public GridPropertyEditor(ILogger logger) 
+            : base(logger)
+        { }
 
-        private static void DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
+        internal void DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
         {
             var indexer = (BaseUmbracoIndexer)sender;
             foreach (var field in indexer.IndexerData.UserFields)
@@ -128,52 +124,5 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
             public string Rte { get; set; }
         }
-
-        #region Application event handler, used to bind to events on startup
-
-        private readonly GridPropertyEditorApplicationStartup _applicationStartup;
-
-        /// <summary>
-        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
-        /// </summary>
-        private class GridPropertyEditorApplicationStartup : ApplicationEventHandler
-        {
-            private readonly IExamineIndexCollectionAccessor _indexCollection;
-
-            public GridPropertyEditorApplicationStartup(IExamineIndexCollectionAccessor indexCollection)
-            {
-                this._indexCollection = indexCollection;
-            }
-
-            /// <summary>
-            /// We're going to bind to the Examine events so we can ensure grid data is index nicely.
-            /// </summary>        
-            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
-            {
-                foreach (var i in _indexCollection.Indexes.Values.OfType<BaseUmbracoIndexer>())
-                {
-                    i.DocumentWriting += DocumentWriting;
-                }
-            }
-        }
-
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication)
-        {
-            //wrap
-            _applicationStartup.OnApplicationInitialized(umbracoApplication);
-        }
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication)
-        {
-            //wrap
-            _applicationStartup.OnApplicationStarting(umbracoApplication);
-        }
-        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication)
-        {
-            //wrap
-            _applicationStartup.OnApplicationStarted(umbracoApplication);            
-        }
-        #endregion
     }
-
-
 }

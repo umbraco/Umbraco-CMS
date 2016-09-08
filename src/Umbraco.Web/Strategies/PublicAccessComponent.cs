@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Core;
-using Umbraco.Core.Models.EntityBase;
+﻿using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Strategies
@@ -12,12 +7,10 @@ namespace Umbraco.Web.Strategies
     /// <summary>
     /// Used to ensure that the public access data file is kept up to date properly
     /// </summary>
-    public sealed class PublicAccessEventHandler : ApplicationEventHandler
+    public sealed class PublicAccessComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
+        public void Initialize()
         {
-            base.ApplicationStarted(umbracoApplication);
-
             MemberGroupService.Saved += MemberGroupService_Saved;
         }
 

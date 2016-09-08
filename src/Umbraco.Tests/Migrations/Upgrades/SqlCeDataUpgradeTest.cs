@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -28,6 +27,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             var db = GetConfiguredDatabase();
 
             var fix = new PublishAfterUpgradeToVersionSixth();
+            MigrationRunner.Migrated += fix.Migrated;
 
             //Setup the MigrationRunner
             var migrationContext = new MigrationContext(db, Mock.Of<ILogger>());
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             bool hasPropertyTypeGroupTable = schemaHelper.TableExist("cmsPropertyTypeGroup");
             bool hasAppTreeTable = schemaHelper.TableExist("umbracoAppTree");
 
-            fix.Unsubscribe();
+            MigrationRunner.Migrated -= fix.Migrated;
 
             Assert.That(hasTabTable, Is.False);
             Assert.That(hasPropertyTypeGroupTable, Is.True);

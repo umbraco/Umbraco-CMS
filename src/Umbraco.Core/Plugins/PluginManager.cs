@@ -681,14 +681,6 @@ namespace Umbraco.Core.Plugins
         }
 
         /// <summary>
-        /// Resolves IApplicationStartupHandler objects.
-        /// </summary>
-        internal static IEnumerable<Type> ResolveApplicationStartupHandlers(this PluginManager mgr)
-        {
-            return mgr.ResolveTypes<IApplicationEventHandler>();
-        }
-
-        /// <summary>
         /// Resolves ICacheRefresher objects.
         /// </summary>
         internal static IEnumerable<Type> ResolveCacheRefreshers(this PluginManager mgr)

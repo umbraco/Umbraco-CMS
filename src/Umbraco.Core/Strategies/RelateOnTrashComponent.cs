@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Core.Components;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -7,9 +8,9 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Strategies
 {
-    public sealed class RelateOnTrashHandler : ApplicationEventHandler
+    public sealed class RelateOnTrashComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication)
+        public void Initialize()
         {
             ContentService.Moved += ContentService_Moved;
             ContentService.Trashed += ContentService_Trashed;

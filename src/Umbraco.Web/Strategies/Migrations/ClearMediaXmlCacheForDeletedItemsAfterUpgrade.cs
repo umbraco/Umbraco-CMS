@@ -3,7 +3,6 @@ using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Strategies.Migrations
@@ -16,27 +15,27 @@ namespace Umbraco.Web.Strategies.Migrations
     ///
     /// * If current is less than or equal to 7.0.0
     /// </remarks>
-    public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : MigrationStartupHandler
+    public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : IPostMigration
     {
-        protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
+        public void Migrated(MigrationRunner sender, MigrationEventArgs args)
         {
-            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+            if (args.ProductName != GlobalSettings.UmbracoMigrationName) return;
 
             var target70 = new Version(7, 0, 0);
 
-            if (e.ConfiguredVersion <= target70)
+            if (args.ConfiguredVersion <= target70)
             {
                 //This query is structured to work with MySql, SQLCE and SqlServer:
                 // http://issues.umbraco.org/issue/U4-3876
 
-                var syntax = e.MigrationContext.Database.SqlSyntax;
+                var syntax = args.MigrationContext.Database.SqlSyntax;
 
                 var sql = @"DELETE FROM cmsContentXml WHERE nodeId IN
     (SELECT nodeId FROM (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
     INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
     WHERE nodeObjectType = '" + Constants.ObjectTypes.Media + "' AND " + syntax.GetQuotedColumnName("path") + " LIKE '%-21%') x)";
 
-                var count = e.MigrationContext.Database.Execute(sql);
+                var count = args.MigrationContext.Database.Execute(sql);
 
                 LogHelper.Info<ClearMediaXmlCacheForDeletedItemsAfterUpgrade>("Cleared " + count + " items from the media xml cache that were trashed and not meant to be there");
             }
