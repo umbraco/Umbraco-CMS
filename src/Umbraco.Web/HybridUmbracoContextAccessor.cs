@@ -2,7 +2,7 @@
 {
     internal class HybridUmbracoContextAccessor : HybridAccessorBase<UmbracoContext>, IUmbracoContextAccessor
     {
-        protected override string HttpContextItemKey => "Umbraco.Web.UmbracoContext";
+        protected override string ItemKey => "Umbraco.Web.UmbracoContext";
 
         public HybridUmbracoContextAccessor(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)

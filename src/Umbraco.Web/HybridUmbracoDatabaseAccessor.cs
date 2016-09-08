@@ -4,7 +4,7 @@ namespace Umbraco.Web
 {
     internal class HybridUmbracoDatabaseAccessor : HybridAccessorBase<UmbracoDatabase>, IUmbracoDatabaseAccessor
     {
-        protected override string HttpContextItemKey => "Umbraco.Core.Persistence.UmbracoDatabase";
+        protected override string ItemKey => "Umbraco.Core.Persistence.UmbracoDatabase";
 
         public HybridUmbracoDatabaseAccessor(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)
