@@ -197,15 +197,17 @@
                                                                               <i class="umb-control-tool-icon icon-settings" ng-click="editGridItemSettings(control, 'control')"></i>
                                                                           </div>
 
-                                                                        <div class="umb-control-tool">
-                                                                            <i class="umb-control-tool-icon icon-trash"  ng-click="togglePrompt(control)"></i>
-                                                                            <umb-confirm-action
-                                                                                ng-if="control.deletePrompt"
-                                                                                direction="left"
-                                                                                on-confirm="removeControl(area, $index)"
-                                                                                on-cancel="hidePrompt(control)">
-                                                                            </umb-confirm-action>
-                                                                        </div>
+                                                                          <div class="umb-control-tool">
+                                                                              <i class="umb-control-tool-icon icon-multiple-windows" ng-click="copy(control)"></i>
+
+                                                                              <i class="umb-control-tool-icon icon-trash" ng-click="togglePrompt(control)"></i>
+                                                                              <umb-confirm-action
+                                                                                  ng-if="control.deletePrompt"
+                                                                                  direction="left"
+                                                                                  on-confirm="removeControl(area, $index)"
+                                                                                  on-cancel="hidePrompt(control)">
+                                                                              </umb-confirm-action>
+                                                                          </div>
 
                                                                       </div>
 
@@ -225,7 +227,9 @@
 
                                                       <!-- if area is empty tools -->
                                                       <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0 && !sortMode">
-                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);"><localize key="grid_addElement" /></div>
+                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);"><localize key="grid_addElement"/>
+                                                          </div>
+                                                          <div><i class="icon icon-paste-in" ng-click="paste($event, area, 0, area.$uniqueId)"></i></div>
                                                       </div>
 
                                                  </div>

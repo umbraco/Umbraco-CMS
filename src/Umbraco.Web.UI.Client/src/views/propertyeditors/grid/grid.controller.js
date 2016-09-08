@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper, angularHelper) {
+    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper, angularHelper, localStorageService) {
 
         // Grid status variables
         var placeHolder = "";
@@ -616,6 +616,24 @@ angular.module("umbraco")
           $scope.showRowConfigurations = !$scope.showRowConfigurations;
         };
 
+        $scope.copy = function(control) {
+            localStorageService.set("grid-clipboard", $.extend({}, control));
+        }
+
+        $scope.paste = function(event, cell, index) {
+            var copied = localStorageService.get("grid-clipboard"),
+                newControl = $.extend({}, copied);
+            if (copied && copied.editor) {
+                
+                if (index === undefined) {
+                    index = cell.controls.length;
+                }
+
+                newControl.active = true;
+                $scope.initControl(newControl, index + 1);
+                cell.controls.push(newControl);
+            }
+        }
 
         // *********************************************
         // Initialization
