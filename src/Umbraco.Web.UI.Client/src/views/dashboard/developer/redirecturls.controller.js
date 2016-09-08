@@ -1,7 +1,7 @@
 (function() {
     "use strict";
 
-    function RedirectUrlsController($scope, redirectUrlsResource, notificationsService, $q) {
+    function RedirectUrlsController($scope, redirectUrlsResource, notificationsService, localizationService, $q) {
         //...todo
         //search by url or url part
         //search by domain
@@ -14,7 +14,8 @@
         vm.dashboard = {
             searchTerm: "",
             loading: false,
-            urlTrackerDisabled: false
+            urlTrackerDisabled: false,
+            userIsAdmin: false
         };
 
         vm.pagination = {
@@ -40,8 +41,9 @@
 
         function checkEnabled() {
             vm.dashboard.loading = true;
-            return redirectUrlsResource.isEnabled().then(function (response) {
-                vm.dashboard.urlTrackerDisabled = response !== "true";
+            return redirectUrlsResource.getEnableState().then(function (response) {
+                vm.dashboard.urlTrackerDisabled = response.enabled !== true;
+                vm.dashboard.userIsAdmin = response.userIsAdmin;
                 vm.dashboard.loading = false;
             });
         }
@@ -76,53 +78,56 @@
         }
 
         function removeRedirect(redirectToDelete) {
-            var toggleConfirm = confirm('Are you sure you want to remove the redirect from ' + '"' + redirectToDelete.originalUrl + '"' + " to " + '"' + redirectToDelete.destinationUrl + '"' + " ?");
+            localizationService.localize("redirectUrls_confirmRemove", [redirectToDelete.originalUrl, redirectToDelete.destinationUrl]).then(function (value) {
+                var toggleConfirm = confirm(value);
 
-            if (toggleConfirm) {
-                redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
+                if (toggleConfirm) {
+                    redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
 
-                    var index = vm.redirectUrls.indexOf(redirectToDelete);
-                    vm.redirectUrls.splice(index, 1);
-                    notificationsService.success("Redirect Url Removed!", "Redirect Url has been deleted");
+                        var index = vm.redirectUrls.indexOf(redirectToDelete);
+                        vm.redirectUrls.splice(index, 1);
+                        notificationsService.success(localizationService.localize("redirectUrls_redirectRemoved"));
 
-                    // check if new redirects needs to be loaded
-                    if(vm.redirectUrls.length === 0 && vm.pagination.totalPages > 1) {
+                        // check if new redirects needs to be loaded
+                        if (vm.redirectUrls.length === 0 && vm.pagination.totalPages > 1) {
 
-                        // if we are not on the first page - get records from the previous
-                        if(vm.pagination.pageIndex > 0 ) {
-                            vm.pagination.pageIndex = vm.pagination.pageIndex - 1;
-                            vm.pagination.pageNumber = vm.pagination.pageNumber - 1;
+                            // if we are not on the first page - get records from the previous
+                            if (vm.pagination.pageIndex > 0) {
+                                vm.pagination.pageIndex = vm.pagination.pageIndex - 1;
+                                vm.pagination.pageNumber = vm.pagination.pageNumber - 1;
+                            }
+
+                            search();
                         }
-
-                        search();
-                    }
-
-                }, function(error) {
-                    notificationsService.error("Redirect Url Error!", "Redirect Url was not deleted");
-                });
-            }
+                    }, function (error) {
+                        notificationsService.error(localizationService.localize("redirectUrls_redirectRemoveError"));
+                    });
+                }
+            });
         }
 
         function disableUrlTracker() {
-            var toggleConfirm = confirm("Are you sure you want to disable the URL tracker?");
-            if (toggleConfirm) {
+            localizationService.localize("redirectUrls_confirmDisable").then(function(value) {
+                var toggleConfirm = confirm(value);
+                if (toggleConfirm) {
 
-                redirectUrlsResource.toggleUrlTracker(true).then(function() {
-                    activate();
-                    notificationsService.success("URL Tracker has now been disabled");
-                }, function(error) {
-                    notificationsService.warning("Error disabling the URL Tracker, more information can be found in your log file.");
-                });
+                    redirectUrlsResource.toggleUrlTracker(true).then(function () {
+                        activate();
+                        notificationsService.success(localizationService.localize("redirectUrls_disabledConfirm"));
+                    }, function (error) {
+                        notificationsService.warning(localizationService.localize("redirectUrls_disableError"));
+                    });
 
-            }
+                }
+            });
         }
 
         function enableUrlTracker() {
             redirectUrlsResource.toggleUrlTracker(false).then(function() {
                 activate();
-                notificationsService.success("URL Tracker has now been enabled");
+                notificationsService.success(localizationService.localize("redirectUrls_enabledConfirm"));
             }, function(error) {
-                notificationsService.warning("Error enabling the URL Tracker, more information can be found in your log file.");
+                notificationsService.warning(localizationService.localize("redirectUrls_enableError"));
             });
         }
 
