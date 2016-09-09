@@ -209,6 +209,29 @@
     <key alias="unsavedChanges">Vous avez des changements en cours</key>
     <key alias="unsavedChangesWarning">Etes-vous certain(e) de vouloir quitter cette page? - vous avez des changements en cours</key>
   </area>
+  <area alias="bulk">
+    <key alias="done">Terminé</key>
+    <key alias="deletedItem">%0% élément supprimé</key>
+    <key alias="deletedItems">%0% éléments supprimés</key>
+    <key alias="deletedItemOfItem">%0% élément sur %1% supprimé</key>
+    <key alias="deletedItemOfItems">%0% éléments sur %1% supprimés</key>
+    <key alias="publishedItem">%0% élément publié</key>
+    <key alias="publishedItems">%0% éléments publiés</key>
+    <key alias="publishedItemOfItem">%0% élément sur %1% publié</key>
+    <key alias="publishedItemOfItems">%0% éléments sur %1% publiés</key>
+    <key alias="unpublishedItem">%0% élément dépublié</key>
+    <key alias="unpublishedItems">%0% éléments dépubliés</key>
+    <key alias="unpublishedItemOfItem">%0% élément sur %1% dépublié</key>
+    <key alias="unpublishedItemOfItems">%0% éléments sur %1% dépubliés</key>
+    <key alias="movedItem">%0% élément déplacé</key>
+    <key alias="movedItems">%0% éléments déplacés</key>
+    <key alias="movedItemOfItem">%0% élément sur %1% déplacé</key>
+    <key alias="movedItemOfItems">%0% éléments sur %1% déplacés</key>
+    <key alias="copiedItem">%0% élément copié</key>
+    <key alias="copiedItems">%0% éléments copiés</key>
+    <key alias="copiedItemOfItem">%0% élément sur %1% copié</key>
+    <key alias="copiedItemOfItems">%0% éléments sur %1% copiés</key>
+  </area>  
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Nom</key>
     <key alias="assignDomain">Gérer les noms d'hôtes</key>
