@@ -454,7 +454,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        public Stream GetFileContent(string filepath)
+        public Stream GetFileContentStream(string filepath)
         {
             var fs = GetFileSystem(filepath);
             if (fs.FileExists(filepath) == false) return null;

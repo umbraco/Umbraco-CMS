@@ -558,17 +558,49 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Stream GetTemplateFileContent(string filepath)
+        public Stream GetTemplateFileContentStream(string filepath)
         {
             using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.GetFileContent(filepath);
+                return repository.GetFileContentStream(filepath);
             }
         }
 
         public void SetTemplateFileContent(string filepath, Stream content)
         {
             using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            {
+                repository.SetFileContent(filepath, content);
+            }
+        }
+
+        public Stream GetStylesheetFileContentStream(string filepath)
+        {
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileContentStream(filepath);
+            }
+        }
+
+        public void SetStylesheetFileContent(string filepath, Stream content)
+        {
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(UowProvider.GetUnitOfWork()))
+            {
+                repository.SetFileContent(filepath, content);
+            }
+        }
+
+        public Stream GetSriptFileContentStream(string filepath)
+        {
+            using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileContentStream(filepath);
+            }
+        }
+
+        public void SetScriptFileContent(string filepath, Stream content)
+        {
+            using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
             }

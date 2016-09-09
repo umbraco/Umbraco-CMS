@@ -242,7 +242,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the template.</param>
         /// <returns>The content of the template.</returns>
-        Stream GetTemplateFileContent(string filepath);
+        Stream GetTemplateFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a template.
@@ -250,5 +250,34 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the template.</param>
         /// <param name="content">The content of the template.</param>
         void SetTemplateFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the content of a stylesheet as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the stylesheet.</param>
+        /// <returns>The content of the stylesheet.</returns>
+        Stream GetStylesheetFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a stylesheet.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the stylesheet.</param>
+        /// <param name="content">The content of the stylesheet.</param>
+        void SetStylesheetFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the content of a script file as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the script.</param>
+        /// <returns>The content of the script file.</returns>
+        Stream GetSriptFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a script file.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the script.</param>
+        /// <param name="content">The content of the script file.</param>
+        void SetScriptFileContent(string filepath, Stream content);
+
     }
 }
