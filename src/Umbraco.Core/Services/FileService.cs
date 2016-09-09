@@ -858,6 +858,22 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Stream GetPartialViewFileContentStream(string filepath)
+        {
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileContentStream(filepath);
+            }
+        }
+
+        public void SetPartialViewFileContent(string filepath, Stream content)
+        {
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetUnitOfWork()))
+            {
+                repository.SetFileContent(filepath, content);
+            }
+        }
+
         #endregion
 
         private void Audit(AuditType type, string message, int userId, int objectId)

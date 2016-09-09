@@ -293,5 +293,19 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the macro partial view.</param>
         /// <param name="content">The content of the macro partial view.</param>
         void SetPartialViewMacroFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the content of a partial view as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the partial view.</param>
+        /// <returns>The content of the partial view.</returns>
+        Stream GetPartialViewFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the partial view.</param>
+        /// <param name="content">The content of the partial view.</param>
+        void SetPartialViewFileContent(string filepath, Stream content);
     }
 }
