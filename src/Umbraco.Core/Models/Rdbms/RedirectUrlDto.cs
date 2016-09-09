@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("umbracoRedirectUrl")]
-    [PrimaryKey("id")]
+    [PrimaryKey("id", autoIncrement = false)]
     [ExplicitColumns]
     class RedirectUrlDto
     {
@@ -14,14 +14,24 @@ namespace Umbraco.Core.Models.Rdbms
             CreateDateUtc = DateTime.UtcNow;
         }
 
-        [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 1, Name = "PK_umbracoRedirectUrl")]
-        public int Id { get; set; }
+        // notes
+        //
+        // we want a unique, non-clustered  index on (url ASC, contentId ASC, createDate DESC) but the
+        // problem is that the index key must be 900 bytes max. should we run without an index? done
+        // some perfs comparisons, and running with an index on a hash is only slightly slower on
+        // inserts, and much faster on reads, so... we have an index on a hash.
 
-        [Column("contentId")]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
-        [ForeignKey(typeof(NodeDto), Column = "id")]
+        [Column("id")]
+        [PrimaryKeyColumn(Name = "PK_umbracoRedirectUrl", AutoIncrement = false)]
+        public Guid Id { get; set; }
+
+        [ResultColumn]
         public int ContentId { get; set; }
+
+        [Column("contentKey")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [ForeignKey(typeof(NodeDto), Column = "uniqueID")]
+        public Guid ContentKey { get; set; }
 
         [Column("createDateUtc")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
@@ -29,7 +39,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("url")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "url, createDateUtc")]
         public string Url { get; set; }
+
+        [Column("urlHash")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "urlHash, contentKey, createDateUtc")]
+        [Length(40)]
+        public string UrlHash { get; set; }
     }
 }

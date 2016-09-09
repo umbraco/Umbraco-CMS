@@ -61,5 +61,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string DefaultDocumentTypeProperty { get; }
 
         bool EnableInheritedDocumentTypes { get; }
+
+        bool EnableInheritedMediaTypes { get; }
     }
 }

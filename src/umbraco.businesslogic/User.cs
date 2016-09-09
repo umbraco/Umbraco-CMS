@@ -184,9 +184,10 @@ namespace umbraco.BusinessLogic
         /// <returns>
         /// 	<c>true</c> if this user is admin; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("Use Umbraco.Core.Models.IsAdmin extension method instead", false)]
         public bool IsAdmin()
         {
-            return UserType.Alias == "admin";
+            return UserEntity.IsAdmin();
         }
 
         [Obsolete("Do not use this method to validate credentials, use the user's membership provider to do authentication. This method will not work if the password format is 'Encrypted'")]

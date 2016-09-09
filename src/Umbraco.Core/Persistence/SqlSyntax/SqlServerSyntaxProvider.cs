@@ -8,18 +8,63 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Server
     /// </summary>
-    [SqlSyntaxProviderAttribute("System.Data.SqlClient")]
+    [SqlSyntaxProviderAttribute(Constants.DatabaseProviders.SqlServer)]
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
         public SqlServerSyntaxProvider()
         {
             
-        }
+        }     
 
         /// <summary>
         /// Gets/sets the version of the current SQL server instance
         /// </summary>
-        internal Lazy<SqlServerVersionName> VersionName { get; set; }
+        internal SqlServerVersionName GetVersionName(Database database)
+        {
+            if (_versionName.HasValue)
+                return _versionName.Value;
+
+            try
+            {
+                var version = database.ExecuteScalar<string>("SELECT SERVERPROPERTY('productversion')");
+                var firstPart = version.Split('.')[0];
+                switch (firstPart)
+                {
+                    case "13":
+                        _versionName = SqlServerVersionName.V2014;
+                        break;
+                    case "12":
+                        _versionName = SqlServerVersionName.V2014;
+                        break;
+                    case "11":
+                        _versionName = SqlServerVersionName.V2012;
+                        break;
+                    case "10":
+                        _versionName = SqlServerVersionName.V2008;
+                        break;
+                    case "9":
+                        _versionName = SqlServerVersionName.V2005;
+                        break;
+                    case "8":
+                        _versionName = SqlServerVersionName.V2000;
+                        break;
+                    case "7":
+                        _versionName = SqlServerVersionName.V7;
+                        break;
+                    default:
+                        _versionName = SqlServerVersionName.Other;
+                        break;
+                }
+            }
+            catch (Exception)
+            {
+                _versionName = SqlServerVersionName.Invalid;
+            }
+
+            return _versionName.Value;
+        }
+
+        private SqlServerVersionName? _versionName;
 
         /// <summary>
         /// SQL Server stores default values assigned to columns as constraints, it also stores them with named values, this is the only
@@ -102,6 +147,11 @@ order by T.name, I.name");
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;
+        }
+
+        public override Sql SelectTop(Sql sql, int top)
+        {
+            return new Sql(sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
         }
 
         private static string GetIdentityString(ColumnDefinition column)

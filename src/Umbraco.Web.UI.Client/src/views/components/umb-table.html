@@ -36,7 +36,7 @@
                 }"
                  ng-click="selectItem(item, $index, $event)">
 
-                <div class="umb-table-cell">
+                <div class="umb-table-cell" ng-class="{'has-unpublished-version':!item.published && item.hasPublishedVersion}">
                     <i class="umb-table-body__icon umb-table-body__fileicon {{item.icon}}" ng-class="getIcon(item)"></i>
                     <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
                 </div>

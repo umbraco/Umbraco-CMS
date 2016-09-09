@@ -133,7 +133,7 @@
     bottom: 0;
     border: none;
     box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
-    margin-left: 80px;
+    margin-left: 81px;
 }
 
 .umb-overlay.umb-overlay-left .umb-overlay-header {
@@ -148,7 +148,14 @@
 
 @media (max-width: 767px) {
     .umb-overlay.umb-overlay-left {
-        margin-left: 60px;
+        margin-left: 61px;
+    }
+}
+
+@media (max-width: 500px) {
+    .umb-overlay.umb-overlay-left {
+        margin-left: 41px;
+        width: ~"(calc(~'100%' - ~'41px'))";
     }
 }
 

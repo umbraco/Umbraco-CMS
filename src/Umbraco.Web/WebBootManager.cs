@@ -48,6 +48,7 @@ using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Profiling;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
@@ -186,7 +187,9 @@ namespace Umbraco.Web
         {
             base.InitializeProfilerResolver();
             //Set the profiler to be the web profiler
-            ProfilerResolver.Current.SetProfiler(new WebProfiler());
+            var profiler = new WebProfiler();
+            ProfilerResolver.Current.SetProfiler(profiler);
+            profiler.Start();
         }
 
         /// <summary>

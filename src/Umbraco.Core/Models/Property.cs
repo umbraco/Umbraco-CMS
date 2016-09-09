@@ -133,6 +133,13 @@ namespace Umbraco.Core.Models
             set { SetPropertyValueAndDetectChanges(value, ref _version, Ps.Value.VersionSelector); }
         }
 
+        private static void ThrowTypeException(object value, Type expected, string alias)
+        {
+            throw new InvalidOperationException(string.Format("Value \"{0}\" of type \"{1}\" could not be converted"
+                + " to type \"{2}\" which is expected by property type \"{3}\".",
+                value, value.GetType(), expected, alias));
+        }
+
         /// <summary>
         /// Gets or Sets the value of the Property
         /// </summary>
@@ -146,55 +153,50 @@ namespace Umbraco.Core.Models
             get { return _value; }
             set
             {
-                bool typeValidation = _propertyType.IsPropertyTypeValid(value);
+                var isOfExpectedType = _propertyType.IsPropertyTypeValid(value);
 
-                if (typeValidation == false)
+                if (isOfExpectedType == false) // isOfExpectedType is true if value is null - so if false, value is *not* null
                 {
-                    // Normally we'll throw an exception here.  However if the property is of a type that can have it's data field (dataInt, dataVarchar etc.)
-                    // changed, we might have a value of the now "wrong" type.  As of May 2016 Label is the only built-in property editor that supports this.
-                    // In that case we should try to parse the value and return null if that's not possible rather than throwing an exception.
-                    if (value != null && _propertyType.CanHaveDataValueTypeChanged())
-                    {
-                        var stringValue = value.ToString();
-                        switch (_propertyType.DataTypeDatabaseType)
-                        {
-                            case DataTypeDatabaseType.Nvarchar:
-                            case DataTypeDatabaseType.Ntext:
-                                value = stringValue;
-                                break;
-                            case DataTypeDatabaseType.Integer:
-                                int integerValue;
-                                if (int.TryParse(stringValue, out integerValue) == false)
-                                {
-                                    // Edge case, but if changed from decimal --> integer, the above tryparse will fail.  So we'll try going
-                                    // via decimal too to return the integer value rather than zero.
-                                    decimal decimalForIntegerValue;
-                                    if (decimal.TryParse(stringValue, out decimalForIntegerValue))
-                                    {
-                                        integerValue = (int)decimalForIntegerValue;
-                                    }
-                                }
+                    // "garbage-in", accept what we can & convert
+                    // throw only if conversion is not possible
 
-                                value = integerValue;
-                                break;
-                            case DataTypeDatabaseType.Decimal:
-                                decimal decimalValue;
-                                decimal.TryParse(stringValue, out decimalValue);
-                                value = decimalValue;
-                                break;
-                            case DataTypeDatabaseType.Date:
-                                DateTime dateValue;
-                                DateTime.TryParse(stringValue, out dateValue);
-                                value = dateValue;
-                                break;
-                        }
-                    }
-                    else
+                    var s = value.ToString();
+
+                    switch (_propertyType.DataTypeDatabaseType)
                     {
-                        throw new Exception(
-                            string.Format(
-                                "Type validation failed. The value type: '{0}' does not match the DataType in PropertyType with alias: '{1}'",
-                                value == null ? "null" : value.GetType().Name, Alias));
+                        case DataTypeDatabaseType.Nvarchar:
+                        case DataTypeDatabaseType.Ntext:
+                            value = s;
+                            break;
+                        case DataTypeDatabaseType.Integer:
+                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
+                            else
+                            {
+                                var convInt = value.TryConvertTo<int>();
+                                if (convInt == false) ThrowTypeException(value, typeof(int), _propertyType.Alias);
+                                value = convInt.Result;
+                            }
+                            break;
+                        case DataTypeDatabaseType.Decimal:
+                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
+                            else
+                            {
+                                var convDecimal = value.TryConvertTo<decimal>();
+                                if (convDecimal == false) ThrowTypeException(value, typeof (decimal), _propertyType.Alias);
+                                // need to normalize the value (change the scaling factor and remove trailing zeroes)
+                                // because the underlying database is going to mess with the scaling factor anyways.
+                                value = convDecimal.Result.Normalize();
+                            }
+                            break;
+                        case DataTypeDatabaseType.Date:
+                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
+                            else
+                            {
+                                var convDateTime = value.TryConvertTo<DateTime>();
+                                if (convDateTime == false) ThrowTypeException(value, typeof (DateTime), _propertyType.Alias);
+                                value = convDateTime.Result;
+                            }
+                            break;
                     }
                 }
 

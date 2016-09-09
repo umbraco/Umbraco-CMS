@@ -5,6 +5,7 @@
     **/
 function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
+    //var baseurl = "http://localhost:24292/webapi/packages/v1";
     var baseurl = "https://our.umbraco.org/webapi/packages/v1";
 
     return {
@@ -33,17 +34,17 @@ function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHel
             }
 
             return umbRequestHelper.resourcePromise(
-               $http.get(baseurl + "?pageIndex=0&pageSize=" + maxResults + "&category=" + category + "&order=Popular"),
+               $http.get(baseurl + "?pageIndex=0&pageSize=" + maxResults + "&category=" + category + "&order=Popular&version=" + Umbraco.Sys.ServerVariables.application.version),
                'Failed to query packages');
         },
        
-        search: function (pageIndex, pageSize, category, query, canceler) {
+        search: function (pageIndex, pageSize, orderBy, category, query, canceler) {
 
             var httpConfig = {};
             if (canceler) {
                 httpConfig["timeout"] = canceler;
             }
-
+            
             if (category === undefined) {
                 category = "";
             }
@@ -51,8 +52,11 @@ function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHel
                 query = "";
             }
 
+            //order by score if there is nothing set
+            var order = !orderBy ? "&order=Default" : ("&order=" + orderBy);
+
             return umbRequestHelper.resourcePromise(
-               $http.get(baseurl + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category + "&query=" + query),
+               $http.get(baseurl + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category + "&query=" + query + order + "&version=" + Umbraco.Sys.ServerVariables.application.version),
                httpConfig,
                'Failed to query packages');
         }

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstalledController($scope, $route, $location, packageResource) {
+    function PackagesInstalledController($scope, $route, $location, packageResource, $timeout, $window, localStorageService, localizationService) {
 
         var vm = this;
 
@@ -28,17 +28,27 @@
         }
 
         function uninstallPackage(installedPackage) {
-            vm.installState.status = "Uninstalling package...";
+            vm.installState.status = localizationService.localize("packager_installStateUninstalling");
+            vm.installState.progress = "0";
+
             packageResource.uninstall(installedPackage.id)
                 .then(function () {
-                    if (installedPackage.files.length > 0) {
-                        vm.installState.status = "All done, your browser will now refresh";
 
-                        var url = window.location.href + "?uninstalled=" + vm.package.packageGuid;
-                        window.location.reload(true);
+                    if (installedPackage.files.length > 0) {
+                        vm.installState.status = localizationService.localize("packager_installStateComplete");
+                        vm.installState.progress = "100";
+
+                        //set this flag so that on refresh it shows the installed packages list
+                        localStorageService.set("packageInstallUri", "installed");
+                        
+                        //reload on next digest (after cookie)
+                        $timeout(function () {
+                            $window.location.reload(true);
+                        });
+                        
                     }
                     else {
-                        init();                        
+                        init();
                     }
                 });
         }

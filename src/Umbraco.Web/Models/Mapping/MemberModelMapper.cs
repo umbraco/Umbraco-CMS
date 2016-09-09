@@ -90,6 +90,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore())
                 .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display, applicationContext.Services.TextService));
 
             //FROM IMember TO MemberBasic
@@ -112,7 +113,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore());
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
@@ -143,7 +145,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(x => x.ContentTypeAlias, expression => expression.Ignore());
+                .ForMember(x => x.ContentTypeAlias, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
             config.CreateMap<IMember, ContentItemDto<IMember>>()
@@ -154,6 +157,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
                 .ForMember(dto => dto.Properties, expression => expression.ResolveUsing<MemberDtoPropertiesValueResolver>());
         }

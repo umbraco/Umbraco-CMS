@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -11,6 +12,12 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>, IDeleteMediaFilesRepository
     {
+        /// <summary>
+        /// This builds the Xml document used for the XML cache
+        /// </summary>
+        /// <returns></returns>
+        XmlDocument BuildXmlCache();
+
         /// <summary>
         /// Get the count of published items
         /// </summary>

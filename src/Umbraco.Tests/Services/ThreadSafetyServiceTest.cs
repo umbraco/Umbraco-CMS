@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Services
 			//it is multi-threaded.
 			_dbFactory = new PerThreadDatabaseFactory(Logger);
 			//overwrite the local object
-            ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory, Logger, new SqlCeSyntaxProvider(), "System.Data.SqlServerCe.4.0");
+            ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory, Logger, new SqlCeSyntaxProvider(), Constants.DatabaseProviders.SqlCe);
 
             //disable cache
 		    var cacheHelper = CacheHelper.CreateDisabledCacheHelper();

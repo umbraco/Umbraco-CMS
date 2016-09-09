@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
@@ -636,7 +637,7 @@ namespace Umbraco.Core.Services
                     query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
                 var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
-                
+
                 return contents;
             }
         }
@@ -1712,6 +1713,20 @@ namespace Umbraco.Core.Services
             Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
 
             return true;
+        }
+
+        /// <summary>
+        /// This builds the Xml document used for the XML cache
+        /// </summary>
+        /// <returns></returns>
+        public XmlDocument BuildXmlCache()
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                var result = repository.BuildXmlCache();
+                return result;
+            }
         }
 
         /// <summary>

@@ -97,23 +97,18 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
                     function successCallback(response) {
                         // if we can't download the gravatar for some reason, an null gets returned, we cannot do anything
                         if (response.data !== "null") {
-                            $("#avatar-img").fadeTo(1000, 0, function () {
-                                $scope.$apply(function () {
-                                    //this can be null if they time out
-                                    if ($scope.user && $scope.user.emailHash) {
-                                        var avatarBaseUrl = "https://www.gravatar.com/avatar/",
-                                            hash = $scope.user.emailHash;
+                            if ($scope.user && $scope.user.emailHash) {
+                                var avatarBaseUrl = "https://www.gravatar.com/avatar/";
+                                var hash = $scope.user.emailHash;
 
-                                        $scope.avatar = [
-                                            { value: avatarBaseUrl + hash + ".jpg?s=30&d=mm" },
-                                            { value: avatarBaseUrl + hash + ".jpg?s=60&d=mm" },
-                                            { value: avatarBaseUrl + hash + ".jpg?s=90&d=mm" }
-                                        ];
-                                    }
-                                });
-                                $("#avatar-img").fadeTo(1000, 1);
-                            });
+                                $scope.avatar = [
+                                    { value: avatarBaseUrl + hash + ".jpg?s=30&d=mm" },
+                                    { value: avatarBaseUrl + hash + ".jpg?s=60&d=mm" },
+                                    { value: avatarBaseUrl + hash + ".jpg?s=90&d=mm" }
+                                ];
+                            }
                         }
+
                     }, function errorCallback(response) {
                         //cannot load it from the server so we cannot do anything
                     });

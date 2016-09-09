@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
@@ -63,9 +64,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .Where<DocumentDto>(x => x.Newest)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -143,7 +144,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
-                               "DELETE FROM umbracoRedirectUrl WHERE contentId = @Id",
+                               "DELETE FROM umbracoRedirectUrl WHERE contentKey IN (SELECT uniqueID FROM umbracoNode WHERE id = @Id)",
                                "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
@@ -686,6 +687,77 @@ namespace Umbraco.Core.Persistence.Repositories
                     yield return CreateContentFromDto(dto, dto.VersionId, sql);
                 }
             }
+        }
+
+
+        /// <summary>
+        /// This builds the Xml document used for the XML cache
+        /// </summary>
+        /// <returns></returns>
+        public XmlDocument BuildXmlCache()
+        {
+            //TODO: This is what we should do , but converting to use XDocument would be breaking unless we convert
+            // to XmlDocument at the end of this, but again, this would be bad for memory... though still not nearly as
+            // bad as what is happening before!
+            // We'll keep using XmlDocument for now though, but XDocument xml generation is much faster:
+            // https://blogs.msdn.microsoft.com/codejunkie/2008/10/08/xmldocument-vs-xelement-performance/
+            // I think we already have code in here to convert XDocument to XmlDocument but in case we don't here
+            // it is: https://blogs.msdn.microsoft.com/marcelolr/2009/03/13/fast-way-to-convert-xmldocument-into-xdocument/
+
+            //// Prepare an XmlDocument with an appropriate inline DTD to match
+            //// the expected content
+            //var parent = new XElement("root", new XAttribute("id", "-1"));
+            //var xmlDoc = new XDocument(
+            //    new XDocumentType("root", null, null, DocumentType.GenerateDtd()),
+            //    parent);
+
+            var xmlDoc = new XmlDocument();
+            var doctype = xmlDoc.CreateDocumentType("root", null, null,
+                ApplicationContext.Current.Services.ContentTypeService.GetContentTypesDtd());
+            xmlDoc.AppendChild(doctype);
+            var parent = xmlDoc.CreateElement("root");
+            var pIdAtt = xmlDoc.CreateAttribute("id");
+            pIdAtt.Value = "-1";
+            parent.Attributes.Append(pIdAtt);
+            xmlDoc.AppendChild(parent);
+
+            const string sql = @"select umbracoNode.id, umbracoNode.parentID, umbracoNode.sortOrder, cmsContentXml.xml, umbracoNode.level from umbracoNode
+inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
+where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1)
+order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
+
+            XmlElement last = null;
+
+            //NOTE: Query creates a reader - does not load all into memory
+            foreach (var row in Database.Query<dynamic>(sql, new { type = new Guid(Constants.ObjectTypes.Document) }))
+            {
+                string parentId = ((int)row.parentID).ToInvariantString();
+                string xml = row.xml;
+                int sortOrder = row.sortOrder;
+
+                //if the parentid is changing
+                if (last != null && last.GetAttribute("parentID") != parentId)
+                {
+                    parent = xmlDoc.GetElementById(parentId);
+                    if (parent == null)
+                    {
+                        //Need to short circuit here, if the parent is not there it means that the parent is unpublished
+                        // and therefore the child is not published either so cannot be included in the xml cache
+                        continue;
+                    }
+                }
+
+                var xmlDocFragment = xmlDoc.CreateDocumentFragment();
+                xmlDocFragment.InnerXml = xml;
+
+                last = (XmlElement)parent.AppendChild(xmlDocFragment);
+
+                // fix sortOrder - see notes in UpdateSortOrder
+                last.Attributes["sortOrder"].Value = sortOrder.ToInvariantString();
+            }
+
+            return xmlDoc;
+
         }
 
         public int CountPublished()

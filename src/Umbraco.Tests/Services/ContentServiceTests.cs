@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -14,6 +16,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -877,6 +880,46 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Publish_Content_WithEvents()
+        {
+            ContentService.Publishing += ContentServiceOnPublishing;
+
+            // tests that during 'publishing' event, what we get from the repo is the 'old' content,
+            // because 'publishing' fires before the 'saved' event ie before the content is actually
+            // saved
+
+            try
+            {
+                var contentService = ServiceContext.ContentService;
+                var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
+                Assert.AreEqual("Home", content.Name);
+
+                content.Name = "foo";
+                var published = contentService.Publish(content, 0);
+
+                Assert.That(published, Is.True);
+                Assert.That(content.Published, Is.True);
+
+                var e = ServiceContext.ContentService.GetById(content.Id);
+                Assert.AreEqual("foo", e.Name);
+            }
+            finally
+            {
+                ContentService.Publishing -= ContentServiceOnPublishing;
+            }
+        }
+
+        private void ContentServiceOnPublishing(IPublishingStrategy sender, PublishEventArgs<IContent> args)
+        {
+            Assert.AreEqual(1, args.PublishedEntities.Count());
+            var entity = args.PublishedEntities.First();
+            Assert.AreEqual("foo", entity.Name);
+
+            var e = ServiceContext.ContentService.GetById(entity.Id);
+            Assert.AreEqual("Home", e.Name);
+        }
+
+        [Test]
         public void Can_Publish_Only_Valid_Content()
         {
             // Arrange
@@ -1587,7 +1630,7 @@ namespace Umbraco.Tests.Services
                 list.Add(content);
                 list.AddRange(CreateChildrenOf(contentType, content, 4));
 
-                Console.WriteLine("Created: 'Hierarchy Simple Text Page {0}'", i);
+                Debug.Print("Created: 'Hierarchy Simple Text Page {0}'", i);
             }
 
             return list;
@@ -1601,7 +1644,7 @@ namespace Umbraco.Tests.Services
 				var c = MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage " + i, content);
                 list.Add(c);
 
-                Console.WriteLine("Created: 'Hierarchy Simple Text Subpage {0}' - Depth: {1}", i, depth);
+                Debug.Print("Created: 'Hierarchy Simple Text Subpage {0}' - Depth: {1}", i, depth);
             }
             return list;
         }

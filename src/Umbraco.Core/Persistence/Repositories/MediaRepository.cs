@@ -52,9 +52,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
-            var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -413,6 +413,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 foreach (var property in entity.Properties)
                 {
+                    if (keyDictionary.ContainsKey(property.PropertyTypeId) == false) continue;
+
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
@@ -453,8 +455,16 @@ namespace Umbraco.Core.Persistence.Repositories
             Func<Tuple<string, object[]>> filterCallback = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                sbWhere.Append("AND (umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
+                sbWhere
+                    .Append("AND (")
+                    .Append(SqlSyntax.GetQuotedTableName("umbracoNode"))
+                    .Append(".")
+                    .Append(SqlSyntax.GetQuotedColumnName("text"))
+                    .Append(" LIKE @")
+                    .Append(args.Count)
+                    .Append(")");
                 args.Add("%" + filter + "%");
+
                 filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
             }
 

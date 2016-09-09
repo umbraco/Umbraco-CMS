@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using umbraco;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Routing
 {
@@ -30,8 +31,17 @@ namespace Umbraco.Web.Routing
                 return urls;
             }
 
+            string url;
             var urlProvider = umbracoContext.RoutingContext.UrlProvider;
-            var url = urlProvider.GetUrl(content.Id);            
+            try
+            {
+                url = urlProvider.GetUrl(content.Id);
+            }
+            catch (Exception e)
+            {
+                LogHelper.Error<UrlProvider>("GetUrl exception.", e);
+                url = "#ex";
+            }
             if (url == "#")
             {
                 // document as a published version yet it's url is "#" => a parent must be
@@ -47,6 +57,10 @@ namespace Umbraco.Web.Routing
                     urls.Add(ui.Text("content", "parentNotPublishedAnomaly", umbracoContext.Security.CurrentUser));
                 else
                     urls.Add(ui.Text("content", "parentNotPublished", parent.Name, umbracoContext.Security.CurrentUser));
+            }
+            else if (url == "#ex")
+            {
+                urls.Add(ui.Text("content", "getUrlException", umbracoContext.Security.CurrentUser));
             }
             else if (url.StartsWith("#err-"))
             {

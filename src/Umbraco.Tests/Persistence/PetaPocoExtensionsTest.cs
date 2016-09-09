@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.Persistence
 
                 double totalBytes1;
                 IEnumerable<string> keys;
-                Console.Write(Database.PocoData.PrintDebugCacheReport(out totalBytes1, out keys));
+                Debug.Print(Database.PocoData.PrintDebugCacheReport(out totalBytes1, out keys));
 
                 result.Add(new Tuple<double, int, IEnumerable<string>>(totalBytes1, keys.Count(), keys));
             }
@@ -54,14 +55,14 @@ namespace Umbraco.Tests.Persistence
             for (int index = 0; index < result.Count; index++)
             {
                 var tuple = result[index];
-                Console.WriteLine("Bytes: {0}, Delegates: {1}", tuple.Item1, tuple.Item2);
+                Debug.Print("Bytes: {0}, Delegates: {1}", tuple.Item1, tuple.Item2);
                 if (index != 0)
                 {
-                    Console.WriteLine("----------------DIFFERENCE---------------------");
+                    Debug.Print("----------------DIFFERENCE---------------------");
                     var diff = tuple.Item3.Except(result[index - 1].Item3);
                     foreach (var d in diff)
                     {
-                        Console.WriteLine(d);
+                        Debug.Print(d);
                     }
                 }
                 
@@ -87,13 +88,13 @@ namespace Umbraco.Tests.Persistence
             QueryStuff(id1, id2, id3, alias);
 
             var count1 = managedCache.GetCache().GetCount();
-            Console.WriteLine("Keys = " + count1);
+            Debug.Print("Keys = " + count1);
             Assert.Greater(count1, 0);
             
             Thread.Sleep(10000);
 
             var count2 = managedCache.GetCache().GetCount();
-            Console.WriteLine("Keys = " + count2);
+            Debug.Print("Keys = " + count2);
             Assert.Less(count2, count1);
         }
 

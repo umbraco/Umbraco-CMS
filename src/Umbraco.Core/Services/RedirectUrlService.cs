@@ -14,16 +14,16 @@ namespace Umbraco.Core.Services
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         { }
 
-        public void Register(string url, int contentId)
+        public void Register(string url, Guid contentKey)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var redir = repo.Get(url, contentId);
+                var redir = repo.Get(url, contentKey);
                 if (redir != null)
                     redir.CreateDateUtc = DateTime.UtcNow;
                 else
-                    redir = new RedirectUrl { Url = url, ContentId = contentId };
+                    redir = new RedirectUrl { Key = Guid.NewGuid(), Url = url, ContentKey = contentKey };
                 repo.AddOrUpdate(redir);
                 uow.Commit();
             }
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
@@ -49,12 +49,12 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void DeleteContentRedirectUrls(int contentId)
+        public void DeleteContentRedirectUrls(Guid contentKey)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                repo.DeleteContentUrls(contentId);
+                repo.DeleteContentUrls(contentKey);
                 uow.Commit();
             }
         }
@@ -75,18 +75,16 @@ namespace Umbraco.Core.Services
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
                 var rule = repo.GetMostRecentUrl(url);
-                uow.Commit();
                 return rule;
             }
         }
 
-        public IEnumerable<IRedirectUrl> GetContentRedirectUrls(int contentId)
+        public IEnumerable<IRedirectUrl> GetContentRedirectUrls(Guid contentKey)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var rules = repo.GetContentUrls(contentId);
-                uow.Commit();
+                var rules = repo.GetContentUrls(contentKey);
                 return rules;
             }
         }
@@ -97,7 +95,6 @@ namespace Umbraco.Core.Services
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
                 var rules = repo.GetAllUrls(pageIndex, pageSize, out total);
-                uow.Commit();
                 return rules;
             }
         }
@@ -108,7 +105,15 @@ namespace Umbraco.Core.Services
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
                 var rules = repo.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
-                uow.Commit();
+                return rules;
+            }
+        }
+        public IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
+            {
+                var rules = repo.SearchUrls(searchTerm, pageIndex, pageSize, out total);
                 return rules;
             }
         }
