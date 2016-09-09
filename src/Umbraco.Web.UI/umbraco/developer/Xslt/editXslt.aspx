@@ -61,9 +61,6 @@
                  <cc1:PropertyPanel ID="pp_filename" runat="server" Text="Filename">
                     <asp:TextBox ID="xsltFileName" runat="server" CssClass="guiInputText"></asp:TextBox>
                 </cc1:PropertyPanel>
-                <cc1:PropertyPanel ID="pp_testing" runat="server" Text="Skip testing (ignore errors)">
-                    <asp:CheckBox ID="SkipTesting" runat="server"></asp:CheckBox>
-                </cc1:PropertyPanel>
             </cc1:Pane>
     </cc1:TabView>
 </asp:Content>
