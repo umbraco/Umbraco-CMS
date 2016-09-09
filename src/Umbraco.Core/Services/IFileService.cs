@@ -270,7 +270,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the script.</param>
         /// <returns>The content of the script file.</returns>
-        Stream GetSriptFileContentStream(string filepath);
+        Stream GetScriptFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a script file.

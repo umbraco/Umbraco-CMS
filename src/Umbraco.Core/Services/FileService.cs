@@ -590,7 +590,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Stream GetSriptFileContentStream(string filepath)
+        public Stream GetScriptFileContentStream(string filepath)
         {
             using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetUnitOfWork()))
             {

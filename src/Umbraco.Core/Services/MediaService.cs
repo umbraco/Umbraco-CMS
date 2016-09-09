@@ -6,11 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Xml.Linq;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
@@ -19,9 +16,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
@@ -1298,7 +1293,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Stream GetMediaFileContent(string filepath)
+        public Stream GetMediaFileContentStream(string filepath)
         {
             if (MediaHelper.FileSystem.FileExists(filepath) == false)
                 return null;

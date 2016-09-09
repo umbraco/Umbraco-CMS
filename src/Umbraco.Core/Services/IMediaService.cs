@@ -407,7 +407,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the media.</param>
         /// <returns>The content of the media.</returns>
-        Stream GetMediaFileContent(string filepath);
+        Stream GetMediaFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a media.
