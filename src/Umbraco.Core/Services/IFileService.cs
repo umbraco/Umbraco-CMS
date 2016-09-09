@@ -15,6 +15,7 @@ namespace Umbraco.Core.Services
         void DeletePartialViewMacroFolder(string folderPath);
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
+        IEnumerable<IPartialView> GetPartialViewMacros(params string[] names);
         Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = 0);
         Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = 0);
         bool DeletePartialView(string path, int userId = 0);
@@ -279,5 +280,18 @@ namespace Umbraco.Core.Services
         /// <param name="content">The content of the script file.</param>
         void SetScriptFileContent(string filepath, Stream content);
 
+        /// <summary>
+        /// Gets the content of a macro partial view as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macro partial view.</param>
+        /// <returns>The content of the macro partial view.</returns>
+        Stream GetPartialViewMacroFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a macro partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macro partial view.</param>
+        /// <param name="content">The content of the macro partial view.</param>
+        void SetPartialViewMacroFileContent(string filepath, Stream content);
     }
 }

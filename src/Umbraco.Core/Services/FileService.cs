@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Text.RegularExpressions;
-using System.Web;
-using Umbraco.Core.Auditing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -574,6 +569,8 @@ namespace Umbraco.Core.Services
             }
         }
 
+        #endregion
+
         public Stream GetStylesheetFileContentStream(string filepath)
         {
             using (var repository = RepositoryFactory.CreateStylesheetRepository(UowProvider.GetUnitOfWork()))
@@ -605,8 +602,6 @@ namespace Umbraco.Core.Services
                 repository.SetFileContent(filepath, content);
             }
         }
-
-        #endregion
 
         #region Partial Views
 
@@ -659,6 +654,14 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(_fileUowProvider.GetUnitOfWork()))
             {
                 return repository.Get(path);
+            }
+        }
+
+        public IEnumerable<IPartialView> GetPartialViewMacros(params string[] names)
+        {
+            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(_fileUowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(names).OrderBy(x => x.Name);
             }
         }
 
@@ -837,6 +840,22 @@ namespace Umbraco.Core.Services
                     return RepositoryFactory.CreatePartialViewMacroRepository(uow);
             }
             throw new ArgumentOutOfRangeException("partialViewType");
+        }
+
+        public Stream GetPartialViewMacroFileContentStream(string filepath)
+        {
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileContentStream(filepath);
+            }
+        }
+
+        public void SetPartialViewMacroFileContent(string filepath, Stream content)
+        {
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, UowProvider.GetUnitOfWork()))
+            {
+                repository.SetFileContent(filepath, content);
+            }
         }
 
         #endregion
