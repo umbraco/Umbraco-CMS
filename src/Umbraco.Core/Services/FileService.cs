@@ -665,6 +665,22 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IXsltFile GetXsltFile(string path)
+        {
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(_fileUowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(path);
+            }
+        }
+
+        public IEnumerable<IXsltFile> GetXsltFiles(params string[] names)
+        {
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(_fileUowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(names).OrderBy(x => x.Name);
+            }
+        }
+
         public Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = 0)
         {
             return CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);

@@ -240,6 +240,11 @@ namespace Umbraco.Core.Persistence
                 _settings.Templates);
         }
 
+        public virtual IXsltFileRepository CreateXsltFileRepository(IUnitOfWork uow)
+        {
+            return new XsltFileRepository(uow, new PhysicalFileSystem(SystemDirectories.Xslt));
+        }
+
         public virtual IMigrationEntryRepository CreateMigrationEntryRepository(IDatabaseUnitOfWork uow)
         {
             return new MigrationEntryRepository(

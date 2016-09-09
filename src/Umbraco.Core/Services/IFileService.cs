@@ -16,6 +16,8 @@ namespace Umbraco.Core.Services
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
         IEnumerable<IPartialView> GetPartialViewMacros(params string[] names);
+        IXsltFile GetXsltFile(string path);
+        IEnumerable<IXsltFile> GetXsltFiles(params string[] names);
         Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = 0);
         Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = 0);
         bool DeletePartialView(string path, int userId = 0);

@@ -386,6 +386,7 @@
     <Compile Include="Models\IPublishedContentWithKey.cs" />
     <Compile Include="Models\IRedirectUrl.cs" />
     <Compile Include="Models\IServerRegistration.cs" />
+    <Compile Include="Models\IXsltFile.cs" />
     <Compile Include="Models\Mapping\MappingExpressionExtensions.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
     <Compile Include="Models\PartialViewType.cs" />
@@ -414,6 +415,7 @@
     <Compile Include="Models\Rdbms\MigrationDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployChecksumDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployDependencyDto.cs" />
+    <Compile Include="Models\XsltFile.cs" />
     <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
@@ -490,11 +492,13 @@
     <Compile Include="Persistence\Repositories\Interfaces\IRedirectUrlRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IServerRegistrationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDeleteMediaFilesRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IXsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepository.cs" />
+    <Compile Include="Persistence\Repositories\XsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
