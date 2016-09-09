@@ -342,5 +342,10 @@ namespace Umbraco.Core.Persistence
                 _logger,
                 _sqlSyntax);
         }
+
+        internal IStylesheetRepository CreateStylesheetRepository(IDatabaseUnitOfWork uow)
+        {
+            return new StylesheetRepository(uow, new PhysicalFileSystem(SystemDirectories.Css));
+        }
     }
 }
