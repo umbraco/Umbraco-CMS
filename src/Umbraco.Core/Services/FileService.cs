@@ -603,6 +603,22 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Stream GetXsltFileContentStream(string filepath)
+        {
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileContentStream(filepath);
+            }
+        }
+
+        public void SetXsltFileContent(string filepath, Stream content)
+        {
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetUnitOfWork()))
+            {
+                repository.SetFileContent(filepath, content);
+            }
+        }
+
         #region Partial Views
 
         public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)

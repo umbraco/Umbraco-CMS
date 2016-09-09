@@ -283,6 +283,20 @@ namespace Umbraco.Core.Services
         void SetScriptFileContent(string filepath, Stream content);
 
         /// <summary>
+        /// Gets the content of a XSLT file as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the XSLT file.</param>
+        /// <returns>The content of the XSLT file.</returns>
+        Stream GetXsltFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a XSLT file.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the XSLT file.</param>
+        /// <param name="content">The content of the XSLT file.</param>
+        void SetXsltFileContent(string filepath, Stream content);
+
+        /// <summary>
         /// Gets the content of a macro partial view as a stream.
         /// </summary>
         /// <param name="filepath">The filesystem path to the macro partial view.</param>
