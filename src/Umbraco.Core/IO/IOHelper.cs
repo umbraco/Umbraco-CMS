@@ -13,7 +13,9 @@ using Umbraco.Core.Logging;
 namespace Umbraco.Core.IO
 {
 	public static class IOHelper
-    {
+	{
+	    public static bool IAmUnitTestingSoNeverUseHttpContextEver = false;
+
         private static string _rootDir = "";
 
         // static compiled regex for faster performance
@@ -97,6 +99,8 @@ namespace Umbraco.Core.IO
 
         public static string MapPath(string path, bool useHttpContext)
         {
+            useHttpContext = useHttpContext && IAmUnitTestingSoNeverUseHttpContextEver == false;
+
             // Check if the path is already mapped
             if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
                 || path.StartsWith(@"\\")) //UNC Paths start with "\\". If the site is running off a network drive mapped paths will look like "\\Whatever\Boo\Bar"
