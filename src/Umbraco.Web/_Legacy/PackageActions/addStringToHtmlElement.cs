@@ -122,12 +122,12 @@ namespace Umbraco.Web._Legacy.PackageActions
 				}
 				catch (Exception ex)
 				{
-					LogHelper.Error<addStringToHtmlElement>("An error occurred", ex);
+					Current.Logger.Error<addStringToHtmlElement>("An error occurred", ex);
 				}
 			}
 			else
 			{
-				LogHelper.Debug<addStringToHtmlElement>("template not found");
+				Current.Logger.Debug<addStringToHtmlElement>("template not found");
 			}
 		}
 
@@ -170,12 +170,12 @@ namespace Umbraco.Web._Legacy.PackageActions
 				}
 				catch (Exception ex)
 				{
-					LogHelper.Error<addStringToHtmlElement>("An error occurred", ex);
+					Current.Logger.Error<addStringToHtmlElement>("An error occurred", ex);
 				}
 			}
 			else
 			{
-				LogHelper.Debug<addStringToHtmlElement>("template not found");
+				Current.Logger.Debug<addStringToHtmlElement>("template not found");
 			}
 		}
 

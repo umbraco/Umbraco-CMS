@@ -15,6 +15,7 @@ using AutoMapper;
 using Microsoft.Owin;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Logging;
 
@@ -122,7 +123,7 @@ namespace Umbraco.Core.Security
                 catch (InvalidOperationException ex)
                 {
                     //This will occur if the required claim types are missing which would mean something strange is going on
-                    LogHelper.Error(typeof(AuthenticationExtensions), "The current identity cannot be converted to " + typeof(UmbracoBackOfficeIdentity), ex);
+                    Current.Logger.Error(typeof(AuthenticationExtensions), "The current identity cannot be converted to " + typeof(UmbracoBackOfficeIdentity), ex);
                 }
             }
 

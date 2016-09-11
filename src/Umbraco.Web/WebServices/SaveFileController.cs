@@ -305,7 +305,7 @@ namespace Umbraco.Web.WebServices
         private JsonResult Failed(string message, string header, Exception exception = null)
         {
             if (exception != null)
-                LogHelper.Error<SaveFileController>("An error occurred saving a file. " + message, exception);
+                Logger.Error<SaveFileController>("An error occurred saving a file. " + message, exception);
             return Json(new
             {
                 success = false,

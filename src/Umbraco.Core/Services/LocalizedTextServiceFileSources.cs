@@ -6,6 +6,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Services
@@ -87,7 +88,7 @@ namespace Umbraco.Core.Services
                                         }
                                         catch (CultureNotFoundException)
                                         {
-                                            LogHelper.Warn<LocalizedTextServiceFileSources>(
+                                            Current.Logger.Warn<LocalizedTextServiceFileSources>(
                                                 string.Format("The culture {0} found in the file {1} is not a valid culture", cultureVal, fileInfo.FullName));
                                             //If the culture in the file is invalid, we'll just hope the file name is a valid culture below, otherwise
                                             // an exception will be thrown.
@@ -125,7 +126,7 @@ namespace Umbraco.Core.Services
 
             if (fileSourceFolder.Exists == false)
             {
-                LogHelper.Warn<LocalizedTextServiceFileSources>("The folder does not exist: {0}, therefore no sources will be discovered", () => fileSourceFolder.FullName);
+                Current.Logger.Warn<LocalizedTextServiceFileSources>("The folder does not exist: {0}, therefore no sources will be discovered", () => fileSourceFolder.FullName);
             }
             else
             {

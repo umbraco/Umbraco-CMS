@@ -170,7 +170,7 @@ namespace Umbraco.Web.Editors
                     var actionsXml = new XmlDocument();
                     actionsXml.LoadXml("<Actions>" + pack.Data.Actions + "</Actions>");
 
-                    LogHelper.Debug<installedPackage>("executing undo actions: {0}", () => actionsXml.OuterXml);
+                    Logger.Debug<installedPackage>("executing undo actions: {0}", () => actionsXml.OuterXml);
 
                     foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
                     {
@@ -181,13 +181,13 @@ namespace Umbraco.Web.Editors
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error<installedPackage>("An error occurred running undo actions", ex);
+                            Logger.Error<installedPackage>("An error occurred running undo actions", ex);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<installedPackage>("An error occurred running undo actions", ex);
+                    Logger.Error<installedPackage>("An error occurred running undo actions", ex);
                 }
             }
 

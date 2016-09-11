@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         protected override PropertyValueEditor CreateValueEditor()
         {
-            return new PublishValueValueEditor(base.CreateValueEditor());
+            return new PublishValueValueEditor(base.CreateValueEditor(), Logger);
         }
 
     }

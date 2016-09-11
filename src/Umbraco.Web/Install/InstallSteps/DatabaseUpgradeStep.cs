@@ -18,14 +18,16 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly DatabaseContext _databaseContext;
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly IRuntimeState _runtime;
+        private readonly ILogger _logger;
         private readonly MigrationCollectionBuilder _migrationCollectionBuilder;
 
-        public DatabaseUpgradeStep(DatabaseContext databaseContext, IMigrationEntryService migrationEntryService, IRuntimeState runtime, MigrationCollectionBuilder migrationCollectionBuilder)
+        public DatabaseUpgradeStep(DatabaseContext databaseContext, IMigrationEntryService migrationEntryService, IRuntimeState runtime, MigrationCollectionBuilder migrationCollectionBuilder, ILogger logger)
         {
             _databaseContext = databaseContext;
             _migrationEntryService = migrationEntryService;
             _runtime = runtime;
             _migrationCollectionBuilder = migrationCollectionBuilder;
+            _logger = logger;
         }
 
         public override InstallSetupResult Execute(object model)
@@ -36,7 +38,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (upgrade)
             {
-                LogHelper.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
+                _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
                 var result = _databaseContext.UpgradeSchemaAndData(_migrationEntryService, _migrationCollectionBuilder);
 
@@ -45,7 +47,7 @@ namespace Umbraco.Web.Install.InstallSteps
                     throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
                 }
 
-                DatabaseInstallStep.HandleConnectionStrings();
+                DatabaseInstallStep.HandleConnectionStrings(_logger);
             }
 
             return null;

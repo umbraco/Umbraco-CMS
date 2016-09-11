@@ -45,7 +45,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new FileUploadPreValueEditor(_textService);
+            return new FileUploadPreValueEditor(_textService, Logger);
         }
 
         /// <summary>
@@ -168,8 +168,8 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class FileUploadPreValueEditor : ValueListPreValueEditor
         {
-            public FileUploadPreValueEditor(ILocalizedTextService textService)
-                : base(textService)
+            public FileUploadPreValueEditor(ILocalizedTextService textService, ILogger logger)
+                : base(textService, logger)
             {
                 var field = Fields.First();
                 field.Description = "Enter a max width/height for each thumbnail";

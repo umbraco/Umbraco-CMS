@@ -210,13 +210,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	            var indexer = eMgr.IndexProviderCollection["InternalIndexer"];
 	            if (indexer.IndexerData.IncludeNodeTypes.Any() || indexer.IndexerData.ExcludeNodeTypes.Any())
 	            {
-	                LogHelper.Warn<PublishedMediaCache>("The InternalIndexer for examine is configured incorrectly, it should not list any include/exclude node types or field names, it should simply be configured as: " + "<IndexSet SetName=\"InternalIndexSet\" IndexPath=\"~/App_Data/TEMP/ExamineIndexes/Internal/\" />");
+	                Current.Logger.Warn<PublishedMediaCache>("The InternalIndexer for examine is configured incorrectly, it should not list any include/exclude node types or field names, it should simply be configured as: " + "<IndexSet SetName=\"InternalIndexSet\" IndexPath=\"~/App_Data/TEMP/ExamineIndexes/Internal/\" />");
 	            }
 	            return indexer;
 	        }
 	        catch (Exception ex)
 	        {
-	            LogHelper.Error<PublishedMediaCache>("Could not retrieve the InternalIndexer", ex);
+	            Current.Logger.Error<PublishedMediaCache>("Could not retrieve the InternalIndexer", ex);
 	            //something didn't work, continue returning null.
 	        }
 	        return null;
@@ -291,11 +291,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					//See this thread: http://examine.cdodeplex.com/discussions/264341
 					//Catch the exception here for the time being, and just fallback to GetMedia
 					//TODO: Need to fix examine in LB scenarios!
-                    LogHelper.Error<PublishedMediaCache>("Could not load data from Examine index for media", ex);
+                    Current.Logger.Error<PublishedMediaCache>("Could not load data from Examine index for media", ex);
 				}
 			}
 
-            LogHelper.Warn<PublishedMediaCache>(
+            Current.Logger.Warn<PublishedMediaCache>(
                 "Could not retrieve media {0} from Examine index, reverting to looking up media via legacy library.GetMedia method",
                 () => id);
 
@@ -312,7 +312,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     : ConvertFromXPathNavigator(media.Current);
             }
 
-            LogHelper.Warn<PublishedMediaCache>(
+            Current.Logger.Warn<PublishedMediaCache>(
                 "Could not retrieve media {0} from Examine index or from legacy library.GetMedia method",
                 () => id);
 
@@ -665,7 +665,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     else
                     {
                         // this is a property that does not correspond to anything, ignore and log
-                        LogHelper.Warn<PublishedMediaCache>("Dropping property \"" + i.Key + "\" because it does not belong to the content type.");
+                        Current.Logger.Warn<PublishedMediaCache>("Dropping property \"" + i.Key + "\" because it does not belong to the content type.");
                     }
 				}
 			}

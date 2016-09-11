@@ -36,7 +36,7 @@ namespace Umbraco.Web.Trees
                 var legacyAtt = controllerAttempt.Result.GetCustomAttribute<LegacyBaseTreeAttribute>(false);
                 if (legacyAtt == null)
                 {
-                    LogHelper.Warn<LegacyTreeDataConverter>("Cannot render tree: " + appTree.Alias + ". Cannot render a " + typeof(TreeController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
+                    Current.Logger.Warn<LegacyTreeDataConverter>("Cannot render tree: " + appTree.Alias + ". Cannot render a " + typeof(TreeController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
                     return null;
                 }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
@@ -37,9 +38,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             ICacheProvider requestCache, 
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IFacadeAccessor facadeAccessor,
+            ILogger logger,
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
-            : this(serviceContext, uowProvider, requestCache, segmentProviders, facadeAccessor, null, mainDom, testing, enableRepositoryEvents)
+            : this(serviceContext, uowProvider, requestCache, segmentProviders, facadeAccessor, logger, null, mainDom, testing, enableRepositoryEvents)
         { }
 
         // used in some tests
@@ -47,10 +49,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IDatabaseUnitOfWorkProvider uowProvider, 
             ICacheProvider requestCache,
             IFacadeAccessor facadeAccessor,
+            ILogger logger,
             PublishedContentTypeCache contentTypeCache, 
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
-            : this(serviceContext, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), facadeAccessor, contentTypeCache, mainDom, testing, enableRepositoryEvents)
+            : this(serviceContext, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), facadeAccessor, logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
         private FacadeService(ServiceContext serviceContext, 
@@ -58,6 +61,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IFacadeAccessor facadeAccessor,
+            ILogger logger,
             PublishedContentTypeCache contentTypeCache, 
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
@@ -65,7 +69,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             _routesCache = new RoutesCache();
             _contentTypeCache = contentTypeCache
-                ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService);
+                ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, logger);
 
             _xmlStore = new XmlStore(serviceContext, uowProvider, _routesCache, _contentTypeCache, segmentProviders, facadeAccessor, mainDom, testing, enableRepositoryEvents);
 

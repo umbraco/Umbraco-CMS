@@ -14,5 +14,15 @@ namespace Umbraco.Core.Exceptions
         public BootFailedException(string message)
             : base(message)
         { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Exception"/> class with a specified error message
+        /// and a reference to the inner exception which is the cause of this exception.
+        /// </summary>
+        /// <param name="message">The message that describes the error. </param>
+        /// <param name="inner">The inner exception, or null.</param>
+        public BootFailedException(string message, Exception inner)
+            : base(message, inner)
+        { }
     }
 }

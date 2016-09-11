@@ -89,7 +89,7 @@ namespace Umbraco.Web.Editors
                 //get the deserialized value from the property editor
                 if (p.PropertyEditor == null)
                 {
-                    LogHelper.Warn<ContentController>("No property editor found for property " + p.Alias);
+                    Logger.Warn<ContentController>("No property editor found for property " + p.Alias);
                 }
                 else
                 {

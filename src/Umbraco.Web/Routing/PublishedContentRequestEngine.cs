@@ -398,7 +398,7 @@ namespace Umbraco.Web.Routing
                 //iterate but return on first one that finds it
 			    var found = _routingContext.PublishedContentFinders.Any(finder =>
 			    {
-                    LogHelper.Debug<PublishedContentRequestEngine>("Finder " + finder.GetType().FullName);
+                    Current.Logger.Debug<PublishedContentRequestEngine>("Finder " + finder.GetType().FullName);
 			        return finder.TryFindContent(_pcr);
 			    });
 			}

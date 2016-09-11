@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -18,22 +19,26 @@ namespace Umbraco.Web.PublishedCache
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
+        public readonly ILogger _logger;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
-        internal PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService)
+        internal PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, ILogger logger)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
             _memberTypeService = memberTypeService;
+            _logger = logger;
         }
 
         // for unit tests ONLY
-        internal PublishedContentTypeCache()
-        { }
+        internal PublishedContentTypeCache(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         public void ClearAll()
         {
-            Core.Logging.LogHelper.Debug<PublishedContentTypeCache>("Clear all.");
+            _logger.Debug<PublishedContentTypeCache>("Clear all.");
 
             using (new WriteLock(_lock))
             {
@@ -44,7 +49,7 @@ namespace Umbraco.Web.PublishedCache
 
         public void ClearContentType(int id)
         {
-            Core.Logging.LogHelper.Debug<PublishedContentTypeCache>("Clear content type w/id {0}.", () => id);
+            _logger.Debug<PublishedContentTypeCache>("Clear content type w/id {0}.", () => id);
 
             using (var l = new UpgradeableReadLock(_lock))
             {
@@ -61,7 +66,7 @@ namespace Umbraco.Web.PublishedCache
 
         public void ClearDataType(int id)
         {
-            Core.Logging.LogHelper.Debug<PublishedContentTypeCache>("Clear data type w/id {0}.", () => id);
+            _logger.Debug<PublishedContentTypeCache>("Clear data type w/id {0}.", () => id);
 
             // there is no recursion to handle here because a PublishedContentType contains *all* its
             // properties ie both its own properties and those that were inherited (it's based upon an

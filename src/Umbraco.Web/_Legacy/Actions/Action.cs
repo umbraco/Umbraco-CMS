@@ -107,7 +107,7 @@ namespace Umbraco.Web._Legacy.Actions
                     }
                     catch (Exception ee)
                     {
-                        LogHelper.Error<Action>("Error registrering action to javascript", ee);
+                        Current.Logger.Error<Action>("Error registrering action to javascript", ee);
                     }
                 }
 

@@ -60,7 +60,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<ImageCropperValueConverter>("Could not parse the string " + cropsString + " to a json object", ex);
+                    Current.Logger.Error<ImageCropperValueConverter>("Could not parse the string " + cropsString + " to a json object", ex);
                     return;
                 }
 
@@ -118,7 +118,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<ImageCropperValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
+                    Current.Logger.Error<ImageCropperValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
                     return sourceString;
                 }
 

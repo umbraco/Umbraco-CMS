@@ -21,6 +21,8 @@ namespace Umbraco.Web.Scheduling
         private IRuntimeState _runtime;
         private IUserService _userService;
         private IAuditService _auditService;
+        private ILogger _logger;
+        private ProfilingLogger _proflog;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -31,11 +33,13 @@ namespace Umbraco.Web.Scheduling
         private object _locker = new object();
         private IBackgroundTask[] _tasks;
 
-        public void Initialize(IRuntimeState runtime, IUserService userService, IAuditService auditService, ILogger logger)
+        public void Initialize(IRuntimeState runtime, IUserService userService, IAuditService auditService, ILogger logger, ProfilingLogger proflog)
         {
             _runtime = runtime;
             _userService = userService;
             _auditService = auditService;
+            _logger = logger;
+            _proflog = proflog;
 
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
             _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", logger);
@@ -65,15 +69,15 @@ namespace Umbraco.Web.Scheduling
 
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
-                LogHelper.Debug<SchedulerComponent>(() => "Initializing the scheduler");
+                _logger.Debug<SchedulerComponent>(() => "Initializing the scheduler");
                 var settings = UmbracoConfig.For.UmbracoSettings();
 
                 var tasks = new List<IBackgroundTask>
                 {
-                    new KeepAlive(_keepAliveRunner, 60000, 300000, _runtime),
-                    new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _userService),
-                    new ScheduledTasks(_tasksRunner, 60000, 60000, _runtime, settings),
-                    new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings), _runtime, _auditService, settings)
+                    new KeepAlive(_keepAliveRunner, 60000, 300000, _runtime, _logger, _proflog),
+                    new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _userService, _logger, _proflog),
+                    new ScheduledTasks(_tasksRunner, 60000, 60000, _runtime, settings, _logger, _proflog),
+                    new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _logger, _proflog)
                 };
 
                 // ping/keepalive

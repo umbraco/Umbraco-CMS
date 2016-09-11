@@ -276,14 +276,15 @@ namespace Umbraco.Tests.TestHelpers
                 ContentTypesCache = new PublishedContentTypeCache(
                         Current.Services.ContentTypeService,
                         Current.Services.MediaTypeService,
-                        Current.Services.MemberTypeService);
+                        Current.Services.MemberTypeService,
+                        Current.Logger);
 
                 // testing=true so XmlStore will not use the file nor the database
                 var facadeAccessor = new TestFacadeAccessor();
                 var service = new FacadeService(
                     Current.Services,
                     _uowProvider,
-                    cache, facadeAccessor, ContentTypesCache, null, true, enableRepositoryEvents);
+                    cache, facadeAccessor, Current.Logger, ContentTypesCache, null, true, enableRepositoryEvents);
 
                 // initialize PublishedCacheService content with an Xml source
                 service.XmlStore.GetXmlDocument = () =>
@@ -406,7 +407,7 @@ namespace Umbraco.Tests.TestHelpers
             }
             catch (Exception ex)
             {
-                LogHelper.Error<BaseDatabaseFactoryTest>("Could not remove the old database file", ex);
+                Current.Logger.Error<BaseDatabaseFactoryTest>("Could not remove the old database file", ex);
 
                 //We will swallow this exception! That's because a sub class might require further teardown logic.
                 onFail?.Invoke(ex);

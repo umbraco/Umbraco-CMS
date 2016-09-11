@@ -6,6 +6,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.Logging;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.HealthCheck.Checks.DataIntegrity;
 
@@ -25,6 +26,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 factory.GetInstance<CacheHelper>().RequestCache,
                 factory.GetAllInstances<IUrlSegmentProvider>(),
                 factory.GetInstance<IFacadeAccessor>(),
+                factory.GetInstance<ILogger>(),
                 factory.GetInstance<MainDom>()));
 
             // add the Xml cache health check (hidden from type finder)

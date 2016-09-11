@@ -2,7 +2,6 @@ using System;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -18,7 +17,7 @@ namespace Umbraco.Tests.TestHelpers
             _enabled = false;
         }
 
-        private static bool _enabled = false;
+        private static bool _enabled;
 
         public string Render()
         {
@@ -32,21 +31,17 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Start()
         {
-            if (_enabled)
-            {
-                MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
-                MiniProfiler.Settings.StackMaxLength = 5000;
-                MiniProfiler.Start();    
-            }
-            
+            if (_enabled == false) return;
+
+            MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
+            MiniProfiler.Settings.StackMaxLength = 5000;
+            MiniProfiler.Start();
         }
 
         public void Stop(bool discardResults = false)
         {
             if (_enabled)
-            {
                 MiniProfiler.Stop(discardResults);
-            }
         }
     }
 }

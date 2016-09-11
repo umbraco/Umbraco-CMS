@@ -60,7 +60,7 @@ namespace Umbraco.Web.Mvc
             var result = ViewEngines.Engines.FindView(ControllerContext, template, null);
             if (result.View != null) return true;
 
-            LogHelper.Warn<RenderMvcController>("No physical template file was found for template " + template);
+            Logger.Warn<RenderMvcController>("No physical template file was found for template " + template);
             return false;
         }
 

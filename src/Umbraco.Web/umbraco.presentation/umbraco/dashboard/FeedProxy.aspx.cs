@@ -46,7 +46,7 @@ namespace dashboardUtilities
                             }
                             else
                             {
-                                LogHelper.Debug<FeedProxy>(string.Format("Access to unallowed feedproxy attempted: {0}", requestUri));
+                                Current.Logger.Debug<FeedProxy>(string.Format("Access to unallowed feedproxy attempted: {0}", requestUri));
                             }
                         }
                     }
@@ -54,7 +54,7 @@ namespace dashboardUtilities
             }
             catch (Exception ex)
             {
-                LogHelper.Error<FeedProxy>("Exception occurred", ex);
+                Current.Logger.Error<FeedProxy>("Exception occurred", ex);
             }
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -13,7 +14,8 @@ namespace Umbraco.Web.PropertyEditors
     internal class ColorListPreValueEditor : ValueListPreValueEditor
     {
       
-        public ColorListPreValueEditor(ILocalizedTextService textService) : base(textService)
+        public ColorListPreValueEditor(ILocalizedTextService textService, ILogger logger) 
+            : base(textService, logger)
         {
             var field = Fields.First();
 

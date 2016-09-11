@@ -17,7 +17,7 @@ namespace Umbraco.Core.Logging
 
         private WebProfiler _profiler;
 
-        public void Initialize(IProfiler profiler, IRuntimeState runtime)
+        public void Initialize(IProfiler profiler, ILogger logger, IRuntimeState runtime)
         {
             // although registered in WebRuntime.Compose, ensure that we have
             // not been replaced by another component, and we are still "the" profiler
@@ -27,12 +27,12 @@ namespace Umbraco.Core.Logging
             if (SystemUtilities.GetCurrentTrustLevel() < AspNetHostingPermissionLevel.High)
             {
                 // if we don't have a high enough trust level we cannot bind to the events
-                LogHelper.Info<WebProfilerComponent>("Cannot install when the application is running in Medium trust.");
+                logger.Info<WebProfilerComponent>("Cannot install when the application is running in Medium trust.");
             }
             else if (runtime.Debug == false)
             {
                 // only when debugging
-                LogHelper.Info<WebProfilerComponent>("Cannot install when the application is not running in debug mode.");
+                logger.Info<WebProfilerComponent>("Cannot install when the application is not running in debug mode.");
             }
             else
             {

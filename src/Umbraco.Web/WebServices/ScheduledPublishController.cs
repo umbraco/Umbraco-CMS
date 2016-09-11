@@ -41,7 +41,7 @@ namespace Umbraco.Web.WebServices
             }
             catch (Exception ee)
             {
-                LogHelper.Error<ScheduledPublishController>("Error executing scheduled task", ee);
+                Logger.Error<ScheduledPublishController>("Error executing scheduled task", ee);
 
                 Response.StatusCode = 400; 
 

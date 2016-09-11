@@ -1,6 +1,7 @@
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using Umbraco.Core;
+using Umbraco.Web;
 using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
@@ -10,7 +11,7 @@ namespace umbraco
         
         public override bool PerformSave()
         {
-            LogHelper.Info<CreatedPackageTasks>("Xml save started");
+            Current.Logger.Info<CreatedPackageTasks>("Xml save started");
             int id = cms.businesslogic.packager.CreatedPackage.MakeNew(Alias).Data.Id;
             _returnUrl = string.Format("developer/packages/editPackage.aspx?id={0}", id);
             return true;

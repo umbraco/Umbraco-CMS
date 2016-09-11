@@ -35,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new ValueListPreValueEditor(_textService);
+            return new ValueListPreValueEditor(_textService, Logger);
         }
 
         /// <summary>

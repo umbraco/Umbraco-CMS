@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -64,7 +65,7 @@ namespace Umbraco.Core.PropertyEditors
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.WarnWithException<PreValueEditor>("Could not create an instance of " + att.PreValueFieldType, ex);                            
+                            Current.Logger.Warn<PreValueEditor>(ex, "Could not create an instance of " + att.PreValueFieldType);
                         }
                     }
                     else

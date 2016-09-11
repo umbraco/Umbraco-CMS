@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Models
@@ -517,7 +518,7 @@ namespace Umbraco.Core.Models
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
         {
-            Action doLog = () => LogHelper.Warn<Member>(
+            Action doLog = () => Current.Logger.Warn<Member>(
                         "Trying to access the '"
                         + propertyName
                         + "' property on "
@@ -554,7 +555,7 @@ namespace Umbraco.Core.Models
 
         private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyname)
         {
-            Action doLog = () => LogHelper.Warn<Member>("An attempt was made to set a value on the property '"
+            Action doLog = () => Current.Logger.Warn<Member>("An attempt was made to set a value on the property '"
                         + propertyname
                         + "' on type "
                         + typeof(Member)

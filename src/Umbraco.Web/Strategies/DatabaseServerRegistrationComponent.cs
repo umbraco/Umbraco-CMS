@@ -27,6 +27,7 @@ namespace Umbraco.Web.Strategies
         private object _locker = new object();
         private DatabaseServerRegistrar _registrar;
         private IRuntimeState _runtime;
+        private ILogger _logger;
         private IServerRegistrationService _registrationService;
         private BackgroundTaskRunner<IBackgroundTask> _backgroundTaskRunner;
         private bool _started;
@@ -40,6 +41,7 @@ namespace Umbraco.Web.Strategies
             if (_registrar == null) return;
 
             _runtime = runtime;
+            _logger = logger;
             _registrationService = registrationService;
 
             _backgroundTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(
@@ -86,7 +88,7 @@ namespace Umbraco.Web.Strategies
                 var task = new TouchServerTask(_backgroundTaskRunner,
                     15000, //delay before first execution
                     _registrar.Options.RecurringSeconds*1000, //amount of ms between executions
-                    svc, _registrar, serverAddress);
+                    svc, _registrar, serverAddress, _logger);
                 
                 // perform the rest async, we don't want to block the startup sequence
                 // this will just reoccur on a background thread
@@ -101,6 +103,7 @@ namespace Umbraco.Web.Strategies
             private readonly IServerRegistrationService _svc;
             private readonly DatabaseServerRegistrar _registrar;
             private readonly string _serverAddress;
+            private readonly ILogger _logger;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="RecurringTaskBase"/> class.
@@ -111,15 +114,17 @@ namespace Umbraco.Web.Strategies
             /// <param name="svc"></param>
             /// <param name="registrar"></param>
             /// <param name="serverAddress"></param>
+            /// <param name="logger"></param>
             /// <remarks>The task will repeat itself periodically. Use this constructor to create a new task.</remarks>
             public TouchServerTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress)
+                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress, ILogger logger)
                 : base(runner, delayMilliseconds, periodMilliseconds)
             {
                 if (svc == null) throw new ArgumentNullException(nameof(svc));
                 _svc = svc;
                 _registrar = registrar;
                 _serverAddress = serverAddress;
+                _logger = logger;
             }
 
             public override bool IsAsync => false;
@@ -139,7 +144,7 @@ namespace Umbraco.Web.Strategies
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<DatabaseServerRegistrationComponent>("Failed to update server record in database.", ex);
+                    _logger.Error<DatabaseServerRegistrationComponent>("Failed to update server record in database.", ex);
                     return false; // probably stop if we have an error
                 }
             }

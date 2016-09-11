@@ -7,6 +7,7 @@ using System.Security;
 using System.Text;
 using System.Web;
 using System.Web.Compilation;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -115,7 +116,7 @@ namespace Umbraco.Core.Plugins
                     catch (FileNotFoundException ex)
                     {
                         //this will occur if it cannot load the assembly
-                        LogHelper.Error(typeof(TypeFinder), "Could not load assembly App_Code", ex);
+                        Current.Logger.Error(typeof(TypeFinder), "Could not load assembly App_Code", ex);
                     }
                 }
             }
@@ -394,7 +395,7 @@ namespace Umbraco.Core.Plugins
                 }
                 catch (TypeLoadException ex)
                 {
-                    LogHelper.Error(typeof(TypeFinder), string.Format("Could not query types on {0} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", a), ex);
+                    Current.Logger.Error(typeof(TypeFinder), string.Format("Could not query types on {0} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", a), ex);
                     continue;
                 }
 
@@ -539,7 +540,7 @@ namespace Umbraco.Core.Plugins
                 }
                 catch (TypeLoadException ex)
                 {
-                    LogHelper.Error(typeof(TypeFinder), string.Format("Could not query types on {0} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", a), ex);
+                    Current.Logger.Error(typeof(TypeFinder), string.Format("Could not query types on {0} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", a), ex);
                     continue;
                 }
 

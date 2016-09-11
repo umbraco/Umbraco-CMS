@@ -188,7 +188,7 @@ namespace umbraco.presentation.developer.packages {
 				}
 				catch (Exception ex)
 				{
-					LogHelper.Error<LoadNitros>("An error occurred", ex);
+					Current.Logger.Error<LoadNitros>("An error occurred", ex);
 
 					loadNitros.Controls.Clear();
 					loadNitros.Controls.Add(fb);

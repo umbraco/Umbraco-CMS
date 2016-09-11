@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Umbraco.Core.Logging
 {
     /// <summary>
-    /// A profiler that outputs its results to an ILogger
+    /// Implements <see cref="IProfiler"/> by writing profiling results to an <see cref="ILogger"/>.
     /// </summary>
     internal class LogProfiler : IProfiler
     {
@@ -14,25 +15,48 @@ namespace Umbraco.Core.Logging
             _logger = logger;
         }
 
+        /// <inheritdoc/>
         public string Render()
         {
             return string.Empty;
         }
 
+        /// <inheritdoc/>
         public IDisposable Step(string name)
         {
-            _logger.Debug(typeof(LogProfiler), "Starting - " + name);
-            return new DisposableTimer(l => _logger.Info(typeof(LogProfiler), () => name + " (took " + l + "ms)"));
+            _logger.Debug<LogProfiler>($"Begin: {name}.");
+            return new LightDisposableTimer(duration => _logger.Info<LogProfiler>($"End {name}. ({duration}ms)"));
         }
 
+        /// <inheritdoc/>
         public void Start()
         {
-            //the log will alwasy be started   
+            // the log will always be started   
         }
 
+        /// <inheritdoc/>
         public void Stop(bool discardResults = false)
         {
-            //we don't need to do anything here
+            // the log never stops
+        }
+
+        // a lightweight disposable timer
+        private class LightDisposableTimer : DisposableObject
+        {
+            private readonly Action<long> _callback;
+            private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+
+            protected internal LightDisposableTimer(Action<long> callback)
+            {
+                if (callback == null) throw new ArgumentNullException(nameof(callback));
+                _callback = callback;
+            }
+
+            protected override void DisposeResources()
+            {
+                _stopwatch.Stop();
+                _callback(_stopwatch.ElapsedMilliseconds);
+            }
         }
     }
 }

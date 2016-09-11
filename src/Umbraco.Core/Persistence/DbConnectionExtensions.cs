@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using NPoco;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence
@@ -60,7 +61,7 @@ namespace Umbraco.Core.Persistence
             catch (DbException e)
             {
                 // Don't swallow this error, the exception is super handy for knowing "why" its not available
-                LogHelper.WarnWithException<IDbConnection>("Configured database is reporting as not being available.", e);
+                Current.Logger.Warn<IDbConnection>(e, "Configured database is reporting as not being available.");
                 return false;
             }
 

@@ -2,6 +2,7 @@ using System;
 using System.Configuration;
 using umbraco.DataLayer;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace umbraco.cms.businesslogic
@@ -41,7 +42,7 @@ namespace umbraco.cms.businesslogic
                     }
                     catch(Exception ex)
                     {
-                        LogHelper.Error<LegacySqlHelper>(string.Format("Can't instantiate SQLHelper with connectionstring \"{0}\"", connectionString), ex);
+                        Current.Logger.Error<LegacySqlHelper>(string.Format("Can't instantiate SQLHelper with connectionstring \"{0}\"", connectionString), ex);
                     }
                 }
 

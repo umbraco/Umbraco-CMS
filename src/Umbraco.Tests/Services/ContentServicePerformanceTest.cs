@@ -40,6 +40,13 @@ namespace Umbraco.Tests.Services
             Assert.IsInstanceOf<TestProfiler>(Current.Profiler);
         }
 
+        private static ProfilingLogger GetTestProfilingLogger()
+        {
+            var logger = new DebugDiagnosticsLogger();
+            var profiler = new TestProfiler();
+            return new ProfilingLogger(logger, profiler);
+        }
+
         [Test]
         public void Retrieving_All_Content_In_Site()
         {
@@ -88,7 +95,8 @@ namespace Umbraco.Tests.Services
             }
 
             var total = new List<IContent>();
-            using (DisposableTimer.TraceDuration<ContentServicePerformanceTest>("Getting all content in site"))
+
+            using (GetTestProfilingLogger().TraceDuration<ContentServicePerformanceTest>("Getting all content in site"))
             {
                 TestProfiler.Enable();
                 total.AddRange(ServiceContext.ContentService.GetRootContent());
@@ -97,9 +105,8 @@ namespace Umbraco.Tests.Services
                     total.AddRange(ServiceContext.ContentService.GetDescendants(content));
                 }
                 TestProfiler.Disable();
-                LogHelper.Info<ContentServicePerformanceTest>("Returned " + total.Count + " items");
+                Current.Logger.Info<ContentServicePerformanceTest>("Returned " + total.Count + " items");
             }
-
         }
 
         [Test]

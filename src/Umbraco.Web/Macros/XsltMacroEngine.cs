@@ -61,13 +61,13 @@ namespace Umbraco.Web.Macros
 
             if (hasXslt == false && hasCode == false)
             {
-                LogHelper.Warn<XsltMacroEngine>("Xslt is empty");
+                Current.Logger.Warn<XsltMacroEngine>("Xslt is empty");
                 return MacroContent.Empty;
             }
 
             if (hasCode && model.ScriptLanguage.InvariantEquals("xslt") == false)
             {
-                LogHelper.Warn<XsltMacroEngine>("Unsupported script language \"" + model.ScriptLanguage + "\".");
+                Current.Logger.Warn<XsltMacroEngine>("Unsupported script language \"" + model.ScriptLanguage + "\".");
                 return MacroContent.Empty;
             }
 
@@ -304,7 +304,7 @@ namespace Umbraco.Web.Macros
             // if no value is passed, then use the current "pageID" as value
             var contentId = macroPropertyValue == string.Empty ? UmbracoContext.Current.PageId.ToString() : macroPropertyValue;
 
-            LogHelper.Info<XsltMacroEngine>($"Xslt node adding search start ({macroPropertyAlias},{macroPropertyValue})");
+            Current.Logger.Info<XsltMacroEngine>($"Xslt node adding search start ({macroPropertyAlias},{macroPropertyValue})");
 
             switch (macroPropertyType)
             {
@@ -368,10 +368,10 @@ namespace Umbraco.Web.Macros
                             macroXmlNode.AppendChild(node);
                         }
                         else
-                            LogHelper.Warn<XsltMacroEngine>("Error adding random node - parent (" + macroPropertyValue + ") doesn't have children!");
+                            Current.Logger.Warn<XsltMacroEngine>("Error adding random node - parent (" + macroPropertyValue + ") doesn't have children!");
                     }
                     else
-                        LogHelper.Warn<XsltMacroEngine>("Error adding random node - parent (" + macroPropertyValue + ") doesn't exists!");
+                        Current.Logger.Warn<XsltMacroEngine>("Error adding random node - parent (" + macroPropertyValue + ") doesn't exists!");
                     break;
 
                 case "mediaCurrent":
@@ -401,7 +401,7 @@ namespace Umbraco.Web.Macros
             // if no value is passed, then use the current "pageID" as value
             var contentId = macroPropertyValue == string.Empty ? UmbracoContext.Current.PageId.ToString() : macroPropertyValue;
 
-            LogHelper.Info<XsltMacroEngine>($"Xslt node adding search start ({macroPropertyAlias},{macroPropertyValue})");
+            Current.Logger.Info<XsltMacroEngine>($"Xslt node adding search start ({macroPropertyAlias},{macroPropertyValue})");
 
             // beware! do not use the raw content- or media- navigators, but clones !!
 
@@ -463,10 +463,10 @@ namespace Umbraco.Web.Macros
                                 throw new InvalidOperationException("Iterator contains non-INavigableContent elements.");
                         }
                         else
-                            LogHelper.Warn<XsltMacroEngine>("Error adding random node - parent (" + macroPropertyValue + ") doesn't have children!");
+                            Current.Logger.Warn<XsltMacroEngine>("Error adding random node - parent (" + macroPropertyValue + ") doesn't have children!");
                     }
                     else
-                        LogHelper.Warn<XsltMacroEngine>("Error adding random node - parent (" + macroPropertyValue + ") doesn't exists!");
+                        Current.Logger.Warn<XsltMacroEngine>("Error adding random node - parent (" + macroPropertyValue + ") doesn't exists!");
                     break;
 
                 case "mediaCurrent":
@@ -582,7 +582,7 @@ namespace Umbraco.Web.Macros
             {
                 var extensionNamespace = "urn:" + extension.Key;
                 xslArgs.AddExtensionObject(extensionNamespace, extension.Value);
-                LogHelper.Info<XsltMacroEngine>($"Extension added: {extensionNamespace}, {extension.Value.GetType().Name}");
+                Current.Logger.Info<XsltMacroEngine>($"Extension added: {extensionNamespace}, {extension.Value.GetType().Name}");
             }
 
             return xslArgs;

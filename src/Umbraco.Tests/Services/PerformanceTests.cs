@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -62,6 +63,13 @@ namespace Umbraco.Tests.Services
       		base.TearDown();
 		}
 
+        private static ProfilingLogger GetTestProfilingLogger()
+        {
+            var logger = new DebugDiagnosticsLogger();
+            var profiler = new TestProfiler();
+            return new ProfilingLogger(logger, profiler);
+        }
+
         [Test]
         public void Get_All_Published_Content()
         {
@@ -71,7 +79,8 @@ namespace Umbraco.Tests.Services
             var countOfPublished = result.Count(x => x.Published);
             var contentTypeId = result.First().ContentTypeId;
 
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content normally"))
+            var proflog = GetTestProfilingLogger();
+            using (proflog.DebugDuration<PerformanceTests>("Getting published content normally"))
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
@@ -90,7 +99,7 @@ namespace Umbraco.Tests.Services
 
             }
 
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content optimized"))
+            using (proflog.DebugDuration<PerformanceTests>("Getting published content optimized"))
             {
 
                 //do this 10x!
@@ -114,7 +123,8 @@ namespace Umbraco.Tests.Services
             var countOfPublished = result.Count(x => x.Published);
             var contentTypeId = result.First().ContentTypeId;
 
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content of type normally"))
+            var proflog = GetTestProfilingLogger();
+            using (proflog.DebugDuration<PerformanceTests>("Getting published content of type normally"))
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
@@ -126,7 +136,7 @@ namespace Umbraco.Tests.Services
                 }
             }
 
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content of type optimized"))
+            using (proflog.DebugDuration<PerformanceTests>("Getting published content of type optimized"))
             {
 
                 //do this 10x!
@@ -145,10 +155,11 @@ namespace Umbraco.Tests.Services
             var customObjectType = Guid.NewGuid();
             //chuck lots of data in the db
             var nodes = PrimeDbWithLotsOfContentXmlRecords(customObjectType);
+            var proflog = GetTestProfilingLogger();
 
             //now we need to test the difference between truncating all records and re-inserting them as we do now,
             //vs updating them (which might result in checking if they exist for or listening on an exception).
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Starting truncate + normal insert test"))
+            using (proflog.DebugDuration<PerformanceTests>("Starting truncate + normal insert test"))
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
@@ -168,7 +179,7 @@ namespace Umbraco.Tests.Services
             }
 
             //now, isntead of truncating, we'll attempt to update and if it doesn't work then we insert
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Starting update test"))
+            using (proflog.DebugDuration<PerformanceTests>("Starting update test"))
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
@@ -183,7 +194,7 @@ namespace Umbraco.Tests.Services
             }
 
             //now, test truncating but then do bulk insertion of records
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test"))
+            using (proflog.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test"))
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
@@ -200,7 +211,7 @@ namespace Umbraco.Tests.Services
             }
 
             //now, test truncating but then do bulk insertion of records
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test in one transaction"))
+            using (proflog.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test in one transaction"))
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)

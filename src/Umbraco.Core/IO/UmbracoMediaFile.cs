@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 
@@ -93,7 +94,7 @@ namespace Umbraco.Core.IO
             Exists = _fs.FileExists(Path);
             if (Exists == false)
             {
-                LogHelper.Warn<UmbracoMediaFile>("The media file doesn't exist: " + Path);
+                Current.Logger.Warn<UmbracoMediaFile>("The media file doesn't exist: " + Path);
             }
         }
 

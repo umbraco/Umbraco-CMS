@@ -65,7 +65,7 @@ namespace Umbraco.Web.WebApi.Filters
                             }
                             catch (System.Exception ex)
                             {
-                                LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + f.TempFilePath, ex);
+                                Current.Logger.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + f.TempFilePath, ex);
                             }
                         }
                     }
@@ -75,17 +75,17 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 if (actionExecutedContext == null)
                 {
-                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext is null!!??");
+                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext is null!!??");
                     return;
                 }
                 if (actionExecutedContext.Request == null)
                 {
-                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request is null!!??");
+                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request is null!!??");
                     return;
                 }
                 if (actionExecutedContext.Request.Content == null)
                 {
-                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is null!!??");
+                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is null!!??");
                     return;
                 }
 
@@ -97,7 +97,7 @@ namespace Umbraco.Web.WebApi.Filters
                 }
                 catch (System.Exception ex)
                 {
-                    LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not acquire actionExecutedContext.Response.Content", ex);
+                    Current.Logger.Error<FileUploadCleanupFilterAttribute>("Could not acquire actionExecutedContext.Response.Content", ex);
                     return;
                 }
 
@@ -120,7 +120,7 @@ namespace Umbraco.Web.WebApi.Filters
                                         tempFolders.Add(dir);
                                     }
 
-                                    LogHelper.Debug<FileUploadCleanupFilterAttribute>("Removing temp file " + f.TempFilePath);
+                                    Current.Logger.Debug<FileUploadCleanupFilterAttribute>("Removing temp file " + f.TempFilePath);
 
                                     try
                                     {
@@ -128,7 +128,7 @@ namespace Umbraco.Web.WebApi.Filters
                                     }
                                     catch (System.Exception ex)
                                     {
-                                        LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + f.TempFilePath, ex);
+                                        Current.Logger.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + f.TempFilePath, ex);
                                     }
 
                                     //clear out the temp path so it's not returned in the response
@@ -136,23 +136,23 @@ namespace Umbraco.Web.WebApi.Filters
                                 }
                                 else
                                 {
-                                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The f.TempFilePath is null or whitespace!!??");   
+                                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The f.TempFilePath is null or whitespace!!??");   
                                 }
                             }
                         }
                         else
                         {
-                            LogHelper.Warn<FileUploadCleanupFilterAttribute>("The uploadedFiles.UploadedFiles is null!!??");   
+                            Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The uploadedFiles.UploadedFiles is null!!??");   
                         }                        
                     }
                     else
                     {
-                        LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is " + objectContent.Value.GetType());
+                        Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is " + objectContent.Value.GetType());
                     }
                 }
                 else
                 {
-                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is " + actionExecutedContext.Request.Content.GetType());
+                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is " + actionExecutedContext.Request.Content.GetType());
                 }
             }
 
@@ -170,7 +170,7 @@ namespace Umbraco.Web.WebApi.Filters
                         }
                         catch (System.Exception ex)
                         {
-                            LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + file, ex);
+                            Current.Logger.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + file, ex);
                         }
                     }
                 }

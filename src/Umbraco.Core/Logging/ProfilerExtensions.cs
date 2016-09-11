@@ -5,31 +5,35 @@ namespace Umbraco.Core.Logging
     internal static class ProfilerExtensions
     {
         /// <summary>
-        /// Writes out a step prefixed with the type
+        /// Gets an <see cref="IDisposable"/> that will time the code between its creation and disposal,
+        /// prefixing the name of the step with a reporting type name.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="profiler"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The reporting type.</typeparam>
+        /// <param name="profiler">The profiler.</param>
+        /// <param name="name">The name of the step.</param>
+        /// <returns>A step.</returns>
+        /// <remarks>The returned <see cref="IDisposable"/> is meant to be used within a <c>using (...) {{ ... }}</c> block.</remarks>
         internal static IDisposable Step<T>(this IProfiler profiler, string name)
         {
-            if (profiler == null) throw new ArgumentNullException("profiler");
+            if (profiler == null) throw new ArgumentNullException(nameof(profiler));
             return profiler.Step(typeof (T), name);
         }
 
         /// <summary>
-        /// Writes out a step prefixed with the type
+        /// Gets an <see cref="IDisposable"/> that will time the code between its creation and disposal,
+        /// prefixing the name of the step with a reporting type name.
         /// </summary>
-        /// <param name="profiler"></param>
-        /// <param name="objectType"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        internal static IDisposable Step(this IProfiler profiler, Type objectType, string name)
+        /// <param name="profiler">The profiler.</param>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="name">The name of the step.</param>
+        /// <returns>A step.</returns>
+        /// <remarks>The returned <see cref="IDisposable"/> is meant to be used within a <c>using (...) {{ ... }}</c> block.</remarks>
+        internal static IDisposable Step(this IProfiler profiler, Type reporting, string name)
         {
-            if (profiler == null) throw new ArgumentNullException("profiler");
-            if (objectType == null) throw new ArgumentNullException("objectType");
-            if (name == null) throw new ArgumentNullException("name");
-            return profiler.Step(string.Format("[{0}] {1}", objectType.Name, name));
+            if (profiler == null) throw new ArgumentNullException(nameof(profiler));
+            if (reporting == null) throw new ArgumentNullException(nameof(reporting));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            return profiler.Step($"[{reporting.Name}] {name}");
         }
     }
 }

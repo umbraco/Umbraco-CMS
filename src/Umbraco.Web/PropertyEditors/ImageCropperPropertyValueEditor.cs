@@ -87,7 +87,7 @@ namespace Umbraco.Web.PropertyEditors
                 catch (Exception ex)
                 {
                     //for some reason the value is invalid so continue as if there was no value there
-                    _logger.WarnWithException<ImageCropperPropertyValueEditor>("Could not parse current db value to a JObject", ex);
+                    _logger.Warn<ImageCropperPropertyValueEditor>(ex, "Could not parse current db value to a JObject");
                 }
 
                 if (oldJson != null && oldJson["src"] != null)

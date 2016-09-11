@@ -236,7 +236,7 @@ namespace Umbraco.Web.Security
             if (member == null)
             {
                 //this should not happen
-                LogHelper.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);
+                Current.Logger.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);
                 return false;
             }
             //Log them in
@@ -647,7 +647,7 @@ namespace Umbraco.Web.Security
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.WarnWithException<WebSecurity>("Could not reset member password", ex);
+                    Current.Logger.Warn<WebSecurity>(ex, "Could not reset member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, error: " + ex.Message + " (see log for full details)", new[] { "resetPassword" }) });
                 }
             }
@@ -673,7 +673,7 @@ namespace Umbraco.Web.Security
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex);
+                    Current.Logger.Warn<WebSecurity>(ex, "Could not change member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
                 }
             }
@@ -698,7 +698,7 @@ namespace Umbraco.Web.Security
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex);
+                    Current.Logger.Warn<WebSecurity>(ex, "Could not change member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
                 }
             }
@@ -730,14 +730,14 @@ namespace Umbraco.Web.Security
                 }
                 catch (Exception ex1)
                 {
-                    LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex1);
+                    Current.Logger.Warn<WebSecurity>(ex1, "Could not change member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex1.Message + " (see log for full details)", new[] { "value" }) });
                 }
 
             }
             catch (Exception ex2)
             {
-                LogHelper.WarnWithException<WebSecurity>("Could not retrieve member password", ex2);
+                Current.Logger.Warn<WebSecurity>(ex2, "Could not retrieve member password");
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });
             }
         }

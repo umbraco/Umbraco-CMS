@@ -319,13 +319,13 @@ namespace umbraco.cms.businesslogic.member
                 }
                 else
                 {
-                    LogHelper.Debug<Member>("Incorrect login/password attempt or member is locked out or not approved (" + loginName + ")", true);
+                    Current.Logger.Debug<Member>("Incorrect login/password attempt or member is locked out or not approved (" + loginName + ")");
                     return null;
                 }
             }
             else
             {
-                LogHelper.Debug<Member>("No member with loginname: " + loginName + " Exists", true);
+                Current.Logger.Debug<Member>("No member with loginname: " + loginName + " Exists");
                 return null;
             }
         }
@@ -899,7 +899,7 @@ namespace umbraco.cms.businesslogic.member
             }
             catch (Exception ex)
             {
-                LogHelper.Error<Member>("An error occurred in GetCurrentMember", ex);
+                Current.Logger.Error<Member>("An error occurred in GetCurrentMember", ex);
             }
             return null;
         }

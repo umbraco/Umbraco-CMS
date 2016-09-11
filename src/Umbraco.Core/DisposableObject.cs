@@ -36,7 +36,11 @@ namespace Umbraco.Core
 		}
 
         private void Dispose(bool disposing)
-		{
+        {
+            // can happen if the object construction failed
+            if (_locko == null)
+                return;
+
 		    lock (_locko)
 		    {
 		        if (Disposed) return;

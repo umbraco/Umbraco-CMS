@@ -14,13 +14,17 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly IRuntimeState _runtime;
         private readonly IUserService _userService;
+        private readonly ILogger _logger;
+        private readonly ProfilingLogger _proflog;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IUserService userService)
+            IRuntimeState runtime, IUserService userService, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _userService = userService;
+            _logger = logger;
+            _proflog = proflog;
         }
 
         public override bool PerformRun()
@@ -33,21 +37,21 @@ namespace Umbraco.Web.Scheduling
             switch (_runtime.ServerRole)
             {
                 case ServerRole.Slave:
-                    LogHelper.Debug<ScheduledPublishing>("Does not run on slave servers.");
+                    _logger.Debug<ScheduledPublishing>("Does not run on slave servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
-                    LogHelper.Debug<ScheduledPublishing>("Does not run on servers with unknown role.");
+                    _logger.Debug<ScheduledPublishing>("Does not run on servers with unknown role.");
                     return true; // DO repeat, server role can change
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
             if (_runtime.IsMainDom == false)
             {
-                LogHelper.Debug<ScheduledPublishing>("Does not run if not MainDom.");
+                _logger.Debug<ScheduledPublishing>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
             }
 
-            using (DisposableTimer.DebugDuration<ScheduledPublishing>(() => "Scheduled publishing executing", () => "Scheduled publishing complete"))
+            using (_proflog.DebugDuration<ScheduledPublishing>("Scheduled publishing executing", "Scheduled publishing complete"))
             {
                 string umbracoAppUrl = null;
 
@@ -56,7 +60,7 @@ namespace Umbraco.Web.Scheduling
                     umbracoAppUrl = _runtime.ApplicationUrl.ToString();
                     if (umbracoAppUrl.IsNullOrWhiteSpace())
                     {
-                        LogHelper.Warn<ScheduledPublishing>("No url for service (yet), skip.");
+                        _logger.Warn<ScheduledPublishing>("No url for service (yet), skip.");
                         return true; // repeat
                     }
 
@@ -75,7 +79,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception e)
                 {
-                    LogHelper.Error<ScheduledPublishing>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
+                    _logger.Error<ScheduledPublishing>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
                 }
             }
 

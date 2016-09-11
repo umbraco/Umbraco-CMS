@@ -71,44 +71,93 @@ namespace Umbraco.Core
             // are NOT disposed - which is not a big deal as long as they remain lightweight
             // objects.
 
-            using (ProfilingLogger.TraceDuration<CoreRuntime>($"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()} on {NetworkHelper.MachineName}.", "Booted."))
+            using (var bootTimer = ProfilingLogger.TraceDuration<CoreRuntime>(
+                $"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()} on {NetworkHelper.MachineName}.",
+                "Booted.",
+                "Boot failed."))
             {
-                Logger.Debug<CoreRuntime>($"Runtime: {GetType().FullName}");
-
-                using (ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Aquired."))
+                try
                 {
-                    // become the main domain - before anything else
+                    Logger.Debug<CoreRuntime>($"Runtime: {GetType().FullName}");
+
+                    AquireMainDom(container);
+                    DetermineRuntimeLevel(container);
+                    var componentTypes = ResolveComponentTypes();
+                    _bootLoader = new BootLoader(container);
+                    _bootLoader.Boot(componentTypes, _state.Level);
+
+                    // this was done in Complete() right before running the Started event handlers
+                    // "special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
+                    // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)"
+                    //
+                    // was *always* setting the value to true which is?! so using the runtime level
+                    // and then, it is *never* resetted to false, meaning Umbraco has been running with IsUpgrading being true?
+                    // fixme - this is... bad
+                    ((UserService) Current.Services.UserService).IsUpgrading = _state.Level == RuntimeLevel.Upgrade;
+                }
+                catch (Exception e)
+                {
+                    _state.Level = RuntimeLevel.BootFailed;
+                    var bfe = e as BootFailedException ?? new BootFailedException("Boot failed.", e);
+                    bootTimer.Fail(exception: bfe); // be sure to log the exception - even if we repeat ourselves
+
+                    // throwing here can cause w3wp to hard-crash and we want to avoid it.
+                    // instead, we're logging the exception and setting level to BootFailed.
+                    // various parts of Umbraco such as UmbracoModule and UmbracoDefaultOwinStartup
+                    // understand this and will nullify themselves, while UmbracoModule will
+                    // throw a BootFailedException for every requests.
+                }
+            }
+        }
+
+        private void AquireMainDom(IServiceFactory container)
+        {
+            using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Aquired."))
+            {
+                try
+                {
                     var mainDom = container.GetInstance<MainDom>();
                     mainDom.Acquire();
                 }
+                catch
+                {
+                    timer.Fail();
+                    throw;
+                }
+            }
+        }
 
-                using (ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
+        private void DetermineRuntimeLevel(IServiceFactory container)
+        {
+            using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
+            {
+                try
                 {
                     var dbfactory = container.GetInstance<IDatabaseFactory>();
                     SetRuntimeStateLevel(_state, dbfactory, Logger);
+                    Logger.Debug<CoreRuntime>($"Runtime level: {_state.Level}");
                 }
-
-                Logger.Debug<CoreRuntime>($"Runtime level: {_state.Level}");
-
-                IEnumerable<Type> componentTypes;
-                using (ProfilingLogger.TraceDuration<CoreRuntime>("Resolving component types.", "Resolved."))
+                catch
                 {
-                    componentTypes = GetComponentTypes();
+                    timer.Fail();
+                    throw;
                 }
+            }
+        }
 
-                // boot
-                _bootLoader = new BootLoader(container);
-                _bootLoader.Boot(componentTypes, _state.Level);
-
-                // this was done in Complete() right before running the Started event handlers
-                // "special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
-                // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)"
-                //
-                // was *always* setting the value to true which is?! so using the runtime level
-                // and then, it is *never* resetted to false, meaning Umbraco has been running with IsUpgrading being true?
-                // fixme - this is... bad
-                ((UserService) Current.Services.UserService).IsUpgrading = _state.Level == RuntimeLevel.Upgrade;
-
+        private IEnumerable<Type> ResolveComponentTypes()
+        {
+            using (var timer = ProfilingLogger.TraceDuration<CoreRuntime>("Resolving component types.", "Resolved."))
+            {
+                try
+                {
+                    return GetComponentTypes();
+                }
+                catch
+                {
+                    timer.Fail();
+                    throw;
+                }
             }
         }
 
@@ -217,7 +266,7 @@ namespace Umbraco.Core
             {
                 // cannot connect to configured database, this is bad, fail
                 logger.Debug<CoreRuntime>("Could not connect to database.");
-                runtimeState.Level = RuntimeLevel.Failed;
+                runtimeState.Level = RuntimeLevel.BootFailed;
 
                 // in fact, this is bad enough that we want to throw
                 throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");

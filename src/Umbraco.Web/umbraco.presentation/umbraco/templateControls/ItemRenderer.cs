@@ -146,7 +146,7 @@ namespace umbraco.presentation.templateControls
         /// <param name="item">The item.</param>
         public virtual void Load(Item item)
         {
-            using (DisposableTimer.DebugDuration<ItemRenderer>(string.Format("Item: {0}", item.Field)))
+            using (Current.ProfilingLogger.DebugDuration<ItemRenderer>(string.Format("Item: {0}", item.Field)))
             {
                 ParseMacros(item);
             }
@@ -172,7 +172,7 @@ namespace umbraco.presentation.templateControls
             }
             else
             {
-                using (DisposableTimer.DebugDuration<ItemRenderer>("Parsing Macros"))
+                using (Current.ProfilingLogger.DebugDuration<ItemRenderer>("Parsing Macros"))
                 {
 
                     MacroTagParser.ParseMacros(

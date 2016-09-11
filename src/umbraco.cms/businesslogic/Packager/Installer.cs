@@ -177,9 +177,9 @@ namespace umbraco.cms.businesslogic.packager
         /// <returns></returns>
         public string Import(string inputFile, bool deleteFile)
         {
-            using (DisposableTimer.DebugDuration<Installer>(
-                () => "Importing package file " + inputFile,
-                () => "Package file " + inputFile + "imported"))
+            using (Current.ProfilingLogger.DebugDuration<Installer>(
+                $"Importing package file {inputFile}.",
+                $"Package file {inputFile} imported."))
             {
                 var tempDir = "";
                 if (File.Exists(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + inputFile)))
@@ -258,9 +258,9 @@ namespace umbraco.cms.businesslogic.packager
 
         public void InstallFiles(int packageId, string tempDir)
         {
-            using (DisposableTimer.DebugDuration<Installer>(
-                () => "Installing package files for package id " + packageId + " into temp folder " + tempDir,
-                () => "Package file installation complete for package id " + packageId))
+            using (Current.ProfilingLogger.DebugDuration<Installer>(
+                "Installing package files for package id " + packageId + " into temp folder " + tempDir,
+                "Package file installation complete for package id " + packageId))
             {
                 //retrieve the manifest to continue installation
                 var insPack = InstalledPackage.GetById(packageId);
@@ -308,9 +308,9 @@ namespace umbraco.cms.businesslogic.packager
 
         public void InstallBusinessLogic(int packageId, string tempDir)
         {
-            using (DisposableTimer.DebugDuration<Installer>(
-                () => "Installing business logic for package id " + packageId + " into temp folder " + tempDir,
-                () => "Package business logic installation complete for package id " + packageId))
+            using (Current.ProfilingLogger.DebugDuration<Installer>(
+                "Installing business logic for package id " + packageId + " into temp folder " + tempDir,
+                "Package business logic installation complete for package id " + packageId))
             {
                 //retrieve the manifest to continue installation
                 var insPack = InstalledPackage.GetById(packageId);

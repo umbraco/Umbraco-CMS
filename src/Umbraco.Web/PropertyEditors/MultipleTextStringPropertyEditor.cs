@@ -1,7 +1,5 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,8 +19,7 @@ namespace Umbraco.Web.PropertyEditors
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
         public MultipleTextStringPropertyEditor(ILogger logger) : base(logger)
-        {
-        }
+        { }
 
         protected override PropertyValueEditor CreateValueEditor()
         {
@@ -31,7 +28,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new MultipleTextStringPreValueEditor();
+            return new MultipleTextStringPreValueEditor(Logger);
         }
 
         /// <summary>
@@ -39,8 +36,11 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class MultipleTextStringPreValueEditor : PreValueEditor
         {
-            public MultipleTextStringPreValueEditor()
+            private readonly ILogger _logger;
+
+            public MultipleTextStringPreValueEditor(ILogger logger)
             {
+                _logger = logger;
                 //create the fields
                 Fields.Add(new PreValueField(new IntegerValidator())
                 {
@@ -103,8 +103,8 @@ namespace Umbraco.Web.PropertyEditors
                     }
                     catch (Exception e)
                     {
-                        //this shouldn't happen unless there's already a bad formatted pre-value
-                        LogHelper.WarnWithException<MultipleTextStringPreValueEditor>("Could not deserialize value to json " + stringVal, e);
+                        // this shouldn't happen unless there's already a bad formatted pre-value
+                        _logger.Warn<MultipleTextStringPreValueEditor>(e, "Could not deserialize value to json " + stringVal);
                         return returnVal;
                     }
                 }

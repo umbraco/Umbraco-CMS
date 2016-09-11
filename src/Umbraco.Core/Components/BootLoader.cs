@@ -179,7 +179,7 @@ namespace Umbraco.Core.Components
                 foreach (var component in _components)
                 {
                     var componentType = component.GetType();
-                    using (_proflog.DebugDuration<BootLoader>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", LogThresholdMilliseconds))
+                    using (_proflog.DebugDuration<BootLoader>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         component.Compose(_container, level);
                     }
@@ -199,7 +199,7 @@ namespace Umbraco.Core.Components
                     var componentType = component.GetType();
                     var initializers = componentType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                         .Where(x => x.Name == "Initialize" && x.IsGenericMethod == false);
-                    using (_proflog.DebugDuration<BootLoader>($"Initializing {componentType.FullName}.", $"Initialised {componentType.FullName}.", LogThresholdMilliseconds))
+                    using (_proflog.DebugDuration<BootLoader>($"Initializing {componentType.FullName}.", $"Initialised {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         foreach (var initializer in initializers)
                         {
@@ -222,14 +222,18 @@ namespace Umbraco.Core.Components
 
         public void Terminate()
         {
-            if (_booted == false) throw new InvalidOperationException("Cannot terminate, has not booted.");
+            if (_booted == false)
+            {
+                _proflog.Logger.Warn<BootLoader>("Cannot terminate, has not booted.");
+                return;
+            }
 
             using (_proflog.DebugDuration<BootLoader>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
             {
                 foreach (var component in _components)
                 {
                     var componentType = component.GetType();
-                    using (_proflog.DebugDuration<BootLoader>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", LogThresholdMilliseconds))
+                    using (_proflog.DebugDuration<BootLoader>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         component.Terminate();
                     }

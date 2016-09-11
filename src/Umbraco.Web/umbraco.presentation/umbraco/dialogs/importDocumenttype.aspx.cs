@@ -89,7 +89,7 @@ namespace umbraco.presentation.umbraco.dialogs
             }
             catch(Exception ex)
             {
-                Umbraco.Core.Logging.LogHelper.Error(typeof(importDocumentType), "Error cleaning up temporary udt file in App_Data: " + ex.Message, ex);
+                Current.Logger.Error(typeof(importDocumentType), "Error cleaning up temporary udt file in App_Data: " + ex.Message, ex);
             }
 
 		    Wizard.Visible = false;

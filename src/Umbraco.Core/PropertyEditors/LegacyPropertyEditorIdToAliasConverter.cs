@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.PropertyEditors
@@ -81,7 +82,7 @@ namespace Umbraco.Core.PropertyEditors
                         var generated = alias.EncodeAsGuid();
                         CreateMap(generated, alias);
 
-                        LogHelper.Warn(typeof(LegacyPropertyEditorIdToAliasConverter), "A legacy GUID id was generated for property editor " + alias + ". This occurs when the legacy APIs are used and done to attempt to maintain backwards compatibility. Consider upgrading all code to use the new Services APIs instead to avoid any potential issues.");
+                        Current.Logger.Warn(typeof(LegacyPropertyEditorIdToAliasConverter), "A legacy GUID id was generated for property editor " + alias + ". This occurs when the legacy APIs are used and done to attempt to maintain backwards compatibility. Consider upgrading all code to use the new Services APIs instead to avoid any potential issues.");
 
                         return generated;
                 }

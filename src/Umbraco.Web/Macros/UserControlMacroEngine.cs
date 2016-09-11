@@ -30,7 +30,7 @@ namespace Umbraco.Web.Macros
             // note: we are not setting the 'CurrentNode' property on the control anymore,
             // as that was an INode which is gone in v8. Use UmbracoContext to access the
             // current content.
-            LogHelper.Info<UserControlMacroEngine>($"Loaded control \"{filename}\" with ID \"{control.ID}\".");
+            Current.Logger.Info<UserControlMacroEngine>($"Loaded control \"{filename}\" with ID \"{control.ID}\".");
             UpdateControlProperties(control, model);
 
             return new MacroContent { Control = control };
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Macros
                 var controlProperty = type.GetProperty(modelProperty.Key);
                 if (controlProperty == null)
                 {
-                    LogHelper.Warn<UserControlMacroEngine>($"Control property \"{modelProperty.Key}\" doesn't exist or isn't accessible, skip.");
+                    Current.Logger.Warn<UserControlMacroEngine>($"Control property \"{modelProperty.Key}\" doesn't exist or isn't accessible, skip.");
                     continue;
                 }
 
@@ -73,16 +73,16 @@ namespace Umbraco.Web.Macros
                     try
                     {
                         controlProperty.SetValue(control, tryConvert.Result, null);
-                        LogHelper.Debug<UserControlMacroEngine>($"Set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
+                        Current.Logger.Debug<UserControlMacroEngine>($"Set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
                     }
                     catch (Exception e)
                     {
-                        LogHelper.WarnWithException<UserControlMacroEngine>($"Failed to set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".", e);
+                        Current.Logger.Warn<UserControlMacroEngine>(e, $"Failed to set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
                     }
                 }
                 else
                 {
-                    LogHelper.Warn<UserControlMacroEngine>($"Failed to set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
+                    Current.Logger.Warn<UserControlMacroEngine>($"Failed to set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
                 }
             }
         }

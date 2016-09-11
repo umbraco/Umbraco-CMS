@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using NPoco;
 using Semver;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -90,7 +91,7 @@ namespace Umbraco.Core
             {
                 if (IsDatabaseConfigured == false) return false;
                 var canConnect = _factory.CanConnect;
-                LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
+                Current.Logger.Info<DatabaseContext>("CanConnect = " + canConnect);
                 return canConnect;
             }
         }

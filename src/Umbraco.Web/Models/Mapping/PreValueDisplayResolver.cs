@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
                 var found = preValues.Any(x => x.Key.InvariantEquals(field.Key));
                 if (found == false)
                 {
-                    LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field " + field.Key);
+                    Current.Logger.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field " + field.Key);
                     continue;
                 }
                 field.Value = preValues.Single(x => x.Key.InvariantEquals(field.Key)).Value;

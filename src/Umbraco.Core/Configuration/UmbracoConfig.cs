@@ -5,6 +5,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Dashboard;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
@@ -66,7 +67,7 @@ namespace Umbraco.Core.Configuration
             if (_dashboardSection == null)
             {
                 var ex = new ConfigurationErrorsException("Could not load the " + typeof(IDashboardSection) + " from config file, ensure the web.config and Dashboard.config files are formatted correctly");
-                LogHelper.Error<UmbracoConfig>("Config error", ex);
+                Current.Logger.Error<UmbracoConfig>("Config error", ex);
                 throw ex;
             }
 
@@ -99,7 +100,7 @@ namespace Umbraco.Core.Configuration
             if (_umbracoSettings == null)
             {
                 var ex = new ConfigurationErrorsException("Could not load the " + typeof (IUmbracoSettingsSection) + " from config file, ensure the web.config and umbracoSettings.config files are formatted correctly");
-                LogHelper.Error<UmbracoConfig>("Config error", ex);
+                Current.Logger.Error<UmbracoConfig>("Config error", ex);
                 throw ex;
             }
 

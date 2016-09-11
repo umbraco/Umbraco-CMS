@@ -28,6 +28,11 @@ namespace Umbraco.Web
         public virtual void Configuration(IAppBuilder app)
         {
             app.SanitizeThreadCulture();
+
+            // there's nothing we can do really
+            if (Core.DependencyInjection.Current.RuntimeState.Level == RuntimeLevel.BootFailed)
+                return;
+
             ConfigureServices(app, Current.Services);
             ConfigureMiddleware(app);
             ConfigureSignalR(app);

@@ -485,14 +485,14 @@ namespace Umbraco.Web.Editors
                 // Save content with new sort order and update content xml in db accordingly
                 if (contentService.Sort(sortedContent) == false)
                 {
-                    LogHelper.Warn<MediaController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    Logger.Warn<MediaController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                LogHelper.Error<MediaController>("Could not update content sort order", ex);
+                Logger.Error<MediaController>("Could not update content sort order", ex);
                 throw;
             }
         }
@@ -591,7 +591,7 @@ namespace Umbraco.Web.Editors
                 if (template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    LogHelper.Warn<ContentController>("No template exists with the specified alias: " + contentItem.TemplateAlias);
+                    Logger.Warn<ContentController>("No template exists with the specified alias: " + contentItem.TemplateAlias);
                 }
                 else
                 {

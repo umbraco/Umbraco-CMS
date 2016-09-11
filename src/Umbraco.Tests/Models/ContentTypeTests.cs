@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Serialization;
@@ -92,6 +93,13 @@ namespace Umbraco.Tests.Models
             }
         }
 
+        private static ProfilingLogger GetTestProfilingLogger()
+        {
+            var logger = new DebugDiagnosticsLogger();
+            var profiler = new TestProfiler();
+            return new ProfilingLogger(logger, profiler);
+        }
+
         [Ignore]
         [Test]
         public void Can_Deep_Clone_Content_Type_Perf_Test()
@@ -132,11 +140,13 @@ namespace Umbraco.Tests.Models
             ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
             ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
 
-            using (DisposableTimer.DebugDuration<ContentTypeTests>("STARTING PERF TEST"))
+            var proflog = GetTestProfilingLogger();
+
+            using (proflog.DebugDuration<ContentTypeTests>("STARTING PERF TEST"))
             {
-                for (int j = 0; j < 1000; j++)
+                for (var j = 0; j < 1000; j++)
                 {
-                    using (DisposableTimer.DebugDuration<ContentTypeTests>("Cloning content type"))
+                    using (proflog.DebugDuration<ContentTypeTests>("Cloning content type"))
                     {
                         var clone = (ContentType)contentType.DeepClone();
                     }                    

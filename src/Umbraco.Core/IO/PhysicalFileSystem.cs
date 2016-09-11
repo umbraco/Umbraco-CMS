@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
@@ -70,11 +71,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                LogHelper.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
             }
             catch (DirectoryNotFoundException ex)
             {
-                LogHelper.Error<PhysicalFileSystem>("Directory not found", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Directory not found", ex);
             }
 
             return Enumerable.Empty<string>();
@@ -97,7 +98,7 @@ namespace Umbraco.Core.IO
             }
             catch (DirectoryNotFoundException ex)
             {
-                LogHelper.Error<PhysicalFileSystem>("Directory not found", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Directory not found", ex);
             }
         }
 
@@ -144,11 +145,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                LogHelper.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
             }
             catch (DirectoryNotFoundException ex)
             {
-                LogHelper.Error<PhysicalFileSystem>("Directory not found", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Directory not found", ex);
             }
 
             return Enumerable.Empty<string>();
@@ -172,7 +173,7 @@ namespace Umbraco.Core.IO
             }
             catch (FileNotFoundException ex)
             {
-                LogHelper.Info<PhysicalFileSystem>(string.Format("DeleteFile failed with FileNotFoundException: {0}", ex.InnerException));
+                Current.Logger.Info<PhysicalFileSystem>(string.Format("DeleteFile failed with FileNotFoundException: {0}", ex.InnerException));
             }
         }
 

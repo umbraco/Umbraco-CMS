@@ -91,7 +91,7 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                LogHelper.Error<XsltTasks>(string.Format("Could not remove XSLT file {0} - User {1}", Alias, UmbracoContext.Current.Security.GetUserId()), ex);
+                Current.Logger.Error<XsltTasks>(string.Format("Could not remove XSLT file {0} - User {1}", Alias, UmbracoContext.Current.Security.GetUserId()), ex);
             }
             return true;
         }

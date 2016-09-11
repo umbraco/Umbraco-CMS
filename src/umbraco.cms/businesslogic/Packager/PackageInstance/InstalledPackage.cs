@@ -35,7 +35,7 @@ namespace umbraco.cms.businesslogic.packager {
         {
 #if DEBUG
             _saveHitCount++;
-            LogHelper.Info<InstalledPackage>("The InstalledPackage class save method has been hit " + _saveHitCount + " times.");
+            Current.Logger.Info<InstalledPackage>("The InstalledPackage class save method has been hit " + _saveHitCount + " times.");
 #endif
             this.FireBeforeSave(EventArgs.Empty);
             data.Save(this.Data, IOHelper.MapPath(Settings.InstalledPackagesSettings));
@@ -84,7 +84,7 @@ namespace umbraco.cms.businesslogic.packager {
 			}
 			catch (Exception ex)
 			{
-				LogHelper.Error<InstalledPackage>("An error occured in isPackagedInstalled", ex);
+                Current.Logger.Error<InstalledPackage>("An error occured in isPackagedInstalled", ex);
 				return false;
 			}
         }

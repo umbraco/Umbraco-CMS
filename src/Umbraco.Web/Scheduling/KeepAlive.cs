@@ -10,12 +10,16 @@ namespace Umbraco.Web.Scheduling
     internal class KeepAlive : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
+        private readonly ILogger _logger;
+        private readonly ProfilingLogger _proflog;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
-            IRuntimeState runtime)
+            IRuntimeState runtime, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
+            _logger = logger;
+            _proflog = proflog;
         }
 
         public override bool PerformRun()
@@ -28,11 +32,11 @@ namespace Umbraco.Web.Scheduling
             // ensure we do not run if not main domain, but do NOT lock it
             if (_runtime.IsMainDom == false)
             {
-                LogHelper.Debug<KeepAlive>("Does not run if not MainDom.");
+                _logger.Debug<KeepAlive>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
             }
 
-            using (DisposableTimer.DebugDuration<KeepAlive>(() => "Keep alive executing", () => "Keep alive complete"))
+            using (_proflog.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
             {
                 string umbracoAppUrl = null;
 
@@ -41,7 +45,7 @@ namespace Umbraco.Web.Scheduling
                     umbracoAppUrl = _runtime.ApplicationUrl.ToString();
                     if (umbracoAppUrl.IsNullOrWhiteSpace())
                     {
-                        LogHelper.Warn<KeepAlive>("No url for service (yet), skip.");
+                        _logger.Warn<KeepAlive>("No url for service (yet), skip.");
                         return true; // repeat
                     }
 
@@ -54,7 +58,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception e)
                 {
-                    LogHelper.Error<KeepAlive>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
+                    _logger.Error<KeepAlive>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
                 }
             }
 

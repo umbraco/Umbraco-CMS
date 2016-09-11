@@ -399,7 +399,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var urlProvider = new UrlProvider(umbracoContext, settings.WebRouting, new IUrlProvider[]
             {
-                new DefaultUrlProvider(settings.RequestHandler)
+                new DefaultUrlProvider(settings.RequestHandler, Current.Logger)
             });
             var routingContext = new RoutingContext(
                 umbracoContext,
@@ -438,7 +438,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var cache = new NullCacheProvider();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
-            _service = new FacadeService(svcCtx, provider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, null, true, false); // no events
+            _service = new FacadeService(svcCtx, provider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, Current.Logger, null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 

@@ -10,6 +10,7 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = System.IO.Directory;
@@ -59,7 +60,7 @@ namespace UmbracoExamine.LocalStorage
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error<LocalTempStorageIndexer>(
+                        Current.Logger.Error<LocalTempStorageIndexer>(
                             string.Format("Could not create a temp storage location of type {0}, reverting to use the " + typeof (CodeGenLocalStorageDirectory).FullName, dirType),
                             ex);
                     }
@@ -105,16 +106,16 @@ namespace UmbracoExamine.LocalStorage
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.WarnWithException<LocalTempStorageIndexer>(
-                                string.Format("Could not open an index reader, local temp storage index is empty or corrupt... retrying... {0}", configuredPath),
-                                ex);
+                            Current.Logger.Warn<LocalTempStorageIndexer>(
+                                ex,
+                                string.Format("Could not open an index reader, local temp storage index is empty or corrupt... retrying... {0}", configuredPath));
                         }
                         return Attempt.Fail(false);
                     }, 5, TimeSpan.FromSeconds(1));
 
                     if (result.Success == false)
                     {
-                        LogHelper.Warn<LocalTempStorageIndexer>(
+                        Current.Logger.Warn<LocalTempStorageIndexer>(
                                 string.Format("Could not open an index reader, local temp storage index is empty or corrupt... attempting to clear index files in local temp storage, will operate from main storage only {0}", configuredPath));
 
                         ClearFilesInPath(TempPath);
@@ -152,7 +153,7 @@ namespace UmbracoExamine.LocalStorage
                     }
                     catch (Exception exInner)
                     {
-                        LogHelper.Error<LocalTempStorageIndexer>("Could not delete local temp storage index file", exInner);
+                        Current.Logger.Error<LocalTempStorageIndexer>("Could not delete local temp storage index file", exInner);
                     }
                 }
             }
@@ -178,7 +179,7 @@ namespace UmbracoExamine.LocalStorage
                         {
                             if (file.InvariantEquals("write.lock"))
                             {
-                                LogHelper.Warn<LocalTempStorageIndexer>("The lock file could not be deleted but should be removed when the writer is disposed");
+                                Current.Logger.Warn<LocalTempStorageIndexer>("The lock file could not be deleted but should be removed when the writer is disposed");
                             }
 
                         }
@@ -189,7 +190,7 @@ namespace UmbracoExamine.LocalStorage
             }
             catch (Exception ex)
             {
-                LogHelper.Error<LocalTempStorageIndexer>("Could not clear corrupt index from main index folder, the index cannot be used", ex);
+                Current.Logger.Error<LocalTempStorageIndexer>("Could not clear corrupt index from main index folder, the index cannot be used", ex);
                 return false;
             }
         }
@@ -210,7 +211,7 @@ namespace UmbracoExamine.LocalStorage
             }
             catch (Exception ex)
             {
-                LogHelper.WarnWithException<LocalTempStorageIndexer>("Could not create index writer with snapshot policy for copying... retrying...", ex);
+                Current.Logger.Warn<LocalTempStorageIndexer>(ex, "Could not create index writer with snapshot policy for copying... retrying...");
                 return Attempt<IndexWriter>.Fail(ex);
             }
         }
@@ -230,14 +231,14 @@ namespace UmbracoExamine.LocalStorage
                 //last try...
                 if (currentTry == maxTries)
                 {
-                    LogHelper.Info<LocalTempStorageIndexer>("Could not acquire index lock, attempting to force unlock it...");
+                    Current.Logger.Info<LocalTempStorageIndexer>("Could not acquire index lock, attempting to force unlock it...");
                     //unlock it!
                     IndexWriter.Unlock(baseLuceneDirectory);
                 }
 
                 var writerAttempt = TryCreateWriter(baseLuceneDirectory, analyzer);
                 if (writerAttempt) return writerAttempt;
-                LogHelper.Info<LocalTempStorageIndexer>("Could not create writer on {0}, retrying ....", baseLuceneDirectory.ToString);
+                Current.Logger.Info<LocalTempStorageIndexer>("Could not create writer on {0}, retrying ....", baseLuceneDirectory.ToString);
                 return Attempt<IndexWriter>.Fail();
             }, 5, TimeSpan.FromSeconds(1));
 
@@ -253,13 +254,13 @@ namespace UmbracoExamine.LocalStorage
                 //last try...
                 if (currentTry == maxTries)
                 {
-                    LogHelper.Info<LocalTempStorageIndexer>("Could not acquire directory lock, attempting to force unlock it...");
+                    Current.Logger.Info<LocalTempStorageIndexer>("Could not acquire directory lock, attempting to force unlock it...");
                     //unlock it!
                     IndexWriter.Unlock(dir);
                 }
 
                 if (IndexWriter.IsLocked(dir) == false) return Attempt.Succeed(true);
-                LogHelper.Info<LocalTempStorageIndexer>("Could not acquire directory lock for {0} writer, retrying ....", dir.ToString);
+                Current.Logger.Info<LocalTempStorageIndexer>("Could not acquire directory lock for {0} writer, retrying ....", dir.ToString);
                 return Attempt<bool>.Fail();
             }, 5, TimeSpan.FromSeconds(1));
 
@@ -282,7 +283,7 @@ namespace UmbracoExamine.LocalStorage
 
                 if (writerAttempt.Success == false)
                 {
-                    LogHelper.Error<LocalTempStorageIndexer>("Could not create index writer with snapshot policy for copying, the index cannot be used", writerAttempt.Exception);
+                    Current.Logger.Error<LocalTempStorageIndexer>("Could not create index writer with snapshot policy for copying, the index cannot be used", writerAttempt.Exception);
                     return InitializeDirectoryFlags.FailedLocked;
                 }
 
@@ -298,14 +299,14 @@ namespace UmbracoExamine.LocalStorage
                 {
                     writerAttempt.Result.Dispose();
 
-                    LogHelper.Error<LocalTempStorageIndexer>(
+                    Current.Logger.Error<LocalTempStorageIndexer>(
                         string.Format("Could not open an index reader, {0} is empty or corrupt... attempting to clear index files in master folder", configuredPath),
                         ex);
 
                     if (ClearLuceneDirFiles(baseLuceneDirectory) == false)
                     {
                         //hrm, not much we can do in this situation, but this shouldn't happen
-                        LogHelper.Error<LocalTempStorageIndexer>("Could not open an index reader, index is corrupt.", ex);
+                        Current.Logger.Error<LocalTempStorageIndexer>("Could not open an index reader, index is corrupt.", ex);
                         return InitializeDirectoryFlags.FailedCorrupt;
                     }
 
@@ -314,7 +315,7 @@ namespace UmbracoExamine.LocalStorage
                     if (writerAttempt.Success == false)
                     {
                         //ultra fail...
-                        LogHelper.Error<LocalTempStorageIndexer>("Could not create index writer with snapshot policy for copying, the index cannot be used", writerAttempt.Exception);
+                        Current.Logger.Error<LocalTempStorageIndexer>("Could not create index writer with snapshot policy for copying, the index cannot be used", writerAttempt.Exception);
                         return InitializeDirectoryFlags.FailedLocked;
                     }
                 }
@@ -358,10 +359,10 @@ namespace UmbracoExamine.LocalStorage
                                         if (file.InvariantEquals("write.lock"))
                                         {
                                             //This might happen if the writer is open
-                                            LogHelper.Warn<LocalTempStorageIndexer>("The lock file could not be deleted but should be removed when the writer is disposed");
+                                            Current.Logger.Warn<LocalTempStorageIndexer>("The lock file could not be deleted but should be removed when the writer is disposed");
                                         }
 
-                                        LogHelper.Debug<LocalTempStorageIndexer>("Could not delete non synced index file file, index sync will continue but old index files will remain - this shouldn't affect indexing/searching operations. {0}", () => ex.ToString());
+                                        Current.Logger.Debug<LocalTempStorageIndexer>("Could not delete non synced index file file, index sync will continue but old index files will remain - this shouldn't affect indexing/searching operations. {0}", () => ex.ToString());
 
                                     }
                                 }
@@ -369,7 +370,7 @@ namespace UmbracoExamine.LocalStorage
                             else
                             {
                                 //quit here, this shouldn't happen with all the checks above.
-                                LogHelper.Warn<LocalTempStorageIndexer>("Cannot sync index files from main storage, the temp file index is currently locked");
+                                Current.Logger.Warn<LocalTempStorageIndexer>("Cannot sync index files from main storage, the temp file index is currently locked");
                                 return InitializeDirectoryFlags.FailedLocked;
                             }
 
@@ -389,7 +390,7 @@ namespace UmbracoExamine.LocalStorage
                                 }
                                 catch (IOException ex)
                                 {
-                                    LogHelper.Error<LocalTempStorageIndexer>("Could not copy index file, could not sync from main storage", ex);
+                                    Current.Logger.Error<LocalTempStorageIndexer>("Could not copy index file, could not sync from main storage", ex);
 
                                     //quit here
                                     return InitializeDirectoryFlags.FailedFileSync;
@@ -403,7 +404,7 @@ namespace UmbracoExamine.LocalStorage
                     }
                 }
 
-                LogHelper.Info<LocalTempStorageIndexer>("Successfully sync'd main index to local temp storage for index: {0}", () => configuredPath);
+                Current.Logger.Info<LocalTempStorageIndexer>("Successfully sync'd main index to local temp storage for index: {0}", () => configuredPath);
                 return InitializeDirectoryFlags.Success;
             }
         }

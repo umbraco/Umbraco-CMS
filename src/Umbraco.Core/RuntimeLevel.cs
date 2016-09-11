@@ -5,7 +5,7 @@ namespace Umbraco.Core
         /// <summary>
         /// The runtime has failed to boot and cannot run.
         /// </summary>
-        Failed = -1,
+        BootFailed = -1,
 
         /// <summary>
         /// The level is unknown.

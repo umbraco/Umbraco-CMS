@@ -676,7 +676,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
 
             foreach (var payload in payloads)
-                LogHelper.Debug<XmlStore>($"Notified {payload.ChangeTypes} for {payload.ItemType} {payload.Id}");
+                _logger.Debug<XmlStore>($"Notified {payload.ChangeTypes} for {payload.ItemType} {payload.Id}");
 
             var removedIds = payloads
                 .Where(x => x.ItemType == typeof(IContentType).Name && x.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
@@ -726,7 +726,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var idsA = payloads.Select(x => x.Id).ToArray();
 
             foreach (var payload in payloads)
-                LogHelper.Debug<FacadeService>($"Notified {(payload.Removed ? "Removed" : "Refreshed")} for data type {payload.Id}");
+                _logger.Debug<FacadeService>($"Notified {(payload.Removed ? "Removed" : "Refreshed")} for data type {payload.Id}");
 
             _contentStore.WriteLocked(() =>
                 _mediaStore.WriteLocked(() =>
@@ -936,7 +936,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var facadeCache = _options.FacadeCacheIsApplicationRequestCache
                 ? Current.ApplicationCache.RequestCache
                 : new StaticCacheProvider(); // assuming that's OK for tests, etc
-            var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService);
+            var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _logger);
 
             var domainCache = new DomainCache(domainSnap);
 

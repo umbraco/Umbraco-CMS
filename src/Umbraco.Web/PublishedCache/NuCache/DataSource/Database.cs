@@ -195,7 +195,7 @@ ORDER BY n.level, n.sortOrder
                 if (dto.DraftData == null)
                 {
                     //throw new Exception("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
-                    LogHelper.Warn<Database>("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
+                    Current.Logger.Warn<Database>("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
                 }
                 else
                 {
@@ -217,7 +217,7 @@ ORDER BY n.level, n.sortOrder
                 if (dto.PubData == null)
                 {
                     //throw new Exception("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
-                    LogHelper.Warn<Database>("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
+                    Current.Logger.Warn<Database>("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
                 }
                 else
                 {

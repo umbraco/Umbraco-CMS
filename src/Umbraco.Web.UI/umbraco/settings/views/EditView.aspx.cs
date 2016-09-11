@@ -108,7 +108,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					}
 					catch (Exception ex)
 					{
-                        LogHelper.Error<EditView>("An error occurred setting a master template id", ex);
+                        Current.Logger.Error<EditView>("An error occurred setting a master template id", ex);
 					}
 
 					MasterTemplate.SelectedValue = selectedTemplate;

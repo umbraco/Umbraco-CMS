@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Sync
@@ -157,7 +158,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type RefreshByPayload",
+            Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type RefreshByPayload",
                 refresher.GetType);
 
             var payloadRefresher = refresher as IPayloadCacheRefresher<TPayload>;
@@ -180,7 +181,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
+            Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
                 refresher.GetType,
                 () => messageType);
 
@@ -243,7 +244,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
+            Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
                 refresher.GetType,
                 () => messageType);
 
@@ -281,7 +282,7 @@ namespace Umbraco.Core.Sync
         //{
         //    if (refresher == null) throw new ArgumentNullException("refresher");
 
-        //    LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type Notify",
+        //    Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type Notify",
         //        () => refresher.GetType());
 
         //    refresher.Notify(payload);

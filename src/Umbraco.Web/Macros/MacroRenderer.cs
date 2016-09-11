@@ -100,7 +100,7 @@ namespace Umbraco.Web.Macros
 
             if (macroContent == null) return null;
 
-            LogHelper.Debug<MacroRenderer>("Macro content loaded from cache \"{0}\".", () => model.CacheIdentifier);
+            Current.Logger.Debug<MacroRenderer>("Macro content loaded from cache \"{0}\".", () => model.CacheIdentifier);
 
             // ensure that the source has not changed
             // note: does not handle dependencies, and never has
@@ -109,13 +109,13 @@ namespace Umbraco.Web.Macros
             {
                 if (macroSource.Exists == false)
                 {
-                    LogHelper.Debug<MacroRenderer>("Macro source does not exist anymore, ignore cache.");
+                    Current.Logger.Debug<MacroRenderer>("Macro source does not exist anymore, ignore cache.");
                     return null;
                 }
 
                 if (macroContent.Date < macroSource.LastWriteTime)
                 {
-                    LogHelper.Debug<MacroRenderer>("Macro source has changed, ignore cache.");
+                    Current.Logger.Debug<MacroRenderer>("Macro source has changed, ignore cache.");
                     return null;
                 }
             }
@@ -165,7 +165,7 @@ namespace Umbraco.Web.Macros
                 priority: CacheItemPriority.NotRemovable
                 );
 
-            LogHelper.Debug<MacroRenderer>("Macro content saved to cache \"{0}\".", () => model.CacheIdentifier);
+            Current.Logger.Debug<MacroRenderer>("Macro content saved to cache \"{0}\".", () => model.CacheIdentifier);
         }
 
         // gets the macro source file name
@@ -322,7 +322,7 @@ namespace Umbraco.Web.Macros
             {
                 Exceptions.Add(e);
 
-                _plogger.Logger.WarnWithException<MacroRenderer>("Failed " + msgIn, e);
+                _plogger.Logger.Warn<MacroRenderer>(e, "Failed " + msgIn);
 
                 var macroErrorEventArgs = new MacroErrorEventArgs
                 {

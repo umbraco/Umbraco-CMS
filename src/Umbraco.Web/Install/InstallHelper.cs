@@ -49,8 +49,8 @@ namespace Umbraco.Web.Install
                 new MajorVersion7UpgradeReport(Current.DatabaseContext, Current.RuntimeState),
                 new Version73FileCleanup(_httpContext, _logger),
                 new DatabaseConfigureStep(Current.DatabaseContext),
-                new DatabaseInstallStep(Current.DatabaseContext, Current.RuntimeState),
-                new DatabaseUpgradeStep(Current.DatabaseContext, Current.Services.MigrationEntryService, Current.RuntimeState, Current.MigrationCollectionBuilder),
+                new DatabaseInstallStep(Current.DatabaseContext, Current.RuntimeState, Current.Logger),
+                new DatabaseUpgradeStep(Current.DatabaseContext, Current.Services.MigrationEntryService, Current.RuntimeState, Current.MigrationCollectionBuilder, Current.Logger),
                 new StarterKitDownloadStep(Current.Services.ContentService, this),
                 new StarterKitInstallStep(_httpContext),
                 new StarterKitCleanupStep(),
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Install
             }
             catch (Exception ex)
             {
-                LogHelper.Error<InstallHelper>("An error occurred in InstallStatus trying to check upgrades", ex);
+                Current.Logger.Error<InstallHelper>("An error occurred in InstallStatus trying to check upgrades", ex);
             }
         }
 
@@ -230,7 +230,7 @@ namespace Umbraco.Web.Install
             }
             catch (AggregateException ex)
             {
-                LogHelper.Error<InstallHelper>("Could not download list of available starter kits", ex);
+                Current.Logger.Error<InstallHelper>("Could not download list of available starter kits", ex);
             }
 
             return packages;

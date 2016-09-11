@@ -119,7 +119,7 @@ namespace UmbracoExamine
                             }
                             catch (Exception ex)
                             {
-                                LogHelper.Error<UmbracoExamineSearcher>(
+                                Current.Logger.Error<UmbracoExamineSearcher>(
                                     string.Format("Could not create a temp storage location of type {0}, reverting to use the " + typeof(CodeGenLocalStorageDirectory).FullName, dirType),
                                     ex);
                             }

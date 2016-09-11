@@ -23,10 +23,12 @@ namespace Umbraco.Web.PropertyEditors
     internal class ValueListPreValueEditor : PreValueEditor
     {
         private readonly ILocalizedTextService _textService;
+        private readonly ILogger _logger;
 
-        public ValueListPreValueEditor(ILocalizedTextService textService)
+        public ValueListPreValueEditor(ILocalizedTextService textService, ILogger logger)
         {
             _textService = textService;
+            _logger = logger;
             Fields.AddRange(CreatePreValueFields());
         }
 
@@ -127,7 +129,7 @@ namespace Umbraco.Web.PropertyEditors
             }
             catch (Exception ex)
             {
-                LogHelper.Error<ValueListPreValueEditor>("Could not deserialize the posted value: " + val, ex);                
+                _logger.Error<ValueListPreValueEditor>("Could not deserialize the posted value: " + val, ex);                
             }
 
             return result;

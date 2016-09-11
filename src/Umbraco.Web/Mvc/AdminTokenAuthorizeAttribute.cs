@@ -18,10 +18,13 @@ namespace Umbraco.Web.Mvc
         // see note in HttpInstallAuthorizeAttribute
         private readonly IUserService _userService;
         private readonly IRuntimeState _runtimeState;
+        private readonly ILogger _logger;
 
         private IUserService UserService => _userService ?? Current.Services.UserService;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
+
+        private ILogger Logger => _logger ?? Current.Logger;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
@@ -115,7 +118,7 @@ namespace Umbraco.Web.Mvc
             }
             catch (Exception ex)
             {
-                LogHelper.Error<AdminTokenAuthorizeAttribute>("Failed to format passed in token value", ex);
+                Logger.Error<AdminTokenAuthorizeAttribute>("Failed to format passed in token value", ex);
                 return false;
             }
         }

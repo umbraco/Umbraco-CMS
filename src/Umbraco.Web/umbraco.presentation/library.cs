@@ -338,10 +338,10 @@ namespace umbraco
             }
             catch(Exception ex)
             {
-                LogHelper.Error<library>("An error occurred looking up media", ex);
+                Current.Logger.Error<library>("An error occurred looking up media", ex);
             }
 
-            LogHelper.Debug<library>("No media result for id {0}", () => MediaId);
+            Current.Logger.Debug<library>("No media result for id {0}", () => MediaId);
 
             var errorXml = new XElement("error", string.Format("No media is maching '{0}'", MediaId));
             return errorXml.CreateNavigator().Select("/");
@@ -393,10 +393,10 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                LogHelper.Error<library>("An error occurred looking up member", ex);
+                Current.Logger.Error<library>("An error occurred looking up member", ex);
             }
 
-            LogHelper.Debug<library>("No member result for id {0}", () => MemberId);
+            Current.Logger.Debug<library>("No member result for id {0}", () => MemberId);
 
             var xd = new XmlDocument();
             xd.LoadXml(string.Format("<error>No member is maching '{0}'</error>", MemberId));
@@ -1217,7 +1217,7 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                LogHelper.Error<library>("Could not retrieve current xml node", ex);
+                Current.Logger.Error<library>("Could not retrieve current xml node", ex);
             }
 
             XmlDocument xd = new XmlDocument();
@@ -1442,7 +1442,7 @@ namespace umbraco
             }
             catch (Exception ee)
             {
-                LogHelper.Error<library>("umbraco.library.SendMail: Error sending mail.", ee);
+                Current.Logger.Error<library>("umbraco.library.SendMail: Error sending mail.", ee);
             }
         }
 

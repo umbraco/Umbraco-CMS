@@ -19,7 +19,9 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
 using umbraco.uicontrols;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Plugins;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;
@@ -100,27 +102,35 @@ namespace Umbraco.Tests.Plugins
             Assert.AreEqual(22, typesFound.Count()); // 22 classes in Umbraco.Web are marked with [Tree]
         }
 
+	    private static ProfilingLogger GetTestProfilingLogger()
+	    {
+            var logger = new DebugDiagnosticsLogger();
+	        var profiler = new TestProfiler();
+            return new ProfilingLogger(logger, profiler);
+        }
+
         [Ignore]
         [Test]
         public void Benchmark_Original_Finder()
         {
-            using (DisposableTimer.TraceDuration<TypeFinderTests>("Starting test", "Finished test"))
+            var profilingLogger = GetTestProfilingLogger();
+            using (profilingLogger.TraceDuration<TypeFinderTests>("Starting test", "Finished test"))
             {
-                using (DisposableTimer.TraceDuration<TypeFinderTests>("Starting FindClassesOfType", "Finished FindClassesOfType"))
+                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesOfType", "Finished FindClassesOfType"))
                 {
                     for (var i = 0; i < 1000; i++)
                     {
                         Assert.Greater(TypeFinderOriginal.FindClassesOfType<DisposableObject>(_assemblies).Count(), 0);
                     }
                 }
-                using (DisposableTimer.TraceDuration<TypeFinderTests>("Starting FindClassesOfTypeWithAttribute", "Finished FindClassesOfTypeWithAttribute"))
+                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesOfTypeWithAttribute", "Finished FindClassesOfTypeWithAttribute"))
                 {
                     for (var i = 0; i < 1000; i++)
                     {
                         Assert.Greater(TypeFinderOriginal.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies).Count(), 0);
                     }
                 }
-                using (DisposableTimer.TraceDuration<TypeFinderTests>("Starting FindClassesWithAttribute", "Finished FindClassesWithAttribute"))
+                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesWithAttribute", "Finished FindClassesWithAttribute"))
                 {
                     for (var i = 0; i < 1000; i++)
                     {
@@ -135,23 +145,24 @@ namespace Umbraco.Tests.Plugins
         [Test]
         public void Benchmark_New_Finder()
         {
-            using (DisposableTimer.TraceDuration<TypeFinderTests>("Starting test", "Finished test"))
+            var profilingLogger = GetTestProfilingLogger();
+            using (profilingLogger.TraceDuration<TypeFinderTests>("Starting test", "Finished test"))
             {
-                using (DisposableTimer.TraceDuration<TypeFinderTests>("Starting FindClassesOfType", "Finished FindClassesOfType"))
+                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesOfType", "Finished FindClassesOfType"))
                 {
                     for (var i = 0; i < 1000; i++)
                     {
                         Assert.Greater(TypeFinder.FindClassesOfType<DisposableObject>(_assemblies).Count(), 0);
                     }
                 }
-                using (DisposableTimer.TraceDuration<TypeFinderTests>("Starting FindClassesOfTypeWithAttribute", "Finished FindClassesOfTypeWithAttribute"))
+                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesOfTypeWithAttribute", "Finished FindClassesOfTypeWithAttribute"))
                 {
                     for (var i = 0; i < 1000; i++)
                     {
                         Assert.Greater(TypeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies).Count(), 0);
                     }
                 }
-                using (DisposableTimer.TraceDuration<TypeFinderTests>("Starting FindClassesWithAttribute", "Finished FindClassesWithAttribute"))
+                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesWithAttribute", "Finished FindClassesWithAttribute"))
                 {
                     for (var i = 0; i < 1000; i++)
                     {

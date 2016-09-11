@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Core.Sync
 {
@@ -108,7 +109,7 @@ namespace Umbraco.Core.Sync
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<WebServiceServerMessenger>("Could not resolve username/password delegate, server distribution will be disabled", ex);
+                    Current.Logger.Error<WebServiceServerMessenger>("Could not resolve username/password delegate, server distribution will be disabled", ex);
                     Login = null;
                     Password = null;
                     DistributedEnabled = false;
@@ -157,7 +158,7 @@ namespace Umbraco.Core.Sync
             Type idArrayType = null,
             string jsonPayload = null)
         {
-            LogHelper.Debug<WebServiceServerMessenger>(
+            Current.Logger.Debug<WebServiceServerMessenger>(
                 "Performing distributed call for {0}/{1} on servers ({2}), ids: {3}, json: {4}",
                 refresher.GetType,
                 () => messageType,
@@ -356,28 +357,28 @@ namespace Umbraco.Core.Sync
 
         private static void LogDispatchBatchError(Exception ee)
         {
-            LogHelper.Error<WebServiceServerMessenger>("Error refreshing distributed list", ee);
+            Current.Logger.Error<WebServiceServerMessenger>("Error refreshing distributed list", ee);
         }
 
         private static void LogDispatchBatchResult(int errorCount)
         {
-            LogHelper.Debug<WebServiceServerMessenger>(string.Format("Distributed server push completed with {0} nodes reporting an error", errorCount == 0 ? "no" : errorCount.ToString(CultureInfo.InvariantCulture)));
+            Current.Logger.Debug<WebServiceServerMessenger>(string.Format("Distributed server push completed with {0} nodes reporting an error", errorCount == 0 ? "no" : errorCount.ToString(CultureInfo.InvariantCulture)));
         }
 
         private static void LogDispatchNodeError(Exception ex)
         {
-            LogHelper.Error<WebServiceServerMessenger>("Error refreshing a node in the distributed list", ex);
+            Current.Logger.Error<WebServiceServerMessenger>("Error refreshing a node in the distributed list", ex);
         }
 
         private static void LogDispatchNodeError(WebException ex)
         {
             string url = (ex.Response != null) ? ex.Response.ResponseUri.ToString() : "invalid url (responseUri null)";
-            LogHelper.Error<WebServiceServerMessenger>("Error refreshing a node in the distributed list, URI attempted: " + url, ex);
+            Current.Logger.Error<WebServiceServerMessenger>("Error refreshing a node in the distributed list, URI attempted: " + url, ex);
         }
         
         private static void LogStartDispatch()
         {
-            LogHelper.Info<WebServiceServerMessenger>("Submitting calls to distributed servers");
+            Current.Logger.Info<WebServiceServerMessenger>("Submitting calls to distributed servers");
         }
 
         #endregion

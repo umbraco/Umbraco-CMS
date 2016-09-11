@@ -30,7 +30,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataTypeService = dataTypeServiceMock.Object;
-            var editor = new PublishValuesMultipleValueEditor(true, dataTypeService, new PropertyValueEditor());
+            var editor = new PublishValuesMultipleValueEditor(true, dataTypeService, Mock.Of<ILogger>(), new PropertyValueEditor());
 
             var prop = new Property(1, Guid.NewGuid(),
                                     new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")),
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.PropertyEditors
                                }));
 
             var dataTypeService = dataTypeServiceMock.Object;
-            var editor = new PublishValuesMultipleValueEditor(false, dataTypeService, new PropertyValueEditor());
+            var editor = new PublishValuesMultipleValueEditor(false, dataTypeService, Mock.Of<ILogger>(), new PropertyValueEditor());
 
             var prop = new Property(1, Guid.NewGuid(),
                                     new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")),
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.PropertyEditors
                                }));
 
             var dataTypeService = dataTypeServiceMock.Object;
-            var editor = new PublishValueValueEditor(dataTypeService, new PropertyValueEditor());
+            var editor = new PublishValueValueEditor(dataTypeService, new PropertyValueEditor(), Mock.Of<ILogger>());
 
             var prop = new Property(1, Guid.NewGuid(),
                                     new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")),
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.PropertyEditors
                     {"item3", new PreValue(3, "Item 3")}
                 });
 
-            var editor = new ValueListPreValueEditor(Mock.Of<ILocalizedTextService>());
+            var editor = new ValueListPreValueEditor(Mock.Of<ILocalizedTextService>(), logger);
 
             var result = editor.ConvertDbToEditor(defaultVals, persisted);
 

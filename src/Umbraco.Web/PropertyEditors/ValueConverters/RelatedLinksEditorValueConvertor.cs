@@ -19,12 +19,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ServiceContext _services;
         private readonly CacheHelper _appCache;
+        private readonly ILogger _logger;
 
-        public RelatedLinksEditorValueConvertor(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache)
+        public RelatedLinksEditorValueConvertor(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache, ILogger logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _services = services;
             _appCache = appCache;
+            _logger = logger;
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -72,7 +74,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<RelatedLinksEditorValueConvertor>("Could not parse the string " + sourceString + " to a json object", ex);
+                    _logger.Error<RelatedLinksEditorValueConvertor>("Could not parse the string " + sourceString + " to a json object", ex);
                 }
             }
 
@@ -111,7 +113,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<RelatedLinksEditorValueConvertor>("Could not parse the string " + sourceString + " to a json object", ex);
+                    _logger.Error<RelatedLinksEditorValueConvertor>("Could not parse the string " + sourceString + " to a json object", ex);
                 }
             }
 

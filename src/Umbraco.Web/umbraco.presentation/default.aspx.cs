@@ -54,7 +54,7 @@ namespace umbraco
         protected override void OnPreInit(EventArgs e)
         {
             base.OnPreInit(e);
-            using (DisposableTimer.DebugDuration<UmbracoDefault>("PreInit"))
+            using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("PreInit"))
             {
 
                 // handle the infamous umbDebugShowTrace, etc
@@ -91,7 +91,7 @@ namespace umbraco
 
         protected override void OnInit(EventArgs e)
         {
-            using (DisposableTimer.DebugDuration<UmbracoDefault>("Init"))
+            using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("Init"))
             {
                 base.OnInit(e);
 
@@ -138,7 +138,7 @@ namespace umbraco
 
         protected override void OnLoad(EventArgs e)
         {
-            using (DisposableTimer.DebugDuration<UmbracoDefault>("Load"))
+            using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("Load"))
             {
                 base.OnLoad(e);
                 
@@ -149,7 +149,7 @@ namespace umbraco
 
         protected override void Render(HtmlTextWriter writer)
         {
-            using (DisposableTimer.DebugDuration<UmbracoDefault>("Render"))
+            using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("Render"))
             {
 
                 // do the original rendering
@@ -163,7 +163,7 @@ namespace umbraco
                 // filter / add preview banner
                 if (UmbracoContext.Current.InPreviewMode)
                 {
-                    LogHelper.Debug<UmbracoDefault>("Umbraco is running in preview mode.", true);
+                    Current.Logger.Debug<UmbracoDefault>("Umbraco is running in preview mode.");
 
                     if (Response.ContentType.InvariantEquals("text/html")) // ASP.NET default value
                     {

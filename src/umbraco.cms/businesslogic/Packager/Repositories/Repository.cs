@@ -61,7 +61,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
             }
             catch (Exception ex)
             {
-                LogHelper.Error<Repository>("An error occurred in SubmitPackage", ex);
+                Current.Logger.Error<Repository>("An error occurred in SubmitPackage", ex);
 
                 return SubmitStatus.Error;
             }

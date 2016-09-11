@@ -36,7 +36,7 @@ namespace umbraco.cms.businesslogic.packager
 				}
 				catch (Exception ipaExp)
 				{
-					LogHelper.Error<PackageAction>(string.Format("Error loading package action '{0}' for package {1}", ipa.Alias(), packageName), ipaExp);
+                    Current.Logger.Error<PackageAction>(string.Format("Error loading package action '{0}' for package {1}", ipa.Alias(), packageName), ipaExp);
 				}
 			}
 		}
@@ -62,7 +62,7 @@ namespace umbraco.cms.businesslogic.packager
 				}
 				catch (Exception ipaExp)
 				{
-					LogHelper.Error<PackageAction>(string.Format("Error undoing package action '{0}' for package {1}", ipa.Alias(), packageName), ipaExp);
+                    Current.Logger.Error<PackageAction>(string.Format("Error undoing package action '{0}' for package {1}", ipa.Alias(), packageName), ipaExp);
 				}
 			}
 		}

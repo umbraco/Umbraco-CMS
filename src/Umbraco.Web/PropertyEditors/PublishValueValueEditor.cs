@@ -18,15 +18,17 @@ namespace Umbraco.Web.PropertyEditors
     internal class PublishValueValueEditor : PropertyValueEditorWrapper
     {
         private readonly IDataTypeService _dataTypeService;
+        private readonly ILogger _logger;
 
-        internal PublishValueValueEditor(IDataTypeService dataTypeService, PropertyValueEditor wrapped)
+        internal PublishValueValueEditor(IDataTypeService dataTypeService, PropertyValueEditor wrapped, ILogger logger)
             : base(wrapped)
         {
             _dataTypeService = dataTypeService;
+            _logger = logger;
         }
 
-        public PublishValueValueEditor(PropertyValueEditor wrapped)
-            : this(Current.Services.DataTypeService, wrapped)
+        public PublishValueValueEditor(PropertyValueEditor wrapped, ILogger logger)
+            : this(Current.Services.DataTypeService, wrapped, logger)
         {
         }
 
@@ -54,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors
                         return preVals.Single(x => x.Value.Id == preValId).Value.Value;
                     }
 
-                    LogHelper.Warn<PublishValueValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + property.Alias);
+                    _logger.Warn<PublishValueValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + property.Alias);
                 }
             }
             

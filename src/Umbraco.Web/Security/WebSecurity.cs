@@ -285,7 +285,7 @@ namespace Umbraco.Web.Security
                 return true;
 
             var user = umbracoUser;
-            LogHelper.Info<WebSecurity>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => path, () => string.Join(",", permission.AssignedPermissions), () => action);
+            Current.Logger.Info<WebSecurity>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => path, () => string.Join(",", permission.AssignedPermissions), () => action);
             return false;
         }
 

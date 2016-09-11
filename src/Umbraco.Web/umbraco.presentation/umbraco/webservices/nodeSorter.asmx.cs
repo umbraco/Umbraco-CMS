@@ -136,7 +136,7 @@ namespace umbraco.presentation.webservices
             }
             catch (Exception ex)
             {
-                LogHelper.Error<nodeSorter>("Could not update media sort order", ex);
+                Current.Logger.Error<nodeSorter>("Could not update media sort order", ex);
             }
         }
 
@@ -188,7 +188,7 @@ namespace umbraco.presentation.webservices
             }
             catch (Exception ex)
             {
-                LogHelper.Error<nodeSorter>("Could not update content sort order", ex);
+                Current.Logger.Error<nodeSorter>("Could not update content sort order", ex);
             }
         }
 

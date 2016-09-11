@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Packaging
@@ -185,7 +186,7 @@ namespace Umbraco.Core.Packaging
                                           assemblyName.Name,
                                           "' see error log for full details."));
                         assembliesWithErrors.Add(a);
-                        LogHelper.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
+                        Current.Logger.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
                     }
                 }
             }
@@ -229,7 +230,7 @@ namespace Umbraco.Core.Packaging
                                           a.GetName().Name,
                                           "' see error log for full details."));
                         assembliesWithErrors.Add(a);
-                        LogHelper.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
+                        Current.Logger.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
                     }
                 }
                 

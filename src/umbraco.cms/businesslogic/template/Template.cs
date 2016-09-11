@@ -308,7 +308,7 @@ namespace umbraco.cms.businesslogic.template
             if (this.HasChildren)
             {
                 var ex = new InvalidOperationException("Can't delete a master template. Remove any bindings from child templates first.");
-				LogHelper.Error<Template>("Can't delete a master template. Remove any bindings from child templates first.", ex);
+                Current.Logger.Error<Template>("Can't delete a master template. Remove any bindings from child templates first.", ex);
 	            throw ex;
             }
 

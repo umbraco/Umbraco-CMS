@@ -26,9 +26,9 @@ namespace Umbraco.Web.Search
 	/// </summary>
 	public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
 	{
-		public void Initialize()
+		public void Initialize(ILogger logger)
 		{
-            LogHelper.Info<ExamineComponent>("Initializing Examine and binding to business logic events");
+            logger.Info<ExamineComponent>("Initializing Examine and binding to business logic events");
 
             //TODO: For now we'll make this true, it means that indexes will be near real time
             // we'll see about what implications this may have - should be great in most scenarios
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Search
 			var registeredProviders = ExamineManager.Instance.IndexProviderCollection
 				.OfType<BaseUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
 
-			LogHelper.Info<ExamineComponent>("Adding examine event handlers for index providers: {0}", () => registeredProviders);
+            logger.Info<ExamineComponent>("Adding examine event handlers for index providers: {0}", () => registeredProviders);
 
 			// don't bind event handlers if we're not suppose to listen
 			if (registeredProviders == 0)

@@ -50,7 +50,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<StarterKits>("Cannot connect to package repository", ex);
+                    Current.Logger.Error<StarterKits>("Cannot connect to package repository", ex);
                     InstallationDirectoryNotAvailable.Visible = true;
                     StarterKitNotInstalled.Visible = false;
                 }

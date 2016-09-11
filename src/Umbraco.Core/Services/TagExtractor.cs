@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -40,7 +41,7 @@ namespace Umbraco.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<TagExtractor>("Could not create custom " + attribute.TagPropertyDefinitionType + " tag definition", ex);
+                    Current.Logger.Error<TagExtractor>("Could not create custom " + attribute.TagPropertyDefinitionType + " tag definition", ex);
                     throw;
                 }
                 SetPropertyTags(property, convertedPropertyValue, def.Delimiter, def.ReplaceTags, def.TagGroup, attribute.ValueType, def.StorageType);
@@ -93,7 +94,7 @@ namespace Umbraco.Core.Services
                                 }
                                 catch (Exception ex)
                                 {
-                                    LogHelper.WarnWithException<TagExtractor>("Could not automatically convert stored json value to an enumerable string", ex);
+                                    Current.Logger.Warn<TagExtractor>(ex, "Could not automatically convert stored json value to an enumerable string");
                                 }
                                 break;
                             default:

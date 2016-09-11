@@ -18,10 +18,12 @@ namespace Umbraco.Web.Routing
     public class DefaultUrlProvider : IUrlProvider
     {
         private readonly IRequestHandlerSection _requestSettings;
+        private readonly ILogger _logger;
 
-        public DefaultUrlProvider(IRequestHandlerSection requestSettings)
+        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger)
         {
             _requestSettings = requestSettings;
+            _logger = logger;
         }
 
         #region GetUrl
@@ -48,7 +50,7 @@ namespace Umbraco.Web.Routing
 
             if (string.IsNullOrWhiteSpace(route))
             {
-                LogHelper.Debug<DefaultUrlProvider>(
+                _logger.Debug<DefaultUrlProvider>(
                     "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
                     () => id);
                 return null;
@@ -56,7 +58,7 @@ namespace Umbraco.Web.Routing
 
             if (route.StartsWith("err/"))
             {
-                LogHelper.Debug<DefaultUrlProvider>(
+                _logger.Debug<DefaultUrlProvider>(
                     "Page with nodeId={0} has a colliding url with page with nodeId={1}.",
                     () => id, () => route.Substring(4));
                 return "#err-" + route.Substring(4);
@@ -98,7 +100,7 @@ namespace Umbraco.Web.Routing
 
             if (string.IsNullOrWhiteSpace(route))
             {
-                LogHelper.Debug<DefaultUrlProvider>(
+                _logger.Debug<DefaultUrlProvider>(
                     "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
                     () => id);
                 return null;

@@ -85,7 +85,7 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
 				}
 				catch (Exception ex)
 				{
-					LogHelper.Error<LoadStarterKits>("Cannot connect to package repository", ex);
+                    Current.Logger.Error<LoadStarterKits>("Cannot connect to package repository", ex);
 					CannotConnect = true;
 
 				}

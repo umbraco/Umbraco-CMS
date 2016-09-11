@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new DropDownMultiplePreValueEditor(_textService);
+            return new DropDownMultiplePreValueEditor(_textService, Logger);
         }
 
         /// <summary>
@@ -46,7 +46,8 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         internal class DropDownMultiplePreValueEditor : ValueListPreValueEditor
         {
-            public DropDownMultiplePreValueEditor(ILocalizedTextService textService) : base(textService)
+            public DropDownMultiplePreValueEditor(ILocalizedTextService textService, ILogger logger) 
+                : base(textService, logger)
             {
                 //add the multiple field, we'll make it hidden so it is not seen in the pre-value editor
                 Fields.Add(new PreValueField

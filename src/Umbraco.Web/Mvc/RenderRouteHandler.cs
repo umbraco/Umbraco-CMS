@@ -154,7 +154,7 @@ namespace Umbraco.Web.Mvc
             }
             catch (FormatException)
             {
-                LogHelper.Warn<RenderRouteHandler>("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
+                Current.Logger.Warn<RenderRouteHandler>("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
                 return null;
             }
 
@@ -325,7 +325,7 @@ namespace Umbraco.Web.Mvc
                 }
                 else
                 {
-                    LogHelper.Warn<RenderRouteHandler>(
+                    Current.Logger.Warn<RenderRouteHandler>(
                         "The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must implement '{2}' and inherit from '{3}'.",
                         () => publishedContentRequest.PublishedContent.DocumentTypeAlias,
                         () => controllerType.FullName,
@@ -405,7 +405,7 @@ namespace Umbraco.Web.Mvc
 
                 // HandleHttpResponseStatus returns a value indicating that the request should
                 // not be processed any further, eg because it has been redirect. then, exit.
-                if (UmbracoModule.HandleHttpResponseStatus(requestContext.HttpContext, publishedContentRequest))
+                if (UmbracoModule.HandleHttpResponseStatus(requestContext.HttpContext, publishedContentRequest, Current.Logger))
                     return null;
 
                 var handler = GetHandlerOnMissingTemplate(publishedContentRequest);

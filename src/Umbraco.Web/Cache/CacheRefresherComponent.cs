@@ -22,7 +22,7 @@ namespace Umbraco.Web.Cache
     {
         public void Initialize()
         {
-            LogHelper.Info<CacheRefresherComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
+            Current.Logger.Info<CacheRefresherComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
             AddHandlers();
         }
 

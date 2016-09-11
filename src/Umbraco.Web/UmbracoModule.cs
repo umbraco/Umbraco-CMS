@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web;
 using System.Web.Routing;
+using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -11,6 +12,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Exceptions;
+using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.PublishedCache;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -25,13 +28,41 @@ namespace Umbraco.Web
 
 	public class UmbracoModule : IHttpModule
 	{
-		#region HttpModule event handlers
+        #region Dependencies
 
-		/// <summary>
-		/// Begins to process a request.
-		/// </summary>
-		/// <param name="httpContext"></param>
-        static void BeginRequest(HttpContextBase httpContext)
+        // modules are *not* instanciated by the container so we have to
+        // get our dependencies injected manually, through properties, in
+        // Init(). works for dependencies that are singletons.
+
+        [Inject]
+        public IFacadeService FacadeService { get; set; }
+
+        [Inject]
+        public IUserService UserService { get; set; }
+
+        [Inject]
+        public UrlProviderCollection UrlProviders { get; set; }
+
+        [Inject]
+        public IRuntimeState Runtime { get; set; }
+
+        [Inject]
+        public ILogger Logger { get; set; }
+
+        #endregion
+
+	    public UmbracoModule()
+	    {
+            _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
+        }
+
+        #region HttpModule event handlers
+
+        /// <summary>
+        /// Begins to process a request.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        private void BeginRequest(HttpContextBase httpContext)
 		{
             // ensure application url is initialized
             ((RuntimeState)Current.RuntimeState).EnsureApplicationUrl(httpContext.Request);
@@ -54,10 +85,10 @@ namespace Umbraco.Web
             // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)
 		    UmbracoContext.EnsureContext(
 		        httpContext,
-                Current.FacadeService,
-		        new WebSecurity(httpContext, Current.Services.UserService),
+                FacadeService,
+		        new WebSecurity(httpContext, UserService),
 		        UmbracoConfig.For.UmbracoSettings(),
-		        Current.UrlProviders,
+		        UrlProviders,
 		        true);
 		}
 
@@ -117,7 +148,7 @@ namespace Umbraco.Web
 
             // HandleHttpResponseStatus returns a value indicating that the request should
             // not be processed any further, eg because it has been redirect. then, exit.
-            if (HandleHttpResponseStatus(httpContext, pcr))
+            if (HandleHttpResponseStatus(httpContext, pcr, Logger))
 		        return;
 
             if (pcr.HasPublishedContent == false)
@@ -209,16 +240,16 @@ namespace Umbraco.Web
 			//NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
 			//if (!maybeDoc)
 			//{
-			//	LogHelper.Warn<UmbracoModule>("Not a document");
+			//	Logger.Warn<UmbracoModule>("Not a document");
 			//}
 
 			return maybeDoc;
 		}
 
-	    private static bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
+	    private bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
 	    {
-	        var debug = Current.RuntimeState.Debug;
-	        var level = Current.RuntimeState.Level;
+	        var debug = Runtime.Debug;
+	        var level = Runtime.Level;
             switch (level)
             {
                 case RuntimeLevel.Unknown:
@@ -237,7 +268,7 @@ namespace Umbraco.Web
                     httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
                     return false; // cannot serve content
 
-                case RuntimeLevel.Failed:
+                case RuntimeLevel.BootFailed:
                     // redirect to death page
                     ReportRuntime(level, "Umbraco has failed.");
 
@@ -268,23 +299,23 @@ namespace Umbraco.Web
         private static bool _reported;
 	    private static RuntimeLevel _reportedLevel;
 
-        private static void ReportRuntime(RuntimeLevel level, string message)
+        private void ReportRuntime(RuntimeLevel level, string message)
 	    {
 	        if (_reported && _reportedLevel == level) return;
             _reported = true;
 	        _reportedLevel = level;
-            Current.Logger.Warn<UmbracoModule>(message);
+            Logger.Warn<UmbracoModule>(message);
 	    }
 
 		// ensures Umbraco has at least one published node
 		// if not, rewrites to splash and return false
 		// if yes, return true
-	    private static bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
+	    private bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
 		{
             if (context.ContentCache.HasContent())
 		        return true;
 
-            LogHelper.Warn<UmbracoModule>("Umbraco has no content");
+            Logger.Warn<UmbracoModule>("Umbraco has no content");
 
 			const string noContentUrl = "~/config/splashes/noNodes.aspx";
 			httpContext.RewritePath(UriUtility.ToAbsolute(noContentUrl));
@@ -295,12 +326,12 @@ namespace Umbraco.Web
         // returns a value indicating whether redirection took place and the request has
         // been completed - because we don't want to Response.End() here to terminate
         // everything properly.
-        internal static bool HandleHttpResponseStatus(HttpContextBase context, PublishedContentRequest pcr)
+        internal static bool HandleHttpResponseStatus(HttpContextBase context, PublishedContentRequest pcr, ILogger logger)
         {
             var end = false;
             var response = context.Response;
 
-            LogHelper.Debug<UmbracoModule>("Response status: Redirect={0}, Is404={1}, StatusCode={2}",
+            logger.Debug<UmbracoModule>("Response status: Redirect={0}, Is404={1}, StatusCode={2}",
                 () => pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
                 () => pcr.Is404 ? "true" : "false", () => pcr.ResponseStatusCode);
 
@@ -318,7 +349,7 @@ namespace Umbraco.Web
                 response.TrySkipIisCustomErrors = UmbracoConfig.For.UmbracoSettings().WebRouting.TrySkipIisCustomErrors;
 
                 if (response.TrySkipIisCustomErrors == false)
-                    LogHelper.Warn<UmbracoModule>("Status code is 404 yet TrySkipIisCustomErrors is false - IIS will take over.");
+                    logger.Warn<UmbracoModule>("Status code is 404 yet TrySkipIisCustomErrors is false - IIS will take over.");
             }
 
             if (pcr.ResponseStatusCode > 0)
@@ -337,7 +368,7 @@ namespace Umbraco.Web
             context.ApplicationInstance.CompleteRequest();
             // though some say that .CompleteRequest() does not properly shutdown the response
             // and the request will hang until the whole code has run... would need to test?
-            LogHelper.Debug<UmbracoModule>("Response status: redirecting, complete request now.");
+            logger.Debug<UmbracoModule>("Response status: redirecting, complete request now.");
 
             return end;
         }
@@ -404,7 +435,7 @@ namespace Umbraco.Web
         /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
         /// </summary>
         /// <param name="http"></param>
-        private static void DisposeHttpContextItems(HttpContext http)
+        private void DisposeHttpContextItems(HttpContext http)
         {
             // do not process if client-side request
             if (http.Request.Url.IsClientSideRequest())
@@ -428,7 +459,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<UmbracoModule>("Could not dispose item with key " + k, ex);
+                    Logger.Error<UmbracoModule>("Could not dispose item with key " + k, ex);
                 }
                 try
                 {
@@ -436,7 +467,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<UmbracoModule>("Could not dispose item key " + k, ex);
+                    Logger.Error<UmbracoModule>("Could not dispose item key " + k, ex);
                 }
             }
         }
@@ -452,52 +483,62 @@ namespace Umbraco.Web
 		/// <param name="app"></param>
 		public void Init(HttpApplication app)
 		{
-			app.BeginRequest += (sender, e) =>
-				{
-					var httpContext = ((HttpApplication)sender).Context;
-				    LogHelper.Debug<UmbracoModule>("Begin request: {0}.", () => httpContext.Request.Url);
-                    BeginRequest(new HttpContextWrapper(httpContext));
-				};
+            if (Core.DependencyInjection.Current.RuntimeState.Level == RuntimeLevel.BootFailed)
+            {
+                // there's nothing we can do really
+                app.BeginRequest += (sender, args) => { throw new BootFailedException("Boot failed. Umbraco cannot run. Umbraco's log file contains details about what caused the boot to fail."); };
+                return;
+            }
 
-            //disable asp.net headers (security)
-            // This is the correct place to modify headers according to MS:
-            // https://our.umbraco.org/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
-		    app.PostReleaseRequestState += (sender, args) =>
+		    // modules are *not* instanciated by the container so we have to
+		    // get our dependencies injected manually, through properties.
+		    Core.DependencyInjection.Current.Container.InjectProperties(this);
+
+		    app.BeginRequest += (sender, e) =>
 		    {
-                var httpContext = ((HttpApplication)sender).Context;
-                try
-                {
-                    httpContext.Response.Headers.Remove("Server");
-                    //this doesn't normally work since IIS sets it but we'll keep it here anyways.
-                    httpContext.Response.Headers.Remove("X-Powered-By");
-                    httpContext.Response.Headers.Remove("X-AspNet-Version");
-                    httpContext.Response.Headers.Remove("X-AspNetMvc-Version");
-                }
-                catch (PlatformNotSupportedException)
-                {
-                    // can't remove headers this way on IIS6 or cassini.
-                }
+		        var httpContext = ((HttpApplication) sender).Context;
+		        Logger.Debug<UmbracoModule>("Begin request: {0}.", () => httpContext.Request.Url);
+		        BeginRequest(new HttpContextWrapper(httpContext));
 		    };
 
-            app.PostResolveRequestCache += (sender, e) =>
-				{
-					var httpContext = ((HttpApplication)sender).Context;
-					ProcessRequest(new HttpContextWrapper(httpContext));
-				};
+		    //disable asp.net headers (security)
+		    // This is the correct place to modify headers according to MS:
+		    // https://our.umbraco.org/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
+		    app.PostReleaseRequestState += (sender, args) =>
+		    {
+		        var httpContext = ((HttpApplication) sender).Context;
+		        try
+		        {
+		            httpContext.Response.Headers.Remove("Server");
+		            //this doesn't normally work since IIS sets it but we'll keep it here anyways.
+		            httpContext.Response.Headers.Remove("X-Powered-By");
+		            httpContext.Response.Headers.Remove("X-AspNet-Version");
+		            httpContext.Response.Headers.Remove("X-AspNetMvc-Version");
+		        }
+		        catch (PlatformNotSupportedException)
+		        {
+		            // can't remove headers this way on IIS6 or cassini.
+		        }
+		    };
 
-			app.EndRequest += (sender, args) =>
-				{
-					var httpContext = ((HttpApplication)sender).Context;
-					if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
-					{
-						LogHelper.Debug<UmbracoModule>(
-                            "Total milliseconds for umbraco request to process: {0}", () => DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
-					}
+		    app.PostResolveRequestCache += (sender, e) =>
+		    {
+		        var httpContext = ((HttpApplication) sender).Context;
+		        ProcessRequest(new HttpContextWrapper(httpContext));
+		    };
 
-                    OnEndRequest(new EventArgs());
+		    app.EndRequest += (sender, args) =>
+		    {
+		        var httpContext = ((HttpApplication) sender).Context;
+		        if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
+		        {
+		            Logger.Debug<UmbracoModule>($"End Request. ({DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds}ms)");
+		        }
 
-					DisposeHttpContextItems(httpContext);
-				};
+		        OnEndRequest(new EventArgs());
+
+		        DisposeHttpContextItems(httpContext);
+		    };
 		}
 
 		public void Dispose()
@@ -530,28 +571,30 @@ namespace Umbraco.Web
         /// <remarks>
         /// This is basically used to reserve paths dynamically
         /// </remarks>
-        private readonly Lazy<RouteCollection> _combinedRouteCollection = new Lazy<RouteCollection>(() =>
-        {
-            var allRoutes = new RouteCollection();
+        private readonly Lazy<RouteCollection> _combinedRouteCollection;
+
+	    private RouteCollection CreateRouteCollection()
+	    {
+            var routes = new RouteCollection();
+
             foreach (var route in RouteTable.Routes)
-            {
-                allRoutes.Add(route);
-            }
+                routes.Add(route);
+
             foreach (var reservedPath in ReservedPaths)
             {
                 try
                 {
-                    allRoutes.Add("_umbreserved_" + reservedPath.ReplaceNonAlphanumericChars(""),
-                                new Route(reservedPath.TrimStart('/'), new StopRoutingHandler()));
+                    routes.Add("_umbreserved_" + reservedPath.ReplaceNonAlphanumericChars(""),
+                        new Route(reservedPath.TrimStart('/'), new StopRoutingHandler()));
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<UmbracoModule>("Could not add reserved path route", ex);
+                    Logger.Error<UmbracoModule>("Could not add reserved path route", ex);
                 }
             }
 
-            return allRoutes;
-        });
+            return routes;
+        }
 
         /// <summary>
         /// This is used internally to track any registered callback paths for Identity providers. If the request path matches

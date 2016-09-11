@@ -416,7 +416,7 @@ namespace Umbraco.Core.Plugins
                 using (_logger.DebugDuration<PluginManager>(
                     $"Resolving {typeof(T).FullName}",
                     $"Resolved {typeof(T).FullName}", // cannot contain typesFound.Count as it's evaluated before the find!
-                    50))
+                    thresholdMilliseconds: 50))
                 {
                     // resolve within a lock & timer
                     return ResolveTypes2<T>(finder, resolutionType, cacheResult, rlock);

@@ -387,7 +387,7 @@ namespace umbraco.cms.presentation.user
                 catch (Exception ex)
                 {
                     ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, Services.TextService.Localize("speechBubbles/editUserError"), "");
-                    LogHelper.Error<EditUser>("Exception", ex);
+                    Current.Logger.Error<EditUser>("Exception", ex);
                 }
             }
             else

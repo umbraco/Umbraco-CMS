@@ -3,41 +3,36 @@
 namespace Umbraco.Core.Logging
 {
     /// <summary>
-    /// Defines an object for use in the application to profile operations
+    /// Defines the profiling service.
     /// </summary>
     public interface IProfiler
     {
         /// <summary>
-        /// Render the UI to display the profiler 
+        /// Renders the profiling results.
         /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Generally used for HTML displays
-        /// </remarks>
+        /// <returns>The profiling results.</returns>
+        /// <remarks>Generally used for Html rendering.</remarks>
         string Render();
 
         /// <summary>
-        /// Profile an operation
+        /// Gets an <see cref="IDisposable"/> that will time the code between its creation and disposal.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Use the 'using(' syntax
-        /// </remarks>
+        /// <param name="name">The name of the step.</param>
+        /// <returns>A step.</returns>
+        /// <remarks>The returned <see cref="IDisposable"/> is meant to be used within a <c>using (...) {{ ... }}</c> block.</remarks>
         IDisposable Step(string name);
    
         /// <summary>
-        /// Start the profiler
+        /// Starts the profiler.
         /// </summary>
         void Start();
 
         /// <summary>
-        /// Start the profiler
+        /// Stops the profiler.
         /// </summary>
-        /// <remarks>
-        /// set discardResults to false when you want to abandon all profiling, this is useful for 
-        /// when someone is not authenticated or you want to clear the results based on some other mechanism.
-        /// </remarks>
+        /// <param name="discardResults">A value indicating whether to discard results.</param>
+        /// <remarks>Set discardResult to true to abandon all profiling - useful when eg someone is not
+        /// authenticated or you want to clear the results, based upon some other mechanism.</remarks>
         void Stop(bool discardResults = false);
     }
 }

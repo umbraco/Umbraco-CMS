@@ -1148,7 +1148,6 @@
     <Compile Include="_Legacy\PackageActions\PackageActionCollectionBuilder.cs" />
     <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
-    <Compile Include="Logging\LogHelper.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="Services\PublishStatus.cs" />

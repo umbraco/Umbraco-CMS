@@ -190,7 +190,7 @@ namespace Umbraco.Web.WebServices
                 {
                     //ensure it's not listening
                     indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
-                    LogHelper.Error<ExamineManagementApiController>("An error occurred rebuilding index", ex);
+                    Logger.Error<ExamineManagementApiController>("An error occurred rebuilding index", ex);
                     var response = Request.CreateResponse(HttpStatusCode.Conflict);
                     response.Content = new StringContent(string.Format("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {0}", ex));
                     response.ReasonPhrase = "Could Not Rebuild";
@@ -273,7 +273,7 @@ namespace Umbraco.Web.WebServices
                 var val = p.GetValue(indexer, null);
                 if (val == null)
                 {
-                    LogHelper.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexer.Key + " property: " + p.Name);
+                    Logger.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexer.Key + " property: " + p.Name);
                     val = string.Empty;
                 }
                 indexerModel.ProviderProperties.Add(p.Name, val.ToString());

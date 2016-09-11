@@ -44,6 +44,17 @@ namespace Umbraco.Web
         /// during the startup process as well.
         /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
+        // used by
+        // UmbracoModule BeginRequest (since it's a request it has an UmbracoContext)
+        //   in BeginRequest so *late* ie *after* the HttpApplication has started (+ init? check!)
+        // WebRuntimeComponent (and I'm not quite sure why)
+        // -> because an UmbracoContext seems to be required by UrlProvider to get the "current" facade?
+        //    note: at startup not sure we have an HttpContext.Current
+        //          at startup not sure we have an httpContext.Request => hard to tell "current" url
+        //          should we have a post-boot event of some sort for ppl that *need* ?!
+        //          can we have issues w/ routing context?
+        // and tests
+        // can .ContentRequest be null? of course!
         public static UmbracoContext EnsureContext(
             HttpContextBase httpContext,
             IFacadeService facadeService,
@@ -64,6 +75,7 @@ namespace Umbraco.Web
 
             // create, assign the singleton, and return
             umbracoContext = CreateContext(httpContext, facadeService, webSecurity, umbracoSettings, urlProviders);
+            // fixme... ?!
             Web.Current.SetUmbracoContext(umbracoContext, replaceContext); // will dispose the one that is being replaced
             return umbracoContext;
         }
@@ -80,6 +92,7 @@ namespace Umbraco.Web
         /// <returns>
         /// A new instance of UmbracoContext
         /// </returns>
+        // internal for tests
         internal static UmbracoContext CreateContext(
             HttpContextBase httpContext,
             IFacadeService facadeService,

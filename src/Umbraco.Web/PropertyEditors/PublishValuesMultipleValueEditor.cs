@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -19,16 +20,15 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly bool _publishIds;
 
-        internal PublishValuesMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, PropertyValueEditor wrapped)
-            : base(dataTypeService, wrapped)
+        internal PublishValuesMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, ILogger logger, PropertyValueEditor wrapped)
+            : base(dataTypeService, wrapped, logger)
         {
             _publishIds = publishIds;
         }
 
         public PublishValuesMultipleValueEditor(bool publishIds, PropertyValueEditor wrapped)
-            : this(publishIds, Current.Services.DataTypeService, wrapped)
-        {
-        }
+            : this(publishIds, Current.Services.DataTypeService, Current.Logger, wrapped)
+        { }
 
         /// <summary>
         /// If publishing ids, we don't need to do anything, otherwise we need to look up the pre-values and get the string values

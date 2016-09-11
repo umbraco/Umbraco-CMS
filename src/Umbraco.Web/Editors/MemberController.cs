@@ -408,7 +408,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                LogHelper.WarnWithException<MemberController>("Could not update member, the provider returned an error", ex);
+                Logger.Warn<MemberController>(ex, "Could not update member, the provider returned an error");
                 ModelState.AddPropertyError(
                     //specify 'default' just so that it shows up as a notification - is not assigned to a property
                     new ValidationResult("Could not update member, the provider returned an error: " + ex.Message + " (see log for full details)"), "default");

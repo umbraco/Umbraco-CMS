@@ -383,14 +383,14 @@ namespace Umbraco.Web.Editors
                 // Save Media with new sort order and update content xml in db accordingly
                 if (mediaService.Sort(sortedMedia) == false)
                 {
-                    LogHelper.Warn<MediaController>("Media sorting failed, this was probably caused by an event being cancelled");
+                    Logger.Warn<MediaController>("Media sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Media sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                LogHelper.Error<MediaController>("Could not update media sort order", ex);
+                Logger.Error<MediaController>("Could not update media sort order", ex);
                 throw;
             }
         }

@@ -146,7 +146,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.Exists(username))
             {
                 status = MembershipCreateStatus.DuplicateUserName;
-                LogHelper.Warn<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as username already exists: " + username);
+                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as username already exists: " + username);
                 return null;
             }
 
@@ -154,7 +154,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.GetByEmail(email) != null && RequiresUniqueEmail)
             {
                 status = MembershipCreateStatus.DuplicateEmail;
-                LogHelper.Warn<UmbracoMembershipProvider<T, TEntity>>(
+                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>>(
                     "Cannot create member as a member with the same email address exists: " + email);
                 return null;
             }
@@ -523,7 +523,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (member == null)
             {
-                LogHelper.Info<UmbracoMembershipProviderBase>(
+                Current.Logger.Info<UmbracoMembershipProviderBase>(
                     string.Format(
                         "Login attempt failed for username {0} from IP address {1}, the user does not exist",
                         username,
@@ -534,7 +534,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (member.IsApproved == false)
             {
-                LogHelper.Info<UmbracoMembershipProviderBase>(
+                Current.Logger.Info<UmbracoMembershipProviderBase>(
                     string.Format(
                         "Login attempt failed for username {0} from IP address {1}, the user is not approved",
                         username,
@@ -544,7 +544,7 @@ namespace Umbraco.Web.Security.Providers
             }
             if (member.IsLockedOut)
             {
-                LogHelper.Info<UmbracoMembershipProviderBase>(
+                Current.Logger.Info<UmbracoMembershipProviderBase>(
                     string.Format(
                         "Login attempt failed for username {0} from IP address {1}, the user is locked",
                         username,
@@ -568,7 +568,7 @@ namespace Umbraco.Web.Security.Providers
                     member.IsLockedOut = true;
                     member.LastLockoutDate = DateTime.Now;
 
-                    LogHelper.Info<UmbracoMembershipProviderBase>(
+                    Current.Logger.Info<UmbracoMembershipProviderBase>(
                         string.Format(
                             "Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded",
                             username,
@@ -576,7 +576,7 @@ namespace Umbraco.Web.Security.Providers
                 }
                 else
                 {
-                    LogHelper.Info<UmbracoMembershipProviderBase>(
+                    Current.Logger.Info<UmbracoMembershipProviderBase>(
                         string.Format(
                             "Login attempt failed for username {0} from IP address {1}",
                             username,
@@ -588,7 +588,7 @@ namespace Umbraco.Web.Security.Providers
                 member.FailedPasswordAttempts = 0;
                 member.LastLoginDate = DateTime.Now;
 
-                LogHelper.Info<UmbracoMembershipProviderBase>(
+                Current.Logger.Info<UmbracoMembershipProviderBase>(
                         string.Format(
                             "Login attempt succeeded for username {0} from IP address {1}",
                             username,

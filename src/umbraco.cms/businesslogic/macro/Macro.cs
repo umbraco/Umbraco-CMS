@@ -262,7 +262,7 @@ namespace umbraco.cms.businesslogic.macro
                 }
                 catch (Exception macroExp)
                 {
-                    LogHelper.Error<Macro>("Error creating macro property", macroExp);
+                    Current.Logger.Error<Macro>("Error creating macro property", macroExp);
                 }
 
                 // macro properties
@@ -291,7 +291,7 @@ namespace umbraco.cms.businesslogic.macro
                     }
                     catch (Exception macroPropertyExp)
                     {
-                        LogHelper.Error<Macro>("Error creating macro property", macroPropertyExp);
+                        Current.Logger.Error<Macro>("Error creating macro property", macroPropertyExp);
                     }
                 }
 
@@ -299,7 +299,7 @@ namespace umbraco.cms.businesslogic.macro
             }
             catch (Exception ex)
             {
-                LogHelper.Error<Macro>("An error occurred importing a macro", ex);
+                Current.Logger.Error<Macro>("An error occurred importing a macro", ex);
                 return null;
             }
 

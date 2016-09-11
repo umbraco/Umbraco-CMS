@@ -167,6 +167,13 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(content.Properties, clone.Properties);
         }
 
+        private static ProfilingLogger GetTestProfilingLogger()
+        {
+            var logger = new DebugDiagnosticsLogger();
+            var profiler = new TestProfiler();
+            return new ProfilingLogger(logger, profiler);
+        }
+
         [Ignore]
         [Test]
         public void Can_Deep_Clone_Perf_Test()
@@ -206,7 +213,9 @@ namespace Umbraco.Tests.Models
             var runtimeCache = new ObjectCacheRuntimeCacheProvider();
             runtimeCache.InsertCacheItem(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
-            using (DisposableTimer.DebugDuration<ContentTests>("STARTING PERF TEST WITH RUNTIME CACHE"))
+            var proflog = GetTestProfilingLogger();
+
+            using (proflog.DebugDuration<ContentTests>("STARTING PERF TEST WITH RUNTIME CACHE"))
             {
                 for (int j = 0; j < 1000; j++)
                 {
@@ -214,7 +223,7 @@ namespace Umbraco.Tests.Models
                 }
             }
 
-            using (DisposableTimer.DebugDuration<ContentTests>("STARTING PERF TEST WITHOUT RUNTIME CACHE"))
+            using (proflog.DebugDuration<ContentTests>("STARTING PERF TEST WITHOUT RUNTIME CACHE"))
             {
                 for (int j = 0; j < 1000; j++)
                 {

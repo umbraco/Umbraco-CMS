@@ -14,10 +14,12 @@ namespace Umbraco.Web.Routing
     public class ContentFinderByRedirectUrl : IContentFinder
     {
         private readonly IRedirectUrlService _redirectUrlService;
+        private readonly ILogger _logger;
 
-        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService)
+        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger logger)
         {
             _redirectUrlService = redirectUrlService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace Umbraco.Web.Routing
 
             if (redirectUrl == null)
             {
-                LogHelper.Debug<ContentFinderByRedirectUrl>("No match for route: \"{0}\".", () => route);
+                _logger.Debug<ContentFinderByRedirectUrl>("No match for route: \"{0}\".", () => route);
                 return false;
             }
 
@@ -44,12 +46,12 @@ namespace Umbraco.Web.Routing
             var url = content == null ? "#" : content.Url;
             if (url.StartsWith("#"))
             {
-                LogHelper.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} which has no url.",
+                _logger.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} which has no url.",
                     () => route, () => redirectUrl.ContentId);
                 return false;
             }
 
-            LogHelper.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} with url \"{2}\", redirecting.",
+            _logger.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} with url \"{2}\", redirecting.",
                 () => route, () => content.Id, () => url);
             contentRequest.SetRedirectPermanent(url);
             return true;

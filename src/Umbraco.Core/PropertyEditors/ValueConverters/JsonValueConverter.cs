@@ -52,7 +52,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<JsonValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);                    
+                    Current.Logger.Error<JsonValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);                    
                 }
             }
             

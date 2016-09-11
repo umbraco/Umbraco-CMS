@@ -19,14 +19,18 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly IRuntimeState _runtime;
         private readonly IUmbracoSettingsSection _settings;
+        private readonly ILogger _logger;
+        private readonly ProfilingLogger _proflog;
         private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
 
         public ScheduledTasks(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IUmbracoSettingsSection settings)
+            IRuntimeState runtime, IUmbracoSettingsSection settings, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _settings = settings;
+            _logger = logger;
+            _proflog = proflog;
         }
 
         private async Task ProcessTasksAsync(CancellationToken token)
@@ -54,7 +58,7 @@ namespace Umbraco.Web.Scheduling
                 {
                     var taskResult = await GetTaskByHttpAync(t.Url, token);
                     if (t.Log)
-                        LogHelper.Info<ScheduledTasks>(string.Format("{0} has been called with response: {1}", t.Alias, taskResult));
+                        _logger.Info<ScheduledTasks>(string.Format("{0} has been called with response: {1}", t.Alias, taskResult));
                 }
             }
         }
@@ -75,7 +79,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<ScheduledTasks>("An error occurred calling web task for url: " + url, ex);
+                    _logger.Error<ScheduledTasks>("An error occurred calling web task for url: " + url, ex);
                 }
                 return false;
             }
@@ -91,21 +95,21 @@ namespace Umbraco.Web.Scheduling
             switch (_runtime.ServerRole)
             {
                 case ServerRole.Slave:
-                    LogHelper.Debug<ScheduledTasks>("Does not run on slave servers.");
+                    _logger.Debug<ScheduledTasks>("Does not run on slave servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
-                    LogHelper.Debug<ScheduledTasks>("Does not run on servers with unknown role.");
+                    _logger.Debug<ScheduledTasks>("Does not run on servers with unknown role.");
                     return true; // DO repeat, server role can change
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
             if (_runtime.IsMainDom == false)
             {
-                LogHelper.Debug<ScheduledTasks>("Does not run if not MainDom.");
+                _logger.Debug<ScheduledTasks>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
             }
 
-            using (DisposableTimer.DebugDuration<ScheduledTasks>(() => "Scheduled tasks executing", () => "Scheduled tasks complete"))
+            using (_proflog.DebugDuration<ScheduledTasks>("Scheduled tasks executing", "Scheduled tasks complete"))
             {
                 try
                 {
@@ -113,7 +117,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ee)
                 {
-                    LogHelper.Error<ScheduledTasks>("Error executing scheduled task", ee);
+                    _logger.Error<ScheduledTasks>("Error executing scheduled task", ee);
                 }
             }
 

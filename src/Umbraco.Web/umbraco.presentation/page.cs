@@ -329,16 +329,14 @@ namespace umbraco
 
 				if (_elements.ContainsKey(alias))
 				{
-					LogHelper.Debug<page>(
-						string.Format("Aliases must be unique, an element with alias \"{0}\" has already been loaded!", alias), 
-						true);					
+					Current.Logger.Debug<page>(
+						string.Format("Aliases must be unique, an element with alias \"{0}\" has already been loaded!", alias));					
 				}
 				else
 				{
 					_elements[alias] = value;
-					LogHelper.Debug<page>(
-						string.Format("Load element \"{0}\"", alias),
-						true);					
+                    Current.Logger.Debug<page>(
+						string.Format("Load element \"{0}\"", alias));					
 				}
 			}
 		}

@@ -290,15 +290,19 @@ namespace Umbraco.Web
             // set routes
             CreateRoutes(surfaceControllerTypes, apiControllerTypes);
 
+            // get an http context
+            // fixme - although HttpContext.Current is NOT null during Application_Start
+            //         it does NOT have a request and therefore no request ...
+            var httpContext = new HttpContextWrapper(HttpContext.Current);
+
             //before we do anything, we'll ensure the umbraco context
             //see: http://issues.umbraco.org/issue/U4-1717
-            var httpContext = new HttpContextWrapper(HttpContext.Current);
             UmbracoContext.EnsureContext( // fixme - refactor! UmbracoContext & UmbracoRequestContext! + inject, accessor, etc
                 httpContext,
-                Current.FacadeService,
-                new WebSecurity(httpContext, Current.Services.UserService),
+                Current.FacadeService, // fixme inject! stop using current here!
+                new WebSecurity(httpContext, Current.Services.UserService),// fixme inject! stop using current here!
                 UmbracoConfig.For.UmbracoSettings(),
-                Current.UrlProviders,
+                Current.UrlProviders,// fixme inject! stop using current here!
                 false);
 
             // rebuild any empty indexes

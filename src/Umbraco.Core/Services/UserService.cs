@@ -337,7 +337,7 @@ namespace Umbraco.Core.Services
                     //Special case, if we are upgrading and an exception occurs, just continue
                     if (IsUpgrading == false) throw;
 
-                    Logger.WarnWithException<UserService>("An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored", ex);
+                    Logger.Warn<UserService>(ex, "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
                     return;
                 }
             }

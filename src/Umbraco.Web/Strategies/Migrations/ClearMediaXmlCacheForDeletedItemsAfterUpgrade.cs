@@ -17,6 +17,13 @@ namespace Umbraco.Web.Strategies.Migrations
     /// </remarks>
     public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : IPostMigration
     {
+        private readonly ILogger _logger;
+
+        public ClearMediaXmlCacheForDeletedItemsAfterUpgrade(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         public void Migrated(MigrationRunner sender, MigrationEventArgs args)
         {
             if (args.ProductName != GlobalSettings.UmbracoMigrationName) return;
@@ -37,7 +44,7 @@ namespace Umbraco.Web.Strategies.Migrations
 
                 var count = args.MigrationContext.Database.Execute(sql);
 
-                LogHelper.Info<ClearMediaXmlCacheForDeletedItemsAfterUpgrade>("Cleared " + count + " items from the media xml cache that were trashed and not meant to be there");
+                _logger.Info<ClearMediaXmlCacheForDeletedItemsAfterUpgrade>("Cleared " + count + " items from the media xml cache that were trashed and not meant to be there");
             }
         }
     }

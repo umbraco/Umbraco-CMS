@@ -14,11 +14,13 @@ namespace Umbraco.Web.Install.InstallSteps
     {
         private readonly DatabaseContext _databaseContext;
         private readonly IRuntimeState _runtime;
+        private readonly ILogger _logger;
 
-        public DatabaseInstallStep(DatabaseContext databaseContext, IRuntimeState runtime)
+        public DatabaseInstallStep(DatabaseContext databaseContext, IRuntimeState runtime, ILogger logger)
         {
             _databaseContext = databaseContext;
             _runtime = runtime;
+            _logger = logger;
         }
 
         public override InstallSetupResult Execute(object model)
@@ -35,7 +37,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (result.RequiresUpgrade == false)
             {
-                HandleConnectionStrings();
+                HandleConnectionStrings(_logger);
                 return null;
             }
 
@@ -46,7 +48,7 @@ namespace Umbraco.Web.Install.InstallSteps
             });
         }
 
-        internal static void HandleConnectionStrings()
+        internal static void HandleConnectionStrings(ILogger logger)
         {
             // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
             if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
@@ -56,7 +58,7 @@ namespace Umbraco.Web.Install.InstallSteps
             else
             {
                 var ex = new ArgumentNullException(string.Format("ConfigurationManager.ConnectionStrings[{0}]", GlobalSettings.UmbracoConnectionName), "Install / upgrade did not complete successfully, umbracoDbDSN was not set in the connectionStrings section");
-                LogHelper.Error<DatabaseInstallStep>("", ex);
+                logger.Error<DatabaseInstallStep>("", ex);
                 throw ex;
             }
         }

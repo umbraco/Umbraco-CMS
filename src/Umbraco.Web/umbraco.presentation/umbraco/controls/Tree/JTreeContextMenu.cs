@@ -46,7 +46,7 @@ namespace umbraco.controls.Tree
                 }
                 catch (Exception ee)
                 {
-	                LogHelper.Error<JTreeContextMenu>("Error initializing tree action", ee);
+	                Current.Logger.Error<JTreeContextMenu>("Error initializing tree action", ee);
                 }
 
 			}

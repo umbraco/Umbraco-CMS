@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -61,7 +62,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 {
                     var sql = "SET parentID=@parentId WHERE id=@nodeId";
 
-                    LogHelper.Info<MigrateAndRemoveTemplateMasterColumn>("Executing sql statement: UPDATE umbracoNode " + sql);
+                    Current.Logger.Info<MigrateAndRemoveTemplateMasterColumn>("Executing sql statement: UPDATE umbracoNode " + sql);
 
                     database.Update<NodeDto>(sql,
                         new {parentId = template.master ?? -1, nodeId = template.nodeId});
@@ -82,7 +83,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                         "path=@buildPath",
                         "id=@nodeId");
 
-                    LogHelper.Info<MigrateAndRemoveTemplateMasterColumn>("Executing sql statement: " + sql);
+                    Current.Logger.Info<MigrateAndRemoveTemplateMasterColumn>("Executing sql statement: " + sql);
 
                     //now build the correct path for the template
                     database.Execute(sql, new

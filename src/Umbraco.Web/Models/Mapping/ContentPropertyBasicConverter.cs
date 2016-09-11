@@ -33,7 +33,7 @@ namespace Umbraco.Web.Models.Mapping
             var editor = Current.PropertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null)
             {
-                LogHelper.Error<ContentPropertyBasicConverter<T>>(
+                Current.Logger.Error<ContentPropertyBasicConverter<T>>(
                     "No property editor found, converting to a Label",
                     new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"));
 

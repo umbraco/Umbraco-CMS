@@ -178,14 +178,14 @@ namespace umbraco.presentation.dialogs
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error<sendToTranslation>("Error sending translation e-mail", ex);
+                            Current.Logger.Error<sendToTranslation>("Error sending translation e-mail", ex);
                         }
                     }
                         
                 }
                 else
                 {
-                    LogHelper.Warn<sendToTranslation>("Could not send translation e-mail because either user or translator lacks e-mail in settings");
+                    Current.Logger.Warn<sendToTranslation>("Could not send translation e-mail because either user or translator lacks e-mail in settings");
                 }
 
             }

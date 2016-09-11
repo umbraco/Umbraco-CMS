@@ -64,7 +64,7 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                LogHelper.Error<userTasks>(string.Format("Failed to create the user. Error from provider: {0}", status.ToString()), ex);
+                Current.Logger.Error<userTasks>(string.Format("Failed to create the user. Error from provider: {0}", status.ToString()), ex);
                 return false;
             }
         }

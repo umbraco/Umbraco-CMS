@@ -144,7 +144,7 @@ namespace umbraco.cms.businesslogic.language
             }
             catch (Exception ex)
             {
-                LogHelper.Error<Language>("Could not find the culture " + cultureCode, ex);
+                Current.Logger.Error<Language>("Could not find the culture " + cultureCode, ex);
                 return null;
             }
         }
@@ -250,7 +250,7 @@ namespace umbraco.cms.businesslogic.language
             else
             {
                 var e = new DataException("Cannot remove language " + LanguageEntity.CultureInfo.DisplayName + " because it's attached to a domain on a node");
-                LogHelper.Error<Language>("Cannot remove language " + LanguageEntity.CultureInfo.DisplayName + " because it's attached to a domain on a node", e);
+                Current.Logger.Error<Language>("Cannot remove language " + LanguageEntity.CultureInfo.DisplayName + " because it's attached to a domain on a node", e);
                 throw e;
             }
         }

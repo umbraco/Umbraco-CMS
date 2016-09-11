@@ -31,7 +31,7 @@ namespace Umbraco.Tests.TestHelpers
 			var umbracoContext = GetUmbracoContext(url, templateId, routeData);
             var urlProvider = new UrlProvider(umbracoContext, umbracoSettings.WebRouting, new IUrlProvider[]
             {
-                new DefaultUrlProvider(umbracoSettings.RequestHandler)
+                new DefaultUrlProvider(umbracoSettings.RequestHandler, Current.Logger)
             });
 			var routingContext = new RoutingContext(
 				umbracoContext,

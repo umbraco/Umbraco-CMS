@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Xml;
@@ -189,7 +190,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<data>("An error occurred in GetAllPackages", ex);
+                    Current.Logger.Error<data>("An error occurred in GetAllPackages", ex);
                 }
             }
 

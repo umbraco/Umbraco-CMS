@@ -508,7 +508,7 @@ namespace umbraco.presentation.developer.packages
                     var actionsXml = new XmlDocument();
                     actionsXml.LoadXml("<Actions>" + _pack.Data.Actions + "</Actions>");
 
-                    LogHelper.Debug<installedPackage>("executing undo actions: {0}", () => actionsXml.OuterXml);
+                    Current.Logger.Debug<installedPackage>("executing undo actions: {0}", () => actionsXml.OuterXml);
 
                     foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
                     {
@@ -518,13 +518,13 @@ namespace umbraco.presentation.developer.packages
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error<installedPackage>("An error occurred running undo actions", ex);
+                            Current.Logger.Error<installedPackage>("An error occurred running undo actions", ex);
 						}
 					}
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<installedPackage>("An error occurred running undo actions", ex);
+                    Current.Logger.Error<installedPackage>("An error occurred running undo actions", ex);
 				}
 
 	            //moved remove of files here so custom package actions can still undo

@@ -21,7 +21,7 @@ namespace Umbraco.Web
         {
             if (Current.UmbracoContext == null)
             {
-                LogHelper.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
+                Current.Logger.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
                 return;
             }
             service.SendNotification(entity, action, Current.UmbracoContext);
@@ -31,7 +31,7 @@ namespace Umbraco.Web
         {
             if (Current.UmbracoContext == null)
             {
-                LogHelper.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
+                Current.Logger.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
                 return;
             }
             service.SendNotification(entities, action, Current.UmbracoContext);
@@ -41,7 +41,7 @@ namespace Umbraco.Web
         //{
         //    if (umbracoContext == null)
         //    {
-        //        LogHelper.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
+        //        Current.Logger.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
         //        return;
         //    }
         //    service.SendNotification(entity, action, umbracoContext);
@@ -51,7 +51,7 @@ namespace Umbraco.Web
         //{
         //    if (umbracoContext == null)
         //    {
-        //        LogHelper.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
+        //        Current.Logger.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
         //        return;
         //    }
         //    service.SendNotification(entities, action, umbracoContext);
@@ -61,7 +61,7 @@ namespace Umbraco.Web
         {
             if (umbracoContext == null)
             {
-                LogHelper.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
+                Current.Logger.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
                 return;
             }
 
@@ -71,11 +71,11 @@ namespace Umbraco.Web
             //if there is no current user, then use the admin 
             if (user == null)
             {
-                LogHelper.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
+                Current.Logger.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
                 user = userService.GetUserById(0);
                 if (user == null)
                 {
-                    LogHelper.Warn(typeof(NotificationServiceExtensions), "Noticiations can not be sent, no admin user with id 0 could be resolved");
+                    Current.Logger.Warn(typeof(NotificationServiceExtensions), "Noticiations can not be sent, no admin user with id 0 could be resolved");
                     return;
                 }
             }
@@ -86,7 +86,7 @@ namespace Umbraco.Web
         {
             if (umbracoContext == null)
             {
-                LogHelper.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
+                Current.Logger.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
                 return;
             }
 
@@ -96,11 +96,11 @@ namespace Umbraco.Web
             //if there is no current user, then use the admin 
             if (user == null)
             {
-                LogHelper.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
+                Current.Logger.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
                 user = userService.GetUserById(0);
                 if (user == null)
                 {
-                    LogHelper.Warn(typeof(NotificationServiceExtensions), "Noticiations can not be sent, no admin user with id 0 could be resolved");
+                    Current.Logger.Warn(typeof(NotificationServiceExtensions), "Noticiations can not be sent, no admin user with id 0 could be resolved");
                     return;
                 }
             }
