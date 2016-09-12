@@ -23,6 +23,9 @@ namespace Umbraco.Tests.Persistence
 		[SetUp]
 		public void Setup()
 		{
+            // bah
+            SafeCallContext.ClearCallContext();
+
             _dbContext = new DatabaseContext(
                 new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Mock.Of<ILogger>()),
                 Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), Constants.DatabaseProviders.SqlCe);
@@ -98,7 +101,7 @@ namespace Umbraco.Tests.Persistence
             var schemaHelper = new DatabaseSchemaHelper(_dbContext.Database, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
 
             var appCtx = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                _dbContext,
                 new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()), 
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.Remoting.Messaging;
 using System.Web;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence
@@ -46,9 +45,12 @@ namespace Umbraco.Core.Persistence
 	    /// <param name="logger"></param>
 	    public DefaultDatabaseFactory(string connectionStringName, ILogger logger)
 		{
-	        if (logger == null) throw new ArgumentNullException("logger");
+            if (logger == null) throw new ArgumentNullException("logger");
 	        Mandate.ParameterNotNullOrEmpty(connectionStringName, "connectionStringName");
-			_connectionStringName = connectionStringName;
+
+            //if (NonContextValue != null) throw new Exception("NonContextValue is not null.");
+
+            _connectionStringName = connectionStringName;
 	        _logger = logger;
 		}
 
@@ -60,10 +62,13 @@ namespace Umbraco.Core.Persistence
 	    /// <param name="logger"></param>
 	    public DefaultDatabaseFactory(string connectionString, string providerName, ILogger logger)
 		{
-	        if (logger == null) throw new ArgumentNullException("logger");
+            if (logger == null) throw new ArgumentNullException("logger");
 	        Mandate.ParameterNotNullOrEmpty(connectionString, "connectionString");
 			Mandate.ParameterNotNullOrEmpty(providerName, "providerName");
-			ConnectionString = connectionString;
+
+            //if (NonContextValue != null) throw new Exception("NonContextValue is not null.");
+
+            ConnectionString = connectionString;
 			ProviderName = providerName;
             _logger = logger;
 		}
@@ -120,29 +125,14 @@ namespace Umbraco.Core.Persistence
 	        else
 	        {
 	            var db = (UmbracoDatabase) HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
-	            if (db != null)
-	            {
-	                db.Dispose();
-                    HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
-	            }
+	            if (db != null) db.Dispose();
+                HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
 	        }
 	    }
 
 		protected override void DisposeResources()
 		{
-			if (HttpContext.Current == null)
-			{
-			    var value = NonContextValue;
-			    if (value != null) value.Dispose();
-			    NonContextValue = null;
-			}
-			else
-			{
-				if (HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)))
-				{
-					((UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)]).Dispose();
-				}
-			}
+            ReleaseDatabase();
 		}
 
 	    internal void ResetForTests()
@@ -151,5 +141,56 @@ namespace Umbraco.Core.Persistence
             if (value != null) value.Dispose();
             NonContextValue = null;
         }
+
+        #region SafeCallContext
+
+        // see notes in SafeCallContext - need to do this since we are using
+        // the logical call context...
+
+        static DefaultDatabaseFactory()
+	    {
+	        SafeCallContext.Register(DetachDatabase, AttachDatabase);
+	    }
+
+        // detaches the current database
+        // ie returns the database and remove it from whatever is "context"
+	    private static UmbracoDatabase DetachDatabase()
+	    {
+	        if (HttpContext.Current == null)
+	        {
+	            var db = NonContextValue;
+	            NonContextValue = null;
+	            return db;
+	        }
+	        else
+	        {
+	            var db = (UmbracoDatabase) HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
+                HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
+	            return db;
+	        }
+        }
+
+        // attach a current database
+        // ie assign it to whatever is "context"
+        // throws if there already is a database
+	    private static void AttachDatabase(object o)
+	    {
+	        if (o == null) return;
+	        var database = o as UmbracoDatabase;
+            if (database == null) throw new ArgumentException("Not an UmbracoDatabase.", "o");
+
+	        if (HttpContext.Current == null)
+	        {
+                if (NonContextValue != null) throw new InvalidOperationException();
+                NonContextValue = database;
+            }
+	        else
+	        {
+                if (HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] != null) throw new InvalidOperationException();
+                HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] = database;
+	        }
+        }
+
+        #endregion
     }
 }

@@ -29,20 +29,24 @@ namespace Umbraco.Core.Packaging
         /// </remarks>
         public static IEnumerable<string> ScanAssembliesForTypeReference<T>(IEnumerable<byte[]> assemblys, out string[] errorReport)
         {
-            var appDomain = GetTempAppDomain();
-            var type = typeof(PackageBinaryInspector);
-            try
+            // beware! when toying with domains, use a safe call context!
+            using (new SafeCallContext())
             {
-                var value = (PackageBinaryInspector)appDomain.CreateInstanceAndUnwrap(
-                       type.Assembly.FullName,
-                       type.FullName);
-                // do NOT turn PerformScan into static (even if ReSharper says so)!
-                var result = value.PerformScan<T>(assemblys.ToArray(), out errorReport);
-                return result;
-            }
-            finally
-            {
-                AppDomain.Unload(appDomain);
+                var appDomain = GetTempAppDomain();
+                var type = typeof(PackageBinaryInspector);
+                try
+                {
+                    var value = (PackageBinaryInspector) appDomain.CreateInstanceAndUnwrap(
+                        type.Assembly.FullName,
+                        type.FullName);
+                    // do NOT turn PerformScan into static (even if ReSharper says so)!
+                    var result = value.PerformScan<T>(assemblys.ToArray(), out errorReport);
+                    return result;
+                }
+                finally
+                {
+                    AppDomain.Unload(appDomain);
+                }
             }
         }
 
@@ -281,12 +285,8 @@ namespace Umbraco.Core.Packaging
                     PrivateBinPathProbe = AppDomain.CurrentDomain.SetupInformation.PrivateBinPathProbe
                 };
 
-            //create new domain with full trust
-            return AppDomain.CreateDomain(
-                appName,
-                AppDomain.CurrentDomain.Evidence,
-                domainSetup,
-                new PermissionSet(PermissionState.Unrestricted));
+            // create new domain with full trust
+            return AppDomain.CreateDomain(appName, AppDomain.CurrentDomain.Evidence, domainSetup, new PermissionSet(PermissionState.Unrestricted));
         }
     }
 }
