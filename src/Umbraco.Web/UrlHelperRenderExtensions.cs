@@ -114,6 +114,9 @@ namespace Umbraco.Web
         /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
         /// set to false if using the result of this method for CSS.
         /// </param>
+        /// <param name="backgroundColor">
+        /// Changes the background color of the image. Used when adding a background when resizing image formats without an alpha channel.
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -132,11 +135,12 @@ namespace Umbraco.Web
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true,
-            bool htmlEncode = true)
+            bool htmlEncode = true,
+            string backgroundColor = null)
         {
             var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
-                upScale);
+                upScale, backgroundColor);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
 
@@ -190,6 +194,9 @@ namespace Umbraco.Web
         /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
         /// set to false if using the result of this method for CSS.
         /// </param>
+        /// <param name="backgroundColor">
+        /// Changes the background color of the image. Used when adding a background when resizing image formats without an alpha channel.
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -208,11 +215,12 @@ namespace Umbraco.Web
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true,
-            bool htmlEncode = true)
+            bool htmlEncode = true,
+            string backgroundColor = null)
         {
             var url = imageUrl.GetCropUrl(width, height, imageCropperValue, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
-                upScale);
+                upScale, backgroundColor);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);            
         }
 
@@ -333,7 +341,5 @@ namespace Umbraco.Web
         {
             return url.SurfaceAction(action, typeof (T), additionalRouteVals);
         }
-
-
     }
 }

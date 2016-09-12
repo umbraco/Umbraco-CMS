@@ -91,10 +91,13 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="ratioMode">
         /// Use a dimension as a ratio
-        /// </param>  
+        /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>         
+        /// </param>
+        /// <param name="backgroundColor">
+        /// Changes the background color of the image. Used when adding a background when resizing image formats without an alpha channel.
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -112,7 +115,8 @@ namespace Umbraco.Web
              bool cacheBuster = true, 
              string furtherOptions = null,
              ImageCropRatioMode? ratioMode = null,
-             bool upScale = true)
+             bool upScale = true,
+             string backgroundColor = null)
         {
             if (mediaItem == null) throw new ArgumentNullException("mediaItem");
 
@@ -132,7 +136,7 @@ namespace Umbraco.Web
                 mediaItemUrl = stronglyTyped.Src;
                 return GetCropUrl(
                     mediaItemUrl, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                    cacheBusterValue, furtherOptions, ratioMode, upScale);
+                    cacheBusterValue, furtherOptions, ratioMode, upScale, backgroundColor);
             }
 
             //this shouldn't be the case but we'll check
@@ -143,14 +147,14 @@ namespace Umbraco.Web
                 mediaItemUrl = stronglyTyped.Src;
                 return GetCropUrl(
                     mediaItemUrl, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                    cacheBusterValue, furtherOptions, ratioMode, upScale);
+                    cacheBusterValue, furtherOptions, ratioMode, upScale, backgroundColor);
             }
 
             //it's a single string
             mediaItemUrl = cropperValue.ToString();
             return GetCropUrl(
                 mediaItemUrl, width, height, mediaItemUrl, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                cacheBusterValue, furtherOptions, ratioMode, upScale);
+                cacheBusterValue, furtherOptions, ratioMode, upScale, backgroundColor);
         }
 
         /// <summary>
@@ -198,6 +202,9 @@ namespace Umbraco.Web
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
         /// </param>
+        /// <param name="backgroundColor">
+        /// Changes the background color of the image. Used when adding a background when resizing image formats without an alpha channel.
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -215,7 +222,8 @@ namespace Umbraco.Web
             string cacheBusterValue = null, 
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
-            bool upScale = true)
+            bool upScale = true,
+            string backgroundColor = null)
         {
             if (string.IsNullOrEmpty(imageUrl)) return string.Empty;
 
@@ -226,7 +234,7 @@ namespace Umbraco.Web
             }
             return GetCropUrl(
                 imageUrl, cropDataSet, width, height, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
+                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale, backgroundColor);
         }
 
         public static string GetCropUrl(
@@ -243,7 +251,8 @@ namespace Umbraco.Web
             string cacheBusterValue = null,
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
-            bool upScale = true)
+            bool upScale = true,
+            string backgroundColor = null)
         {
             if (string.IsNullOrEmpty(imageUrl) == false)
             {
@@ -348,6 +357,11 @@ namespace Umbraco.Web
                 if (upScale == false)
                 {
                     imageProcessorUrl.Append("&upscale=false");
+                }
+
+                if (backgroundColor != null)
+                {
+                    imageProcessorUrl.Append("&bgcolor=" + backgroundColor);
                 }
 
                 if (furtherOptions != null)
