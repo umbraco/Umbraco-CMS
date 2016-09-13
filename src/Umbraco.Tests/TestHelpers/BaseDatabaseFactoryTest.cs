@@ -381,7 +381,6 @@ namespace Umbraco.Tests.TestHelpers
                             ? new FakeHttpContextFactory(url, routeData)
                             : new FakeHttpContextFactory(url);
 
-
             //set the state helper
             StateHelper.HttpContext = factory.HttpContext;
 
