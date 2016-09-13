@@ -45,7 +45,6 @@ namespace Umbraco.Core
 
         public SafeCallContext()
         {
-            Interlocked.Increment(ref _count);
             lock (EnterFuncs)
             {
                 _count++;
