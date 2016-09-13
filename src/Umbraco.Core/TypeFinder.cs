@@ -26,6 +26,8 @@ namespace Umbraco.Core
     /// </summary>
     public static class TypeFinder
     {
+        public static bool IAmUnitTestingSoNeverUseHttpContextEver = false;
+
         private static volatile HashSet<Assembly> _localFilteredAssemblyCache = null;
         private static readonly object LocalFilteredAssemblyCacheLocker = new object();
 
@@ -52,7 +54,7 @@ namespace Umbraco.Core
             HashSet<Assembly> assemblies = null;
             try
             {
-                var isHosted = HttpContext.Current != null;
+                var isHosted = HttpContext.Current != null && IAmUnitTestingSoNeverUseHttpContextEver == false;
 
                 try
                 {
