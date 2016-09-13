@@ -64,7 +64,7 @@ namespace Umbraco.Tests.TestHelpers
             // fixme - in theory we should not need this
             // it's done in base.Initialize() and no idea why we do things
             // in this order here... not going to change it now though...
-            SafeCallContext.ClearCallContext();
+            SafeCallContext.Clear();
 
             _dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),

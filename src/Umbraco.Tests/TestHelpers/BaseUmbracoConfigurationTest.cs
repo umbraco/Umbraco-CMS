@@ -27,7 +27,7 @@ namespace Umbraco.Tests.TestHelpers
             SettingsForTests.Reset();
 
             // clear the logical call context
-            SafeCallContext.ClearCallContext();
+            SafeCallContext.Clear();
         }
     }
 }

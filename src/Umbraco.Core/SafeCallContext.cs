@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading;
-using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core
 {
@@ -21,17 +19,9 @@ namespace Umbraco.Core
 
             lock (EnterFuncs)
             {
-                if (_count > 0) throw new Exception("Busy.");
+                if (_count > 0) throw new InvalidOperationException("Cannot register while some SafeCallContext instances exist.");
                 EnterFuncs.Add(enterFunc);
                 ExitActions.Add(exitAction);
-            }
-        }
-
-        public static void ClearCallContext()
-        {
-            lock (EnterFuncs)
-            {
-                var ignore = EnterFuncs.Select(x => x()).ToList();
             }
         }
 
@@ -40,8 +30,34 @@ namespace Umbraco.Core
         // as an object instead but then it comes *back* deserialized into the original context
         // as an object and of course it breaks everything. Cannot prevent this from flowing,
         // and ExecutionContext.SuppressFlow() works for threads but not domains. and we'll
-        // have the same issue with anything that toys with logical call context... so this
-        // class let them register & deal with the situation (removing themselves)
+        // have the same issue with anything that toys with logical call context...
+        //
+        // so this class lets anything that uses the logical call context register itself,
+        // providing two methods:
+        // - an enter func that removes and returns whatever is in the logical call context
+        // - an exit action that restores the value into the logical call context
+        // whenever a SafeCallContext instance is created, it uses these methods to capture
+        // and clear the logical call context, and restore it when disposed.
+        //
+        // in addition, a static Clear method is provided - which uses the enter funcs to
+        // remove everything from logical call context - not to be used when the app runs,
+        // but can be useful during tests
+        //
+        // note
+        // see System.Transactions
+        // they are using a conditional weak table to store the data, and what they store in
+        // LLC is the key - which is just an empty MarshalByRefObject that is created with
+        // the transaction scope - that way, they can "clear current data" provided that
+        // they have the key - but they need to hold onto a ref to the scope... not ok for us
+
+        public static void Clear()
+        {
+            lock (EnterFuncs)
+            {
+                foreach (var enter in EnterFuncs)
+                    enter();
+            }
+        }
 
         public SafeCallContext()
         {
@@ -61,6 +77,17 @@ namespace Umbraco.Core
                 for (var i = 0; i < ExitActions.Count; i++)
                     ExitActions[i](_objects[i]);
                 _count--;
+            }
+        }
+
+        // for unit tests ONLY
+        internal static void Reset()
+        {
+            lock (EnterFuncs)
+            {
+                if (_count > 0) throw new InvalidOperationException("Cannot reset while some SafeCallContext instances exist.");
+                EnterFuncs.Clear();
+                ExitActions.Clear();
             }
         }
     }

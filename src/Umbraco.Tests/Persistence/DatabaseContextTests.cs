@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence
 		public void Setup()
 		{
             // bah
-            SafeCallContext.ClearCallContext();
+            SafeCallContext.Clear();
 
             _dbContext = new DatabaseContext(
                 new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Mock.Of<ILogger>()),
