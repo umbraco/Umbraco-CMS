@@ -499,8 +499,10 @@ AND umbracoNode.id <> @id",
                 propType.Key = dto.UniqueId;
                 propType.Name = dto.Name;
                 propType.Mandatory = dto.Mandatory;
+                propType.MandatoryMessage = dto.MandatoryMessage;
                 propType.SortOrder = dto.SortOrder;
                 propType.ValidationRegExp = dto.ValidationRegExp;
+                propType.ValidationRegExpMessage = dto.ValidationRegExpMessage;
                 propType.CreateDate = createDate;
                 propType.UpdateDate = updateDate;
                 list.Add(propType);
@@ -1075,14 +1077,14 @@ AND umbracoNode.id <> @id",
                 // NOTE: MySQL requires a SELECT * FROM the inner union in order to be able to sort . lame.
 
                 var sqlBuilder = new StringBuilder(@"SELECT PG.contenttypeNodeId as contentTypeId,
-                            PT.ptUniqueId as ptUniqueID, PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp,
+                            PT.ptUniqueId as ptUniqueID, PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptMandatory,PT.ptMandatoryMessage,PT.ptName,PT.ptSortOrder,PT.ptRegExp,PT.ptRegExpMessage,
                             PT.dtId,PT.dtDbType,PT.dtPropEdAlias,
                             PG.id as pgId, PG.uniqueID as pgKey, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
                         FROM cmsPropertyTypeGroup as PG
                         LEFT JOIN
                         (
                             SELECT PT.uniqueID as ptUniqueId, PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc,
-                                    PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
+                                    PT.mandatory as ptMandatory, PT.mandatoryMessage as ptMandatoryMessage, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp, PT.validationRegExpMessage as ptRegExpMessage,
                                     PT.propertyTypeGroupId as ptGroupId,
                                     DT.dbType as dtDbType, DT.nodeId as dtId, DT.propertyEditorAlias as dtPropEdAlias
                             FROM cmsPropertyType as PT
@@ -1096,7 +1098,7 @@ AND umbracoNode.id <> @id",
 
                         SELECT  PT.contentTypeId as contentTypeId,
                                 PT.uniqueID as ptUniqueID, PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc,
-                                PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
+                                PT.mandatory as ptMandatory, PT.mandatoryMessage as ptMandatoryMessage, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp, PT.validationRegExpMessage as ptRegExpMessage,
                                 DT.nodeId as dtId, DT.dbType as dtDbType, DT.propertyEditorAlias as dtPropEdAlias,
                                 PG.id as pgId, PG.uniqueID as pgKey, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
                         FROM cmsPropertyType as PT
@@ -1146,10 +1148,12 @@ AND umbracoNode.id <> @id",
                                     Id = row.ptId,
                                     Key = row.ptUniqueID,
                                     Mandatory = Convert.ToBoolean(row.ptMandatory),
+                                    MandatoryMessage = row.ptMandatoryMessage,
                                     Name = row.ptName,
                                     PropertyGroupId = new Lazy<int>(() => group.GroupId, false),
                                     SortOrder = row.ptSortOrder,
-                                    ValidationRegExp = row.ptRegExp
+                                    ValidationRegExp = row.ptRegExp,
+                                    ValidationRegExpMessage = row.ptRegExpMessage
                                 })))
                         {
                             //fill in the rest of the group properties
@@ -1175,10 +1179,12 @@ AND umbracoNode.id <> @id",
                             Id = row.ptId,
                             Key = row.ptUniqueID,
                             Mandatory = Convert.ToBoolean(row.ptMandatory),
+                            MandatoryMessage = row.ptMandatoryMessage,
                             Name = row.ptName,
                             PropertyGroupId = null,
                             SortOrder = row.ptSortOrder,
-                            ValidationRegExp = row.ptRegExp
+                            ValidationRegExp = row.ptRegExp,
+                            ValidationRegExpMessage = row.ptRegExpMessage
                         }).ToArray());
 
                     allPropertyTypeCollection[currId] = propertyTypeCollection;

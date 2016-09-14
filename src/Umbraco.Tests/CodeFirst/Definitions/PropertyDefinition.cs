@@ -19,6 +19,10 @@ namespace Umbraco.Tests.CodeFirst.Definitions
 
         public bool Mandatory { get; set; }
 
+        public string MandatoryMessage { get; set; }
+
         public string ValidationRegExp { get; set; }
+
+        public string ValidationRegExpMessage { get; set; }
     }
 }

@@ -110,12 +110,14 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                 if(group.PropertyTypes.Contains(definition.Alias)) continue;
 
                 var propertyType = new PropertyType(definition.DataTypeDefinition, definition.Alias)
-                                       {
-                                           Mandatory = definition.Mandatory,
-                                           ValidationRegExp = definition.ValidationRegExp,
-                                           SortOrder = definition.Order,
-                                           Name = definition.Name
-                                       };
+                {
+                    Mandatory = definition.Mandatory,
+                    MandatoryMessage = definition.MandatoryMessage,
+                    ValidationRegExp = definition.ValidationRegExp,
+                    ValidationRegExpMessage = definition.ValidationRegExpMessage,
+                    SortOrder = definition.Order,
+                    Name = definition.Name
+                };
 
                 group.PropertyTypes.Add(propertyType);
             }

@@ -38,8 +38,10 @@ namespace Umbraco.Web.Models.Mapping
             
             //add the validation information
             display.Validation.Mandatory = originalProp.PropertyType.Mandatory;
+            display.Validation.MandatoryMessage = originalProp.PropertyType.MandatoryMessage;
             display.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
-            
+            display.Validation.PatternMessage = originalProp.PropertyType.ValidationRegExpMessage;
+
             if (display.PropertyEditor == null)
             {
                 //display.Config = PreValueCollection.AsDictionary(preVals);

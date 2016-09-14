@@ -28,9 +28,11 @@ namespace Umbraco.Core.Models
         private string _propertyEditorAlias;
         private DataTypeDatabaseType _dataTypeDatabaseType;
         private bool _mandatory;
+        private string _mandatoryMessage;
         private string _helpText;
         private int _sortOrder;
         private string _validationRegExp;
+        private string _validationRegExpMessage;
 
         public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
@@ -98,9 +100,11 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
             public readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, DataTypeDatabaseType>(x => x.DataTypeDatabaseType);
             public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
+            public readonly PropertyInfo MandatoryMessageSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.MandatoryMessage);
             public readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
             public readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
+            public readonly PropertyInfo ValidationRegExpMessageSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExpMessage);
             public readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
         }
 
@@ -209,6 +213,16 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Gets of Sets the custom validation message used when a value for this PropertyType is required
+        /// </summary>
+        [DataMember]
+        public string MandatoryMessage
+        {
+            get { return _mandatoryMessage; }
+            set { SetPropertyValueAndDetectChanges(value, ref _mandatoryMessage, Ps.Value.MandatoryMessageSelector); }
+        }
+
+        /// <summary>
         /// Gets of Sets the Help text for the current PropertyType
         /// </summary>
         [DataMember]
@@ -237,6 +251,16 @@ namespace Umbraco.Core.Models
         {
             get { return _validationRegExp; }
             set { SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Ps.Value.ValidationRegExpSelector); }
+        }
+
+        /// <summary>
+        /// Gets of Sets the custom validation message used when a pattern for this PropertyType must be matched
+        /// </summary>
+        [DataMember]
+        public string ValidationRegExpMessage
+        {
+            get { return _validationRegExpMessage; }
+            set { SetPropertyValueAndDetectChanges(value, ref _validationRegExpMessage, Ps.Value.ValidationRegExpMessageSelector); }
         }
 
         private string GetAlias(string value)

@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
         internal override void BuildMap()
         {
-            if(PropertyInfoCache.IsEmpty)
+            if (PropertyInfoCache.IsEmpty)
             {
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Key, dto => dto.UniqueId);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Id, dto => dto.Id);
@@ -39,9 +39,11 @@ namespace Umbraco.Core.Persistence.Mappers
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.DataTypeDefinitionId, dto => dto.DataTypeId);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Description, dto => dto.Description);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Mandatory, dto => dto.Mandatory);
+                CacheMap<PropertyType, PropertyTypeDto>(src => src.MandatoryMessage, dto => dto.MandatoryMessage);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Name, dto => dto.Name);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.SortOrder, dto => dto.SortOrder);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.ValidationRegExp, dto => dto.ValidationRegExp);
+                CacheMap<PropertyType, PropertyTypeDto>(src => src.ValidationRegExpMessage, dto => dto.ValidationRegExpMessage);
                 CacheMap<PropertyType, DataTypeDto>(src => src.PropertyEditorAlias, dto => dto.PropertyEditorAlias);
                 CacheMap<PropertyType, DataTypeDto>(src => src.DataTypeDatabaseType, dto => dto.DbType);
             }

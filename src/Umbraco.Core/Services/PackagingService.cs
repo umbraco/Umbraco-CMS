@@ -742,7 +742,9 @@ namespace Umbraco.Core.Services
                     Name = property.Element("Name").Value,
                     Description = (string)property.Element("Description"),
                     Mandatory = property.Element("Mandatory") != null ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true") : false,
+                    MandatoryMessage = (string)property.Element("MandatoryMessage"),
                     ValidationRegExp = (string)property.Element("Validation"),
+                    ValidationRegExpMessage = (string)property.Element("ValidationMessage"),
                     SortOrder = sortOrder
                 };
 

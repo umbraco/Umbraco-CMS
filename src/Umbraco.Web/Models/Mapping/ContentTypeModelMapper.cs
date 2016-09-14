@@ -39,7 +39,9 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<PropertyTypeBasic, PropertyType>()
                 .ConstructUsing(basic => new PropertyType(applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(basic.DataTypeId)))
                 .ForMember(type => type.ValidationRegExp, expression => expression.ResolveUsing(basic => basic.Validation.Pattern))
+                .ForMember(type => type.ValidationRegExpMessage, expression => expression.ResolveUsing(basic => basic.Validation.PatternMessage))
                 .ForMember(type => type.Mandatory, expression => expression.ResolveUsing(basic => basic.Validation.Mandatory))
+                .ForMember(type => type.MandatoryMessage, expression => expression.ResolveUsing(basic => basic.Validation.MandatoryMessage))
                 .ForMember(type => type.Name, expression => expression.ResolveUsing(basic => basic.Label))
                 .ForMember(type => type.DataTypeDefinitionId, expression => expression.ResolveUsing(basic => basic.DataTypeId))
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
@@ -190,7 +192,9 @@ namespace Umbraco.Web.Models.Mapping
                 //ignore because this is obsolete and shouldn't be used
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
                 .ForMember(type => type.Mandatory, expression => expression.MapFrom(display => display.Validation.Mandatory))
+                .ForMember(type => type.MandatoryMessage, expression => expression.MapFrom(display => display.Validation.MandatoryMessage))
                 .ForMember(type => type.ValidationRegExp, expression => expression.MapFrom(display => display.Validation.Pattern))
+                .ForMember(type => type.ValidationRegExpMessage, expression => expression.MapFrom(display => display.Validation.PatternMessage))
                 .ForMember(type => type.DataTypeDefinitionId, expression => expression.MapFrom(display => display.DataTypeId))
                 .ForMember(type => type.Name, expression => expression.MapFrom(display => display.Label));
 
