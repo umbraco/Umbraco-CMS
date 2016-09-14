@@ -45,11 +45,29 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                         return err.errorMsg;
                     }
                     else {
-                        return scope.property.propertyErrorMessage ? scope.property.propertyErrorMessage : defaultErrorMessage;
+                        return scope.property.propertyErrorMessage
+                            ? scope.property.propertyErrorMessage
+                            : getErrorMsgForInvalidProperty(scope.property);
                     }
 
                 }
+
                 return defaultErrorMessage;
+            }
+
+            function getErrorMsgForInvalidProperty(property) {
+                var errorMessage;
+                if (property.validation.mandatory && !property.value) {
+                    errorMessage = property.validation.mandatoryMessage;
+                } else {
+                    errorMessage = property.validation.validationRegExpMessage;
+                }
+
+                if (!errorMessage) {
+                    errorMessage = defaultErrorMessage;
+                }
+
+                return errorMessage;
             }
 
             // We need to subscribe to any changes to our model (based on user input)

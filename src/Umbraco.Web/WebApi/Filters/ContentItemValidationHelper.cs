@@ -146,13 +146,17 @@ namespace Umbraco.Web.WebApi.Filters
                 {
                     foreach (var result in p.PropertyEditor.ValueEditor.RequiredValidator.Validate(postedValue, "", preValues, editor))
                     {
+                        if (string.IsNullOrEmpty(p.IsRequiredMessage) == false)
+                        {
+                            result.ErrorMessage = p.IsRequiredMessage;
+                        }
+
                         actionContext.ModelState.AddPropertyError(result, p.Alias);
                     }
                 }
 
                 if (p.ValidationRegExp.IsNullOrWhiteSpace() == false)
                 {
-
                     //We only want to execute the regex statement if:
                     // * the value is null or empty AND it is required OR
                     // * the value is not null or empty
@@ -168,6 +172,11 @@ namespace Umbraco.Web.WebApi.Filters
                     {
                         foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, p.ValidationRegExp, preValues, editor))
                         {
+                            if (string.IsNullOrEmpty(p.ValidationRegExpMessage) == false)
+                            {
+                                result.ErrorMessage = p.ValidationRegExpMessage;
+                            }
+
                             actionContext.ModelState.AddPropertyError(result, p.Alias);
                         }
                     }

@@ -5,12 +5,18 @@
     * @description A custom directive to allow for matching a value against a regex string.
     *               NOTE: there's already an ng-pattern but this requires that a regex expression is set, not a regex string
     **/
-function valRegex() {
+function valRegex(localizationService) {
     
     return {
         require: 'ngModel',
         restrict: "A",
         link: function (scope, elm, attrs, ctrl) {
+
+            // Localize default error message
+            var defaultErrorMessage = "Value is invalid, it does not match the correct pattern";
+            localizationService.localize("validation_valueIsInvalid").then(function (value) {
+                defaultErrorMessage = value;
+            });
 
             var flags = "";
             var regex;
@@ -59,7 +65,7 @@ function valRegex() {
                         // it is invalid, return undefined (no model update)
                         ctrl.$setValidity('valRegex', false);
                         //assign a message to the validator
-                        ctrl.errorMsg = "Value is invalid, it does not match the correct pattern";
+                        ctrl.errorMsg = defaultErrorMessage;
                         return undefined;
                     }
                 }

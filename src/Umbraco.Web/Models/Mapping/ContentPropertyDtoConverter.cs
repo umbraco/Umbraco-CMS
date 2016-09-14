@@ -24,7 +24,9 @@ namespace Umbraco.Web.Models.Mapping
             var dataTypeService = DataTypeService.Value;
 
             propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
+            propertyDto.IsRequiredMessage = originalProperty.PropertyType.MandatoryMessage;
             propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
+            propertyDto.ValidationRegExpMessage = originalProperty.PropertyType.ValidationRegExpMessage;
             propertyDto.Description = originalProperty.PropertyType.Description;
             propertyDto.Label = originalProperty.PropertyType.Name;
             

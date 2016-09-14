@@ -11,10 +11,18 @@ namespace Umbraco.Web.Models.ContentEditing
     internal class ContentPropertyDto : ContentPropertyBasic
     {
         public IDataTypeDefinition DataType { get; set; }
+
         public string Label { get; set; }
+
         public string Description { get; set; }
+
         public bool IsRequired { get; set; }
+
+        public string IsRequiredMessage { get; set; }
+
         public string ValidationRegExp { get; set; }
+
+        public string ValidationRegExpMessage { get; set; }
 
         /// <summary>
         /// The current pre-values for this property
