@@ -9,7 +9,7 @@
 * and when an error is detected for this property we'll show the error message.
 * In order for this directive to work, the valStatusChanged directive must be placed on the containing form.
 **/
-function valPropertyMsg(serverValidationManager) {
+function valPropertyMsg(serverValidationManager, localizationService) {
 
     return {
         scope: {
@@ -28,6 +28,12 @@ function valPropertyMsg(serverValidationManager) {
 
             var watcher = null;
 
+            // Localize default error message
+            var defaultErrorMessage = "Property has errors";
+            localizationService.localize("validation_propertyHasErrors").then(function (value) {
+                defaultErrorMessage = value;
+            });
+
             // Gets the error message to display
             function getErrorMsg() {
                 //this can be null if no property was assigned
@@ -39,11 +45,11 @@ function valPropertyMsg(serverValidationManager) {
                         return err.errorMsg;
                     }
                     else {
-                        return scope.property.propertyErrorMessage ? scope.property.propertyErrorMessage : "Property has errors";
+                        return scope.property.propertyErrorMessage ? scope.property.propertyErrorMessage : defaultErrorMessage;
                     }
 
                 }
-                return "Property has errors";
+                return defaultErrorMessage;
             }
 
             // We need to subscribe to any changes to our model (based on user input)
