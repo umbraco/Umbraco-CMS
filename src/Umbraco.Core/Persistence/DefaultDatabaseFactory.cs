@@ -175,9 +175,8 @@ namespace Umbraco.Core.Persistence
         // throws if there already is a database
 	    private static void AttachDatabase(object o)
 	    {
-	        if (o == null) return;
 	        var database = o as UmbracoDatabase;
-            if (database == null) throw new ArgumentException("Not an UmbracoDatabase.", "o");
+            if (o != null && database == null) throw new ArgumentException("Not an UmbracoDatabase.", "o");
 
 	        if (HttpContext.Current == null)
 	        {
@@ -187,7 +186,10 @@ namespace Umbraco.Core.Persistence
 	        else
 	        {
                 if (HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] != null) throw new InvalidOperationException();
-                HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] = database;
+                if (database == null)
+                    HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
+                else
+                    HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] = database;
 	        }
         }
 
