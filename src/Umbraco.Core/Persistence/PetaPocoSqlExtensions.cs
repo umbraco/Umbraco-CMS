@@ -34,11 +34,27 @@ namespace Umbraco.Core.Persistence
             return sql.Where(whereExpression, expresionist.GetSqlParameters());
         }
 
+        private static string GetFieldName<T>(Expression<Func<T, object>> fieldSelector, ISqlSyntaxProvider sqlSyntax)
+        {
+            var field = ExpressionHelper.FindProperty(fieldSelector) as PropertyInfo;
+            var fieldName = field.GetColumnName();
+
+            var type = typeof(T);
+            var tableName = type.GetTableName();
+
+            return sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(fieldName);
+        }
+
+        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql WhereIn<T>(this Sql sql, Expression<Func<T, object>> fieldSelector, IEnumerable values)
         {
-            var expresionist = new PocoToSqlExpressionHelper<T>();
-            var fieldExpression = expresionist.Visit(fieldSelector);
-            return sql.Where(fieldExpression + " IN (@values)", new {@values = values});
+            return sql.WhereIn(fieldSelector, values, SqlSyntaxContext.SqlSyntaxProvider);
+        }
+
+        public static Sql WhereIn<T>(this Sql sql, Expression<Func<T, object>> fieldSelector, IEnumerable values, ISqlSyntaxProvider sqlSyntax)
+        {
+            var fieldName = GetFieldName(fieldSelector, sqlSyntax);
+            return sql.Where(fieldName + " IN (@values)", new { values });
         }
 
         [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
@@ -49,17 +65,7 @@ namespace Umbraco.Core.Persistence
 
         public static Sql OrderBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember, ISqlSyntaxProvider sqlSyntax)
         {
-            var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
-            var columnName = column.GetColumnName();
-
-            var type = typeof(TColumn);
-            var tableName = type.GetTableName();
-
-            //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
-            var syntax = string.Format("({0}.{1})",
-                sqlSyntax.GetQuotedTableName(tableName),
-                sqlSyntax.GetQuotedColumnName(columnName));
-
+            var syntax = "(" + GetFieldName(columnMember, sqlSyntax) + ")";
             return sql.OrderBy(syntax);
         }
 
