@@ -280,6 +280,8 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto.Design == content) return;
             dto.Design = content;
             Database.Update(dto); // though... we don't care about the db value really??!!
+
+            SetVirtualPath(template);
         }
 
         protected override void PersistDeletedItem(ITemplate entity)
@@ -377,6 +379,50 @@ namespace Umbraco.Core.Persistence.Repositories
             return template;
         }
 
+        private void SetVirtualPath(ITemplate template)
+        {
+            var path = template.OriginalPath;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                // we need to discover the path
+                path = string.Concat(template.Alias, ".cshtml");
+                if (_viewsFileSystem.FileExists(path))
+                {
+                    template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                    return;
+                }
+                path = string.Concat(template.Alias, ".vbhtml");
+                if (_viewsFileSystem.FileExists(path))
+                {
+                    template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                    return;
+                }
+                path = string.Concat(template.Alias, ".master");
+                if (_masterpagesFileSystem.FileExists(path))
+                {
+                    template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
+                    return;
+                }
+            }
+            else
+            {
+                // we know the path already
+                var ext = Path.GetExtension(path);
+                switch (ext)
+                {
+                    case ".cshtml":
+                    case ".vbhtml":
+                        template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                        return;
+                    case ".master":
+                        template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
+                        return;
+                }
+            }
+
+            template.VirtualPath = string.Empty; // file not found...
+        }
+
         private string GetFileContent(ITemplate template, bool init)
         {
             var path = template.OriginalPath;
@@ -404,20 +450,8 @@ namespace Umbraco.Core.Persistence.Repositories
                         return GetFileContent(template, _viewsFileSystem, path, init);
                     case ".master":
                         return GetFileContent(template, _masterpagesFileSystem, path, init);
-                    default:
-                        return string.Empty;
                 }
             }
-
-            var fsname = string.Concat(template.Alias, ".cshtml");
-            if (_viewsFileSystem.FileExists(fsname))
-                return GetFileContent(template, _viewsFileSystem, fsname, init);
-            fsname = string.Concat(template.Alias, ".vbhtml");
-            if (_viewsFileSystem.FileExists(fsname))
-                return GetFileContent(template, _viewsFileSystem, fsname, init);
-            fsname = string.Concat(template.Alias, ".master");
-            if (_masterpagesFileSystem.FileExists(fsname))
-                return GetFileContent(template, _masterpagesFileSystem, fsname, init);
 
             template.VirtualPath = string.Empty; // file not found...
             return string.Empty;
