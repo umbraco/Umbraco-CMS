@@ -80,7 +80,7 @@
                             <div class="umb-row-title-bar">
 
                                 <div class=".umb-grid-right">
-                                    <div class="umb-row-title">{{row.name}}</div>
+                                    <div class="umb-row-title">{{row.label || row.name}}</div>
 
                                     <div class="umb-grid-has-config" ng-if="row.hasConfig && !sortMode">
                                             <localize key="grid_settingsApplied" />
@@ -282,7 +282,7 @@
                             <div class="preview-overlay">
                             </div>
 
-                            <small>{{layout.name}}</small>
+                            <small>{{layout.label || layout.name}}</small>
 
                         </div> <!-- .templates-preview-rows -->
 
