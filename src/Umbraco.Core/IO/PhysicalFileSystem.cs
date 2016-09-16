@@ -6,7 +6,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
-    public class PhysicalFileSystem : IFileSystem
+    public class PhysicalFileSystem : IFileSystem2
     {
         // the rooted, filesystem path, using directory separator chars, NOT ending with a separator
         // eg "c:" or "c:\path\to\site" or "\\server\path"

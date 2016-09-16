@@ -16,93 +16,103 @@ namespace Umbraco.Core.IO
 	/// </remarks>
 	public abstract class FileSystemWrapper : IFileSystem
 	{
-		private readonly IFileSystem _wrapped;
-
-		protected FileSystemWrapper(IFileSystem wrapped)
+	    protected FileSystemWrapper(IFileSystem wrapped)
 		{
-			_wrapped = wrapped;
+			Wrapped = wrapped;
 		}
 
-        internal IFileSystem Wrapped { get { return _wrapped; } }
+        internal IFileSystem Wrapped { get; set; }
 
-		public IEnumerable<string> GetDirectories(string path)
+	    public IEnumerable<string> GetDirectories(string path)
 		{
-			return _wrapped.GetDirectories(path);
+			return Wrapped.GetDirectories(path);
 		}
 
 		public void DeleteDirectory(string path)
 		{
-			_wrapped.DeleteDirectory(path);
+			Wrapped.DeleteDirectory(path);
 		}
 
 		public void DeleteDirectory(string path, bool recursive)
 		{
-			_wrapped.DeleteDirectory(path, recursive);
+			Wrapped.DeleteDirectory(path, recursive);
 		}
 
 		public bool DirectoryExists(string path)
 		{
-			return _wrapped.DirectoryExists(path);
+			return Wrapped.DirectoryExists(path);
 		}
 
 		public void AddFile(string path, Stream stream)
 		{
-			_wrapped.AddFile(path, stream);
+			Wrapped.AddFile(path, stream);
 		}
 
 		public void AddFile(string path, Stream stream, bool overrideExisting)
 		{
-			_wrapped.AddFile(path, stream, overrideExisting);
+			Wrapped.AddFile(path, stream, overrideExisting);
 		}
 
 		public IEnumerable<string> GetFiles(string path)
 		{
-			return _wrapped.GetFiles(path);
+			return Wrapped.GetFiles(path);
 		}
 
 		public IEnumerable<string> GetFiles(string path, string filter)
 		{
-			return _wrapped.GetFiles(path, filter);
+			return Wrapped.GetFiles(path, filter);
 		}
 
 		public Stream OpenFile(string path)
 		{
-			return _wrapped.OpenFile(path);
+			return Wrapped.OpenFile(path);
 		}
 
 		public void DeleteFile(string path)
 		{
-			_wrapped.DeleteFile(path);
+			Wrapped.DeleteFile(path);
 		}
 
 		public bool FileExists(string path)
 		{
-			return _wrapped.FileExists(path);
+			return Wrapped.FileExists(path);
 		}
 
 		public string GetRelativePath(string fullPathOrUrl)
 		{
-			return _wrapped.GetRelativePath(fullPathOrUrl);
+			return Wrapped.GetRelativePath(fullPathOrUrl);
 		}
 
 		public string GetFullPath(string path)
 		{
-			return _wrapped.GetFullPath(path);
+			return Wrapped.GetFullPath(path);
 		}
 
 		public string GetUrl(string path)
 		{
-			return _wrapped.GetUrl(path);
+			return Wrapped.GetUrl(path);
 		}
 
 		public DateTimeOffset GetLastModified(string path)
 		{
-			return _wrapped.GetLastModified(path);
+			return Wrapped.GetLastModified(path);
 		}
 
 		public DateTimeOffset GetCreated(string path)
 		{
-			return _wrapped.GetCreated(path);
+			return Wrapped.GetCreated(path);
 		}
 	}
+
+    public class FileSystemWrapper2 : FileSystemWrapper, IFileSystem2
+    {
+        public FileSystemWrapper2(IFileSystem2 fs)
+            : base(fs)
+        { }
+
+        public long GetSize(string path)
+        {
+            return ((IFileSystem2) Wrapped).GetSize(path);
+        }
+    }
 }

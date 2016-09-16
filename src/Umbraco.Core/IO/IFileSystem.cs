@@ -41,4 +41,10 @@ namespace Umbraco.Core.IO
 
         DateTimeOffset GetCreated(string path);
     }
+
+    // this should be part of IFileSystem but we don't want to change the interface
+    public interface IFileSystem2 : IFileSystem
+    {
+        long GetSize(string path);
+    }
 }

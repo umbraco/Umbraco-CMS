@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Media;
@@ -13,16 +12,16 @@ namespace Umbraco.Core.IO
 	/// A custom file system provider for media
 	/// </summary>
 	[FileSystemProvider("media")]
-	public class MediaFileSystem : FileSystemWrapper
+	public class MediaFileSystem : FileSystemWrapper2
 	{
 	    private readonly IContentSection _contentConfig;
 
-	    public MediaFileSystem(IFileSystem wrapped)
+	    public MediaFileSystem(IFileSystem2 wrapped)
 			: this(wrapped, UmbracoConfig.For.UmbracoSettings().Content)
 		{
 		}
 
-        public MediaFileSystem(IFileSystem wrapped, IContentSection contentConfig) : base(wrapped)
+        public MediaFileSystem(IFileSystem2 wrapped, IContentSection contentConfig) : base(wrapped)
         {
             _contentConfig = contentConfig;
         }

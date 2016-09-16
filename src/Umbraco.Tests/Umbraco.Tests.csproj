@@ -176,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CallContextTests.cs" />
+    <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\PetaPocoExpressionsTests.cs" />

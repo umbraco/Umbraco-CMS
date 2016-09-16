@@ -37,21 +37,14 @@ namespace Umbraco.Core.IO
             throw new ArgumentException("Retries must be greater than zero");
         }
 
+        // GetSize has been added to IFileSystem2 but not IFileSystem
+        // this is implementing GetSize for IFileSystem, the old way
         public static long GetSize(this IFileSystem fs, string path)
         {
-            // unwrap, eg MediaFileSystem is wrapping an IFileSystem
-            FileSystemWrapper w;
-            while ((w = fs as FileSystemWrapper) != null)
-                fs = w.Wrapped;
+            // if we reach this point, fs is *not* IFileSystem2
+            // so it's not FileSystemWrapper nor shadow nor anything we know
+            // so... fall back to the old & inefficient method
 
-            // no idea why GetSize is not part of IFileSystem, but
-            // for physical file system we have way better & faster ways
-            // to get the size, than to read the entire thing in memory!
-            var physical = fs as PhysicalFileSystem;
-            if (physical != null)
-                return physical.GetSize(path);
-
-            // other filesystems... bah...
             using (var file = fs.OpenFile(path))
             using (var sr = new StreamReader(file))
             {
