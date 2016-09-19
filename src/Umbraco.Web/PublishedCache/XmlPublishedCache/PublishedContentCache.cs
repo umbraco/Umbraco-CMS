@@ -58,7 +58,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 var iscanon = !UnitTesting && !DomainHelper.ExistsDomainInPath(DomainHelper.GetAllDomains(false), content.Path, domainRootNodeId);
                 // and only if this is the canonical url (the one GetUrl would return)
                 if (iscanon)
-                    _routesCache.Store(contentId, route);
+                    _routesCache.Store(content.Id, route);
             }
 
             return content;
