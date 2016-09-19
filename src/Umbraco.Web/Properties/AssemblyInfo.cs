@@ -32,3 +32,6 @@ using System.Security;
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder")]
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.AspNet")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
+// v8
+[assembly: InternalsVisibleTo("Umbraco.Compat7")]

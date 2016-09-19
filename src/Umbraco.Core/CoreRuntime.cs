@@ -28,6 +28,7 @@ namespace Umbraco.Core
     /// should be possible to use this runtime in console apps.</remarks>
     public class CoreRuntime : IRuntime
     {
+        private readonly UmbracoApplicationBase _app;
         private BootLoader _bootLoader;
         private RuntimeState _state;
 
@@ -38,14 +39,16 @@ namespace Umbraco.Core
         public CoreRuntime(UmbracoApplicationBase umbracoApplication)
         {
             if (umbracoApplication == null) throw new ArgumentNullException(nameof(umbracoApplication));
+            _app = umbracoApplication;
         }
 
         /// <inheritdoc/>
         public virtual void Boot(ServiceContainer container)
         {
             // some components may want to initialize with the UmbracoApplicationBase
-            // well, they should not - let's not do this
-            //container.RegisterInstance(_app);
+            // well, they should not - we should not do this - however, Compat7 wants
+            // it, so let's do it, but we should remove this eventually.
+            container.RegisterInstance(_app);
 
             Compose(container);
 

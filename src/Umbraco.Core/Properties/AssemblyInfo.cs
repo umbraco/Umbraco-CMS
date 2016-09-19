@@ -45,3 +45,6 @@ using System.Security.Permissions;
 
 //allow this to be mocked in our unit tests
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
+// v8
+[assembly: InternalsVisibleTo("Umbraco.Compat7")]

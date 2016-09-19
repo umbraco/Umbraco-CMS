@@ -121,6 +121,7 @@ ECHO.
 ECHO Restoring NuGet packages
 ECHO Into %nuGetFolder%
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Core\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
+..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Compat7\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
@@ -149,6 +150,7 @@ REN .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
 ECHO.
 ECHO Packing the NuGet release files
 ..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %VERSION% -Symbols -Verbosity quiet
+..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Compat7.nuspec -Version %VERSION% -Symbols -Verbosity quiet
 ..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %VERSION% -Verbosity quiet
 IF ERRORLEVEL 1 GOTO error
 

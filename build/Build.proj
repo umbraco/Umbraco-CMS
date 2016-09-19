@@ -264,8 +264,8 @@
     <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
     <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
     <!-- Build the Umbraco.Web.UI project -->
-    <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath);Verbosity=minimal" Targets="Clean;Rebuild;">
-    </MSBuild>
+    <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath);Verbosity=minimal" Targets="Clean;Rebuild;" />
+    <MSBuild Projects="..\src\Umbraco.Compat7\Umbraco.Compat7.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);Verbosity=minimal" Targets="Clean;Rebuild;" />
 
     <!-- DONE -->
     <Message Text="Finished compiling projects" Importance="high" />
