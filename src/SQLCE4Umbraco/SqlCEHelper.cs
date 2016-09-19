@@ -59,12 +59,11 @@ namespace SqlCE4Umbraco
             if (System.IO.File.Exists(ReplaceDataDirectory(localConnection.Database)))
             {
                 List<string> tables;
-                var noparms = new IParameter[0];
 
                 // drop foreign keys
                 // SQL may need "where constraint_catalog=DB_NAME() and ..."
                 tables = new List<string>();
-                using (var reader = ExecuteReader("select table_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' order by table_name", noparms))
+                using (var reader = ExecuteReader("select table_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' order by table_name"))
                 {
                     while (reader.Read()) tables.Add(reader.GetString("table_name").Trim());
                 }
@@ -72,21 +71,21 @@ namespace SqlCE4Umbraco
                 foreach (var table in tables)
                 {
                     var constraints = new List<string>();
-                    using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' and table_name = '" + table + "' order by constraint_name", noparms))
+                    using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' and table_name = '" + table + "' order by constraint_name"))
                     {
                         while (reader.Read()) constraints.Add(reader.GetString("constraint_name").Trim());
                     }
                     foreach (var constraint in constraints)
                     {
                         // SQL may need "[dbo].[table]"
-                        ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]", noparms);
+                        ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]");
                     }
                 }
 
                 // drop primary keys
                 // SQL may need "where constraint_catalog=DB_NAME() and ..."
                 tables = new List<string>();
-                using (var reader = ExecuteReader("select table_name from information_schema.table_constraints where constraint_type = 'PRIMARY KEY' order by table_name", noparms))
+                using (var reader = ExecuteReader("select table_name from information_schema.table_constraints where constraint_type = 'PRIMARY KEY' order by table_name"))
                 {
                     while (reader.Read()) tables.Add(reader.GetString("table_name").Trim());
                 }
@@ -94,27 +93,27 @@ namespace SqlCE4Umbraco
                 foreach (var table in tables)
                 {
                     var constraints = new List<string>();
-                    using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'PRIMARY KEY' and table_name = '" + table + "' order by constraint_name", noparms))
+                    using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'PRIMARY KEY' and table_name = '" + table + "' order by constraint_name"))
                     {
                         while (reader.Read()) constraints.Add(reader.GetString("constraint_name").Trim());
                     }
                     foreach (var constraint in constraints)
                     {
                         // SQL may need "[dbo].[table]"
-                        ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]", noparms);
+                        ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]");
                     }
                 }
 
                 // drop tables
                 tables = new List<string>();
-                using (var reader = ExecuteReader("select table_name from information_schema.tables where table_type <> 'VIEW' order by table_name", noparms))
+                using (var reader = ExecuteReader("select table_name from information_schema.tables where table_type <> 'VIEW' order by table_name"))
                 {
                     while (reader.Read()) tables.Add(reader.GetString("table_name").Trim());
                 }
 
                 foreach (var table in tables)
                 {
-                    ExecuteNonQuery("drop table [" + table + "]", noparms);
+                    ExecuteNonQuery("drop table [" + table + "]");
                 }
             }
         }
@@ -127,15 +126,14 @@ namespace SqlCE4Umbraco
         internal void DropForeignKeys(string table)
         {
             var constraints = new List<string>();
-            var noparms = new IParameter[0];
-            using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' and table_name = '" + table + "' order by constraint_name", noparms))
+            using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' and table_name = '" + table + "' order by constraint_name"))
             {
                 while (reader.Read()) constraints.Add(reader.GetString("constraint_name").Trim());
             }
             foreach (var constraint in constraints)
             {
                 // SQL may need "[dbo].[table]"
-                ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]", noparms);
+                ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]");
             }
         }
 
@@ -223,6 +221,17 @@ namespace SqlCE4Umbraco
 
             return new SqlCeDataReaderHelper(SqlCeApplicationBlock.ExecuteReader(ConnectionString, CommandType.Text,
                                                             commandText, parameters));
+        }
+
+        internal IRecordsReader ExecuteReader(string commandText)
+        {
+            return ExecuteReader(commandText, new SqlCEParameter(string.Empty, string.Empty));
+        }
+
+
+        internal int ExecuteNonQuery(string commandText)
+        {
+            return ExecuteNonQuery(commandText, new SqlCEParameter(string.Empty, string.Empty));
         }
     }
 }
