@@ -30,20 +30,26 @@ namespace Umbraco.Core.Packaging
         /// </remarks>
         public static IEnumerable<string> ScanAssembliesForTypeReference<T>(IEnumerable<byte[]> assemblys, out string[] errorReport)
         {
-            var appDomain = GetTempAppDomain();
-            var type = typeof(PackageBinaryInspector);
-            try
+            // need to wrap in a safe call context in order to prevent whatever Umbraco stores
+            // in the logical call context from flowing to the created app domain (eg, the
+            // UmbracoDatabase is *not* serializable and cannot and should not flow).
+            using (new SafeCallContext())
             {
-                var value = (PackageBinaryInspector)appDomain.CreateInstanceAndUnwrap(
-                       type.Assembly.FullName,
-                       type.FullName);
-                // do NOT turn PerformScan into static (even if ReSharper says so)!
-                var result = value.PerformScan<T>(assemblys.ToArray(), out errorReport);
-                return result;
-            }
-            finally
-            {
-                AppDomain.Unload(appDomain);
+                var appDomain = GetTempAppDomain();
+                var type = typeof(PackageBinaryInspector);
+                try
+                {
+                    var value = (PackageBinaryInspector)appDomain.CreateInstanceAndUnwrap(
+                           type.Assembly.FullName,
+                           type.FullName);
+                    // do NOT turn PerformScan into static (even if ReSharper says so)!
+                    var result = value.PerformScan<T>(assemblys.ToArray(), out errorReport);
+                    return result;
+                }
+                finally
+                {
+                    AppDomain.Unload(appDomain);
+                }
             }
         }
 
