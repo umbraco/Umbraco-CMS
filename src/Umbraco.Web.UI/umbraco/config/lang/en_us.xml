@@ -1345,10 +1345,15 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <!-- The following keys get these tokens passed in:
 	     0: Current value
+		   1: Server version
+	  -->
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%1%'.</key>
+
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
 		   1: Recommended value
 		   2: Server version
 	  -->
-    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%2%'.</key>
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
 
