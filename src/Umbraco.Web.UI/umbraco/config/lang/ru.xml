@@ -641,7 +641,7 @@
 		   1: Recommended value
 		   2: Server version
 	  -->
-    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Параметр 'Try Skip IIS Custom Errors' установлен в '%0%' и Вы используете IIS версии '%1%'.</key>
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Параметр 'Try Skip IIS Custom Errors' установлен в '%0%' и Вы используете IIS версии '%2%'.</key>
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">Параметр 'Try Skip IIS Custom Errors' сейчас установлен в '%0%'. Рекомендуется установить в '%1%' для Вашего текущего IIS версии (%2%).</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Параметр 'Try Skip IIS Custom Errors' успешно установлен в '%0%'.</key>
 

@@ -38,7 +38,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                var recommendedValue = _serverVersion >= new Version("7.5.0")
+                var recommendedValue = _serverVersion >= new Version("7.5")
                     ? bool.TrueString.ToLower()
                     : bool.FalseString.ToLower();
                 return new List<AcceptableConfiguration> { new AcceptableConfiguration { IsRecommended =  true, Value = recommendedValue } };
