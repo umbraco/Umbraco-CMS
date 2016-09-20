@@ -499,6 +499,7 @@
     <key alias="install">Установить</key>
     <key alias="invalid">Неверно</key>
     <key alias="justify">Выравнивание</key>
+    <key alias="label">Название</key>
     <key alias="language">Язык</key>
     <key alias="layout">Макет</key>
     <key alias="loading">Загрузка</key>
