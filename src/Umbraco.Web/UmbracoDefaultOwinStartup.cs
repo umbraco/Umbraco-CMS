@@ -11,7 +11,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
 using Umbraco.Web;
 using Umbraco.Web.Security.Identity;
-using Umbraco.Web.SignalR;
 
 [assembly: OwinStartup("UmbracoDefaultOwinStartup", typeof(UmbracoDefaultOwinStartup))]
 
