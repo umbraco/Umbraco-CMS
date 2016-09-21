@@ -261,11 +261,23 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          $scope.actionInProgress = false;
          $scope.listViewResultSet = data;
 
-         //update all values for display
+         // Update all values for display
          if ($scope.listViewResultSet.items) {
-            _.each($scope.listViewResultSet.items, function (e, index) {
-               setPropertyValues(e);
+
+            // For content, track any values that are referended node Ids
+            var referencedNodeIds = [];
+            _.each($scope.listViewResultSet.items, function (e) {
+                setPropertyValues(e, referencedNodeIds);
             });
+             
+            // If we've got some referenced nodeIds, update the numerical display of the node Id with the node names
+            if (referencedNodeIds.length > 0) {
+                contentResource.getByIds(referencedNodeIds).then(function (referencedNodes) {
+                    _.each($scope.listViewResultSet.items, function (e) {
+                        updatePropertyValuesForReferencedNodes(e, referencedNodes);
+                    });
+                });
+            }
          }
 
          if ($scope.entityType === 'media') {
@@ -536,32 +548,55 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
              });
    }
 
-   function getCustomPropertyValue(alias, properties) {
+   function getCustomPropertyValue(alias, properties, referencedNodeIds) {
       var value = '';
-      var index = 0;
-      var foundAlias = false;
-      for (var i = 0; i < properties.length; i++) {
-         if (properties[i].alias == alias) {
-            foundAlias = true;
-            break;
-         }
-         index++;
-      }
+      var index = getCustomPropertyIndex(alias, properties);
 
-      if (foundAlias) {
+      if (index > -1) {
          value = properties[index].value;
+         if (value) {
+             var editor = properties[index].editor;
+             if (editor === 'Umbraco.ContentPickerAlias') {
+                 trackReferencedNodeIdsInIncludedProperties(referencedNodeIds, value);
+             } else if (editor === 'Umbraco.MultiNodeTreePicker') {
+                 var pickedNodeIds = value.split(',');
+                 for (var j = 0; j < pickedNodeIds.length; j++) {
+                     trackReferencedNodeIdsInIncludedProperties(referencedNodeIds, pickedNodeIds[j]);
+                 }
+             }
+         }
       }
 
       return value;
    }
 
+   function getCustomPropertyIndex(alias, properties) {
+       var index = 0;
+       for (var i = 0; i < properties.length; i++) {
+           if (properties[i].alias === alias) {
+               return index;
+           }
+
+           index++;
+       }
+
+       return -1;
+   }
+
+   function trackReferencedNodeIdsInIncludedProperties(referencedNodeIdsInIncludedProperties, nodeId) {
+       var nodeIdAsNumber = parseInt(nodeId);
+       if (referencedNodeIdsInIncludedProperties.indexOf(nodeIdAsNumber) === -1) {
+           referencedNodeIdsInIncludedProperties.push(nodeIdAsNumber);
+       }
+   }
+
    /** This ensures that the correct value is set for each item in a row, we don't want to call a function during interpolation or ng-bind as performance is really bad that way */
-   function setPropertyValues(result) {
+   function setPropertyValues(result, referencedNodeIds) {
 
       //set the edit url
       result.editPath = createEditUrlCallback(result);
 
-      _.each($scope.options.includeProperties, function (e, i) {
+      _.each($scope.options.includeProperties, function (e) {
 
          var alias = e.alias;
 
@@ -575,7 +610,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
          // If we've got nothing yet, look at a user defined property
          if (typeof value === 'undefined') {
-            value = getCustomPropertyValue(alias, result.properties);
+            value = getCustomPropertyValue(alias, result.properties, referencedNodeIds);
          }
 
          // If we have a date, format it
@@ -586,8 +621,47 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          // set what we've got on the result
          result[alias] = value;
       });
+   }
 
+   function updatePropertyValuesForReferencedNodes(result, referencedNodes) {
+       _.each($scope.options.includeProperties, function (e) {
+           var alias = e.alias;
+           var propertyIndex = getCustomPropertyIndex(alias, result.properties);
+           if (propertyIndex > -1) {
+               var editor = result.properties[propertyIndex].editor;
+               var currentValue = result[alias];
+               var nodeName;
+               if (editor === 'Umbraco.ContentPickerAlias') {
+                   nodeName = getNameForReferencedNodeId(parseInt(currentValue), referencedNodes);
+                   if (nodeName !== '') {
+                       result[alias] = nodeName;
+                   }
+               } else if (editor === 'Umbraco.MultiNodeTreePicker') {
+                   var pickedNodeIds = currentValue.split(',');
+                   result[alias] = '';
+                   for (var j = 0; j < pickedNodeIds.length; j++) {
+                       nodeName = getNameForReferencedNodeId(parseInt(pickedNodeIds[j]), referencedNodes);
+                       if (nodeName !== '') {
+                           if (result[alias] !== '') {
+                               result[alias] += ', ';
+                           }
 
+                           result[alias] += nodeName;
+                       }
+                   }
+               }
+           }
+       });
+   }
+
+   function getNameForReferencedNodeId(nodeId, referencedNodes) {
+       for (var i = 0; i < referencedNodes.length; i++) {
+           if (referencedNodes[i].id === nodeId) {
+               return referencedNodes[i].name;
+           }
+       }
+
+       return '';
    }
 
    function isDate(val) {
