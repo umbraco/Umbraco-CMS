@@ -714,6 +714,7 @@
     <Content Include="Umbraco\Config\Lang\pt.xml" />
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
+    <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Umbraco\Controls\Tree\CustomTreeService.asmx" />
     <Content Include="Umbraco\Create\PartialViewMacro.ascx" />
     <Content Include="Umbraco\Dashboard\ExamineManagement.ascx" />
