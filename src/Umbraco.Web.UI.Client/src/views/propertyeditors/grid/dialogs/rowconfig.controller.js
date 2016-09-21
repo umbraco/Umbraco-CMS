@@ -14,7 +14,7 @@ function RowConfigController($scope) {
     };
 
     $scope.scaleDown = function(section) {
-        var remove = (section.grid > 1) ? 1 : section.grid;
+        var remove = (section.grid > 1) ? 1 : 0;
         section.grid = section.grid - remove;
     };
 
