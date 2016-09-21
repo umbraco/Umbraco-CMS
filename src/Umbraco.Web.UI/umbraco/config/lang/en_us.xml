@@ -460,6 +460,7 @@
     <key alias="install">Install</key>
     <key alias="invalid">Invalid</key>
     <key alias="justify">Justify</key>
+    <key alias="label">Label</key>
     <key alias="language">Language</key>
     <key alias="layout">Layout</key>
     <key alias="loading">Loading</key>
