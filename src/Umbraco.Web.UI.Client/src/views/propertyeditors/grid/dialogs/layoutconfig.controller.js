@@ -49,9 +49,12 @@ angular.module("umbraco")
     		    $scope.currentSection = section;
     		};
 
-
-    		$scope.deleteSection = function(index){
-    		    $scope.currentTemplate.sections.splice(index, 1);
+    		$scope.deleteSection = function(section, template) {
+    			if ($scope.currentSection === section) {
+    				$scope.currentSection = undefined;
+    			}
+    			var index = template.sections.indexOf(section)
+    			template.sections.splice(index, 1);
     		};
     		
     		$scope.closeSection = function(){
