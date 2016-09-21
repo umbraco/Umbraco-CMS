@@ -16,7 +16,7 @@
           Copyright © 2001 - 
           <asp:Literal ID="thisYear" runat="server"></asp:Literal>
           Umbraco / Niels Hartvig<br />
-          Developed by the <a href="http://our.umbraco.org/wiki/about/core-team" target="_blank">Umbraco Core
+          Developed by the <a href="https://our.umbraco.org/wiki/about/core-team" target="_blank">Umbraco Core
               Team</a><br />
           <br />
           

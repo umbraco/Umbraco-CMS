@@ -72,8 +72,8 @@
 			return {
 				longname : 'Umbraco Embed',
 				author : 'Tim Geyssens',
-				authorurl : 'http://http://umbraco.com/',
-				infourl : 'http://http://umbraco.com/',
+				authorurl : 'http://https://umbraco.com/',
+				infourl : 'http://https://umbraco.com/',
 				version : "1.0"
 			};
 		}

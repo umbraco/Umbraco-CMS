@@ -2,7 +2,7 @@
 <language alias="fr" intName="French" localName="français" lcid="12" culture="fr-FR">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Gérer les noms d'hôtes</key>
@@ -457,7 +457,7 @@
               <p>Pour poursuivre, éditez le fichier "web.config" (avec Visual Studio ou votre éditeur de texte favori), scrollez jusqu'en bas, ajoutez une "connection string" dans la ligne "umbracoDbDSN" et sauvegardez votre fichier.</p>
               <p>
               Cliquez sur le bouton <strong>Réessayer</strong> lorsque cela est fait.
-              <br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <br /><a href="https://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              Plus d'informations sur l'édition du fichier web.config ici.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Pour effectuer cette étape, vous devez d'abord connaître des informations de votre serveur de base de données ("connection string").<br />
         Contactez votre administrateur système si nécessaire.
@@ -514,7 +514,7 @@
     <key alias="runwayFromScratch">Je veux démarrer "from scratch"</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Votre site est vide pour le moment, ce qui est parfait si vous voulez commencer "from scratch" et créer vos propres types de documents et modèles d'affichages.
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Apprenez comment</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Apprenez comment</a>)
         Vous pouvez toujours choisir d'installer Runway plus tard. Pour cela allez dans la séction "Développeur" et séléctionnez "Packages".
       ]]></key>
     <key alias="runwayHeader">Vous avez mis en oeuvre une plateforme Umbraco clean. Que voulez-vous faire ensuite ?</key>
@@ -582,7 +582,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="greeting6">Joyeux samedi</key>
     <key alias="instruction">Connectez-vous ci-dessous</key>
     <key alias="timeout">La session a expiré</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Tableau de bord</key>

@@ -29,8 +29,8 @@
             return {
                 longname: 'Umbraco Save short cut key',
                 author: 'Umbraco HQ',
-                authorurl: 'http://umbraco.com',
-                infourl: 'http://our.umbraco.org',
+                authorurl: 'https://umbraco.com',
+                infourl: 'https://our.umbraco.org',
                 version: "1.0"
             };
         }

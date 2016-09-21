@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void DefaultUrl()
         {
-            Assert.IsTrue(SettingsSection.Help.DefaultUrl == "http://our.umbraco.org/wiki/umbraco-help/{0}/{1}");            
+            Assert.IsTrue(SettingsSection.Help.DefaultUrl == "https://our.umbraco.org/wiki/umbraco-help/{0}/{1}");            
         }
 
         [Test]
