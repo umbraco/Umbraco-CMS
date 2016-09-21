@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Web;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Owin;
 using Umbraco.Core;
@@ -61,6 +63,7 @@ namespace Umbraco.Web
                 .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
                 .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.Authorize)
+                .MapSignalR("/umbraco/signalr", new HubConfiguration {EnableDetailedErrors = true})
                 .FinalizeMiddlewareConfiguration();
         }
 
