@@ -30,6 +30,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get { return ValueComparisonType.ShouldEqual; }
         }
 
+        public override bool ValidIfConfigMissing
+        {
+            get { return true; }
+        }
+
         public override IEnumerable<AcceptableConfiguration> Values
         {
             get
