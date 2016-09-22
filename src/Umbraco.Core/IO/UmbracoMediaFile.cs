@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.IO;
 using System.Web;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 

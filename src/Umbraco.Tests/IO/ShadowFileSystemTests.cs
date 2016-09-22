@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.IO
@@ -14,14 +14,32 @@ namespace Umbraco.Tests.IO
     {
         [SetUp]
         public void SetUp()
-        { }
+        {
+            ClearFiles();
+        }
 
         [TearDown]
         public void TearDown()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
-            if (Directory.Exists(path) == false) return;
-            Directory.Delete(path, true);
+            ClearFiles();
+        }
+
+        private static void ClearFiles()
+        {
+            var path = IOHelper.MapPath("FileSysTests");
+            if (Directory.Exists(path))
+            {
+                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                    File.Delete(file);
+                Directory.Delete(path, true);
+            }
+            path = IOHelper.MapPath("App_Data");
+            if (Directory.Exists(path))
+            {
+                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                    File.Delete(file);
+                Directory.Delete(path, true);
+            }
         }
 
         private static string NormPath(string path)
@@ -32,7 +50,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteDirectory()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -66,7 +84,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteDirectoryInDir()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -115,7 +133,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteFile()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -154,7 +172,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteFileInDir()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -209,7 +227,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowCantCreateFile()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -228,7 +246,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowCreateFile()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -267,7 +285,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowCreateFileInDir()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -307,7 +325,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowAbort()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -328,7 +346,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowComplete()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -354,9 +372,182 @@ namespace Umbraco.Tests.IO
         }
 
         [Test]
+        public void ShadowScopeComplete()
+        {
+            var path = IOHelper.MapPath("FileSysTests");
+            var appdata = IOHelper.MapPath("App_Data");
+            Directory.CreateDirectory(path);
+
+            var fs = new PhysicalFileSystem(path, "ignore");
+            var sw = new ShadowWrapper(fs, "shadow");
+            var swa = new[] { sw };
+
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f1.txt", ms);
+            Assert.IsTrue(fs.FileExists("sub/f1.txt"));
+
+            Guid id;
+
+            // explicit shadow without scope does not work
+            sw.Shadow(id = Guid.NewGuid());
+            Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f2.txt", ms);
+            Assert.IsTrue(fs.FileExists("sub/f2.txt"));
+            sw.UnShadow(true);
+            Assert.IsTrue(fs.FileExists("sub/f2.txt"));
+            Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
+
+            // shadow with scope but no complete does not complete
+            var scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f3.txt", ms);
+            Assert.IsFalse(fs.FileExists("sub/f3.txt"));
+            Assert.AreEqual(1, Directory.GetDirectories(appdata + "/Shadow").Length);
+            scope.Dispose();
+            Assert.IsFalse(fs.FileExists("sub/f3.txt"));
+            Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
+
+            // shadow with scope and complete does complete
+            scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f4.txt", ms);
+            Assert.IsFalse(fs.FileExists("sub/f4.txt"));
+            Assert.AreEqual(1, Directory.GetDirectories(appdata + "/Shadow").Length);
+            scope.Complete();
+            Assert.IsTrue(fs.FileExists("sub/f4.txt"));
+            Assert.AreEqual(0, Directory.GetDirectories(appdata + "/Shadow").Length);
+            scope.Dispose();
+            Assert.IsTrue(fs.FileExists("sub/f4.txt"));
+            Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
+
+            // test scope for "another thread"
+
+            scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f5.txt", ms);
+            Assert.IsFalse(fs.FileExists("sub/f5.txt"));
+            using (new SafeCallContext()) // pretend we're another thread w/out scope
+            {
+                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                    sw.AddFile("sub/f6.txt", ms);
+            }
+            Assert.IsTrue(fs.FileExists("sub/f6.txt")); // other thread has written out to fs
+            scope.Complete();
+            Assert.IsTrue(fs.FileExists("sub/f5.txt"));
+            scope.Dispose();
+            Assert.IsTrue(fs.FileExists("sub/f5.txt"));
+            Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
+        }
+
+        [Test]
+        public void ShadowScopeCompleteWithFileConflict()
+        {
+            var path = IOHelper.MapPath("FileSysTests");
+            var appdata = IOHelper.MapPath("App_Data");
+            Directory.CreateDirectory(path);
+
+            var fs = new PhysicalFileSystem(path, "ignore");
+            var sw = new ShadowWrapper(fs, "shadow");
+            var swa = new[] { sw };
+
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f1.txt", ms);
+            Assert.IsTrue(fs.FileExists("sub/f1.txt"));
+
+            Guid id;
+
+            var scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f2.txt", ms);
+            Assert.IsFalse(fs.FileExists("sub/f2.txt"));
+            using (new SafeCallContext()) // pretend we're another thread w/out scope
+            {
+                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("bar")))
+                    sw.AddFile("sub/f2.txt", ms);
+            }
+            Assert.IsTrue(fs.FileExists("sub/f2.txt")); // other thread has written out to fs
+            scope.Complete();
+            Assert.IsTrue(fs.FileExists("sub/f2.txt"));
+            scope.Dispose();
+            Assert.IsTrue(fs.FileExists("sub/f2.txt"));
+            Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
+
+            string text;
+            using (var s = fs.OpenFile("sub/f2.txt"))
+            using (var r = new StreamReader(s))
+                text = r.ReadToEnd();
+
+            // the shadow filesystem will happily overwrite anything it can
+            Assert.AreEqual("foo", text);
+        }
+
+        [Test]
+        public void ShadowScopeCompleteWithDirectoryConflict()
+        {
+            var path = IOHelper.MapPath("FileSysTests");
+            var appdata = IOHelper.MapPath("App_Data");
+            Directory.CreateDirectory(path);
+
+            var fs = new PhysicalFileSystem(path, "ignore");
+            var sw = new ShadowWrapper(fs, "shadow");
+            var swa = new[] { sw };
+
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f1.txt", ms);
+            Assert.IsTrue(fs.FileExists("sub/f1.txt"));
+
+            Guid id;
+
+            var scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f2.txt", ms);
+            Assert.IsFalse(fs.FileExists("sub/f2.txt"));
+            using (new SafeCallContext()) // pretend we're another thread w/out scope
+            {
+                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("bar")))
+                    sw.AddFile("sub/f2.txt/f2.txt", ms);
+            }
+            Assert.IsTrue(fs.FileExists("sub/f2.txt/f2.txt")); // other thread has written out to fs
+
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f3.txt", ms);
+            Assert.IsFalse(fs.FileExists("sub/f3.txt"));
+
+            try
+            {
+                // no way this can work since we're trying to write a file
+                // but there's now a directory with the same name on the real fs
+                scope.Complete();
+                Assert.Fail("Expected AggregateException.");
+            }
+            catch (AggregateException ae)
+            {
+                Assert.AreEqual(1, ae.InnerExceptions.Count);
+                var e = ae.InnerExceptions[0];
+                Assert.IsNotNull(e.InnerException);
+                Assert.IsInstanceOf<AggregateException>(e);
+                ae = (AggregateException) e;
+
+                Assert.AreEqual(1, ae.InnerExceptions.Count);
+                e = ae.InnerExceptions[0];
+                Assert.IsNotNull(e.InnerException);
+                Assert.IsInstanceOf<UnauthorizedAccessException>(e.InnerException);
+            }
+
+            // still, the rest of the changes has been applied ok
+            Assert.IsTrue(fs.FileExists("sub/f3.txt"));
+        }
+
+        [Test]
         public void GetFilesReturnsChildrenOnly()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             File.WriteAllText(path + "/f1.txt", "foo");
             Directory.CreateDirectory(path + "/test");
@@ -378,7 +569,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void DeleteDirectoryAndFiles()
         {
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var path = IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             File.WriteAllText(path + "/f1.txt", "foo");
             Directory.CreateDirectory(path + "/test");

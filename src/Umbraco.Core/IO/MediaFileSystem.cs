@@ -12,7 +12,7 @@ namespace Umbraco.Core.IO
 	/// A custom file system provider for media
 	/// </summary>
 	[FileSystemProvider("media")]
-	public class MediaFileSystem : FileSystemWrapper2
+	public class MediaFileSystem : FileSystemWrapper
 	{
 	    private readonly IContentSection _contentConfig;
 

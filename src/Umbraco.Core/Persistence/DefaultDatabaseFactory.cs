@@ -181,15 +181,12 @@ namespace Umbraco.Core.Persistence
 	        if (HttpContext.Current == null)
 	        {
                 if (NonContextValue != null) throw new InvalidOperationException();
-                NonContextValue = database;
+	            if (database != null) NonContextValue = database;
             }
 	        else
 	        {
                 if (HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] != null) throw new InvalidOperationException();
-                if (database == null)
-                    HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
-                else
-                    HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] = database;
+                if (database != null) HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] = database;
 	        }
         }
 

@@ -5,8 +5,6 @@ using System.Linq;
 
 namespace Umbraco.Core.IO
 {
-    // at the moment this is just a wrapper
-
     public class ShadowFileSystem : IFileSystem2
     {
         private readonly IFileSystem _fs;
@@ -18,30 +16,51 @@ namespace Umbraco.Core.IO
             _sfs = sfs;
         }
 
-        public IFileSystem Inner { get { return _fs; } }
+        public IFileSystem Inner
+        {
+            get { return _fs; }
+        }
 
         public void Complete()
         {
             if (_nodes == null) return;
+            var exceptions = new List<Exception>();
             foreach (var kvp in _nodes)
             {
                 if (kvp.Value.IsExist)
                 {
                     if (kvp.Value.IsFile)
                     {
-                        using (var stream = _sfs.OpenFile(kvp.Key))
-                            _fs.AddFile(kvp.Key, stream, true);
+                        try
+                        {
+                            using (var stream = _sfs.OpenFile(kvp.Key))
+                                _fs.AddFile(kvp.Key, stream, true);
+                        }
+                        catch (Exception e)
+                        {
+                            exceptions.Add(new Exception("Could not save file \"" + kvp.Key + "\".", e));
+                        }
                     }
                 }
                 else
                 {
-                    if (kvp.Value.IsDir)
-                        _fs.DeleteDirectory(kvp.Key, true);
-                    else
-                        _fs.DeleteFile(kvp.Key);
+                    try
+                    {
+                        if (kvp.Value.IsDir)
+                            _fs.DeleteDirectory(kvp.Key, true);
+                        else
+                            _fs.DeleteFile(kvp.Key);
+                    }
+                    catch (Exception e)
+                    {
+                        exceptions.Add(new Exception("Could not delete " + (kvp.Value.IsDir ? "directory": "file") + " \"" + kvp.Key + "\".", e));
+                    }
                 }
             }
             _nodes.Clear();
+
+            if (exceptions.Count == 0) return;
+            throw new AggregateException("Failed to apply all changes (see exceptions).", exceptions);
         }
 
         private Dictionary<string, ShadowNode> _nodes;
@@ -255,6 +274,8 @@ namespace Umbraco.Core.IO
             ShadowNode sf;
             if (Nodes.TryGetValue(NormPath(path), out sf) == false)
             {
+                // the inner filesystem (_fs) can be IFileSystem2... or just IFileSystem
+                // figure it out and use the most effective GetSize method
                 var fs2 = _fs as IFileSystem2;
                 return fs2 == null ? _fs.GetSize(path) : fs2.GetSize(path);
             }

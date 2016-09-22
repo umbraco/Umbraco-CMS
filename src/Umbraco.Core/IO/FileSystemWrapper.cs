@@ -14,7 +14,7 @@ namespace Umbraco.Core.IO
 	/// 
 	/// This abstract class just wraps the 'real' IFileSystem object passed in to its constructor.
 	/// </remarks>
-	public abstract class FileSystemWrapper : IFileSystem
+	public abstract class FileSystemWrapper : IFileSystem2
 	{
 	    protected FileSystemWrapper(IFileSystem wrapped)
 		{
@@ -102,17 +102,12 @@ namespace Umbraco.Core.IO
 		{
 			return Wrapped.GetCreated(path);
 		}
-	}
 
-    public class FileSystemWrapper2 : FileSystemWrapper, IFileSystem2
-    {
-        public FileSystemWrapper2(IFileSystem2 fs)
-            : base(fs)
-        { }
-
-        public long GetSize(string path)
-        {
-            return ((IFileSystem2) Wrapped).GetSize(path);
-        }
+        // explicitely implementing - not breaking
+	    long IFileSystem2.GetSize(string path)
+	    {
+	        var wrapped2 = Wrapped as IFileSystem2;
+	        return wrapped2 == null ? Wrapped.GetSize(path) : wrapped2.GetSize(path);
+	    }
     }
 }

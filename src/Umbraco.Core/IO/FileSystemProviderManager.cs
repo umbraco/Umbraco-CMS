@@ -2,23 +2,16 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Web.Hosting;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {	
     public class FileSystemProviderManager
     {
         private readonly FileSystemProvidersSection _config;
-        private readonly object _shadowLocker = new object();
-        private readonly WeakSet<FileSystemWrapper> _fs = new WeakSet<FileSystemWrapper>();
-        private readonly bool _shadowEnabled;
-        private Guid _shadow = Guid.Empty;
-        private FileSystemWrapper[] _shadowFs;
+        private readonly WeakSet<ShadowWrapper> _wrappers = new WeakSet<ShadowWrapper>();
 
         // actual well-known filesystems returned by properties
         private readonly IFileSystem2 _macroPartialFileSystem;
@@ -30,13 +23,13 @@ namespace Umbraco.Core.IO
         private readonly IFileSystem2 _mvcViewsFileSystem;
 
         // when shadowing is enabled, above filesystems, as wrappers
-        private readonly FileSystemWrapper2 _macroPartialFileSystemWrapper;
-        private readonly FileSystemWrapper2 _partialViewsFileSystemWrapper;
-        private readonly FileSystemWrapper2 _stylesheetsFileSystemWrapper;
-        private readonly FileSystemWrapper2 _scriptsFileSystemWrapper;
-        private readonly FileSystemWrapper2 _xsltFileSystemWrapper;
-        private readonly FileSystemWrapper2 _masterPagesFileSystemWrapper;
-        private readonly FileSystemWrapper2 _mvcViewsFileSystemWrapper;
+        private readonly ShadowWrapper _macroPartialFileSystemWrapper;
+        private readonly ShadowWrapper _partialViewsFileSystemWrapper;
+        private readonly ShadowWrapper _stylesheetsFileSystemWrapper;
+        private readonly ShadowWrapper _scriptsFileSystemWrapper;
+        private readonly ShadowWrapper _xsltFileSystemWrapper;
+        private readonly ShadowWrapper _masterPagesFileSystemWrapper;
+        private readonly ShadowWrapper _mvcViewsFileSystemWrapper;
 
         #region Singleton & Constructor
 
@@ -59,31 +52,15 @@ namespace Umbraco.Core.IO
             _masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             _mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
 
-            // if shadow is enable we need a mean to replace the filesystem by a shadowed filesystem, however we cannot
-            // replace the actual filesystem as we don't know if anything is not holding an app-long reference to them,
-            // so we have to force-wrap each of them and work with the wrapped filesystem. if shadow is not enabled,
-            // no need to wrap (small perfs improvement).
+            _macroPartialFileSystem = _macroPartialFileSystemWrapper = new ShadowWrapper(_macroPartialFileSystem, "Views/MacroPartials");
+            _partialViewsFileSystem = _partialViewsFileSystemWrapper = new ShadowWrapper(_partialViewsFileSystem, "Views/Partials");
+            _stylesheetsFileSystem = _stylesheetsFileSystemWrapper = new ShadowWrapper(_stylesheetsFileSystem, "css");
+            _scriptsFileSystem = _scriptsFileSystemWrapper = new ShadowWrapper(_scriptsFileSystem, "scripts");
+            _xsltFileSystem = _xsltFileSystemWrapper = new ShadowWrapper(_xsltFileSystem, "xslt");
+            _masterPagesFileSystem = _masterPagesFileSystemWrapper = new ShadowWrapper(_masterPagesFileSystem, "masterpages");
+            _mvcViewsFileSystem = _mvcViewsFileSystemWrapper = new ShadowWrapper(_mvcViewsFileSystem, "Views");
 
-            // fixme - irks!
-            // but cannot be enabled by deploy from an application event handler, because by the time an app event handler
-            // is instanciated it is already too late and some filesystems have been referenced by Core. here we force
-            // enable for deploy... but maybe it should be some sort of config option?
-            _shadowEnabled = AppDomain.CurrentDomain.GetAssemblies().Any(x => x.GetName().Name == "Umbraco.Deploy");
-
-            if (_shadowEnabled)
-            {
-                _macroPartialFileSystem = _macroPartialFileSystemWrapper = new FileSystemWrapper2(_macroPartialFileSystem);
-                _partialViewsFileSystem = _partialViewsFileSystemWrapper = new FileSystemWrapper2(_partialViewsFileSystem);
-                _stylesheetsFileSystem = _stylesheetsFileSystemWrapper = new FileSystemWrapper2(_stylesheetsFileSystem);
-                _scriptsFileSystem = _scriptsFileSystemWrapper = new FileSystemWrapper2(_scriptsFileSystem);
-                _xsltFileSystem = _xsltFileSystemWrapper = new FileSystemWrapper2(_xsltFileSystem);
-                _masterPagesFileSystem = _masterPagesFileSystemWrapper = new FileSystemWrapper2(_masterPagesFileSystem);
-                _mvcViewsFileSystem = _mvcViewsFileSystemWrapper = new FileSystemWrapper2(_mvcViewsFileSystem);
-            }
-
-            // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again,
-            // whether shadow is enabled or not
-
+            // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
             MediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
         }
 
@@ -194,12 +171,14 @@ namespace Umbraco.Core.IO
 
 			        return attr.Alias;
 		        });
-			
+
             // gets the inner fs, create the strongly-typed fs wrapping the inner fs, register & return
+            // so we are double-wrapping here
+            // could be optimized by having FileSystemWrapper inherit from ShadowWrapper, maybe
             var innerFs = GetUnderlyingFileSystemProvider(alias);
+            var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias);
 	        var fs = (TFileSystem) Activator.CreateInstance(typeof (TFileSystem), innerFs);
-            if (_shadowEnabled)
-                _fs.Add(fs);
+            _wrappers.Add(shadowWrapper); // keeping a weak reference to the wrapper
 	        return fs;
         }
 
@@ -225,88 +204,21 @@ namespace Umbraco.Core.IO
         //    _shadowEnabled = true;
         //}
 
-        internal void Shadow(Guid id)
+        public ShadowFileSystemsScope Shadow(Guid id)
         {
-            lock (_shadowLocker)
-            {
-                if (_shadowEnabled == false) throw new InvalidOperationException("Shadowing is not enabled.");
-                if (_shadow != Guid.Empty) throw new InvalidOperationException("Already shadowing (" + _shadow + ").");
-                _shadow = id;
+            var typed = _wrappers.ToArray();
+            var wrappers = new ShadowWrapper[typed.Length + 7];
+            var i = 0;
+            while (i < typed.Length) wrappers[i] = typed[i++];
+            wrappers[i++] = _macroPartialFileSystemWrapper;
+            wrappers[i++] = _partialViewsFileSystemWrapper;
+            wrappers[i++] = _stylesheetsFileSystemWrapper;
+            wrappers[i++] = _scriptsFileSystemWrapper;
+            wrappers[i++] = _xsltFileSystemWrapper;
+            wrappers[i++] = _masterPagesFileSystemWrapper;
+            wrappers[i] = _mvcViewsFileSystemWrapper;
 
-                LogHelper.Debug<FileSystemProviderManager>("Shadow " + id + ".");
-
-                ShadowFs(id, _macroPartialFileSystemWrapper, "Views/MacroPartials");
-                ShadowFs(id, _partialViewsFileSystemWrapper, "Views/Partials");
-                ShadowFs(id, _stylesheetsFileSystemWrapper, "css");
-                ShadowFs(id, _scriptsFileSystemWrapper, "scripts");
-                ShadowFs(id, _xsltFileSystemWrapper, "xslt");
-                ShadowFs(id, _masterPagesFileSystemWrapper, "masterpages");
-                ShadowFs(id, _mvcViewsFileSystemWrapper, "Views");
-
-                _shadowFs = _fs.ToArray();
-                foreach (var fs in _shadowFs)
-                    ShadowFs(id, fs, "stfs/" + fs.GetType().FullName);
-            }
-        }
-
-        private static void ShadowFs(Guid id, FileSystemWrapper filesystem, string path)
-        {
-            var virt = "~/App_Data/Shadow/" + id + "/" + path;
-            var dir = HostingEnvironment.MapPath(virt);
-            if (dir == null) throw new InvalidOperationException("Could not map path.");
-            Directory.CreateDirectory(dir);
-
-            // shadow filesystem pretends to be IFileSystem2 even though the inner filesystem
-            // is not, by invoking the GetSize extension method when needed.
-            var shadowFs = new ShadowFileSystem(filesystem.Wrapped, new PhysicalFileSystem(virt));
-            filesystem.Wrapped = shadowFs;
-        }
-
-        internal void UnShadow(bool complete)
-        {
-            lock (_shadowLocker)
-            {
-                if (_shadow == Guid.Empty) return;
-
-                // copy and null before anything else
-                var shadow = _shadow;
-                var shadowFs = _shadowFs;
-                _shadow = Guid.Empty;
-                _shadowFs = null;
-
-                LogHelper.Debug<FileSystemProviderManager>("UnShadow " + shadow + (complete?" (complete)":" (abort)") + ".");
-
-                if (complete)
-                {
-                    ((ShadowFileSystem) _macroPartialFileSystemWrapper.Wrapped).Complete();
-                    ((ShadowFileSystem) _partialViewsFileSystemWrapper.Wrapped).Complete();
-                    ((ShadowFileSystem) _stylesheetsFileSystemWrapper.Wrapped).Complete();
-                    ((ShadowFileSystem) _scriptsFileSystemWrapper.Wrapped).Complete();
-                    ((ShadowFileSystem) _xsltFileSystemWrapper.Wrapped).Complete();
-                    ((ShadowFileSystem) _masterPagesFileSystemWrapper.Wrapped).Complete();
-                    ((ShadowFileSystem) _mvcViewsFileSystemWrapper.Wrapped).Complete();
-
-                    foreach (var fs in shadowFs)
-                        ((ShadowFileSystem) fs.Wrapped).Complete();
-                }
-
-                UnShadowFs(_macroPartialFileSystemWrapper);
-                UnShadowFs(_partialViewsFileSystemWrapper);
-                UnShadowFs(_stylesheetsFileSystemWrapper);
-                UnShadowFs(_scriptsFileSystemWrapper);
-                UnShadowFs(_xsltFileSystemWrapper);
-                UnShadowFs(_masterPagesFileSystemWrapper);
-                UnShadowFs(_mvcViewsFileSystemWrapper);
-
-                foreach (var fs in shadowFs)
-                    UnShadowFs(fs);
-            }
-        }
-
-        private static void UnShadowFs(FileSystemWrapper filesystem)
-        {
-            var inner = ((ShadowFileSystem) filesystem.Wrapped).Inner;
-            filesystem.Wrapped = inner;
+            return ShadowFileSystemsScope.CreateScope(id, wrappers);
         }
 
         #endregion
