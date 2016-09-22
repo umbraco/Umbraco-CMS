@@ -15,12 +15,14 @@ namespace Umbraco.Tests.IO
         [SetUp]
         public void SetUp()
         {
+            SafeCallContext.Clear();
             ClearFiles();
         }
 
         [TearDown]
         public void TearDown()
         {
+            SafeCallContext.Clear();
             ClearFiles();
         }
 
