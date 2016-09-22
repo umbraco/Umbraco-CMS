@@ -149,6 +149,7 @@
     <key alias="otherElements">Propriétés</key>
     <key alias="parentNotPublished">Ce document est publié mais n'est pas visible car son parent '%0%' n'est pas publié</key>
     <key alias="parentNotPublishedAnomaly">Oups : ce document est publié mais n'est pas présent dans le cache (erreur interne Umbraco)</key>
+    <key alias="getUrlException">Oups: impossible d'obtenir cet url (erreur interne - voir fichier log)</key>
     <key alias="routeError">Oups: ce document est publié mais son url entrerait en collision avec le contenu %0%</key>
     <key alias="publish">Publier</key>
     <key alias="publishStatus">Statut de publication</key>
@@ -170,7 +171,9 @@
     <key alias="notmemberof">Pas membre du/des groupe(s)</key>
     <key alias="childItems" version="7.0">Eléments enfants</key>
     <key alias="target" version="7.0">Cible</key>
-  </area>
+    <key alias="scheduledPublishServerTime">Ceci se traduit par l'heure suivante sur le serveur :</key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Qu'est-ce que cela signifie?</a>]]></key>
+</area>
   <area alias="media">
     <key alias="clickToUpload">Cliquez pour télécharger</key>
     <key alias="dropFilesHere">Faites glisser vos fichier ici...</key>
@@ -211,22 +214,27 @@
   </area>
   <area alias="bulk">
     <key alias="done">Terminé</key>
+	
     <key alias="deletedItem">%0% élément supprimé</key>
     <key alias="deletedItems">%0% éléments supprimés</key>
     <key alias="deletedItemOfItem">%0% élément sur %1% supprimé</key>
     <key alias="deletedItemOfItems">%0% éléments sur %1% supprimés</key>
+	
     <key alias="publishedItem">%0% élément publié</key>
     <key alias="publishedItems">%0% éléments publiés</key>
     <key alias="publishedItemOfItem">%0% élément sur %1% publié</key>
     <key alias="publishedItemOfItems">%0% éléments sur %1% publiés</key>
+	
     <key alias="unpublishedItem">%0% élément dépublié</key>
     <key alias="unpublishedItems">%0% éléments dépubliés</key>
     <key alias="unpublishedItemOfItem">%0% élément sur %1% dépublié</key>
     <key alias="unpublishedItemOfItems">%0% éléments sur %1% dépubliés</key>
+	
     <key alias="movedItem">%0% élément déplacé</key>
     <key alias="movedItems">%0% éléments déplacés</key>
     <key alias="movedItemOfItem">%0% élément sur %1% déplacé</key>
     <key alias="movedItemOfItems">%0% éléments sur %1% déplacés</key>
+	
     <key alias="copiedItem">%0% élément copié</key>
     <key alias="copiedItems">%0% éléments copiés</key>
     <key alias="copiedItemOfItem">%0% élément sur %1% copié</key>
@@ -452,6 +460,7 @@
     <key alias="install">Installer</key>
     <key alias="invalid">Non valide</key>
     <key alias="justify">Justifier</key>
+	<key alias="label">Libellé</key>
     <key alias="language">Langue</key>
     <key alias="layout">Mise en page</key>
     <key alias="loading">En cours de chargement</key>
@@ -592,7 +601,8 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Le mot de passe par défaut a été modifié avec succès depuis l'installation!</strong></p><p>Aucune autre action n'est requise. Cliquez sur <strong>Suivant</strong> pour poursuivre.]]></key>
     <key alias="defaultUserPasswordChanged">Le mot de passe a été modifié !</key>
     <key alias="defaultUserText">
-		<![CDATA[Umbraco crée un utilisateur par défaut avec le login <strong>('admin')</strong> et le mot de passe <strong>('default')</strong>. Il est <strong>important</strong> que ce mot de passe soit modifié en quelque-chose de sécurisé et unique.]]></key>
+		<![CDATA[Umbraco crée un utilisateur par défaut avec le login <strong>('admin')</strong> et le mot de passe <strong>('default')</strong>. Il est <strong>important</strong> que ce mot de passe soit modifié en quelque-chose de sécurisé et unique.
+		]]></key>
     <key alias="greatStart">Pour bien commencer, regardez nos vidéos d'introduction</key>
     <key alias="licenseText">En cliquant sur le bouton "Suivant" (ou en modifiant umbracoConfigurationStatus dans le fichier web.config), vous acceptez la licence de ce logiciel telle que spécifiée dans le champ ci-dessous. Veuillez noter que cette distribution Umbraco consiste en deux licences différentes, la licence open source MIT pour le framework et la licence Umbraco freeware qui couvre l'UI.</key>
     <key alias="None">Pas encore installé.</key>
@@ -690,7 +700,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="greeting5">Joyeux vendredi</key>
     <key alias="greeting6">Joyeux samedi</key>
     <key alias="instruction">Connectez-vous ci-dessous</key>
-    <key alias="timeout">La session a expiré</key>
+	<key alias="signInWith">Identifiez-vous avec</key>
+	<key alias="timeout">La session a expiré</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Mot de passe oublié?</key>
     <key alias="forgottenPasswordInstruction">Un email contenant un lien pour ré-initialiser votre mot de passe sera envoyé à l'adresse spécifiée</key>
@@ -800,6 +811,14 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="packageVersion">Version du package</key>
     <key alias="packageVersionHistory">Historique des versions du package</key>
     <key alias="viewPackageWebsite">Voir le site internet du package</key>
+    <key alias="packageAlreadyInstalled">Package déjà installé</key>
+    <key alias="targetVersionMismatch">Ce package ne peut pas être installé, il nécessite au minimum la version Umbraco %0%</key>
+    <key alias="installStateUninstalling">Désinstallation...</key>
+    <key alias="installStateDownloading">Téléchargement...</key>
+    <key alias="installStateImporting">Import...</key>
+    <key alias="installStateInstalling">Installation...</key>
+    <key alias="installStateRestarting">Redémarrage, veuillez patienter...</key>
+    <key alias="installStateComplete">Terminé, votre navigateur va être rafraîchi, veuillez patienter...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Coller en conservant le formatage (non recommandé)</key>
@@ -1401,4 +1420,22 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Un email de notification a été envoyé à <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[L'adresse email de notification est toujours à sa valeur par défaut : <strong>%0%</strong>.]]></key>
-  </area></language>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">Désactiver URL tracker</key>
+    <key alias="enableUrlTracker">Activer URL tracker</key>
+    <key alias="originalUrl">URL original</key>
+    <key alias="redirectedTo">Redirigé Vers</key>
+    <key alias="noRedirects">Aucune redirection n'a été créée</key>
+    <key alias="noRedirectsDescription">Lorsqu'une page publiée est renommée ou déplacée, une redirection sera automatiquement créée vers la nouvelle page.</key>
+    <key alias="removeButton">Supprimer</key>
+    <key alias="confirmRemove">Etes-vous certain(e) de vouloir supprimer la redirection de '%0%' vers '%1%'?</key>
+    <key alias="redirectRemoved">Redirection d'URL supprimée.</key>
+    <key alias="redirectRemoveError">Erreur lors de la suppression de la redirection d'URL.</key>
+    <key alias="confirmDisable">Etes-vous certain(e) de vouloir désactiver le URL tracker?</key>
+    <key alias="disabledConfirm">URL tracker est maintenant désactivé.</key>
+    <key alias="disableError">Erreur lors de la désactivation de l'URL tracker, plus d'information disponible dans votre fichier log.</key>
+    <key alias="enabledConfirm">URL tracker est maintenant activé.</key>
+    <key alias="enableError">Erreur lors de l'activation de l'URL tracker, plus d'information disponible dans votre fichier log.</key>
+  </area>
+</language>
