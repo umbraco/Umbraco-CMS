@@ -58,9 +58,9 @@ namespace Umbraco.Tests.DependencyInjection
             container.ConfigureUmbracoCore();
 
             TestCollectionBuilder.Register(container)
-                .AddProducer(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
-                .AddProducer(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
-                .AddProducer(() => new[] { typeof(TransientObject1) });
+                .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
+                .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
+                .Add(() => new[] { typeof(TransientObject1) });
 
             var values = container.GetInstance<TestCollection>();
 
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.DependencyInjection
                 .Add<TransientObject3>()
                 .Add<TransientObject2>()
                 .Add<TransientObject3>()
-                .AddProducer(() => new[] { typeof(TransientObject1) });
+                .Add(() => new[] { typeof(TransientObject1) });
 
             var values = container.GetInstance<TestCollection>();
 
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.DependencyInjection
                 //.Add<TransientObject4>()
 
                 // legal so far...
-                .AddProducer(() => new[] { typeof(TransientObject4)  });
+                .Add(() => new[] { typeof(TransientObject4)  });
 
 	        Assert.Throws<InvalidOperationException>(() =>
 	        {
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.DependencyInjection
 
             TestCollectionBuilder.Register(container)
                 .Add<TransientObject3>()
-                .AddProducer(() => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) })
+                .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) })
                 .Exclude<TransientObject3>();
 
             var values = container.GetInstance<TestCollection>();

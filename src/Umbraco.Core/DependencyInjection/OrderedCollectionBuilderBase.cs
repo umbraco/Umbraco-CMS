@@ -21,6 +21,16 @@ namespace Umbraco.Core.DependencyInjection
         protected abstract TBuilder This { get; }
 
         /// <summary>
+        /// Clears all types in the collection.
+        /// </summary>
+        /// <returns>The buidler.</returns>
+        public TBuilder Clear()
+        {
+            Configure(types => types.Clear());
+            return This;
+        }
+
+        /// <summary>
         /// Appends a type to the collection.
         /// </summary>
         /// <typeparam name="T">The type to append.</typeparam>
@@ -31,6 +41,22 @@ namespace Umbraco.Core.DependencyInjection
             Configure(types =>
             {
                 var type = typeof (T);
+                if (types.Contains(type)) types.Remove(type);
+                types.Add(type);
+            });
+            return This;
+        }
+
+        /// <summary>
+        /// Appends a type to the collection.
+        /// </summary>
+        /// <param name="type">The type to append.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Append(Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(type, "register");
                 if (types.Contains(type)) types.Remove(type);
                 types.Add(type);
             });
@@ -49,8 +75,7 @@ namespace Umbraco.Core.DependencyInjection
                 foreach (var type in types)
                 {
                     // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
-                    if (typeof(TItem).IsAssignableFrom(type) == false)
-                        throw new InvalidOperationException($"Cannot register type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
+                    EnsureType(type, "register");
                     if (list.Contains(type)) list.Remove(type);
                     list.Add(type);
                 }
@@ -70,8 +95,7 @@ namespace Umbraco.Core.DependencyInjection
                 foreach (var type in types(Container))
                 {
                     // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
-                    if (typeof(TItem).IsAssignableFrom(type) == false)
-                        throw new InvalidOperationException($"Cannot register type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
+                    EnsureType(type, "register");
                     if (list.Contains(type)) list.Remove(type);
                     list.Add(type);
                 }
@@ -126,6 +150,35 @@ namespace Umbraco.Core.DependencyInjection
         }
 
         /// <summary>
+        /// Inserts a type into the collection.
+        /// </summary>
+        /// <param name="type">The type to insert.</param>
+        /// <returns>The builder.</returns>
+        /// <remarks>Throws if the index is out of range.</remarks>
+        public TBuilder Insert(Type type)
+        {
+            return Insert(0, type);
+        }
+
+        /// <summary>
+        /// Inserts a type into the collection.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <param name="type">The type to insert.</param>
+        /// <returns>The builder.</returns>
+        /// <remarks>Throws if the index is out of range.</remarks>
+        public TBuilder Insert(int index, Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(type, "register");
+                if (types.Contains(type)) types.Remove(type);
+                types.Insert(index, type);
+            });
+            return This;
+        }
+
+        /// <summary>
         /// Inserts a type before another type.
         /// </summary>
         /// <typeparam name="TBefore">The other type.</typeparam>
@@ -153,6 +206,32 @@ namespace Umbraco.Core.DependencyInjection
         }
 
         /// <summary>
+        /// Inserts a type before another type.
+        /// </summary>
+        /// <param name="typeBefore">The other type.</param>
+        /// <param name="type">The type to insert.</param>
+        /// <returns>The builder.</returns>
+        /// <remarks>Throws if both types are identical, or if the other type does not already belong to the collection.</remarks>
+        public TBuilder InsertBefore(Type typeBefore, Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(typeBefore, "find");
+                EnsureType(type, "register");
+
+                if (typeBefore == type) throw new InvalidOperationException();
+
+                var index = types.IndexOf(typeBefore);
+                if (index < 0) throw new InvalidOperationException();
+
+                if (types.Contains(type)) types.Remove(type);
+                index = types.IndexOf(typeBefore); // in case removing type changed index
+                types.Insert(index, type);
+            });
+            return This;
+        }
+
+        /// <summary>
         /// Removes a type from the collection.
         /// </summary>
         /// <typeparam name="T">The type to remove.</typeparam>
@@ -163,6 +242,21 @@ namespace Umbraco.Core.DependencyInjection
             Configure(types =>
             {
                 var type = typeof (T);
+                if (types.Contains(type)) types.Remove(type);
+            });
+            return This;
+        }
+
+        /// <summary>
+        /// Removes a type from the collection.
+        /// </summary>
+        /// <param name="type">The type to remove.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Remove(Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(type, "remove");
                 if (types.Contains(type)) types.Remove(type);
             });
             return This;
@@ -197,23 +291,29 @@ namespace Umbraco.Core.DependencyInjection
         }
 
         /// <summary>
-        /// Gets a value indicating whether the collection contains a type.
+        /// Replaces a type in the collection.
         /// </summary>
-        /// <typeparam name="T">The type to look for.</typeparam>
-        /// <returns>A value indicating whether the collection contains the type.</returns>
-        public bool Has<T>()
-            where T : TItem
+        /// <param name="typeReplaced">The type to replace.</param>
+        /// <param name="type">The type to insert.</param>
+        /// <returns>The builder.</returns>
+        /// <remarks>Throws if the type to replace does not already belong to the collection.</remarks>
+        public TBuilder Replace(Type typeReplaced, Type type)
         {
-            return HasBase<T>();
-        }
+            Configure(types =>
+            {
+                EnsureType(typeReplaced, "find");
+                EnsureType(type, "register");
 
-        /// <summary>
-        /// Clears all types in the collection.
-        /// </summary>
-        /// <returns>The buidler.</returns>
-        public TBuilder Clear()
-        {
-            Configure(types => types.Clear());
+                if (typeReplaced == type) return;
+
+                var index = types.IndexOf(typeReplaced);
+                if (index < 0) throw new InvalidOperationException();
+
+                if (types.Contains(type)) types.Remove(type);
+                index = types.IndexOf(typeReplaced); // in case removing type changed index
+                types.Insert(index, type);
+                types.Remove(typeReplaced);
+            });
             return This;
         }
     }

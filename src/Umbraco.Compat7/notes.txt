@@ -19,7 +19,10 @@ This includes:
     status: to be tested
 
 - Resolvers
-    status: to be implemented - all of them - bah
+    compat: full
+    status: 
+	  base resolvers: done
+	  resolvers: TODO
 
 - RenderModel, UmbracoTemplatePage
     compat: will NOT support dynamics, so CurrentPage will prob not work
@@ -33,4 +36,6 @@ What else?
 ** Building
 
 By default, Umbraco.Compat7 is built but not copied / nothing.
+If the conditional symbol 'COMPAT7' is defined, it is copied to Umbraco.Web.UI/bin.
+Currently, that symbol is defined for the DEBUG build.
 Eventually it should become an extra NuGet package.

@@ -8,7 +8,7 @@ using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web._Legacy.Actions
 {
-    public class ActionCollectionBuilder : ICollectionBuilder<ActionCollection, IAction>
+    internal class ActionCollectionBuilder : ICollectionBuilder<ActionCollection, IAction>
     {
         private static Func<IEnumerable<Type>> _producer;
 
@@ -23,6 +23,13 @@ namespace Umbraco.Web._Legacy.Actions
             var collectionLifetime = builder.CollectionLifetime;
 
             // register the collection - special lifetime
+            // the lifetime here is custom ResettablePerContainerLifetime which will manage one
+            // single instance of the collection (much alike PerContainerLifetime) but can be resetted
+            // to force a new collection to be created.
+            // this is needed because of the weird things we do during install, where we'd use the
+            // infamous DirtyBackdoorToConfiguration to reset the ActionResolver way after Resolution
+            // had frozen. This has been replaced by the possibility here to set the producer at any
+            // time - but the builder is internal - and all this will be gone eventually.
             container.Register(factory => factory.GetInstance<ActionCollectionBuilder>().CreateCollection(), collectionLifetime);
 
             return builder;

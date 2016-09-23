@@ -86,7 +86,7 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register(_ => manifestBuilder);
 
             PropertyEditorCollectionBuilder.Register(Container)
-                .AddProducer(() => Current.PluginManager.ResolvePropertyEditors());
+                .Add(() => Current.PluginManager.ResolvePropertyEditors());
         }
 
         private CacheHelper _disabledCacheHelper;

@@ -19,15 +19,18 @@ namespace Umbraco.Core.Persistence.Migrations
             //
             // for IMigrationContext
             container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IMigrationContext : null);
-
         }
 
         protected override void Initialize()
         {
-            // nothing - do not register the collection
+            // nothing - do not register the collection            
         }
 
         protected override MigrationCollectionBuilder This => this;
+
+        // this is *not* needed since we do not register the collection
+        // however, keep it here to be absolutely explicit about it
+        protected override ILifetime CollectionLifetime { get; } = null; // transient
 
         public MigrationCollection CreateCollection(IMigrationContext context)
         {

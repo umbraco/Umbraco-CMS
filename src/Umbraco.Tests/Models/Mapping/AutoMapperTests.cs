@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             Func<IEnumerable<Type>> typeListProducerList = Enumerable.Empty<Type>;
             PropertyEditorCollectionBuilder.Register(Container)
-                .AddProducer(typeListProducerList);
+                .Add(typeListProducerList);
         }
 
         [Test]

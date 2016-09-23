@@ -108,7 +108,7 @@ namespace Umbraco.Web
                 .AddExtensionObjectProducer(() => pluginManager.ResolveXsltExtensions());
 
             EditorValidatorCollectionBuilder.Register(container)
-                .AddProducer(() => pluginManager.ResolveTypes<IEditorValidator>());
+                .Add(() => pluginManager.ResolveTypes<IEditorValidator>());
 
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
@@ -151,7 +151,7 @@ namespace Umbraco.Web
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
-            container.Register<IContentLastChanceFinder, ContentFinderByLegacy404>();
+            container.RegisterSingleton<IContentLastChanceFinder, ContentFinderByLegacy404>();
 
             ContentFinderCollectionBuilder.Register(container)
                 // all built-in finders in the correct order,
@@ -164,7 +164,7 @@ namespace Umbraco.Web
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
-            container.Register<ISiteDomainHelper, SiteDomainHelper>();
+            container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
 
             ThumbnailProviderCollectionBuilder.Register(container)
                 .Add(pluginManager.ResolveThumbnailProviders());
@@ -176,7 +176,7 @@ namespace Umbraco.Web
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             HealthCheckCollectionBuilder.Register(container)
-                .AddProducer(() => pluginManager.ResolveTypes<HealthCheck.HealthCheck>());
+                .Add(() => pluginManager.ResolveTypes<HealthCheck.HealthCheck>());
 
             // auto-register views
             container.RegisterAuto(typeof(UmbracoViewPage<>));

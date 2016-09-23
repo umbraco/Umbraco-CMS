@@ -23,7 +23,7 @@ namespace Umbraco.Tests.DependencyInjection
             container.ConfigureUmbracoCore();
 
             PackageActionCollectionBuilder.Register(container)
-                .AddProducer(() => PluginManager.ResolvePackageActions());
+                .Add(() => PluginManager.ResolvePackageActions());
 
 			var actions = Current.PackageActions;
 			Assert.AreEqual(2, actions.Count());

@@ -6,21 +6,21 @@ using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.PropertyEditors
 {
-    internal class PropertyEditorCollectionBuilder : LazyCollectionBuilderBase<PropertyEditorCollectionBuilder, PropertyEditorCollection, PropertyEditor>
+    public class PropertyEditorCollectionBuilder : LazyCollectionBuilderBase<PropertyEditorCollectionBuilder, PropertyEditorCollection, PropertyEditor>
     {
-        private readonly ManifestBuilder _manifestBuilder;
-
-        public PropertyEditorCollectionBuilder(IServiceContainer container, ManifestBuilder manifestBuilder)
+        public PropertyEditorCollectionBuilder(IServiceContainer container)
             : base(container)
-        {
-            _manifestBuilder = manifestBuilder;
-        }
+        { }
+
+        // have to property-inject that one as it is internal & the builder is public
+        [Inject]
+        internal ManifestBuilder ManifestBuilder { get; set; }
 
         protected override PropertyEditorCollectionBuilder This => this;
 
         protected override IEnumerable<PropertyEditor> CreateItems(params object[] args)
         {
-            return base.CreateItems(args).Union(_manifestBuilder.PropertyEditors);
+            return base.CreateItems(args).Union(ManifestBuilder.PropertyEditors);
         }
     }
 }

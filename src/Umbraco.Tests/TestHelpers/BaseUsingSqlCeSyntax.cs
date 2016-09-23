@@ -44,7 +44,7 @@ namespace Umbraco.Tests.TestHelpers
             container.RegisterInstance(pluginManager);
 
             MapperCollectionBuilder.Register(container)
-                .AddProducer(() => Current.PluginManager.ResolveAssignedMapperTypes());
+                .Add(() => Current.PluginManager.ResolveAssignedMapperTypes());
             Mappers = container.GetInstance<IMapperCollection>();
 
             var mappers = new NPoco.MapperCollection { new PocoMapper() };

@@ -60,10 +60,10 @@ namespace Umbraco.Core
             container.RegisterSingleton<ManifestBuilder>();
 
             PropertyEditorCollectionBuilder.Register(container)
-                .AddProducer(factory => factory.GetInstance<PluginManager>().ResolvePropertyEditors());
+                .Add(factory => factory.GetInstance<PluginManager>().ResolvePropertyEditors());
 
             ParameterEditorCollectionBuilder.Register(container)
-                .AddProducer(factory => factory.GetInstance<PluginManager>().ResolveParameterEditors());
+                .Add(factory => factory.GetInstance<PluginManager>().ResolveParameterEditors());
 
             // register our predefined validators
             ValidatorCollectionBuilder.Register(container)
@@ -95,13 +95,13 @@ namespace Umbraco.Core
                     true, new DatabaseServerMessengerOptions()));
 
             CacheRefresherCollectionBuilder.Register(container)
-                .AddProducer(factory => factory.GetInstance<PluginManager>().ResolveCacheRefreshers());
+                .Add(factory => factory.GetInstance<PluginManager>().ResolveCacheRefreshers());
 
             PackageActionCollectionBuilder.Register(container)
-                .AddProducer(f => f.GetInstance<PluginManager>().ResolvePackageActions());
+                .Add(f => f.GetInstance<PluginManager>().ResolvePackageActions());
 
             MigrationCollectionBuilder.Register(container)
-                .AddProducer(factory => factory.GetInstance<PluginManager>().ResolveTypes<IMigration>());
+                .Add(factory => factory.GetInstance<PluginManager>().ResolveTypes<IMigration>());
 
             // need to filter out the ones we dont want!! fixme - what does that mean?
             PropertyValueConverterCollectionBuilder.Register(container)

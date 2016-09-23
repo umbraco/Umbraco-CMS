@@ -19,6 +19,7 @@ using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Media;
+using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -134,7 +135,7 @@ namespace Umbraco.Web
         public static HealthCheckCollectionBuilder HealthCheckCollectionBuilder
             => Container.GetInstance<HealthCheckCollectionBuilder>();
 
-        public static ActionCollectionBuilder ActionCollectionBuilder
+        internal static ActionCollectionBuilder ActionCollectionBuilder
             => Container.GetInstance<ActionCollectionBuilder>();
 
         public static ActionCollection Actions
@@ -172,6 +173,9 @@ namespace Umbraco.Web
 
         public static ISiteDomainHelper SiteDomainHelper
             => Container.GetInstance<ISiteDomainHelper>();
+
+        public static ThumbnailProviderCollection ThumbnailProviders
+            => Container.GetInstance<ThumbnailProviderCollection>();
 
         #endregion
 

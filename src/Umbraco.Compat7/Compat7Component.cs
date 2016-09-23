@@ -9,11 +9,12 @@ using Umbraco.Core.Plugins;
 
 namespace Umbraco.Compat7
 {
-    internal class Compat7Component : UmbracoComponentBase, IUmbracoUserComponent
+    public class Compat7Component : UmbracoComponentBase, IUmbracoUserComponent
     {
         private List<IApplicationEventHandler> _handlers;
         private UmbracoApplicationBase _app;
 
+        // these events replace the UmbracoApplicationBase corresponding events
         public static event EventHandler ApplicationStarting;
         public static event EventHandler ApplicationStarted;
 
@@ -25,8 +26,6 @@ namespace Umbraco.Compat7
             var pluginManager = container.GetInstance<PluginManager>();
             var handlerTypes = pluginManager.ResolveTypes<IApplicationEventHandler>();
             _handlers = handlerTypes.Select(Activator.CreateInstance).Cast<IApplicationEventHandler>().ToList();
-
-            // fixme - UmbracoApplication events
 
             foreach (var handler in _handlers)
                 handler.OnApplicationInitialized(_app, ApplicationContext.Current);
@@ -47,8 +46,6 @@ namespace Umbraco.Compat7
 
         public void Initialize(ILogger logger)
         {
-            // fixme - UmbracoApplication events
-
             foreach (var handler in _handlers)
                 handler.OnApplicationStarted(_app, ApplicationContext.Current);
 

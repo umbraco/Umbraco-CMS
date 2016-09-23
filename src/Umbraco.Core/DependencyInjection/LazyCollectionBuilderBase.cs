@@ -26,6 +26,22 @@ namespace Umbraco.Core.DependencyInjection
         protected abstract TBuilder This { get; }
 
         /// <summary>
+        /// Clears all types in the collection.
+        /// </summary>
+        /// <returns>The buidler.</returns>
+        public TBuilder Clear()
+        {
+            Configure(types =>
+            {
+                types.Clear();
+                _producers1.Clear();
+                _producers2.Clear();
+                _excluded.Clear();
+            });
+            return This;
+        }
+
+        /// <summary>
         /// Adds a type to the collection.
         /// </summary>
         /// <typeparam name="T">The type to add.</typeparam>
@@ -36,6 +52,21 @@ namespace Umbraco.Core.DependencyInjection
             Configure(types =>
             {
                 var type = typeof(T);
+                if (types.Contains(type) == false) types.Add(type);
+            });
+            return This;
+        }
+
+        /// <summary>
+        /// Adds a type to the collection.
+        /// </summary>
+        /// <param name="type">The type to add.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Add(Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(type, "register");
                 if (types.Contains(type) == false) types.Add(type);
             });
             return This;
@@ -58,11 +89,26 @@ namespace Umbraco.Core.DependencyInjection
         }
 
         /// <summary>
+        /// Removes a type from the collection.
+        /// </summary>
+        /// <param name="type">The type to remove.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Remove(Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(type, "remove");
+                if (types.Contains(type)) types.Remove(type);
+            });
+            return This;
+        }
+
+        /// <summary>
         /// Adds a types producer to the collection.
         /// </summary>
         /// <param name="producer">The types producer.</param>
         /// <returns>The builder.</returns>
-        public TBuilder AddProducer(Func<IEnumerable<Type>> producer)
+        public TBuilder Add(Func<IEnumerable<Type>> producer)
         {
             Configure(types =>
             {
@@ -76,7 +122,7 @@ namespace Umbraco.Core.DependencyInjection
         /// </summary>
         /// <param name="producer">The types producer.</param>
         /// <returns>The builder.</returns>
-        public TBuilder AddProducer(Func<IServiceFactory, IEnumerable<Type>> producer)
+        public TBuilder Add(Func<IServiceFactory, IEnumerable<Type>> producer)
         {
             Configure(types =>
             {
@@ -91,6 +137,7 @@ namespace Umbraco.Core.DependencyInjection
         /// <typeparam name="T">The type to exclude.</typeparam>
         /// <returns>The builder.</returns>
         public TBuilder Exclude<T>()
+            where T : TItem
         {
             Configure(types =>
             {
@@ -100,12 +147,28 @@ namespace Umbraco.Core.DependencyInjection
             return This;
         }
 
-        protected override IEnumerable<Type> GetTypes(IEnumerable<Type> types)
+        /// <summary>
+        /// Excludes a type from the collection.
+        /// </summary>
+        /// <param name="type">The type to exclude.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Exclude(Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(type, "exclude");
+                if (_excluded.Contains(type) == false) _excluded.Add(type);
+            });
+            return This;
+        }
+
+        protected override IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types)
         {
             return types
                 .Union(_producers1.SelectMany(x => x()))
                 .Union(_producers2.SelectMany(x => x(Container)))
                 .Distinct()
+                .Select(x => EnsureType(x, "register"))
                 .Except(_excluded);
         }
     }

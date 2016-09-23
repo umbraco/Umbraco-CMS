@@ -22,6 +22,16 @@ namespace Umbraco.Core.DependencyInjection
         protected abstract TBuilder This { get; }
 
         /// <summary>
+        /// Clears all types in the collection.
+        /// </summary>
+        /// <returns>The buidler.</returns>
+        public TBuilder Clear()
+        {
+            Configure(types => types.Clear());
+            return This;
+        }
+
+        /// <summary>
         /// Adds a type to the collection.
         /// </summary>
         /// <typeparam name="T">The type to add.</typeparam>
@@ -32,6 +42,21 @@ namespace Umbraco.Core.DependencyInjection
             Configure(types =>
             {
                 var type = typeof(T);
+                if (types.Contains(type) == false) types.Add(type);
+            });
+            return This;
+        }
+
+        /// <summary>
+        /// Adds a type to the collection.
+        /// </summary>
+        /// <param name="type">The type to add.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Add(Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(type, "register");
                 if (types.Contains(type) == false) types.Add(type);
             });
             return This;
@@ -49,8 +74,7 @@ namespace Umbraco.Core.DependencyInjection
                 foreach (var type in types)
                 {
                     // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
-                    if (typeof(TItem).IsAssignableFrom(type) == false)
-                        throw new InvalidOperationException($"Cannot register type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
+                    EnsureType(type, "register");
                     if (list.Contains(type) == false) list.Add(type);
                 }
             });
@@ -73,7 +97,22 @@ namespace Umbraco.Core.DependencyInjection
             return This;
         }
 
-        protected override IEnumerable<Type> GetTypes(IEnumerable<Type> types)
+        /// <summary>
+        /// Removes a type from the collection.
+        /// </summary>
+        /// <param name="type">The type to remove.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Remove(Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(type, "remove");
+                if (types.Contains(type)) types.Remove(type);
+            });
+            return This;
+        }
+
+        protected override IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types)
         {
             var list = types.ToList();
             list.Sort((t1, t2) => GetWeight(t1).CompareTo(GetWeight(t2)));

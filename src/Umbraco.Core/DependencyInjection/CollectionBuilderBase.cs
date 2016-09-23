@@ -39,6 +39,11 @@ namespace Umbraco.Core.DependencyInjection
         protected IServiceContainer Container { get; }
 
         /// <summary>
+        /// Gets the internal list of types as an IEnumerable (immutable).
+        /// </summary>
+        public IEnumerable<Type> GetTypes() => _types;
+
+        /// <summary>
         /// Initializes a new instance of the builder.
         /// </summary>
         /// <remarks>This is called by the constructor and, by default, registers the
@@ -113,7 +118,8 @@ namespace Umbraco.Core.DependencyInjection
         /// </summary>
         /// <param name="types">The internal list of types.</param>
         /// <returns>The list of types to register.</returns>
-        protected virtual IEnumerable<Type> GetTypes(IEnumerable<Type> types)
+        /// <remarks>Used by implementations to add types to the internal list, sort the list, etc.</remarks>
+        protected virtual IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types)
         {
             return types;
         }
@@ -124,12 +130,9 @@ namespace Umbraco.Core.DependencyInjection
             {
                 if (_registrations != null) return;
 
-                var types = GetTypes(_types).ToArray();
+                var types = GetRegisteringTypes(_types).ToArray();
                 foreach (var type in types)
-                {
-                    if (typeof(TItem).IsAssignableFrom(type) == false)
-                        throw new InvalidOperationException($"Cannot register type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
-                }
+                    EnsureType(type, "register");
 
                 var prefix = GetType().FullName + "_";
                 var i = 0;
@@ -172,6 +175,13 @@ namespace Umbraco.Core.DependencyInjection
             return _collectionCtor(CreateItems());
         }
 
+        protected Type EnsureType(Type type, string action)
+        {
+            if (typeof(TItem).IsAssignableFrom(type) == false)
+                throw new InvalidOperationException($"Cannot {action} type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
+            return type;
+        }
+
         /// <summary>
         /// Gets a value indicating whether the collection contains a type.
         /// </summary>
@@ -179,10 +189,23 @@ namespace Umbraco.Core.DependencyInjection
         /// <returns>A value indicating whether the collection contains the type.</returns>
         /// <remarks>Some builder implementations may use this to expose a public Has{T}() method,
         /// when it makes sense. Probably does not make sense for lazy builders, for example.</remarks>
-        protected bool HasBase<T>()
+        public virtual bool Has<T>()
             where T : TItem
         {
             return _types.Contains(typeof (T));
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the collection contains a type.
+        /// </summary>
+        /// <param name="type">The type to look for.</param>
+        /// <returns>A value indicating whether the collection contains the type.</returns>
+        /// <remarks>Some builder implementations may use this to expose a public Has{T}() method,
+        /// when it makes sense. Probably does not make sense for lazy builders, for example.</remarks>
+        public virtual bool Has(Type type)
+        {
+            EnsureType(type, "find");
+            return _types.Contains(type);
         }
     }
 }

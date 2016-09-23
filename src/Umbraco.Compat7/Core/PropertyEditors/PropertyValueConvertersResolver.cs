@@ -1,15 +1,19 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.ObjectResolution;
 using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Core.PropertyEditors
 {
-    public class PropertyValueConvertersResolver
+    public class PropertyValueConvertersResolver : ManyObjectsResolverBase<PropertyValueConverterCollectionBuilder, PropertyValueConverterCollection, IPropertyValueConverter>
     {
-        public static PropertyValueConvertersResolver Current { get; set; } = new PropertyValueConvertersResolver();
+        private PropertyValueConvertersResolver(PropertyValueConverterCollectionBuilder builder)
+            : base(builder)
+        { }
+
+        public static PropertyValueConvertersResolver Current { get; } 
+            = new PropertyValueConvertersResolver(CoreCurrent.Container.GetInstance<PropertyValueConverterCollectionBuilder>());
 
         public IEnumerable<IPropertyValueConverter> Converters => CoreCurrent.PropertyValueConverters;
-
-        // fixme - should implement the basic resolver add/edit/etc methods!
     }
 }

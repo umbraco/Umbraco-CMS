@@ -6,7 +6,12 @@ namespace Umbraco.Core.Models.PublishedContent
 {
     public class PublishedContentModelFactoryResolver
     {
-        public static PublishedContentModelFactoryResolver Current { get; set; } = new PublishedContentModelFactoryResolver();
+        private PublishedContentModelFactoryResolver()
+        { }
+
+        public static PublishedContentModelFactoryResolver Current { get; } = new PublishedContentModelFactoryResolver();
+
+        public static bool HasCurrent => true;
 
         public void SetFactory(IPublishedContentModelFactory factory)
         {

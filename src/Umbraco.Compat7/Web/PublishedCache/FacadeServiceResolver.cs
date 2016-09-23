@@ -5,7 +5,10 @@ namespace Umbraco.Web.PublishedCache
 {
     public class FacadeServiceResolver
     {
-        public static FacadeServiceResolver Current { get; set; } = new FacadeServiceResolver();
+        private FacadeServiceResolver()
+        { }
+
+        public static FacadeServiceResolver Current { get; } = new FacadeServiceResolver();
 
         public IFacadeService Service => WebCurrent.FacadeService;
     }

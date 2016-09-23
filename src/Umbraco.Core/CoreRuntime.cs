@@ -20,7 +20,6 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
-
     /// <summary>
     /// Represents the Core Umbraco runtime.
     /// </summary>
@@ -203,7 +202,7 @@ namespace Umbraco.Core
             // register persistence mappers - means the only place the collection can be modified
             // is in a runtime - afterwards it has been frozen and it is too late
             MapperCollectionBuilder.Register(container)
-                .AddProducer(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
+                .Add(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
 
             // register database factory
             // will be initialized with syntax providers and a logger, and will try to configure

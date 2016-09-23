@@ -10,7 +10,7 @@ namespace Umbraco.Web.Strategies.Migrations
         public override void Compose(ServiceContainer container)
         {
             PostMigrationCollectionBuilder.Register(container)
-                .AddProducer(factory => factory.GetInstance<PluginManager>().ResolveTypes<IPostMigration>());
+                .Add(factory => factory.GetInstance<PluginManager>().ResolveTypes<IPostMigration>());
         }
 
         public void Initialize(PostMigrationCollection posts)
