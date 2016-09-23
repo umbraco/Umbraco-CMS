@@ -3,13 +3,17 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Hosting;
+using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
-    // exists for logging purposes
-    internal class BackgroundTaskRunner
+    /// <summary>
+    /// Manages a queue of tasks and runs them in the background.
+    /// </summary>
+    /// <remarks>This class exists for logging purposes - the one you want to use is BackgroundTaskRunner{T}.</remarks>
+    public abstract class BackgroundTaskRunner
     { }
 
     /// <summary>
@@ -18,7 +22,7 @@ namespace Umbraco.Web.Scheduling
     /// <typeparam name="T">The type of the managed tasks.</typeparam>
     /// <remarks>The task runner is web-aware and will ensure that it shuts down correctly when the AppDomain
     /// shuts down (ie is unloaded).</remarks>
-    internal class BackgroundTaskRunner<T> : BackgroundTaskRunner, IBackgroundTaskRunner<T>
+    public class BackgroundTaskRunner<T> : BackgroundTaskRunner, IBackgroundTaskRunner<T>
         where T : class, IBackgroundTask
     {
         private readonly string _logPrefix;
@@ -43,10 +47,10 @@ namespace Umbraco.Web.Scheduling
         private bool _terminated; // remember we've terminated
         private TaskCompletionSource<int> _terminatedSource; // awaitable source
 
-        internal event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskError;
-        internal event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskStarting;
-        internal event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskCompleted;
-        internal event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskCancelled;
+        public event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskError;
+        public event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskStarting;
+        public event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskCompleted;
+        public event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskCancelled;
         
         // triggers when the runner stops (but could start again if a task is added to it)
         internal event TypedEventHandler<BackgroundTaskRunner<T>, EventArgs> Stopped;
@@ -60,26 +64,33 @@ namespace Umbraco.Web.Scheduling
         /// <summary>
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class.
         /// </summary>
-        public BackgroundTaskRunner(ILogger logger)
-            : this(typeof (T).FullName, new BackgroundTaskRunnerOptions(), logger)
+        /// <param name="logger">A logger.</param>
+        /// <param name="mainDomInstall">An optional action to execute when the main domain status is aquired.</param>
+        /// <param name="mainDomRelease">An optional action to execute when the main domain status is released.</param>
+        public BackgroundTaskRunner(ILogger logger, Action mainDomInstall = null, Action mainDomRelease = null)
+            : this(typeof (T).FullName, new BackgroundTaskRunnerOptions(), logger, mainDomInstall, mainDomRelease)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class.
         /// </summary>
         /// <param name="name">The name of the runner.</param>
-        /// <param name="logger"></param>
-        public BackgroundTaskRunner(string name, ILogger logger)
-            : this(name, new BackgroundTaskRunnerOptions(), logger)
+        /// <param name="logger">A logger.</param>
+        /// <param name="mainDomInstall">An optional action to execute when the main domain status is aquired.</param>
+        /// <param name="mainDomRelease">An optional action to execute when the main domain status is released.</param>
+        public BackgroundTaskRunner(string name, ILogger logger, Action mainDomInstall = null, Action mainDomRelease = null)
+            : this(name, new BackgroundTaskRunnerOptions(), logger, mainDomInstall, mainDomRelease)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class with a set of options.
         /// </summary>
         /// <param name="options">The set of options.</param>
-        /// <param name="logger"></param>
-        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger)
-            : this(typeof (T).FullName, options, logger)
+        /// <param name="logger">A logger.</param>
+        /// <param name="mainDomInstall">An optional action to execute when the main domain status is aquired.</param>
+        /// <param name="mainDomRelease">An optional action to execute when the main domain status is released.</param>
+        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger, Action mainDomInstall = null, Action mainDomRelease = null)
+            : this(typeof (T).FullName, options, logger, mainDomInstall, mainDomRelease)
         { }
 
         /// <summary>
@@ -87,8 +98,10 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         /// <param name="name">The name of the runner.</param>
         /// <param name="options">The set of options.</param>
-        /// <param name="logger"></param>
-        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger)
+        /// <param name="logger">A logger.</param>
+        /// <param name="mainDomInstall">An optional action to execute when the main domain status is aquired.</param>
+        /// <param name="mainDomRelease">An optional action to execute when the main domain status is released.</param>
+        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger, Action mainDomInstall = null, Action mainDomRelease = null)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (logger == null) throw new ArgumentNullException("logger");
@@ -99,7 +112,15 @@ namespace Umbraco.Web.Scheduling
             if (options.Hosted)
                 HostingEnvironment.RegisterObject(this);
 
-            if (options.AutoStart)
+            if (mainDomRelease != null)
+            {
+                var mainDom = ApplicationContext.Current.MainDom;
+                var reg = mainDom == null || ApplicationContext.Current.MainDom.Register(mainDomInstall, mainDomRelease);
+                if (reg == false)
+                    _isCompleted = _terminated = true;                    
+            }
+
+            if (options.AutoStart && _terminated == false)
                 StartUp();
         }
 
