@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    function AceEditorDirective(umbAceEditorConfig) {
+    function AceEditorDirective(umbAceEditorConfig, assetsService) {
 
         if (angular.isUndefined(window.ace)) {
             throw new Error('ui-ace need ace to work... (o rly?)');
@@ -32,12 +32,14 @@
                 var config = window.ace.require('ace/config');
                 config.set('workerPath', opts.workerPath);
             }
+
             // ace requires loading
             if (angular.isDefined(opts.require)) {
                 opts.require.forEach(function(n) {
                     window.ace.require(n);
                 });
             }
+
             // Boolean options
             if (angular.isDefined(opts.showGutter)) {
                 acee.renderer.setShowGutter(opts.showGutter);
@@ -126,6 +128,7 @@
 
         function link(scope, el, attr, ngModel) {
 
+
             /**
              * Corresponds the umbAceEditorConfig ACE configuration.
              * @type object
@@ -138,11 +141,15 @@
              */
             var opts = angular.extend({}, options, scope.$eval(attr.umbAceEditor));
 
+
+            //load ace libraries here... 
+
             /**
              * ACE editor
              * @type object
              */
             var acee = window.ace.edit(el[0]);
+            acee.$blockScrolling = Infinity;
 
             /**
              * ACE editor session.

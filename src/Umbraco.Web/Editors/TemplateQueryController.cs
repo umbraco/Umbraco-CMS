@@ -65,7 +65,7 @@ namespace Umbraco.Web.Editors
 
             var sb = new StringBuilder();
             
-            sb.Append("CurrentPage.Site()");
+            sb.Append("Model.Content.Site()");
             
             var timer = new Stopwatch();
             
@@ -217,7 +217,7 @@ namespace Umbraco.Web.Editors
                                                                  });
 
 
-            return queryResult;
+            return queryResult; 
         }
 
         private object GetConstraintValue(QueryCondition condition)

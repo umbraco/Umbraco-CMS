@@ -81,6 +81,11 @@
             vm.aceOption = {
                 mode: "razor",
                 theme: "chrome",
+                showPrintMargin: false,
+
+                advanced: {
+                    fontSize: '16px'
+                },
 
                 onLoad: function(_editor) {
                     vm.editor = _editor;
