@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
@@ -241,10 +242,20 @@ namespace Umbraco.Web
                             .Distinct()
                             .ToArray();
 
+                        //Create a hash of the server name and the IIS app Id to send up so we don't double cache refresh the
+                        // master server. 
+                        //Fixes: http://issues.umbraco.org/issue/U4-5491
+                        //NOTE: This will only work in full trust, in med trust, a double cache refresh is inevitable 
+                        var hashedAppId = string.Empty;
+                        if (SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
+                        {
+                            hashedAppId = (NetworkHelper.MachineName + HttpRuntime.AppDomainAppId).ToMd5();    
+                        }
+                        
                         asyncResultsList.Add(
                             cacheRefresher.BeginBulkRefresh(
-                                instructions, 
-                                HttpRuntime.AppDomainAppId,
+                                instructions,
+                                hashedAppId,
                                 Login, Password, null, null));
                     }
 

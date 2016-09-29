@@ -11,6 +11,7 @@ using System.Web.Services;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
 namespace umbraco.presentation.webservices
@@ -21,7 +22,44 @@ namespace umbraco.presentation.webservices
 	/// </summary>
 	[WebService(Namespace="http://umbraco.org/webservices/")]
 	public class CacheRefresher : WebService
-	{   
+	{
+
+        /// <summary>
+        /// This checks the passed in hash and verifies if it does not match the hash of the combination of appDomainAppId and machineName
+        /// passed in. If the hashes don't match, then cache refreshing continues.
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="appDomainAppId"></param>
+        /// <param name="machineName"></param>
+        /// <returns></returns>
+	    internal bool ContinueRefreshingForRequest(string hash, string appDomainAppId, string machineName)
+	    {
+            //check if this is the same app id as the one passed in, if it is, then we will ignore
+            // the request - we will have to assume that the cache refreshing has already been applied to the server
+            // that executed the request.
+            if (hash.IsNullOrWhiteSpace() == false && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
+            {
+                var hasher = new HashCodeCombiner();
+                hasher.AddCaseInsensitiveString(machineName);
+                hasher.AddCaseInsensitiveString(appDomainAppId);
+                var hashedAppId = hasher.GetCombinedHashCode();
+
+                //we can only check this in full trust. if it's in medium trust we'll just end up with 
+                // the server refreshing it's cache twice.
+                if (hashedAppId == hash)
+                {
+                    LogHelper.Debug<CacheRefresher>(
+                        "The passed in hashed appId equals the current server's hashed appId, cache refreshing will be ignored for this request as it will have already executed for this server (server: {0} , appId: {1} , hash: {2})",
+                        () => machineName,
+                        () => appDomainAppId,
+                        () => hashedAppId);
+
+                    return false;
+                }
+            }
+
+	        return true;
+	    }
 
         [WebMethod]
         public void BulkRefresh(RefreshInstruction[] instructions, string appId, string login, string password)
@@ -31,18 +69,7 @@ namespace umbraco.presentation.webservices
                 return;
             }
 
-            //check if this is the same app id as the one passed in, if it is, then we will ignore
-            // the request - we will have to assume that the cache refeshing has already been applied to the server
-            // that executed the request.
-            if (SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
-            {
-                //we can only check this in full trust. if it's in medium trust we'll just end up with 
-                // the server refreshing it's cache twice.
-                if (HttpRuntime.AppDomainAppId == appId)
-                {
-                    return;
-                }
-            }
+            if (ContinueRefreshingForRequest(appId, HttpRuntime.AppDomainAppId, NetworkHelper.MachineName) == false) return;
 
             //only execute distinct instructions - no sense in running the same one.
             foreach (var instruction in instructions.Distinct())
