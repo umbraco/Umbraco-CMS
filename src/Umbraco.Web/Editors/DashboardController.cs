@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
-        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "http://dashboard.umbraco.org/")
+        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
             var ctx = UmbracoContext.Current;
             if (ctx == null)
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Editors
         }
 
         [WebApi.UmbracoAuthorize]
-        public async Task<HttpResponseMessage> GetRemoteDashboardCss(string section, string baseUrl = "http://dashboard.umbraco.org/")
+        public async Task<HttpResponseMessage> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
             var cssUrl = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
             var key = "umb-dyn-dash-css-" + section;
