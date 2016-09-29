@@ -112,12 +112,15 @@ namespace Umbraco.Web.Scheduling
             if (options.Hosted)
                 HostingEnvironment.RegisterObject(this);
 
-            if (mainDomRelease != null)
+            if (mainDomInstall != null || mainDomRelease != null)
             {
-                var mainDom = ApplicationContext.Current.MainDom;
+                var appContext = ApplicationContext.Current;
+                var mainDom = appContext == null ? null : appContext.MainDom;
                 var reg = mainDom == null || ApplicationContext.Current.MainDom.Register(mainDomInstall, mainDomRelease);
                 if (reg == false)
-                    _isCompleted = _terminated = true;                    
+                    _isCompleted = _terminated = true;
+                if (reg && mainDom == null && mainDomInstall != null)
+                    mainDomInstall();
             }
 
             if (options.AutoStart && _terminated == false)
