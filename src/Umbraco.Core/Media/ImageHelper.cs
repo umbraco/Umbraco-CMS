@@ -15,7 +15,7 @@ namespace Umbraco.Core.Media
     /// <summary>
     /// Provides helper methods for managing images.
     /// </summary>
-    internal static class ImageHelper
+    public static class ImageHelper
     {
         private static readonly Dictionary<int, string> DefaultSizes = new Dictionary<int, string>
         {
