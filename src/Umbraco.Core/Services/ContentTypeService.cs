@@ -791,21 +791,23 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-
-                //TODO: This needs to change, if we are deleting a content type, we should just delete the data,
-                // this method will recursively go lookup every content item, check if any of it's descendants are
-                // of a different type, move them to the recycle bin, then permanently delete the content items.
-                // The main problem with this is that for every content item being deleted, events are raised...
-                // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
-
-                _contentService.DeleteContentOfType(contentType.Id);
-
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                 {
+                    //TODO: This needs to change, if we are deleting a content type, we should just delete the data,
+                    // this method will recursively go lookup every content item, check if any of it's descendants are
+                    // of a different type, move them to the recycle bin, then permanently delete the content items.
+                    // The main problem with this is that for every content item being deleted, events are raised...
+                    // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
+                    
                     var deletedContentTypes = new List<IContentType>() {contentType};
                     deletedContentTypes.AddRange(contentType.Descendants().OfType<IContentType>());
 
+                    foreach (var deletedContentType in deletedContentTypes)
+                    {
+                        _contentService.DeleteContentOfType(deletedContentType.Id);
+                    }
+                    
                     repository.Delete(contentType);
                     uow.Commit();
 
@@ -833,11 +835,6 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-                foreach (var contentType in asArray)
-                {
-                    _contentService.DeleteContentOfType(contentType.Id);
-                }
-
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                 {
@@ -847,6 +844,15 @@ namespace Umbraco.Core.Services
                     foreach (var contentType in asArray)
                     {
                         deletedContentTypes.AddRange(contentType.Descendants().OfType<IContentType>());
+                    }
+
+                    foreach (var deletedContentType in deletedContentTypes)
+                    {
+                        _contentService.DeleteContentOfType(deletedContentType.Id);
+                    }
+
+                    foreach (var contentType in asArray)
+                    {
                         repository.Delete(contentType);
                     }
 
