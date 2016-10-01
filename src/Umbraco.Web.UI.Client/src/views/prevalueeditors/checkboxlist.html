@@ -1,7 +1,8 @@
-<ul class="unstyled">
-	<li ng-repeat="preval in model.prevalues">
-	    <label class="checkbox">
-            <input type="checkbox" checklist-model="model.value" checklist-value="preval" value="{{preval.value || preval}}" /> {{preval.label || preval.value || preval}}
-	    </label>
-	</li>
+<ul class="unstyled umb-checkbox-list-preval">
+    <li ng-repeat="preval in model.prevalues">
+        <label class="checkbox">
+            <input type="checkbox" ng-hide="preval.icon" checklist-model="model.value" checklist-value="preval" value="{{preval.value || preval}}" />
+            <i ng-if="preval.icon" class="icon {{preval.icon}}"></i> <span>{{preval.label || preval.value || preval}}</span>
+        </label>
+    </li>
 </ul>

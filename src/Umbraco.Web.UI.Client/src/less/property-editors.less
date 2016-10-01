@@ -123,6 +123,33 @@ ul.color-picker li a  {
 
 
 //
+// Checkbox List
+// --------------------------------------------------
+
+/* pre-value editor */
+.umb-checkbox-list-preval,
+.umb-radiobutton-list-preval {
+    .checkbox, .radio {
+        .icon {
+            display: inline-block;
+            line-height: 100%;
+            font-size: 32px;
+            width: 32px;
+        }
+        .icon + span {
+            vertical-align: top;
+            line-height: 32px;
+        }
+    }
+    .checkbox input[type="checkbox"]:checked + .icon,
+    .radio input[type="radio"]:checked + .icon
+    {
+        color: @blue;
+    }
+}
+
+
+//
 // Media picker
 // --------------------------------------------------
 .umb-mediapicker .add-link {

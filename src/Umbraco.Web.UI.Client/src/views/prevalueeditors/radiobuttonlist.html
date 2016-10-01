@@ -1,7 +1,8 @@
-<ul class="unstyled">
-	<li ng-repeat="preval in model.prevalues">
-	    <label class="checkbox">
-	        <input type="radio" ng-model="model.value" value="{{preval.value || preval}}" /> {{preval.label || preval.value || preval}}
-	    </label>
-	</li>
+<ul class="unstyled umb-radiobutton-list-preval">
+    <li ng-repeat="preval in model.prevalues">
+        <label class="radio">
+            <input type="radio" ng-hide="preval.icon" ng-model="model.value" value="{{preval.value || preval}}" />
+            <i ng-if="preval.icon" class="icon {{preval.icon}}"></i> <span>{{preval.label || preval.value || preval}}</span>
+        </label>
+    </li>
 </ul>
