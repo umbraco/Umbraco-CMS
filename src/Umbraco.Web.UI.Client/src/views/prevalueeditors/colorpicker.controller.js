@@ -1,9 +1,5 @@
 function ColorPickerPrevalController($scope, assetsService, angularHelper) {
 
-
-    console.log("test");
-    console.log($scope.model.prevalues);
-
     assetsService.load([
         "lib/tinycolor/tinycolor.js",
         //"lib/spectrum/spectrum.js"
@@ -12,7 +8,7 @@ function ColorPickerPrevalController($scope, assetsService, angularHelper) {
         //make an array from the dictionary
         var items = [];
         for (var i in $scope.model.prevalues) {
-            console.log("i", i);
+            
             angularHelper.safeApply($scope, function () {
                 var color = tinycolor($scope.model.prevalues[i].value || $scope.model.prevalues[i]).toHexString(),
                     label = $scope.model.prevalues[i].label || $scope.model.prevalues[i].value || $scope.model.prevalues[i]
@@ -48,7 +44,7 @@ function ColorPickerPrevalController($scope, assetsService, angularHelper) {
     //        errorKey: "required"
     //    };
     //}
-    $scope.isConfigured = true; // $scope.model.config && $scope.model.config.items && _.keys($scope.model.config.items).length > 0;
+    $scope.isConfigured = $scope.model.prevalues && _.keys($scope.model.prevalues).length > 0;
 }
 
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.ColorPickerController", ColorPickerPrevalController);
