@@ -783,25 +783,25 @@ namespace Umbraco.Tests.Scheduling
         private class MyLatchedTask : ILatchedBackgroundTask
         {
             private readonly int _runMilliseconds;
-            private readonly ManualResetEventSlim _latch;
+            private readonly TaskCompletionSource<bool> _latch;
 
             public bool HasRun { get; private set; }
 
             public MyLatchedTask(int runMilliseconds, bool runsOnShutdown)
             {
                 _runMilliseconds = runMilliseconds;
-                _latch = new ManualResetEventSlim(false);
+                _latch = new TaskCompletionSource<bool>();
                 RunsOnShutdown = runsOnShutdown;
             }
 
-            public WaitHandle Latch
+            public Task Latch
             {
-                get { return _latch.WaitHandle; }
+                get { return _latch.Task; }
             }
 
             public bool IsLatched
             {
-                get { return _latch.IsSet == false; }
+                get { return _latch.Task.IsCompleted == false; }
             }
 
             public bool RunsOnShutdown { get; private set; }
@@ -814,7 +814,7 @@ namespace Umbraco.Tests.Scheduling
 
             public void Release()
             {
-                _latch.Set();
+                _latch.SetResult(true);
             }
 
             public Task RunAsync(CancellationToken token)
@@ -907,6 +907,56 @@ namespace Umbraco.Tests.Scheduling
             {
                 get { return true; }
             }
+        }
+
+        [Test]
+        public void SourceTaskTest()
+        {
+            var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, _logger);
+
+            var task = new SourceTask();
+            runner.Add(task);
+            Assert.IsTrue(runner.IsRunning);
+            Console.WriteLine("completing");
+            task.Complete(); // in Deploy this does not return ffs - no point until I cannot repro
+            Console.WriteLine("completed");
+            Console.WriteLine("done");
+        }
+
+        private class SourceTask : IBackgroundTask
+        {
+            private readonly SemaphoreSlim _timeout = new SemaphoreSlim(0, 1);
+            private readonly TaskCompletionSource<object> _source = new TaskCompletionSource<object>();
+
+            public void Complete()
+            {
+                _source.SetResult(null);
+            }
+
+            public void Dispose()
+            { }
+
+            public void Run()
+            {
+                throw new NotImplementedException();
+            }
+
+            private int i;
+
+            public async Task RunAsync(CancellationToken token)
+            {
+                Console.WriteLine("boom");
+                var timeout = _timeout.WaitAsync(token);
+                var task = WorkItemRunAsync();
+                var anyTask = await Task.WhenAny(task, timeout).ConfigureAwait(false);
+            }
+
+            private async Task WorkItemRunAsync()
+            {
+                await _source.Task.ConfigureAwait(false);
+            }
+
+            public bool IsAsync { get { return true; } }
         }
 
         public abstract class BaseTask : IBackgroundTask
