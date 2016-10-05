@@ -449,6 +449,21 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets a list of all version Ids for the given content item ordered so latest is first
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        public IEnumerable<Guid> GetVersionIds(int id, int maxRows)
+        {
+            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
+            {
+                var versions = repository.GetVersionIds(id, maxRows);
+                return versions;
+            }
+        }
+
+        /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects, which are ancestors of the current content.
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> to retrieve ancestors for</param>

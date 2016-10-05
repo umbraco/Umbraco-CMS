@@ -60,8 +60,8 @@ namespace Umbraco.Core.Services
 
             var content = (IContent) entity;
 
-            // lazily get versions
-            List<IContent> allVersions = null;
+            // lazily get previous version
+            IContentBase prevVersion = null;
 
             // do not load *all* users in memory at once
             // do not load notifications *per user* (N+1 select)
@@ -87,11 +87,14 @@ namespace Umbraco.Core.Services
                     // continue if there's no notification for this user
                     if (notifications[i].UserId != user.Id) continue; // next user
 
-                    // lazy load all versions
-                    if (allVersions == null) allVersions = _contentService.GetVersions(entity.Id).ToList();
+                    // lazy load prev version
+                    if (prevVersion == null)
+                    {
+                        prevVersion = GetPreviousVersion(entity.Id);
+                    }
 
                     // queue notification
-                    var req = CreateNotificationRequest(operatingUser, user, content, allVersions, actionName, http, createSubject, createBody);
+                    var req = CreateNotificationRequest(operatingUser, user, content, prevVersion, actionName, http, createSubject, createBody);
                     Enqueue(req);
 
                     // skip other notifications for this user
@@ -103,6 +106,21 @@ namespace Umbraco.Core.Services
                 id = users.Count == pagesz ? users.Last().Id + 1 : -1;
 
             } while (id > 0);
+        }
+
+        /// <summary>
+        /// Gets the previous version to the latest version of the content item if there is one
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        private IContentBase GetPreviousVersion(int contentId)
+        {
+            // Regarding this: http://issues.umbraco.org/issue/U4-5180
+            // we know they are descending from the service so we know that newest is first
+            // we are only selecting the top 2 rows since that is all we need
+            var allVersions = _contentService.GetVersionIds(contentId, 2).ToList();
+            var prevVersionIndex = allVersions.Count > 1 ? 1 : 0;
+            return _contentService.GetByVersion(allVersions[prevVersionIndex]);
         }
 
         /// <summary>
@@ -126,10 +144,15 @@ namespace Umbraco.Core.Services
                 throw new NotSupportedException();
 
             var entitiesL = entities as List<IContent> ?? entities.Cast<IContent>().ToList();
-            var paths = new List<int[]>();
+
+            //exit if there are no entities
+            if (entitiesL.Count == 0) return;
+
+            //put all entity's paths into a list with the same indicies
+            var paths = entitiesL.Select(x => x.Path.Split(',').Select(int.Parse).ToArray()).ToArray();
 
             // lazily get versions
-            var allVersionsDictionary = new Dictionary<int, List<IContent>>();
+            var prevVersionDictionary = new Dictionary<int, IContentBase>();
 
             // see notes above
             var id = 0;
@@ -150,25 +173,28 @@ namespace Umbraco.Core.Services
                     for (var j = 0; j < entitiesL.Count; j++)
                     {
                         var content = entitiesL[j];
-                        int[] path;
-                        if (paths.Count < j)
-                            paths.Add(path = content.Path.Split(',').Select(int.Parse).ToArray());
-                        else path = paths[j];
-
+                        var path = paths[j];
+                        
                         // test if the notification applies to the path ie to this entity
                         if (path.Contains(notifications[i].EntityId) == false) continue; // next entity
-
-                        var allVersions = allVersionsDictionary.ContainsKey(content.Id)
-                            ? allVersionsDictionary[content.Id]
-                            : allVersionsDictionary[content.Id] = _contentService.GetVersions(content.Id).ToList();
-
+                        
+                        if (prevVersionDictionary.ContainsKey(content.Id) == false)
+                        {
+                            prevVersionDictionary[content.Id] = GetPreviousVersion(content.Id);
+                        }
+                        
                         // queue notification
-                        var req = CreateNotificationRequest(operatingUser, user, content, allVersions, actionName, http, createSubject, createBody);
+                        var req = CreateNotificationRequest(operatingUser, user, content, prevVersionDictionary[content.Id], actionName, http, createSubject, createBody);
                         Enqueue(req);
                     }
 
-                    // skip other notifications for this user
-                    while (i < notifications.Count && notifications[i++].UserId == user.Id) ;
+                    // skip other notifications for this user, essentially this means moving i to the next index of notifications
+                    // for the next user.
+                    do
+                    {
+                        i++;
+                    } while (i < notifications.Count && notifications[i].UserId == user.Id);
+                    
                     if (i >= notifications.Count) break; // break if no more notifications
                 }
 
@@ -291,29 +317,23 @@ namespace Umbraco.Core.Services
         /// <param name="performingUser"></param>
         /// <param name="mailingUser"></param>
         /// <param name="content"></param>
-        /// <param name="allVersions"></param>
+        /// <param name="oldDoc"></param>
         /// <param name="actionName">The action readable name - currently an action is just a single letter, this is the name associated with the letter </param>
         /// <param name="http"></param>
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
-        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContent content, IEnumerable<IContent> allVersions, string actionName, HttpContextBase http,
+        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContentBase content, IContentBase oldDoc,            
+            string actionName, HttpContextBase http,
             Func<IUser, string[], string> createSubject,
             Func<IUser, string[], string> createBody)
         {
             if (performingUser == null) throw new ArgumentNullException("performingUser");
             if (mailingUser == null) throw new ArgumentNullException("mailingUser");
             if (content == null) throw new ArgumentNullException("content");
-            if (allVersions == null) throw new ArgumentNullException("allVersions");
             if (http == null) throw new ArgumentNullException("http");
             if (createSubject == null) throw new ArgumentNullException("createSubject");
-            if (createBody == null) throw new ArgumentNullException("createBody");
-
-            //Ensure they are sorted: http://issues.umbraco.org/issue/U4-5180
-            var allVersionsAsArray = allVersions.OrderBy(x => x.UpdateDate).ToArray();
-
-            int versionCount = (allVersionsAsArray.Length > 1) ? (allVersionsAsArray.Length - 2) : (allVersionsAsArray.Length - 1);
-            var oldDoc = _contentService.GetByVersion(allVersionsAsArray[versionCount].Version);
-
+            if (createBody == null) throw new ArgumentNullException("createBody");            
+            
             // build summary
             var summary = new StringBuilder();
             var props = content.Properties.ToArray();
@@ -345,26 +365,31 @@ namespace Umbraco.Core.Services
                         "<td style='text-align: left; vertical-align: top;'> <span style='background-color:red;'>Red for deleted characters</span>&nbsp;<span style='background-color:yellow;'>Yellow for inserted characters</span></td>");
                     summary.Append("</tr>");
                     summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> New " +
-                                   p.PropertyType.Name + "</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>" +
-                                   ReplaceLinks(CompareText(oldText, newText, true, false, "<span style='background-color:yellow;'>", string.Empty), http.Request) +
-                                   "</td>");
+                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> New ");
+                    summary.Append(p.PropertyType.Name);
+                    summary.Append("</th>");
+                    summary.Append("<td style='text-align: left; vertical-align: top;'>");
+                    summary.Append(ReplaceLinks(CompareText(oldText, newText, true, false, "<span style='background-color:yellow;'>", string.Empty), http.Request));
+                    summary.Append("</td>");
                     summary.Append("</tr>");
                     summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> Old " +
-                                   p.PropertyType.Name + "</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>" +
-                                   ReplaceLinks(CompareText(newText, oldText, true, false, "<span style='background-color:red;'>", string.Empty), http.Request) +
-                                   "</td>");
+                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> Old ");
+                    summary.Append(p.PropertyType.Name);
+                    summary.Append("</th>");
+                    summary.Append("<td style='text-align: left; vertical-align: top;'>");
+                    summary.Append(ReplaceLinks(CompareText(newText, oldText, true, false, "<span style='background-color:red;'>", string.Empty), http.Request));
+                    summary.Append("</td>");
                     summary.Append("</tr>");
                 }
                 else
                 {
                     summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'>" +
-                                   p.PropertyType.Name + "</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>" + newText + "</td>");
+                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'>");
+                    summary.Append(p.PropertyType.Name);
+                    summary.Append("</th>");
+                    summary.Append("<td style='text-align: left; vertical-align: top;'>");
+                    summary.Append(newText);
+                    summary.Append("</td>");
                     summary.Append("</tr>");
                 }
                 summary.Append(
@@ -375,9 +400,7 @@ namespace Umbraco.Core.Services
 
 
             string[] subjectVars = {
-                                       http.Request.ServerVariables["SERVER_NAME"] + ":" +
-                                       http.Request.Url.Port +
-                                       IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+                                       string.Concat(http.Request.ServerVariables["SERVER_NAME"], ":", http.Request.Url.Port, IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
                                        actionName,
                                        content.Name
                                    };
@@ -386,13 +409,13 @@ namespace Umbraco.Core.Services
                                     actionName,
                                     content.Name,
                                     performingUser.Name,
-                                    http.Request.ServerVariables["SERVER_NAME"] + ":" + http.Request.Url.Port + IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+                                    string.Concat(http.Request.ServerVariables["SERVER_NAME"], ":", http.Request.Url.Port, IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
                                     content.Id.ToString(CultureInfo.InvariantCulture), summary.ToString(),
                                     string.Format("{2}://{0}/{1}",
-                                                  http.Request.ServerVariables["SERVER_NAME"] + ":" + http.Request.Url.Port,
+                                                  string.Concat(http.Request.ServerVariables["SERVER_NAME"], ":", http.Request.Url.Port),
                                                   //TODO: RE-enable this so we can have a nice url
                                                   /*umbraco.library.NiceUrl(documentObject.Id))*/
-                                                  content.Id + ".aspx",
+                                                  string.Concat(content.Id, ".aspx"),
                                                   protocol)
 
                                 };
@@ -411,10 +434,10 @@ namespace Umbraco.Core.Services
             {
                 mail.IsBodyHtml = true;
                 mail.Body =
-                    @"<html><head>
+                    string.Concat(@"<html><head>
 </head>
 <body style='font-family: Trebuchet MS, arial, sans-serif; font-color: black;'>
-" + createBody(mailingUser, bodyVars);
+", createBody(mailingUser, bodyVars));
             }
 
             // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here
@@ -432,8 +455,12 @@ namespace Umbraco.Core.Services
 
         private static string ReplaceLinks(string text, HttpRequestBase request)
         {
-            string domain = GlobalSettings.UseSSL ? "https://" : "http://";
-            domain += request.ServerVariables["SERVER_NAME"] + ":" + request.Url.Port + "/";
+            var sb = new StringBuilder(GlobalSettings.UseSSL ? "https://" : "http://");
+            sb.Append(request.ServerVariables["SERVER_NAME"]);
+            sb.Append(":");
+            sb.Append(request.Url.Port);
+            sb.Append("/");
+            var domain = sb.ToString();
             text = text.Replace("href=\"/", "href=\"" + domain);
             text = text.Replace("src=\"/", "src=\"" + domain);
             return text;
