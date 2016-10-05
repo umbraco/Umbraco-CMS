@@ -1047,7 +1047,7 @@
       <name>Fanoe</name>
       <version>1.0.0</version>
       <license url="http://opensource.org/licenses/MIT">MIT License</license>
-      <url>http://umbraco.com</url>
+      <url>https://umbraco.com</url>
       <requirements>
         <major>3</major>
         <minor>0</minor>
@@ -1056,7 +1056,7 @@
     </package>
     <author>
       <name>Umbraco HQ</name>
-      <website>http://umbraco.com</website>
+      <website>https://umbraco.com</website>
     </author>
     <readme><![CDATA[]]></readme>
   </info>

@@ -5,7 +5,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class HelpElement : ConfigurationElement, IHelpSection
     {
-        [ConfigurationProperty("defaultUrl", DefaultValue = "http://our.umbraco.org/wiki/umbraco-help/{0}/{1}")]
+        [ConfigurationProperty("defaultUrl", DefaultValue = "https://our.umbraco.org/wiki/umbraco-help/{0}/{1}")]
         public string DefaultUrl
         {
             get { return (string) base["defaultUrl"]; }
