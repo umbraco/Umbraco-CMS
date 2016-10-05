@@ -69,6 +69,27 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Get_By_Ids_Sorted()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var results = new List<IContent>();
+            for (int i = 0; i < 20; i++)
+            {
+                results.Add(contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0));
+            }
+
+            var sortedGet = contentService.GetByIds(new[] {results[10].Id, results[5].Id, results[12].Id}).ToArray();
+
+            // Assert
+            Assert.AreEqual(sortedGet[0].Id, results[10].Id);
+            Assert.AreEqual(sortedGet[1].Id, results[5].Id);
+            Assert.AreEqual(sortedGet[2].Id, results[12].Id);
+        }
+
+        [Test]
         public void Count_All()
         {
             // Arrange
