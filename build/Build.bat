@@ -1,4 +1,4 @@
-::@ECHO OFF
+@ECHO OFF
 
 :: UMBRACO BUILD FILE
 
@@ -10,13 +10,13 @@ IF NOT EXIST UmbracoVersion.txt (
 	GOTO error
 )
 
-:: get the version and comment from UmbracoVersion.txt lines 2 and 3
+REM Get the version and comment from UmbracoVersion.txt lines 2 and 3
 SET RELEASE=
 SET COMMENT=
 FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED RELEASE SET RELEASE=%%i
 FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED COMMENT SET COMMENT=%%i
 
-:: process args
+REM process args
 
 SET INTEGRATION=0
 SET nuGetFolder=%CD%\..\src\packages\
@@ -77,7 +77,7 @@ GOTO processArgs
 
 :endProcessArgs 
 
-:: run
+REM run
 
 SET VERSION=%RELEASE%
 IF [%COMMENT%] EQU [] (SET VERSION=%RELEASE%) ELSE (SET VERSION=%RELEASE%-%COMMENT%)
@@ -86,8 +86,9 @@ ECHO.
 ECHO Building Umbraco %VERSION%
 ECHO.
 
-SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
-SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+SET MSBUILDPATH=C:\Program Files (x86)\MSBuild\14.0\Bin
+SET MSBUILD="%MSBUILDPATH%\MsBuild.exe"
+SET PATH="%MSBUILDPATH%";%PATH%
 
 ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %RELEASE%
 
@@ -111,22 +112,23 @@ CALL InstallGit.cmd
 REM Adding the default Git path so that if it's installed it can actually be found
 REM This is necessary because SETLOCAL is on in InstallGit.cmd so that one might find Git, 
 REM but the path setting is lost due to SETLOCAL 
-path=C:\Program Files (x86)\Git\cmd;C:\Program Files\Git\cmd;%PATH%
+SET PATH="C:\Program Files (x86)\Git\cmd";"C:\Program Files\Git\cmd";%PATH%
 
 ECHO.
 ECHO Making sure we have a web.config
 IF NOT EXIST %CD%\..\src\Umbraco.Web.UI\web.config COPY %CD%\..\src\Umbraco.Web.UI\web.Template.config %CD%\..\src\Umbraco.Web.UI\web.config
 
 ECHO.
+ECHO Reporting NuGet version
+%CD%\..\src\.nuget\NuGet.exe help | findstr "^NuGet Version:"
+
+ECHO.
 ECHO Restoring NuGet packages
 ECHO Into %nuGetFolder%
-..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Core\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
-..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Compat7\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
-..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
-..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-..\src\.nuget\NuGet.exe restore ..\src\UmbracoExamine\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+%CD%\..\src\.nuget\NuGet.exe restore %CD%\..\src\umbraco.sln -Verbosity Quiet -NonInteractive -PackagesDirectory %nuGetFolder%
+IF ERRORLEVEL 1 GOTO :error
 
+ECHO.
 ECHO.
 ECHO Performing MSBuild and producing Umbraco binaries zip files
 ECHO This takes a few minutes and logging is set to report warnings
@@ -145,7 +147,6 @@ IF %SKIPNUGET% EQU 1 GOTO success
 ECHO.
 ECHO Adding Web.config transform files to the NuGet package
 REN .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
-:: REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO.
 ECHO Packing the NuGet release files
@@ -169,6 +170,6 @@ ECHO.
 ECHO Errors were detected!
 ECHO.
 
-:: don't pause if continuous integration else the build server waits forever
-:: before cancelling the build (and, there is noone to read the output anyways)
+REM don't pause if continuous integration else the build server waits forever
+REM before cancelling the build (and, there is noone to read the output anyways)
 IF %INTEGRATION% NEQ 1 PAUSE

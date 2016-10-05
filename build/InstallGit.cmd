@@ -3,21 +3,23 @@ SETLOCAL
 REM SETLOCAL is on, so changes to the path not persist to the actual user's path
 
 git.exe --version
-if %ERRORLEVEL%==9009 GOTO :trydefaultpath
+IF %ERRORLEVEL%==9009 GOTO :trydefaultpath
+REM OK, DONE
 GOTO :EOF
 
 :trydefaultpath
-path=C:\Program Files (x86)\Git\cmd;C:\Program Files\Git\cmd;%PATH%
+PATH=C:\Program Files (x86)\Git\cmd;C:\Program Files\Git\cmd;%PATH%
 git.exe --version
-if %ERRORLEVEL%==9009 GOTO :showerror
+IF %ERRORLEVEL%==9009 GOTO :showerror
+REM OK, DONE
 GOTO :EOF
 
 :showerror
 ECHO Git is not in your path and could not be found in C:\Program Files (x86)\Git\cmd nor in C:\Program Files\Git\cmd
-set /p install=" Do you want to install Git through Chocolatey [y/n]? " %=%
-if %install%==y (
+SET /p install=" Do you want to install Git through Chocolatey [y/n]? " %=%
+IF %install%==y (
 	GOTO :installgit
-) else (
+) ELSE (
 	GOTO :cantcontinue
 )
 
