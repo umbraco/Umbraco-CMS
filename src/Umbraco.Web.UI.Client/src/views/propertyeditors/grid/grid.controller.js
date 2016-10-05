@@ -343,6 +343,37 @@ angular.module("umbraco")
             }
         };
 
+        var shouldApply = function(item, itemType, gridItem) {
+            if (item.applyTo === undefined || item.applyTo === null || item.applyTo === "") {
+                return true;
+            }
+
+            if (typeof (item.applyTo) === "string") {
+                return item.applyTo === itemType;
+            }
+
+            if (itemType === "row") {
+                if (item.applyTo.row === undefined) {
+                    return false;
+                }
+                if (item.applyTo.row === null || item.applyTo.row === "") {
+                    return true;
+                }
+                var rows = item.applyTo.row.split(',');
+                return _.indexOf(rows, gridItem.name) !== -1;
+            } else if (itemType === "cell") {
+                if (item.applyTo.cell === undefined) {
+                    return false;
+                }
+                if (item.applyTo.cell === null || item.applyTo.cell === "") {
+                    return true;
+                }
+                var cells = item.applyTo.cell.split(',');
+                var cellSize = gridItem.grid.toString();
+                return _.indexOf(cells, cellSize) !== -1;
+            }
+        }
+
         $scope.editGridItemSettings = function (gridItem, itemType) {
 
             placeHolder = "{0}";
@@ -352,8 +383,8 @@ angular.module("umbraco")
                 styles = null;
                 config = angular.copy(gridItem.editor.config.settings);
             } else {
-                styles = _.filter(angular.copy($scope.model.config.items.styles), function (item) { return (item.applyTo === undefined || item.applyTo === itemType); });
-                config = _.filter(angular.copy($scope.model.config.items.config), function (item) { return (item.applyTo === undefined || item.applyTo === itemType); });
+                styles = _.filter(angular.copy($scope.model.config.items.styles), function (item) { return shouldApply(item, itemType, gridItem); });
+                config = _.filter(angular.copy($scope.model.config.items.config), function (item) { return shouldApply(item, itemType, gridItem); });
             }
 
             if(angular.isObject(gridItem.config)){

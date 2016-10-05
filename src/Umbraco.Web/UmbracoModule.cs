@@ -324,7 +324,8 @@ namespace Umbraco.Web
                 () => pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
                 () => pcr.Is404 ? "true" : "false", () => pcr.ResponseStatusCode);
             
-            response.Cache.SetCacheability(pcr.Cacheability);
+            if(pcr.Cacheability != default(HttpCacheability))
+                response.Cache.SetCacheability(pcr.Cacheability);
 
             foreach (var cacheExtension in pcr.CacheExtensions)
                 response.Cache.AppendCacheExtension(cacheExtension);

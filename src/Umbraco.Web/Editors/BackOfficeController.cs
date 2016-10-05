@@ -226,7 +226,7 @@ namespace Umbraco.Web.Editors
                             //API URLs
                             {
                                 "redirectUrlManagementApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
-                                    controller => controller.IsEnabled())
+                                    controller => controller.GetEnableState())
                             },
                             {
                                 "embedApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RteEmbedController>(

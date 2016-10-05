@@ -342,11 +342,23 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IEnumerable<IContent> GetByIds(IEnumerable<int> ids)
         {
-            if (ids.Any() == false) return Enumerable.Empty<IContent>();
+            var idsArray = ids.ToArray();
+            if (idsArray.Length == 0) return Enumerable.Empty<IContent>();
 
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.GetAll(ids.ToArray());
+                //ensure that the result has the order based on the ids passed in
+                var result = repository.GetAll(idsArray);
+
+                var content = result.ToDictionary(x => x.Id, x => x);
+
+                var sortedResult = idsArray.Select(x =>
+                {
+                    IContent c;
+                    return content.TryGetValue(x, out c) ? c : null;
+                }).WhereNotNull();
+
+                return sortedResult;
             }
         }
 
