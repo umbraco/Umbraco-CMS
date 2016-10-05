@@ -52,7 +52,7 @@ namespace Umbraco.Web.Scheduling
 
         private bool _terminating; // ensures we raise that event only once
         private bool _terminated; // remember we've terminated
-        private TaskCompletionSource<int> _terminatedSource; // enable awaiting termination
+        private readonly TaskCompletionSource<int> _terminatedSource = new TaskCompletionSource<int>(); // enable awaiting termination
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class.
@@ -201,10 +201,6 @@ namespace Umbraco.Web.Scheduling
             {
                 lock (_locker)
                 {
-                    if (_terminatedSource == null)
-                        _terminatedSource = new TaskCompletionSource<int>();
-                    if (_terminated)
-                        _terminatedSource.SetResult(0);
                     return new ThreadingTaskImmutable(_terminatedSource.Task);
                 }
             }
@@ -719,8 +715,7 @@ namespace Umbraco.Web.Scheduling
 
             OnEvent(Terminated, "Terminated");
 
-            if (terminatedSource != null)
-                terminatedSource.SetResult(0);
+            terminatedSource.SetResult(0);
         }
     }
 }
