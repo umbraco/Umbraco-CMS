@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Hosting;
 using log4net;
 using LightInject;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core

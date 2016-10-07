@@ -1,4 +1,4 @@
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Core.DI
 {
     /// <summary>
     /// Represents a collection builder.

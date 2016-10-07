@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using LightInject;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Core.Cache
 {

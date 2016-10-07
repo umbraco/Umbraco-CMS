@@ -30,6 +30,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Plugins;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -85,8 +86,8 @@ namespace Umbraco.Tests.TestHelpers
                 new ManifestParser(Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), new NullCacheProvider()));
             Container.Register(_ => manifestBuilder);
 
-            PropertyEditorCollectionBuilder.Register(Container)
-                .Add(() => Current.PluginManager.ResolvePropertyEditors());
+            Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
+                .Add(() => Core.DI.Current.PluginManager.ResolvePropertyEditors());
         }
 
         private CacheHelper _disabledCacheHelper;
@@ -263,7 +264,7 @@ namespace Umbraco.Tests.TestHelpers
         protected override void FreezeResolution()
         {
             // fixme - what about if (PropertyValueConvertersResolver.HasCurrent == false) ??
-            PropertyValueConverterCollectionBuilder.Register(Container);
+            Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
             // ensure we have a FacadeService
             if (_facadeService == null)
@@ -274,17 +275,17 @@ namespace Umbraco.Tests.TestHelpers
                 var enableRepositoryEvents = behavior != null && behavior.EnableRepositoryEvents;
 
                 ContentTypesCache = new PublishedContentTypeCache(
-                        Current.Services.ContentTypeService,
-                        Current.Services.MediaTypeService,
-                        Current.Services.MemberTypeService,
-                        Current.Logger);
+                        Core.DI.Current.Services.ContentTypeService,
+                        Core.DI.Current.Services.MediaTypeService,
+                        Core.DI.Current.Services.MemberTypeService,
+                        Core.DI.Current.Logger);
 
                 // testing=true so XmlStore will not use the file nor the database
                 var facadeAccessor = new TestFacadeAccessor();
                 var service = new FacadeService(
-                    Current.Services,
+                    Core.DI.Current.Services,
                     _uowProvider,
-                    cache, facadeAccessor, Current.Logger, ContentTypesCache, null, true, enableRepositoryEvents);
+                    cache, facadeAccessor, Core.DI.Current.Logger, ContentTypesCache, null, true, enableRepositoryEvents);
 
                 // initialize PublishedCacheService content with an Xml source
                 service.XmlStore.GetXmlDocument = () =>
@@ -318,7 +319,7 @@ namespace Umbraco.Tests.TestHelpers
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
             {
-                var database = Current.DatabaseContext.Database;
+                var database = Core.DI.Current.DatabaseContext.Database;
                 var schemaHelper = new DatabaseSchemaHelper(database, Logger);
                 //Create the umbraco database and its base data
                 schemaHelper.CreateDatabaseSchema(Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
@@ -334,7 +335,7 @@ namespace Umbraco.Tests.TestHelpers
         [TestFixtureTearDown]
         public void FixtureTearDown()
         {
-            RemoveDatabaseFile(Current.DatabaseContext.Database);
+            RemoveDatabaseFile(Core.DI.Current.DatabaseContext.Database);
         }
 
         [TearDown]
@@ -346,7 +347,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
                 {
-                    RemoveDatabaseFile(Current.DatabaseContext.Database);
+                    RemoveDatabaseFile(Core.DI.Current.DatabaseContext.Database);
                 }
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
@@ -407,16 +408,16 @@ namespace Umbraco.Tests.TestHelpers
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<BaseDatabaseFactoryTest>("Could not remove the old database file", ex);
+                Core.DI.Current.Logger.Error<BaseDatabaseFactoryTest>("Could not remove the old database file", ex);
 
                 //We will swallow this exception! That's because a sub class might require further teardown logic.
                 onFail?.Invoke(ex);
             }
         }
 
-        protected ServiceContext ServiceContext => Current.Services;
+        protected ServiceContext ServiceContext => Core.DI.Current.Services;
 
-        protected DatabaseContext DatabaseContext => Current.DatabaseContext;
+        protected DatabaseContext DatabaseContext => Core.DI.Current.DatabaseContext;
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
@@ -437,7 +438,7 @@ namespace Umbraco.Tests.TestHelpers
             var ctx = UmbracoContext.CreateContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Current.Services.UserService),
+                new WebSecurity(httpContext, Core.DI.Current.Services.UserService),
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>());
 

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders

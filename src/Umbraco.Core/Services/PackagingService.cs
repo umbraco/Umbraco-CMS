@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 

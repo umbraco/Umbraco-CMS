@@ -1,12 +1,13 @@
 ﻿using System;
 using Umbraco.Core.Components;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Strategies
 {
     //TODO: This should just exist in the content service/repo!
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class RelateOnCopyComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         public void Initialize()
@@ -14,32 +15,31 @@ namespace Umbraco.Core.Strategies
             ContentService.Copied += ContentServiceCopied;
         }
 
-        private void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
+        private static void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<IContent> e)
         {
-            if (e.RelateToOriginal)
+            if (e.RelateToOriginal == false) return;
+
+            var relationService = Current.Services.RelationService;
+
+            var relationType = relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
+
+            if (relationType == null)
             {
-                var relationService = Current.Services.RelationService;
+                relationType = new RelationType(new Guid(Constants.ObjectTypes.Document),
+                    new Guid(Constants.ObjectTypes.Document),
+                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
+                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyName) { IsBidirectional = true };
 
-                var relationType = relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
-
-                if (relationType == null)
-                {
-                    relationType = new RelationType(new Guid(Constants.ObjectTypes.Document),
-                        new Guid(Constants.ObjectTypes.Document),
-                        Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
-                        Constants.Conventions.RelationTypes.RelateDocumentOnCopyName) { IsBidirectional = true };
-
-                    relationService.Save(relationType);
-                }
-
-                var relation = new Relation(e.Original.Id, e.Copy.Id, relationType);
-                relationService.Save(relation);
-
-                Current.Services.AuditService.Add(
-                    AuditType.Copy,
-                    string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
-                        e.Copy.Id, e.Original.Id), e.Copy.WriterId, e.Copy.Id);
+                relationService.Save(relationType);
             }
+
+            var relation = new Relation(e.Original.Id, e.Copy.Id, relationType);
+            relationService.Save(relation);
+
+            Current.Services.AuditService.Add(
+                AuditType.Copy,
+                $"Copied content with Id: '{e.Copy.Id}' related to original content with Id: '{e.Original.Id}'",
+                e.Copy.WriterId, e.Copy.Id);
         }
     }
 }

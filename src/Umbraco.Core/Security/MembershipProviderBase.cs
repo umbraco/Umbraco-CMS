@@ -8,7 +8,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Security

@@ -13,7 +13,7 @@ using umbraco.cms.businesslogic.web;
 using System.Diagnostics;
 using Umbraco.Core.Models;
 using System.Security;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Xml;
 using File = System.IO.File;
 using Macro = umbraco.cms.businesslogic.macro.Macro;

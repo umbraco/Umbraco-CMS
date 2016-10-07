@@ -4,7 +4,7 @@ using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Cache;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Web

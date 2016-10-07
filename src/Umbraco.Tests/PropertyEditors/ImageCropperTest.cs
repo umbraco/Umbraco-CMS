@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.PropertyEditors
             {
                 var container = new ServiceContainer();
                 container.ConfigureUmbracoCore();
-                PropertyValueConverterCollectionBuilder.Register(container);
+                container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
                 var dataTypeService = new Mock<IDataTypeService>();
                 dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>())).Returns(new PreValueCollection(Enumerable.Empty<PreValue>()));
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.PropertyEditors
             }
             finally
             {
-                Core.DependencyInjection.Current.Reset();
+                Core.DI.Current.Reset();
             }
         }
 

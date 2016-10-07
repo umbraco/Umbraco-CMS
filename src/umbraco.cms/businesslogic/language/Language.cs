@@ -12,7 +12,7 @@ using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Linq;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 
 namespace umbraco.cms.businesslogic.language
 {

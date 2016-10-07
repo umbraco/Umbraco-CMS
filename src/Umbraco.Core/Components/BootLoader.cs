@@ -40,7 +40,7 @@ namespace Umbraco.Core.Components
         {
             if (_booted) throw new InvalidOperationException("Can not boot, has already booted.");
 
-            var orderedComponentTypes = PrepareComponentTypes(componentTypes);
+            var orderedComponentTypes = PrepareComponentTypes(componentTypes, level);
 
             InstanciateComponents(orderedComponentTypes);
             ComposeComponents(level);
@@ -50,17 +50,24 @@ namespace Umbraco.Core.Components
             _booted = true;
         }
 
-        private IEnumerable<Type> PrepareComponentTypes(IEnumerable<Type> componentTypes)
+        private IEnumerable<Type> PrepareComponentTypes(IEnumerable<Type> componentTypes, RuntimeLevel level)
         {
             using (_proflog.DebugDuration<BootLoader>("Preparing component types.", "Prepared component types."))
             {
-                return PrepareComponentTypes2(componentTypes);
+                return PrepareComponentTypes2(componentTypes, level);
             }
         }
 
-        private static IEnumerable<Type> PrepareComponentTypes2(IEnumerable<Type> componentTypes)
+        private static IEnumerable<Type> PrepareComponentTypes2(IEnumerable<Type> componentTypes, RuntimeLevel level)
         {
-            var componentTypeList = componentTypes.ToList();
+            // create a list, remove those that cannot be enabled due to runtime level
+            var componentTypeList = componentTypes
+                .Where(x =>
+                {
+                    var attr = x.GetCustomAttribute<RuntimeLevelAttribute>();
+                    return attr == null || level >= attr.MinLevel;
+                })
+                .ToList();
 
             // cannot remove that one - ever
             if (componentTypeList.Contains(typeof(UmbracoCoreComponent)) == false)
@@ -176,12 +183,13 @@ namespace Umbraco.Core.Components
         {
             using (_proflog.DebugDuration<BootLoader>($"Composing components. (log when >{LogThresholdMilliseconds}ms)", "Composed components."))
             {
+                var composition = new Composition(_container, level);
                 foreach (var component in _components)
                 {
                     var componentType = component.GetType();
                     using (_proflog.DebugDuration<BootLoader>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
-                        component.Compose(_container, level);
+                        component.Compose(composition);
                     }
                 }
             }

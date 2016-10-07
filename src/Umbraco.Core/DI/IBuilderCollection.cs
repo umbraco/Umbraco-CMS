@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Core.DI
 {
     /// <summary>
     /// Represents a builder collection, ie an immutable enumeration of items.

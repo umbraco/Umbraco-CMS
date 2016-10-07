@@ -4,7 +4,7 @@ using System.Linq;
 using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.DependencyInjection
 {
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.DependencyInjection
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
-            TestCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
                 .Add<TransientObject2>()
                 .Add<TransientObject3>()
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.DependencyInjection
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
-            TestCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject1) });
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.DependencyInjection
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
-            TestCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
                 .Add<TransientObject2>()
                 .Add<TransientObject3>()
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.DependencyInjection
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
-            TestCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
 
                 // illegal, does not implement the interface!
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.DependencyInjection
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
-            TestCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) })
                 .Exclude<TransientObject3>();

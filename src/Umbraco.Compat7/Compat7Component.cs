@@ -18,8 +18,11 @@ namespace Umbraco.Compat7
         public static event EventHandler ApplicationStarting;
         public static event EventHandler ApplicationStarted;
 
-        public override void Compose(ServiceContainer container)
+        public override void Compose(Composition composition)
         {
+            base.Compose(composition);
+
+            var container = composition.Container;
             _app = container.GetInstance<UmbracoApplicationBase>();
             var logger = container.GetInstance<ILogger>();
 

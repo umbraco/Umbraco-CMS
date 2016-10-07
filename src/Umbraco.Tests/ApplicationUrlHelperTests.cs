@@ -12,7 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests
 {

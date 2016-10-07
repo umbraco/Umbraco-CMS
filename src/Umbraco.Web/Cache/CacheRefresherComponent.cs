@@ -18,6 +18,7 @@ namespace Umbraco.Web.Cache
     /// <summary>
     /// Installs listeners on service events in order to refresh our caches.
     /// </summary>
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class CacheRefresherComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         public void Initialize()

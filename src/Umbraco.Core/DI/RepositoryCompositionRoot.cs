@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Plugins;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Core.DI
 {
     /// <summary>
     /// Sets the IoC container for the umbraco data layer/repositories/sql/database/etc...

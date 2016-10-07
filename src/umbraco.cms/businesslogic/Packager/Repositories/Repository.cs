@@ -7,7 +7,7 @@ using System.IO;
 using System.Net;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;

@@ -7,7 +7,7 @@ using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
@@ -157,15 +157,15 @@ namespace Umbraco.Tests.Runtimes
                 Ctored = true;
             }
 
-            public override void Compose(ServiceContainer container)
+            public override void Compose(Composition composition)
             {
-                base.Compose(container);
+                base.Compose(composition);
 
-                container.Register(factory => SettingsForTests.GetDefault());
-                container.Register(factory => new DatabaseContext(
+                composition.Container.Register(factory => SettingsForTests.GetDefault());
+                composition.Container.Register(factory => new DatabaseContext(
                     factory.GetInstance<IDatabaseFactory>(),
                     factory.GetInstance<ILogger>(), factory.GetInstance<IRuntimeState>(), Mock.Of<IMigrationEntryService>()), new PerContainerLifetime());
-                container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
+                composition.Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
 
                 Composed = true;
             }

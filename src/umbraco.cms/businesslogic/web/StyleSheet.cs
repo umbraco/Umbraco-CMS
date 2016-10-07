@@ -5,7 +5,7 @@ using System.Xml;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Xml;
 

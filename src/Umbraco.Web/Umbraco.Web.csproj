@@ -159,6 +159,7 @@
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
+    <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Current.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
@@ -277,6 +278,7 @@
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
     <Compile Include="SignalR\PreviewHub.cs" />
+    <Compile Include="Strategies\LegacyServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Strategies\Migrations\IPostMigration.cs" />
     <Compile Include="Strategies\Migrations\PostMigrationCollection.cs" />
     <Compile Include="Strategies\Migrations\PostMigrationCollectionBuilder.cs" />
@@ -989,7 +991,7 @@
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineComponent.cs" />
     <Compile Include="Strategies\Migrations\PublishAfterUpgradeToVersionSixth.cs" />
-    <Compile Include="Strategies\DatabaseServerRegistrationComponent.cs" />
+    <Compile Include="Strategies\DatabaseServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />

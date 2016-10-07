@@ -12,7 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using umbraco.DataLayer.Utility;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 
 namespace umbraco.DataLayer

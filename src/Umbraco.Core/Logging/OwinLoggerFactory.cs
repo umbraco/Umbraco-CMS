@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Owin.Logging;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Core.Logging
 {

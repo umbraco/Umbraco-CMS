@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Core.DI
 {
     /// <summary>
     /// Specifies the weight of pretty much anything.

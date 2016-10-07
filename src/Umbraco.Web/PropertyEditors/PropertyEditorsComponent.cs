@@ -8,6 +8,7 @@ using UmbracoExamine;
 
 namespace Umbraco.Web.PropertyEditors
 {
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     internal class PropertyEditorsComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection)

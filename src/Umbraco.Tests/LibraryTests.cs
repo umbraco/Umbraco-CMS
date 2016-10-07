@@ -16,6 +16,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using umbraco;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests
 {
@@ -56,7 +57,7 @@ namespace Umbraco.Tests
 	    protected override void FreezeResolution()
 	    {
             // required so we can access property.Value
-	        PropertyValueConverterCollectionBuilder.Register(Container);
+	        Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
 	        base.FreezeResolution();
 	    }

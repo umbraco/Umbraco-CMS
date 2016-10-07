@@ -6,7 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Integration
             Container.Register<IServerRegistrar>(_ => new DistributedCacheTests.TestServerRegistrar()); // localhost-only
             Container.Register<IServerMessenger, WebServiceServerMessenger>(new PerContainerLifetime());
 
-            CacheRefresherCollectionBuilder.Register(Container)
+            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<ContentTypeCacheRefresher>()
                 .Add<ContentCacheRefresher>()
                 .Add<MacroCacheRefresher>();

@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.Models.Mapping
 {
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Models.Mapping
             Container.Register(_ => manifestBuilder);
 
             Func<IEnumerable<Type>> typeListProducerList = Enumerable.Empty<Type>;
-            PropertyEditorCollectionBuilder.Register(Container)
+            Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
                 .Add(typeListProducerList);
         }
 

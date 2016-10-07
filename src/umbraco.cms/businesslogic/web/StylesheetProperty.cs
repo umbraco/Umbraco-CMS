@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web

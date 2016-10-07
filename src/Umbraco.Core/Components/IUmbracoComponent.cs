@@ -1,6 +1,4 @@
-﻿using LightInject;
-
-namespace Umbraco.Core.Components
+﻿namespace Umbraco.Core.Components
 {
     /// <summary>
     /// Represents an Umbraco component.
@@ -10,9 +8,8 @@ namespace Umbraco.Core.Components
         /// <summary>
         /// Composes the component.
         /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="level">The runtime level.</param>
-        void Compose(ServiceContainer container, RuntimeLevel level);
+        /// <param name="composition">The composition.</param>
+        void Compose(Composition composition);
 
         /// <summary>
         /// Terminates the component.

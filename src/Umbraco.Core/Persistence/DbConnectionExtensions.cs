@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using NPoco;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence

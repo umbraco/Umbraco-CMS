@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.ObjectResolution;
-using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
+using CoreCurrent = Umbraco.Core.DI.Current;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Core.Cache

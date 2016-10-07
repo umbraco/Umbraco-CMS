@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web.Security;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 

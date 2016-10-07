@@ -3,7 +3,7 @@ using System.Linq;
 using System.Xml;
 using LightInject;
 using NUnit.Framework;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Plugins;
 using Umbraco.Core._Legacy.PackageActions;
 
@@ -22,7 +22,7 @@ namespace Umbraco.Tests.DependencyInjection
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
-            PackageActionCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => PluginManager.ResolvePackageActions());
 
 			var actions = Current.PackageActions;

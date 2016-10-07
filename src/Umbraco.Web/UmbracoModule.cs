@@ -483,7 +483,7 @@ namespace Umbraco.Web
 		/// <param name="app"></param>
 		public void Init(HttpApplication app)
 		{
-            if (Core.DependencyInjection.Current.RuntimeState.Level == RuntimeLevel.BootFailed)
+            if (Core.DI.Current.RuntimeState.Level == RuntimeLevel.BootFailed)
             {
                 // there's nothing we can do really
                 app.BeginRequest += (sender, args) => { throw new BootFailedException("Boot failed. Umbraco cannot run. Umbraco's log file contains details about what caused the boot to fail."); };
@@ -492,7 +492,7 @@ namespace Umbraco.Web
 
 		    // modules are *not* instanciated by the container so we have to
 		    // get our dependencies injected manually, through properties.
-		    Core.DependencyInjection.Current.Container.InjectProperties(this);
+		    Core.DI.Current.Container.InjectProperties(this);
 
 		    app.BeginRequest += (sender, e) =>
 		    {

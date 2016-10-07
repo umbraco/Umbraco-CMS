@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Strategies
 {
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class NotificationsComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         public void Initialize(INotificationService notificationService)

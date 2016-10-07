@@ -1,6 +1,6 @@
 ﻿using LightInject;
 using NUnit.Framework;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.DependencyInjection
@@ -13,7 +13,7 @@ namespace Umbraco.Tests.DependencyInjection
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
-            UrlProviderCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<UrlProviderCollectionBuilder>()
                 .Append<DefaultUrlProvider>();
             var col = container.GetInstance<UrlProviderCollection>();
         }

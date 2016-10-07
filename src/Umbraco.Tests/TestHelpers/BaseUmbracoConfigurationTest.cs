@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.TestHelpers

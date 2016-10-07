@@ -12,7 +12,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.businesslogic.language

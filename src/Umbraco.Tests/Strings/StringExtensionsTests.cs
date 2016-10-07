@@ -4,7 +4,7 @@ using System.Globalization;
 using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Strings

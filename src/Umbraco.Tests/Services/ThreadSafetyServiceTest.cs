@@ -23,7 +23,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Current = Umbraco.Core.DependencyInjection.Current;
+using Current = Umbraco.Core.DI.Current;
 
 namespace Umbraco.Tests.Services
 {

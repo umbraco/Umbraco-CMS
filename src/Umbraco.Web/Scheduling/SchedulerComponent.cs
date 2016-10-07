@@ -16,6 +16,7 @@ namespace Umbraco.Web.Scheduling
     /// All tasks are run in a background task runner which is web aware and will wind down 
     /// the task correctly instead of killing it completely when the app domain shuts down.
     /// </remarks>
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     internal sealed class SchedulerComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private IRuntimeState _runtime;

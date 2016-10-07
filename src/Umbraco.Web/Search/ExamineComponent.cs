@@ -21,10 +21,11 @@ using UmbracoExamine;
 
 namespace Umbraco.Web.Search
 {
-	/// <summary>
-	/// Used to wire up events for Examine
-	/// </summary>
-	public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    /// <summary>
+    /// Used to wire up events for Examine
+    /// </summary>
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
+    public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
 	{
 		public void Initialize(ILogger logger)
 		{

@@ -20,7 +20,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Cache.PublishedCache
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 	{
         protected override void FreezeResolution()
         {
-            UrlSegmentProviderCollectionBuilder.Register(Container)
+            Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
 
             base.FreezeResolution();

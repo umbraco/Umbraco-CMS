@@ -8,7 +8,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Tests.Components
@@ -192,9 +192,9 @@ namespace Umbraco.Tests.Components
 
         public class TestComponentBase : UmbracoComponentBase
         {
-            public override void Compose(ServiceContainer container)
+            public override void Compose(Composition composition)
             {
-                base.Compose(container);
+                base.Compose(composition);
                 Composed.Add(GetType());
             }
         }

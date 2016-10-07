@@ -18,6 +18,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using UmbracoExamine;
 using Current = Umbraco.Web.Current;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.PublishedContent
         /// </summary>
         protected override void FreezeResolution()
         {
-            UrlSegmentProviderCollectionBuilder.Register(Container)
+            Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
 
             base.FreezeResolution();

@@ -23,7 +23,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Current = Umbraco.Core.DependencyInjection.Current;
+using Current = Umbraco.Core.DI.Current;
 
 namespace Umbraco.Tests.Web.Mvc
 {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

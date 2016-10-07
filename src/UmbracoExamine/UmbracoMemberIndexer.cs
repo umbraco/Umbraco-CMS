@@ -13,7 +13,7 @@ using Examine;
 using System.IO;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
 

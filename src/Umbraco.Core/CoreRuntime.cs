@@ -7,7 +7,7 @@ using Semver;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -201,7 +201,7 @@ namespace Umbraco.Core
 
             // register persistence mappers - means the only place the collection can be modified
             // is in a runtime - afterwards it has been frozen and it is too late
-            MapperCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<MapperCollectionBuilder>()
                 .Add(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
 
             // register database factory

@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
 
@@ -22,7 +28,8 @@ namespace Umbraco.Web.Strategies
     /// out the "server address" ie the address to which server-to-server requests should be sent - because it
     /// probably is not the "current request address" - especially in multi-domains configurations.</para>
     /// </remarks>
-    public sealed class DatabaseServerRegistrationComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
+    public sealed class DatabaseServerRegistrarAndMessengerComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private object _locker = new object();
         private DatabaseServerRegistrar _registrar;
@@ -33,12 +40,66 @@ namespace Umbraco.Web.Strategies
         private bool _started;
         private TouchServerTask _task;
 
+        public override void Compose(Composition composition)
+        {
+            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
+
+            composition.SetServerMessenger(factory =>
+            {
+                var runtime = factory.GetInstance<IRuntimeState>();
+                var databaseContext = factory.GetInstance<DatabaseContext>();
+                var logger = factory.GetInstance<ILogger>();
+                var proflog = factory.GetInstance<ProfilingLogger>();
+
+                return new BatchedDatabaseServerMessenger(
+                    runtime, databaseContext, logger, proflog,
+                    true,
+                    //Default options for web including the required callbacks to build caches
+                    new DatabaseServerMessengerOptions
+                    {
+                        //These callbacks will be executed if the server has not been synced
+                        // (i.e. it is a new server or the lastsynced.txt file has been removed)
+                        InitializingCallbacks = new Action[]
+                        {
+                            //rebuild the xml cache file if the server is not synced
+                            () =>
+                            {
+                                // rebuild the facade caches entirely, if the server is not synced
+                                // this is equivalent to DistributedCache RefreshAllFacade but local only
+                                // (we really should have a way to reuse RefreshAllFacade... locally)
+                                // note: refresh all content & media caches does refresh content types too
+                                var svc = Current.FacadeService;
+                                bool ignored1, ignored2;
+                                svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
+                                svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1, out ignored2);
+                                svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1);
+                            },
+
+                            //rebuild indexes if the server is not synced
+                            // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
+                            // indexes then they can adjust this logic themselves.
+                            () => RebuildIndexes(false)
+                        }
+                    });
+            });
+        }
+
+        // fixme - this should move to something else, we should not depend on Examine here!
+        private static void RebuildIndexes(bool onlyEmptyIndexes)
+        {
+            var indexers = (IEnumerable<KeyValuePair<string, IExamineIndexer>>) ExamineManager.Instance.IndexProviders;
+            if (onlyEmptyIndexes)
+                indexers = indexers.Where(x => x.Value.IsIndexNew());
+            foreach (var indexer in indexers)
+                indexer.Value.RebuildIndex();
+        }
+
         public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerRegistrationService registrationService, ILogger logger)
         {
-            _registrar = serverRegistrar as DatabaseServerRegistrar;
+            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
 
-            // only for the DatabaseServerRegistrar
-            if (_registrar == null) return;
+            _registrar = serverRegistrar as DatabaseServerRegistrar;
+            if (_registrar == null) throw new Exception("panic: registar.");
 
             _runtime = runtime;
             _logger = logger;
@@ -144,7 +205,7 @@ namespace Umbraco.Web.Strategies
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseServerRegistrationComponent>("Failed to update server record in database.", ex);
+                    _logger.Error<DatabaseServerRegistrarAndMessengerComponent>("Failed to update server record in database.", ex);
                     return false; // probably stop if we have an error
                 }
             }

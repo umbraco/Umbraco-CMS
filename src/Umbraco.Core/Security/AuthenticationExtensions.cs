@@ -15,7 +15,7 @@ using AutoMapper;
 using Microsoft.Owin;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Logging;
 

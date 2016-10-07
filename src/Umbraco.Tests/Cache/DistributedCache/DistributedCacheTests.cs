@@ -6,7 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             container.Register<IServerRegistrar>(_ => new TestServerRegistrar());
             container.Register<IServerMessenger>(_ => new TestServerMessenger(), new PerContainerLifetime());
 
-            CacheRefresherCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<TestCacheRefresher>();
         }
 

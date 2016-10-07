@@ -2,7 +2,7 @@ using System;
 using System.Configuration;
 using umbraco.DataLayer;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 
 namespace umbraco.cms.businesslogic

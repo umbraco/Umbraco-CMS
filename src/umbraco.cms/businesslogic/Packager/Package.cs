@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.packager

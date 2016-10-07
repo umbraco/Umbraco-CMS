@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LightInject;
 using NUnit.Framework;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.DependencyInjection
 {
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void ContainsTypes()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void Clear()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.DependencyInjection
         [ExpectedException(typeof(InvalidOperationException))]
         public void ClearOnceResolved()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void Append()
         {
-            var builder = TestCollectionBuilder.Register(_container);
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>();
             builder.Append<Resolved1>();
             builder.Append<Resolved2>();
 
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.DependencyInjection
         [ExpectedException(typeof(InvalidOperationException))]
         public void AppendOnceResolved()
         {
-            var builder = TestCollectionBuilder.Register(_container);
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>();
 
             var col = builder.CreateCollection();
             builder.Append<Resolved1>();
@@ -168,7 +168,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void AppendDuplicate()
         {
-            var builder = TestCollectionBuilder.Register(_container);
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>();
             builder.Append<Resolved1>();
             builder.Append<Resolved1>();
 
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.DependencyInjection
         [ExpectedException(typeof(InvalidOperationException))]
         public void AppendInvalid()
         {
-            var builder = TestCollectionBuilder.Register(_container);
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>();
             //builder.Append<Resolved4>(); // does not compile
             builder.Append(new[] { typeof(Resolved4) }); // throws
         }
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void Remove()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .Remove<Resolved2>();
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void RemoveAbsent()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .Remove<Resolved3>();
@@ -217,7 +217,7 @@ namespace Umbraco.Tests.DependencyInjection
         [ExpectedException(typeof(InvalidOperationException))]
         public void RemoveOnceResolved()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void Insert()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .Insert<Resolved3>();
@@ -245,7 +245,7 @@ namespace Umbraco.Tests.DependencyInjection
         [ExpectedException(typeof(InvalidOperationException))]
         public void InsertOnceResolved()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void CanInsertDuplicate()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .Insert<Resolved2>();
@@ -268,7 +268,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void InsertInEmpty()
         {
-            var builder = TestCollectionBuilder.Register(_container);
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>();
             builder.Insert<Resolved2>();
 
             var col = builder.CreateCollection();
@@ -279,7 +279,7 @@ namespace Umbraco.Tests.DependencyInjection
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void InsertAtWrongIndex1()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -290,7 +290,7 @@ namespace Umbraco.Tests.DependencyInjection
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void InsertAtWrongIndex2()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -300,7 +300,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void InsertBefore()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .InsertBefore<Resolved2, Resolved3>();
@@ -317,7 +317,7 @@ namespace Umbraco.Tests.DependencyInjection
         [ExpectedException(typeof(InvalidOperationException))]
         public void InsertBeforeOnceResolved()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -328,7 +328,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void InsertBeforeDuplicate()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .InsertBefore<Resolved1, Resolved2>();
@@ -341,7 +341,7 @@ namespace Umbraco.Tests.DependencyInjection
         [ExpectedException(typeof(InvalidOperationException))]
         public void InsertBeforeAbsent()
         {
-            var builder = TestCollectionBuilder.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .InsertBefore<Resolved2, Resolved3>();
         }
@@ -349,7 +349,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void ScopeIsApplication()
         {
-            TestCollectionBuilder.Register(_container)
+            _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -369,7 +369,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void ScopeIsTransient()
         {
-            TestCollectionBuilderTransient.Register(_container)
+            _container.RegisterCollectionBuilder<TestCollectionBuilderTransient>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -389,7 +389,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void OrderOfTypes()
         {
-            var builder = TestCollectionBuilderTransient.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilderTransient>()
                 .Append<Resolved3>()
                 .Insert<Resolved1>()
                 .InsertBefore<Resolved3, Resolved2>();
@@ -401,7 +401,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void ScopeIsScope()
         {
-            TestCollectionBuilderScope.Register(_container)
+            _container.RegisterCollectionBuilder<TestCollectionBuilderScope>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -432,7 +432,7 @@ namespace Umbraco.Tests.DependencyInjection
         [Test]
         public void Weights()
         {
-            var builder = TestCollectionBuilderWeighted.Register(_container)
+            var builder = _container.RegisterCollectionBuilder<TestCollectionBuilderWeighted>()
                .Add<Resolved1>()
                .Add<Resolved2>();
 

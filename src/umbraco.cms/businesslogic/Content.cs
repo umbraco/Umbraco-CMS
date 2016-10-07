@@ -9,7 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 using File = System.IO.File;

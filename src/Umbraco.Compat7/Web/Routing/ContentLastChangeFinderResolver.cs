@@ -1,6 +1,6 @@
 ﻿using System;
-using Umbraco.Core.DependencyInjection;
-using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
+using Umbraco.Core.DI;
+using CoreCurrent = Umbraco.Core.DI.Current;
 using WebCurrent = Umbraco.Web.Current;
 
 // ReSharper disable once CheckNamespace

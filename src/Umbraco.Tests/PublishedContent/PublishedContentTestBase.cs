@@ -1,4 +1,5 @@
 using Umbraco.Core;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             // fixme - what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
             // can we risk double - registering and then, what happens?
-            PropertyValueConverterCollectionBuilder.Register(Container)
+            Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<DatePickerValueConverter>()
                 .Append<TinyMceValueConverter>()
                 .Append<YesNoValueConverter>();

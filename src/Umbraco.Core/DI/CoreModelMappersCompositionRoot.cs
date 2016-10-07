@@ -1,7 +1,7 @@
 using LightInject;
 using Umbraco.Core.Models.Identity;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Core.DI
 {
     public sealed class CoreModelMappersCompositionRoot : ICompositionRoot
     {

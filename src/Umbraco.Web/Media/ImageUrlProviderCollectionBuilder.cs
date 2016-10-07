@@ -1,5 +1,5 @@
 ﻿using LightInject;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media

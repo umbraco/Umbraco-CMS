@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LightInject;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Core.DI
 {
     internal static class LightInjectExtensions
     {
@@ -248,6 +248,17 @@ namespace Umbraco.Core.DependencyInjection
                     container.Register(serviceType);
                 return false;
             }, null);
+        }
+
+        public static TBuilder RegisterCollectionBuilder<TBuilder>(this IServiceContainer container)
+        {
+            // register the builder - per container
+            var builderLifetime = new PerContainerLifetime();
+            container.Register<TBuilder>(builderLifetime);
+
+            // return the builder
+            // (also initializes the builder)
+            return container.GetInstance<TBuilder>();
         }
     }
 }

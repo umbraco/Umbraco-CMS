@@ -1,5 +1,5 @@
-﻿using LightInject;
-using Umbraco.Core.Components;
+﻿using Umbraco.Core.Components;
+using Umbraco.Core.DI;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Plugins;
 
@@ -7,9 +7,9 @@ namespace Umbraco.Web.Strategies.Migrations
 {
     public class PostMigrationComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        public override void Compose(ServiceContainer container)
+        public override void Compose(Composition composition)
         {
-            PostMigrationCollectionBuilder.Register(container)
+            composition.Container.RegisterCollectionBuilder<PostMigrationCollectionBuilder>()
                 .Add(factory => factory.GetInstance<PluginManager>().ResolveTypes<IPostMigration>());
         }
 
@@ -20,5 +20,15 @@ namespace Umbraco.Web.Strategies.Migrations
             foreach (var post in posts)
                 MigrationRunner.Migrated += post.Migrated;
         }
+    }
+
+    public static class PostMigrationComponentCompositionExtensions
+    {
+        /// <summary>
+        /// Gets the post-migrations collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        internal static PostMigrationCollectionBuilder PostMigrations(this Composition composition)
+            => composition.Container.GetInstance<PostMigrationCollectionBuilder>();
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using LightInject;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Core.DI
 {
     /// <summary>
     /// Provides a base class for collection builders.
@@ -69,34 +69,6 @@ namespace Umbraco.Core.DependencyInjection
         /// </summary>
         /// <remarks>Return null for transient collections.</remarks>
         protected virtual ILifetime CollectionLifetime => new PerContainerLifetime();
-
-        /// <summary>
-        /// Registers the collection builder into a service container.
-        /// </summary>
-        /// <param name="container">The service container.</param>
-        /// <remarks>The collection builder is registered with a "per container" lifetime,
-        /// and the collection is registered wiht a lifetime that is "per container" by
-        /// default but can be overriden by each builder implementation.</remarks>
-        public static TBuilder Register(IServiceContainer container)
-        {
-            // register the builder - per container
-            var builderLifetime = new PerContainerLifetime();
-            container.Register<TBuilder>(builderLifetime);
-
-            // return the builder
-            // also initializes the builder
-            return container.GetInstance<TBuilder>();
-        }
-
-        /// <summary>
-        /// Gets the collection builder from a service container.
-        /// </summary>
-        /// <param name="container">The service container.</param>
-        /// <returns>The collection builder.</returns>
-        public static TBuilder Get(IServiceContainer container)
-        {
-            return container.GetInstance<TBuilder>();
-        }
 
         /// <summary>
         /// Configures the internal list of types.

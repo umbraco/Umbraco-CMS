@@ -12,7 +12,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Core.DI
 {
     // this class is here to support the transition from singletons and resolvers to injection,
     // by providing a static access to singleton services - it is initialized once with a service

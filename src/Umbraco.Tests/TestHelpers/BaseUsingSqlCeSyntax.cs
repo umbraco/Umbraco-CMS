@@ -8,7 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Plugins;
 
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.TestHelpers
                 false);
             container.RegisterInstance(pluginManager);
 
-            MapperCollectionBuilder.Register(container)
+            container.RegisterCollectionBuilder<MapperCollectionBuilder>()
                 .Add(() => Current.PluginManager.ResolveAssignedMapperTypes());
             Mappers = container.GetInstance<IMapperCollection>();
 

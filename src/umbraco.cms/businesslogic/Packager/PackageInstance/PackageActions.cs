@@ -1,7 +1,7 @@
 using System;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core._Legacy.PackageActions;
 

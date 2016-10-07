@@ -19,7 +19,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
@@ -83,13 +83,13 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.CleanUmbracoSettingsConfig();
 
             // reset the app context, this should reset most things that require resetting like ALL resolvers
-            Core.DependencyInjection.Current.Reset();
+            Core.DI.Current.Reset();
 
             // reset plugin manager
             ResetPluginManager();
             Container.Dispose();
 
-            Core.DependencyInjection.Current.Reset();
+            Core.DI.Current.Reset();
         }
 
         protected virtual void ConfigureContainer()
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (PluginManagerResetRequired)
             {
-                Core.DependencyInjection.Current.PluginManager = null;
+                Core.DI.Current.PluginManager = null;
             }
         }
 
@@ -252,7 +252,7 @@ namespace Umbraco.Tests.TestHelpers
             // fixme - oops
             if (/*PluginManager.Current == null ||*/ PluginManagerResetRequired)
             {
-                Core.DependencyInjection.Current.PluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
+                Core.DI.Current.PluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
                 {
                     AssembliesToScan = new[]
                     {

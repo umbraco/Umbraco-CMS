@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests
 {

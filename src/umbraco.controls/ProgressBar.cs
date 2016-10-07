@@ -1,6 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Services;
 
 namespace umbraco.uicontrols

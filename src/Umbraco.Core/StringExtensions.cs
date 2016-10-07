@@ -15,7 +15,7 @@ using Umbraco.Core.Configuration;
 using System.Web.Security;
 using Umbraco.Core.Strings;
 using Umbraco.Core.CodeAnnotations;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core

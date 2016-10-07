@@ -6,7 +6,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Services

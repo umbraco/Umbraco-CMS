@@ -12,7 +12,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Models.Mapping

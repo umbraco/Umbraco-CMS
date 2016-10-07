@@ -25,7 +25,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
-using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
+using CoreCurrent = Umbraco.Core.DI.Current;
 
 namespace Umbraco.Web
 {
@@ -187,15 +187,14 @@ namespace Umbraco.Web
 
         private static Type _defaultRenderMvcControllerType;
 
-        public static Type DefaultRenderMvcControllerType
+        // internal - can only be accessed through Composition at compose time
+        internal static Type DefaultRenderMvcControllerType
         {
             get { return _defaultRenderMvcControllerType; }
             set
             {
                 if (value.Implements<IRenderController>() == false)
                     throw new ArgumentException($"Type {value.FullName} does not implement {typeof (IRenderController).FullName}.", nameof(value));
-
-                // fixme - must lock + ensure we're not frozen?
                 _defaultRenderMvcControllerType = value;
             }
         }

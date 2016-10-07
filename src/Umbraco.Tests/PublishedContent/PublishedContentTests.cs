@@ -9,8 +9,8 @@ using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Core.DependencyInjection;
-using Current = Umbraco.Core.DependencyInjection.Current;
+using Umbraco.Core.DI;
+using Current = Umbraco.Core.DI.Current;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // this is so the model factory looks into the test assembly
             _pluginManager = Current.PluginManager;
-            Core.DependencyInjection.Current.PluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
+            Core.DI.Current.PluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
             {
                 AssembliesToScan = _pluginManager.AssembliesToScan
                     .Union(new[] { typeof(PublishedContentTests).Assembly })
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.PublishedContent
             base.TearDown();
             // fixme - wtf, restoring? keeping it accross tests for perfs I guess?
             //PluginManager.Current = _pluginManager;
-            Core.DependencyInjection.Current.Reset();
+            Core.DI.Current.Reset();
         }
 
 	    protected override void FreezeResolution()

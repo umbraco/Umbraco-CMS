@@ -10,7 +10,7 @@ using System.Web.Security;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;

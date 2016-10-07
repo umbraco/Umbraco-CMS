@@ -10,9 +10,9 @@ namespace Umbraco.Core.Logging
         // it is composed first thing in WebRuntime.Compose - this component
         // only initializes it if needed.
         //
-        //public override void Compose(ServiceContainer container)
+        //public override void Compose(Composition Composition)
         //{
-        //    container.RegisterSingleton<IProfiler, WebProfiler>();
+        //    composition.Container.RegisterSingleton<IProfiler, WebProfiler>();
         //}
 
         private WebProfiler _profiler;

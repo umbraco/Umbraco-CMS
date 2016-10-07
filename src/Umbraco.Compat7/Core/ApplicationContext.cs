@@ -13,19 +13,19 @@ namespace Umbraco.Core
 
         public static ApplicationContext Current { get; } = new ApplicationContext();
 
-        public CacheHelper ApplicationCache => DependencyInjection.Current.ApplicationCache;
+        public CacheHelper ApplicationCache => DI.Current.ApplicationCache;
 
-        public ProfilingLogger ProfilingLogger => DependencyInjection.Current.ProfilingLogger;
+        public ProfilingLogger ProfilingLogger => DI.Current.ProfilingLogger;
 
         public bool IsReady { get; } = true; // because... not accessible before we are ready
 
-        public bool IsConfigured => DependencyInjection.Current.RuntimeState.Level == RuntimeLevel.Run;
+        public bool IsConfigured => DI.Current.RuntimeState.Level == RuntimeLevel.Run;
 
-	    public bool IsUpgrading => DependencyInjection.Current.RuntimeState.Level == RuntimeLevel.Upgrade;
+	    public bool IsUpgrading => DI.Current.RuntimeState.Level == RuntimeLevel.Upgrade;
 
-        public DatabaseContext DatabaseContext => DependencyInjection.Current.DatabaseContext;
+        public DatabaseContext DatabaseContext => DI.Current.DatabaseContext;
 
-        public ServiceContext Services => DependencyInjection.Current.Services;
+        public ServiceContext Services => DI.Current.Services;
 
         public void Dispose()
         { }

@@ -1,20 +1,22 @@
 ﻿using System.IO;
 using Umbraco.Core.Components;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.Strategies
 {
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class ManifestWatcherComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         // if configured and in debug mode, a ManifestWatcher watches App_Plugins folders for
         // package.manifest chances and restarts the application on any change
         private ManifestWatcher _mw;
 
-        public void Initialize(IRuntimeState runtime)
+        public void Initialize(IRuntimeState runtime, ILogger logger)
         {
-            if (runtime.Level < RuntimeLevel.Run || runtime.Debug == false) return;
+            if (runtime.Debug == false) return;
 
             //if (ApplicationContext.Current.IsConfigured == false || GlobalSettings.DebugMode == false)
             //    return;
@@ -22,7 +24,7 @@ namespace Umbraco.Core.Strategies
             var appPlugins = IOHelper.MapPath("~/App_Plugins/");
             if (Directory.Exists(appPlugins) == false) return;
 
-            _mw = new ManifestWatcher(Current.Logger);
+            _mw = new ManifestWatcher(logger);
             _mw.Start(Directory.GetDirectories(appPlugins));
         }
 

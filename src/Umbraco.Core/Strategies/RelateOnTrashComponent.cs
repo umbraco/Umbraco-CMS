@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Components;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Strategies
 {
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class RelateOnTrashComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         public void Initialize()
@@ -16,12 +17,12 @@ namespace Umbraco.Core.Strategies
             ContentService.Trashed += ContentService_Trashed;
         }
 
-        private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
+        private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
         {
             foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinContent.ToInvariantString())))
             {
                 var relationService = Current.Services.RelationService;
-                var relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
+                const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
                 var relations = relationService.GetByChildId(item.Entity.Id);
 
                 foreach (var relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
@@ -31,17 +32,17 @@ namespace Umbraco.Core.Strategies
             }
         }
 
-        private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e)
+        private static void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e)
         {
             var relationService = Current.Services.RelationService;
-            var relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
+            const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
             var relationType = relationService.GetRelationTypeByAlias(relationTypeAlias);
 
             // check that the relation-type exists, if not, then recreate it
             if (relationType == null)
             {
                 var documentObjectType = new Guid(Constants.ObjectTypes.Document);
-                var relationTypeName = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName;
+                const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName;
 
                 relationType = new RelationType(documentObjectType, documentObjectType, relationTypeAlias, relationTypeName);
                 relationService.Save(relationType);
@@ -59,7 +60,7 @@ namespace Umbraco.Core.Strategies
                 relationService.Save(relation);
 
                 Current.Services.AuditService.Add(AuditType.Delete,
-                    string.Format("Trashed content with Id: '{0}' related to original parent content with Id: '{1}'", item.Entity.Id, originalParentId),
+                    $"Trashed content with Id: '{item.Entity.Id}' related to original parent content with Id: '{originalParentId}'",
                     item.Entity.WriterId,
                     item.Entity.Id);
             }

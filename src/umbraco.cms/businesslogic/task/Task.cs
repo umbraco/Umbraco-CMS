@@ -2,7 +2,7 @@ using System;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using umbraco.DataLayer;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.task

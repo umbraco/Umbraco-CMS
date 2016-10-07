@@ -6,7 +6,6 @@ using Umbraco.Core.Events;
 using System.Collections.Generic;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 
@@ -20,6 +19,7 @@ namespace Umbraco.Web.Redirects
     /// <para>not managing domains because we don't know how to do it - changing domains => must create a higher level strategy using rewriting rules probably</para>
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
     /// </remarks>
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class RedirectTrackingComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private const string ContextKey1 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.1";

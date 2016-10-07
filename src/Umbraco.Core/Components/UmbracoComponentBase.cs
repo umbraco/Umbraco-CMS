@@ -1,6 +1,4 @@
-﻿using LightInject;
-
-namespace Umbraco.Core.Components
+﻿namespace Umbraco.Core.Components
 {
     /// <summary>
     /// Provides a base class for <see cref="IUmbracoComponent"/> implementations.
@@ -8,16 +6,7 @@ namespace Umbraco.Core.Components
     public abstract class UmbracoComponentBase : IUmbracoComponent
     {
         /// <inheritdoc/>
-        public virtual void Compose(ServiceContainer container, RuntimeLevel level)
-        {
-            Compose(container);
-        }
-
-        /// <summary>
-        /// Composes the component.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        public virtual void Compose(ServiceContainer container)
+        public virtual void Compose(Composition composition)
         { }
 
         /// <inheritdoc/>

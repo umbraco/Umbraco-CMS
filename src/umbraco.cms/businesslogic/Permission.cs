@@ -3,7 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Events;
 using umbraco.cms.businesslogic;
 using System.Collections.Generic;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
