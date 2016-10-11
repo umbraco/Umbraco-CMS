@@ -14,7 +14,6 @@ using Umbraco.Web.Security;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
 using Umbraco.Web.PublishedCache;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
@@ -48,6 +47,9 @@ namespace Umbraco.Web
 
         [Inject]
         public ILogger Logger { get; set; }
+
+        [Inject]
+        internal FacadeRouter FacadeRouter { get; set; }
 
         #endregion
 
@@ -112,8 +114,6 @@ namespace Umbraco.Web
 
 			if (UmbracoContext.Current == null)
 				throw new InvalidOperationException("The UmbracoContext.Current is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
-			if (UmbracoContext.Current.RoutingContext == null)
-				throw new InvalidOperationException("The UmbracoContext.RoutingContext has not been assigned, ProcessRequest cannot proceed unless there is a RoutingContext assigned to the UmbracoContext");
 
 			var umbracoContext = UmbracoContext.Current;
 
@@ -142,19 +142,19 @@ namespace Umbraco.Web
 
 			// instanciate, prepare and process the published content request
 			// important to use CleanedUmbracoUrl - lowercase path-only version of the current url
-			var pcr = new PublishedContentRequest(umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext);
-			umbracoContext.PublishedContentRequest = pcr;
-			pcr.Prepare();
+		    var request = FacadeRouter.CreateRequest(umbracoContext);
+		    umbracoContext.PublishedContentRequest = request;
+            FacadeRouter.PrepareRequest(request);
 
             // HandleHttpResponseStatus returns a value indicating that the request should
             // not be processed any further, eg because it has been redirect. then, exit.
-            if (HandleHttpResponseStatus(httpContext, pcr, Logger))
+            if (HandleHttpResponseStatus(httpContext, request, Logger))
 		        return;
 
-            if (pcr.HasPublishedContent == false)
+            if (request.HasPublishedContent == false)
 				httpContext.RemapHandler(new PublishedContentNotFoundHandler());
 			else
-				RewriteToUmbracoHandler(httpContext, pcr);
+				RewriteToUmbracoHandler(httpContext, request);
 		}
 
 		#endregion

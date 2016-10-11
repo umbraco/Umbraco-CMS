@@ -10,8 +10,8 @@ using Umbraco.Core.IO;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture, RequiresSTA]
-	public class UmbracoModuleTests : BaseRoutingTest
-	{
+	public class UmbracoModuleTests : BaseWebTest
+    {
 		private UmbracoModule _module;
 
 		public override void Initialize()
@@ -65,8 +65,7 @@ namespace Umbraco.Tests.Routing
 		{
 			var httpContextFactory = new FakeHttpContextFactory(url);
 			var httpContext = httpContextFactory.HttpContext;
-			var routingContext = GetRoutingContext(url);
-			var umbracoContext = routingContext.UmbracoContext;
+		    var umbracoContext = GetUmbracoContext(url);
 			
 			var result = _module.EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 

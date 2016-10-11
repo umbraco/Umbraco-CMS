@@ -33,31 +33,37 @@ namespace Umbraco.Web.Templates
 
 		public TemplateRenderer(UmbracoContext umbracoContext, int pageId, int? altTemplateId)
 		{
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+			if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
 			PageId = pageId;
 			AltTemplate = altTemplateId;
 			_umbracoContext = umbracoContext;
 		}
 
-		/// <summary>
-		/// Gets/sets the page id for the template to render
-		/// </summary>
-		public int PageId { get; private set; }
+        // todo - inject!
+        private FacadeRouter FacadeRouter => Core.DI.Current.Container.GetInstance<FacadeRouter>();
+
+
+        /// <summary>
+        /// Gets/sets the page id for the template to render
+        /// </summary>
+        public int PageId { get; }
 
 		/// <summary>
 		/// Gets/sets the alt template to render if there is one
 		/// </summary>
-		public int? AltTemplate { get; private set; }
+		public int? AltTemplate { get; }
 
 		public void Render(StringWriter writer)
 		{
-			if (writer == null) throw new ArgumentNullException("writer");
+			if (writer == null) throw new ArgumentNullException(nameof(writer));
+
 			// instanciate a request a process
 			// important to use CleanedUmbracoUrl - lowercase path-only version of the current url, though this isn't going to matter
 			// terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
-			var contentRequest = new PublishedContentRequest(_umbracoContext.CleanedUmbracoUrl, _umbracoContext.RoutingContext);
+            // fixme - previously that would create an aengine...
+			var contentRequest = FacadeRouter.CreateRequest(_umbracoContext);
 
-            var doc = contentRequest.RoutingContext.UmbracoContext.ContentCache.GetById(PageId);
+            var doc = contentRequest.UmbracoContext.ContentCache.GetById(PageId);
 
 			if (doc == null)
 			{
@@ -88,9 +94,9 @@ namespace Umbraco.Web.Templates
                 : _fileService.GetTemplate(AltTemplate.Value);
 
 			//if there is not template then exit
-			if (!contentRequest.HasTemplate)
+			if (contentRequest.HasTemplate == false)
 			{
-				if (!AltTemplate.HasValue)
+				if (AltTemplate.HasValue == false)
 				{
 					writer.Write("<!-- Could not render template for Id {0}, the document's template was not found with id {0}-->", doc.TemplateId);	
 				}				
@@ -138,7 +144,7 @@ namespace Umbraco.Web.Templates
 					{
 						Route = RouteTable.Routes["Umbraco_default"]
 					});
-					var routeHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory(), _umbracoContext);
+					var routeHandler = new RenderRouteHandler(_umbracoContext, ControllerBuilder.Current.GetControllerFactory());
 					var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, contentRequest);
 					var renderModel = new ContentModel(contentRequest.PublishedContent);
 					//manually add the action/controller, this is required by mvc
@@ -197,7 +203,7 @@ namespace Umbraco.Web.Templates
 			//now, set the new ones for this page execution
 			_umbracoContext.HttpContext.Items["pageID"] = contentRequest.PublishedContent.Id;
 			_umbracoContext.HttpContext.Items["pageElements"] = contentRequest.UmbracoPage.Elements;
-			_umbracoContext.HttpContext.Items[Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;
+			_umbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
 			_umbracoContext.PublishedContentRequest = contentRequest;
 		}
 
@@ -224,6 +230,5 @@ namespace Umbraco.Web.Templates
 			_umbracoContext.HttpContext.Items["pageElements"] = _oldPageElements;
 			_umbracoContext.HttpContext.Items[Umbraco.Core.Constants.Conventions.Url.AltTemplate] = _oldAltTemplate;
 		}
-
 	}
 }

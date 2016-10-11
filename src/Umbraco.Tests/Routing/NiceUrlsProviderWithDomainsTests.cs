@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Routing
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
@@ -187,7 +187,7 @@ namespace Umbraco.Tests.Routing
             SetDomains1();
 
             var currentUri = new Uri(currentUrl);
-            var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
+            var result = umbracoContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
             Assert.AreEqual(expected, result);
         }
 
@@ -210,7 +210,7 @@ namespace Umbraco.Tests.Routing
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Routing
             SetDomains2();
 
             var currentUri = new Uri(currentUrl);
-            var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
+            var result = umbracoContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
             Assert.AreEqual(expected, result);
         }
 
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Routing
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
@@ -241,7 +241,7 @@ namespace Umbraco.Tests.Routing
             SetDomains3();
 
             var currentUri = new Uri(currentUrl);
-            var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
+            var result = umbracoContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
             Assert.AreEqual(expected, result);
         }
 
@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Routing
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Routing
             SetDomains4();
 
             var currentUri = new Uri(currentUrl);
-            var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
+            var result = umbracoContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
             Assert.AreEqual(expected, result);
         }
 
@@ -281,7 +281,7 @@ namespace Umbraco.Tests.Routing
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
@@ -289,19 +289,19 @@ namespace Umbraco.Tests.Routing
             SetDomains4();
 
             string ignore;
-            ignore = routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain2.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain2.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain2.com"), false);
-            ignore = routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain2.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(1001, new Uri("http://domain2.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(10011, new Uri("http://domain2.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(100111, new Uri("http://domain2.com"), false);
+            ignore = umbracoContext.UrlProvider.GetUrl(1002, new Uri("http://domain2.com"), false);
 
-            var cache = routingContext.UmbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
             Assert.AreEqual(7, cachedRoutes.Count);
@@ -318,15 +318,15 @@ namespace Umbraco.Tests.Routing
             CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
 
             // use the cache
-            Assert.AreEqual("/", routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false));
-            Assert.AreEqual("/en/", routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false));
-            Assert.AreEqual("/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false));
-            Assert.AreEqual("/fr/", routingContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false));
-            Assert.AreEqual("/fr/1001-2-1/", routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false));
-            Assert.AreEqual("/1001-3/", routingContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false));
-            Assert.AreEqual("/1002/", routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/", umbracoContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/en/", umbracoContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/fr/", umbracoContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/fr/1001-2-1/", umbracoContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/1001-3/", umbracoContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/1002/", umbracoContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false));
 
-            Assert.AreEqual("http://domain1.com/fr/1001-2-1/", routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain2.com"), false));
+            Assert.AreEqual("http://domain1.com/fr/1001-2-1/", umbracoContext.UrlProvider.GetUrl(100121, new Uri("http://domain2.com"), false));
         }
 
         void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
@@ -344,43 +344,43 @@ namespace Umbraco.Tests.Routing
             var requestMock = Mock.Get(settings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var routingContext = GetRoutingContext("http://domain1.com/test", 1111, umbracoSettings: settings);
+            var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
             SetDomains4();
 
-            Assert.AreEqual("/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
-            Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
+            Assert.AreEqual("/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", umbracoContext.UrlProvider.GetUrl(100311));
 
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
 
-            Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
-            Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
+            Assert.AreEqual("http://domain1.com/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", umbracoContext.UrlProvider.GetUrl(100311));
 
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
-            routingContext.UrlProvider.Mode = UrlProviderMode.Absolute;
+            umbracoContext.UrlProvider.Mode = UrlProviderMode.Absolute;
 
-            Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
-            Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
+            Assert.AreEqual("http://domain1.com/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", umbracoContext.UrlProvider.GetUrl(100311));
         }
 
         [Test]
         public void Get_Nice_Url_Alternate()
         {
             var settings = SettingsForTests.GenerateMockSettings();
-            var routingContext = GetRoutingContext("http://domain1.com/en/test", 1111, umbracoSettings: settings);
+            var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
             SetDomains5();
 
-            var url = routingContext.UrlProvider.GetUrl(100111, true);
+            var url = umbracoContext.UrlProvider.GetUrl(100111, true);
             Assert.AreEqual("http://domain1.com/en/1001-1-1/", url);
 
-            var result = routingContext.UrlProvider.GetOtherUrls(100111).ToArray();
+            var result = umbracoContext.UrlProvider.GetOtherUrls(100111).ToArray();
 
             Assert.AreEqual(2, result.Count());
             Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1/"));

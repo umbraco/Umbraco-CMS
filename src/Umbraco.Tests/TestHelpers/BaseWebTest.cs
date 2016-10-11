@@ -1,13 +1,19 @@
+using System.Linq;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.PublishedContent;
+using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Web;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.TestHelpers
 {
     [TestFixture, RequiresSTA]
     public abstract class BaseWebTest : BaseDatabaseFactoryTest
     {
-
         [SetUp]
         public override void Initialize()
         {
@@ -58,6 +64,16 @@ namespace Umbraco.Tests.TestHelpers
 	</Home>
 	<CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
+        }
+
+        internal static FacadeRouter CreateFacadeRouter()
+        {
+            return new FacadeRouter(
+                Mock.Of<IWebRoutingSection>(),
+                Enumerable.Empty<IContentFinder>(),
+                new FakeLastChanceFinder(),
+                null,
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
         }
     }
 }

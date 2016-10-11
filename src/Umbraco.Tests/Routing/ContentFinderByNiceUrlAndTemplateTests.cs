@@ -11,8 +11,8 @@ namespace Umbraco.Tests.Routing
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
-	public class ContentFinderByNiceUrlAndTemplateTests : BaseRoutingTest
-	{
+	public class ContentFinderByNiceUrlAndTemplateTests : BaseWebTest
+    {
         Template CreateTemplate(string alias)
         {
             var template = new Template(alias, alias);
@@ -29,20 +29,19 @@ namespace Umbraco.Tests.Routing
 		public void Match_Document_By_Url_With_Template(string urlAsString)
 		{
             var template = CreateTemplate("test");
-            var altTemplate = CreateTemplate("blah");
-			var routingContext = GetRoutingContext(urlAsString, template);
-			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-			var docRequest = new PublishedContentRequest(url, routingContext);
+			var umbracoContext = GetUmbracoContext(urlAsString, template.Id);
+		    var facadeRouter = CreateFacadeRouter();
+			var frequest = facadeRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByNiceUrlAndTemplate(Logger);
 
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
 
-			var result = lookup.TryFindContent(docRequest);
+			var result = lookup.TryFindContent(frequest);
 
 			Assert.IsTrue(result);
-			Assert.IsNotNull(docRequest.PublishedContent);
-			Assert.IsNotNull(docRequest.TemplateAlias);
-			Assert.AreEqual("blah".ToUpperInvariant(), docRequest.TemplateAlias.ToUpperInvariant());
+			Assert.IsNotNull(frequest.PublishedContent);
+			Assert.IsNotNull(frequest.TemplateAlias);
+			Assert.AreEqual("blah".ToUpperInvariant(), frequest.TemplateAlias.ToUpperInvariant());
 		}
 	}
 }

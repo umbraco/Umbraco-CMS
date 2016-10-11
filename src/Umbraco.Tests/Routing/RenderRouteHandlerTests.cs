@@ -23,8 +23,8 @@ namespace Umbraco.Tests.Routing
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
-	public class RenderRouteHandlerTests : BaseRoutingTest
-	{
+	public class RenderRouteHandlerTests : BaseWebTest
+    {
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -32,6 +32,7 @@ namespace Umbraco.Tests.Routing
 		    SettingsForTests.UmbracoPath = "~/umbraco";
 
             WebRuntimeComponent.CreateRoutes(
+                new TestUmbracoContextAccessor(),
                 new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
                 new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()));
 		}
@@ -95,20 +96,17 @@ namespace Umbraco.Tests.Routing
 		{
             var template = CreateTemplate("homePage");
 			var route = RouteTable.Routes["Umbraco_default"];
-			var routeData = new RouteData() { Route = route };
-			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData);
-			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
-			{
-                PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(1174),
-				TemplateModel = template,
-                RenderingEngine = RenderingEngine.Mvc
-			};
+			var routeData = new RouteData { Route = route };
+			var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData);
+		    var facadeRouter = CreateFacadeRouter();
+		    var frequest = facadeRouter.CreateRequest(umbracoContext);
+		    frequest.PublishedContent = umbracoContext.ContentCache.GetById(1174);
+			frequest.TemplateModel = template;
+			frequest.RenderingEngine = RenderingEngine.Mvc;
 
-			var handler = new RenderRouteHandler(
-                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()),
-                routingContext.UmbracoContext);
+			var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
 
-			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
+			handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
 			Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
             //the route action will still be the one we've asked for because our RenderActionInvoker is the thing that decides
             // if the action matches.
@@ -135,18 +133,15 @@ namespace Umbraco.Tests.Routing
             var template = CreateTemplate(templateName);
             var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() {Route = route};
-			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData, true);
-			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
-				{
-                    PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(1172),
-					TemplateModel = template
-				};
+			var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
+		    var facadeRouter = CreateFacadeRouter();
+		    var frequest = facadeRouter.CreateRequest(umbracoContext);
+		    frequest.PublishedContent = umbracoContext.ContentCache.GetById(1172);
+		    frequest.TemplateModel = template;
 
-			var handler = new RenderRouteHandler(
-                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()),
-                routingContext.UmbracoContext);
+			var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
 
-			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
+			handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
 			Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
 		    Assert.AreEqual(
                 //global::umbraco.cms.helpers.Casing.SafeAlias(template.Alias),

@@ -15,8 +15,8 @@ namespace Umbraco.Tests.PublishedContent
 	/// Unit tests for IPublishedContent and extensions
 	/// </summary>
 	[TestFixture]
-	public class PublishedContentDataTableTests : BaseRoutingTest
-	{
+	public class PublishedContentDataTableTests : BaseWebTest
+    {
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -56,10 +56,10 @@ namespace Umbraco.Tests.PublishedContent
 					}
 					return allFields;
 				};
-			var routingContext = GetRoutingContext("/test");
+			var umbracoContext = GetUmbracoContext("/test");
 
             //set the UmbracoContext.Current since the extension methods rely on it
-            Umbraco.Web.Current.SetUmbracoContext(routingContext.UmbracoContext, true);
+            Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);
         }
 
 		public override void TearDown()

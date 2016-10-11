@@ -419,7 +419,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected DatabaseContext DatabaseContext => Core.DI.Current.DatabaseContext;
 
-        protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
+        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null)
         {
             // ensure we have a PublishedCachesService
             var service = _facadeService as FacadeService;
@@ -434,12 +434,14 @@ namespace Umbraco.Tests.TestHelpers
                 return doc;
             };
 
+            if (umbracoSettings == null) umbracoSettings = SettingsForTests.GetDefault();
+
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
             var ctx = UmbracoContext.CreateContext(
                 httpContext,
                 service,
                 new WebSecurity(httpContext, Core.DI.Current.Services.UserService),
-                Mock.Of<IUmbracoSettingsSection>(),
+                umbracoSettings,
                 Enumerable.Empty<IUrlProvider>());
 
             if (setSingleton)

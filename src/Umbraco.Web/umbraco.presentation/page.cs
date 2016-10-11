@@ -93,31 +93,31 @@ namespace umbraco
 		/// <summary>
 		/// Initializes a new instance of the <see cref="page"/> class for a published document request.
 		/// </summary>
-		/// <param name="docreq">The <see cref="PublishedContentRequest"/> pointing to the document.</param>
+		/// <param name="frequest">The <see cref="PublishedContentRequest"/> pointing to the document.</param>
 		/// <remarks>
 		/// The difference between creating the page with PublishedContentRequest vs an IPublishedContent item is 
 		/// that the PublishedContentRequest takes into account how a template is assigned during the routing process whereas
 		/// with an IPublishedContent item, the template id is asssigned purely based on the default.
 		/// </remarks>
-		internal page(PublishedContentRequest docreq)
+		internal page(PublishedContentRequest frequest)
 		{
 
-			if (!docreq.HasPublishedContent)
-				throw new ArgumentException("Document request has no node.", "docreq");
+			if (!frequest.HasPublishedContent)
+				throw new ArgumentException("Document request has no node.", "frequest");
 			
-			populatePageData(docreq.PublishedContent.Id,
-				docreq.PublishedContent.Name, docreq.PublishedContent.DocumentTypeId, docreq.PublishedContent.DocumentTypeAlias,
-				docreq.PublishedContent.WriterName, docreq.PublishedContent.CreatorName, docreq.PublishedContent.CreateDate, docreq.PublishedContent.UpdateDate,
-				docreq.PublishedContent.Path, docreq.PublishedContent.Version, docreq.PublishedContent.Parent == null ? -1 : docreq.PublishedContent.Parent.Id);
+			populatePageData(frequest.PublishedContent.Id,
+				frequest.PublishedContent.Name, frequest.PublishedContent.DocumentTypeId, frequest.PublishedContent.DocumentTypeAlias,
+				frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
+				frequest.PublishedContent.Path, frequest.PublishedContent.Version, frequest.PublishedContent.Parent == null ? -1 : frequest.PublishedContent.Parent.Id);
 
-			if (docreq.HasTemplate)
+			if (frequest.HasTemplate)
 			{
 
-				this._template = docreq.TemplateModel.Id;
+				this._template = frequest.TemplateModel.Id;
 				_elements["template"] = _template.ToString();				
 			}
 
-			PopulateElementData(docreq.PublishedContent);
+			PopulateElementData(frequest.PublishedContent);
 
 		}
 

@@ -25,7 +25,7 @@ namespace Umbraco.Tests
 	/// Tests for the legacy library class
 	/// </summary>
 	[TestFixture]
-	public class LibraryTests : BaseRoutingTest
+	public class LibraryTests : BaseWebTest
 	{
         public override void Initialize()
         {
@@ -47,8 +47,8 @@ namespace Umbraco.Tests
                 ContentTypesCache.Get(PublishedItemType.Content, "anything")
                     .PropertyTypes.Count());
             
-            var routingContext = GetRoutingContext("/test", 1234);
-            Umbraco.Web.Current.SetUmbracoContext(routingContext.UmbracoContext, true);
+            var umbracoContext = GetUmbracoContext("/test");
+            Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);
 		}
 
 	    /// <summary>

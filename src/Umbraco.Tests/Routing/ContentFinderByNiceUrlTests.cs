@@ -6,8 +6,8 @@ namespace Umbraco.Tests.Routing
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
 	[TestFixture]
-	public class ContentFinderByNiceUrlTests : BaseRoutingTest
-	{
+	public class ContentFinderByNiceUrlTests : BaseWebTest
+    {
 		[TestCase("/", 1046)]
 		[TestCase("/default.aspx", 1046)] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
 		[TestCase("/Sub1", 1173)]
@@ -21,9 +21,9 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/test-page", 1172)]
 		public void Match_Document_By_Url_Hide_Top_Level(string urlString, int expectedId)
 		{
-			var routingContext = GetRoutingContext(urlString);
-			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-			var docreq = new PublishedContentRequest(url, routingContext);
+			var umbracoContext = GetUmbracoContext(urlString);
+		    var facadeRouter = CreateFacadeRouter();
+			var frequest = facadeRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByNiceUrl(Logger);
 		    SettingsForTests.HideTopLevelNodeFromPath = true;
 
@@ -33,12 +33,12 @@ namespace Umbraco.Tests.Routing
 		    if (urlString == "/home/sub1")
 		        System.Diagnostics.Debugger.Break();
 
-			var result = lookup.TryFindContent(docreq);
+			var result = lookup.TryFindContent(frequest);
 
 			if (expectedId > 0)
 			{
 				Assert.IsTrue(result);
-				Assert.AreEqual(expectedId, docreq.PublishedContent.Id);
+				Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
 			}
 			else
 			{
@@ -54,18 +54,18 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/home/Sub1.aspx", 1173)]
 		public void Match_Document_By_Url(string urlString, int expectedId)
 		{
-			var routingContext = GetRoutingContext(urlString);
-			var url = routingContext.UmbracoContext.CleanedUmbracoUrl;	//very important to use the cleaned up umbraco url
-			var docreq = new PublishedContentRequest(url, routingContext);
+			var umbracoContext = GetUmbracoContext(urlString);
+		    var facadeRouter = CreateFacadeRouter();
+			var frequest = facadeRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByNiceUrl(Logger);
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
             Assert.IsFalse(Core.Configuration.GlobalSettings.HideTopLevelNodeFromPath);
 
-            var result = lookup.TryFindContent(docreq);
+            var result = lookup.TryFindContent(frequest);
 
 			Assert.IsTrue(result);
-			Assert.AreEqual(expectedId, docreq.PublishedContent.Id);
+			Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
 		}
 	}
 }

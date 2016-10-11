@@ -1,6 +1,4 @@
-using System;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -33,35 +31,35 @@ namespace Umbraco.Web.Routing
 	    /// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
+		/// <param name="frequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TryFindContent(PublishedContentRequest docRequest)
+		public bool TryFindContent(PublishedContentRequest frequest)
         {
 
-            if (docRequest.RoutingContext.UmbracoContext != null && docRequest.RoutingContext.UmbracoContext.InPreviewMode == false
+            if (frequest.UmbracoContext != null && frequest.UmbracoContext.InPreviewMode == false
                 && _webRoutingSection.DisableFindContentByIdPath)
                 return false;
 
             IPublishedContent node = null;
-			var path = docRequest.Uri.GetAbsolutePathDecoded();
+			var path = frequest.Uri.GetAbsolutePathDecoded();
 
             var nodeId = -1;
 			if (path != "/") // no id if "/"
             {
 				var noSlashPath = path.Substring(1);
 
-                if (!Int32.TryParse(noSlashPath, out nodeId))
+                if (int.TryParse(noSlashPath, out nodeId) == false)
                     nodeId = -1;
 
                 if (nodeId > 0)
                 {
 					_logger.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
-                    node = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(nodeId);
+                    node = frequest.UmbracoContext.ContentCache.GetById(nodeId);
 
                     if (node != null)
                     {
-						docRequest.PublishedContent = node;
-						_logger.Debug<ContentFinderByIdPath>("Found node with id={0}", () => docRequest.PublishedContent.Id);
+						frequest.PublishedContent = node;
+						_logger.Debug<ContentFinderByIdPath>("Found node with id={0}", () => frequest.PublishedContent.Id);
                     }
                     else
                     {

@@ -523,7 +523,6 @@
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
-    <Compile Include="TestHelpers\BaseRoutingTest.cs" />
     <Compile Include="TestHelpers\BaseUmbracoApplicationTest.cs" />
     <Compile Include="TestHelpers\DatabaseBehavior.cs" />
     <Compile Include="TestHelpers\SettingsForTests.cs" />

@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot1.Id);
 			var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot2.Id);
 
-			var ctx = GetUmbracoContext("/test", 1234);
+			var ctx = GetUmbracoContext("/test");
             var cache = new PublishedMediaCache(new XmlStore((XmlDocument) null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
 			var roots = cache.GetAtRoot();
 			Assert.AreEqual(2, roots.Count());
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
 
             //var publishedMedia = PublishedMediaTests.GetNode(mRoot.Id, GetUmbracoContext("/test", 1234));
-            var umbracoContext = GetUmbracoContext("/test", 1234);
+            var umbracoContext = GetUmbracoContext("/test");
             var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null), Current.Services.MediaService, Current.Services.UserService, new StaticCacheProvider(), ContentTypesCache);
             var publishedMedia = cache.GetById(mRoot.Id);
             Assert.IsNotNull(publishedMedia);
@@ -151,7 +151,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
         [Test]
         public void Convert_From_Search_Result()
 		{
-            var ctx = GetUmbracoContext("/test", 1234);
+            var ctx = GetUmbracoContext("/test");
 		    var key = Guid.NewGuid();
 
 			var result = new SearchResult()
@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
         [Test]
         public void Convert_From_XPath_Navigator()
 		{
-            var ctx = GetUmbracoContext("/test", 1234);
+            var ctx = GetUmbracoContext("/test");
             var key = Guid.NewGuid();
 
 			var xmlDoc = GetMediaXml();

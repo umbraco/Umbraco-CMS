@@ -172,6 +172,7 @@ namespace Umbraco.Web
 
         internal void Initialize(
             IRuntimeState runtime,
+            IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
@@ -209,7 +210,7 @@ namespace Umbraco.Web
             ConfigureGlobalFilters();
 
             // set routes
-            CreateRoutes(surfaceControllerTypes, apiControllerTypes);
+            CreateRoutes(umbracoContextAccessor, surfaceControllerTypes, apiControllerTypes);
 
             // get an http context
             // fixme - although HttpContext.Current is NOT null during Application_Start
@@ -269,6 +270,7 @@ namespace Umbraco.Web
 
         // internal for tests
         internal static void CreateRoutes(
+            IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
@@ -280,7 +282,7 @@ namespace Umbraco.Web
                 umbracoPath + "/RenderMvc/{action}/{id}",
                 new { controller = "RenderMvc", action = "Index", id = UrlParameter.Optional }
                 );
-            defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
+            defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory());
 
             // register install routes
             RouteTable.Routes.RegisterArea<UmbracoInstallArea>();

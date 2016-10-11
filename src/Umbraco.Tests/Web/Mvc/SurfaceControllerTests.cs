@@ -172,17 +172,13 @@ namespace Umbraco.Tests.Web.Mvc
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
             var contextBase = umbCtx.HttpContext;
-            var pcr = new PublishedContentRequest(new Uri("http://localhost/test"),
-                umbCtx.RoutingContext,
-                webRoutingSettings,
-                s => Enumerable.Empty<string>())
-            {
-                PublishedContent = content
-            };
+            var facadeRouter = BaseWebTest.CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbCtx, new Uri("http://localhost/test"));
+            frequest.PublishedContent = content;
 
             var routeDefinition = new RouteDefinition
             {
-                PublishedContentRequest = pcr
+                PublishedContentRequest = frequest
             };
 
             var routeData = new RouteData();

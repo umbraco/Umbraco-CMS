@@ -1,11 +1,6 @@
-﻿using System.Globalization;
-using System.Linq;
-using System.Web;
+﻿using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.Security;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
@@ -14,19 +9,19 @@ namespace Umbraco.Web.Mvc
 {
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
+        // todo - try lazy property injection?
+        private FacadeRouter FacadeRouter => Core.DI.Current.Container.GetInstance<FacadeRouter>();
+
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
             var umbracoContext = UmbracoContext.Current;
 
             var found = FindContent(requestContext, umbracoContext);
             if (found == null) return new NotFoundHandler();
-            
-            umbracoContext.PublishedContentRequest = new PublishedContentRequest(
-                umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext, 
-                UmbracoConfig.For.UmbracoSettings().WebRouting, s => Roles.Provider.GetRolesForUser(s))
-            {
-                PublishedContent = found
-            };
+
+            var request = FacadeRouter.CreateRequest(umbracoContext);
+            request.PublishedContent = found;
+            umbracoContext.PublishedContentRequest = request;
 
             //allows inheritors to change the pcr
             PreparePublishedContentRequest(umbracoContext.PublishedContentRequest);
@@ -53,7 +48,7 @@ namespace Umbraco.Web.Mvc
                 };
 
                 //set the special data token to the current route definition
-                requestContext.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
+                requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
 
                 return RenderRouteHandler.HandlePostedValues(requestContext, formInfo);
             }
@@ -63,9 +58,9 @@ namespace Umbraco.Web.Mvc
 
         protected abstract IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext);
 
-        protected virtual void PreparePublishedContentRequest(PublishedContentRequest publishedContentRequest)
+        protected virtual void PreparePublishedContentRequest(PublishedContentRequest request)
         {
-            publishedContentRequest.Prepare();
+            FacadeRouter.PrepareRequest(request);
         }
     }
 }

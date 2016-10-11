@@ -31,9 +31,9 @@ namespace Umbraco.Web.Routing
                 _inner = inner;
             }
 
-            public bool TryFindContent(PublishedContentRequest contentRequest)
+            public bool TryFindContent(PublishedContentRequest frequest)
             {
-                return _inner.TryFindContent(contentRequest);
+                return _inner.TryFindContent(frequest);
             }
         }
     }

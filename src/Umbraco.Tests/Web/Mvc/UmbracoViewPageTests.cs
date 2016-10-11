@@ -397,29 +397,15 @@ namespace Umbraco.Tests.Web.Mvc
                 logger, settings,
                 "/dang", 0);
 
-            var urlProvider = new UrlProvider(umbracoContext, settings.WebRouting, new IUrlProvider[]
-            {
-                new DefaultUrlProvider(settings.RequestHandler, Current.Logger)
-            });
-            var routingContext = new RoutingContext(
-                umbracoContext,
-                Enumerable.Empty<IContentFinder>(),
-                new FakeLastChanceFinder(),
-                urlProvider);
-            umbracoContext.RoutingContext = routingContext;
+            var facadeRouter = BaseWebTest.CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
 
-            var request = new PublishedContentRequest(
-                new Uri("http://localhost/dang"),
-                routingContext,
-               settings.WebRouting,
-                s => Enumerable.Empty<string>());
-
-            request.Culture = CultureInfo.InvariantCulture;
-            umbracoContext.PublishedContentRequest = request;
+            frequest.Culture = CultureInfo.InvariantCulture;
+            umbracoContext.PublishedContentRequest = frequest;
 
             var context = new ViewContext();
             context.RouteData = new RouteData();
-            context.RouteData.DataTokens.Add(Umbraco.Core.Constants.Web.UmbracoContextDataToken, umbracoContext);
+            context.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbracoContext);
 
             return context;
         }

@@ -1,5 +1,4 @@
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -23,17 +22,17 @@ namespace Umbraco.Web.Routing
 	    /// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
+		/// <param name="frequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public virtual bool TryFindContent(PublishedContentRequest docRequest)
+		public virtual bool TryFindContent(PublishedContentRequest frequest)
         {
 			string route;
-			if (docRequest.HasDomain)
-				route = docRequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(docRequest.Domain.Uri, docRequest.Uri.GetAbsolutePathDecoded());
+			if (frequest.HasDomain)
+				route = frequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
 			else
-				route = docRequest.Uri.GetAbsolutePathDecoded();
+				route = frequest.Uri.GetAbsolutePathDecoded();
 
-			var node = FindContent(docRequest, route);
+			var node = FindContent(frequest, route);
             return node != null;
         }
 
@@ -47,7 +46,7 @@ namespace Umbraco.Web.Routing
         {
 			Logger.Debug<ContentFinderByNiceUrl>("Test route \"{0}\"", () => route);
 
-		    var node = docreq.RoutingContext.UmbracoContext.ContentCache.GetByRoute(route);
+		    var node = docreq.UmbracoContext.ContentCache.GetByRoute(route);
             if (node != null)
             {
                 docreq.PublishedContent = node;

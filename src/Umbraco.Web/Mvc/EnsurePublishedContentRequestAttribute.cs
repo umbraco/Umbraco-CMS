@@ -1,12 +1,8 @@
 using System;
-using System.Globalization;
-using System.Linq;
 using System.Web.Mvc;
-using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace Umbraco.Web.Mvc
 {
@@ -24,7 +20,6 @@ namespace Umbraco.Web.Mvc
     public class EnsurePublishedContentRequestAttribute : ActionFilterAttribute
     {
         private readonly string _dataTokenName;
-        private readonly string _culture;
         private UmbracoContext _umbracoContext;
         private readonly int? _contentId;
         private UmbracoHelper _helper;
@@ -34,13 +29,11 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="contentId"></param>
-        /// <param name="culture"></param>
-        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, int contentId, string culture = null)
+        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, int contentId)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             _umbracoContext = umbracoContext;
             _contentId = contentId;
-            _culture = culture;
         }
 
         /// <summary>
@@ -66,19 +59,20 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="dataTokenName"></param>
-        /// <param name="culture"></param>
-        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, string dataTokenName, string culture = null)
+        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, string dataTokenName)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             _umbracoContext = umbracoContext;
             _dataTokenName = dataTokenName;
-            _culture = culture;
         }
 
         /// <summary>
         /// Exposes the UmbracoContext
         /// </summary>
         protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = UmbracoContext.Current);
+
+        // todo - try lazy property injection?
+        private FacadeRouter FacadeRouter => Core.DI.Current.Container.GetInstance<FacadeRouter>();
 
         /// <summary>
         /// Exposes an UmbracoHelper
@@ -96,10 +90,7 @@ namespace Umbraco.Web.Mvc
                 return;
             }
 
-            UmbracoContext.Current.PublishedContentRequest =
-                new PublishedContentRequest(
-                    UmbracoContext.Current.CleanedUmbracoUrl, UmbracoContext.Current.RoutingContext);
-
+            UmbracoContext.Current.PublishedContentRequest = FacadeRouter.CreateRequest(UmbracoContext.Current);
             ConfigurePublishedContentRequest(UmbracoContext.Current.PublishedContentRequest, filterContext);
         }
 
@@ -107,9 +98,9 @@ namespace Umbraco.Web.Mvc
         /// This assigns the published content to the request, developers can override this to specify 
         /// any other custom attributes required.
         /// </summary>
-        /// <param name="pcr"></param>
+        /// <param name="request"></param>
         /// <param name="filterContext"></param>
-        protected virtual void ConfigurePublishedContentRequest(PublishedContentRequest pcr, ActionExecutedContext filterContext)
+        protected virtual void ConfigurePublishedContentRequest(PublishedContentRequest request, ActionExecutedContext filterContext)
         {
             if (_contentId.HasValue)
             {
@@ -118,7 +109,7 @@ namespace Umbraco.Web.Mvc
                 {
                     throw new InvalidOperationException("Could not resolve content with id " + _contentId);
                 }
-                pcr.PublishedContent = content;
+                request.PublishedContent = content;
             }
             else if (_dataTokenName.IsNullOrWhiteSpace() == false)
             {
@@ -127,15 +118,14 @@ namespace Umbraco.Web.Mvc
                 {
                     throw new InvalidOperationException("No data token could be found with the name " + _dataTokenName);
                 }
-                if ((result is IPublishedContent) == false)
+                if (result is IPublishedContent == false)
                 {
                     throw new InvalidOperationException("The data token resolved with name " + _dataTokenName + " was not an instance of " + typeof(IPublishedContent));
                 }
-                pcr.PublishedContent = (IPublishedContent) result;
+                request.PublishedContent = (IPublishedContent) result;
             }
 
-            pcr.Prepare();
+            FacadeRouter.PrepareRequest(request);
         }
-
     }
 }

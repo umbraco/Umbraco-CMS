@@ -56,7 +56,7 @@ namespace Umbraco.Tests.PublishedContent
 
         private IPublishedContent GetNode(int id)
         {
-            return GetNode(id, GetUmbracoContext("/test", 1234));
+            return GetNode(id, GetUmbracoContext("/test"));
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.PublishedContent
                 session.WaitForChanges();
 
                 var searcher = indexer.GetSearcher();
-                var ctx = GetUmbracoContext("/test", 1234);
+                var ctx = GetUmbracoContext("/test");
                 var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.PublishedContent
                 session.WaitForChanges();
 
                 var searcher = indexer.GetSearcher();
-                var ctx = GetUmbracoContext("/test", 1234);
+                var ctx = GetUmbracoContext("/test");
                 var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //ensure it is found
@@ -177,7 +177,7 @@ namespace Umbraco.Tests.PublishedContent
                 session.WaitForChanges();
 
                 var searcher = indexer.GetSearcher();
-                var ctx = GetUmbracoContext("/test", 1234);
+                var ctx = GetUmbracoContext("/test");
                 var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
@@ -202,7 +202,7 @@ namespace Umbraco.Tests.PublishedContent
                 session.WaitForChanges();
 
                 var searcher = indexer.GetSearcher();
-                var ctx = GetUmbracoContext("/test", 1234);
+                var ctx = GetUmbracoContext("/test");
                 var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
@@ -227,7 +227,7 @@ namespace Umbraco.Tests.PublishedContent
                 session.WaitForChanges();
 
                 var searcher = indexer.GetSearcher();
-                var ctx = GetUmbracoContext("/test", 1234);
+                var ctx = GetUmbracoContext("/test");
                 var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
@@ -251,7 +251,7 @@ namespace Umbraco.Tests.PublishedContent
                 indexer.RebuildIndex();
                 session.WaitForChanges();
 
-                var ctx = GetUmbracoContext("/test", 1234);
+                var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();
                 var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
@@ -273,7 +273,7 @@ namespace Umbraco.Tests.PublishedContent
                 indexer.RebuildIndex();
                 session.WaitForChanges();
 
-                var ctx = GetUmbracoContext("/test", 1234);
+                var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();
                 var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 

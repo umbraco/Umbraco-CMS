@@ -25,7 +25,6 @@ namespace Umbraco.Web
         /// This is a helper method which is called to ensure that the singleton context is created
         /// </summary>
         /// <param name="httpContext"></param>
-        /// <param name="applicationContext"></param>
         /// <param name="facadeService"></param>
         /// <param name="webSecurity"></param>
         /// <param name="umbracoSettings"></param>
@@ -84,7 +83,6 @@ namespace Umbraco.Web
         /// Creates a standalone UmbracoContext instance
         /// </summary>
         /// <param name="httpContext"></param>
-        /// <param name="applicationContext"></param>
         /// <param name="facadeService"></param>
         /// <param name="webSecurity"></param>
         /// <param name="umbracoSettings"></param>
@@ -105,40 +103,15 @@ namespace Umbraco.Web
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
 
-            // create the context
-            var umbracoContext = new UmbracoContext(
-                httpContext,
-                facadeService,
-                webSecurity);
-
-            // create and assign the RoutingContext,
-            // note the circular dependency here
-            umbracoContext.RoutingContext = new RoutingContext(
-                umbracoContext,
-
-                //TODO: Until the new cache is done we can't really expose these to override/mock
-                new Lazy<IEnumerable<IContentFinder>>(() => Web.Current.ContentFinders),
-                new Lazy<IContentFinder>(() => Web.Current.LastChanceContentFinder),
-
-                // create the nice urls provider
-                // there's one per request because there are some behavior parameters that can be changed
-                new Lazy<UrlProvider>(
-                    () => new UrlProvider(
-                        umbracoContext,
-                        umbracoSettings.WebRouting,
-                        urlProviders),
-                    false));
-
-            return umbracoContext;
+            return new UmbracoContext(httpContext, facadeService, webSecurity, umbracoSettings, urlProviders);
         }
 
-        /// <param name="httpContext">An HttpContext.</param>
-        /// <param name="facadeService">A facade service.</param>
-        /// <param name="webSecurity">A web security.</param>
         private UmbracoContext(
 			HttpContextBase httpContext,
             IFacadeService facadeService,
-            WebSecurity webSecurity)
+            WebSecurity webSecurity,
+            IUmbracoSettingsSection umbracoSettings,
+            IEnumerable<IUrlProvider> urlProviders)
         {
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
@@ -170,6 +143,8 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
+
+            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders);
         }
 
         #endregion
@@ -232,25 +207,9 @@ namespace Umbraco.Web
         public bool IsFrontEndUmbracoRequest => PublishedContentRequest != null;
 
         /// <summary>
-		/// A shortcut to the UmbracoContext's RoutingContext's NiceUrlProvider
+		/// Gets the url provider.
 		/// </summary>
-		/// <remarks>
-		/// If the RoutingContext is null, this will throw an exception.
-		/// </remarks>
-    	public UrlProvider UrlProvider
-    	{
-    		get
-    		{
-    			if (RoutingContext == null)
-					throw new InvalidOperationException("Cannot access the UrlProvider when the UmbracoContext's RoutingContext is null");
-    			return RoutingContext.UrlProvider;
-    		}
-    	}
-
-		/// <summary>
-		/// Gets/sets the RoutingContext object
-		/// </summary>
-		public RoutingContext RoutingContext { get; internal set; }
+    	public UrlProvider UrlProvider { get; }
 
 		/// <summary>
 		/// Gets/sets the PublishedContentRequest object

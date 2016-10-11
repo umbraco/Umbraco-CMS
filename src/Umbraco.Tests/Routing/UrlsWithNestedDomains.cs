@@ -12,6 +12,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
 using System.Configuration;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Routing
 {
@@ -35,31 +36,31 @@ namespace Umbraco.Tests.Routing
 
 			SetDomains1();
 
-			RoutingContext routingContext;
+			UmbracoContext umbracoContext;
 			string url = "http://domain1.com/1001-1/1001-1-1";
 			
 			// get the nice url for 100111
-		    routingContext = GetRoutingContext(url, 9999, umbracoSettings: settings);
-			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.UrlProvider.GetUrl(100111, true));
+		    umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings);
+			Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, true));
 
 			// check that the proper route has been cached
-		    var cache = routingContext.UmbracoContext.ContentCache as PublishedContentCache;
+		    var cache = umbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 		    var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
 			Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
 
-			// route a rogue url
-			url = "http://domain1.com/1001-1/1001-1-1";
-			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-			var pcr = new PublishedContentRequest(uri, routingContext);
-			pcr.Engine.FindDomain();
-			Assert.IsTrue(pcr.HasDomain);
+            // route a rogue url
+            var facadeRouter = CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            
+			facadeRouter.FindDomain(frequest);
+			Assert.IsTrue(frequest.HasDomain);
 
 			// check that it's been routed
 			var lookup = new ContentFinderByNiceUrl(Logger);
-			var result = lookup.TryFindContent(pcr);
+			var result = lookup.TryFindContent(frequest);
 			Assert.IsTrue(result);
-			Assert.AreEqual(100111, pcr.PublishedContent.Id);
+			Assert.AreEqual(100111, frequest.PublishedContent.Id);
 
 			// has the cache been polluted?
             cachedRoutes = cache.RoutesCache.GetCachedRoutes();
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.Routing
 			//Assert.AreEqual("1001/1001-1/1001-1-1", cachedRoutes[100111]); // yes
 
 			// what's the nice url now?
-			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.UrlProvider.GetUrl(100111)); // good
+			Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111)); // good
 			//Assert.AreEqual("http://domain1.com/1001-1/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, true)); // bad
 		}
 

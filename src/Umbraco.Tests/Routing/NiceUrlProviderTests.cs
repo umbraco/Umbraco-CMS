@@ -12,8 +12,8 @@ namespace Umbraco.Tests.Routing
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
-	public class NiceUrlProviderTests : BaseRoutingTest
-	{
+	public class NiceUrlProviderTests : BaseWebTest
+    {
         protected override void FreezeResolution()
         {
             base.FreezeResolution();
@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Routing
 		[Test]
 		public void Ensure_Cache_Is_Correct()
 		{
-			var routingContext = GetRoutingContext("/test", 1111);
+			var umbracoContext = GetUmbracoContext("/test", 1111);
 		    SettingsForTests.UseDirectoryUrls = true;
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
 
@@ -58,18 +58,18 @@ namespace Umbraco.Tests.Routing
 
 			foreach (var sample in samples)
 			{
-				var result = routingContext.UrlProvider.GetUrl(sample.Key);
+				var result = umbracoContext.UrlProvider.GetUrl(sample.Key);
 				Assert.AreEqual(sample.Value, result);
 			}
 
 			var randomSample = new KeyValuePair<int, string>(1177, "/home/sub1/custom-sub-1");
 			for (int i = 0; i < 5; i++)
 			{
-				var result = routingContext.UrlProvider.GetUrl(randomSample.Key);
+				var result = umbracoContext.UrlProvider.GetUrl(randomSample.Key);
 				Assert.AreEqual(randomSample.Value, result);
 			}
 
-            var cache = routingContext.UmbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
 			Assert.AreEqual(8, cachedRoutes.Count);
@@ -102,14 +102,14 @@ namespace Umbraco.Tests.Routing
 		[TestCase(1172, "/test-page/")]
 		public void Get_Nice_Url_Not_Hiding_Top_Level(int nodeId, string niceUrlMatch)
 		{
-			var routingContext = GetRoutingContext("/test", 1111);
+			var umbracoContext = GetUmbracoContext("/test", 1111);
 
 		    SettingsForTests.UseDirectoryUrls = true;
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			var result = routingContext.UrlProvider.GetUrl(nodeId);
+			var result = umbracoContext.UrlProvider.GetUrl(nodeId);
 			Assert.AreEqual(niceUrlMatch, result);
 		}
 
@@ -126,14 +126,14 @@ namespace Umbraco.Tests.Routing
 		[TestCase(1172, "/test-page/")] // not hidden because not first root
 		public void Get_Nice_Url_Hiding_Top_Level(int nodeId, string niceUrlMatch)
 		{
-			var routingContext = GetRoutingContext("/test", 1111);
+			var umbracoContext = GetUmbracoContext("/test", 1111);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = true;
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			var result = routingContext.UrlProvider.GetUrl(nodeId);
+			var result = umbracoContext.UrlProvider.GetUrl(nodeId);
 			Assert.AreEqual(niceUrlMatch, result);
 		}
 
@@ -145,24 +145,22 @@ namespace Umbraco.Tests.Routing
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var routingContext = GetRoutingContext("http://example.com/test", 1111, umbracoSettings: _umbracoSettings);
+            var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, umbracoSettings: _umbracoSettings);
 
-            
-
-			Assert.AreEqual("/home/sub1/custom-sub-1/", routingContext.UrlProvider.GetUrl(1177));
+			Assert.AreEqual("/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
             
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
-			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", routingContext.UrlProvider.GetUrl(1177));
+			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
 
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
-			routingContext.UrlProvider.Mode = UrlProviderMode.Absolute;
-			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", routingContext.UrlProvider.GetUrl(1177));
+            umbracoContext.UrlProvider.Mode = UrlProviderMode.Absolute;
+			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
 		}
 
 		[Test]
 		public void Get_Nice_Url_Unpublished()
 		{
-			var routingContext = GetRoutingContext("http://example.com/test", 1111);
+			var umbracoContext = GetUmbracoContext("http://example.com/test", 1111);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
@@ -171,17 +169,17 @@ namespace Umbraco.Tests.Routing
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			Assert.AreEqual("#", routingContext.UrlProvider.GetUrl(999999));
+			Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
 
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);            
             
-            Assert.AreEqual("#", routingContext.UrlProvider.GetUrl(999999));
+            Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
 
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			routingContext.UrlProvider.Mode = UrlProviderMode.Absolute;
+            umbracoContext.UrlProvider.Mode = UrlProviderMode.Absolute;
 			
-            Assert.AreEqual("#", routingContext.UrlProvider.GetUrl(999999));
+            Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
 		}
 	}
 }

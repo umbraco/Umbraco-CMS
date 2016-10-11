@@ -2,9 +2,9 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.TestHelpers.Stubs
 {
-	internal class FakeLastChanceFinder : IContentFinder
+	internal class FakeLastChanceFinder : IContentLastChanceFinder
 	{
-		public bool TryFindContent(PublishedContentRequest docRequest)
+		public bool TryFindContent(PublishedContentRequest frequest)
 		{
 			return false;
 		}

@@ -26,22 +26,22 @@ namespace Umbraco.Tests.Routing
         {
             //SetDomains1();
 
-            var routingContext = GetRoutingContext(inputUrl);
-            var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-            var pcr = new PublishedContentRequest(url, routingContext);
+            var umbracoContext = GetUmbracoContext(inputUrl);
+            var facadeRouter = CreateFacadeRouter();
+            var request = facadeRouter.CreateRequest(umbracoContext);
             // must lookup domain
-            pcr.Engine.FindDomain();
+            facadeRouter.FindDomain(request);
 
             if (expectedNode > 0)
-                Assert.AreEqual(expectedCulture, pcr.Culture.Name);
+                Assert.AreEqual(expectedCulture, request.Culture.Name);
 
             var finder = new ContentFinderByUrlAlias(Logger);
-            var result = finder.TryFindContent(pcr);
+            var result = finder.TryFindContent(request);
 
             if (expectedNode > 0)
             {
                 Assert.IsTrue(result);
-                Assert.AreEqual(pcr.PublishedContent.Id, expectedNode);
+                Assert.AreEqual(request.PublishedContent.Id, expectedNode);
             }
             else
             {

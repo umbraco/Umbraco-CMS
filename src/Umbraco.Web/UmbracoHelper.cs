@@ -117,7 +117,6 @@ namespace Umbraco.Web
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (appCache == null) throw new ArgumentNullException(nameof(appCache));
-            if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null.");
 
             _umbracoContext = umbracoContext;
             if (_umbracoContext.IsFrontEndUmbracoRequest)

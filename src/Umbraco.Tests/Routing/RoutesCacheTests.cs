@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Routing
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
-    public class RoutesCacheTests : BaseRoutingTest
+    public class RoutesCacheTests : BaseWebTest
     {
         [Test]
         public void U4_7939()

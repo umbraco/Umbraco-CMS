@@ -10,7 +10,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void PublishedContentHasNoRootNode()
         {
-            var ctx = GetUmbracoContext("/test", 1234);
+            var ctx = GetUmbracoContext("/test");
 
             // there is no content node with ID -1
             var content = ctx.ContentCache.GetById(-1);

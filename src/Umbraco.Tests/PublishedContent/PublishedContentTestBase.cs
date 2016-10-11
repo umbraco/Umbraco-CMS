@@ -11,7 +11,7 @@ namespace Umbraco.Tests.PublishedContent
     /// <summary>
     /// Abstract base class for tests for published content and published media
     /// </summary>
-    public abstract class PublishedContentTestBase : BaseRoutingTest
+    public abstract class PublishedContentTestBase : BaseWebTest
     {
         public override void Initialize()
         {
@@ -26,8 +26,8 @@ namespace Umbraco.Tests.PublishedContent
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
 
-            var rCtx = GetRoutingContext("/test", 1234);
-            Umbraco.Web.Current.SetUmbracoContext(rCtx.UmbracoContext, true);            
+            var umbracoContext = GetUmbracoContext("/test");
+            Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);            
         }
 
         protected override void FreezeResolution()

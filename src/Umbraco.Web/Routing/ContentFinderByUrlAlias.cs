@@ -2,7 +2,6 @@ using System;
 using System.Text;
 using System.Linq;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
@@ -29,22 +28,22 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
+		/// <param name="frequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TryFindContent(PublishedContentRequest docRequest)
+		public bool TryFindContent(PublishedContentRequest frequest)
 		{
 			IPublishedContent node = null;
 
-			if (docRequest.Uri.AbsolutePath != "/") // no alias if "/"
+			if (frequest.Uri.AbsolutePath != "/") // no alias if "/"
 			{
-				node = FindContentByAlias(docRequest.RoutingContext.UmbracoContext.ContentCache,
-					docRequest.HasDomain ? docRequest.Domain.ContentId : 0, 
-					docRequest.Uri.GetAbsolutePathDecoded());
+				node = FindContentByAlias(frequest.UmbracoContext.ContentCache,
+					frequest.HasDomain ? frequest.Domain.ContentId : 0, 
+					frequest.Uri.GetAbsolutePathDecoded());
 
 				if (node != null)
 				{					
-					docRequest.PublishedContent = node;
-					Logger.Debug<ContentFinderByUrlAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.PublishedContent.Id);
+					frequest.PublishedContent = node;
+					Logger.Debug<ContentFinderByUrlAlias>("Path \"{0}\" is an alias for id={1}", () => frequest.Uri.AbsolutePath, () => frequest.PublishedContent.Id);
 				}
 			}
 

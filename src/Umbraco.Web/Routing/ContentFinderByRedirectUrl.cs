@@ -25,14 +25,14 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
         /// </summary>
-        /// <param name="contentRequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
-        public bool TryFindContent(PublishedContentRequest contentRequest)
+        public bool TryFindContent(PublishedContentRequest frequest)
         {
-            var route = contentRequest.HasDomain
-                ? contentRequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(contentRequest.Domain.Uri, contentRequest.Uri.GetAbsolutePathDecoded())
-                : contentRequest.Uri.GetAbsolutePathDecoded();
+            var route = frequest.HasDomain
+                ? frequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded())
+                : frequest.Uri.GetAbsolutePathDecoded();
 
             var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route);
 
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Routing
                 return false;
             }
 
-            var content = contentRequest.RoutingContext.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
+            var content = frequest.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
             var url = content == null ? "#" : content.Url;
             if (url.StartsWith("#"))
             {
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Routing
 
             _logger.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} with url \"{2}\", redirecting.",
                 () => route, () => content.Id, () => url);
-            contentRequest.SetRedirectPermanent(url);
+            frequest.SetRedirectPermanent(url);
             return true;
         }
     }

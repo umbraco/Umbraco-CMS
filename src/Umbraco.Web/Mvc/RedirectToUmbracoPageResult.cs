@@ -31,7 +31,7 @@ namespace Umbraco.Web.Mvc
 					throw new InvalidOperationException(string.Format("Cannot redirect, no entity was found for id {0}", _pageId));
 				}
 
-				var result = _umbracoContext.RoutingContext.UrlProvider.GetUrl(PublishedContent.Id);
+				var result = _umbracoContext.UrlProvider.GetUrl(PublishedContent.Id);
 				if (result != "#")
 				{
 					_url = result;

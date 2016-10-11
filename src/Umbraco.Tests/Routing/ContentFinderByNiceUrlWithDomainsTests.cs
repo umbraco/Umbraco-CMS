@@ -125,17 +125,17 @@ namespace Umbraco.Tests.Routing
 
 		    SettingsForTests.HideTopLevelNodeFromPath = true;
 
-			var routingContext = GetRoutingContext(url);
-			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-			var pcr = new PublishedContentRequest(uri, routingContext);
+			var umbracoContext = GetUmbracoContext(url);
+		    var facadeRouter = CreateFacadeRouter();
+			var frequest = facadeRouter.CreateRequest(umbracoContext);
 
 			// must lookup domain else lookup by url fails
-			pcr.Engine.FindDomain();
+			facadeRouter.FindDomain(frequest);
 
             var lookup = new ContentFinderByNiceUrl(Logger);
-			var result = lookup.TryFindContent(pcr);
+			var result = lookup.TryFindContent(frequest);
 			Assert.IsTrue(result);
-			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);
+			Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
 		}
 
 		[TestCase("http://domain1.com/", 1001, "en-US")]
@@ -166,18 +166,18 @@ namespace Umbraco.Tests.Routing
 
             SettingsForTests.HideTopLevelNodeFromPath = true;
 
-			var routingContext = GetRoutingContext(url);
-			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-			var pcr = new PublishedContentRequest(uri, routingContext);
+			var umbracoContext = GetUmbracoContext(url);
+		    var facadeRouter = CreateFacadeRouter();
+			var frequest = facadeRouter.CreateRequest(umbracoContext);
 
 			// must lookup domain else lookup by url fails
-			pcr.Engine.FindDomain();
-			Assert.AreEqual(expectedCulture, pcr.Culture.Name);
+			facadeRouter.FindDomain(frequest);
+			Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
             var lookup = new ContentFinderByNiceUrl(Logger);
-			var result = lookup.TryFindContent(pcr);
+			var result = lookup.TryFindContent(frequest);
 			Assert.IsTrue(result);
-			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);
+			Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
 		}
 	}
 }

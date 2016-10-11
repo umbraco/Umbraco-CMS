@@ -1,6 +1,5 @@
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -23,12 +22,12 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
         /// </summary>
-        /// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public override bool TryFindContent(PublishedContentRequest docRequest)
+        public override bool TryFindContent(PublishedContentRequest frequest)
         {
             IPublishedContent node = null;
-            var path = docRequest.Uri.GetAbsolutePathDecoded();
+            var path = frequest.Uri.GetAbsolutePathDecoded();
 
             var isProfile = false;
             var pos = path.LastIndexOf('/');
@@ -42,13 +41,13 @@ namespace Umbraco.Web.Routing
                     isProfile = true;
                     Logger.Debug<ContentFinderByProfile>("Path \"{0}\" is the profile path", () => path);
 
-					var route = docRequest.HasDomain ? (docRequest.Domain.ContentId + path) : path;
-                    node = FindContent(docRequest, route);
+					var route = frequest.HasDomain ? (frequest.Domain.ContentId + path) : path;
+                    node = FindContent(frequest, route);
 
                     if (node != null)
                     {
                         //TODO: Should be handled by Context Items class manager (http://issues.umbraco.org/issue/U4-61)
-                        docRequest.RoutingContext.UmbracoContext.HttpContext.Items["umbMemberLogin"] = memberLogin;
+                        frequest.UmbracoContext.HttpContext.Items["umbMemberLogin"] = memberLogin;
                     }
                     else
                     {

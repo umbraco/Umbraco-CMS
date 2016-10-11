@@ -2,98 +2,69 @@ using System;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Web.Security;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
-    public class PublishedContentRequestEngineTests : BaseRoutingTest
+    public class PublishedContentRequestEngineTests : BaseWebTest
     {
-        [Test]
-        public void Ctor_Throws_On_Null_PCR()
-        {
-            Assert.Throws<ArgumentException>(() => new PublishedContentRequestEngine(                
-                Mock.Of<IWebRoutingSection>(),
-                null));
-        }
-
         [Test]
         public void ConfigureRequest_Returns_False_Without_HasPublishedContent()
         {
-            var routeCtx = GetRoutingContext("/test");
+            var umbracoContext = GetUmbracoContext("/test");
+            var facadeRouter = CreateFacadeRouter();
+            var request = facadeRouter.CreateRequest(umbracoContext);
+            var result = facadeRouter.ConfigureRequest(request);
 
-            var pcre = new PublishedContentRequestEngine(
-                Mock.Of<IWebRoutingSection>(),
-                new PublishedContentRequest(
-                    routeCtx.UmbracoContext.CleanedUmbracoUrl, 
-                    routeCtx,
-                    Mock.Of<IWebRoutingSection>(),
-                    s => new string[] { }));
-
-            var result = pcre.ConfigureRequest();
             Assert.IsFalse(result);
         }
 
         [Test]
         public void ConfigureRequest_Returns_False_When_IsRedirect()
         {
-            var routeCtx = GetRoutingContext("/test");
+            var umbracoContext = GetUmbracoContext("/test");
+            var facadeRouter = CreateFacadeRouter();
+            var request = facadeRouter.CreateRequest(umbracoContext);
+            var content = GetPublishedContentMock();            
+            request.PublishedContent = content.Object;
+            request.Culture = new CultureInfo("en-AU");
+            request.SetRedirect("/hello");
+            var result = facadeRouter.ConfigureRequest(request);
 
-            var pcr = new PublishedContentRequest(routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx, Mock.Of<IWebRoutingSection>(), s => new string[] { });
-            var pc = GetPublishedContentMock();            
-            pcr.PublishedContent = pc.Object;
-            pcr.Culture = new CultureInfo("en-AU");
-            pcr.SetRedirect("/hello");
-            var pcre = new PublishedContentRequestEngine(
-                Mock.Of<IWebRoutingSection>(),
-                pcr);
-
-            var result = pcre.ConfigureRequest();
             Assert.IsFalse(result);
         }
 
         [Test]
         public void ConfigureRequest_Adds_HttpContext_Items_When_Published_Content_Assigned()
         {
-            var routeCtx = GetRoutingContext("/test");
-
-            var pcr = new PublishedContentRequest(routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx, Mock.Of<IWebRoutingSection>(), s => new string[] { });
-            var pc = GetPublishedContentMock();
-            pcr.PublishedContent = pc.Object;
-            pcr.Culture = new CultureInfo("en-AU");
-            var pcre = new PublishedContentRequestEngine(
-                Mock.Of<IWebRoutingSection>(),
-                pcr);
-
-            pcre.ConfigureRequest();
+            var umbracoContext = GetUmbracoContext("/test");
+            var facadeRouter = CreateFacadeRouter();
+            var request = facadeRouter.CreateRequest(umbracoContext);
+            var content = GetPublishedContentMock();
+            request.PublishedContent = content.Object;
+            request.Culture = new CultureInfo("en-AU");
+            facadeRouter.ConfigureRequest(request);
             
-            Assert.AreEqual(1, routeCtx.UmbracoContext.HttpContext.Items["pageID"]);
-            Assert.AreEqual(pcr.UmbracoPage.Elements.Count, ((Hashtable)routeCtx.UmbracoContext.HttpContext.Items["pageElements"]).Count);
+            Assert.AreEqual(1, umbracoContext.HttpContext.Items["pageID"]);
+            Assert.AreEqual(request.UmbracoPage.Elements.Count, ((Hashtable) umbracoContext.HttpContext.Items["pageElements"]).Count);
         }
 
         [Test]
         public void ConfigureRequest_Sets_UmbracoPage_When_Published_Content_Assigned()
         {
-            var routeCtx = GetRoutingContext("/test");
+            var umbracoContext = GetUmbracoContext("/test");
+            var facadeRouter = CreateFacadeRouter();
+            var request = facadeRouter.CreateRequest(umbracoContext);
+            var content = GetPublishedContentMock();
+            request.Culture = new CultureInfo("en-AU");
+            request.PublishedContent = content.Object;
+            facadeRouter.ConfigureRequest(request);
 
-            var pcr = new PublishedContentRequest(routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx, Mock.Of<IWebRoutingSection>(), s => new string[] { });
-            var pc = GetPublishedContentMock();
-            pcr.Culture = new CultureInfo("en-AU");
-            pcr.PublishedContent = pc.Object;
-            var pcre = new PublishedContentRequestEngine(
-                Mock.Of<IWebRoutingSection>(),
-                pcr);
-
-            pcre.ConfigureRequest();
-
-            Assert.IsNotNull(pcr.UmbracoPage);
+            Assert.IsNotNull(request.UmbracoPage);
         }
 
         private Mock<IPublishedContent> GetPublishedContentMock()
@@ -114,6 +85,5 @@ namespace Umbraco.Tests.PublishedContent
             pc.Setup(content => content.Properties).Returns(new Collection<IPublishedProperty>());
             return pc;
         }
-
     }
 }

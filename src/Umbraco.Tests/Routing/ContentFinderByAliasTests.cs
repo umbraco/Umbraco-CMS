@@ -1,6 +1,4 @@
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -19,15 +17,15 @@ namespace Umbraco.Tests.Routing
         [TestCase("/alias43", 100121)]
         public void Lookup_By_Url_Alias(string urlAsString, int nodeMatch)
         {
-            var routingContext = GetRoutingContext(urlAsString);
-            var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-            var docRequest = new PublishedContentRequest(url, routingContext);
+            var umbracoContext = GetUmbracoContext(urlAsString);
+            var facadeRouter = CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByUrlAlias(Logger);
 
-            var result = lookup.TryFindContent(docRequest);
+            var result = lookup.TryFindContent(frequest);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(docRequest.PublishedContent.Id, nodeMatch);
+            Assert.AreEqual(frequest.PublishedContent.Id, nodeMatch);
         }
 
         protected override string GetXmlContent(int templateId)

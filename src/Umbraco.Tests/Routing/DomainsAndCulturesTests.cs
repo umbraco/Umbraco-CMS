@@ -269,22 +269,21 @@ namespace Umbraco.Tests.Routing
         {
             SetDomains1();
 
-            var routingContext = GetRoutingContext(inputUrl);
-            var url = routingContext.UmbracoContext.CleanedUmbracoUrl;
-            //very important to use the cleaned up umbraco url
-            var pcr = new PublishedContentRequest(url, routingContext);
+            var umbracoContext = GetUmbracoContext(inputUrl);
+            var facadeRouter = CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext);
 
             // lookup domain
-            pcr.Engine.FindDomain();
+            facadeRouter.FindDomain(frequest);
 
-            Assert.AreEqual(expectedCulture, pcr.Culture.Name);
+            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
             SettingsForTests.HideTopLevelNodeFromPath = false;
             var finder = new ContentFinderByNiceUrl(Logger);
-            var result = finder.TryFindContent(pcr);
+            var result = finder.TryFindContent(frequest);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(pcr.PublishedContent.Id, expectedNode);
+            Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
         }
 
         #region Cases
@@ -317,25 +316,24 @@ namespace Umbraco.Tests.Routing
             // defaults depend on test environment
             expectedCulture = expectedCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
-            var routingContext = GetRoutingContext(inputUrl);
-            var url = routingContext.UmbracoContext.CleanedUmbracoUrl;
-            //very important to use the cleaned up umbraco url
-            var pcr = new PublishedContentRequest(url, routingContext);
+            var umbracoContext = GetUmbracoContext(inputUrl);
+            var facadeRouter = CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext);
 
             // lookup domain
-            pcr.Engine.FindDomain();
+            facadeRouter.FindDomain(frequest);
 
             // find document
             SettingsForTests.HideTopLevelNodeFromPath = false;
             var finder = new ContentFinderByNiceUrl(Logger);
-            var result = finder.TryFindContent(pcr);
+            var result = finder.TryFindContent(frequest);
 
             // apply wildcard domain
-            pcr.Engine.HandleWildcardDomains();
+            facadeRouter.HandleWildcardDomains(frequest);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(expectedCulture, pcr.Culture.Name);
-            Assert.AreEqual(pcr.PublishedContent.Id, expectedNode);
+            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+            Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
         }
 
 
@@ -374,8 +372,7 @@ namespace Umbraco.Tests.Routing
                 }
             });
 
-            var routingContext = GetRoutingContext("http://anything/");
-            var umbracoContext = routingContext.UmbracoContext;
+            var umbracoContext = GetUmbracoContext("http://anything/");
 
             var content = umbracoContext.ContentCache.GetById(nodeId);
             Assert.IsNotNull(content);

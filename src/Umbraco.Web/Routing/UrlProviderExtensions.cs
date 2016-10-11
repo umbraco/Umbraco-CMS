@@ -34,7 +34,7 @@ namespace Umbraco.Web.Routing
                 return urls;
             }
 
-            var urlProvider = umbracoContext.RoutingContext.UrlProvider;
+            var urlProvider = umbracoContext.UrlProvider;
             var url = urlProvider.GetUrl(content.Id);            
             if (url == "#")
             {

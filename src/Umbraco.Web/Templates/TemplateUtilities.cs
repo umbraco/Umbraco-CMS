@@ -36,7 +36,7 @@ namespace Umbraco.Web.Templates
             //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable, better yet, pass in urlprovider, routing context, separately
 
 			//don't attempt to proceed without a context as we cannot lookup urls without one
-			if (UmbracoContext.Current == null || UmbracoContext.Current.RoutingContext == null)
+			if (UmbracoContext.Current == null)
 			{
 				return text;
 			}
