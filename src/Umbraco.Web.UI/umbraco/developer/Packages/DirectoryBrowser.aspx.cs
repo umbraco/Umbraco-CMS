@@ -89,6 +89,12 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
                 //Output directorys
                 var oDirInfo = new DirectoryInfo(IOHelper.MapPath("~/" + sSubDir));
                 var oDirs = oDirInfo.GetDirectories();
+
+                Array.Sort(oDirs, delegate(DirectoryInfo dir1, DirectoryInfo dir2)
+                {
+                    return dir1.Name.CompareTo(dir2.Name);
+                });
+
                 foreach (var oDir in oDirs)
                 {
                     try
@@ -103,6 +109,12 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
                 //Ouput files
                 var oFiles = oDirInfo.GetFiles();
+                
+                Array.Sort(oFiles, delegate(FileInfo file1, FileInfo file2)
+                {
+                    return file1.Name.CompareTo(file2.Name);
+                });
+
                 foreach (var oFile in oFiles.Where(oFile => oFile.Name.ToLower() != _lsScriptName))
                 {
                     decimal iLen = oFile.Length;
