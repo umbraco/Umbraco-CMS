@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.DI;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
@@ -34,14 +35,9 @@ namespace Umbraco.Core.IO
 
         public PhysicalFileSystem(string rootPath, string rootUrl)
         {
-            if (string.IsNullOrEmpty(rootPath))
-                throw new ArgumentException("The argument 'rootPath' cannot be null or empty.");
-
-            if (string.IsNullOrEmpty(rootUrl))
-                throw new ArgumentException("The argument 'rootUrl' cannot be null or empty.");
-
-			if (rootPath.StartsWith("~/"))
-				throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
+            if (string.IsNullOrEmpty(rootPath)) throw new ArgumentNullOrEmptyException(nameof(rootPath));
+            if (string.IsNullOrEmpty(rootUrl)) throw new ArgumentNullOrEmptyException(nameof(rootUrl));
+			if (rootPath.StartsWith("~/")) throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
 
             // rootPath should be... rooted, as in, it's a root path!
             // but the test suite App.config cannot really "root" anything so we'll have to do it here

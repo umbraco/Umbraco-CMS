@@ -7,6 +7,7 @@ using System.Threading;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
@@ -73,7 +74,7 @@ namespace Umbraco.Core.Persistence
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (umbracoDatabaseAccessor == null) throw new ArgumentNullException(nameof(umbracoDatabaseAccessor));
-            if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value cannot be null nor empty.", nameof(connectionStringName));
+            if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentNullOrEmptyException(nameof(connectionStringName));
             if (mappers == null) throw new ArgumentNullException(nameof(mappers));
 
             _mappers = mappers;

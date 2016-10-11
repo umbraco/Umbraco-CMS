@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Xml
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Xml
         {
             if (xml == null) throw new ArgumentNullException("xml");
             if (n == null) throw new ArgumentNullException("n");
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
             if (n.Attributes == null)
             {
@@ -376,7 +377,7 @@ namespace Umbraco.Core.Xml
         public static XmlAttribute AddAttribute(XmlDocument xd, string name, string value)
         {
             if (xd == null) throw new ArgumentNullException("xd");
-            if (string.IsNullOrEmpty(name)) throw new ArgumentException("Value cannot be null or empty.", "name");
+            if (string.IsNullOrEmpty(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
             var temp = xd.CreateAttribute(name);
             temp.Value = value;
@@ -393,7 +394,7 @@ namespace Umbraco.Core.Xml
         public static XmlNode AddTextNode(XmlDocument xd, string name, string value)
         {
             if (xd == null) throw new ArgumentNullException("xd");
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
             var temp = xd.CreateNode(XmlNodeType.Element, name, "");
             temp.AppendChild(xd.CreateTextNode(value));
@@ -412,7 +413,7 @@ namespace Umbraco.Core.Xml
         {
             if (xd == null) throw new ArgumentNullException("xd");
             if (parent == null) throw new ArgumentNullException("parent");
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
             var child = parent.SelectSingleNode(name);
             if (child != null)
@@ -433,7 +434,7 @@ namespace Umbraco.Core.Xml
 		public static XmlNode AddCDataNode(XmlDocument xd, string name, string value)
         {
             if (xd == null) throw new ArgumentNullException("xd");
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
             var temp = xd.CreateNode(XmlNodeType.Element, name, "");
             temp.AppendChild(xd.CreateCDataSection(value));
@@ -452,7 +453,7 @@ namespace Umbraco.Core.Xml
         {
             if (xd == null) throw new ArgumentNullException("xd");
             if (parent == null) throw new ArgumentNullException("parent");
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
             var child = parent.SelectSingleNode(name);
             if (child != null)

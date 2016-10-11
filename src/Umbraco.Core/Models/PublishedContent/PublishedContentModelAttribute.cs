@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -16,8 +17,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <param name="contentTypeAlias">The content type alias.</param>
         public PublishedContentModelAttribute(string contentTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(contentTypeAlias))
-                throw new ArgumentException("Argument cannot be null nor empty.", "contentTypeAlias");
+            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
             ContentTypeAlias = contentTypeAlias;
         }
 

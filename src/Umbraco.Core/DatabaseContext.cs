@@ -10,6 +10,7 @@ using NPoco;
 using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.DI;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -270,8 +271,8 @@ namespace Umbraco.Core
         /// <param name="logger">A logger.</param>
         private static void SaveConnectionString(string connectionString, string providerName, ILogger logger)
         {
-            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException("Value cannot be null nor empty.", nameof(connectionString));
-            if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentException("Value cannot be null nor empty.", nameof(providerName));
+            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullOrEmptyException(nameof(connectionString));
+            if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentNullOrEmptyException(nameof(providerName));
 
             // set the connection string for the new datalayer
             var connectionStringSettings = new ConnectionStringSettings(GlobalSettings.UmbracoConnectionName, connectionString, providerName);
