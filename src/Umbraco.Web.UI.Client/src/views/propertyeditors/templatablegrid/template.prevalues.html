@@ -1,0 +1,10 @@
+﻿<div ng-controller="Umbraco.PropertyEditors.TemplatableGridPrevalueEditorController">
+    <div ng-show="unsupported">Template not supported in document type editor, please use the data type editor.</div>
+    <div ng-show="!unsupported">
+        <button class="btn btn-small" ng-click="reset()"
+                style="z-index: 999;">
+            <i class="icon-delete red"></i>Reset template
+        </button>
+        <div ng-include="gridPath"></div>
+    </div>
+</div>

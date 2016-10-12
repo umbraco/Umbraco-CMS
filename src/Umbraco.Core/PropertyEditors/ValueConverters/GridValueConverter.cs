@@ -22,7 +22,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.GridAlias);
+            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.GridAlias)
+                || propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.TemplatableGridAlias);
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

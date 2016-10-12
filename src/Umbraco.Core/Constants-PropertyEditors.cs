@@ -135,6 +135,11 @@ namespace Umbraco.Core
             /// </summary>
             public const string GridAlias = "Umbraco.Grid";
 
+            /// <summary>
+            /// Alias for the templatable grid datatype.
+            /// </summary>
+            public const string TemplatableGridAlias = "Umbraco.Templatable.Grid";
+
 
             /// <summary>
             /// Guid for the Image Cropper datatype.
