@@ -97,6 +97,11 @@
                 .then(function (data) {
                     $scope.submit(true);
                 }, function (reason) {
+                    
+                    //is Two Factor required?
+                    if(reason.status === 403){
+                      userService._show2FALoginDialog(reason.data.twoFactorView,$scope.submit);
+                    }
                     $scope.errorMsg = reason.errorMsg;
 
                     //set the form inputs to invalid

@@ -161,7 +161,7 @@ namespace Umbraco.Web.Editors
                                 HttpStatusCode.BadRequest, 
                                 "UserManager does not implement " + typeof(IUmbracoBackOfficeTwoFactorOptions)));
                     }
-
+                    
                     var twofactorView = twofactorOptions.GetTwoFactorView(
                         TryGetOwinContext().Result,
                         UmbracoContext,
@@ -175,10 +175,13 @@ namespace Umbraco.Web.Editors
                                 typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
                     }
 
+                    var attemptedUser = Security.GetBackOfficeUser(loginModel.Username);
+                    
                     //create a with information to display a custom two factor send code view
-                    var verifyResponse = Request.CreateResponse(HttpStatusCode.OK, new
+                    var verifyResponse = Request.CreateResponse(HttpStatusCode.Forbidden, new
                     {
-                        twoFactorView = twofactorView
+                        twoFactorView = twofactorView,
+                        userId = attemptedUser.Id
                     });
 
                     return verifyResponse;
