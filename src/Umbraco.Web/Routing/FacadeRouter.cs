@@ -30,7 +30,7 @@ namespace Umbraco.Web.Routing
         // fixme - maybe we should be initialized with UmbracoContext accessor instead?
 
 	    private readonly IWebRoutingSection _webRoutingSection;
-        private readonly IEnumerable<IContentFinder> _contentFinders;
+        private readonly ContentFinderCollection _contentFinders;
 	    private readonly IContentLastChanceFinder _contentLastChanceFinder;
         private readonly ServiceContext _services;
         private readonly ProfilingLogger _profilingLogger;
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public FacadeRouter(
             IWebRoutingSection webRoutingSection,
-            IEnumerable<IContentFinder> contentFinders,
+            ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
             ServiceContext services,
             ProfilingLogger proflog)

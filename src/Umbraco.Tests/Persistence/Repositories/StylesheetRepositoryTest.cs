@@ -16,14 +16,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
-    public class StylesheetRepositoryTest : BaseDatabaseFactoryTest
+    public class StylesheetRepositoryTest : TestWithDatabaseBase
     {
         private IFileSystem _fileSystem;
 
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             _fileSystem = new PhysicalFileSystem(SystemDirectories.Css);
             var stream = CreateStream("body {background:#EE7600; color:#FFF;}");

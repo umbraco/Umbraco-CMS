@@ -27,20 +27,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class ContentRepositoryTest : BaseDatabaseFactoryTest
+    public class ContentRepositoryTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             CreateTestData();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
         }
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository)

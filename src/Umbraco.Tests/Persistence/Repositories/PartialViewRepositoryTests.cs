@@ -14,14 +14,13 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
-    public class PartialViewRepositoryTests : BaseUmbracoApplicationTest
+    public class PartialViewRepositoryTests : TestWithApplicationBase
     {
         private IFileSystem _fileSystem;
 
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             _fileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/");
         }

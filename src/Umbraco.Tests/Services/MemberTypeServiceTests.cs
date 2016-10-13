@@ -16,18 +16,6 @@ namespace Umbraco.Tests.Services
     [TestSetup.FacadeService(EnableRepositoryEvents = true)]
     public class MemberTypeServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Member_Cannot_Edit_Property()
         {

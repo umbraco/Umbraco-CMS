@@ -25,9 +25,9 @@ namespace Umbraco.Tests.Integration
     {
         #region Setup
 
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             _h1 = new CacheRefresherComponent();
             _h1.AddHandlers();
@@ -48,9 +48,9 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentTypeService.Save(_contentType);
         }
 
-        protected override void ConfigureContainer()
+        protected override void Compose()
         {
-            base.ConfigureContainer();
+            base.Compose();
 
             Container.Register<IServerRegistrar>(_ => new DistributedCacheTests.TestServerRegistrar()); // localhost-only
             Container.Register<IServerMessenger, WebServiceServerMessenger>(new PerContainerLifetime());

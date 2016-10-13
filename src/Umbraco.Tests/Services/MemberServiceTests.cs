@@ -23,18 +23,6 @@ namespace Umbraco.Tests.Services
     [TestSetup.FacadeService(EnableRepositoryEvents = true)]
     public class MemberServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Can_Create_Role()
         {

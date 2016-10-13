@@ -6,25 +6,21 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.DI;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StringExtensionsTests
+    public class StringExtensionsTests : BaseTestBase
     {
-	    [SetUp]
-	    public void Setup()
+	    public override void SetUp()
 	    {
+            base.SetUp();
+
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
             container.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
 	    }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
-        }
 
         [Test]
         public void CurrentHelper()

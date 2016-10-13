@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Integration
     [TestFixture, RequiresSTA]
     public class GetCultureTests : BaseServiceTest
     {
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
             Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }

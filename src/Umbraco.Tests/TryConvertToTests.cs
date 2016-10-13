@@ -9,21 +9,16 @@ using Umbraco.Core.DI;
 namespace Umbraco.Tests
 {
     [TestFixture]
-    public class TryConvertToTests
+    public class TryConvertToTests : BaseTestBase
     {
-        [SetUp]
-        public void SetUp()
+        public override void SetUp()
         {
+            base.SetUp();
+
             var settings = SettingsForTests.GetDefault();
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
             container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(settings));
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
         }
 
         [Test]

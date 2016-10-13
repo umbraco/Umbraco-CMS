@@ -12,12 +12,11 @@ namespace Umbraco.Tests.Publishing
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class PublishingStrategyTests : BaseDatabaseFactoryTest
+    public class PublishingStrategyTests : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             //LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);              
         }

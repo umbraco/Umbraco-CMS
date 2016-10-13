@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Migrations
 {
     [TestFixture]
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    public class MigrationIssuesTests : BaseDatabaseFactoryTest
+    public class MigrationIssuesTests : TestWithDatabaseBase
     {
         [Test]
         public void Issue8370Test()

@@ -25,9 +25,9 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class RenderRouteHandlerTests : BaseWebTest
     {
-		public override void Initialize()
+		public override void SetUp()
 		{
-			base.Initialize();
+			base.SetUp();
 
 		    SettingsForTests.UmbracoPath = "~/umbraco";
 
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Routing
 	        }
 	    }
 
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Routing
 
             Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
-            base.FreezeResolution();
+            base.MoreSetUp();
         }
 
 		public override void TearDown()

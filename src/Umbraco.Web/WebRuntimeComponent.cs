@@ -15,6 +15,7 @@ using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DI;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
@@ -134,14 +135,14 @@ namespace Umbraco.Web
             composition.Container.RegisterCollectionBuilder<FilteredControllerFactoryCollectionBuilder>()
                 .Append<RenderControllerFactory>();
 
-            composition.Container.RegisterCollectionBuilder < UrlProviderCollectionBuilder>()
+            composition.Container.RegisterCollectionBuilder<UrlProviderCollectionBuilder>()
                 //.Append<AliasUrlProvider>() // not enabled by default
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
             composition.Container.RegisterSingleton<IContentLastChanceFinder, ContentFinderByLegacy404>();
 
-            composition.Container.RegisterCollectionBuilder < ContentFinderCollectionBuilder>()
+            composition.Container.RegisterCollectionBuilder<ContentFinderCollectionBuilder>()
                 // all built-in finders in the correct order,
                 // devs can then modify this list on application startup
                 .Append<ContentFinderByPageIdQuery>()
@@ -168,6 +169,10 @@ namespace Umbraco.Web
 
             // auto-register views
             composition.Container.RegisterAuto(typeof(UmbracoViewPage<>));
+
+            // register facade router
+            composition.Container.Register<FacadeRouter>();
+            composition.Container.Register(_ => UmbracoConfig.For.UmbracoSettings().WebRouting);
         }
 
         internal void Initialize(

@@ -18,18 +18,6 @@ namespace Umbraco.Tests.Services
     [TestFixture, RequiresSTA]
     public class UserServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void UserService_Get_User_Permissions_For_Unassigned_Permission_Nodes()
         {

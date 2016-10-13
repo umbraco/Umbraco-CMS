@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -62,7 +63,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
-                Mock.Of<IUmbracoSettingsSection>(),
+                TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 true);
             var ctrl = new MatchesDefaultIndexController { UmbracoContext = umbCtx };
@@ -85,7 +86,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
-                Mock.Of<IUmbracoSettingsSection>(),
+                TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 true);
             var ctrl = new MatchesOverriddenIndexController { UmbracoContext = umbCtx };
@@ -108,7 +109,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
-                Mock.Of<IUmbracoSettingsSection>(),
+                TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 true);
             var ctrl = new MatchesCustomIndexController { UmbracoContext = umbCtx };
@@ -131,7 +132,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
-                Mock.Of<IUmbracoSettingsSection>(),
+                TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 true);
             var ctrl = new MatchesAsyncIndexController { UmbracoContext = umbCtx };

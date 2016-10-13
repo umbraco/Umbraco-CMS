@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -17,13 +16,13 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class DefaultShortStringHelperTests 
+    public class DefaultShortStringHelperTests : BaseTestBase
     {
         private DefaultShortStringHelper _helper;
 
-        [SetUp]
-        public void Initialize()
+        public override void SetUp()
         {
+            base.SetUp();
 
             // NOTE: it is not possible to configure the helper once it has been assigned
             // to the resolver and resolution has frozen. but, obviously, it is possible
@@ -80,13 +79,7 @@ namespace Umbraco.Tests.Strings
             container.Register<IShortStringHelper>(_ => _helper);
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
-        }
-
-        static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static string FilterFrenchElisions(string s)
         {

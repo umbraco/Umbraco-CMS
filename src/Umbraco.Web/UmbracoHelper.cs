@@ -36,7 +36,6 @@ namespace Umbraco.Web
         private MembershipHelper _membershipHelper;
         private ITagQuery _tag;
         private IDataTypeService _dataTypeService;
-        private UrlProvider _urlProvider;
         private ICultureDictionary _cultureDictionary;
 
         #region Constructors
@@ -49,7 +48,6 @@ namespace Umbraco.Web
             IPublishedContentQuery query,
             ITagQuery tagQuery,
             IDataTypeService dataTypeService,
-            UrlProvider urlProvider,
             ICultureDictionary cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
             MembershipHelper membershipHelper,
@@ -61,7 +59,6 @@ namespace Umbraco.Web
             if (query == null) throw new ArgumentNullException(nameof(query));
             if (tagQuery == null) throw new ArgumentNullException(nameof(tagQuery));
             if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
-            if (urlProvider == null) throw new ArgumentNullException(nameof(urlProvider));
             if (cultureDictionary == null) throw new ArgumentNullException(nameof(cultureDictionary));
             if (componentRenderer == null) throw new ArgumentNullException(nameof(componentRenderer));
             if (membershipHelper == null) throw new ArgumentNullException(nameof(membershipHelper));
@@ -71,7 +68,6 @@ namespace Umbraco.Web
             _umbracoContext = umbracoContext;
             _tag = new TagQuery(tagQuery);
             _dataTypeService = dataTypeService;
-            _urlProvider = urlProvider;
             _cultureDictionary = cultureDictionary;
             _componentRenderer = componentRenderer;
             _membershipHelper = membershipHelper;
@@ -163,8 +159,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the url provider.
         /// </summary>
-        public UrlProvider UrlProvider => _urlProvider 
-            ?? (_urlProvider = UmbracoContext.UrlProvider);
+        public UrlProvider UrlProvider => UmbracoContext.UrlProvider;
 
         /// <summary>
         /// Gets the datatype service.

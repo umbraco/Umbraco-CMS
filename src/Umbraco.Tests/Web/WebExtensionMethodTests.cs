@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -24,25 +17,16 @@ using Current = Umbraco.Web.Current;
 namespace Umbraco.Tests.Web
 {
     [TestFixture]
-    public class WebExtensionMethodTests
+    public class WebExtensionMethodTests : TestWithApplicationBase
     {
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
-        }
-
         [Test]
         public void RouteDataExtensions_GetUmbracoContext()
         {
-            //var appCtx = new ApplicationContext(
-            //   CacheHelper.CreateDisabledCacheHelper(),
-            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.CreateContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
-                Mock.Of<IUmbracoSettingsSection>(),
+                TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>());
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -54,14 +38,11 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_RouteValues()
         {
-            //var appCtx = new ApplicationContext(
-            //   CacheHelper.CreateDisabledCacheHelper(),
-            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.CreateContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
-                Mock.Of<IUmbracoSettingsSection>(),
+                TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>());
 
             var r1 = new RouteData();
@@ -83,14 +64,11 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_Current()
         {
-            //var appCtx = new ApplicationContext(
-            //   CacheHelper.CreateDisabledCacheHelper(),
-            //   new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.CreateContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
-                Mock.Of<IUmbracoSettingsSection>(),
+                TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>());
 
             var httpContext = Mock.Of<HttpContextBase>();
@@ -104,8 +82,8 @@ namespace Umbraco.Tests.Web
             r3.DataTokens.Add("ParentActionViewContext", ctx2);
             var ctx3 = CreateViewContext(new ControllerContext(httpContext, r3, new MyController()));
 
-            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
-            Umbraco.Web.Current.SetUmbracoContext(umbCtx, true);
+            Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            Current.SetUmbracoContext(umbCtx, true);
 
             var result = ctx3.GetUmbracoContext();
 

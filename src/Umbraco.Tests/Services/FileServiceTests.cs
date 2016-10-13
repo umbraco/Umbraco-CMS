@@ -13,19 +13,6 @@ namespace Umbraco.Tests.Services
     [TestFixture, RequiresSTA]
     public class FileServiceTests : BaseServiceTest
     {
-
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Create_Template_Then_Assign_Child()
         {

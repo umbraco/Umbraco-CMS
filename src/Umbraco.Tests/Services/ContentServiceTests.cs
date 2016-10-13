@@ -5,17 +5,16 @@ using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DI;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -32,20 +31,17 @@ namespace Umbraco.Tests.Services
     [TestSetup.FacadeService(EnableRepositoryEvents = true)]
     public class ContentServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-	        base.Initialize();
-        }
-
-		[TearDown]
-		public override void TearDown()
-		{
-      		base.TearDown();
-		}
-
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
+
+        protected override void Compose()
+        {
+            base.Compose();
+
+            // fixme - do it differently
+            Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>();
+            Container.Register(factory => factory.GetInstance<ServiceContext>().TextService);
+        }
 
         [Test]
         public void Remove_Scheduled_Publishing_Date()

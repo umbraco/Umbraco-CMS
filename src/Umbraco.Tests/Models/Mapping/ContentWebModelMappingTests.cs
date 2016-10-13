@@ -20,13 +20,13 @@ namespace Umbraco.Tests.Models.Mapping
     [RequiresAutoMapperMappings]
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
-    public class ContentWebModelMappingTests : BaseDatabaseFactoryTest
+    public class ContentWebModelMappingTests : TestWithDatabaseBase
     {
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
             Container.RegisterSingleton<ICultureDictionaryFactory>(_ => Mock.Of<ICultureDictionaryFactory>());
 
-            base.FreezeResolution();
+            base.MoreSetUp();
         }
 
         [PropertyEditor("Test.Test", "Test", "~/Test.html")]

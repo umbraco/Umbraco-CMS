@@ -12,20 +12,8 @@ namespace Umbraco.Tests.Persistence
     //
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class NPocoExtensionsTest : BaseDatabaseFactoryTest
+    public class NPocoExtensionsTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Can_Bulk_Insert()
         {

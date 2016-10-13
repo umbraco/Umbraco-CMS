@@ -1,17 +1,13 @@
 using System;
 using System.Configuration;
-using System.IO;
 using System.Linq;
 using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Sync;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.DI;
 
 namespace Umbraco.Tests
@@ -19,24 +15,17 @@ namespace Umbraco.Tests
     [TestFixture]
     public class ApplicationUrlHelperTests
     {
-        private ILogger _logger;
         private IServerRegistrar _registrar;
 
         // note: in tests, read appContext._umbracoApplicationUrl and not the property,
         // because reading the property does run some code, as long as the field is null.
-
-        [TestFixtureSetUp]
-        public void InitializeFixture()
-        {
-            _logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
-        }
 
         private void Initialize(IUmbracoSettingsSection settings)
         {
             _registrar = new ConfigServerRegistrar(settings.DistributedCall);
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
-            container.Register<IServerRegistrar>(_ => _registrar);
+            container.Register(_ => _registrar);
         }
 
         [TearDown]
@@ -48,9 +37,6 @@ namespace Umbraco.Tests
         [Test]
         public void NoApplicationUrlByDefault()
         {
-            //var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            //Assert.IsNull(appCtx._umbracoApplicationUrl);
             var state = new RuntimeState(Mock.Of<ILogger>(), new Lazy<IServerRegistrar>(Mock.Of<IServerRegistrar>), new Lazy<MainDom>(Mock.Of<MainDom>));
             Assert.IsNull(state.ApplicationUrl);
         }
@@ -70,15 +56,12 @@ namespace Umbraco.Tests
             Initialize(settings);
 
             var state = new RuntimeState(Mock.Of<ILogger>(), new Lazy<IServerRegistrar>(Mock.Of<IServerRegistrar>), new Lazy<MainDom>(Mock.Of<MainDom>));
-            //var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
-            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true"); // does not make a diff here
 
-            //ApplicationUrlHelper.EnsureApplicationUrl(appCtx, settings: settings);
             state.EnsureApplicationUrl(settings: settings);
 
-            Assert.AreEqual("http://server1.com/umbraco", state.ApplicationUrl);
+            Assert.AreEqual("http://server1.com/umbraco", state.ApplicationUrl.ToString());
         }
 
         [Test]
@@ -108,7 +91,7 @@ namespace Umbraco.Tests
             // first server is master server
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled == true && callSection.Servers == new IServer[]
+                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled && callSection.Servers == new[]
                 {
                     Mock.Of<IServer>(server => server.ServerName == NetworkHelper.MachineName && server.ServerAddress == "server1.com"),
                     Mock.Of<IServer>(server => server.ServerName == "ANOTHERNAME" && server.ServerAddress == "server2.com"),
@@ -135,7 +118,7 @@ namespace Umbraco.Tests
             // other servers are slave servers
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled == true && callSection.Servers == new IServer[]
+                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled && callSection.Servers == new[]
                 {
                     Mock.Of<IServer>(server => server.ServerName == "ANOTHERNAME" && server.ServerAddress == "server2.com"),
                     Mock.Of<IServer>(server => server.ServerName == NetworkHelper.MachineName && server.ServerAddress == "server1.com"),
@@ -162,7 +145,7 @@ namespace Umbraco.Tests
             // cannot set if not enabled
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled == false && callSection.Servers == new IServer[]
+                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled == false && callSection.Servers == new[]
                 {
                     Mock.Of<IServer>(server => server.ServerName == "ANOTHERNAME" && server.ServerAddress == "server2.com"),
                     Mock.Of<IServer>(server => server.ServerName == NetworkHelper.MachineName && server.ServerAddress == "server1.com"),
@@ -204,7 +187,7 @@ namespace Umbraco.Tests
             // distributed call enabled but missing servers, unknown server
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled == true && callSection.Servers == Enumerable.Empty<IServer>())
+                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled && callSection.Servers == Enumerable.Empty<IServer>())
                 && section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string)null)
                 && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == (string)null));
 
@@ -220,7 +203,7 @@ namespace Umbraco.Tests
             // distributed call enabled, cannot find server, assume it's an undeclared slave
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled == true && callSection.Servers == new IServer[]
+                section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled && callSection.Servers == new[]
                 {
                     Mock.Of<IServer>(server => server.ServerName == "ANOTHERNAME" && server.ServerAddress == "server2.com"),
                 })

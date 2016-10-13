@@ -17,12 +17,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class DictionaryRepositoryTest : BaseDatabaseFactoryTest
+    public class DictionaryRepositoryTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             CreateTestData();
         }

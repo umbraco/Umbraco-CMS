@@ -22,12 +22,12 @@ namespace Umbraco.Tests.PublishedContent
 	{
         private PluginManager _pluginManager;
 
-        public override void Initialize()
+        public override void SetUp()
         {
             // required so we can access property.Value
             //PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
 
-            base.Initialize();
+            base.SetUp();
 
             // this is so the model factory looks into the test assembly
             _pluginManager = Current.PluginManager;
@@ -64,12 +64,12 @@ namespace Umbraco.Tests.PublishedContent
             Core.DI.Current.Reset();
         }
 
-	    protected override void FreezeResolution()
+	    protected override void MoreSetUp()
 	    {
             var types = Current.PluginManager.ResolveTypes<PublishedContentModel>();
             Container.RegisterSingleton<IPublishedContentModelFactory>(_ => new PublishedContentModelFactory(types));
 
-            base.FreezeResolution();
+            base.MoreSetUp();
 	    }
 
 	    protected override string GetXmlContent(int templateId)

@@ -1,6 +1,4 @@
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -9,9 +7,6 @@ namespace Umbraco.Tests.Routing
     [TestFixture]
     public class ContentFinderByAliasWithDomainsTests : ContentFinderByAliasTests
     {
-
-        
-
         [TestCase("http://domain1.com/this/is/my/alias", "de-DE", -1001)] // alias to domain's page fails - no alias on domain's home
         [TestCase("http://domain1.com/page2/alias", "de-DE", 10011)] // alias to sub-page works
         [TestCase("http://domain1.com/en/flux", "en-US", -10011)] // alias to domain's page fails - no alias on domain's home

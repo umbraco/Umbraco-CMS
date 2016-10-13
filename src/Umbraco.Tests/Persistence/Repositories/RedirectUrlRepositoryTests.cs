@@ -12,19 +12,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class RedirectUrlRepositoryTests : BaseDatabaseFactoryTest
+    public class RedirectUrlRepositoryTests : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
-            CreateTestData();
-        }
+            base.SetUp();
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
+            CreateTestData();
         }
 
         [Test]

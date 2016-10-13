@@ -6,87 +6,85 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Current = Umbraco.Core.DI.Current;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.Services
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
 	[TestFixture, RequiresSTA]
-	public class ThreadSafetyServiceTest : BaseDatabaseFactoryTest
+	public class ThreadSafetyServiceTest : TestWithDatabaseBase
 	{
-		private IDatabaseUnitOfWorkProvider _uowProvider;
-		private PerThreadSqlCeDatabaseFactory _dbFactory;
-	    private DatabaseContext _dbContext;
-	    private ServiceContext _services;
+		//private IDatabaseUnitOfWorkProvider _uowProvider;
+		//private PerThreadSqlCeDatabaseFactory _dbFactory;
+	    private IUmbracoDatabaseAccessor _accessor;
+	 //   private DatabaseContext _dbContext;
+	 //   private ServiceContext _services;
 
-		[SetUp]
-		public override void Initialize()
+		public override void SetUp()
 		{
-			base.Initialize();
+			base.SetUp();
             
-            //we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that
-            //a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
-            //threading environment, or a single apartment threading environment will not work for this test because
-            //it is multi-threaded.
-            _dbFactory = new PerThreadSqlCeDatabaseFactory(Logger, Mock.Of<IMapperCollection>());
-            var repositoryFactory = new RepositoryFactory(Container);
-            _uowProvider = new NPocoUnitOfWorkProvider(_dbFactory, repositoryFactory);
+   //         //we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that
+   //         //a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
+   //         //threading environment, or a single apartment threading environment will not work for this test because
+   //         //it is multi-threaded.
+   //         _dbFactory = new PerThreadSqlCeDatabaseFactory(Logger, Mock.Of<IMapperCollection>());
+   //         var repositoryFactory = new RepositoryFactory(Container);
+   //         _uowProvider = new NPocoUnitOfWorkProvider(_dbFactory, repositoryFactory);
 
-            // overwrite the local object
-            _dbContext = new DatabaseContext(_dbFactory, Logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
+   //         // overwrite the local object
+   //         _dbContext = new DatabaseContext(_dbFactory, Logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
 
-            //disable cache
-		    var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+   //         //disable cache
+		 //   var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
-			//here we are going to override the ServiceContext because normally with our test cases we use a
-			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
-			//we need a new Database object for each thread.
-		    var evtMsgs = new TransientEventMessagesFactory();
-		    _services = TestObjects.GetServiceContext(
-                repositoryFactory,
-                _uowProvider,
-                new FileUnitOfWorkProvider(),
-                cacheHelper,
-                Logger,
-                evtMsgs,
-                Enumerable.Empty<IUrlSegmentProvider>());
+			////here we are going to override the ServiceContext because normally with our test cases we use a
+			////global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
+			////we need a new Database object for each thread.
+		 //   var evtMsgs = new TransientEventMessagesFactory();
+		 //   _services = TestObjects.GetServiceContext(
+   //             repositoryFactory,
+   //             _uowProvider,
+   //             new FileUnitOfWorkProvider(),
+   //             cacheHelper,
+   //             Logger,
+   //             evtMsgs,
+   //             Enumerable.Empty<IUrlSegmentProvider>());
 
 			CreateTestData();
 		}
 
-        protected override void ConfigureContainer()
+        protected override void Compose()
         {
-            base.ConfigureContainer();
+            base.Compose();
 
             //replace some services
-            Container.Register<IDatabaseFactory>(factory => _dbFactory);
+            //Container.Register<IDatabaseFactory>(factory => _dbFactory);
+            //Container.Register<IDatabaseFactory>(f => _dbFactory = new PerThreadSqlCeDatabaseFactory(f.GetInstance<ILogger>(), f.GetInstance<IMapperCollection>()));
+            Container.RegisterSingleton(f => _accessor = new ThreadStaticUmbracoDatabaseAccessor()); // per-thread database
 
-            Container.Register<DatabaseContext>(factory => _dbContext);
-            Container.Register<ServiceContext>(factory => _services);
+            //Container.Register<DatabaseContext>(factory => _dbContext);
+            //Container.Register<ServiceContext>(factory => _services);
         }
 
-        [TearDown]
 		public override void TearDown()
 		{
 			// dispose!
-            _dbFactory?.Dispose();
+           // _dbFactory?.Dispose();
+		    _accessor.UmbracoDatabase?.Dispose();
 
             base.TearDown();
 		}
@@ -96,55 +94,58 @@ namespace Umbraco.Tests.Services
 		[Test]
 		public void Ensure_All_Threads_Execute_Successfully_Content_Service()
 		{
-			//we will mimick the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
-			var contentService = (ContentService)ServiceContext.ContentService;
+			var contentService = (ContentService) ServiceContext.ContentService;
 
 			var threads = new List<Thread>();
             var exceptions = new List<Exception>();
 
-            Debug.WriteLine("Starting test...");
+            Debug.WriteLine("Starting test");
 
-			for (var i = 0; i < MaxThreadCount; i++)
+            for (var i = 0; i < MaxThreadCount; i++)
 			{
 				var t = new Thread(() =>
+				{
+					try
 					{
-						try
-						{
-							//Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Create 1st content.");
-							var content1 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
+						//Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Create 1st content.");
+						var content1 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
 
-							//Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 1st content.");
-							contentService.Save(content1);
-                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 1st content.");
+						//Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 1st content.");
+						contentService.Save(content1);
+                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 1st content.");
 
-							Thread.Sleep(100); //quick pause for maximum overlap!
+						Thread.Sleep(100); //quick pause for maximum overlap!
 
-                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Create 2nd content.");
-                            var content2 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
+                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Create 2nd content.");
+                        var content2 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
 
-                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 2nd content.");
-                            contentService.Save(content2);
-                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 2nd content.");
-                        }
-                        catch (Exception e)
-						{
-                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Exception!");
-						    lock (exceptions) { exceptions.Add(e); }
-						}
-					});
+                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 2nd content.");
+                        contentService.Save(content2);
+                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 2nd content.");
+                    }
+                    catch (Exception e)
+					{
+                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Exception!");
+						lock (exceptions) { exceptions.Add(e); }
+					}
+				});
 				threads.Add(t);
 			}
 
-			//start all threads
-			threads.ForEach(x => x.Start());
+            // start all threads
+            Debug.WriteLine("Starting threads");
+            threads.ForEach(x => x.Start());
 
-			//wait for all to complete
-			threads.ForEach(x => x.Join());
+            // wait for all to complete
+            Debug.WriteLine("Joining threads");
+            threads.ForEach(x => x.Join());
 
-			//kill them all
-			threads.ForEach(x => x.Abort());
+            // kill them all
+            // uh? no!
+            //threads.ForEach(x => x.Abort());
 
-			if (exceptions.Count == 0)
+            Debug.WriteLine("Checking exceptions");
+            if (exceptions.Count == 0)
 			{
 				//now look up all items, there should be 40!
 				var items = contentService.GetRootContent();
@@ -154,7 +155,6 @@ namespace Umbraco.Tests.Services
 			{
 			    throw new Exception("Exceptions!", exceptions.First()); // rethrow the first one...
 			}
-
 		}
 
 		[Test]
@@ -203,7 +203,8 @@ namespace Umbraco.Tests.Services
 			threads.ForEach(x => x.Join());
 
 			//kill them all
-			threads.ForEach(x => x.Abort());
+            // uh? no!
+			//threads.ForEach(x => x.Abort());
 
 			if (exceptions.Count == 0)
 			{

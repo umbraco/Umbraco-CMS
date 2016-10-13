@@ -19,18 +19,6 @@ namespace Umbraco.Tests.Services
     [TestSetup.FacadeService(EnableRepositoryEvents = true)]
     public class MediaServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Can_Move_Media()
         {

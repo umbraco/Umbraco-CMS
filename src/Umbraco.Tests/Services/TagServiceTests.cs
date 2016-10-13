@@ -16,18 +16,6 @@ namespace Umbraco.Tests.Services
     [TestFixture, RequiresSTA]
     public class TagServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-	        base.Initialize();
-        }
-		
-		[TearDown]
-		public override void TearDown()
-		{   
-      		base.TearDown();
-		}
-
         [Test]
         public void TagList_Contains_NodeCount()
         {

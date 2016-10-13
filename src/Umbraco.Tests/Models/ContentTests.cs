@@ -22,7 +22,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentTests : BaseUmbracoConfigurationTest
+    public class ContentTests : TestWithSettingsBase
     {
         [SetUp]
         public void Init()

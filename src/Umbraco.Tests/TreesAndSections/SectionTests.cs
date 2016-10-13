@@ -16,14 +16,18 @@ namespace Umbraco.Tests.TreesAndSections
     ///</summary>
     [RequiresAutoMapperMappings]
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture()]
-    public class SectionTests : BaseDatabaseFactoryTest
+    [TestFixture]
+    public class SectionTests : TestWithDatabaseBase
     {
-
-        [SetUp]
-        public override void Initialize()
+        protected override void Compose()
         {
-            base.Initialize();
+            base.Compose();
+            Container.Register<ISectionService, SectionService>();
+        }
+
+        public override void SetUp()
+        {
+            base.SetUp();
 
             var treesConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/trees.config");
             var appConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/applications.config");
@@ -41,10 +45,10 @@ namespace Umbraco.Tests.TreesAndSections
             SectionService.AppConfigFilePath = appConfig;
         }
 
-        [TearDown]
         public override void TearDown()
         {
             base.TearDown();
+
             if (Directory.Exists(TestHelper.MapPathForTest("~/TEMP/TreesAndSections")))
             {
                 Directory.Delete(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"), true);

@@ -15,18 +15,6 @@ namespace Umbraco.Tests.Services.Importing
     [TestFixture, RequiresSTA]
     public class PackageImportTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void PackagingService_Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
         {

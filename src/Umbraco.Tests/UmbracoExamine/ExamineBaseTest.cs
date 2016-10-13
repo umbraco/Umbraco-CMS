@@ -14,7 +14,7 @@ using UmbracoExamine;
 namespace Umbraco.Tests.UmbracoExamine
 {
     [TestFixture]
-    public abstract class ExamineBaseTest : BaseDatabaseFactoryTest
+    public abstract class ExamineBaseTest : TestWithDatabaseBase
     {
         [TestFixtureSetUp]
         public void InitializeFixture()
@@ -28,11 +28,11 @@ namespace Umbraco.Tests.UmbracoExamine
         /// <summary>
         /// sets up resolvers before resolution is frozen
         /// </summary>
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
             Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
-            base.FreezeResolution();
+            base.MoreSetUp();
         }
     }
 }

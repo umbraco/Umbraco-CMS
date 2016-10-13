@@ -16,11 +16,11 @@ namespace Umbraco.Tests.Models.Mapping
 {
     [RequiresAutoMapperMappings]
     [TestFixture]
-    public class AutoMapperTests : BaseUmbracoApplicationTest
+    public class AutoMapperTests : TestWithApplicationBase
     {
-        protected override void ConfigureContainer()
+        protected override void Compose()
         {
-            base.ConfigureContainer();
+            base.Compose();
 
             var manifestBuilder = new ManifestBuilder(
                 CacheHelper.CreateDisabledCacheHelper().RuntimeCache,

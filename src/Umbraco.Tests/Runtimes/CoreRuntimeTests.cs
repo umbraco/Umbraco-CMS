@@ -6,7 +6,6 @@ using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Components;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -17,20 +16,20 @@ using UmbracoExamine;
 namespace Umbraco.Tests.Runtimes
 {
     [TestFixture]
-    public class CoreRuntimeTests : BaseUmbracoConfigurationTest
+    public class CoreRuntimeTests : TestWithSettingsBase
     {
-        public override void Initialize() // fixme SetUp!
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
+
             TestComponent.Reset();
         }
 
-        [TearDown] // fixme TearDown is INHERITED
         public override void TearDown()
         {
             base.TearDown();
+
             TestComponent.Reset();
-            Current.Reset();
         }
 
         [Test]

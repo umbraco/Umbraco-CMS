@@ -17,9 +17,9 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
 	public class PublishedContentDataTableTests : BaseWebTest
     {
-		public override void Initialize()
+		public override void SetUp()
 		{
-			base.Initialize();
+			base.SetUp();
 
             // need to specify a different callback for testing
 			PublishedContentExtensions.GetPropertyAliasesAndNames = (services, alias) =>

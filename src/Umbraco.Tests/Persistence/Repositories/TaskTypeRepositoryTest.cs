@@ -10,7 +10,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class TaskTypeRepositoryTest : BaseDatabaseFactoryTest
+    public class TaskTypeRepositoryTest : TestWithDatabaseBase
     {
         [Test]
         public void Can_Delete()

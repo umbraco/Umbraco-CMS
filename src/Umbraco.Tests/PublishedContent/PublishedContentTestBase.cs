@@ -13,9 +13,9 @@ namespace Umbraco.Tests.PublishedContent
     /// </summary>
     public abstract class PublishedContentTestBase : BaseWebTest
     {
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
             
             // need to specify a custom callback for unit tests
             var propertyTypes = new[]
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.PublishedContent
             Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);            
         }
 
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
             // fixme - what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
             // can we risk double - registering and then, what happens?
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.PublishedContent
                 .Append<TinyMceValueConverter>()
                 .Append<YesNoValueConverter>();
 
-            base.FreezeResolution();
+            base.MoreSetUp();
         }
     }
 }

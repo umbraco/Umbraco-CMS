@@ -4,21 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using Examine;
-using LightInject;
-using Lucene.Net.Documents;
-using Moq;
 using NUnit.Framework;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Core.DI;
 using Current = Umbraco.Web.Current;
@@ -29,12 +20,12 @@ namespace Umbraco.Tests.Cache.PublishedCache
 	[TestFixture]
     public class PublishMediaCacheTests : BaseWebTest
 	{
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
 
-            base.FreezeResolution();
+            base.MoreSetUp();
         }
 
         //NOTE: This is "Without_Examine" too

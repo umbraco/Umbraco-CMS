@@ -28,7 +28,11 @@ namespace Umbraco.Compat7
 
             var pluginManager = container.GetInstance<PluginManager>();
             var handlerTypes = pluginManager.ResolveTypes<IApplicationEventHandler>();
+
             _handlers = handlerTypes.Select(Activator.CreateInstance).Cast<IApplicationEventHandler>().ToList();
+
+            foreach (var handler in _handlers)
+                logger.Debug<Compat7Component>($"ADding ApplicationEventHandler {handler.GetType().FullName}.");
 
             foreach (var handler in _handlers)
                 handler.OnApplicationInitialized(_app, ApplicationContext.Current);

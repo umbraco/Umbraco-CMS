@@ -1,9 +1,6 @@
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Models;
 using Current = Umbraco.Web.Current;
 
@@ -28,8 +25,9 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/home/Sub1.aspx/blah")]
 		public void Match_Document_By_Url_With_Template(string urlAsString)
 		{
-            var template = CreateTemplate("test");
-			var umbracoContext = GetUmbracoContext(urlAsString, template.Id);
+            var template1 = CreateTemplate("test");
+            var template2 = CreateTemplate("blah");
+            var umbracoContext = GetUmbracoContext(urlAsString, template1.Id);
 		    var facadeRouter = CreateFacadeRouter();
 			var frequest = facadeRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByNiceUrlAndTemplate(Logger);

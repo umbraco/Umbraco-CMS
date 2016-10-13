@@ -31,14 +31,8 @@ namespace Umbraco.Tests.Services
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     [NUnit.Framework.Ignore("These should not be run by the server, only directly as they are only benchmark tests")]
-    public class PerformanceTests : BaseDatabaseFactoryTest
+    public class PerformanceTests : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-	        base.Initialize();
-        }
-
         protected override string GetDbConnectionString()
         {
             return @"server=.\SQLEXPRESS;database=UmbTest;user id=sa;password=test";

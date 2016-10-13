@@ -19,20 +19,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class TagRepositoryTest : BaseDatabaseFactoryTest
+    public class TagRepositoryTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         private TagRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
             var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, Mappers);

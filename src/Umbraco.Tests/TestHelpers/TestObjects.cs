@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
 using System.Linq;
 using LightInject;
 using Moq;
 using NPoco;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -25,7 +23,7 @@ namespace Umbraco.Tests.TestHelpers
     /// <summary>
     /// Provides objects for tests.
     /// </summary>
-    static partial class TestObjects
+    internal static partial class TestObjects
     {
         /// <summary>
         /// Gets the default ISqlSyntaxProvider objects.
@@ -53,7 +51,7 @@ namespace Umbraco.Tests.TestHelpers
         public static UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger logger)
         {
             var syntax = new SqlCeSyntaxProvider();
-            var connection = TestObjects.GetDbConnection();
+            var connection = GetDbConnection();
             return new UmbracoDatabase(connection, syntax, DatabaseType.SQLCe, logger);
         }
 
@@ -67,9 +65,12 @@ namespace Umbraco.Tests.TestHelpers
         public static UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
         {
             var syntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)); // do NOT try to get the server's version!
-            var connection = TestObjects.GetDbConnection();
+            var connection = GetDbConnection();
             return new UmbracoDatabase(connection, syntax, DatabaseType.SqlServer2008, logger);
         }
+
+        public static void RegisterServices(IServiceContainer container)
+        { }
 
         /// <summary>
         /// Gets a ServiceContext.
@@ -81,6 +82,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
         /// <param name="urlSegmentProviders">Some url segment providers.</param>
+        /// <param name="container">A container.</param>
         /// <returns>A ServiceContext.</returns>
         /// <remarks>Should be used sparingly for integration tests only - for unit tests
         /// just mock the services to be passed to the ctor of the ServiceContext.</remarks>
@@ -90,7 +92,8 @@ namespace Umbraco.Tests.TestHelpers
             CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            IServiceFactory container = null)
         {
             if (repositoryFactory == null) throw new ArgumentNullException(nameof(repositoryFactory));
             if (dbUnitOfWorkProvider == null) throw new ArgumentNullException(nameof(dbUnitOfWorkProvider));
@@ -102,14 +105,14 @@ namespace Umbraco.Tests.TestHelpers
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
-            var migrationEntryService = new Lazy<IMigrationEntryService>(() => new MigrationEntryService(provider, logger, eventMessagesFactory));
-            var externalLoginService = new Lazy<IExternalLoginService>(() => new ExternalLoginService(provider, logger, eventMessagesFactory));
-            var publicAccessService = new Lazy<IPublicAccessService>(() => new PublicAccessService(provider, logger, eventMessagesFactory));
-            var taskService = new Lazy<ITaskService>(() => new TaskService(provider, logger, eventMessagesFactory));
-            var domainService = new Lazy<IDomainService>(() => new DomainService(provider, logger, eventMessagesFactory));
-            var auditService = new Lazy<IAuditService>(() => new AuditService(provider, logger, eventMessagesFactory));
+            var migrationEntryService = GetLazyService<IMigrationEntryService>(container, () => new MigrationEntryService(provider, logger, eventMessagesFactory));
+            var externalLoginService = GetLazyService<IExternalLoginService>(container, () => new ExternalLoginService(provider, logger, eventMessagesFactory));
+            var publicAccessService = GetLazyService<IPublicAccessService>(container, () => new PublicAccessService(provider, logger, eventMessagesFactory));
+            var taskService = GetLazyService<ITaskService>(container, () => new TaskService(provider, logger, eventMessagesFactory));
+            var domainService = GetLazyService<IDomainService>(container, () => new DomainService(provider, logger, eventMessagesFactory));
+            var auditService = GetLazyService<IAuditService>(container, () => new AuditService(provider, logger, eventMessagesFactory));
 
-            var localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
+            var localizedTextService = GetLazyService<ILocalizedTextService>(container, () => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
                     {
                         var mainLangFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"));
@@ -141,33 +144,33 @@ namespace Umbraco.Tests.TestHelpers
                     }),
                     logger));
 
-            var userService = new Lazy<IUserService>(() => new UserService(provider, logger, eventMessagesFactory));
-            var dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, logger, eventMessagesFactory));
-            var contentService = new Lazy<IContentService>(() => new ContentService(provider, logger, eventMessagesFactory));
-            var notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, userService.Value, contentService.Value, logger));
-            var serverRegistrationService = new Lazy<IServerRegistrationService>(() => new ServerRegistrationService(provider, logger, eventMessagesFactory));
-            var memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, logger, eventMessagesFactory));
-            var memberService = new Lazy<IMemberService>(() => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value));
-            var mediaService = new Lazy<IMediaService>(() => new MediaService(provider, logger, eventMessagesFactory));
-            var contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value));
-            var mediaTypeService = new Lazy<IMediaTypeService>(() => new MediaTypeService(provider, logger, eventMessagesFactory, mediaService.Value));
-            var fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, logger, eventMessagesFactory));
-            var localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, logger, eventMessagesFactory));
+            var userService = GetLazyService<IUserService>(container, () => new UserService(provider, logger, eventMessagesFactory));
+            var dataTypeService = GetLazyService<IDataTypeService>(container, () => new DataTypeService(provider, logger, eventMessagesFactory));
+            var contentService = GetLazyService<IContentService>(container, () => new ContentService(provider, logger, eventMessagesFactory));
+            var notificationService = GetLazyService<INotificationService>(container, () => new NotificationService(provider, userService.Value, contentService.Value, logger));
+            var serverRegistrationService = GetLazyService<IServerRegistrationService>(container, () => new ServerRegistrationService(provider, logger, eventMessagesFactory));
+            var memberGroupService = GetLazyService<IMemberGroupService>(container, () => new MemberGroupService(provider, logger, eventMessagesFactory));
+            var memberService = GetLazyService<IMemberService>(container, () => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value));
+            var mediaService = GetLazyService<IMediaService>(container, () => new MediaService(provider, logger, eventMessagesFactory));
+            var contentTypeService = GetLazyService<IContentTypeService>(container, () => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value));
+            var mediaTypeService = GetLazyService<IMediaTypeService>(container, () => new MediaTypeService(provider, logger, eventMessagesFactory, mediaService.Value));
+            var fileService = GetLazyService<IFileService>(container, () => new FileService(fileProvider, provider, logger, eventMessagesFactory));
+            var localizationService = GetLazyService<ILocalizationService>(container, () => new LocalizationService(provider, logger, eventMessagesFactory));
 
-            var memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, logger, eventMessagesFactory, memberService.Value));
-            var entityService = new Lazy<IEntityService>(() => new EntityService(
+            var memberTypeService = GetLazyService<IMemberTypeService>(container, () => new MemberTypeService(provider, logger, eventMessagesFactory, memberService.Value));
+            var entityService = GetLazyService<IEntityService>(container, () => new EntityService(
                     provider, logger, eventMessagesFactory,
                     contentService.Value, contentTypeService.Value, mediaService.Value, mediaTypeService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
                     //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
 
-            var macroService = new Lazy<IMacroService>(() => new MacroService(provider, logger, eventMessagesFactory));
-            var packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, contentService.Value, contentTypeService.Value, mediaService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, userService.Value, repositoryFactory, provider, urlSegmentProviders));
-            var relationService = new Lazy<IRelationService>(() => new RelationService(provider, logger, eventMessagesFactory, entityService.Value));
-            var treeService = new Lazy<IApplicationTreeService>(() => new ApplicationTreeService(logger, cache));
-            var tagService = new Lazy<ITagService>(() => new TagService(provider, logger, eventMessagesFactory));
-            var sectionService = new Lazy<ISectionService>(() => new SectionService(userService.Value, treeService.Value, provider, cache));
-            var redirectUrlService = new Lazy<IRedirectUrlService>(() => new RedirectUrlService(provider, logger, eventMessagesFactory));
+            var macroService = GetLazyService<IMacroService>(container, () => new MacroService(provider, logger, eventMessagesFactory));
+            var packagingService = GetLazyService<IPackagingService>(container, () => new PackagingService(logger, contentService.Value, contentTypeService.Value, mediaService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, userService.Value, repositoryFactory, provider, urlSegmentProviders));
+            var relationService = GetLazyService<IRelationService>(container, () => new RelationService(provider, logger, eventMessagesFactory, entityService.Value));
+            var treeService = GetLazyService<IApplicationTreeService>(container, () => new ApplicationTreeService(logger, cache));
+            var tagService = GetLazyService<ITagService>(container, () => new TagService(provider, logger, eventMessagesFactory));
+            var sectionService = GetLazyService<ISectionService>(container, () => new SectionService(userService.Value, treeService.Value, provider, cache));
+            var redirectUrlService = GetLazyService<IRedirectUrlService>(container, () => new RedirectUrlService(provider, logger, eventMessagesFactory));
 
             return new ServiceContext(
                 migrationEntryService,
@@ -200,12 +203,21 @@ namespace Umbraco.Tests.TestHelpers
                 redirectUrlService);
         }
 
-        public static IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger)
+        private static Lazy<T> GetLazyService<T>(IServiceFactory container, Func<T> ctor)
+            where T : class
         {
-            var adapter = new TestUmbracoDatabaseAccessor();
-            var mappers = Mock.Of<IMapperCollection>();
-            var databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, adapter, mappers);
-            var repositoryFactory = new RepositoryFactory(Mock.Of<IServiceContainer>());
+            return new Lazy<T>(() => container?.TryGetInstance<T>() ?? ctor());
+        }
+
+        public static IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger, IDatabaseFactory databaseFactory = null, RepositoryFactory repositoryFactory = null)
+        {
+            if (databaseFactory == null)
+            {
+                var accessor = new TestUmbracoDatabaseAccessor();
+                var mappers = Mock.Of<IMapperCollection>();
+                databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, mappers);
+            }
+            repositoryFactory = repositoryFactory  ??  new RepositoryFactory(Mock.Of<IServiceContainer>());
             return new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
         }
     }

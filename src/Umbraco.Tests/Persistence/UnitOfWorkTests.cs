@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Persistence
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class UnitOfWorkTests : BaseDatabaseFactoryTest
+    public class UnitOfWorkTests : TestWithDatabaseBase
     {
         [Test]
         public void ReadLockNonExisting()

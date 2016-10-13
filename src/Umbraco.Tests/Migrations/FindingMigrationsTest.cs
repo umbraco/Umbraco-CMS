@@ -19,7 +19,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Migrations
 {
     [TestFixture]
-    public class FindingMigrationsTest : BaseDatabaseFactoryTest
+    public class FindingMigrationsTest : TestWithDatabaseBase
     {
 
         [Test]

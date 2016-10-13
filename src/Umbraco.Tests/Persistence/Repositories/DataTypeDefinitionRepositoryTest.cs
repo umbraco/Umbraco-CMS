@@ -27,14 +27,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class DataTypeDefinitionRepositoryTest : BaseDatabaseFactoryTest
+    public class DataTypeDefinitionRepositoryTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
         protected override CacheHelper CreateCacheHelper()
         {
             // hackish, but it works

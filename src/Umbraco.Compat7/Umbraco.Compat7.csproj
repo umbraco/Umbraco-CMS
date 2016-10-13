@@ -83,6 +83,7 @@
     <Compile Include="Web\Routing\ContentLastChangeFinderResolver.cs" />
     <Compile Include="Web\Routing\SiteDomainHelperResolver.cs" />
     <Compile Include="Web\Routing\UrlProviderResolver.cs" />
+    <Compile Include="Web\UmbracoHelperExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

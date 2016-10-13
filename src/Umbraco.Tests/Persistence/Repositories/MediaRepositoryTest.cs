@@ -19,16 +19,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class MediaRepositoryTest : BaseDatabaseFactoryTest
+    public class MediaRepositoryTest : TestWithDatabaseBase
     {
-        public MediaRepositoryTest()
+        public override void SetUp()
         {
-        }
-
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
+            base.SetUp();
 
             CreateTestData();
         }

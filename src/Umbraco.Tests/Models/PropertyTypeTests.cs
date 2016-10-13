@@ -8,7 +8,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class PropertyTypeTests : BaseUmbracoConfigurationTest
+    public class PropertyTypeTests : TestWithSettingsBase
     {
         [Test]
         public void Can_Deep_Clone()

@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class NotificationsRepositoryTest : BaseDatabaseFactoryTest
+    public class NotificationsRepositoryTest : TestWithDatabaseBase
     {
         [Test]
         public void CreateNotification()

@@ -14,6 +14,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Core.DI;
+using Umbraco.Tests.TestHelpers;
 using Current = Umbraco.Core.DI.Current;
 
 namespace Umbraco.Tests.PublishedContent
@@ -28,9 +29,9 @@ namespace Umbraco.Tests.PublishedContent
 
         private PluginManager _pluginManager;
 
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             // this is so the model factory looks into the test assembly
             _pluginManager = Current.PluginManager;
@@ -43,14 +44,14 @@ namespace Umbraco.Tests.PublishedContent
             InitializeUmbracoContext();
         }
 
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
             Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
             var types = Current.PluginManager.ResolveTypes<PublishedContentModel>();
             Container.RegisterSingleton<IPublishedContentModelFactory>(_ => new PublishedContentModelFactory(types));
 
-            base.FreezeResolution();
+            base.MoreSetUp();
         }
 
         private void InitializeUmbracoContext()
@@ -63,14 +64,14 @@ namespace Umbraco.Tests.PublishedContent
             facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
-            var ctx = UmbracoContext.CreateContext(
+            var umbracoContext = UmbracoContext.CreateContext(
                 httpContext,
                 facadeService.Object,
                 new WebSecurity(httpContext, Current.Services.UserService),
-                Mock.Of<IUmbracoSettingsSection>(),
+                TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>());
 
-            Umbraco.Web.Current.SetUmbracoContext(ctx, true);
+            Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);
         }
 
         public override void TearDown()

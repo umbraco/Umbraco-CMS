@@ -19,19 +19,18 @@ namespace Umbraco.Tests.Services
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, NUnit.Framework.Ignore]
-    public class ContentServicePerformanceTest : BaseDatabaseFactoryTest
+    public class ContentServicePerformanceTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
             CreateTestData();
         }
 
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
             Container.Register<IProfiler, TestProfiler>();
-            base.FreezeResolution();
+            base.MoreSetUp();
         }
 
         [Test]

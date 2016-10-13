@@ -39,14 +39,6 @@ namespace Umbraco.Tests.Macros
             UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefault());
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            Current.ApplicationCache.RuntimeCache.ClearAllCache();
-            //Current.ApplicationContext.DisposeIfDisposable();
-            Current.Reset();
-        }
-
         [TestCase("123", "IntProp", typeof(int))]
         [TestCase("Hello", "StringProp", typeof(string))]
         [TestCase("123456789.01", "DoubleProp", typeof(double))]

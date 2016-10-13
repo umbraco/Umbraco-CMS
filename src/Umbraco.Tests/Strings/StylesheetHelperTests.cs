@@ -3,11 +3,12 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings.Css;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StylesheetHelperTests
+    public class StylesheetHelperTests : BaseTestBase
     {
         [Test]
         public void Replace_Rule()

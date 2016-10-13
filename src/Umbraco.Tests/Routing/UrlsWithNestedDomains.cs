@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
-using umbraco.cms.businesslogic.web;
-using System.Configuration;
-using Umbraco.Web;
+using Umbraco.Core.Services;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.Routing
 {
@@ -24,7 +18,13 @@ namespace Umbraco.Tests.Routing
 		// using the closest domain to the node - here we test that if we request
 		// a non-canonical route, it is not cached / the cache is not polluted
 
-		[Test]
+	    protected override void Compose()
+	    {
+            base.Compose();
+            Container.RegisterSingleton(_ => Mock.Of<IDomainService>());
+        }
+
+        [Test]
 		public void DoNotPolluteCache()
 		{
             SettingsForTests.UseDirectoryUrls = true;
@@ -36,11 +36,10 @@ namespace Umbraco.Tests.Routing
 
 			SetDomains1();
 
-			UmbracoContext umbracoContext;
-			string url = "http://domain1.com/1001-1/1001-1-1";
+		    const string url = "http://domain1.com/1001-1/1001-1-1";
 			
 			// get the nice url for 100111
-		    umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings);
+		    var umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings, urlProviders: new [] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
 			Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, true));
 
 			// check that the proper route has been cached
@@ -72,9 +71,9 @@ namespace Umbraco.Tests.Routing
 			//Assert.AreEqual("http://domain1.com/1001-1/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, true)); // bad
 		}
 
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
-            base.FreezeResolution();
+            base.MoreSetUp();
             Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 

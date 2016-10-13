@@ -27,9 +27,9 @@ namespace Umbraco.Tests
 	[TestFixture]
 	public class LibraryTests : BaseWebTest
 	{
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
             
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
@@ -54,12 +54,12 @@ namespace Umbraco.Tests
 	    /// <summary>
 	    /// sets up resolvers before resolution is frozen
 	    /// </summary>
-	    protected override void FreezeResolution()
+	    protected override void MoreSetUp()
 	    {
             // required so we can access property.Value
 	        Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
-	        base.FreezeResolution();
+	        base.MoreSetUp();
 	    }
 
 	    [Test]

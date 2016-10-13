@@ -16,12 +16,6 @@ namespace Umbraco.Tests.Services
     [TestFixture, RequiresSTA]
     public class MacroServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
         public override void CreateTestData()
         {
             base.CreateTestData();

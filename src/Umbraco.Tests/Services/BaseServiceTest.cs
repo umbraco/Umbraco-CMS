@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
@@ -7,20 +8,13 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Services
 {
 	[TestFixture, RequiresSTA]
-	public abstract class BaseServiceTest : BaseDatabaseFactoryTest
+	public abstract class BaseServiceTest : TestWithDatabaseBase
 	{
-		[SetUp]
-		public override void Initialize()
+		public override void SetUp()
 		{        
-			base.Initialize();
+			base.SetUp();
 
-			CreateTestData();
-		}
-
-		[TearDown]
-		public override void TearDown()
-		{
-			base.TearDown();
+            CreateTestData();
 		}
 
 		public virtual void CreateTestData()

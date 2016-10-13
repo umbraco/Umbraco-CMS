@@ -7,7 +7,7 @@ namespace Umbraco.Tests.Persistence
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class SqlCeTableByTableTest : BaseDatabaseFactoryTest
+    public class SqlCeTableByTableTest : TestWithDatabaseBase
     {
         private DatabaseSchemaHelper _schemaHelper;
         
@@ -15,18 +15,6 @@ namespace Umbraco.Tests.Persistence
         {
             get { return _schemaHelper ?? (_schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger)); }
         }
-
-        [SetUp]
-        public override void Initialize()
-        {            
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }        
 
         [Test]
         public void Can_Create_umbracoNode_Table()

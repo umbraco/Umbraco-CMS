@@ -102,9 +102,16 @@ namespace Umbraco.Core.Persistence
             return NPoco.Sql.BuilderFor(new SqlContext(this)).Append(sql, args);
         }
 
+        //protected override void OnConnectionClosing(DbConnection conn)
+        //{
+        //    base.OnConnectionClosing(conn);
+        //}
+
         protected override DbConnection OnConnectionOpened(DbConnection connection)
         {
             if (connection == null) throw new ArgumentNullException(nameof(connection));
+
+            // fixme could we avoid re-wrapping all of the time if the underlying cnx object does not change? (does it?) (should it?)
 
             // wrap the connection with a profiling connection that tracks timings
             connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);

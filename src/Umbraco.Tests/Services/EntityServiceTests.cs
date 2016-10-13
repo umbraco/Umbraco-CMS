@@ -15,18 +15,6 @@ namespace Umbraco.Tests.Services
     [TestFixture, RequiresSTA]
     public class EntityServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-        
         [Test]
         public void EntityService_Can_Find_All_Content_By_UmbracoObjectTypes()
         {

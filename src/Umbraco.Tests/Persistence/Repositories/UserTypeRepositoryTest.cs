@@ -17,20 +17,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class UserTypeRepositoryTest : BaseDatabaseFactoryTest
+    public class UserTypeRepositoryTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         private UserTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
             return new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);            

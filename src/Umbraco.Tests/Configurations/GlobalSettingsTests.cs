@@ -10,21 +10,20 @@ namespace Umbraco.Tests.Configurations
     [TestFixture]
 	public class GlobalSettingsTests : BaseWebTest
 	{
-
-		public override void Initialize()
+		public override void SetUp()
 		{            
-			base.Initialize();
+			base.SetUp();
+
             SettingsForTests.UmbracoPath = "~/umbraco";
 		}
 
 		public override void TearDown()
 		{
+            base.TearDown();
+
             //ensure this is reset
 		    SystemDirectories.Root = null;
             SettingsForTests.UmbracoPath = "~/umbraco";
-            //reset the app config		            
-			base.TearDown();
-			
 		}
 
         [Test]

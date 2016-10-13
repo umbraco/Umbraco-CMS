@@ -6,26 +6,18 @@ using System.Web.Routing;
 using LightInject;
 using Moq;
 using NUnit.Framework;
-using umbraco.BusinessLogic;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -33,7 +25,7 @@ using Umbraco.Web.Security;
 namespace Umbraco.Tests.Web.Mvc
 {
     [TestFixture]
-    public class UmbracoViewPageTests : BaseUmbracoConfigurationTest
+    public class UmbracoViewPageTests : TestWithApplicationBase
     {
         private FacadeService _service;
 
@@ -414,7 +406,7 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var svcCtx = GetServiceContext();
 
-            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            var databaseFactory = TestObjects.GetDatabaseFactoryMock();
 
             //var appCtx = new ApplicationContext(
             //    new DatabaseContext(databaseFactory, logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
@@ -432,7 +424,7 @@ namespace Umbraco.Tests.Web.Mvc
                 GetHttpContextFactory(url, routeData).HttpContext,
                 _service,
                 new WebSecurity(http, Current.Services.UserService),
-                Mock.Of<IUmbracoSettingsSection>(),
+                TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>());
 
             //if (setSingleton)

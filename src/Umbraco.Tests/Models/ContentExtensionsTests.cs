@@ -8,7 +8,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentExtensionsTests : BaseUmbracoConfigurationTest
+    public class ContentExtensionsTests : TestWithSettingsBase
     {
         #region RequiresSaving
 

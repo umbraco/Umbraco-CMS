@@ -5,7 +5,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Plugins;
 
@@ -20,24 +19,6 @@ namespace Umbraco.Core.DI
 
         public void Compose(IServiceRegistry container)
         {
-            // fixme - moved these to CoreRuntime
-            /*
-            // register syntax providers
-            container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
-            container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>("SqlCeSyntaxProvider");
-            container.Register<ISqlSyntaxProvider, SqlServerSyntaxProvider>("SqlServerSyntaxProvider");
-
-            // register database factory
-            // will be initialized with syntax providers and a logger, and will try to configure
-            // from the default connection string name, if possible, else will remain non-configured
-            // until the database context configures it properly (eg when installing)
-            container.RegisterSingleton<IDatabaseFactory, DefaultDatabaseFactory>();
-
-            // register a database accessor - will be replaced - fixme - what does this mean?
-            // by HybridUmbracoDatabaseAccessor in the web project - so what?
-            container.RegisterSingleton<IUmbracoDatabaseAccessor, ThreadStaticUmbracoDatabaseAccessor>();
-            */
-
             // register database context
             container.RegisterSingleton<DatabaseContext>();
 
@@ -121,10 +102,11 @@ namespace Umbraco.Core.DI
             var serviceContainer = container as IServiceContainer;
             if (serviceContainer == null) throw new Exception("Container is not IServiceContainer.");
 
-            // fixme fixme fixme more
+            // fixme fixme fixme more - wtf?
+            // has moved to core runtime, why?
             // register persistence mappers
-            //MapperCollectionBuilder.Register(serviceContainer)
-            //    .AddProducer(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
+            serviceContainer.RegisterCollectionBuilder<MapperCollectionBuilder>()
+                .Add(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
         }
     }
 }

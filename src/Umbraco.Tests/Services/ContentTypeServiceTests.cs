@@ -19,18 +19,6 @@ namespace Umbraco.Tests.Services
     [TestSetup.FacadeService(EnableRepositoryEvents = true)]
     public class ContentTypeServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Deleting_PropertyType_Removes_The_Property_From_Content()
         {

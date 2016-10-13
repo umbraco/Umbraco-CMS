@@ -32,12 +32,12 @@ namespace Umbraco.Tests.PublishedContent
         /// <summary>
         /// sets up resolvers before resolution is frozen
         /// </summary>
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
 
-            base.FreezeResolution();
+            base.MoreSetUp();
         }
 
         /// <summary>

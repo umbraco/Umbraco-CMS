@@ -47,10 +47,9 @@ namespace Umbraco.Tests.Cache.PublishedCache
 </root>";
 		}
 
-		[SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             _httpContextFactory = new FakeHttpContextFactory("~/Home");
 

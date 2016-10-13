@@ -1,34 +1,29 @@
+using System.Collections.Generic;
 using System.Linq;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Web;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.TestHelpers
 {
     [TestFixture, RequiresSTA]
-    public abstract class BaseWebTest : BaseDatabaseFactoryTest
+    public abstract class BaseWebTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
             var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] {});
-            ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 
         protected override string GetXmlContent(int templateId)
@@ -66,13 +61,13 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
-        internal static FacadeRouter CreateFacadeRouter()
+        internal static FacadeRouter CreateFacadeRouter(IServiceContainer container = null, ContentFinderCollection contentFinders = null)
         {
             return new FacadeRouter(
-                Mock.Of<IWebRoutingSection>(),
-                Enumerable.Empty<IContentFinder>(),
+                TestObjects.GetUmbracoSettings().WebRouting,
+                contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()), 
                 new FakeLastChanceFinder(),
-                null,
+                container?.TryGetInstance<ServiceContext>() ?? new ServiceContext(), 
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
         }
     }

@@ -9,7 +9,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Models.Collections
 {
     [TestFixture]
-    public class PropertyCollectionTests : BaseUmbracoConfigurationTest
+    public class PropertyCollectionTests : TestWithSettingsBase
     {
         [Test]
         public void Property_Adds_Case_Insensitive_Compare()

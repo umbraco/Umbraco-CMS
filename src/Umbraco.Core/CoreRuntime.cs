@@ -13,7 +13,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
@@ -129,7 +128,8 @@ namespace Umbraco.Core
             }
         }
 
-        private void DetermineRuntimeLevel(IServiceFactory container)
+        // internal for tests
+        internal void DetermineRuntimeLevel(IServiceFactory container)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
             {
@@ -199,10 +199,11 @@ namespace Umbraco.Core
             container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>("SqlCeSyntaxProvider");
             container.Register<ISqlSyntaxProvider, SqlServerSyntaxProvider>("SqlServerSyntaxProvider");
 
-            // register persistence mappers - means the only place the collection can be modified
-            // is in a runtime - afterwards it has been frozen and it is too late
-            container.RegisterCollectionBuilder<MapperCollectionBuilder>()
-                .Add(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
+            // fixme explain
+            //// register persistence mappers - means the only place the collection can be modified
+            //// is in a runtime - afterwards it has been frozen and it is too late
+            //container.RegisterCollectionBuilder<MapperCollectionBuilder>()
+            //    .Add(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
 
             // register database factory
             // will be initialized with syntax providers and a logger, and will try to configure

@@ -236,6 +236,7 @@
     <Compile Include="Persistence\Migrations\PostMigrationTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
+    <Compile Include="TestHelpers\BaseTestBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TryConvertToTests.cs" />
     <Compile Include="TestHelpers\TestFacadeAccessor.cs" />
@@ -249,7 +250,6 @@
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
     <Compile Include="Web\AngularIntegration\ServerVariablesParserTests.cs" />
-    <Compile Include="ApplicationContextTests.cs" />
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Cache\CacheRefresherTests.cs" />
     <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
@@ -482,7 +482,7 @@
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="DependencyInjection\ActionCollectionTests.cs" />
     <Compile Include="Logging\RingBufferTest.cs" />
-    <Compile Include="TestHelpers\BaseUmbracoConfigurationTest.cs" />
+    <Compile Include="TestHelpers\TestWithSettingsBase.cs" />
     <Compile Include="TestHelpers\DatabaseTestBehaviorAttribute.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
@@ -522,8 +522,8 @@
     <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
-    <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
-    <Compile Include="TestHelpers\BaseUmbracoApplicationTest.cs" />
+    <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
+    <Compile Include="TestHelpers\TestWithApplicationBase.cs" />
     <Compile Include="TestHelpers\DatabaseBehavior.cs" />
     <Compile Include="TestHelpers\SettingsForTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />

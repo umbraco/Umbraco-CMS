@@ -11,7 +11,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    public class ContentTypeServiceExtensionsTests : BaseUmbracoApplicationTest
+    public class ContentTypeServiceExtensionsTests : TestWithApplicationBase
     {
         [Test]
         public void GetAvailableCompositeContentTypes_No_Overlap_By_Content_Type_And_Property_Type_Alias()

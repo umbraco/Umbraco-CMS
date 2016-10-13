@@ -16,9 +16,9 @@ namespace Umbraco.Tests.Routing
     [TestFixture]
     internal class DomainsAndCulturesTests : UrlRoutingTestBase
     {
-        protected override void FreezeResolution()
+        protected override void MoreSetUp()
         {
-            base.FreezeResolution();
+            base.MoreSetUp();
             Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Routing
             SetDomains1();
 
             var umbracoContext = GetUmbracoContext(inputUrl);
-            var facadeRouter = CreateFacadeRouter();
+            var facadeRouter = CreateFacadeRouter(Container);
             var frequest = facadeRouter.CreateRequest(umbracoContext);
 
             // lookup domain
@@ -317,7 +317,7 @@ namespace Umbraco.Tests.Routing
             expectedCulture = expectedCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
             var umbracoContext = GetUmbracoContext(inputUrl);
-            var facadeRouter = CreateFacadeRouter();
+            var facadeRouter = CreateFacadeRouter(Container);
             var frequest = facadeRouter.CreateRequest(umbracoContext);
 
             // lookup domain

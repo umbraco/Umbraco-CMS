@@ -259,7 +259,7 @@ namespace Umbraco.Web
 
                     // let requests pile up and wait for 10s then show the splash anyway
                     if (UmbracoConfig.For.UmbracoSettings().Content.EnableSplashWhileLoading == false
-                        && ((RuntimeState) Current.RuntimeState).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
+                        && ((RuntimeState) Runtime).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
 
                     // redirect to booting page
                     httpContext.Response.StatusCode = 503; // temp not available

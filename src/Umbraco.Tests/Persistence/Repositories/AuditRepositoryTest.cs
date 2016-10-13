@@ -10,7 +10,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class AuditRepositoryTest : BaseDatabaseFactoryTest
+    public class AuditRepositoryTest : TestWithDatabaseBase
     {
         [Test]
         public void Can_Add_Audit_Entry()

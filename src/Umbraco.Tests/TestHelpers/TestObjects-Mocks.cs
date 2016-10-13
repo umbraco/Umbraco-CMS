@@ -1,13 +1,18 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using Examine;
+using System.Linq;
+using System.Web;
+using LightInject;
 using Moq;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using UmbracoExamine;
+using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -23,7 +28,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="configured">A value indicating whether the factory is configured.</param>
         /// <param name="canConnect">A value indicating whether the factory can connect to the database.</param>
         /// <remarks>This is just a void factory that has no actual database.</remarks>
-        public static IDatabaseFactory GetIDatabaseFactoryMock(bool configured = true, bool canConnect = true)
+        public static IDatabaseFactory GetDatabaseFactoryMock(bool configured = true, bool canConnect = true)
         {
             var databaseFactoryMock = new Mock<IDatabaseFactory>();
             databaseFactoryMock.Setup(x => x.Configured).Returns(configured);
@@ -40,32 +45,38 @@ namespace Umbraco.Tests.TestHelpers
         /// Gets a mocked service context built with mocked services.
         /// </summary>
         /// <returns>A ServiceContext.</returns>
-        public static ServiceContext GetServiceContextMock()
+        public static ServiceContext GetServiceContextMock(IServiceFactory container = null)
         {
             return new ServiceContext(
-                new Mock<IContentService>().Object,
-                new Mock<IMediaService>().Object,
-                new Mock<IContentTypeService>().Object,
-                new Mock<IMediaTypeService>().Object,
-                new Mock<IDataTypeService>().Object,
-                new Mock<IFileService>().Object,
-                new Mock<ILocalizationService>().Object,
-                new Mock<IPackagingService>().Object,
-                new Mock<IEntityService>().Object,
-                new Mock<IRelationService>().Object,
-                new Mock<IMemberGroupService>().Object,
-                new Mock<IMemberTypeService>().Object,
-                new Mock<IMemberService>().Object,
-                new Mock<IUserService>().Object,
-                new Mock<ISectionService>().Object,
-                new Mock<IApplicationTreeService>().Object,
-                new Mock<ITagService>().Object,
-                new Mock<INotificationService>().Object,
-                new Mock<ILocalizedTextService>().Object,
-                new Mock<IAuditService>().Object,
-                new Mock<IDomainService>().Object,
-                new Mock<ITaskService>().Object,
-                new Mock<IMacroService>().Object);
+                MockService<IContentService>(),
+                MockService<IMediaService>(),
+                MockService<IContentTypeService>(),
+                MockService<IMediaTypeService>(),
+                MockService<IDataTypeService>(),
+                MockService<IFileService>(),
+                MockService<ILocalizationService>(),
+                MockService<IPackagingService>(),
+                MockService<IEntityService>(),
+                MockService<IRelationService>(),
+                MockService<IMemberGroupService>(),
+                MockService<IMemberTypeService>(),
+                MockService<IMemberService>(),
+                MockService<IUserService>(),
+                MockService<ISectionService>(),
+                MockService<IApplicationTreeService>(),
+                MockService<ITagService>(),
+                MockService<INotificationService>(),
+                MockService<ILocalizedTextService>(),
+                MockService<IAuditService>(),
+                MockService<IDomainService>(),
+                MockService<ITaskService>(),
+                MockService<IMacroService>());
+        }
+
+        private static T MockService<T>(IServiceFactory container = null)
+            where T : class
+        {
+            return container?.TryGetInstance<T>() ?? new Mock<T>().Object;
         }
 
         /// <summary>
@@ -78,10 +89,46 @@ namespace Umbraco.Tests.TestHelpers
         {
             return new MockDbConnection();
         }
-        
+
+        /// <summary>
+        /// Gets an Umbraco context.
+        /// </summary>
+        /// <returns>An Umbraco context.</returns>
+        /// <remarks>This should be the minimum Umbraco context.</remarks>
+        public static UmbracoContext GetUmbracoContextMock()
+        {
+            var httpContext = Mock.Of<HttpContextBase>();
+
+            //var facadeService = Mock.Of<IFacadeService>();
+            var facadeMock = new Mock<IFacade>();
+            facadeMock.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            var facade = facadeMock.Object;
+            var facadeServiceMock = new Mock<IFacadeService>();
+            facadeServiceMock.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
+            var facadeService = facadeServiceMock.Object;
+
+            var webSecurity = new Mock<WebSecurity>(null, null).Object;
+            var settings = GetUmbracoSettings();
+            var urlProviders = Enumerable.Empty<IUrlProvider>();
+
+            // fixme
+            // sort out Create vs New vs Ensure...
+
+            return UmbracoContext.EnsureContext(httpContext, facadeService, webSecurity, settings, urlProviders, true);
+        }
+
+        public static IUmbracoSettingsSection GetUmbracoSettings()
+        {
+            var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
+            var webRoutingSectionMock = new Mock<IWebRoutingSection>();
+            webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlProviderMode.Auto.ToString());
+            umbracoSettingsMock.Setup(x => x.WebRouting).Returns(webRoutingSectionMock.Object);
+            return umbracoSettingsMock.Object;
+        }
+
         #region Inner classes
 
-        
+
 
         private class MockDbConnection : DbConnection
         {

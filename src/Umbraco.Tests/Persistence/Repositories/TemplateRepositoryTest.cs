@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class TemplateRepositoryTest : BaseDatabaseFactoryTest
+    public class TemplateRepositoryTest : TestWithDatabaseBase
     {
         private IFileSystem _masterPageFileSystem;
         private IFileSystem _viewsFileSystem;
@@ -34,10 +34,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc), Mappers);
         }
 
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             _masterPageFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             _viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);

@@ -10,20 +10,8 @@ namespace Umbraco.Tests.Persistence
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
-    public class SchemaValidationTest : BaseDatabaseFactoryTest
+    public class SchemaValidationTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void DatabaseSchemaCreation_Produces_DatabaseSchemaResult_With_Zero_Errors()
         {

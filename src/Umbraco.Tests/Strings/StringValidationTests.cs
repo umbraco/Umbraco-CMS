@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using NUnit.Framework;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StringValidationTests
+    public class StringValidationTests : BaseTestBase
     {
         [Test]
         public void Validate_Email_Address()

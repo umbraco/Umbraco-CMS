@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
+using Umbraco.Core.DI;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -15,7 +14,7 @@ namespace Umbraco.Tests.Routing
     public abstract class UrlRoutingTestBase : BaseWebTest
     {
         /// <summary>
-        /// Sets up the mock domain service
+        /// Sets up the mock domain service 
         /// </summary>
         /// <param name="allDomains"></param>
         protected IDomainService SetupDomainServiceMock(IEnumerable<IDomain> allDomains)
@@ -29,13 +28,20 @@ namespace Umbraco.Tests.Routing
             return domainService.Object;
         }
 
-        protected ServiceContext GetServiceContext(IUmbracoSettingsSection umbracoSettings, ILogger logger)
+        protected override void Compose()
         {
-            //get the mocked service context to get the mocked domain service
-            var svcCtx = TestObjects.GetServiceContextMock();
+            base.Compose();
 
-            var domainService = Mock.Get(svcCtx.DomainService);
+            Container.RegisterSingleton(_ => GetServiceContext());
+        }
+
+        protected ServiceContext GetServiceContext()
+        {
+            // get the mocked service context to get the mocked domain service
+            var serviceContext = TestObjects.GetServiceContextMock(Container);
+
             //setup mock domain service
+            var domainService = Mock.Get(serviceContext.DomainService);
             domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
                 .Returns((bool incWildcards) => new[]
                 {
@@ -44,7 +50,7 @@ namespace Umbraco.Tests.Routing
                     new UmbracoDomain("domain1.com/fr"){Id = 1, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"}
                 });            
 
-            return svcCtx;
+            return serviceContext;
         }
 
         public const int LangDeId = 333;
@@ -53,19 +59,5 @@ namespace Umbraco.Tests.Routing
         public const int LangCzId = 336;
         public const int LangNlId = 337;
         public const int LangDkId = 338;
-
-        //protected override ApplicationContext CreateApplicationContext()
-        //{
-        //    var settings = SettingsForTests.GetDefault();
-        //    var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
-        //    return new ApplicationContext(
-        //        new DatabaseContext(databaseFactory, Logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
-        //        GetServiceContext(settings, Logger),
-        //        CacheHelper,
-        //        ProfilingLogger)
-        //    {
-        //        //IsReady = true
-        //    };
-        //}
     }
 }

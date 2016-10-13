@@ -14,14 +14,13 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
-    public class ScriptRepositoryTest : BaseUmbracoApplicationTest
+    public class ScriptRepositoryTest : TestWithApplicationBase
     {
         private IFileSystem _fileSystem;
 
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             _fileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             using (var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))

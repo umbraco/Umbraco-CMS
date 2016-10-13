@@ -18,14 +18,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class MediaTypeRepositoryTest : BaseDatabaseFactoryTest
+    public class MediaTypeRepositoryTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
         private MediaTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
             return new MediaTypeRepository(unitOfWork, DisabledCache, Logger, Mappers);            

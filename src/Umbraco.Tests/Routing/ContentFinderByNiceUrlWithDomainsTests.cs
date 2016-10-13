@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Routing
 		    SettingsForTests.HideTopLevelNodeFromPath = true;
 
 			var umbracoContext = GetUmbracoContext(url);
-		    var facadeRouter = CreateFacadeRouter();
+		    var facadeRouter = CreateFacadeRouter(Container);
 			var frequest = facadeRouter.CreateRequest(umbracoContext);
 
 			// must lookup domain else lookup by url fails
@@ -167,7 +167,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.HideTopLevelNodeFromPath = true;
 
 			var umbracoContext = GetUmbracoContext(url);
-		    var facadeRouter = CreateFacadeRouter();
+		    var facadeRouter = CreateFacadeRouter(Container);
 			var frequest = facadeRouter.CreateRequest(umbracoContext);
 
 			// must lookup domain else lookup by url fails

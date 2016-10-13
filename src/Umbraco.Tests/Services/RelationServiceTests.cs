@@ -10,18 +10,6 @@ namespace Umbraco.Tests.Services
     [TestFixture, RequiresSTA]
     public class RelationServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Can_Create_RelationType_Without_Name()
         {

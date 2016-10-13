@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Querying
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class ContentTypeSqlMappingTests : BaseDatabaseFactoryTest
+    public class ContentTypeSqlMappingTests : TestWithDatabaseBase
     {
         [Test]
         public void Can_Map_Content_Type_Templates_And_Allowed_Types()

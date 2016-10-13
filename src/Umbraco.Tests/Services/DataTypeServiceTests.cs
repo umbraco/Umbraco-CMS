@@ -16,20 +16,6 @@ namespace Umbraco.Tests.Services
     [TestFixture, RequiresSTA]
     public class DataTypeServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
-        
-
         [Test]
         public void DataTypeService_Can_Persist_New_DataTypeDefinition()
         {

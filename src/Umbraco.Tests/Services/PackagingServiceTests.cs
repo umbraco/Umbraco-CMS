@@ -17,18 +17,6 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     public class PackagingServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void PackagingService_Can_Export_Macro()
         {

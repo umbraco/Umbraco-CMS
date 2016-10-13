@@ -12,18 +12,6 @@ namespace Umbraco.Tests.Services
     [TestFixture, RequiresSTA]
     public class PublicAccessServiceTests : BaseServiceTest
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Can_Add_New_Entry()
         {

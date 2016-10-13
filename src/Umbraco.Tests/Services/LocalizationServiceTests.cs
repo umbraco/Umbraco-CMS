@@ -25,18 +25,6 @@ namespace Umbraco.Tests.Services
         private int _danishLangId;
         private int _englishLangId;
 
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Can_Get_Root_Dictionary_Items()
         {

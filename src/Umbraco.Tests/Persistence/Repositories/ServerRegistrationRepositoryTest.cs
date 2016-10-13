@@ -17,14 +17,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class ServerRegistrationRepositoryTest : BaseDatabaseFactoryTest
+    public class ServerRegistrationRepositoryTest : TestWithDatabaseBase
     {
         private CacheHelper _cacheHelper;
 
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             _cacheHelper = new CacheHelper();
             CreateTestData();

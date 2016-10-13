@@ -1,21 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using AutoMapper;
-using LightInject;
 using Moq;
 using NUnit.Framework;
-using umbraco;
-using umbraco.cms.presentation;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -27,22 +20,23 @@ using Umbraco.Web.PropertyEditors;
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    public class ContentTypeModelMappingTests : BaseUmbracoConfigurationTest
+    public class ContentTypeModelMappingTests : TestWithApplicationBase
     {
-        //Mocks of services that can be setup on a test by test basis to return whatever we want
+        // mocks of services that can be setup on a test by test basis to return whatever we want
         private readonly Mock<IContentTypeService> _contentTypeService = new Mock<IContentTypeService>();
         private readonly Mock<IContentService> _contentService = new Mock<IContentService>();
         private readonly Mock<IDataTypeService> _dataTypeService = new Mock<IDataTypeService>();
         private readonly Mock<IEntityService> _entityService = new Mock<IEntityService>();
         private readonly Mock<IFileService> _fileService = new Mock<IFileService>();
 
-        [SetUp]
-        public void Setup()
+        public override void SetUp()
         {
-            var nullCacheHelper = CacheHelper.CreateDisabledCacheHelper();
-            var logger = Mock.Of<ILogger>();
+            base.SetUp();
 
-            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            //var nullCacheHelper = CacheHelper.CreateDisabledCacheHelper();
+            //var logger = Mock.Of<ILogger>();
+
+            //var databaseFactory = TestObjects.GetDatabaseFactoryMock();
 
             ////Create an app context using mocks
             //var appContext = new ApplicationContext(
@@ -68,11 +62,22 @@ namespace Umbraco.Tests.Models.Mapping
             Mapper.Initialize(configuration =>
             {
                 //initialize our content type mapper
-                var mapper = new ContentTypeModelMapper(editorsMock.Object, Mock.Of<IDataTypeService>(), Mock.Of<IFileService>(), Mock.Of<IContentTypeService>(), Mock.Of<IMediaTypeService>());
+                var mapper = new ContentTypeModelMapper(editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>());
                 mapper.ConfigureMappings(configuration);
                 var entityMapper = new EntityModelMapper();
                 entityMapper.ConfigureMappings(configuration);
             });
+        }
+
+        protected override void Compose()
+        {
+            base.Compose();
+
+            Container.RegisterSingleton(_ => _contentTypeService.Object);
+            Container.RegisterSingleton(_ => _contentService.Object);
+            Container.RegisterSingleton(_ => _dataTypeService.Object);
+            Container.RegisterSingleton(_ => _entityService.Object);
+            Container.RegisterSingleton(_ => _fileService.Object);
         }
 
         [Test]

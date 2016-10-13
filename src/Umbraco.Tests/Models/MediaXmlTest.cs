@@ -11,25 +11,8 @@ namespace Umbraco.Tests.Models
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
-    public class MediaXmlTest : BaseDatabaseFactoryTest
+    public class MediaXmlTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {            
-            base.Initialize();
-        }
-
-        protected override void FreezeResolution()
-        {
-            base.FreezeResolution();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Can_Generate_Xml_Representation_Of_Media()
         {

@@ -60,7 +60,7 @@ namespace Umbraco.Web.Security.Identity
         /// <summary>
         /// Determines if we should authenticate the request
         /// </summary>
-        /// <param name="ctx"></param>
+        /// <param name="owinContext"></param>
         /// <param name="originalRequestUrl"></param>
         /// <param name="checkForceAuthTokens"></param>
         /// <returns></returns>
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Security.Identity
         /// * it is a /base request
         /// * it is a preview request
         /// </remarks>
-        internal bool ShouldAuthenticateRequest(IOwinContext ctx, Uri originalRequestUrl, bool checkForceAuthTokens = true)
+        internal bool ShouldAuthenticateRequest(IOwinContext owinContext, Uri originalRequestUrl, bool checkForceAuthTokens = true)
         {
             // Do not authenticate the request if we are not running (don't have a db, are not configured) - since we will never need
             // to know a current user in this scenario - we treat it as a new install. Without this we can have some issues
@@ -82,8 +82,8 @@ namespace Umbraco.Web.Security.Identity
             if (_runtime.Level == RuntimeLevel.Install)
                 return false;
 
-            var request = ctx.Request;
-            var httpCtx = ctx.TryGetHttpContext();
+            var request = owinContext.Request;
+            var httpContext = owinContext.TryGetHttpContext();
             
             //check the explicit paths
             if (_explicitPaths != null)
@@ -95,8 +95,8 @@ namespace Umbraco.Web.Security.Identity
             if (request.Uri.AbsolutePath.InvariantEquals(_getRemainingSecondsPath)) return false;
 
             if (//check the explicit flag
-                (checkForceAuthTokens && ctx.Get<bool?>("umbraco-force-auth") != null)
-                || (checkForceAuthTokens && httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null)                
+                (checkForceAuthTokens && owinContext.Get<bool?>("umbraco-force-auth") != null)
+                || (checkForceAuthTokens && httpContext.Success && httpContext.Result.Items["umbraco-force-auth"] != null)                
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer

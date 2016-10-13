@@ -1,11 +1,14 @@
 using System;
 using System.IO;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Tests.Routing
 {
@@ -14,12 +17,18 @@ namespace Umbraco.Tests.Routing
     {
 		private UmbracoModule _module;
 
-		public override void Initialize()
+		public override void SetUp()
 		{
-			base.Initialize();
+			base.SetUp();
 			
 			//create the module
 			_module = new UmbracoModule();
+
+            // test
+		    _module.Logger = Mock.Of<ILogger>();
+            var runtime = new RuntimeState(_module.Logger, new Lazy<IServerRegistrar>(), new Lazy<MainDom>());
+		    _module.Runtime = runtime;
+            runtime.Level = RuntimeLevel.Run;
 
 		    SettingsForTests.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
             //SettingsForTests.ReservedPaths = "~/umbraco,~/install/";

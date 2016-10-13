@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LightInject;
 using Moq;
 using NUnit.Framework;
@@ -10,20 +7,15 @@ using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Components
 {
     [TestFixture]
-    public class ComponentTests
+    public class ComponentTests : BaseTestBase
     {
         private static readonly List<Type> Composed = new List<Type>();
         private static readonly List<string> Initialized = new List<string>();
-
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
-        }
 
         [Test]
         public void Boot()
