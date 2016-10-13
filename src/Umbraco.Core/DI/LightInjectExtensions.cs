@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using LightInject;
 
 namespace Umbraco.Core.DI
@@ -31,6 +32,10 @@ namespace Umbraco.Core.DI
             // it is an index property. which means that eg protected or internal setters are OK.
             container.EnableAnnotatedPropertyInjection();
 
+            // ensure that we do *not* scan assemblies
+            // we explicitely RegisterFrom our own composition roots and don't want them scanned
+            container.AssemblyScanner = new AssemblyScanner(container.AssemblyScanner);
+
             // see notes in MixedScopeManagerProvider
             container.ScopeManagerProvider = new MixedScopeManagerProvider();
 
@@ -39,6 +44,26 @@ namespace Umbraco.Core.DI
 
             // configure the current container
             Current.Container = container;
+        }
+
+        private class AssemblyScanner : IAssemblyScanner
+        {
+            private readonly IAssemblyScanner _scanner;
+
+            public AssemblyScanner(IAssemblyScanner scanner)
+            {
+                _scanner = scanner;
+            }
+
+            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister)
+            {
+                // nothing - we *could* scan non-Umbraco assemblies, though
+            }
+
+            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry)
+            {
+                // nothing - we *could* scan non-Umbraco assemblies, though
+            }
         }
 
         /// <summary>
