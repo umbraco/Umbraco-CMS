@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
                     var attemptedUser = Security.GetBackOfficeUser(loginModel.Username);
                     
                     //create a with information to display a custom two factor send code view
-                    var verifyResponse = Request.CreateResponse(HttpStatusCode.Forbidden, new
+                    var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
                     {
                         twoFactorView = twofactorView,
                         userId = attemptedUser.Id
