@@ -13,14 +13,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     [HealthCheck(
         "ED0D7E40-971E-4BE8-AB6D-8CC5D0A6A5B0",
-        "Click-Jacking Protection",
+        "Click-Jacking Protection (X-Frame-Options header)",
         Description = "Checks if your site is allowed to be IFRAMed by another site and thus would be susceptible to click-jacking.",
         Group = "Security")]
     public class ClickJackingCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
 
-        private const string SetFrameOptionsHeaderInConfigActiobn = "setFrameOptionsHeaderInConfig";
+        private const string SetFrameOptionsHeaderInConfigAction = "setFrameOptionsHeaderInConfig";
 
         private const string XFrameOptionsHeader = "X-Frame-Options";
         private const string XFrameOptionsValue = "sameorigin"; // Note can't use "deny" as that would prevent Umbraco itself using IFRAMEs
@@ -49,7 +49,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             switch (action.Alias)
             {
-                case SetFrameOptionsHeaderInConfigActiobn:
+                case SetFrameOptionsHeaderInConfigAction:
                     return SetFrameOptionsHeaderInConfig();
                 default:
                     throw new InvalidOperationException("HttpsCheck action requested is either not executable or does not exist");
@@ -91,7 +91,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var actions = new List<HealthCheckAction>();
             if (success == false)
             {
-                actions.Add(new HealthCheckAction(SetFrameOptionsHeaderInConfigActiobn, Id)
+                actions.Add(new HealthCheckAction(SetFrameOptionsHeaderInConfigAction, Id)
                 {
                     Name = _textService.Localize("healthcheck/clickJackingSetHeaderInConfig"),
                     Description = _textService.Localize("healthcheck/clickJackingSetHeaderInConfigDescription")
