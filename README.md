@@ -9,7 +9,7 @@ If you're interested in making changes to Belle without running Visual Studio ma
 
 Note that you can always [download a nightly build](http://nightly.umbraco.org/?container=umbraco-750) so you don't have to build the code yourself.
 
-## Watch a introduction video ##
+## Watch an introduction video ##
 
 [![ScreenShot](http://umbraco.com/images/whatisumbraco.png)](https://umbraco.tv/videos/umbraco-v7/content-editor/basics/introduction/cms-explanation/)
 
