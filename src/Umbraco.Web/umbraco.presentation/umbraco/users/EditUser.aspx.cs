@@ -183,7 +183,7 @@ namespace umbraco.cms.presentation.user
             pp.addProperty(ui.Text("user", "username", UmbracoUser), uname, unameValidator);
             pp.addProperty(ui.Text("user", "loginname", UmbracoUser), lname, lnameValidator, lnameCustomValidator);
             pp.addProperty(ui.Text("user", "password", UmbracoUser), passw);
-            pp.addProperty(ui.Text("email", UmbracoUser), email, emailValidator, emailCustomValidator);
+            pp.addProperty(ui.Text("general", "email", UmbracoUser), email, emailValidator, emailCustomValidator);
             pp.addProperty(ui.Text("user", "usertype", UmbracoUser), userType);
             pp.addProperty(ui.Text("user", "language", UmbracoUser), userLanguage);
 
