@@ -286,7 +286,7 @@ namespace umbraco.cms.presentation.user
 
         private void EmailCustomValidator_ServerValidate(object source, ServerValidateEventArgs args)
         {
-            args.IsValid = Regex.IsMatch(email.Text.Trim(), @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$");
+            args.IsValid = MembershipProviderBase.IsEmailValid(email.Text.Trim());
         }
 
         void sectionValidator_ServerValidate(object source, ServerValidateEventArgs args)
