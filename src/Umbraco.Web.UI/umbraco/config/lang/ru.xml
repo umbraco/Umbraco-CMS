@@ -499,6 +499,7 @@
     <key alias="install">Установить</key>
     <key alias="invalid">Неверно</key>
     <key alias="justify">Выравнивание</key>
+    <key alias="label">Название</key>
     <key alias="language">Язык</key>
     <key alias="layout">Макет</key>
     <key alias="loading">Загрузка</key>
@@ -654,6 +655,7 @@
     <key alias="xmlDataIntegrityCheckMedia">Медиа - всего в XML: %0%, всего: %1%Б с ошибками: %2%</key>
     <key alias="xmlDataIntegrityCheckContent">Содержимое - всего в XML: %0%, всего опубликовано: %1%, с ошибками: %2%</key>
 
+    <key alias="httpsCheckValidCertificate">Сертификат Вашего сайта отмечен как проверенный.</key>
     <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
     <key alias="httpsCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Сейчас Вы %0% просматриваете сайт, используя протокол HTTPS.</key>
@@ -1064,6 +1066,23 @@
 		Вы можете опубликовать этот документ и все его дочерние документы, отметив опцию <em>Опубликовать все дочерние документы</em>.
 		Чтобы опубликовать ранее неопубликованные документы среди дочерних, отметьте опцию <em>Включая неопубликованные дочерние документы</em>.
 		]]></key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">Остановить отслеживание URL</key>
+    <key alias="enableUrlTracker">Запустить отслеживание URL</key>
+    <key alias="originalUrl">Первоначальный URL</key>
+    <key alias="redirectedTo">Перенаправлен в</key>
+    <key alias="noRedirects">На данный момент нет ни одного перенаправления</key>
+    <key alias="noRedirectsDescription">Если опубликованный документ переименовывается или меняет свое расположение в дереве, а следовательно, меняется адрес (URL), автоматически создается перенаправление на новое местоположение этого документа.</key>
+    <key alias="removeButton">Удалить</key>
+    <key alias="confirmRemove">Вы уверены, что хотите удалить перенаправление с '%0%' на '%1%'?</key>
+    <key alias="redirectRemoved">Перенаправление удалено.</key>
+    <key alias="redirectRemoveError">Ошибка удаления перенаправления.</key>
+    <key alias="confirmDisable">Вы уверены, что хотите остановить отслеживание URL?</key>
+    <key alias="disabledConfirm">Отслеживание URL в настоящий момент остановлено.</key>
+    <key alias="disableError">Ошибка остановки отслеживания URL, более подробные сведения находятся в системном журнале.</key>
+    <key alias="enabledConfirm">Отслеживание URL в настоящий момент запущено.</key>
+    <key alias="enableError">Ошибка запуска отслеживания URL, более подробные сведения находятся в системном журнале.</key>
   </area>
   <area alias="relatedlinks">
     <key alias="caption">Заголовок</key>

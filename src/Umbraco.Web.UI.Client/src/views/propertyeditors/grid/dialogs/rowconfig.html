@@ -6,9 +6,14 @@
       <p><localize key="grid_addRowConfigurationDetail" /></p>
 
       <div class="alert alert-warn ng-scope" ng-show="nameChanged">
-          Modifying a row configuration name will result in loss of
-          data for any existing content that is based on this configuration.
+          <p>Modifying a row configuration name will result in loss of
+          data for any existing content that is based on this configuration.</p>
+          <p><strong>Modifying only the label will not result in data loss.</strong></p>
       </div>
+       
+       <umb-control-group label="@general_label">
+           <input type="text" ng-model="currentRow.label" placeholder="Overrides name" />
+       </umb-control-group>
 
       <umb-control-group label="@general_name">
           <input type="text" ng-model="currentRow.name" />
@@ -39,19 +44,23 @@
       <div ng-if="currentCell" style="padding-bottom: 50px;">
 
           <umb-control-group label="@general_width">
-             <div class="grid-size-scaler" >
-                  <div class="grid-size-scaler">
-                      <a href ng-click="scaleDown(currentCell)">
-                          <i class="icon icon-remove"></i>
-                      </a>
+              <div class="grid-size-scaler">
+                  <a href ng-click="scaleDown(currentCell)">
+                      <i class="icon icon-remove"></i>
+                  </a>
                       {{currentCell.grid}}
-                      <a href ng-click="scaleUp(currentCell, availableRowSpace, true)">
-                          <i class="icon icon-add"></i>
-                      </a>
-                  </div>
-             </div>
+                  <a href ng-click="scaleUp(currentCell, availableRowSpace, true)">
+                      <i class="icon icon-add"></i>
+                  </a>
+              </div>
           </umb-control-group>
 
+	  	  <umb-control-group hide-label="true">
+	  		  <i class="icon-delete red"></i>
+	  		  <a class="btn btn-small btn-link" href="" ng-click="deleteArea(currentCell, currentRow)">
+	  			  <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
+	  		  </a>
+	  	  </umb-control-group>
 
           <umb-control-group hide-label="true">
              <ul class="unstyled">

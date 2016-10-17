@@ -6,14 +6,14 @@
 
         <umb-editor-sub-header-content-right>
 
-            <umb-editor-sub-header-section>
+            <umb-editor-sub-header-section ng-if="vm.dashboard.userIsAdmin === true">
 
                 <button
                     ng-if="vm.dashboard.urlTrackerDisabled === false"
                     type="button"
                     class="umb-era-button umb-button--s"
                     ng-click="vm.disableUrlTracker()">
-                    <span>Disable URL Tracker</span>
+                    <span><localize key="redirectUrls_disableUrlTracker">Disable URL Tracker</localize></span>
                 </button>
 
                 <button
@@ -21,7 +21,7 @@
                     type="button"
                     class="umb-era-button umb-button--s -blue"
                     ng-click="vm.enableUrlTracker()">
-                    <span>Enable URL Tracker</span>
+                    <span><localize key="redirectUrls_enableUrlTracker">Enable URL Tracker</localize></span>
                 </button>
 
             </umb-editor-sub-header-section>
@@ -53,11 +53,9 @@
 
         <div class="umb-table-head">
             <div class="umb-table-row">
-                <div class="umb-table-cell"></div>
-                <div class="umb-table-cell">Original Url</div>
-                <div class="umb-table-cell">Redirected To</div>
-                <div class="umb-table-cell">Date Created</div>
-                <div class="umb-table-cell"></div>
+                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b4"><localize key="redirectUrls_originalUrl">Original URL</localize></div>
+                <div class="umb-table-cell flx-s0 flx-g0" style="flex-basis: 20px;"></div>
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b6"><localize key="redirectUrls_redirectedTo">Redirected To</localize></div>
             </div>
         </div>
 
@@ -65,25 +63,21 @@
 
             <div class="umb-table-row -solid" ng-repeat="redirectUrl in vm.redirectUrls">
 
-                <div class="umb-table-cell">
-                    <i class="umb-table-body__icon umb-table-body__fileicon icon-shuffle"></i>
-                </div>
 
-                <div class="umb-table-cell">
+                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b4">
                     <a class="umb-table-body__link" href="{{redirectUrl.originalUrl}}" target="_blank" title="{{redirectUrl.originalUrl}}">{{redirectUrl.originalUrl}}</a>
                 </div>
 
-                <div class="umb-table-cell">
-                    <a class="umb-table-body__link" href="{{redirectUrl.destinationUrl}}" target="_blank" title="{{redirectUrl.destinationUrl}}">{{redirectUrl.destinationUrl}}</a>
+                <div class="umb-table-cell flx-s0 flx-g0" style="flex-basis: 20px;">
+                    <i class="umb-table-body__icon umb-table-body__fileicon icon-arrow-right" style="font-size: 12px; line-height: 1;"></i>
                 </div>
 
-                <div class="umb-table-cell">
-                    {{redirectUrl.createDateUtc | date:'medium'}}
-                </div>
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b6 items-center">
+                    <div class="flx-s1 flx-g1 flx-b0" style="margin-right: 20px;">
+                        <a class="umb-table-body__link" href="{{redirectUrl.destinationUrl}}" target="_blank" title="{{redirectUrl.destinationUrl}}">{{redirectUrl.destinationUrl}}</a>
+                    </div>
 
-                <div class="umb-table-cell justify-end">
-                    <a href="/umbraco/#/content/content/edit/{{redirectUrl.contentId}}" class="umb-era-button -gray umb-button--s" style="margin-right: 10px;">Edit</a>
-                    <button type="button" class="umb-era-button -gray umb-button--s" ng-click="vm.removeRedirect(redirectUrl)">Remove</button>
+                    <button type="button" class="umb-era-button umb-button--s -red" ng-click="vm.removeRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
                 </div>
 
             </div>
@@ -95,8 +89,8 @@
     <umb-empty-state
         ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length === 0 && !vm.dashboard.loading"
         position="center">
-        <div>No redirects have been made</div>
-        <small class="faded">When a published page gets renamed a redirect will automatically be made to the new page</small>
+        <div><localize key="redirectUrls_noRedirects">No redirects have been made</localize></div>
+        <small class="faded"><localize key="redirectUrls_noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page</localize></small>
     </umb-empty-state>
 
     <umb-empty-state

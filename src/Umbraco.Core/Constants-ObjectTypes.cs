@@ -70,6 +70,11 @@ namespace Umbraco.Core
             public const string Document = "C66BA18E-EAF3-4CFF-8A22-41B16D66A972";
 
             /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public static readonly Guid DocumentGuid = new Guid(Document);
+
+            /// <summary>
             /// Guid for a Document Type object.
             /// </summary>
             public const string DocumentType = "A2CB7800-F571-4787-9638-BC48539A0EFB";
