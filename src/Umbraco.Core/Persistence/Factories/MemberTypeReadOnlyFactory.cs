@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     // note: no idea why Id is nullable here, but better check
                     if (groupDto.Id.HasValue == false)
-                        throw new Exception("oops: groupDto.Id has no value.");
+                        throw new Exception("GroupDto.Id has no value.");
                     group.Id = groupDto.Id.Value;
                 }
 

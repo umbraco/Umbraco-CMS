@@ -147,9 +147,9 @@
     <key alias="nodeName">Page Title</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
-    <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error - see log)</key>
-    <key alias="getUrlException">Oops: could not get the url (internal error - see log)</key>
-    <key alias="routeError">Oops: this document is published but its url would collide with content %0%</key>
+    <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
+    <key alias="getUrlException">Could not get the url</key>
+    <key alias="routeError">This document is published but its url would collide with content %0%</key>
     <key alias="publish">Publish</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="releaseDate">Publish at</key>
@@ -1356,6 +1356,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid %2%</key>
 	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid %2%</key>
 
+	  <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
 	  <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
 	  <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
 	  <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>

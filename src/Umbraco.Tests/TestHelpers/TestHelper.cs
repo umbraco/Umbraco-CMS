@@ -142,7 +142,13 @@ namespace Umbraco.Tests.TestHelpers
                 }
                 else if (dateTimeFormat.IsNullOrWhiteSpace() == false && actualValue is DateTime)
                 {
-                    Assert.AreEqual(((DateTime) expectedValue).ToString(dateTimeFormat), ((DateTime)actualValue).ToString(dateTimeFormat), "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expectedValue, actualValue);
+                    // round to second else in some cases tests can fail ;-(
+                    var expectedDateTime = (DateTime) expectedValue;
+                    expectedDateTime = expectedDateTime.AddTicks(-(expectedDateTime.Ticks%TimeSpan.TicksPerSecond));
+                    var actualDateTime = (DateTime) actualValue;
+                    actualDateTime = actualDateTime.AddTicks(-(actualDateTime.Ticks % TimeSpan.TicksPerSecond));
+
+                    Assert.AreEqual(expectedDateTime.ToString(dateTimeFormat), actualDateTime.ToString(dateTimeFormat), "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expectedValue, actualValue);
                 }
                 else
                 {

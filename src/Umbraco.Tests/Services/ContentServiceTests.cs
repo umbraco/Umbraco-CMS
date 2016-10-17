@@ -69,6 +69,50 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Get_Top_Version_Ids()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var content = contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
+            for (int i = 0; i < 20; i++)
+            {
+                content.SetValue("bodyText", "hello world " + Guid.NewGuid());
+                contentService.SaveAndPublishWithStatus(content);
+            }
+
+
+            // Assert
+            var allVersions = contentService.GetVersionIds(content.Id, int.MaxValue);
+            Assert.AreEqual(21, allVersions.Count());
+
+            var topVersions = contentService.GetVersionIds(content.Id, 4);
+            Assert.AreEqual(4, topVersions.Count());
+        }
+
+        [Test]
+        public void Get_By_Ids_Sorted()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var results = new List<IContent>();
+            for (int i = 0; i < 20; i++)
+            {
+                results.Add(contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0));
+            }
+
+            var sortedGet = contentService.GetByIds(new[] {results[10].Id, results[5].Id, results[12].Id}).ToArray();
+
+            // Assert
+            Assert.AreEqual(sortedGet[0].Id, results[10].Id);
+            Assert.AreEqual(sortedGet[1].Id, results[5].Id);
+            Assert.AreEqual(sortedGet[2].Id, results[12].Id);
+        }
+
+        [Test]
         public void Count_All()
         {
             // Arrange
