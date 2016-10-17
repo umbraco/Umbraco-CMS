@@ -8,6 +8,7 @@ using System.Xml;
 using umbraco.presentation.preview;
 using Examine.Providers;
 using Examine;
+using Umbraco.Core;
 
 namespace umbraco.presentation
 {
@@ -183,7 +184,7 @@ namespace umbraco.presentation
         {
             get
             {
-                return ExamineManager.Instance.SearchProviderCollection["InternalSearcher"];
+                return ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher];
             }
         }
 
@@ -195,7 +196,7 @@ namespace umbraco.presentation
         {
             get
             {
-                return ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"];
+                return ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalMemberSearcher];
             }
         }
     }

@@ -25,9 +25,30 @@ namespace Umbraco.Web.Security.Identity
     public static class AppBuilderExtensions
     {
         /// <summary>
+        /// Called at the end of configuring middleware
+        /// </summary>
+        /// <param name="app"></param>
+        /// <remarks>
+        /// This could be used for something else in the future - maybe to inform Umbraco that middleware is done/ready, but for
+        /// now this is used to raise the custom event
+        /// 
+        /// This is an extension method in case developer entirely replace the UmbracoDefaultOwinStartup class, in which case they will
+        /// need to ensure they call this extension method in their startup class.
+        /// 
+        /// TODO: Move this method in v8, it doesn't belong in this namespace/extension class
+        /// </remarks>
+        public static void FinalizeMiddlewareConfiguration(this IAppBuilder app)
+        {
+            UmbracoDefaultOwinStartup.OnMiddlewareConfigured(new OwinMiddlewareConfiguredEventArgs(app));
+        }
+
+        /// <summary>
         /// Sets the OWIN logger to use Umbraco's logging system
         /// </summary>
         /// <param name="app"></param>
+        /// <remarks>
+        /// TODO: Move this method in v8, it doesn't belong in this namespace/extension class
+        /// </remarks>
         public static void SetUmbracoLoggerFactory(this IAppBuilder app)
         {
             app.SetLoggerFactory(new OwinLoggerFactory());
@@ -53,6 +74,8 @@ namespace Umbraco.Web.Security.Identity
                     appContext.Services.UserService,
                     appContext.Services.ExternalLoginService,
                     userMembershipProvider));
+            
+            app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
             //Create a sign in manager per request
             app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger<BackOfficeSignInManager>()));
@@ -81,6 +104,8 @@ namespace Umbraco.Web.Security.Identity
                     customUserStore,
                     userMembershipProvider));
 
+            app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
+
             //Create a sign in manager per request
             app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
         }
@@ -103,8 +128,11 @@ namespace Umbraco.Web.Security.Identity
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<TManager>(userManager);
 
+            app.SetBackOfficeUserManagerType<TManager, TUser>();
+
             //Create a sign in manager per request
-            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
+            app.CreatePerOwinContext<BackOfficeSignInManager>(
+                (options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
         }
 
         /// <summary>
@@ -132,10 +160,10 @@ namespace Umbraco.Web.Security.Identity
         /// <returns></returns>
         public static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, ApplicationContext appContext, PipelineStage stage)
         {
-            if (app == null) throw new ArgumentNullException("app");
-            if (appContext == null) throw new ArgumentNullException("appContext");
+            //Create the default options and provider
+            var authOptions = app.CreateUmbracoCookieAuthOptions();
 
-            var cookieAuthProvider = new BackOfficeCookieAuthenticationProvider
+            authOptions.Provider = new BackOfficeCookieAuthenticationProvider
             {
                 // Enables the application to validate the security stamp when the user 
                 // logs in. This is a security feature which is used when you 
@@ -145,20 +173,39 @@ namespace Umbraco.Web.Security.Identity
                         TimeSpan.FromMinutes(30),
                         (manager, user) => user.GenerateUserIdentityAsync(manager),
                         identity => identity.GetUserId<int>()),
+
             };
 
-            var authOptions = CreateCookieAuthOptions();
-            authOptions.Provider = cookieAuthProvider;
+            return app.UseUmbracoBackOfficeCookieAuthentication(appContext, authOptions, stage);
+        }
 
-            app.UseUmbracoBackOfficeCookieAuthentication(authOptions, appContext, stage);
+        /// <summary>
+        /// Ensures that the UmbracoBackOfficeAuthenticationMiddleware is assigned to the pipeline
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="appContext"></param>
+        /// <param name="cookieOptions">Custom auth cookie options can be specified to have more control over the cookie authentication logic</param>
+        /// <param name="stage">
+        /// Configurable pipeline stage
+        /// </param>
+        /// <returns></returns>
+        public static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, ApplicationContext appContext, CookieAuthenticationOptions cookieOptions, PipelineStage stage)
+        {
+            if (app == null) throw new ArgumentNullException("app");
+            if (appContext == null) throw new ArgumentNullException("appContext");
+            if (cookieOptions == null) throw new ArgumentNullException("cookieOptions");
+            if (cookieOptions.Provider == null) throw new ArgumentNullException("cookieOptions.Provider");
+            if ((cookieOptions.Provider is BackOfficeCookieAuthenticationProvider) == false) throw new ArgumentException("The cookieOptions.Provider must be of type " + typeof(BackOfficeCookieAuthenticationProvider));
+            
+            app.UseUmbracoBackOfficeCookieAuthenticationInternal(cookieOptions, appContext, stage);
 
-            //don't apply if app isnot ready
+            //don't apply if app is not ready
             if (appContext.IsUpgrading || appContext.IsConfigured)
             {
-                var getSecondsOptions = CreateCookieAuthOptions(
+                var getSecondsOptions = app.CreateUmbracoCookieAuthOptions(
                     //This defines the explicit path read cookies from for this middleware
                     new[] {string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)});
-                getSecondsOptions.Provider = cookieAuthProvider;
+                getSecondsOptions.Provider = cookieOptions.Provider;
 
                 //This is a custom middleware, we need to return the user's remaining logged in seconds
                 app.Use<GetUserSecondsMiddleWare>(
@@ -170,7 +217,36 @@ namespace Umbraco.Web.Security.Identity
             return app;
         }
 
-        internal static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, CookieAuthenticationOptions options, ApplicationContext appContext, PipelineStage stage = PipelineStage.Authenticate)
+        private static bool _markerSet = false;
+
+        /// <summary>
+        /// This registers the exact type of the user manager in owin so we can extract it
+        /// when required in order to extract the user manager instance
+        /// </summary>
+        /// <typeparam name="TManager"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <param name="app"></param>
+        /// <remarks>
+        /// This is required because a developer can specify a custom user manager and due to generic types the key name will registered
+        /// differently in the owin context
+        /// </remarks> 
+        private static void SetBackOfficeUserManagerType<TManager, TUser>(this IAppBuilder app)
+            where TManager : BackOfficeUserManager<TUser>
+            where TUser : BackOfficeIdentityUser
+        {
+            if (_markerSet) throw new InvalidOperationException("The back office user manager marker has already been set, only one back office user manager can be configured");
+
+            //on each request set the user manager getter - 
+            // this is required purely because Microsoft.Owin.IOwinContext is super inflexible with it's Get since it can only be
+            // a generic strongly typed instance
+            app.Use((context, func) =>
+            {
+                context.Set(BackOfficeUserManager.OwinMarkerKey, new BackOfficeUserManagerMarker<TManager, TUser>());
+                return func();
+            });            
+        }
+
+        private static void UseUmbracoBackOfficeCookieAuthenticationInternal(this IAppBuilder app, CookieAuthenticationOptions options, ApplicationContext appContext, PipelineStage stage)
         {
             if (app == null)
             {
@@ -188,9 +264,7 @@ namespace Umbraco.Web.Security.Identity
             }
 
             //Marks all of the above middlewares to execute on Authenticate
-            app.UseStageMarker(stage);
-
-            return app;
+            app.UseStageMarker(stage);            
         }
 
 
@@ -273,7 +347,7 @@ namespace Umbraco.Web.Security.Identity
             //don't apply if app isnot ready
             if (appContext.IsConfigured)
             {
-                var authOptions = CreateCookieAuthOptions();                
+                var authOptions = app.CreateUmbracoCookieAuthOptions();                
                 app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions);
 
                 //This middleware must execute at least on PostAuthentication, by default it is on Authorize
@@ -300,9 +374,10 @@ namespace Umbraco.Web.Security.Identity
         /// <summary>
         /// Create the default umb cookie auth options
         /// </summary>
+        /// <param name="app"></param>
         /// <param name="explicitPaths"></param>
         /// <returns></returns>
-        private static UmbracoBackOfficeCookieAuthOptions CreateCookieAuthOptions(string[] explicitPaths = null)
+        public static UmbracoBackOfficeCookieAuthOptions CreateUmbracoCookieAuthOptions(this IAppBuilder app, string[] explicitPaths = null)
         {
             var authOptions = new UmbracoBackOfficeCookieAuthOptions(
                 explicitPaths,

@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.DateTimeAlias, "Date/Time", "datepicker", ValueType = "DATETIME", Icon="icon-time")]
+    [PropertyEditor(Constants.PropertyEditors.DateTimeAlias, "Date/Time", "datepicker", ValueType = PropertyEditorValueTypes.DateTime, Icon="icon-time")]
     public class DateTimePropertyEditor : PropertyEditor
     {
         public DateTimePropertyEditor()
@@ -14,7 +17,11 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     //NOTE: This is very important that we do not use .Net format's there, this format
                     // is the correct format for the JS picker we are using so you cannot capitalize the HH, they need to be 'hh'
-                    {"format", "YYYY-MM-DD HH:mm:ss"}
+                    {"format", "YYYY-MM-DD HH:mm:ss"},
+                    //a pre-value indicating if the client/server time should be offset, when set to true the date/time seen
+                    // by the client will be offset with the server time.
+                    // For example, this is forced to true for scheduled publishing date/time pickers
+                    {"offsetTime", "0"}
                 };
         }
 
@@ -40,7 +47,9 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new DatePreValueEditor();
+            return new DateTimePreValueEditor();
         }
     }
+
+    
 }

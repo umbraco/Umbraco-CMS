@@ -2,15 +2,9 @@
 @name Umbraco 7 JS documentation 
 @description
 
-#Belle
+#Umbraco Backoffice UI API documentation
 
-Umbraco 7 UI, codename "Belle" Built on AngularJS, Lazyload.js and Twitter Bootstrap
-
-##Introduction
-Slides from the initial demonstration of Belle done at the Umbraco DK Fest can be found here: 
-
-http://rawgithub.com/umbraco/Belle/master/Presentation/index.html
-  
+This documentation relates to the angular, js, css and less APIs for developing back office components
 
 ##Running the site with mocked data
 
@@ -45,7 +39,7 @@ So run the command:
 	
 	sudo npm install grunt-cli -g
 
-Now that you have node and grunt installed, you can open `/Umbraco.Belle.Client` in either `cmd.exe` or terminal and run: 
+Now that you have node and grunt installed, you can open `/Umbraco.Web.UI.Client` in either `cmd.exe` or terminal and run: 
 
 	grunt dev
 

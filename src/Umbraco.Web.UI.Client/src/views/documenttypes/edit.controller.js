@@ -145,7 +145,8 @@
 
                             contentTypeHelper.generateModels().then(function (result) {
 
-                                if (result.success) {
+                                // generateModels() returns the dashboard content
+                                if (!result.lastError) {
 
                                     //re-check model status
                                     contentTypeHelper.checkModelsBuilderStatus().then(function(statusResult) {

@@ -65,6 +65,7 @@
     <key alias="atViewingFor">Viewing for</key>
   </area>
   <area alias="buttons">
+    <key alias="clearSelection">Clear selection</key>
     <key alias="select">Select</key>
     <key alias="selectCurrentFolder">Select current folder</key>
     <key alias="somethingElse">Do something else</key>
@@ -146,7 +147,9 @@
     <key alias="nodeName">Page Title</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
-    <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error)</key>
+    <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
+    <key alias="getUrlException">Could not get the url</key>
+    <key alias="routeError">This document is published but its url would collide with content %0%</key>
     <key alias="publish">Publish</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="releaseDate">Publish at</key>
@@ -167,11 +170,13 @@
     <key alias="notmemberof">Not a member of group(s)</key>
     <key alias="childItems" version="7.0">Child items</key>
     <key alias="target" version="7.0">Target</key>
+    <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="dropFilesHere">Drop your files here...</key>
-	<key alias="urls">Link to media</key>
+	  <key alias="urls">Link to media</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="onlyAllowedFiles">Only allowed file types are</key>
     <key alias="maxFileSize">Max file size is</key>
@@ -187,6 +192,8 @@
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+    <key alias="newFolder">New folder</key>
+    <key alias="newDataType">New data type</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -196,6 +203,40 @@
     <key alias="restart">Restart</key>
     <key alias="visit">Visit</key>
     <key alias="welcome">Welcome</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
+  <area alias="bulk">
+    <key alias="done">Done</key>
+
+    <key alias="deletedItem">Deleted %0% item</key>
+    <key alias="deletedItems">Deleted %0% items</key>
+    <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
+    <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
+
+    <key alias="publishedItem">Published %0% item</key>
+    <key alias="publishedItems">Published %0% items</key>
+    <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
+    <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
+
+    <key alias="unpublishedItem">Unpublished %0% item</key>
+    <key alias="unpublishedItems">Unpublished %0% items</key>
+    <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
+    <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
+
+    <key alias="movedItem">Moved %0% item</key>
+    <key alias="movedItems">Moved %0% items</key>
+    <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
+    <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
+
+    <key alias="copiedItem">Copied %0% item</key>
+    <key alias="copiedItems">Copied %0% items</key>
+    <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
+    <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Name</key>
@@ -290,6 +331,7 @@
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
     <key alias="password">Enter your password</key>
+    <key alias="confirmPassword">Confirm your password</key>
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
     <key alias="label">Label...</key>
@@ -297,6 +339,7 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
+    <key alias="email">Enter your email</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Allow at root</key>
@@ -479,8 +522,8 @@
     <key alias="listView">List view</key>
     <key alias="saving">Saving...</key>
     <key alias="current">current</key>
-    <key alias="move">Move</key>
     <key alias="embed">Embed</key>
+    <key alias="selected">selected</key>
   </area>
 
   <area alias="colors">
@@ -658,8 +701,20 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="greeting5">Happy funky Friday</key>
     <key alias="greeting6">Happy Caturday</key>
     <key alias="instruction">Log in below</key>
+    <key alias="signInWith">Sign in with</key>
     <key alias="timeout">Session timed out</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="forgottenPassword">Forgotten password?</key>
+    <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
+    <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
+    <key alias="returnToLogin">Return to login form</key>
+    <key alias="setPasswordInstruction">Please provide a new password</key>
+    <key alias="setPasswordConfirmation">Your Password has been updated</key>
+    <key alias="resetCodeExpired">The link you have clicked on is invalid or has expired</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
+    <key alias="resetPasswordEmailCopyFormat">
+      <![CDATA[<p>Your username to login to the Umbraco back-office is: <strong>%0%</strong></p><p>Click <a href="%1%"><strong>here</strong></a> to reset your password or copy/paste this URL into your browser:</p><p><em>%1%</em></p>]]>
+    </key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -756,6 +811,15 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageVersion">Package version</key>
     <key alias="packageVersionHistory">Package version history</key>
     <key alias="viewPackageWebsite">View package website</key>
+    <key alias="packageAlreadyInstalled">Package already installed</key>
+    <key alias="targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of %0%</key>
+    <key alias="installStateUninstalling">Uninstalling...</key>
+    <key alias="installStateDownloading">Downloading...</key>
+    <key alias="installStateImporting">Importing...</key>
+    <key alias="installStateInstalling">Installing...</key>
+    <key alias="installStateRestarting">Restarting, please wait...</key>
+    <key alias="installStateComplete">All done, your browser will now refresh, please wait...</key>
+
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>
@@ -799,14 +863,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% can not be published, because a parent page is not published.
     ]]></key>
-    <key alias="includeUnpublished">Include unpublished child pages</key>
+    <key alias="includeUnpublished">Include unpublished subpages</key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
     <key alias="nodePublish">%0% has been published</key>
     <key alias="nodePublishAll">%0% and subpages have been published</key>
     <key alias="publishAll">Publish %0% and all its subpages</key>
-    <key alias="publishHelp"><![CDATA[Click <em>ok</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
-      You can publish this page and all it's sub-pages by checking <em>publish all children</em> below.
+    <key alias="publishHelp"><![CDATA[Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
+      You can publish this page and all its subpages by checking <em>Include unpublished subpages</em> below.
       ]]></key>
   </area>
   <area alias="colorpicker">
@@ -1146,6 +1210,7 @@ To manage your website, simply open the Umbraco back office and start adding con
      To close a translation task, please go to the Details view and click the "Close" button.
     ]]></key>
     <key alias="pageHasBeenSendToTranslation">The page '%0%' has been send to translation</key>
+    <key alias="noLanguageSelected">Please select the language that the content should be translated into</key>
     <key alias="sendToTranslate">Send the page '%0%' to translation</key>
     <key alias="taskAssignedBy">Assigned by</key>
     <key alias="taskOpened">Task opened</key>
@@ -1248,5 +1313,125 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="validateAsUrl">Validate as a Url</key>
       <key alias="enterCustomValidation">...or enter a custom validation</key>
       <key alias="fieldIsMandatory">Field is mandatory</key>
+  </area>
+  <area alias="healthcheck">
+	  <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: XPath
+		   3: Configuration file path
+	  -->
+    <key alias="checkSuccessMessage">Value is set to the recommended value: '%0%'.</key>
+	  <key alias="rectifySuccessMessage">Value was set to '%1%' for XPath '%2%' in configuration file '%3%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.</key>
+    <key alias="checkErrorMessageUnexpectedValue">Found unexpected value '%0%' for '%2%' in configuration file '%3%'.</key>
+
+	  <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+	  -->
+	  <key alias="customErrorsCheckSuccessMessage">Custom errors are set to '%0%'.</key>
+	  <key alias="customErrorsCheckErrorMessage">Custom errors are currently set to '%0%'. It is recommended to set this to '%1%' before go live.</key>
+	  <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
+
+	  <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
+	  <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely when there's any errors in macros. Rectifying this will set the value to '%1%'.</key>
+	  <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
+
+	  <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: Server version
+	  -->
+	  <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%1%'.</key>
+	  <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
+	  <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
+
+	  <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+	  <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
+	  <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
+	  <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
+
+	  <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
+	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid %2%</key>
+	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid %2%</key>
+
+	  <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
+	  <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
+	  <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+	  <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
+	  <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
+	  <key alias="httpsCheckConfigurationCheckResult">The appSetting 'umbracoUseSSL' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
+	  <key alias="httpsCheckEnableHttpsError">Could not update the 'umbracoUseSSL' setting in your web.config file. Error: %0%</key>
+
+	  <!-- The following keys don't get tokens passed in -->
+	  <key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
+	  <key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
+	  <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
+
+	  <key alias="rectifyButton">Fix</key>
+    <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
+    <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
+
+	  <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
+	  <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
+	  <key alias="compilationDebugCheckRectifySuccessMessage">Debug compilation mode successfully disabled.</key>
+
+	  <key alias="traceModeCheckSuccessMessage">Trace mode is disabled.</key>
+	  <key alias="traceModeCheckErrorMessage">Trace mode is currently enabled. It is recommended to disable this setting before go live.</key>
+	  <key alias="traceModeCheckRectifySuccessMessage">Trace mode successfully disabled.</key>
+
+    <key alias="folderPermissionsCheckMessage">All folders have the correct permissions set.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
+
+    <key alias="filePermissionsCheckMessage">All files have the correct permissions set.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFilePermissionFailed"><![CDATA[The following files must be set up with write permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFilePermissionFailed"><![CDATA[The following files must be set up with write permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
+
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was not found.]]></key>
+    <key alias="clickJackingSetHeaderInConfig">Set Header in Config</key>
+    <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMEd by other websites.</key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMEing of the site by other websites has been added to your web.config file.</key>
+    <key alias="clickJackingSetHeaderInConfigError">Could not update web.config file. Error: %0%</key>
+
+    <!-- The following key get these tokens passed in:
+	    0: Comma delimitted list of headers found
+  	-->
+    <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
+
+    <key alias="smtpMailSettingsNotFound">In the Web.config file, system.net/mailsettings could not be found.</key>
+    <key alias="smtpMailSettingsHostNotConfigured">In the Web.config file system.net/mailsettings section, the host is not configured.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
+    <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.</key>
+
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">Disable URL tracker</key>
+    <key alias="enableUrlTracker">Enable URL tracker</key>
+    <key alias="originalUrl">Original URL</key>
+    <key alias="redirectedTo">Redirected To</key>
+    <key alias="noRedirects">No redirects have been made</key>
+    <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
+    <key alias="removeButton">Remove</key>
+    <key alias="confirmRemove">Are you sure you want to remove the redirect from '%0%' to '%1%'?</key>
+    <key alias="redirectRemoved">Redirect URL removed.</key>
+    <key alias="redirectRemoveError">Error removing redirect URL.</key>
+    <key alias="confirmDisable">Are you sure you want to disable the URL tracker?</key>
+    <key alias="disabledConfirm">URL tracker has now been disabled.</key>
+    <key alias="disableError">Error disabling the URL tracker, more information can be found in your log file.</key>
+    <key alias="enabledConfirm">URL tracker has now been enabled.</key>
+    <key alias="enableError">Error enabling the URL tracker, more information can be found in your log file.</key>
   </area>
 </language>

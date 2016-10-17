@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -369,9 +370,9 @@ namespace Umbraco.Tests.Strings
             // then next string element is one char and 3 bytes, 16 bits of code point
             Assert.AreEqual('t', bytes[9]);
             //foreach (var b in bytes)
-            //    Console.WriteLine("{0:X}", b);
+            //    Debug.Print("{0:X}", b);
 
-            Console.WriteLine("\U00010B70");
+            Debug.Print("\U00010B70");
         }
 
         [Test]

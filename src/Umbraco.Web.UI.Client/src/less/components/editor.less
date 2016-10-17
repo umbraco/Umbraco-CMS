@@ -2,32 +2,42 @@
 	contains styling for all main editor directives
 */
 
-.umb-editor-wrapper{
+.umb-editor-wrapper {
 	background: white;
 	position: absolute;
-	top: 0px; bottom: 0px; left: 0px; right: 0px;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+
+    > form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
 }
 
-
-.umb-editor-header{
+.umb-editor-header {
 	background: @grayLighter;
 	border-bottom: 1px solid @grayLight;
-	position: absolute;
-	height: 99px;
-	top: 0px;
-	right: 0px;
-	left: 0px;
+	flex: 0 0 99px;
+	position: relative;
 }
 
+.umb-editor-header__actions-menu {
+	margin-left: auto;
+}
 
 .umb-editor-container {
-	top: 101px;
-	left: 0px;
-	right: 0px;
-	bottom: 52px;
-	position: absolute;
-	clear: both;
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 	overflow: auto;
+	flex: 1 1 100%;
 }
 
 .umb-editor-wrapper.-no-footer .umb-editor-container {
@@ -38,18 +48,12 @@
 	overflow: hidden;
 }
 
-.umb-editor-drawer{
+.umb-editor-drawer {
 	margin: 0;
 	padding: 10px 20px;
-	z-index: 999;
-	position: absolute;
-	bottom: 0px;
-	left: 0px;
-	right: 0px;
-	height: 31px;
-
 	background: @grayLighter;
 	border-top: 1px solid @grayLight;
+	flex: 1 0 31px;
 }
 
 

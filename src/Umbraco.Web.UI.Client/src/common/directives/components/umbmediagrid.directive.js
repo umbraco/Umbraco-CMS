@@ -118,6 +118,13 @@ Use this directive to generate a thumbnail grid of media items.
                     var item = scope.items[i];
                     setItemData(item);
                     setOriginalSize(item, itemMaxHeight);
+
+                    // remove non images when onlyImages is set to true
+                    if(scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
+                        scope.items.splice(i, 1);
+                        i--;
+                    }
+
                 }
 
                 if (scope.items.length > 0) {
@@ -131,6 +138,22 @@ Use this directive to generate a thumbnail grid of media items.
                 if (!item.isFolder) {
                     item.thumbnail = mediaHelper.resolveFile(item, true);
                     item.image = mediaHelper.resolveFile(item, false);
+
+                    var fileProp = _.find(item.properties, function (v) {
+                        return (v.alias === "umbracoFile");
+                    });
+
+                    if (fileProp && fileProp.value) {
+                        item.file = fileProp.value;
+                    }
+
+                    var extensionProp = _.find(item.properties, function (v) {
+                        return (v.alias === "umbracoExtension");
+                    });
+
+                    if (extensionProp && extensionProp.value) {
+                        item.extension = extensionProp.value;
+                    }
                 }
             }
 
@@ -265,7 +288,8 @@ Use this directive to generate a thumbnail grid of media items.
                 itemMaxWidth: "@",
                 itemMaxHeight: "@",
                 itemMinWidth: "@",
-                itemMinHeight: "@"
+                itemMinHeight: "@",
+                onlyImages: "@"
             },
             link: link
         };

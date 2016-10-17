@@ -1,3 +1,4 @@
+//TODO: This is silly and unecessary to have a separate module for this
 angular.module('umbraco.security.retryQueue', [])
 
 // This is a generic retry queue for security failures.  Each item is expected to expose two functions: retry and cancel.

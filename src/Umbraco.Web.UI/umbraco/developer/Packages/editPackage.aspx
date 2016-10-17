@@ -35,13 +35,28 @@
             <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" EnableClientScript="false"
                 ControlToValidate="packageVersion">*</asp:RequiredFieldValidator>
         </cc2:PropertyPanel>
+        <cc2:PropertyPanel runat="server" ID="pp_icon" Text="Package Icon URL">
+            <asp:TextBox ID="iconUrl" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>            
+        </cc2:PropertyPanel>
         <cc2:PropertyPanel runat="server" ID="pp_file" Text="Package file (.zip):">
             <asp:Button ID="bt_submitButton" runat="server" Text="Submit to repository" Visible="false" />
             <asp:Literal ID="packageUmbFile" runat="server" />
         </cc2:PropertyPanel>
+         
     </cc2:Pane>
+    
+    <cc2:Pane ID="Pane5" runat="server">
+        <cc2:PropertyPanel runat="server" ID="pp_umbracoVersion" Text="Umbraco Target Version">
+            <asp:TextBox ID="umbracoVersion" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator7" runat="server" EnableClientScript="false"
+                ControlToValidate="umbracoVersion">*</asp:RequiredFieldValidator>
+            <asp:RegularExpressionValidator ID="VersionValidator" runat="server" EnableClientScript="false"
+                ControlToValidate="umbracoVersion" ValidationExpression="^\d+\.\d+\.\d+$">Invalid version number (eg. 7.5.0)</asp:RegularExpressionValidator>
+        </cc2:PropertyPanel>        
+    </cc2:Pane>
+
     <cc2:Pane ID="Pane1_1" runat="server">
-        <cc2:PropertyPanel runat="server" ID="pp_author" Text="Author Name">
+        <cc2:PropertyPanel runat="server" ID="pp_author" Text="Author Name" >
             <asp:TextBox ID="packageAuthorName" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
             <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" EnableClientScript="false"
                 ControlToValidate="packageAuthorName">*</asp:RequiredFieldValidator>
@@ -52,6 +67,7 @@
                 ControlToValidate="packageAuthorUrl">*</asp:RequiredFieldValidator>
         </cc2:PropertyPanel>
     </cc2:Pane>
+
     <cc2:Pane ID="Pane1_2" runat="server">
         <cc2:PropertyPanel runat="server" ID="pp_licens" Text="License Name:">
             <asp:TextBox ID="packageLicenseName" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
@@ -75,7 +91,7 @@
             <asp:PlaceHolder ID="content" runat="server"></asp:PlaceHolder>
             <br />
             <asp:CheckBox ID="packageContentSubdirs" runat="server" />
-            Include all child nodes
+            <asp:Label ID="packageContentSubdirsLabel" Text="Include all child nodes" AssociatedControlID="packageContentSubdirs" runat="server" />
         </cc2:PropertyPanel>
     </cc2:Pane>
     <cc2:Pane ID="Pane2_1" runat="server">

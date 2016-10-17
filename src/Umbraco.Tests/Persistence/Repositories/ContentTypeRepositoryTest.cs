@@ -266,6 +266,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
+                var fetched = repository.Get(contentType.Id);
+
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
@@ -281,6 +283,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Assert.AreNotEqual(propertyType.Key, Guid.Empty);
                 }
+
+                TestHelper.AssertAllPropertyValuesAreEquals(contentType, fetched, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new [] { "DefaultTemplate", "AllowedTemplates", "UpdateDate" });
             }
         }
 

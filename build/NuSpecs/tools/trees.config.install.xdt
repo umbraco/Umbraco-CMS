@@ -55,19 +55,27 @@
        xdt:Transform="SetAttributes()" />
 
   <!--Developer-->
-  <add alias="datatype" application="developer"
+  <add alias="packager" application="developer"
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="Remove" />
-  <add initialize="true" sortOrder="0" alias="datatypes" application="developer" title="Data Types" iconClosed="icon-folder" iconOpen="icon-folder" type="Umbraco.Web.Trees.DataTypeTreeController, umbraco" 
+  <add alias="packagerPackages" application="developer"
        xdt:Locator="Match(application,alias)" 
-       xdt:Transform="InsertIfMissing" />
+       xdt:Transform="Remove" />
+  <add initialize="true" sortOrder="0" alias="packager" application="developer" iconClosed="icon-folder" iconOpen="icon-folder-open" type="Umbraco.Web.Trees.PackagesTreeController, umbraco" 
+       xdt:Locator="Match(application,alias)" 
+       xdt:Transform="InsertIfMissing"  />
+  
+  <!-- Before 7.4 this tree had the alias 'dataType', without the 's' on the end, this is here to rename it  -->
+  <add sortOrder="1" alias="dataTypes" application="developer" type="Umbraco.Web.Trees.DataTypeTreeController, umbraco"
+       xdt:Locator="Match(application,type)" 
+       xdt:Transform="SetAttributes(alias,sortOrder)" />
+	   
+  <!-- Yes, set the sortOrder again, like above because.. sometimes apparently we already have a dataTypes node and we can't remove more than one.. if they're equal though (same alias,application and sortOrder) it doesn't throw an error -->   
+  <add sortOrder="1" alias="dataTypes" application="developer"
+       xdt:Locator="Match(application,alias)" 
+       xdt:Transform="SetAttributes(sortOrder)" />
+	   
   <add application="developer" alias="macros" title="Macros" type="umbraco.loadMacros, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="2" 
-       xdt:Locator="Match(application,alias)" 
-       xdt:Transform="SetAttributes()" />
-  <add application="developer" alias="packager" title="Packages" type="umbraco.loadPackager, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="3" 
-       xdt:Locator="Match(application,alias)" 
-       xdt:Transform="SetAttributes()" />
-  <add application="developer" alias="packagerPackages" title="Packager Packages" type="umbraco.loadPackages, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" initialize="false" sortOrder="3" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
   <add application="developer" alias="relationTypes" title="Relation Types" type="umbraco.loadRelationTypes, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="4" 

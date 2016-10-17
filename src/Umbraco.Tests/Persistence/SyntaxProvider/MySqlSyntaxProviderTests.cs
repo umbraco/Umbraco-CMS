@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -34,16 +35,16 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
             var indexes = SqlSyntaxContext.SqlSyntaxProvider.Format(definition.Indexes);
             var keys = SqlSyntaxContext.SqlSyntaxProvider.Format(definition.ForeignKeys);
 
-            Console.WriteLine(create);
-            Console.WriteLine(primaryKey);
+            Debug.Print(create);
+            Debug.Print(primaryKey);
             foreach (var sql in keys)
             {
-                Console.WriteLine(sql);
+                Debug.Print(sql);
             }
 
             foreach (var sql in indexes)
             {
-                Console.WriteLine(sql);
+                Debug.Print(sql);
             }
         }
 

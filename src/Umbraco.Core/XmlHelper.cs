@@ -18,6 +18,35 @@ namespace Umbraco.Core
     public class XmlHelper
     {
         /// <summary>
+        /// Creates or sets an attribute on the XmlNode if an Attributes collection is available
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <param name="n"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void SetAttribute(XmlDocument xml, XmlNode n, string name, string value)
+        {
+            if (xml == null) throw new ArgumentNullException("xml");
+            if (n == null) throw new ArgumentNullException("n");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+
+            if (n.Attributes == null)
+            {
+                return;
+            }
+            if (n.Attributes[name] == null)
+            {                
+                var a = xml.CreateAttribute(name);
+                a.Value = value;
+                n.Attributes.Append(a);
+            }
+            else
+            {
+                n.Attributes[name].Value = value;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether a specified string contains only xml whitespace characters.
         /// </summary>
         /// <param name="s">The string.</param>
@@ -210,6 +239,9 @@ namespace Umbraco.Core
             var childNodesAndOrder = parentNode.SelectNodes(childNodesXPath).Cast<XmlNode>()
                 .Select(x => Tuple.Create(x, orderBy(x))).ToArray();
 
+            // only one node = node is in the right place already, obviously
+            if (childNodesAndOrder.Length == 1) return false;
+
             // find the first node with a sortOrder > node.sortOrder
             var i = 0;
             while (i < childNodesAndOrder.Length && childNodesAndOrder[i].Item2 <= nodeSortOrder)
@@ -220,17 +252,18 @@ namespace Umbraco.Core
             {
                 // and node is just before, we're done already
                 // else we need to move it right before the node that was found
-                if (i > 0 && childNodesAndOrder[i - 1].Item1 != node)
+                if (i == 0 || childNodesAndOrder[i - 1].Item1 != node)
                 {
                     parentNode.InsertBefore(node, childNodesAndOrder[i].Item1);
                     return true;
                 }
             }
-            else
+            else // i == childNodesAndOrder.Length && childNodesAndOrder.Length > 1
             {
                 // and node is the last one, we're done already
                 // else we need to append it as the last one
-                if (i > 0 && childNodesAndOrder[i - 1].Item1 != node)
+                // (and i > 1, see above)
+                if (childNodesAndOrder[i - 1].Item1 != node)
                 {
                     parentNode.AppendChild(node);
                     return true;
@@ -334,6 +367,9 @@ namespace Umbraco.Core
         /// <returns>a XmlAttribute</returns>
         public static XmlAttribute AddAttribute(XmlDocument xd, string name, string value)
         {
+            if (xd == null) throw new ArgumentNullException("xd");
+            if (string.IsNullOrEmpty(name)) throw new ArgumentException("Value cannot be null or empty.", "name");
+
             var temp = xd.CreateAttribute(name);
             temp.Value = value;
             return temp;
@@ -348,9 +384,35 @@ namespace Umbraco.Core
         /// <returns>a XmlNode</returns>
         public static XmlNode AddTextNode(XmlDocument xd, string name, string value)
         {
+            if (xd == null) throw new ArgumentNullException("xd");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+
             var temp = xd.CreateNode(XmlNodeType.Element, name, "");
             temp.AppendChild(xd.CreateTextNode(value));
             return temp;
+        }
+
+        /// <summary>
+        /// Sets or Creates a text XmlNode with the specified name and value
+        /// </summary>
+        /// <param name="xd">The xmldocument.</param>
+        /// <param name="parent">The node to set or create the child text node on</param>
+        /// <param name="name">The node name.</param>
+        /// <param name="value">The node value.</param>
+        /// <returns>a XmlNode</returns>
+        public static XmlNode SetTextNode(XmlDocument xd, XmlNode parent, string name, string value)
+        {
+            if (xd == null) throw new ArgumentNullException("xd");
+            if (parent == null) throw new ArgumentNullException("parent");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+
+            var child = parent.SelectSingleNode(name);
+            if (child != null)
+            {
+                child.InnerText = value;
+                return child;
+            }
+            return AddTextNode(xd, name, value);
         }
 
         /// <summary>
@@ -362,9 +424,35 @@ namespace Umbraco.Core
         /// <returns>A XmlNode</returns>
 		public static XmlNode AddCDataNode(XmlDocument xd, string name, string value)
         {
+            if (xd == null) throw new ArgumentNullException("xd");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+
             var temp = xd.CreateNode(XmlNodeType.Element, name, "");
             temp.AppendChild(xd.CreateCDataSection(value));
             return temp;
+        }
+
+        /// <summary>
+        /// Sets or Creates a cdata XmlNode with the specified name and value
+        /// </summary>
+        /// <param name="xd">The xmldocument.</param>
+        /// <param name="parent">The node to set or create the child text node on</param>
+        /// <param name="name">The node name.</param>
+        /// <param name="value">The node value.</param>
+        /// <returns>a XmlNode</returns>
+        public static XmlNode SetCDataNode(XmlDocument xd, XmlNode parent, string name, string value)
+        {
+            if (xd == null) throw new ArgumentNullException("xd");
+            if (parent == null) throw new ArgumentNullException("parent");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+
+            var child = parent.SelectSingleNode(name);
+            if (child != null)
+            {
+                child.InnerXml = "<![CDATA[" + value + "]]>"; ;
+                return child;
+            }
+            return AddCDataNode(xd, name, value);
         }
 
         /// <summary>

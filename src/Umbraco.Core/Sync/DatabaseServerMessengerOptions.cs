@@ -16,6 +16,7 @@ namespace Umbraco.Core.Sync
             DaysToRetainInstructions = 2; // 2 days
             ThrottleSeconds = 5; // 5 second
             MaxProcessingInstructionCount = 1000;
+            PruneThrottleSeconds = 60; // 1 minute
         }
 
         /// <summary>
@@ -41,5 +42,10 @@ namespace Umbraco.Core.Sync
         /// The number of seconds to wait between each sync operations.
         /// </summary>
         public int ThrottleSeconds { get; set; }
+
+        /// <summary>
+        /// The number of seconds to wait between each prune operations.
+        /// </summary>
+        public int PruneThrottleSeconds { get; set; }
     }
 }
