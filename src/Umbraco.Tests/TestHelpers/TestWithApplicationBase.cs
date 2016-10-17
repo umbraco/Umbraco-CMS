@@ -148,6 +148,9 @@ namespace Umbraco.Tests.TestHelpers
             Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
 
             // register application stuff (database factory & context, services...)
+            Container.RegisterCollectionBuilder<MapperCollectionBuilder>()
+                .Add(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
+
             Container.RegisterSingleton<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
             Container.RegisterSingleton<IUmbracoDatabaseAccessor, TestUmbracoDatabaseAccessor>();
             Container.RegisterSingleton<IDatabaseFactory>(f => new DefaultDatabaseFactory(
