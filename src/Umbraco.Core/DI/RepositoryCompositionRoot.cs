@@ -101,12 +101,6 @@ namespace Umbraco.Core.DI
             // awkward but it works
             var serviceContainer = container as IServiceContainer;
             if (serviceContainer == null) throw new Exception("Container is not IServiceContainer.");
-
-            // fixme fixme fixme more - wtf?
-            // has moved to core runtime, why?
-            // register persistence mappers
-            serviceContainer.RegisterCollectionBuilder<MapperCollectionBuilder>()
-                .Add(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
         }
     }
 }
