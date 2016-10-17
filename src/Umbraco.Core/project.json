@@ -5,6 +5,7 @@
     "ImageProcessor": "2.4.*",
     "LightInject": "4.0.10",
     "LightInject.Annotation": "1.0.0.4",
+    "LightInject.Web": "1.0.0.7",
     "log4net": "2.0.5",
     "Microsoft.AspNet.Identity.Core": "2.2.1",
     "Microsoft.AspNet.Identity.Owin": "2.2.1",
