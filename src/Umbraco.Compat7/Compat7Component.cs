@@ -32,7 +32,7 @@ namespace Umbraco.Compat7
             _handlers = handlerTypes.Select(Activator.CreateInstance).Cast<IApplicationEventHandler>().ToList();
 
             foreach (var handler in _handlers)
-                logger.Debug<Compat7Component>($"ADding ApplicationEventHandler {handler.GetType().FullName}.");
+                logger.Debug<Compat7Component>($"Adding ApplicationEventHandler {handler.GetType().FullName}.");
 
             foreach (var handler in _handlers)
                 handler.OnApplicationInitialized(_app, ApplicationContext.Current);
