@@ -13,16 +13,13 @@ namespace Umbraco.Web.PropertyEditors
     {
         public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection)
         {
-            if (runtime.Level != RuntimeLevel.Run) return;
-
             var fileUpload = propertyEditors.OfType<FileUploadPropertyEditor>().FirstOrDefault();
             if (fileUpload != null) Initialize(fileUpload);
 
             var imageCropper = propertyEditors.OfType<ImageCropperPropertyEditor>().FirstOrDefault();
             if (imageCropper != null) Initialize(imageCropper);
 
-            var grid = propertyEditors.OfType<GridPropertyEditor>().FirstOrDefault();
-            if (grid != null) Initialize(grid, indexCollection);
+            // grid/examine moved to ExamineComponent
         }
 
         // as long as these methods are private+static they won't be executed by the boot loader
@@ -61,14 +58,6 @@ namespace Umbraco.Web.PropertyEditors
                 => args.Files.AddRange(imageCropper.ServiceEmptiedRecycleBin(args.AllPropertyData));
             MemberService.Deleted += (sender, args) 
                 => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-        }
-
-        private static void Initialize(GridPropertyEditor grid, IExamineIndexCollectionAccessor indexCollection)
-        {
-            var indexes = indexCollection.Indexes;
-            if (indexes == null) return;
-            foreach (var i in indexes.Values.OfType<BaseUmbracoIndexer>())
-                i.DocumentWriting += grid.DocumentWriting;
         }
     }
 }

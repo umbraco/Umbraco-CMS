@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Xml;
+using System.Threading;
 using System.Xml.Linq;
 using Examine;
 using Examine.LuceneEngine;
@@ -13,23 +13,56 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
+using Umbraco.Web.PropertyEditors;
 using UmbracoExamine;
 
 namespace Umbraco.Web.Search
 {
     /// <summary>
-    /// Used to wire up events for Examine
+    /// Configures and installs Examine.
     /// </summary>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
 	{
-		public void Initialize(ILogger logger)
+		public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection, ILogger logger)
 		{
-            logger.Info<ExamineComponent>("Initializing Examine and binding to business logic events");
+            logger.Info<ExamineComponent>("Starting initialize async background thread.");
+
+            // make it async in order not to slow down the boot
+            var bg = new Thread(() =>
+            {
+                try
+                {
+                    // from WebRuntimeComponent
+                    // rebuilds any empty indexes
+                    RebuildIndexes(true);
+                }
+                catch (Exception e)
+                {
+                    logger.Error<ExamineComponent>("Failed to rebuild empty indexes.", e);
+                }
+
+                try
+                {
+                    // from PropertyEditorsComponent
+                    var grid = propertyEditors.OfType<GridPropertyEditor>().FirstOrDefault();
+                    if (grid != null) BindGridToExamine(grid, indexCollection);
+                }
+                catch (Exception e)
+                {
+                    logger.Error<ExamineComponent>("Failed to bind grid property editor.", e);
+                }
+            });
+		    bg.Start();
+
+            // the rest is the original Examine event handler
+
+            logger.Info<ExamineComponent>("Initialize and bind to business logic events.");
 
             //TODO: For now we'll make this true, it means that indexes will be near real time
             // we'll see about what implications this may have - should be great in most scenarios
@@ -38,7 +71,7 @@ namespace Umbraco.Web.Search
 			var registeredProviders = ExamineManager.Instance.IndexProviderCollection
 				.OfType<BaseUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
 
-            logger.Info<ExamineComponent>("Adding examine event handlers for index providers: {0}", () => registeredProviders);
+            logger.Info<ExamineComponent>($"Adding examine event handlers for {registeredProviders} index providers.");
 
 			// don't bind event handlers if we're not suppose to listen
 			if (registeredProviders == 0)
@@ -62,7 +95,25 @@ namespace Umbraco.Web.Search
 			}
 		}
 
-	    static void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
+        private static void RebuildIndexes(bool onlyEmptyIndexes)
+        {
+            var indexers = (IEnumerable<KeyValuePair<string, IExamineIndexer>>)ExamineManager.Instance.IndexProviders;
+            if (onlyEmptyIndexes)
+                indexers = indexers.Where(x => x.Value.IsIndexNew());
+            foreach (var indexer in indexers)
+                indexer.Value.RebuildIndex();
+        }
+
+
+        private static void BindGridToExamine(GridPropertyEditor grid, IExamineIndexCollectionAccessor indexCollection)
+        {
+            var indexes = indexCollection.Indexes;
+            if (indexes == null) return;
+            foreach (var i in indexes.Values.OfType<BaseUmbracoIndexer>())
+                i.DocumentWriting += grid.DocumentWriting;
+        }
+
+        static void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
 	    {
             switch (args.MessageType)
             {
