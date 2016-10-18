@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Globalization;
 using System.IO;
+using System.Web.Security;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -44,7 +45,8 @@ namespace Umbraco.Web.Routing
             ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
             ServiceContext services,
-            ProfilingLogger proflog)
+            ProfilingLogger proflog,
+            Func<string, IEnumerable<string>> getRolesForLogin = null)
 		{
 	        if (webRoutingSection == null) throw new ArgumentNullException(nameof(webRoutingSection)); // fixme usage?
 
@@ -58,10 +60,11 @@ namespace Umbraco.Web.Routing
             _services = services;
             _profilingLogger = proflog;
 		    _logger = proflog.Logger;
+
+		    GetRolesForLogin = getRolesForLogin ?? (s => Roles.Provider.GetRolesForUser(s));
 		}
 
-        // fixme
-	    private Func<string, IEnumerable<string>> GetRolesForLogin;
+	    private Func<string, IEnumerable<string>> GetRolesForLogin { get; }
 
 	    public PublishedContentRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
 	    {
