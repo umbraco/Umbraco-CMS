@@ -4,7 +4,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
-using System.Xml;
 using Umbraco.Core.IO;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
@@ -16,6 +15,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using System.Text;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Editors
 {
@@ -30,85 +30,79 @@ namespace Umbraco.Web.Editors
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
-        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
-            var ctx = UmbracoContext.Current;
-            if (ctx == null)
-                throw new HttpResponseException(System.Net.HttpStatusCode.InternalServerError);
-            
+            var context = UmbracoContext.Current;
+            if (context == null)
+                throw new HttpResponseException(HttpStatusCode.InternalServerError);
+
             var user = Security.CurrentUser;
             var userType = user.UserType.Alias;
             var allowedSections = string.Join(",", user.AllowedSections);
-            var lang = user.Language;
+            var language = user.Language;
             var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
-            var url = string.Format(baseUrl+"{0}?section={0}&type={1}&allowed={2}&lang={3}&version={4}", section, userType, allowedSections, lang, version);
-            var key = "umb-dyn-dash-" + userType + lang + allowedSections + section;
+            var url = string.Format(baseUrl + "{0}?section={0}&type={1}&allowed={2}&lang={3}&version={4}", section, userType, allowedSections, language, version);
+            var key = "umbraco-dynamic-dashboard-" + userType + language + allowedSections.Replace(",", "-") + section;
+            var timeSpan = new TimeSpan(0, 30, 0);
 
-            //look to see if we already have a requested result in the cache.
-            var content = ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<JObject>(key);
-            if (content != null)
-                return content;
-            try
-            {
-                var web = new HttpClient();
+            return ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem(key,
+                async () =>
+                {
+                    try
+                    {
+                        using (var web = new HttpClient())
+                        {
+                            //fetch dashboard json and parse to JObject
+                            var json = await web.GetStringAsync(url);
+                            return JObject.Parse(json);
+                        }
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        LogHelper.Debug<DashboardControl>(string.Format("Error getting dashboard content from '{0}': {1}\n{2}", url, ex.Message, ex.InnerException));
 
-                //fetch dashboard json and parse to JObject
-                var json = await web.GetStringAsync(url);
-                content = JObject.Parse(json);
-                
-                //save server content for 30 mins
-                ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => content, timeout: new TimeSpan(0, 30, 0));
-            }
-            catch (Exception ex)
-            {
-                //set the content to an empty result and cache for 5 mins
-                //we return it like this, we avoid error codes which triggers UI warnings
-
-                content = new JObject();
-                ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => content, timeout: new TimeSpan(0, 5, 0));
-            }
-
-            return content;
+                        //set the content to an empty result and cache for 5 mins
+                        //we return it like this, we avoid error codes which triggers UI warnings
+                        timeSpan = new TimeSpan(0, 5, 0);
+                        return new JObject();
+                    }
+                }, timeSpan);
         }
 
         [WebApi.UmbracoAuthorize]
-        public async Task<HttpResponseMessage> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public Task<HttpResponseMessage> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
-            var cssUrl = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
-            var key = "umb-dyn-dash-css-" + section;
+            var url = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
+            var key = "umbraco-dynamic-dashboard-css-" + section;
+            var timeSpan = new TimeSpan(0, 30, 0);
 
-            //look to see if we already have a requested result in the cache.
-            var content = ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<string>(key);
-
-            //else fetch remotely
-            if (content == null)
-            {
-                try
+            return ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem(key,
+                async () =>
                 {
-                    var web = new HttpClient();
+                    try
+                    {
+                        using (var web = new HttpClient())
+                        {
+                            //fetch remote css
+                            return new HttpResponseMessage(HttpStatusCode.OK)
+                            {
+                                Content = new StringContent(await web.GetStringAsync(url), Encoding.UTF8, "text/css")
+                            };
+                        }
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        LogHelper.Debug<DashboardControl>(string.Format("Error getting dashboard CSS from '{0}': {1}\n{2}", url, ex.Message, ex.InnerException));
 
-                    //fetch remote css
-                    content = await web.GetStringAsync(cssUrl);
-
-                    //save server content for 30 mins
-                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => content, timeout: new TimeSpan(0, 30, 0));
-                }
-                catch (Exception ex)
-                {
-                    //set the content to an empty result and cache for 5 mins
-                    //we return it like this, we avoid error codes which triggers UI warnings
-
-                    content = string.Empty;
-                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => content, timeout: new TimeSpan(0, 5, 0));
-                }
-            }
-
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(content, Encoding.UTF8, "text/css")
-            };
-            
+                        //we return it like this, we avoid error codes which triggers UI warnings
+                        timeSpan = new TimeSpan(0, 5, 0);
+                        return new HttpResponseMessage(HttpStatusCode.OK)
+                        {
+                            Content = new StringContent(string.Empty, Encoding.UTF8, "text/css")
+                        };
+                    }
+                }, timeSpan);
         }
 
 
@@ -123,50 +117,47 @@ namespace Umbraco.Web.Editors
             foreach( var dashboardSection in UmbracoConfig.For.DashboardSettings().Sections.Where(x => x.Areas.Contains(section)))
             {
                 //we need to validate access to this section
-                if (DashboardSecurity.AuthorizeAccess(dashboardSection, Security.CurrentUser, Services.SectionService))
+                if (DashboardSecurity.AuthorizeAccess(dashboardSection, Security.CurrentUser, Services.SectionService) == false)
+                    continue;
+
+                //User is authorized
+                foreach (var tab in dashboardSection.Tabs)
                 {
-                    //User is authorized
-                    foreach (var dashTab in dashboardSection.Tabs)
+                    //we need to validate access to this tab
+                    if (DashboardSecurity.AuthorizeAccess(tab, Security.CurrentUser, Services.SectionService) == false)
+                        continue;
+
+                    var dashboardControls = new List<DashboardControl>();
+
+                    foreach (var control in tab.Controls)
                     {
-                        //we need to validate access to this tab
-                        if (DashboardSecurity.AuthorizeAccess(dashTab, Security.CurrentUser, Services.SectionService))
-                        {
-                            var props = new List<DashboardControl>();
+                        if (DashboardSecurity.AuthorizeAccess(control, Security.CurrentUser, Services.SectionService) == false)
+                            continue;
 
-                            foreach (var dashCtrl in dashTab.Controls)
-                            {
-                                if (DashboardSecurity.AuthorizeAccess(dashCtrl, Security.CurrentUser,
-                                                                      Services.SectionService))
-                                {
-                                    var ctrl = new DashboardControl();
-                                    var controlPath = dashCtrl.ControlPath.Trim(' ', '\r', '\n');
-                                    ctrl.Path = IOHelper.FindFile(controlPath);
-                                    if (controlPath.ToLower().EndsWith(".ascx"))
-                                    {
-                                        ctrl.ServerSide = true;
-                                    }
-                                    props.Add(ctrl);
-                                }
-                            }
+                        var dashboardControl = new DashboardControl();
+                        var controlPath = control.ControlPath.Trim();
+                        dashboardControl.Path = IOHelper.FindFile(controlPath);
+                        if (controlPath.ToLowerInvariant().EndsWith(".ascx".ToLowerInvariant()))
+                            dashboardControl.ServerSide = true;
 
-                            tabs.Add(new Tab<DashboardControl>
-                                {
-                                    Id = i,
-                                    Alias = dashTab.Caption.ToSafeAlias(),
-                                    IsActive = i == 1,
-                                    Label = dashTab.Caption,
-                                    Properties = props
-                                });
-                            i++;
-                        }
+                        dashboardControls.Add(dashboardControl);
                     }
+
+                    tabs.Add(new Tab<DashboardControl>
+                    {
+                        Id = i,
+                        Alias = tab.Caption.ToSafeAlias(),
+                        IsActive = i == 1,
+                        Label = tab.Caption,
+                        Properties = dashboardControls
+                    });
+
+                    i++;
                 }
             }
 
             //In case there are no tabs or a user doesn't have access the empty tabs list is returned
             return tabs;
-
         }
-
     }
 }
