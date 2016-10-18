@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Web
         [Test]
         public void RouteDataExtensions_GetUmbracoContext()
         {
-            var umbCtx = UmbracoContext.CreateContext(
+            var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_RouteValues()
         {
-            var umbCtx = UmbracoContext.CreateContext(
+            var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_Current()
         {
-            var umbCtx = UmbracoContext.CreateContext(
+            var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Web
             var ctx3 = CreateViewContext(new ControllerContext(httpContext, r3, new MyController()));
 
             Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
-            Current.SetUmbracoContext(umbCtx, true);
+            Current.UmbracoContextAccessor.UmbracoContext = umbCtx;
 
             var result = ctx3.GetUmbracoContext();
 

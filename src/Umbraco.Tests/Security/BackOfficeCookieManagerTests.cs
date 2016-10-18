@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Security
             //should force app ctx to show not-configured
             ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", "");
 
-            var umbracoContext = UmbracoContext.CreateContext(
+            var umbracoContext = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Security
         [Test]
         public void ShouldAuthenticateRequest_When_Configured()
         {
-            var umbCtx = UmbracoContext.CreateContext(
+            var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),

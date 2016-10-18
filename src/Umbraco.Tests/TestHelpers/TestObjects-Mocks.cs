@@ -95,7 +95,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         /// <returns>An Umbraco context.</returns>
         /// <remarks>This should be the minimum Umbraco context.</remarks>
-        public static UmbracoContext GetUmbracoContextMock()
+        public static UmbracoContext GetUmbracoContextMock(IUmbracoContextAccessor accessor = null)
         {
             var httpContext = Mock.Of<HttpContextBase>();
 
@@ -111,10 +111,8 @@ namespace Umbraco.Tests.TestHelpers
             var settings = GetUmbracoSettings();
             var urlProviders = Enumerable.Empty<IUrlProvider>();
 
-            // fixme
-            // sort out Create vs New vs Ensure...
-
-            return UmbracoContext.EnsureContext(httpContext, facadeService, webSecurity, settings, urlProviders, true);
+            if (accessor == null) accessor = new TestUmbracoContextAccessor();
+            return UmbracoContext.EnsureContext(accessor, httpContext, facadeService, webSecurity, settings, urlProviders, true);
         }
 
         public static IUmbracoSettingsSection GetUmbracoSettings()

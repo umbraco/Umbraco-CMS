@@ -27,7 +27,7 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
 
             var umbracoContext = GetUmbracoContext("/test");
-            Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);            
+            Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
         }
 
         protected override void MoreSetUp()

@@ -64,14 +64,14 @@ namespace Umbraco.Tests.PublishedContent
             facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
-            var umbracoContext = UmbracoContext.CreateContext(
+            var umbracoContext = new UmbracoContext(
                 httpContext,
                 facadeService.Object,
                 new WebSecurity(httpContext, Current.Services.UserService),
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>());
 
-            Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);
+            Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
         }
 
         public override void TearDown()

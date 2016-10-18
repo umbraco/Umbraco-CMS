@@ -34,6 +34,9 @@ namespace Umbraco.Web
         // Init(). works for dependencies that are singletons.
 
         [Inject]
+        public IUmbracoContextAccessor UmbracoContextAccessor { get; set; }
+
+        [Inject]
         public IFacadeService FacadeService { get; set; }
 
         [Inject]
@@ -67,16 +70,16 @@ namespace Umbraco.Web
         private void BeginRequest(HttpContextBase httpContext)
 		{
             // ensure application url is initialized
-            ((RuntimeState)Current.RuntimeState).EnsureApplicationUrl(httpContext.Request);
+            ((RuntimeState) Current.RuntimeState).EnsureApplicationUrl(httpContext.Request);
 
             // do not process if client-side request
 			if (httpContext.Request.Url.IsClientSideRequest())
 				return;
 
-			//write the trace output for diagnostics at the end of the request
+			// write the trace output for diagnostics at the end of the request
 			httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 
-            // ok, process
+            // process
 
             // create the LegacyRequestInitializer
             // and initialize legacy stuff
@@ -84,9 +87,10 @@ namespace Umbraco.Web
             legacyRequestInitializer.InitializeRequest();
 
             // create the UmbracoContext singleton, one per request, and assign
-            // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)
+            // replace existing if any (eg during app startup, a temp one is created)
 		    UmbracoContext.EnsureContext(
-		        httpContext,
+                UmbracoContextAccessor,
+                httpContext,
                 FacadeService,
 		        new WebSecurity(httpContext, UserService),
 		        UmbracoConfig.For.UmbracoSettings(),

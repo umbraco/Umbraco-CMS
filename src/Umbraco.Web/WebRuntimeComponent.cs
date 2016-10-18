@@ -179,7 +179,10 @@ namespace Umbraco.Web
             IRuntimeState runtime,
             IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
-            UmbracoApiControllerTypeCollection apiControllerTypes)
+            UmbracoApiControllerTypeCollection apiControllerTypes,
+            IFacadeService facadeService,
+            IUserService userService,
+            UrlProviderCollection urlProviders)
         {
             // setup mvc and webapi services
             SetupMvcAndWebApi();
@@ -218,19 +221,19 @@ namespace Umbraco.Web
             CreateRoutes(umbracoContextAccessor, surfaceControllerTypes, apiControllerTypes);
 
             // get an http context
-            // fixme - although HttpContext.Current is NOT null during Application_Start
-            //         it does NOT have a request and therefore no request ...
+            // at that moment, HttpContext.Current != null but its .Request property is null
             var httpContext = new HttpContextWrapper(HttpContext.Current);
 
-            //before we do anything, we'll ensure the umbraco context
-            //see: http://issues.umbraco.org/issue/U4-1717
-            UmbracoContext.EnsureContext( // fixme - refactor! UmbracoContext & UmbracoRequestContext! + inject, accessor, etc
-                httpContext,
-                Current.FacadeService, // fixme inject! stop using current here!
-                new WebSecurity(httpContext, Current.Services.UserService),// fixme inject! stop using current here!
+            // ensure there is an UmbracoContext
+            // (also sets the accessor)
+            // this is a *temp* UmbracoContext
+            UmbracoContext.EnsureContext(
+                umbracoContextAccessor,
+                new HttpContextWrapper(HttpContext.Current),
+                facadeService,
+                new WebSecurity(httpContext, userService),
                 UmbracoConfig.For.UmbracoSettings(),
-                Current.UrlProviders,// fixme inject! stop using current here!
-                false);
+                urlProviders);
 
             // rebuild any empty indexes
             // do we want to make this optional? otherwise the only way to disable this on startup

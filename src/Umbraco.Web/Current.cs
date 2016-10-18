@@ -35,7 +35,6 @@ namespace Umbraco.Web
         private static readonly object Locker = new object();
 
         private static IUmbracoContextAccessor _umbracoContextAccessor;
-        private static IFacadeAccessor _facadeAccessor;
 
         static Current()
         {
@@ -44,7 +43,6 @@ namespace Umbraco.Web
                 if (_umbracoContextAccessor != null)
                     ClearUmbracoContext();
                 _umbracoContextAccessor = null;
-                _facadeAccessor = null;
             };
         }
 
@@ -57,37 +55,10 @@ namespace Umbraco.Web
         private static ServiceContainer Container
             => CoreCurrent.Container;
 
-        // Facade
-        //
-        // is managed by the FacadeAccessor
-        //
-        // have to support setting the accessor directly (vs container) for tests
-        // fixme - not sure about this - should tests use a container?
+        #region Temp & Special
 
-        public static IFacadeAccessor FacadeAccessor
-        {
-            get
-            {
-                if (_facadeAccessor != null) return _facadeAccessor;
-                return _facadeAccessor = Container.GetInstance<IFacadeAccessor>();
-            }
-            set { _facadeAccessor = value; } // for tests
-        }
-
-        // UmbracoContext
-        //
-        // is managed by the UmbracoContext Acceesor
-        //
-        // have to support setting the accessor directly (vs container) for tests
-        // fixme - note sure about this - should tests use a container?
-        //
-        // have to support setting it for now, because of 'ensure umbraco context' which can create
-        // contexts pretty much at any time and in an uncontrolled way - and when we do not have
-        // proper access to the accessor.
-        //
-        // have to support clear, because of the weird mixed accessor we're using that can
-        // store things in thread-static var that need to be cleared, else it retains rogue values.
-
+        // fixme - have to keep this until tests are refactored
+        // but then, it should all be managed properly in the container
         public static IUmbracoContextAccessor UmbracoContextAccessor
         {
             get
@@ -98,20 +69,9 @@ namespace Umbraco.Web
             set { _umbracoContextAccessor = value; } // for tests
         }
 
-        public static UmbracoContext UmbracoContext
-            => UmbracoContextAccessor.UmbracoContext;
-
-        public static void SetUmbracoContext(UmbracoContext value, bool canReplace)
-        {
-            lock (Locker)
-            {
-                if (UmbracoContextAccessor.UmbracoContext != null && canReplace == false)
-                    throw new InvalidOperationException("Current UmbracoContext can be set only once per request.");
-                UmbracoContextAccessor.UmbracoContext?.Dispose(); // dispose the one that is being replaced, if any
-                UmbracoContextAccessor.UmbracoContext = value;
-            }
-        }
-
+        // clears the "current" umbraco context
+        // at the moment the "current" umbraco context can end up being disposed and should get cleared
+        // in the accessor - this should be done differently but for the time being we have to support it
         public static void ClearUmbracoContext()
         {
             lock (Locker)
@@ -121,10 +81,15 @@ namespace Umbraco.Web
             }
         }
 
+        #endregion
+
         #region Web Getters
 
+        public static UmbracoContext UmbracoContext
+            => UmbracoContextAccessor.UmbracoContext;
+
         public static IFacade Facade
-            => FacadeAccessor.Facade;
+            => Container.GetInstance<IFacadeAccessor>().Facade;
 
         public static EventMessages EventMessages
             => Container.GetInstance<IEventMessagesFactory>().GetOrDefault();

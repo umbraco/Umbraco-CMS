@@ -420,7 +420,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 
-            var ctx = UmbracoContext.CreateContext(
+            var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
                 _service,
                 new WebSecurity(http, Current.Services.UserService),

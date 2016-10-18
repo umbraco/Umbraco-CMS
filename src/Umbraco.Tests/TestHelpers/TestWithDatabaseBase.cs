@@ -434,7 +434,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
 
-            var umbracoContext = UmbracoContext.CreateContext(
+            var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
                 new WebSecurity(httpContext, Core.DI.Current.Services.UserService),
@@ -442,7 +442,7 @@ namespace Umbraco.Tests.TestHelpers
                 urlProviders ?? Enumerable.Empty<IUrlProvider>());
 
             if (setSingleton)
-                Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);
+                Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
 
             return umbracoContext;
         }

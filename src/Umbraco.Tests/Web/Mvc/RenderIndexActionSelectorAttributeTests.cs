@@ -60,6 +60,7 @@ namespace Umbraco.Tests.Web.Mvc
             //    CacheHelper.CreateDisabledCacheHelper(),
             //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.EnsureContext(
+                Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
@@ -79,10 +80,8 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
-            //var appCtx = new ApplicationContext(
-            //    CacheHelper.CreateDisabledCacheHelper(),
-            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.EnsureContext(
+                Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
@@ -102,10 +101,8 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
-            //var appCtx = new ApplicationContext(
-            //    CacheHelper.CreateDisabledCacheHelper(),
-            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.EnsureContext(
+                Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
@@ -125,10 +122,8 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
-            //var appCtx = new ApplicationContext(
-            //    CacheHelper.CreateDisabledCacheHelper(),
-            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.EnsureContext(
+                Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,

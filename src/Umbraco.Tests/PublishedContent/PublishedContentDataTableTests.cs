@@ -59,7 +59,7 @@ namespace Umbraco.Tests.PublishedContent
 			var umbracoContext = GetUmbracoContext("/test");
 
             //set the UmbracoContext.Current since the extension methods rely on it
-            Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);
+            Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
         }
 
 		public override void TearDown()

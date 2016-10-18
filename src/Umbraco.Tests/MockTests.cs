@@ -57,7 +57,7 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Mock_Umbraco_Context()
         {
-            var umbracoContext = TestObjects.GetUmbracoContextMock();
+            var umbracoContext = TestObjects.GetUmbracoContextMock(Current.UmbracoContextAccessor);
             Assert.AreEqual(umbracoContext, UmbracoContext.Current);
         }
 
@@ -100,7 +100,7 @@ namespace Umbraco.Tests
             var urlProvider = urlProviderMock.Object;
 
             var theUrlProvider = new UrlProvider(umbracoContext, new [] { urlProvider });
-            
+
             Assert.AreEqual("/hello/world/1234", theUrlProvider.GetUrl(1234));
         }
     }

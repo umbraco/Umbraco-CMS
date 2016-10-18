@@ -48,7 +48,7 @@ namespace Umbraco.Tests
                     .PropertyTypes.Count());
             
             var umbracoContext = GetUmbracoContext("/test");
-            Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);
+            Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
 		}
 
 	    /// <summary>

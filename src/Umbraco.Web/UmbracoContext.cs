@@ -22,26 +22,27 @@ namespace Umbraco.Web
         #region Ensure Context
 
         /// <summary>
-        /// This is a helper method which is called to ensure that the singleton context is created
+        /// Ensures that there is a "current" UmbracoContext.
         /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="facadeService"></param>
-        /// <param name="webSecurity"></param>
-        /// <param name="umbracoSettings"></param>
-        /// <param name="urlProviders"></param>
-        /// <param name="replaceContext">
-        /// if set to true will replace the current singleton with a new one, this is generally only ever used because
-        /// during application startup the base url domain will not be available so after app startup we'll replace the current
-        /// context with a new one in which we can access the httpcontext.Request object.
-        /// </param>
-        /// <returns>
-        /// The Singleton context object
-        /// </returns>
+        /// <param name="httpContext">An http context.</param>
+        /// <param name="facadeService">A facade service.</param>
+        /// <param name="webSecurity">A security helper.</param>
+        /// <param name="umbracoSettings">The umbraco settings.</param>
+        /// <param name="urlProviders">Some url providers.</param>
+        /// <param name="replace">A value indicating whether to replace the existing context.</param>
+        /// <returns>The "current" UmbracoContext.</returns>
         /// <remarks>
-        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
-        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
-        /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        /// fixme - this needs to be clarified
+        ///
+        /// If <paramref name="replace"/> is true then the "current" UmbracoContext is replaced
+        /// with a new one even if there is one already. See <see cref="WebRuntimeComponent"/>. Has to do with
+        /// creating a context at startup and not being able to access httpContext.Request at that time, so
+        /// the OriginalRequestUrl remains unspecified until <see cref="UmbracoModule"/> replaces the context.
+        ///
+        /// This *has* to be done differently!
+        ///
+        /// See http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        ///
         /// </remarks>
         // used by
         // UmbracoModule BeginRequest (since it's a request it has an UmbracoContext)
@@ -55,64 +56,48 @@ namespace Umbraco.Web
         // and tests
         // can .ContentRequest be null? of course!
         public static UmbracoContext EnsureContext(
+            IUmbracoContextAccessor umbracoContextAccessor,
             HttpContextBase httpContext,
             IFacadeService facadeService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
-            bool replaceContext)
+            bool replace = false)
         {
+            if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
 
             // if there is already a current context, return if not replacing
-            var umbracoContext = Web.Current.UmbracoContext;
-            if (umbracoContext != null && replaceContext == false)
-                return umbracoContext;
+            var current = umbracoContextAccessor.UmbracoContext;
+            if (current != null && replace == false)
+                return current;
 
-            // create, assign the singleton, and return
-            umbracoContext = CreateContext(httpContext, facadeService, webSecurity, umbracoSettings, urlProviders);
-            // fixme... ?!
-            Web.Current.SetUmbracoContext(umbracoContext, replaceContext); // will dispose the one that is being replaced
-            return umbracoContext;
+            // create & assign to accessor, dispose existing if any
+            umbracoContextAccessor.UmbracoContext?.Dispose();
+            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, facadeService, webSecurity, umbracoSettings, urlProviders);
         }
 
-        /// <summary>
-        /// Creates a standalone UmbracoContext instance
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="facadeService"></param>
-        /// <param name="webSecurity"></param>
-        /// <param name="umbracoSettings"></param>
-        /// <param name="urlProviders"></param>
-        /// <returns>
-        /// A new instance of UmbracoContext
-        /// </returns>
-        // internal for tests
-        internal static UmbracoContext CreateContext(
-            HttpContextBase httpContext,
-            IFacadeService facadeService,
-            WebSecurity webSecurity,
-            IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders)
-        {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
-            if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
-            if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
-
-            return new UmbracoContext(httpContext, facadeService, webSecurity, umbracoSettings, urlProviders);
-        }
-
-        private UmbracoContext(
+        // initializes a new instance of the UmbracoContext class
+        // internal for unit tests
+        // otherwise it's used by EnsureContext above
+        // warn: does *not* manage setting any IUmbracoContextAccessor
+        internal UmbracoContext(
 			HttpContextBase httpContext,
             IFacadeService facadeService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders)
         {
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
+            if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
+            if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
+            if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
+
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
             //
@@ -123,11 +108,8 @@ namespace Umbraco.Web
             // it is ok and it will be actually disposed only once.
             httpContext.DisposeOnPipelineCompleted(this);
 
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
-
             HttpContext = httpContext;
             Security = webSecurity;
 
@@ -143,7 +125,6 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
-
             UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders);
         }
 
@@ -327,7 +308,7 @@ namespace Umbraco.Web
 
             // reset - important when running outside of http context
             // also takes care of the accessor
-            Web.Current.SetUmbracoContext(null, true);
+            Web.Current.ClearUmbracoContext();
 
             // help caches release resources
             // (but don't create caches just to dispose them)

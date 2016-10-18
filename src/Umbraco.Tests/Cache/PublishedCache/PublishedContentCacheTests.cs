@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 		    var facadeService = new Mock<IFacadeService>();
 		    facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
 
-		    _umbracoContext = UmbracoContext.CreateContext(
+		    _umbracoContext = new UmbracoContext(
 		        _httpContextFactory.HttpContext,
 		        facadeService.Object,
 		        new WebSecurity(_httpContextFactory.HttpContext, Current.Services.UserService),

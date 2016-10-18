@@ -33,6 +33,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void Can_Construct_And_Get_Result()
         {
             var umbracoContext = UmbracoContext.EnsureContext(
+                Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
@@ -50,13 +51,8 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Umbraco_Context_Not_Null()
         {
-            //var appCtx = new ApplicationContext(
-            //    CacheHelper.CreateDisabledCacheHelper(),
-            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-
-            //Current.ApplicationContext = appCtx; // FIXME horrible
-
             var umbCtx = UmbracoContext.EnsureContext(
+                Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
@@ -73,6 +69,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void Umbraco_Helper_Not_Null()
         {
             var umbracoContext = UmbracoContext.EnsureContext(
+                Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
@@ -96,6 +93,7 @@ namespace Umbraco.Tests.Web.Mvc
             facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade.Object);
 
             var umbracoContext = UmbracoContext.EnsureContext(
+                Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 facadeService.Object,
                 new Mock<WebSecurity>(null, null).Object,
@@ -130,6 +128,7 @@ namespace Umbraco.Tests.Web.Mvc
             var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "AutoLegacy");
 
             var umbracoContext = UmbracoContext.EnsureContext(
+                Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
