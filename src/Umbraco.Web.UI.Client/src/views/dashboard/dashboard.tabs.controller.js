@@ -192,27 +192,43 @@ function startupLatestEditsController($scope) {
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupLatestEditsController", startupLatestEditsController);
 
-function MediaFolderBrowserDashboardController($rootScope, $scope, contentTypeResource) {
+function MediaFolderBrowserDashboardController($rootScope, $scope, $location, contentTypeResource, userService) {
 
-    //get the system media listview
-    contentTypeResource.getPropertyTypeScaffold(-96)
-        .then(function(dt) {
+    var currentUser = {};
 
-            $scope.fakeProperty = {
-                alias: "contents",
-                config: dt.config,
-                description: "",
-                editor: dt.editor,
-                hideLabel: true,
-                id: 1,
-                label: "Contents:",
-                validation: {
-                    mandatory: false,
-                    pattern: null
-                },
-                value: "",
-                view: dt.view
-            };
+    userService.getCurrentUser().then(function (user) {
+
+        currentUser = user;
+
+        // check if the user start node is the dashboard
+        if(currentUser.startMediaId === -1) {
+
+            //get the system media listview
+            contentTypeResource.getPropertyTypeScaffold(-96)
+                .then(function(dt) {
+
+                    $scope.fakeProperty = {
+                        alias: "contents",
+                        config: dt.config,
+                        description: "",
+                        editor: dt.editor,
+                        hideLabel: true,
+                        id: 1,
+                        label: "Contents:",
+                        validation: {
+                            mandatory: false,
+                            pattern: null
+                        },
+                        value: "",
+                        view: dt.view
+                    };
+
+            });
+
+        } else {
+            // redirect to start node
+            $location.path("/media/media/edit/" + currentUser.startMediaId);
+        }
 
     });
 

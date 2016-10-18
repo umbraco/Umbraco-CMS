@@ -921,7 +921,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
-    <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
+    <Compile Include="Strategies\Migrations\RebuildXmlCachesAfterUpgrade.cs" />
     <Compile Include="Strategies\PublicAccessEventHandler.cs" />
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />

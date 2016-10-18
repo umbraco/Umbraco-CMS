@@ -44,17 +44,15 @@
       <div ng-if="currentCell" style="padding-bottom: 50px;">
 
           <umb-control-group label="@general_width">
-             <div class="grid-size-scaler" >
-                  <div class="grid-size-scaler">
-                      <a href ng-click="scaleDown(currentCell)">
-                          <i class="icon icon-remove"></i>
-                      </a>
+              <div class="grid-size-scaler">
+                  <a href ng-click="scaleDown(currentCell)">
+                      <i class="icon icon-remove"></i>
+                  </a>
                       {{currentCell.grid}}
-                      <a href ng-click="scaleUp(currentCell, availableRowSpace, true)">
-                          <i class="icon icon-add"></i>
-                      </a>
-                  </div>
-             </div>
+                  <a href ng-click="scaleUp(currentCell, availableRowSpace, true)">
+                      <i class="icon icon-add"></i>
+                  </a>
+              </div>
           </umb-control-group>
 
 	  	  <umb-control-group hide-label="true">
