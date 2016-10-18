@@ -4,13 +4,13 @@ using Umbraco.Web.Search.Factory;
 
 namespace Umbraco.Web.Search
 {
-    public class UmbracoSearcherResolver
+    public class UmbracoTreeSearcherResolver
     {
-        public static IUmbracoSearcher GetInstance(UmbracoHelper umbracoHelper)
+        public static IUmbracoTreeSearcher GetInstance(UmbracoHelper umbracoHelper)
         {
             try
             {
-                var section = ConfigurationManager.GetSection("UmbracoSearcherFactorySection") as UmbracoSearcherFactorySection;
+                var section = ConfigurationManager.GetSection("UmbracoTreeSearcherFactory") as UmbracoTreeSearcherFactory;
 
                 if (section != null)
                 {
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Search
                     if (type != null)
                     {
                         var factory = Activator.CreateInstance(type);
-                        var searcherFactory = factory as IUmbracoSearcherFactory;
+                        var searcherFactory = factory as IUmbracoTreeSearcherFactory;
 
                         if (searcherFactory != null)
                         {
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Search
                 // ToDo: Log or throw ex??
             }
 
-            return new ExamineSearcher(umbracoHelper);
+            return new ExamineTreeSearcher(umbracoHelper);
         }
     }
 }

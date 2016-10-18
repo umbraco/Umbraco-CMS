@@ -4,7 +4,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Search
 {
-    public interface IUmbracoSearcher
+    public interface IUmbracoTreeSearcher
     {
         IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes entityType, IUser user);
 

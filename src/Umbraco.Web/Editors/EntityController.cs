@@ -27,11 +27,11 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
-        private readonly IUmbracoSearcher _umbracoSearcher;
+        private readonly IUmbracoTreeSearcher _umbracoTreeSearcher;
 
         public EntityController()
         {
-            _umbracoSearcher = UmbracoSearcherResolver.GetInstance(Umbraco);
+            _umbracoTreeSearcher = UmbracoTreeSearcherResolver.GetInstance(Umbraco);
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private IEnumerable<EntityBasic> SearchByUmbracoSearcher(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
-            return _umbracoSearcher.Search(query, entityType, Security.CurrentUser, searchFrom);
+            return _umbracoTreeSearcher.Search(query, entityType, Security.CurrentUser, searchFrom);
         }
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)

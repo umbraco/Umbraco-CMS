@@ -13,11 +13,11 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Search
 {
-    public class ExamineSearcher : IUmbracoSearcher
+    public class ExamineTreeSearcher : IUmbracoTreeSearcher
     {
         private readonly UmbracoHelper _umbracoHelper;
 
-        internal ExamineSearcher(UmbracoHelper umbracoHelper)
+        internal ExamineTreeSearcher(UmbracoHelper umbracoHelper)
         {
             _umbracoHelper = umbracoHelper;
         }
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Search
                     }
                     break;
                 default:
-                    throw new NotSupportedException("The " + typeof(ExamineSearcher) + " currently does not support searching against object type " + entityType);
+                    throw new NotSupportedException("The " + typeof(ExamineTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
 
             var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
