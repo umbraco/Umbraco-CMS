@@ -11,10 +11,10 @@ using System.Net.Http;
 using System.Web.Http;
 using System;
 using System.Net;
+using System.Text;
 using Umbraco.Core.Cache;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using System.Text;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Editors
@@ -25,12 +25,12 @@ namespace Umbraco.Web.Editors
     [ValidationFilter]
     [AngularJsonOnlyConfiguration]
     [IsBackOffice]
+    [WebApi.UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
     {
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
-        [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
-        public Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
             var context = UmbracoContext.Current;
             if (context == null)
@@ -44,69 +44,84 @@ namespace Umbraco.Web.Editors
 
             var url = string.Format(baseUrl + "{0}?section={0}&type={1}&allowed={2}&lang={3}&version={4}", section, userType, allowedSections, language, version);
             var key = "umbraco-dynamic-dashboard-" + userType + language + allowedSections.Replace(",", "-") + section;
-            var timeSpan = new TimeSpan(0, 30, 0);
 
-            return ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem(key,
-                async () =>
+            var content = ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<JObject>(key);
+            var result = new JObject();
+            if (content != null)
+            {
+                result = content;
+            }
+            else
+            {
+                //content is null, go get it
+                try
                 {
-                    try
+                    using (var web = new HttpClient())
                     {
-                        using (var web = new HttpClient())
-                        {
-                            //fetch dashboard json and parse to JObject
-                            var json = await web.GetStringAsync(url);
-                            return JObject.Parse(json);
-                        }
+                        //fetch dashboard json and parse to JObject
+                        var json = await web.GetStringAsync(url);
+                        content = JObject.Parse(json);
+                        result = content;
                     }
-                    catch (HttpRequestException ex)
-                    {
-                        LogHelper.Debug<DashboardControl>(string.Format("Error getting dashboard content from '{0}': {1}\n{2}", url, ex.Message, ex.InnerException));
 
-                        //set the content to an empty result and cache for 5 mins
-                        //we return it like this, we avoid error codes which triggers UI warnings
-                        timeSpan = new TimeSpan(0, 5, 0);
-                        return new JObject();
-                    }
-                }, timeSpan);
+                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 30, 0));
+                }
+                catch (HttpRequestException ex)
+                {
+                    LogHelper.Debug<DashboardController>(string.Format("Error getting dashboard content from '{0}': {1}\n{2}", url, ex.Message, ex.InnerException));
+
+                    //it's still new JObject() - we return it like this to avoid error codes which triggers UI warnings
+                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
+                }
+            }
+
+            return result;
         }
 
-        [WebApi.UmbracoAuthorize]
-        public Task<HttpResponseMessage> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public async Task<HttpResponseMessage> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
             var url = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
             var key = "umbraco-dynamic-dashboard-css-" + section;
-            var timeSpan = new TimeSpan(0, 30, 0);
 
-            return ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem(key,
-                async () =>
+            var content = ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<string>(key);
+            var result = string.Empty;
+
+            if (content != null)
+            {
+                result = content;
+            }
+            else
+            {
+                //content is null, go get it
+                try
                 {
-                    try
+                    using (var web = new HttpClient())
                     {
-                        using (var web = new HttpClient())
-                        {
-                            //fetch remote css
-                            return new HttpResponseMessage(HttpStatusCode.OK)
-                            {
-                                Content = new StringContent(await web.GetStringAsync(url), Encoding.UTF8, "text/css")
-                            };
-                        }
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        LogHelper.Debug<DashboardControl>(string.Format("Error getting dashboard CSS from '{0}': {1}\n{2}", url, ex.Message, ex.InnerException));
+                        //fetch remote css
+                        content = await web.GetStringAsync(url);
 
-                        //we return it like this, we avoid error codes which triggers UI warnings
-                        timeSpan = new TimeSpan(0, 5, 0);
-                        return new HttpResponseMessage(HttpStatusCode.OK)
-                        {
-                            Content = new StringContent(string.Empty, Encoding.UTF8, "text/css")
-                        };
+                        //can't use content directly, modified closure problem
+                        result = content;
+
+                        //save server content for 30 mins
+                        ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
                     }
-                }, timeSpan);
+                }
+                catch (HttpRequestException ex)
+                {
+                    LogHelper.Debug<DashboardController>(string.Format("Error getting dashboard CSS from '{0}': {1}\n{2}", url, ex.Message, ex.InnerException));
+
+                    //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
+                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
+                }
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(result, Encoding.UTF8, "text/css")
+            };
         }
-
-
-        [WebApi.UmbracoAuthorize]
+        
         [ValidateAngularAntiForgeryToken]
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
