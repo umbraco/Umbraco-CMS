@@ -69,7 +69,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
-            return ExamineSearch(query, type, searchFrom);
+            return SearchByUmbracoSearcher(query, type, searchFrom);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Umbraco.Web.Editors
             {
                 result.Add(new EntityTypeSearchResult
                 {
-                    Results = ExamineSearch(query, UmbracoEntityTypes.Document),
+                    Results = SearchByUmbracoSearcher(query, UmbracoEntityTypes.Document),
                     EntityType = UmbracoEntityTypes.Document.ToString()
                 });
             }
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Editors
             {
                 result.Add(new EntityTypeSearchResult
                 {
-                    Results = ExamineSearch(query, UmbracoEntityTypes.Media),
+                    Results = SearchByUmbracoSearcher(query, UmbracoEntityTypes.Media),
                     EntityType = UmbracoEntityTypes.Media.ToString()
                 });
             }
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Editors
             {
                 result.Add(new EntityTypeSearchResult
                 {
-                    Results = ExamineSearch(query, UmbracoEntityTypes.Member),
+                    Results = SearchByUmbracoSearcher(query, UmbracoEntityTypes.Member),
                     EntityType = UmbracoEntityTypes.Member.ToString()
                 });
 
@@ -233,12 +233,10 @@ namespace Umbraco.Web.Editors
         /// A starting point for the search, generally a node id, but for members this is a member type alias
         /// </param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
+        private IEnumerable<EntityBasic> SearchByUmbracoSearcher(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
             return _umbracoSearcher.Search(query, entityType, Security.CurrentUser, searchFrom);
         }
-
-
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
         {
