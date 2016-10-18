@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -25,7 +22,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
         public object Id { get; set; }
-        
+
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
@@ -57,12 +54,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "path")]
         public string Path { get; set; }
-        
+
         /// <summary>
         /// A collection of extra data that is available for this specific entity/entity type
         /// </summary>
         [DataMember(Name = "metaData")]
         [ReadOnly(true)]
-        public IDictionary<string, object> AdditionalData { get; private set; } 
+        public IDictionary<string, object> AdditionalData { get; private set; }
     }
 }

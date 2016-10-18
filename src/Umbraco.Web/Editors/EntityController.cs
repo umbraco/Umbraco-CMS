@@ -31,7 +31,7 @@ namespace Umbraco.Web.Editors
 
         public EntityController()
         {
-            _umbracoSearcher = new ExamineSearcher();
+            _umbracoSearcher = UmbracoSearcherResolver.GetInstance(Umbraco);
         }
 
         /// <summary>

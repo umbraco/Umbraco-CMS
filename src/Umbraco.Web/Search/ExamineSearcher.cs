@@ -10,7 +10,6 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web;
 
 namespace Umbraco.Web.Search
 {
@@ -18,9 +17,9 @@ namespace Umbraco.Web.Search
     {
         private readonly UmbracoHelper _umbracoHelper;
 
-        public ExamineSearcher()
+        internal ExamineSearcher(UmbracoHelper umbracoHelper)
         {
-            _umbracoHelper = null;
+            _umbracoHelper = umbracoHelper;
         }
 
         public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes entityType, IUser user)

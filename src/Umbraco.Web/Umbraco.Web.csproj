@@ -398,6 +398,7 @@
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Search\ExamineSearcher.cs" />
     <Compile Include="Search\IUmbracoSearcher.cs" />
+    <Compile Include="Search\UmbracoSearcherResolver.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\Identity\ForceRenewalCookieAuthenticationHandler.cs" />
