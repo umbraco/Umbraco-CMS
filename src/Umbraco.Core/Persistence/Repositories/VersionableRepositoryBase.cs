@@ -610,6 +610,8 @@ WHERE EXISTS(
                     return "cmsContentVersion.VersionDate";
                 case "NAME":
                     return "umbracoNode.text";
+                case "PUBLISHED":
+                    return "cmsDocument.published";
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
