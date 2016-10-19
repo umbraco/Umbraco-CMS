@@ -20,6 +20,8 @@ angular.module("umbraco.directives")
                 var curr = $(event.target);         // active tab
                 var prev = $(event.relatedTarget);  // previous tab
 
+				$scope.$apply();
+
                 for (var c in callbacks) {
                     callbacks[c].apply(this, [{current: curr, previous: prev}]);
                 }
