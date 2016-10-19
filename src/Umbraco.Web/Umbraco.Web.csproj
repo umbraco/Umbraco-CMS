@@ -156,6 +156,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
@@ -277,7 +278,9 @@
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
+    <Compile Include="SignalR\IPreviewHub.cs" />
     <Compile Include="SignalR\PreviewHub.cs" />
+    <Compile Include="SignalR\PreviewHubComponent.cs" />
     <Compile Include="Strategies\LegacyServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Strategies\Migrations\IPostMigration.cs" />
     <Compile Include="Strategies\Migrations\PostMigrationCollection.cs" />

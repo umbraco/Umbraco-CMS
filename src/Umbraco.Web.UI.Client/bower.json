@@ -16,6 +16,7 @@
     "tests"
   ],
   "dependencies": {
+    "signalr": "^2.2.1",
     "typeahead.js": "~0.10.5",
     "underscore": "~1.7.0",
     "rgrove-lazyload": "*",

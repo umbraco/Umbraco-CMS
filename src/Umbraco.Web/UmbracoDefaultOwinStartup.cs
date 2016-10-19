@@ -35,7 +35,6 @@ namespace Umbraco.Web
 
             ConfigureServices(app, Current.Services);
             ConfigureMiddleware(app);
-            ConfigureSignalR(app);
         }
 
         /// <summary>
@@ -52,6 +51,8 @@ namespace Umbraco.Web
             app.ConfigureUserManagerForUmbracoBackOffice(
                 services,
                 Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
+
+            app.ConfigureSignalR();
         }
 
         /// <summary>
@@ -67,20 +68,6 @@ namespace Umbraco.Web
                 .UseUmbracoBackOfficeExternalCookieAuthentication(Current.RuntimeState, PipelineStage.Authenticate)
                 .UseUmbracoPreviewAuthentication(Current.RuntimeState, PipelineStage.Authorize)
                 .FinalizeMiddlewareConfiguration();
-        }
-
-        private IHubContext _previewHubContext;
-
-        /// <summary>
-        /// Configures SignalR.
-        /// </summary>
-        /// <param name="app"></param>
-        protected virtual void ConfigureSignalR(IAppBuilder app)
-        {
-            app.MapSignalR();
-
-            _previewHubContext = GlobalHost.ConnectionManager.GetHubContext<PreviewHub>();
-            PreviewHub.Initialize(_previewHubContext);
         }
 
         public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;

@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
 using LightInject;
+using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
@@ -36,6 +37,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Services;
+using Umbraco.Web.SignalR;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
@@ -171,6 +173,9 @@ namespace Umbraco.Web
             // register facade router
             composition.Container.Register<FacadeRouter>();
             composition.Container.Register(_ => UmbracoConfig.For.UmbracoSettings().WebRouting);
+
+            // register preview SignalR hub
+            composition.Container.Register(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>(), new PerContainerLifetime());
         }
 
         internal void Initialize(

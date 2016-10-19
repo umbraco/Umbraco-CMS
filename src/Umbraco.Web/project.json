@@ -19,7 +19,6 @@
     "Microsoft.AspNet.Mvc": "5.2.3",
     "Microsoft.AspNet.Razor": "3.2.3",
     "Microsoft.AspNet.SignalR.Core": "2.2.0",
-    "Microsoft.AspNet.SignalR.SystemWeb": "2.2.0",
     "Microsoft.AspNet.WebApi": "5.2.3",
     "Microsoft.AspNet.WebApi.Client": "5.2.3",
     "Microsoft.AspNet.WebApi.Core": "5.2.3",

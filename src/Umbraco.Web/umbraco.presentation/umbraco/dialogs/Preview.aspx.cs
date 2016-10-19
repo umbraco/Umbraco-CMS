@@ -2,7 +2,6 @@
 using System.Web;
 using Umbraco.Web;
 using Umbraco.Core;
-using Umbraco.Web.PublishedCache;
 
 namespace umbraco.presentation.dialogs
 {
