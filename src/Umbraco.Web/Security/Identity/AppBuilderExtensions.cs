@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
@@ -53,7 +54,13 @@ namespace Umbraco.Web.Security.Identity
         {
             app.SetLoggerFactory(new OwinLoggerFactory());
         }
-        
+
+        // TODO: Move this method in v8, it doesn't belong in this namespace/extension class
+        public static void ConfigureSignalR(this IAppBuilder app)
+        {
+            app.MapSignalR("/umbraco/signalr", new HubConfiguration { EnableDetailedErrors = true });
+        }
+
         /// <summary>
         /// Configure Default Identity User Manager for Umbraco
         /// </summary>
