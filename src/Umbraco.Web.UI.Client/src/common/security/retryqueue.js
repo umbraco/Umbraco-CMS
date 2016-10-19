@@ -33,8 +33,10 @@ angular.module('umbraco.security.retryQueue', [])
         reason = undefined;
       }
 
-      if ((retryUser && retryUser !== userName) || userName === null)
+      if ((retryUser && retryUser !== userName) || userName === null) {
         throw new Error('invalid user');
+      }
+      
       retryUser = userName;
 
       // The deferred object that will be resolved or rejected by calling retry or cancel
@@ -70,7 +72,10 @@ angular.module('umbraco.security.retryQueue', [])
     },
     retryAll: function (userName) {
 
-      if (retryUser == null) return;
+      if (retryUser == null) {
+        return;
+      } 
+      
       if (retryUser !== userName) {
         service.cancelAll();
         return;
