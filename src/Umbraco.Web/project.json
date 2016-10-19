@@ -34,7 +34,6 @@
     "Owin": "1.0.*",
     "semver": "1.*",
     "SharpZipLib": "0.86.0",
-    "UrlRewritingNet.UrlRewriter": "2.0.7",
     "xmlrpcnet": "2.5.0"
   },
   "frameworks": {
