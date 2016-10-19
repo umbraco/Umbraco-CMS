@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<MembershipUser, IMember>()
                 .ConstructUsing(user => MemberService.CreateGenericMembershipProviderMember(user.UserName, user.Email, user.UserName, ""))
                 //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
-                .ForMember(member => member.Id, expression => expression.MapFrom(user => 0))
+                .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(member => member.Comments, expression => expression.MapFrom(user => user.Comment))
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
@@ -119,7 +119,7 @@ namespace Umbraco.Web.Models.Mapping
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
                 //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
-                .ForMember(member => member.Id, expression => expression.MapFrom(user => 0))
+                .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
                 .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
