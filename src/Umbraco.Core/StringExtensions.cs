@@ -124,11 +124,11 @@ namespace Umbraco.Core
                    || (input.StartsWith("[") && input.EndsWith("]"));
         }
 
-        internal static readonly Regex Whitespace = new Regex(@"\s+", RegexOptions.Compiled);
-        internal static readonly string[] JsonEmpties = new [] { "[]", "{}" };
+        internal static readonly Lazy<Regex> Whitespace = new Lazy<Regex>(() => new Regex(@"\s+", RegexOptions.Compiled));
+        internal static readonly string[] JsonEmpties = { "[]", "{}" };
         internal static bool DetectIsEmptyJson(this string input)
         {
-            return JsonEmpties.Contains(Whitespace.Replace(input, string.Empty));
+            return JsonEmpties.Contains(Whitespace.Value.Replace(input, string.Empty));
         }
 
         /// <summary>
@@ -1322,10 +1322,10 @@ namespace Umbraco.Core
 
         // From: http://stackoverflow.com/a/961504/5018
         // filters control characters but allows only properly-formed surrogate sequences
-        private static readonly Regex InvalidXmlChars =
+        private static readonly Lazy<Regex> InvalidXmlChars = new Lazy<Regex>(() =>
             new Regex(
                 @"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]",
-                RegexOptions.Compiled);
+                RegexOptions.Compiled));
 
 
         /// <summary>
@@ -1340,7 +1340,7 @@ namespace Umbraco.Core
         /// </summary>
         internal static string ToValidXmlString(this string text)
         {
-            return string.IsNullOrEmpty(text) ? text : InvalidXmlChars.Replace(text, "");
+            return string.IsNullOrEmpty(text) ? text : InvalidXmlChars.Value.Replace(text, "");
         }
 
         /// <summary>
