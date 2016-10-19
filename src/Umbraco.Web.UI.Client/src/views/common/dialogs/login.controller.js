@@ -97,11 +97,19 @@
                 .then(function (data) {
                     $scope.submit(true);
                 }, function (reason) {
-                    $scope.errorMsg = reason.errorMsg;
+                    
+                    //is Two Factor required?
+                    if(reason.status === 402){
+                        $scope.errorMsg = "Additional authentication required";
+                      userService._show2FALoginDialog(reason.data.twoFactorView,$scope.submit);
 
-                    //set the form inputs to invalid
-                    $scope.loginForm.username.$setValidity("auth", false);
-                    $scope.loginForm.password.$setValidity("auth", false);
+                    }else{
+                        $scope.errorMsg = reason.errorMsg;
+
+                        //set the form inputs to invalid
+                        $scope.loginForm.username.$setValidity("auth", false);
+                        $scope.loginForm.password.$setValidity("auth", false);
+                    }
                 });
 
             //setup a watch for both of the model values changing, if they change

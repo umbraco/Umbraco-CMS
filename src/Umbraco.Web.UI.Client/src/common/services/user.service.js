@@ -4,6 +4,7 @@ angular.module('umbraco.services')
         var currentUser = null;
         var lastUserId = null;
         var loginDialog = null;
+        var twoFactorloginDialog = null;
         //this tracks the last date/time that the user's remainingAuthSeconds was updated from the server
         // this is used so that we know when to go and get the user's remaining seconds directly.
         var lastServerTimeoutSet = null;
@@ -25,6 +26,21 @@ angular.module('umbraco.services')
                     }
                 });
             }
+        }
+          function show2FALoginDialog(view, callback) {
+              if(!twoFactorloginDialog){
+            twoFactorloginDialog = dialogService.open({
+
+                    //very special flag which means that global events cannot close this dialog
+                    manualClose: true,
+                    template: view,
+                    modalClass: "login-overlay",
+                    animation: "slide",
+                    show: true,
+                    callback: callback,
+                    
+                });
+          }
         }
 
         function onLoginDialogClose(success) {
@@ -183,7 +199,10 @@ angular.module('umbraco.services')
             _showLoginDialog: function () {
                 openLoginDialog();
             },
-
+            /** Internal method to display the login dialog */
+            _show2FALoginDialog: function (view,callback) {
+                show2FALoginDialog(view, callback);
+            },
             /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
             isAuthenticated: function () {
                 //if we've got a current user then just return true
@@ -199,19 +218,19 @@ angular.module('umbraco.services')
             authenticate: function (login, password) {
 
                 return authResource.performLogin(login, password)
-                    .then(function (data) {
-
-                        //when it's successful, return the user data
-                        setCurrentUser(data);
-
-                        var result = { user: data, authenticated: true, lastUserId: lastUserId };
-
-                        //broadcast a global event
-                        eventsService.emit("app.authenticated", result);
-                        return result;
-                    });
+                    .then(this.setAuthenticationSuccessful);
             },
-          
+            setAuthenticationSuccessful:function (data) {
+
+                //when it's successful, return the user data
+                setCurrentUser(data);
+
+                var result = { user: data, authenticated: true, lastUserId: lastUserId };
+
+                //broadcast a global event
+                eventsService.emit("app.authenticated", result);
+                return result;
+            },
             /** Logs the user out 
              */
             logout: function () {
