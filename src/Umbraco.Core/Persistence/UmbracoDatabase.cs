@@ -111,8 +111,6 @@ namespace Umbraco.Core.Persistence
         {
             if (connection == null) throw new ArgumentNullException(nameof(connection));
 
-            // fixme could we avoid re-wrapping all of the time if the underlying cnx object does not change? (does it?) (should it?)
-
             // wrap the connection with a profiling connection that tracks timings
             connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
 
@@ -146,7 +144,7 @@ namespace Umbraco.Core.Persistence
                     sb.Append(" - ");
                     sb.Append(p.Value);
                 }
-                
+
                 _logger.Debug<UmbracoDatabase>(sb.ToString());
             }
 
