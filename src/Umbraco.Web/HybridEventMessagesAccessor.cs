@@ -4,14 +4,7 @@ namespace Umbraco.Web
 {
     internal class HybridEventMessagesAccessor : HybridAccessorBase<EventMessages>, IEventMessagesAccessor
     {
-        private const string ItemKeyConst = "Umbraco.Core.Events.HybridEventMessagesAccessor";
-
-        protected override string ItemKey => ItemKeyConst;
-
-        static HybridEventMessagesAccessor()
-        {
-            SafeCallContextRegister(ItemKeyConst);
-        }
+        protected override string ItemKey => "Umbraco.Core.Events.HybridEventMessagesAccessor";
 
         public HybridEventMessagesAccessor(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)

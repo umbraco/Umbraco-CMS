@@ -7,6 +7,11 @@ namespace Umbraco.Web
     internal abstract class HybridAccessorBase<T>
         where T : class
     {
+        // ReSharper disable StaticMemberInGenericType
+        private static readonly object Locker = new object();
+        private static bool _registered;
+        // ReSharper restore StaticMemberInGenericType
+
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         protected abstract string ItemKey { get; }
@@ -20,11 +25,6 @@ namespace Umbraco.Web
         //
         // anything that is ThreadStatic will stay with the thread and NOT flow in async threads
         // the only thing that flows is the logical call context (safe in 4.5+)
-        // now...
-        // fixme - which tests?!
-        // tests seem to show that either newing Thread or enqueuing in the ThreadPool both produce a thread
-        // with a clear logical call context, which would mean that it is somewhat safe to "fire and forget"
-        // because whatever is in the call context will be gone when the thread returns to the pool
 
         // no!
         //[ThreadStatic]
@@ -41,16 +41,20 @@ namespace Umbraco.Web
             }
         }
 
-        // every class inheriting from this class *must* implement a static ctor
-        // and register itself against the SafeCallContext using this method.
-        //
-        // note: because the item key is not static, we cannot register here in the
-        // base class - unless we do it in the non-static Value property setter,
-        // with a static bool to keep track of registration - less error-prone but
-        // perfs impact - considering implementors should be careful.
-        //
-        protected static void SafeCallContextRegister(string itemKey)
+        protected HybridAccessorBase(IHttpContextAccessor httpContextAccessor)
         {
+            if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
+            _httpContextAccessor = httpContextAccessor;
+
+            lock (Locker)
+            {
+                // register the itemKey once with SafeCallContext
+                if (_registered) return;
+                _registered = true;
+            }
+
+            // ReSharper disable once VirtualMemberCallInConstructor
+            var itemKey = ItemKey; // virtual
             SafeCallContext.Register(() =>
             {
                 var value = CallContext.LogicalGetData(itemKey);
@@ -63,11 +67,6 @@ namespace Umbraco.Web
                 if (value == null) throw new ArgumentException($"Expected type {typeof(T).FullName}, got {o.GetType().FullName}", nameof(o));
                 CallContext.LogicalSetData(itemKey, value);
             });
-        }
-
-        protected HybridAccessorBase(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
         }
 
         protected T Value

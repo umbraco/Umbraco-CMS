@@ -4,14 +4,7 @@ namespace Umbraco.Web
 {
     internal class HybridUmbracoDatabaseAccessor : HybridAccessorBase<UmbracoDatabase>, IUmbracoDatabaseAccessor
     {
-        private const string ItemKeyConst = "Umbraco.Core.Persistence.HybridUmbracoDatabaseAccessor";
-
-        protected override string ItemKey => ItemKeyConst;
-
-        static HybridUmbracoDatabaseAccessor()
-        {
-            SafeCallContextRegister(ItemKeyConst);
-        }
+        protected override string ItemKey => "Umbraco.Core.Persistence.HybridUmbracoDatabaseAccessor";
 
         public HybridUmbracoDatabaseAccessor(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)
