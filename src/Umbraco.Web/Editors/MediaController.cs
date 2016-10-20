@@ -65,7 +65,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets an empty content item for the 
+        /// Gets an empty content item for the
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
@@ -213,7 +213,7 @@ namespace Umbraco.Web.Editors
         /// Moves an item to the recycle bin, if it is already there then it will permanently delete it
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns> 
+        /// <returns></returns>
         [EnsureUserPermissionForMedia("id")]
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
@@ -231,7 +231,7 @@ namespace Umbraco.Web.Editors
                 var moveResult = Services.MediaService.WithResult().MoveToRecycleBin(foundMedia, (int)Security.CurrentUser.Id);
                 if (moveResult == false)
                 {
-                    //returning an object of INotificationModel will ensure that any pending 
+                    //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
                 }
@@ -241,7 +241,7 @@ namespace Umbraco.Web.Editors
                 var deleteResult = Services.MediaService.WithResult().Delete(foundMedia, (int)Security.CurrentUser.Id);
                 if (deleteResult == false)
                 {
-                    //returning an object of INotificationModel will ensure that any pending 
+                    //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
                 }
@@ -270,7 +270,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Saves content
         /// </summary>
-        /// <returns></returns>        
+        /// <returns></returns>
         [FileUploadCleanupFilter]
         [MediaPostValidate]
         public MediaItemDisplay PostSave(
@@ -290,7 +290,7 @@ namespace Umbraco.Web.Editors
             // * We still need to save the entity even if there are validation value errors
             // * Depending on if the entity is new, and if there are non property validation errors (i.e. the name is null)
             //      then we cannot continue saving, we can only display errors
-            // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display 
+            // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display
             //      a message indicating this
             if (ModelState.IsValid == false)
             {
@@ -314,7 +314,7 @@ namespace Umbraco.Web.Editors
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
-            //put the correct msgs in 
+            //put the correct msgs in
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
@@ -461,7 +461,7 @@ namespace Umbraco.Web.Editors
                Services.MediaService, parentId) == false)
             {
                 return Request.CreateResponse(
-                    HttpStatusCode.Unauthorized,
+                    HttpStatusCode.Forbidden,
                     new SimpleNotificationModel(new Notification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
@@ -534,7 +534,7 @@ namespace Umbraco.Web.Editors
                     if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
                         mediaType = Constants.Conventions.MediaTypes.Image;
 
-                    //TODO: make the media item name "nice" since file names could be pretty ugly, we have 
+                    //TODO: make the media item name "nice" since file names could be pretty ugly, we have
                     // string extensions to do much of this but we'll need:
                     // * Pascalcase the name (use string extensions)
                     // * strip the file extension
@@ -595,7 +595,7 @@ namespace Umbraco.Web.Editors
 
             return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
         }
-        
+
         /// <summary>
         /// Ensures the item can be moved/copied to the new location
         /// </summary>
@@ -654,7 +654,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Performs a permissions check for the user to check if it has access to the node based on 
+        /// Performs a permissions check for the user to check if it has access to the node based on
         /// start node and/or permissions for the node
         /// </summary>
         /// <param name="storage">The storage to add the content item to so it can be reused</param>
@@ -668,7 +668,7 @@ namespace Umbraco.Web.Editors
             if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
             {
                 media = mediaService.GetById(nodeId);
-                //put the content item into storage so it can be retreived 
+                //put the content item into storage so it can be retreived
                 // in the controller (saves a lookup)
                 storage[typeof(IMedia).ToString()] = media;
             }

@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
             //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, IMember>()
                 .ConstructUsing(user => MemberService.CreateGenericMembershipProviderMember(user.UserName, user.Email, user.UserName, ""))
-                //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
+                //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(member => member.Comments, expression => expression.MapFrom(user => user.Comment))
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
@@ -118,7 +118,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
-                //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
+                //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
