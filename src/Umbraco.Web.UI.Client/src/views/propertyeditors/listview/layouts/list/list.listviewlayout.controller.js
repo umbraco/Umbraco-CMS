@@ -36,8 +36,8 @@
          }
 
       function clickItem(item) {
-         // if item.id is 0 use item.key
-         $location.path($scope.entityType + '/' +$scope.entityType + '/edit/' + (item.id === 0 ? item.key : item.id));
+         // if item.id is 2147483647 (int.MaxValue) use item.key
+         $location.path($scope.entityType + '/' +$scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id));
          }
 
       function isSortDirection(col, direction) {
