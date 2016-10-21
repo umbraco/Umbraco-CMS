@@ -400,7 +400,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 else
                 {
                     var subQuery = new Sql()
-                        .Select("DISTINCT umbracoNode.id")
+                        .Select("umbracoNode.id as nodeId")
                         .From<ContentDto>(SqlSyntax)
                         .InnerJoin<NodeDto>(SqlSyntax)
                         .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
