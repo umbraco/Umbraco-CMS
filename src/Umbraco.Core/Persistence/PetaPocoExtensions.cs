@@ -195,6 +195,16 @@ namespace Umbraco.Core.Persistence
         /// <param name="commitTrans"></param>
         public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection, Transaction tr, bool commitTrans = false)
         {
+            //TODO: We should change this to use BulkCopy, as an example see:
+            // https://ayende.com/blog/4137/nhibernate-perf-tricks
+            // Even though this just generates lots of raw sql INSERT statements BulkCopy is the fastest it can possibly be
+            // and we should be able to do this using the current connection from the PetaPoco db instance (and would probably be much cleaner)
+            // 
+            // BulkCopy is available for SQL Server and MySqlBulkLoader is available for MySql, pretty sure BulkCopy works for SQLCE so 
+            // we should be covered and of course could fallback to this method if that is not our database. But we would get huge perf
+            // increases for this.
+
+
             //don't do anything if there are no records.
             if (collection.Any() == false)
                 return;
