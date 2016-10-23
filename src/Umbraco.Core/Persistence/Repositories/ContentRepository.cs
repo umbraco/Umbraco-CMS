@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -1010,6 +1011,10 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         {
             if (EnsureUniqueNaming == false)
                 return nodeName;
+
+            // strip unnecessary white space to prevent duplicate URL issue
+            // http://issues.umbraco.org/issue/U4-6580
+            nodeName = Regex.Replace(nodeName, @"\s+", " ");
 
             var sql = new Sql();
             sql.Select("*")
