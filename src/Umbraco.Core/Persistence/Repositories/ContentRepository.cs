@@ -24,6 +24,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using System.Configuration;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -212,7 +213,22 @@ namespace Umbraco.Core.Persistence.Repositories
                 //now insert the data, again if something fails here, the whole transaction is reversed
                 if (contentTypeIds == null)
                 {
-                    var query = Query<IContent>.Builder.Where(x => x.Published == true);
+                    IQuery<IContent> query = Query<IContent>.Builder.Where(x => x.Published == true);
+
+                    // Check whether any content type ids should be excluded from the cach in the web config
+
+                    var excludedContentTypeIds = ConfigurationManager.AppSettings["Umbraco.UnCachedContentTypeIds"];
+
+                    if (excludedContentTypeIds != null && !string.IsNullOrEmpty(excludedContentTypeIds))
+                    {
+                        var ids = excludedContentTypeIds.Split(',').Select(int.Parse);
+
+                        foreach (var id in ids)
+                        {
+                            query.Where(x => x.ContentTypeId != id);
+                        }
+                    }
+                    
                     RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
                 }
                 else
