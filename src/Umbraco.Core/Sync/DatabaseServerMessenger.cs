@@ -278,17 +278,19 @@ namespace Umbraco.Core.Sync
             var localIdentity = LocalIdentity;
 
             var lastId = 0;
-
-            //this is used to determine if we need to exit the reader loop below because there are actually
-            // too many instructions to process. In which case we need to exit the reader so we can actually re-save
-            // the remaining instructions back to the same row (we cannot save something while inside a reader loop)
-            Tuple<CacheInstructionDto, List<RefreshInstruction>> maxInstructions = null;
-
+            
             //IMPORTANT! We are doing a Query here instead of a Fetch, this means that it will open a data reader
             // which we are iterating over instead of loading everything into memory and iterating over that.
             // When doing this we always must use a for loop so that the Enumerator is disposed and the reader is closed.
             foreach (var dto in _appContext.DatabaseContext.Database.Query<CacheInstructionDto>(topSql))
             {
+                //If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
+                // continue processing anything otherwise we'll hold up the app domain shutdown
+                if (_released)
+                {
+                    break;
+                }
+
                 if (dto.OriginIdentity == localIdentity)
                 {
                     // just skip that local one but update lastId nevertheless
@@ -311,51 +313,39 @@ namespace Umbraco.Core.Sync
 
                 var instructionBatch = GetAllInstructions(jsonA);
 
-                // Here we should check if there's too many instructions, if there is we should split them and re-save the instructions entry with
-                // the trimmed instructions. We then don't update the lastsynced value so that this row is re-processed again but with only the remaining
-                // instructions in it.
-                if (instructionBatch.Count > Options.MaxProcessingInstructionCount)
-                {
-                    maxInstructions = new Tuple<CacheInstructionDto, List<RefreshInstruction>>(dto, instructionBatch);
-                    break;                    
-                }
-
                 //process as per-normal
-                lastId = ProcessDatabaseInstructions(instructionBatch, dto);
-            }
+                var success = ProcessDatabaseInstructions(instructionBatch, dto, ref lastId);
 
-            //If this is not null this means we've found a row that has a ton of instructions in it and we'll need to process
-            // just a part of it and then re-save the remaining to the same row so that another request can deal with the data.
-            if (maxInstructions != null)
-            {
-                var remainingCount = maxInstructions.Item2.Count - Options.MaxProcessingInstructionCount;
-
-                _logger.Info<DatabaseServerMessenger>(
-                    "Max processing instruction count reached. This batch will be processed now but the remaining {0} will be processed by subsequent requests.", () => remainingCount);
-
-                var processingBatch = maxInstructions.Item2.GetRange(0, Options.MaxProcessingInstructionCount);
-                //NOTE: We are not persisting the lastId from the result of this method because we will need to re-process it
-                ProcessDatabaseInstructions(processingBatch, maxInstructions.Item1);
-
-                //Save the instruction blob back to the DB with the trimmed instruction count
-                var remaining = maxInstructions.Item2.GetRange(Options.MaxProcessingInstructionCount - 1, remainingCount);
-                maxInstructions.Item1.UtcStamp = DateTime.UtcNow;
-                //serialize the remaining instructions (leave the original identity as-is)
-                maxInstructions.Item1.Instructions = JsonConvert.SerializeObject(remaining, Formatting.None);
-                ApplicationContext.DatabaseContext.Database.Update(maxInstructions.Item1);                
+                //if they couldn't be all processed (i.e. we're shutting down) then exit
+                if (success == false)
+                    break;
             }
 
             if (lastId > 0)
                 SaveLastSynced(lastId);
         }
 
-        private int ProcessDatabaseInstructions(List<RefreshInstruction> instructionBatch, CacheInstructionDto dto)
+        /// <summary>
+        /// Processes the instruction batch and checks for errors
+        /// </summary>
+        /// <param name="instructionBatch"></param>
+        /// <param name="dto"></param>
+        /// <param name="lastId"></param>
+        /// <returns>
+        /// returns true if all instructions in the batch were processed, otherwise false if they could not be due to the app being shut down
+        /// </returns>
+        private bool ProcessDatabaseInstructions(IReadOnlyCollection<RefreshInstruction> instructionBatch, CacheInstructionDto dto, ref int lastId)
         {
             // execute remote instructions & update lastId
             try
             {
-                NotifyRefreshers(instructionBatch);
-                return dto.Id;
+                var result = NotifyRefreshers(instructionBatch);
+                if (result)
+                {
+                    //if all instructions we're processed, set the last id
+                    lastId = dto.Id;
+                }
+                return result;
             }
             //catch (ThreadAbortException ex)
             //{
@@ -369,7 +359,8 @@ namespace Umbraco.Core.Sync
 
                 //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
                 // will be thrown over and over. The only thing we can do is ignore and move on.
-                return dto.Id;
+                lastId = dto.Id;
+                return false;
             }
 
             ////if this is returned it will not be saved
@@ -554,10 +545,19 @@ namespace Umbraco.Core.Sync
         /// executes the instructions against the cache refresher instances
         /// </summary>
         /// <param name="instructions"></param>
-        private static void NotifyRefreshers(IEnumerable<RefreshInstruction> instructions)
+        /// <returns>
+        /// Returns true if all instructions were processed, otherwise false if the processing was interupted (i.e. app shutdown)
+        /// </returns>
+        private bool NotifyRefreshers(IEnumerable<RefreshInstruction> instructions)
         {
             foreach (var instruction in instructions)
             {
+                //Check if the app is shutting down, we need to exit if this happens.
+                if (_released)
+                {
+                    return false;
+                }
+
                 switch (instruction.RefreshType)
                 {
                     case RefreshMethodType.RefreshAll:
@@ -580,6 +580,7 @@ namespace Umbraco.Core.Sync
                         break;
                 }
             }
+            return true;
         }
 
         private static void RefreshAll(Guid uniqueIdentifier)
