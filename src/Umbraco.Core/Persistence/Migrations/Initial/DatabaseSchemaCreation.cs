@@ -159,7 +159,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             foreach (var item in OrderedTables.OrderBy(x => x.Key))
             {
-                var tableDefinition = DefinitionFactory.GetTableDefinition(item.Value);
+                var tableDefinition = DefinitionFactory.GetTableDefinition(_sqlSyntaxProvider, item.Value);
                 result.TableDefinitions.Add(tableDefinition);
             }
 

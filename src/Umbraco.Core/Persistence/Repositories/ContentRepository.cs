@@ -248,12 +248,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() });
 
                 //bulk insert it into the database
-                Database.BulkInsertRecords(xmlItems, tr);
+                var count = Database.BulkInsertRecords(xmlItems, tr, SqlSyntax);
 
-                processed += xmlItems.Length;
+                processed += count;
 
                 pageIndex++;
             } while (processed < total);
