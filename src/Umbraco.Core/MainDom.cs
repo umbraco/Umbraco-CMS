@@ -25,7 +25,7 @@ namespace Umbraco.Core
         private readonly AsyncLock _asyncLock;
         private IDisposable _asyncLocker;
 
-        // event wait handle used to notify current main domain that it should 
+        // event wait handle used to notify current main domain that it should
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
 
@@ -97,7 +97,7 @@ namespace Umbraco.Core
 
             try
             {
-                _logger.Debug<MainDom>("Stopping...");
+                _logger.Info<MainDom>("Stopping...");
                 foreach (var callback in _callbacks.Values)
                 {
                     try
@@ -109,7 +109,7 @@ namespace Umbraco.Core
                         _logger.Error<MainDom>("Error while running callback, remaining callbacks will not run.", e);
                         throw;
                     }
-                    
+
                 }
                 _logger.Debug<MainDom>("Stopped.");
             }

@@ -28,7 +28,7 @@ namespace Umbraco.Core.Sync
     //
     public class DatabaseServerMessenger : ServerMessengerBase
     {
-        private readonly ApplicationContext _appContext;        
+        private readonly ApplicationContext _appContext;
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly ILogger _logger;
@@ -116,13 +116,16 @@ namespace Umbraco.Core.Sync
                         _released = true; // no more syncs
                     }
 
-                    //wait a max of 5 seconds
-                    var result =_syncIdle.WaitOne(5000);
-                    if (result == false)
+                    // wait a max of 5 seconds and then return, so that we don't block
+                    // the entire MainDom callbacks chain and prevent the AppDomain from
+                    // properly releasing MainDom - a timeout here means that one refresher
+                    // is taking too much time processing, however when it's done we will
+                    // not update lastId and stop everything
+                    var idle =_syncIdle.WaitOne(5000);
+                    if (idle == false)
                     {
-                        //a timeout occurred :/
                         _logger.Warn<DatabaseServerMessenger>("The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
-                    }                
+                    }
                 },
                 weight);
 
@@ -206,7 +209,7 @@ namespace Umbraco.Core.Sync
             {
                 if (_syncing)
                     return;
-                
+
                 //Don't continue if we are released
                 if (_released)
                     return;
@@ -272,14 +275,14 @@ namespace Umbraco.Core.Sync
             //
             // FIXME not true if we're running on a background thread, assuming we can?
 
-            
+
             var sql = new Sql().Select("*")
                 .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax)
                 .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
                 .OrderBy<CacheInstructionDto>(dto => dto.Id, _appContext.DatabaseContext.SqlSyntax);
 
             //only retrieve the top 100 (just in case there's tons)
-            // even though MaxProcessingInstructionCount is by default 1000 we still don't want to process that many 
+            // even though MaxProcessingInstructionCount is by default 1000 we still don't want to process that many
             // rows in one request thread since each row can contain a ton of instructions (until 7.5.5 in which case
             // a row can only contain MaxProcessingInstructionCount)
             var topSql = _appContext.DatabaseContext.SqlSyntax.SelectTop(sql, 100);
@@ -290,11 +293,11 @@ namespace Umbraco.Core.Sync
             var localIdentity = LocalIdentity;
 
             var lastId = 0;
-            
+
             //tracks which ones have already been processed to avoid duplicates
             var processed = new HashSet<RefreshInstruction>();
 
-            //It would have been nice to do this in a Query instead of Fetch using a data reader to save 
+            //It would have been nice to do this in a Query instead of Fetch using a data reader to save
             // some memory however we cannot do thta because inside of this loop the cache refreshers are also
             // performing some lookups which cannot be done with an active reader open
             foreach (var dto in _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(topSql))
@@ -337,7 +340,7 @@ namespace Umbraco.Core.Sync
                     _logger.Info<DatabaseServerMessenger>("The current batch of instructions was not processed, app is shutting down");
                     break;
                 }
-                    
+
             }
 
             if (lastId > 0)
