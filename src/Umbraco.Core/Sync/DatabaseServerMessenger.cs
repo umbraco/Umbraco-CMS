@@ -116,10 +116,13 @@ namespace Umbraco.Core.Sync
                         _released = true; // no more syncs
                     }
 
-                    // Wait for pending sync this is waiting for _syncIdle.Set()
-                    // to be called. Until that is called, the appdomain cannot shut down!
-                    // so whatever is locking this currently should hurry up!
-                    _syncIdle.WaitOne(); 
+                    //only wait 5 seconds
+                    var result =_syncIdle.WaitOne(5000);
+                    if (result == false)
+                    {
+                        //a timeout occurred :/
+                        _logger.Warn<DatabaseServerMessenger>("The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
+                    }                
                 },
                 weight);
 
@@ -222,7 +225,7 @@ namespace Umbraco.Core.Sync
                     ProcessDatabaseInstructions();
 
                     //Check for pruning throttling
-                    if ((DateTime.UtcNow - _lastPruned).TotalSeconds <= Options.PruneThrottleSeconds)
+                    if ((_released || (DateTime.UtcNow - _lastPruned).TotalSeconds <= Options.PruneThrottleSeconds))
                         return;
 
                     _lastPruned = _lastSync;
@@ -238,8 +241,12 @@ namespace Umbraco.Core.Sync
             }
             finally
             {
-                //We must reset our flag and signal any waiting locks
-                _syncing = false;
+                lock (_locko)
+                {
+                    //We must reset our flag and signal any waiting locks
+                    _syncing = false;
+                }
+
                 _syncIdle.Set();
             }
         }
@@ -279,10 +286,10 @@ namespace Umbraco.Core.Sync
 
             var lastId = 0;
             
-            //IMPORTANT! We are doing a Query here instead of a Fetch, this means that it will open a data reader
-            // which we are iterating over instead of loading everything into memory and iterating over that.
-            // When doing this we always must use a for loop so that the Enumerator is disposed and the reader is closed.
-            foreach (var dto in _appContext.DatabaseContext.Database.Query<CacheInstructionDto>(topSql))
+            //It would have been nice to do this in a Query instead of Fetch using a data reader to save 
+            // some memory however we cannot do thta because inside of this loop the cache refreshers are also
+            // performing some lookups which cannot be done with an active reader open
+            foreach (var dto in _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(topSql))
             {
                 //If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
                 // continue processing anything otherwise we'll hold up the app domain shutdown
@@ -318,7 +325,11 @@ namespace Umbraco.Core.Sync
 
                 //if they couldn't be all processed (i.e. we're shutting down) then exit
                 if (success == false)
+                {
+                    _logger.Info<DatabaseServerMessenger>("The current batch of instructions was not processed, app is shutting down");
                     break;
+                }
+                    
             }
 
             if (lastId > 0)
@@ -550,6 +561,8 @@ namespace Umbraco.Core.Sync
         /// </returns>
         private bool NotifyRefreshers(IEnumerable<RefreshInstruction> instructions)
         {
+            var processed = new HashSet<RefreshInstruction>();
+
             foreach (var instruction in instructions)
             {
                 //Check if the app is shutting down, we need to exit if this happens.
@@ -557,6 +570,10 @@ namespace Umbraco.Core.Sync
                 {
                     return false;
                 }
+
+                //this has already been processed
+                if (processed.Contains(instruction))
+                    continue;
 
                 switch (instruction.RefreshType)
                 {
@@ -579,6 +596,8 @@ namespace Umbraco.Core.Sync
                         RemoveById(instruction.RefresherId, instruction.IntId);
                         break;
                 }
+
+                processed.Add(instruction);
             }
             return true;
         }
