@@ -161,6 +161,8 @@ namespace Umbraco.Core.Sync
                 else
                 {
                     //check for how many instructions there are to process
+                    //TODO: In 7.6 we need to store the count of instructions per row since this is not affective because there can be far more than one (if not thousands)
+                    // of instructions in a single row.
                     var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
                     if (count > Options.MaxProcessingInstructionCount)
                     {
@@ -276,8 +278,11 @@ namespace Umbraco.Core.Sync
                 .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
                 .OrderBy<CacheInstructionDto>(dto => dto.Id, _appContext.DatabaseContext.SqlSyntax);
 
-            //only retrieve the max (just in case there's tons)
-            var topSql = _appContext.DatabaseContext.SqlSyntax.SelectTop(sql, Options.MaxProcessingInstructionCount);
+            //only retrieve the top 100 (just in case there's tons)
+            // even though MaxProcessingInstructionCount is by default 1000 we still don't want to process that many 
+            // rows in one request thread since each row can contain a ton of instructions (until 7.5.5 in which case
+            // a row can only contain MaxProcessingInstructionCount)
+            var topSql = _appContext.DatabaseContext.SqlSyntax.SelectTop(sql, 100);
 
             // only process instructions coming from a remote server, and ignore instructions coming from
             // the local server as they've already been processed. We should NOT assume that the sequence of
