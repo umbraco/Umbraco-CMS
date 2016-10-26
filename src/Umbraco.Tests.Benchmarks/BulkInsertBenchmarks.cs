@@ -72,7 +72,8 @@ namespace Umbraco.Tests.Benchmarks
                 logger);
 
             //drop the table
-            _dbSqlServer.Execute("DROP TABLE [umbracoServer]");
+            // note: DROP TABLE IF EXISTS is SQL 2016+
+            _dbSqlServer.Execute("IF OBJECT_ID('dbo.umbracoServer', 'U') IS NOT NULL DROP TABLE [umbracoServer]");
 
             //re-create it
             _dbSqlServer.Execute(@"CREATE TABLE [umbracoServer](
