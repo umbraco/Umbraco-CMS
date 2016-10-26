@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.Linq;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -21,6 +21,20 @@ namespace Umbraco.Core.Models.Membership
         /// The assigned permissions for the user/entity combo
         /// </summary>
         public string[] AssignedPermissions { get; private set; }
+
+        /// <summary>
+        /// Adds additional permissions to an existing instance of <see cref="EntityPermission"/>
+        /// ensuring that only ones that aren't already assigned are added
+        /// </summary>
+        /// <param name="additionalPermissions"></param>
+        public void AddAdditionalPermissions(string[] additionalPermissions)
+        {
+            var newPermissions = AssignedPermissions.ToList();
+            newPermissions.AddRange(additionalPermissions);
+            AssignedPermissions = newPermissions
+                .Distinct()
+                .ToArray();
+        }
     }
 
 }

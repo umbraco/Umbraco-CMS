@@ -72,6 +72,30 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
 
         /// <summary>
+        /// Get permissions set for a user group and optional node ids
+        /// </summary>
+        /// <param name="group">Group to retrieve permissions for</param>
+        /// <param name="nodeIds">Specifiying nothing will return all group permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
+        IEnumerable<EntityPermission> GetPermissions(IUserGroup group, params int[] nodeIds);
+
+        /// <summary>
+        /// Gets the permissions for the provided user and path
+        /// </summary>
+        /// <param name="user">User to check permissions for</param>
+        /// <param name="path">Path to check permissions for</param>
+        /// <returns>String indicating permissions for provided user and path</returns>
+        string GetPermissionsForPath(IUser user, string path);
+
+        /// <summary>
+        /// Gets the permissions for the provided group and path
+        /// </summary>
+        /// <param name="group">User to check permissions for</param>
+        /// <param name="path">Path to check permissions for</param>
+        /// <returns>String indicating permissions for provided user and path</returns>
+        string GetPermissionsForPath(IUserGroup group, string path);
+
+        /// <summary>
         /// Replaces the same permission set for a single user to any number of entities
         /// </summary>        
         /// <param name="userId">Id of the user</param>
@@ -91,10 +115,24 @@ namespace Umbraco.Core.Services
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
         void AssignUserPermission(int userId, char permission, params int[] entityIds);
 
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        /// <returns><see cref="IEnumerable{IUser}"/></returns>
+        IEnumerable<IUser> GetAllInGroup(int groupId);
+
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects not associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        /// <returns><see cref="IEnumerable{IUser}"/></returns>
+        IEnumerable<IUser> GetAllNotInGroup(int groupId);
+
         #region User types
 
         /// <summary>
-        /// Gets all UserTypes or thosed specified as parameters
+        /// Gets all UserTypes or those specified as parameters
         /// </summary>
         /// <param name="ids">Optional Ids of UserTypes to retrieve</param>
         /// <returns>An enumerable list of <see cref="IUserType"/></returns>
@@ -134,6 +172,61 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="userType">UserType to delete</param>
         void DeleteUserType(IUserType userType);
+
+        #endregion
+
+        #region User groups
+
+        /// <summary>
+        /// Gets all UserGroups or those specified as parameters
+        /// </summary>
+        /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
+        /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
+        IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids);
+
+        /// <summary>
+        /// Gets all UserGroups for a given user
+        /// </summary>
+        /// <param name="userId">Id of user</param>
+        /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
+        IEnumerable<IUserGroup> GetGroupsForUser(int userId);
+
+        /// <summary>
+        /// Gets a UserGroup by its Alias
+        /// </summary>
+        /// <param name="alias">Alias of the UserGroup to retrieve</param>
+        /// <returns><see cref="IUserGroup"/></returns>
+        IUserGroup GetUserGroupByAlias(string alias);
+
+        /// <summary>
+        /// Gets a UserGroup by its Id
+        /// </summary>
+        /// <param name="id">Id of the UserGroup to retrieve</param>
+        /// <returns><see cref="IUserGroup"/></returns>
+        IUserGroup GetUserGroupById(int id);
+
+        /// <summary>
+        /// Gets a UserGroup by its Name
+        /// </summary>
+        /// <param name="name">Name of the UserGroup to retrieve</param>
+        /// <returns><see cref="IUserGroup"/></returns>
+        IUserGroup GetUserGroupByName(string name);
+
+        /// <summary>
+        /// Saves a UserGroup
+        /// </summary>
+        /// <param name="userGroup">UserGroup to save</param>
+        /// <param name="updateUsers">Flag for whether to update the list of users in the group</param>
+        /// <param name="userIds">List of user Ids</param>
+        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
+        void SaveUserGroup(IUserGroup userGroup, bool updateUsers = false, int[] userIds = null, bool raiseEvents = true);
+
+        /// <summary>
+        /// Deletes a UserGroup
+        /// </summary>
+        /// <param name="userGroup">UserGroup to delete</param>
+        void DeleteUserGroup(IUserGroup userGroup);
 
         #endregion
     }

@@ -1,19 +1,13 @@
 using System;
 using System.Collections;
-using System.Web.Caching;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
-using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using umbraco.DataLayer;
+using Umbraco.Core.Persistence.Querying;
 
 namespace umbraco.BusinessLogic
 {
@@ -596,32 +590,14 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// Gets the users permissions based on a nodes path
         /// </summary>
-        /// <param name="Path">The path.</param>
+        /// <param name="path">The path.</param>
         /// <returns></returns>
-        public string GetPermissions(string Path)
+        public string GetPermissions(string path)
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
 
-            var defaultPermissions = UserType.DefaultPermissions;
-
-            var cachedPermissions = ApplicationContext.Current.Services.UserService.GetPermissions(UserEntity)
-                .ToArray();
-
-            // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
-            // set for the current node
-            var nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal) + 1)) : int.Parse(Path);
-            if (cachedPermissions.Any(x => x.EntityId == nodeId))
-            {
-                var found = cachedPermissions.First(x => x.EntityId == nodeId);
-                return string.Join("", found.AssignedPermissions);
-            }
-
-            // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
-            if (string.IsNullOrEmpty(defaultPermissions) && Path == "-1")
-                defaultPermissions = "F";
-
-            // else return default user type cruds
-            return defaultPermissions;
+            var userService = ApplicationContext.Current.Services.UserService;
+            return userService.GetPermissionsForPath(UserEntity, path);
         }
 
         /// <summary>
@@ -745,6 +721,32 @@ namespace umbraco.BusinessLogic
             //For backwards compatibility this requires an implicit save
             ApplicationContext.Current.Services.UserService.Save(UserEntity);
         }
+
+        /// <summary>
+        /// Clears the list of groups the user is in, ensure to call Save afterwords
+        /// </summary>
+        public void ClearGroups()
+        {
+            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+            foreach (var group in UserEntity.Groups.ToArray())
+            {
+                UserEntity.RemoveGroup(group);
+            }
+        }
+
+        /// <summary>
+        /// Adds a group to the list groups for the user, ensure to call Save() afterwords
+        /// </summary>
+        public void AddGroup(int groupId, string groupName)
+        {
+            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+            UserEntity.AddGroup(new Umbraco.Core.Models.Membership.UserGroup
+            {
+                Id = groupId,
+                Name = groupName,
+            });
+        }
+
 
         /// <summary>
         /// Gets or sets a value indicating whether the user has access to the Umbraco back end.

@@ -2,33 +2,25 @@
 using System.Collections;
 using System.Configuration.Provider;
 using System.Globalization;
-using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using System.Xml;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Security;
 using Umbraco.Web;
-using Umbraco.Web.Models;
 using Umbraco.Web.Security;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
-using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
 using umbraco.presentation.channels.businesslogic;
 using umbraco.uicontrols;
-using umbraco.providers;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.presentation.user
@@ -36,7 +28,7 @@ namespace umbraco.cms.presentation.user
     /// <summary>
     /// Summary description for EditUser.
     /// </summary>
-    public partial class EditUser : UmbracoEnsuredPage
+    public partial class EditUser : EditUserGroupsBase
     {
         public EditUser()
         {
@@ -65,6 +57,13 @@ namespace umbraco.cms.presentation.user
         protected ContentPicker cMediaPicker = new ContentPicker();
         protected ContentPicker cContentPicker = new ContentPicker();
         protected CustomValidator sectionValidator = new CustomValidator();
+
+        protected UpdatePanel pnlGroups = new UpdatePanel();
+        protected PlaceHolder pnlGroupControls = new PlaceHolder();
+        protected ListBox lstInGroups = new ListBox();
+        protected ListBox lstNotInGroups = new ListBox();
+        protected Button btnAddGroup = new Button();
+        protected Button btnRemoveGroup = new Button();
 
         protected Pane pp = new Pane();
 
@@ -154,7 +153,7 @@ namespace umbraco.cms.presentation.user
             var passwordChanger = (passwordChanger)LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
 
-            //Add a custom validation message for the password changer
+            // Add a custom validation message for the password changer
             var passwordValidation = new CustomValidator
             {
                 ID = "PasswordChangerValidator"
@@ -180,22 +179,59 @@ namespace umbraco.cms.presentation.user
             pp.addProperty(ui.Text("user", "usertype", UmbracoUser), userType);
             pp.addProperty(ui.Text("user", "language", UmbracoUser), userLanguage);
 
-            //Media  / content root nodes
-            Pane ppNodes = new Pane();
+            // Media  / content root nodes
+            var ppNodes = new Pane();
             ppNodes.addProperty(ui.Text("user", "startnode", UmbracoUser), content);
             ppNodes.addProperty(ui.Text("user", "mediastartnode", UmbracoUser), medias);
 
-            //Generel umrbaco access
-            Pane ppAccess = new Pane();
+            // General umbraco access
+            var ppAccess = new Pane();
             ppAccess.addProperty(ui.Text("user", "noConsole", UmbracoUser), NoConsole);
             ppAccess.addProperty(ui.Text("user", "disabled", UmbracoUser), Disabled);
 
-            //access to which modules... 
-            Pane ppModules = new Pane();
+            // Access to which modules... 
+            var ppModules = new Pane();
             ppModules.addProperty(ui.Text("user", "modules", UmbracoUser), lapps);
             ppModules.addProperty(" ", sectionValidator);
 
-            TabPage userInfo = UserTabs.NewTabPage(u.Name);
+            // Groups
+            var ppGroups = new Pane();
+            lstNotInGroups.SelectionMode = ListSelectionMode.Multiple;
+            btnAddGroup.Text = "Add";
+            btnAddGroup.Click += btnAddToGroup_Click;
+            btnRemoveGroup.Text = "Remove";
+            btnRemoveGroup.Click += btnRemoveFromGroup_Click;
+            lstInGroups.SelectionMode = ListSelectionMode.Multiple;
+            pnlGroups.ContentTemplateContainer.Controls.Add(pnlGroupControls);
+            pnlGroups.Attributes.Add("class", "group-selector");
+            
+            var pnl1 = new Panel();
+            pnl1.CssClass = "group-selector-list";
+            var pnl1Header = new Panel();
+            pnl1Header.Controls.Add(new Literal { Text = "Available groups" });
+            pnl1.Controls.Add(pnl1Header);
+            pnl1.Controls.Add(lstNotInGroups);
+            
+            var pnl2 = new Panel();
+            pnl2.CssClass = "group-selector-buttons";
+            pnl2.Controls.Add(btnAddGroup);
+            pnl2.Controls.Add(btnRemoveGroup);
+            
+            var pnl3 = new Panel();
+            pnl3.CssClass = "group-selector-list";
+            var pnl3Header = new Panel();
+            pnl3Header.Controls.Add(new Literal { Text = "Selected groups" });
+            pnl3.Controls.Add(pnl3Header);
+            pnl3.Controls.Add(lstInGroups);
+            
+            pnlGroups.ContentTemplateContainer.Controls.Add(pnl1);
+            pnlGroups.ContentTemplateContainer.Controls.Add(pnl2);
+            pnlGroups.ContentTemplateContainer.Controls.Add(pnl3);
+            
+            ppModules.addProperty(ui.Text("user", "userGroups", UmbracoUser), pnlGroups);
+            BindGroups();
+
+            var userInfo = UserTabs.NewTabPage(u.Name);
 
             userInfo.Controls.Add(pp);
 
@@ -203,6 +239,7 @@ namespace umbraco.cms.presentation.user
             userInfo.Controls.Add(ppNodes);
 
             userInfo.Controls.Add(ppModules);
+            userInfo.Controls.Add(ppGroups);
 
             userInfo.HasMenu = true;
 
@@ -227,6 +264,33 @@ namespace umbraco.cms.presentation.user
                 .SyncTree(UID.ToString(), IsPostBack);
         }
 
+        private void BindGroups()
+        {
+            var userService = ApplicationContext.Current.Services.UserService;
+            var allGroups = userService.GetAllUserGroups();
+            var groupsForUser = userService.GetGroupsForUser(u.Id);
+
+            lstInGroups.DataSource = groupsForUser;
+            lstInGroups.DataValueField = "Id";
+            lstInGroups.DataTextField = "Name";
+            lstInGroups.DataBind();
+
+            lstNotInGroups.DataSource = allGroups
+                .Where(x => groupsForUser.Select(y => y.Id).Contains(x.Id) == false);
+            lstNotInGroups.DataValueField = "Id";
+            lstNotInGroups.DataTextField = "Name";
+            lstNotInGroups.DataBind();
+        }
+  
+        protected void btnAddToGroup_Click(object sender, EventArgs e)
+        {
+            MoveItems(lstNotInGroups, lstInGroups);
+        }
+
+        protected void btnRemoveFromGroup_Click(object sender, EventArgs e)
+        {
+            MoveItems(lstInGroups, lstNotInGroups);
+        }
 
         void sectionValidator_ServerValidate(object source, ServerValidateEventArgs args)
         {
@@ -276,7 +340,6 @@ namespace umbraco.cms.presentation.user
             }
 
             // Handle content and media pickers
-
             PlaceHolder medias = new PlaceHolder();
             cMediaPicker.AppAlias = Constants.Applications.Media;
             cMediaPicker.TreeAlias = "media";
@@ -336,7 +399,6 @@ namespace umbraco.cms.presentation.user
         /// </summary>
         private void SetupForm()
         {
-
             if (!IsPostBack)
             {
                 MembershipUser user = BackOfficeProvider.GetUser(u.LoginName, false);
@@ -485,6 +547,12 @@ namespace umbraco.cms.presentation.user
                     foreach (ListItem li in lapps.Items)
                     {
                         if (li.Selected) u.AddApplication(li.Value);
+                    }
+
+                    u.ClearGroups();
+                    foreach (ListItem li in lstInGroups.Items)
+                    {
+                        u.AddGroup(int.Parse(li.Value), li.Text);
                     }
 
                     u.Save();

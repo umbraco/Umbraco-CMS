@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
@@ -44,9 +43,12 @@ namespace Umbraco.Core.Persistence.Factories
                 user.LastLoginDate = dto.LastLoginDate ?? DateTime.MinValue;
                 user.LastPasswordChangeDate = dto.LastPasswordChangeDate ?? DateTime.MinValue;
 
-                foreach (var app in dto.User2AppDtos)
+                if (dto.User2AppDtos != null)
                 {
-                    user.AddAllowedSection(app.AppAlias);
+                    foreach (var app in dto.User2AppDtos)
+                    {
+                        user.AddAllowedSection(app.AppAlias);
+                    }
                 }
 
                 //on initial construction we don't want to have dirty properties tracked
@@ -64,41 +66,43 @@ namespace Umbraco.Core.Persistence.Factories
         public UserDto BuildDto(IUser entity)
         {
             var dto = new UserDto
-                          {
-                              ContentStartId = entity.StartContentId,
-                              MediaStartId = entity.StartMediaId,
-                              Disabled = entity.IsApproved == false,
-                              Email = entity.Email,
-                              Login = entity.Username,
-                              NoConsole = entity.IsLockedOut,
-                              Password = entity.RawPasswordValue,
-                              UserLanguage = entity.Language,
-                              UserName = entity.Name,
-                              Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
-                              User2AppDtos = new List<User2AppDto>(),
-                              SecurityStampToken = entity.SecurityStamp,
-                              FailedLoginAttempts = entity.FailedPasswordAttempts,
-                              LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? (DateTime?)null : entity.LastLockoutDate,
-                              LastLoginDate = entity.LastLoginDate == DateTime.MinValue ? (DateTime?)null : entity.LastLoginDate,
-                              LastPasswordChangeDate = entity.LastPasswordChangeDate == DateTime.MinValue ? (DateTime?)null : entity.LastPasswordChangeDate,
-                          };
+            {
+                ContentStartId = entity.StartContentId,
+                MediaStartId = entity.StartMediaId,
+                Disabled = entity.IsApproved == false,
+                Email = entity.Email,
+                Login = entity.Username,
+                NoConsole = entity.IsLockedOut,
+                Password = entity.RawPasswordValue,
+                UserLanguage = entity.Language,
+                UserName = entity.Name,
+                Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
+                User2AppDtos = new List<User2AppDto>(),
+                SecurityStampToken = entity.SecurityStamp,
+                FailedLoginAttempts = entity.FailedPasswordAttempts,
+                LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? (DateTime?)null : entity.LastLockoutDate,
+                LastLoginDate = entity.LastLoginDate == DateTime.MinValue ? (DateTime?)null : entity.LastLoginDate,
+                LastPasswordChangeDate = entity.LastPasswordChangeDate == DateTime.MinValue ? (DateTime?)null : entity.LastPasswordChangeDate,
+            };
 
             foreach (var app in entity.AllowedSections)
             {
                 var appDto = new User2AppDto
-                    {
-                        AppAlias = app
-                    };
+                {
+                    AppAlias = app
+                };
                 if (entity.HasIdentity)
                 {
-                    appDto.UserId = (int) entity.Id;
+                    appDto.UserId = entity.Id;
                 }
 
                 dto.User2AppDtos.Add(appDto);
             }
 
             if (entity.HasIdentity)
+            {
                 dto.Id = entity.Id.SafeCast<int>();
+            }
 
             return dto;
         }

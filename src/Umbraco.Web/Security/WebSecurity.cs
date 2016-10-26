@@ -66,8 +66,8 @@ namespace Umbraco.Web.Security
         {
             get
             {
-                //only load it once per instance!
-                if (_currentUser == null)
+                //only load it once per instance! (but make sure groups are loaded)
+                if (_currentUser == null || _currentUser.GroupsLoaded == false)
                 {
                     var id = GetUserId();
                     if (id == -1)

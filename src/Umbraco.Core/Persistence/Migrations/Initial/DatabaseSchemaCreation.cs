@@ -73,9 +73,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {34, typeof (TaskDto)},
                                                                               {35, typeof (ContentType2ContentTypeDto)},
                                                                               {36, typeof (ContentTypeAllowedContentTypeDto)},
-                                                                              {37, typeof (User2AppDto)},
+                                                                              // Removed in 7.6 {37, typeof (User2AppDto)},
                                                                               {38, typeof (User2NodeNotifyDto)},
-                                                                              {39, typeof (User2NodePermissionDto)},
+                                                                              // Removed in 7.6 {39, typeof (User2NodePermissionDto)},
                                                                               {40, typeof (ServerRegistrationDto)},
                                                                               {41, typeof (AccessDto)},
                                                                               {42, typeof (AccessRuleDto)},
@@ -84,7 +84,11 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {45, typeof (MigrationDto)},
                                                                               {46, typeof (UmbracoDeployChecksumDto)},
                                                                               {47, typeof (UmbracoDeployDependencyDto)},
-                                                                              {48, typeof (RedirectUrlDto) }
+                                                                              {48, typeof (RedirectUrlDto) },
+                                                                              {49, typeof (UserGroupDto) },
+                                                                              {50, typeof (User2UserGroupDto) },
+                                                                              {51, typeof (UserGroup2NodePermissionDto) },
+                                                                              {52, typeof (UserGroup2AppDto) },
                                                                           };
         #endregion
         
