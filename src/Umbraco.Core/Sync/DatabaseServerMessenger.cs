@@ -116,7 +116,7 @@ namespace Umbraco.Core.Sync
                         _released = true; // no more syncs
                     }
 
-                    //only wait 5 seconds
+                    //wait a max of 5 seconds
                     var result =_syncIdle.WaitOne(5000);
                     if (result == false)
                     {
@@ -291,6 +291,9 @@ namespace Umbraco.Core.Sync
 
             var lastId = 0;
             
+            //tracks which ones have already been processed to avoid duplicates
+            var processed = new HashSet<RefreshInstruction>();
+
             //It would have been nice to do this in a Query instead of Fetch using a data reader to save 
             // some memory however we cannot do thta because inside of this loop the cache refreshers are also
             // performing some lookups which cannot be done with an active reader open
@@ -326,7 +329,7 @@ namespace Umbraco.Core.Sync
                 var instructionBatch = GetAllInstructions(jsonA);
 
                 //process as per-normal
-                var success = ProcessDatabaseInstructions(instructionBatch, dto, ref lastId);
+                var success = ProcessDatabaseInstructions(instructionBatch, dto, processed, ref lastId);
 
                 //if they couldn't be all processed (i.e. we're shutting down) then exit
                 if (success == false)
@@ -346,16 +349,19 @@ namespace Umbraco.Core.Sync
         /// </summary>
         /// <param name="instructionBatch"></param>
         /// <param name="dto"></param>
+        /// <param name="processed">
+        /// Tracks which instructions have already been processed to avoid duplicates
+        /// </param>
         /// <param name="lastId"></param>
         /// <returns>
         /// returns true if all instructions in the batch were processed, otherwise false if they could not be due to the app being shut down
         /// </returns>
-        private bool ProcessDatabaseInstructions(IReadOnlyCollection<RefreshInstruction> instructionBatch, CacheInstructionDto dto, ref int lastId)
+        private bool ProcessDatabaseInstructions(IReadOnlyCollection<RefreshInstruction> instructionBatch, CacheInstructionDto dto, HashSet<RefreshInstruction> processed, ref int lastId)
         {
             // execute remote instructions & update lastId
             try
             {
-                var result = NotifyRefreshers(instructionBatch);
+                var result = NotifyRefreshers(instructionBatch, processed);
                 if (result)
                 {
                     //if all instructions we're processed, set the last id
@@ -561,13 +567,12 @@ namespace Umbraco.Core.Sync
         /// executes the instructions against the cache refresher instances
         /// </summary>
         /// <param name="instructions"></param>
+        /// <param name="processed"></param>
         /// <returns>
         /// Returns true if all instructions were processed, otherwise false if the processing was interupted (i.e. app shutdown)
         /// </returns>
-        private bool NotifyRefreshers(IEnumerable<RefreshInstruction> instructions)
+        private bool NotifyRefreshers(IEnumerable<RefreshInstruction> instructions, HashSet<RefreshInstruction> processed)
         {
-            var processed = new HashSet<RefreshInstruction>();
-
             foreach (var instruction in instructions)
             {
                 //Check if the app is shutting down, we need to exit if this happens.
