@@ -8,9 +8,11 @@ using Examine.LuceneEngine.Providers;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using Examine.LuceneEngine.SearchCriteria;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class SearchTests : ExamineBaseTest
     {

@@ -10,15 +10,17 @@ using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using NUnit.Framework;
+using Umbraco.Tests.TestHelpers;
 using UmbracoExamine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
 
-	/// <summary>
-	/// Tests the standard indexing capabilities
-	/// </summary>
-	[TestFixture, RequiresSTA]
+    /// <summary>
+    /// Tests the standard indexing capabilities
+    /// </summary>
+    //[DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [TestFixture, RequiresSTA]
     public class IndexTest : ExamineBaseTest
 	{
 
@@ -85,12 +87,11 @@ namespace Umbraco.Tests.UmbracoExamine
 			//RESET the parent id
 			existingCriteria = ((IndexCriteria)_indexer.IndexerData);
 			_indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-				null);			
+				null);
 
 			//now ensure it's deleted
 			var newResults = _searcher.Search(_searcher.CreateSearchCriteria().Id(2112).Compile());
 			Assert.AreEqual(1, newResults.Count());
-
 		}
 
 		[Test]
