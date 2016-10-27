@@ -385,6 +385,7 @@
     <Compile Include="Models\IRedirectUrl.cs" />
     <Compile Include="Models\IServerRegistration.cs" />
     <Compile Include="Models\Mapping\MappingExpressionExtensions.cs" />
+    <Compile Include="Models\Membership\UserGroupEntityPermission.cs" />
     <Compile Include="Models\Membership\IUserTypeGroupBase.cs" />
     <Compile Include="Models\Membership\IUserGroup.cs" />
     <Compile Include="Models\Membership\UserTypeGroupBase.cs" />
@@ -787,7 +788,6 @@
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\TagFactory.cs" />
     <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
-    <Compile Include="Persistence\Factories\UserSectionFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\RetryingEventArgs.cs" />
     <Compile Include="Persistence\FaultHandling\RetryLimitExceededException.cs" />
@@ -1034,7 +1034,6 @@
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />
     <Compile Include="Persistence\Relators\PropertyTypePropertyGroupRelator.cs" />
-    <Compile Include="Persistence\Relators\UserSectionRelator.cs" />
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeBaseRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepository.cs" />
@@ -1205,9 +1204,7 @@
     <Compile Include="Models\Rdbms\TaskDto.cs" />
     <Compile Include="Models\Rdbms\TaskTypeDto.cs" />
     <Compile Include="Models\Rdbms\TemplateDto.cs" />
-    <Compile Include="Models\Rdbms\User2AppDto.cs" />
     <Compile Include="Models\Rdbms\User2NodeNotifyDto.cs" />
-    <Compile Include="Models\Rdbms\User2NodePermissionDto.cs" />
     <Compile Include="Models\Rdbms\UserDto.cs" />
     <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />

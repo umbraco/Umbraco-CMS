@@ -147,9 +147,6 @@ namespace Umbraco.Core.Services
                     IsLockedOut = false,
                     IsApproved = true
                 };
-                //adding default sections content and media
-                user.AddAllowedSection("content");
-                user.AddAllowedSection("media");
 
                 if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
                     return user;
@@ -584,33 +581,33 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Replaces the same permission set for a single user to any number of entities
+        /// Replaces the same permission set for a single group to any number of entities
         /// </summary>
-        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
-        /// <param name="userId">Id of the user</param>
+        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified group.</remarks>
+        /// <param name="groupId">Id of the group</param>
         /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
-        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplaceUserGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
             {
-                repository.ReplaceUserPermissions(userId, permissions, entityIds);
+                repository.ReplaceGroupPermissions(groupId, permissions, entityIds);
             }
         }
 
         /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
+        /// Assigns the same permission set for a single user group to any number of entities
         /// </summary>
-        /// <param name="userId">Id of the user</param>
+        /// <param name="groupId">Id of the user group</param>
         /// <param name="permission"></param>
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
-        public void AssignUserPermission(int userId, char permission, params int[] entityIds)
+        public void AssignUserGroupPermission(int groupId, char permission, params int[] entityIds)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
             {
-                repository.AssignUserPermission(userId, permission, entityIds);
+                repository.AssignGroupPermission(groupId, permission, entityIds);
             }
         }
 
@@ -843,48 +840,50 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>This is useful when an entire section is removed from config</remarks>
         /// <param name="sectionAlias">Alias of the section to remove</param>
-        public void DeleteSectionFromAllUsers(string sectionAlias)
+        public void DeleteSectionFromAllUserGroups(string sectionAlias)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
             {
-                var assignedUsers = repository.GetUsersAssignedToSection(sectionAlias);
-                foreach (var user in assignedUsers)
+                var assignedGroups = repository.GetGroupsAssignedToSection(sectionAlias);
+                foreach (var group in assignedGroups)
                 {
                     //now remove the section for each user and commit
-                    user.RemoveAllowedSection(sectionAlias);
-                    repository.AddOrUpdate(user);
+                    group.RemoveAllowedSection(sectionAlias);
+                    repository.AddOrUpdate(group);
                 }
+
                 uow.Commit();
             }
         }
-        
+
         /// <summary>
-        /// Add a specific section to all users or those specified as parameters
+        /// Add a specific section to all user groups or those specified as parameters
         /// </summary>
-        /// <remarks>This is useful when a new section is created to allow specific users accessing it</remarks>
+        /// <remarks>This is useful when a new section is created to allow specific user groups to  access it</remarks>
         /// <param name="sectionAlias">Alias of the section to add</param>
-        /// <param name="userIds">Specifiying nothing will add the section to all user</param>
-        public void AddSectionToAllUsers(string sectionAlias, params int[] userIds)
+        /// <param name="groupIds">Specifiying nothing will add the section to all user</param>
+        public void AddSectionToAllUserGroups(string sectionAlias, params int[] groupIds)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
             {
-                IEnumerable<IUser> users;
-                if (userIds.Any())
+                IEnumerable<IUserGroup> groups;
+                if (groupIds.Any())
                 {
-                    users = repository.GetAll(userIds);
+                    groups = repository.GetAll(groupIds);
                 }
                 else
                 {
-                    users = repository.GetAll();
+                    groups = repository.GetAll();
                 }
-                foreach (var user in users.Where(u => !u.AllowedSections.InvariantContains(sectionAlias)))
+                foreach (var group in groups.Where(g => g.AllowedSections.InvariantContains(sectionAlias) == false))
                 {
-                    //now add the section for each user and commit
-                    user.AddAllowedSection(sectionAlias);
-                    repository.AddOrUpdate(user);
+                    //now add the section for each group and commit
+                    group.AddAllowedSection(sectionAlias);
+                    repository.AddOrUpdate(group);
                 }
+
                 uow.Commit();
             }
         }    
@@ -901,16 +900,15 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
-                var explicitPermissions = repository.GetUserPermissionsForEntities(user.Id, nodeIds);
+                // TODO: rework (to use groups - currently defaulting to user type)
 
                 //if no permissions are assigned to a particular node then we will fill in those permissions with the user's defaults
-                var result = new List<EntityPermission>(explicitPermissions);
+                var result = new List<EntityPermission>();
                 var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
                 foreach (var id in missingIds)
                 {
                     result.Add(
                         new EntityPermission(
-                            user.Id,
                             id,
                             user.DefaultPermissions.ToArray()));
                 }
@@ -939,16 +937,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         private IEnumerable<EntityPermission> GetPermissions(IUserRepository repository, IUser user, params int[] nodeIds)
         {
-            var explicitPermissions = repository.GetUserPermissionsForEntities(user.Id, nodeIds);
-            var result = new List<EntityPermission>(explicitPermissions);
+            var result = new List<EntityPermission>();
 
-            // Save list of nodes that user has explicit permissions for - these take priority so we don't want
-            // to amend with any settings from groups (we'll take the special "null" action as not being defined
-            // as this is set if someone sets permissions on a user and then removes them)
-            var explicitlyDefinedEntityIds = result
-                .Where(IsNotNullActionPermission)
-                .Select(x => x.EntityId)
-                .ToArray();
+            // TODO: rework to groups first, then user type
 
             // If no permissions are assigned to a particular node then, we will fill in those permissions with the user's defaults
             var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
@@ -956,7 +947,6 @@ namespace Umbraco.Core.Services
             {
                 result.Add(
                     new EntityPermission(
-                        user.Id,
                         id,
                         user.DefaultPermissions.ToArray()));
             }
@@ -967,12 +957,8 @@ namespace Umbraco.Core.Services
                 var groupPermissions = GetPermissions(group, nodeIds).ToList();
                 foreach (var groupPermission in groupPermissions)
                 {
-                    // Check if we already have this from explicitly set user permissions, if so, ignore it
-                    if (explicitlyDefinedEntityIds.Contains(groupPermission.EntityId) == false)
-                    {
-                        // Add group permission, ensuring we keep a unique value for the entity Id in the list
-                        AddOrAmendPermission(result, groupPermission);
-                    }
+                    // Add group permission, ensuring we keep a unique value for the entity Id in the list
+                    AddOrAmendPermission(result, groupPermission);
                 }
             }
 

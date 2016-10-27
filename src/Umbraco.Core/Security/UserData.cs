@@ -56,6 +56,9 @@ namespace Umbraco.Core.Security
         [DataMember(Name = "allowedApps")]
         public string[] AllowedApplications { get; set; }
 
+        [DataMember(Name = "groups")]
+        public string[] Groups { get; set; }
+
         [DataMember(Name = "culture")]
         public string Culture { get; set; }
     }

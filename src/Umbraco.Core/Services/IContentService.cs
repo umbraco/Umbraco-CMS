@@ -135,7 +135,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content);
+        IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(IContent content);
 
         bool SendToPublication(IContent content, int userId = 0);
 

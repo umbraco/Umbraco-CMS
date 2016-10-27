@@ -3,18 +3,16 @@
 namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
-    /// Represents a user -> entity permission
+    /// Represents an entity permission (defined on the user group and derived to retrieve permissions for a given user)
     /// </summary>
     public class EntityPermission
     {
-        public EntityPermission(int userId, int entityId, string[] assignedPermissions)
+        public EntityPermission(int entityId, string[] assignedPermissions)
         {
-            UserId = userId;
             EntityId = entityId;
             AssignedPermissions = assignedPermissions;
         }
 
-        public int UserId { get; private set; }
         public int EntityId { get; private set; }
 
         /// <summary>

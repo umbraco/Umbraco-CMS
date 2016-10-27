@@ -25,12 +25,8 @@ namespace Umbraco.Core.Models.Membership
             _defaultPermissions = _userType.Permissions == null ? Enumerable.Empty<string>() : new List<string>(_userType.Permissions);
             //Groups = new List<object> { userType };
             SessionTimeout = 60;
-            _sectionCollection = new ObservableCollection<string>();
-            _addedSections = new List<string>();
-            _removedSections = new List<string>();
             _groupCollection = new List<IUserGroup>();
             _language = GlobalSettings.DefaultUILanguage;
-            _sectionCollection.CollectionChanged += SectionCollectionChanged;
             _isApproved = true;
             _isLockedOut = false;
             _startContentId = -1;
@@ -55,9 +51,6 @@ namespace Umbraco.Core.Models.Membership
         private IUserType _userType;
         private string _name;
         private string _securityStamp;
-        private List<string> _addedSections;
-        private List<string> _removedSections;
-        private ObservableCollection<string> _sectionCollection;
         private List<IUserGroup> _groupCollection;
         private bool _groupsLoaded;
         private int _sessionTimeout;
@@ -92,7 +85,6 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo SessionTimeoutSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.SessionTimeout);
             public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartContentId);
             public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartMediaId);
-            public readonly PropertyInfo AllowedSectionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.AllowedSections);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Name);
 
             public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Username);
@@ -200,22 +192,16 @@ namespace Umbraco.Core.Models.Membership
 
         public IEnumerable<string> AllowedSections
         {
-            get { return _sectionCollection; }
-        }
-
-        public void RemoveAllowedSection(string sectionAlias)
-        {
-            if (_sectionCollection.Contains(sectionAlias))
+            get
             {
-                _sectionCollection.Remove(sectionAlias);
-            }
-        }
+                if (GroupsLoaded == false)
+                {
+                    return Enumerable.Empty<string>();
+                }
 
-        public void AddAllowedSection(string sectionAlias)
-        {
-            if (_sectionCollection.Contains(sectionAlias) == false)
-            {
-                _sectionCollection.Add(sectionAlias);
+                return Groups
+                    .SelectMany(x => x.AllowedSections)
+                    .Distinct();
             }
         }
 
@@ -232,22 +218,6 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return _securityStamp; }
             set { SetPropertyValueAndDetectChanges(value, ref _securityStamp, Ps.Value.SecurityStampSelector); }
-        }
-
-        /// <summary>
-        /// Used internally to check if we need to add a section in the repository to the db
-        /// </summary>
-        internal IEnumerable<string> AddedSections
-        {
-            get { return _addedSections; }
-        }
-
-        /// <summary>
-        /// Used internally to check if we need to remove  a section in the repository to the db
-        /// </summary>
-        internal IEnumerable<string> RemovedSections
-        {
-            get { return _removedSections; }
         }
 
         /// <summary>
@@ -363,61 +333,15 @@ namespace Umbraco.Core.Models.Membership
 
         #endregion
 
-        /// <summary>
-        /// Whenever resetting occurs, clear the remembered add/removed collections, even if 
-        /// rememberPreviouslyChangedProperties is true, the AllowedSections property will still
-        /// be flagged as dirty.
-        /// </summary>
-        /// <param name="rememberPreviouslyChangedProperties"></param>
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
-        {
-            _addedSections.Clear();
-            _removedSections.Clear();
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
-        }
-
-        /// <summary>
-        /// Handles the collection changed event in order for us to flag the AllowedSections property as changed
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void SectionCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            OnPropertyChanged(Ps.Value.AllowedSectionsSelector);
-
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                var item = e.NewItems.Cast<string>().First();
-
-                if (_addedSections.Contains(item) == false)
-                {
-                    _addedSections.Add(item);
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                var item = e.OldItems.Cast<string>().First();
-
-                if (_removedSections.Contains(item) == false)
-                {
-                    _removedSections.Add(item);    
-                }
-            }
-        }
-
         public override object DeepClone()
         {
             var clone = (User)base.DeepClone();
             //turn off change tracking
             clone.DisableChangeTracking();
             //need to create new collections otherwise they'll get copied by ref
-            clone._addedSections = new List<string>();
-            clone._removedSections = new List<string>();
-            clone._sectionCollection = new ObservableCollection<string>(_sectionCollection.ToList());
             clone._groupCollection = new List<IUserGroup>(_groupCollection.ToList());
             clone._defaultPermissions = new List<string>(_defaultPermissions.ToList());
             //re-create the event handler
-            clone._sectionCollection.CollectionChanged += clone.SectionCollectionChanged;
             //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
             //re-enable tracking

@@ -251,7 +251,6 @@ namespace Umbraco.Web.Security
                 IsLockedOut = false,
                 IsApproved = true
             };
-            user.AddAllowedSection("content");
 
             _applicationContext.Services.UserService.Save(user);
 

@@ -394,12 +394,12 @@ namespace Umbraco.Core.Persistence.Repositories
             // user's default permissions.
             if (parentPermissions.Any())
             {
-                var userPermissions = (
+                var userGroupPermissions = (
                     from perm in parentPermissions
                     from p in perm.AssignedPermissions
-                    select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
+                    select new EntityPermissionSet.UserGroupPermission(perm.UserGroupId, p)).ToList();
 
-                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
+                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userGroupPermissions));
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content)entity).PermissionsChanged = true;
@@ -791,7 +791,7 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
             repo.AssignEntityPermission(entity, permission, userIds);
         }
 
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        public IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(int entityId)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             return repo.GetPermissionsForEntity(entityId);

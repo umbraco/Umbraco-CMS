@@ -8,7 +8,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedUser
     {
-        internal static User CreateUser(IUserType userType = null, string suffix = "", params string[] allowedSections)
+        internal static User CreateUser(IUserType userType = null, string suffix = "")
         {
             if (userType == null)
             {
@@ -29,23 +29,10 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     Username = "TestUser" + suffix
                 };
 
-            if (allowedSections.Any())
-            {
-                foreach (var s in allowedSections)
-                {
-                    user.AddAllowedSection(s);
-                }
-            }
-            else
-            {
-                user.AddAllowedSection("content");
-                user.AddAllowedSection("media");    
-            }
-
             return user;
         }
 
-        internal static IEnumerable<IUser> CreateUser(IUserType userType, int amount, Action<int, IUser> onCreating = null)
+        internal static IEnumerable<IUser> CreateMulipleUsers(IUserType userType, int amount, Action<int, IUser> onCreating = null)
         {
             var list = new List<IUser>();
 

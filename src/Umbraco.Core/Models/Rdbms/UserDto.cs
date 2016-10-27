@@ -73,8 +73,5 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("lastLoginDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? LastLoginDate { get; set; }
-        
-        [ResultColumn]
-        public List<User2AppDto> User2AppDtos { get; set; }
     }
 }

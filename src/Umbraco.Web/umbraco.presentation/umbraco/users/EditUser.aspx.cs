@@ -38,7 +38,6 @@ namespace umbraco.cms.presentation.user
         protected TextBox uname = new TextBox();
         protected TextBox lname = new TextBox();
         protected PlaceHolder passw = new PlaceHolder();
-        protected CheckBoxList lapps = new CheckBoxList();
         protected TextBox email = new TextBox();
         protected DropDownList userType = new DropDownList();
         protected DropDownList userLanguage = new DropDownList();
@@ -189,11 +188,6 @@ namespace umbraco.cms.presentation.user
             ppAccess.addProperty(ui.Text("user", "noConsole", UmbracoUser), NoConsole);
             ppAccess.addProperty(ui.Text("user", "disabled", UmbracoUser), Disabled);
 
-            // Access to which modules... 
-            var ppModules = new Pane();
-            ppModules.addProperty(ui.Text("user", "modules", UmbracoUser), lapps);
-            ppModules.addProperty(" ", sectionValidator);
-
             // Groups
             var ppGroups = new Pane();
             lstNotInGroups.SelectionMode = ListSelectionMode.Multiple;
@@ -227,9 +221,8 @@ namespace umbraco.cms.presentation.user
             pnlGroups.ContentTemplateContainer.Controls.Add(pnl1);
             pnlGroups.ContentTemplateContainer.Controls.Add(pnl2);
             pnlGroups.ContentTemplateContainer.Controls.Add(pnl3);
-            
-            ppModules.addProperty(ui.Text("user", "userGroups", UmbracoUser), pnlGroups);
             BindGroups();
+            ppGroups.addProperty(ui.Text("user", "userGroups", UmbracoUser), pnlGroups);
 
             var userInfo = UserTabs.NewTabPage(u.Name);
 
@@ -238,7 +231,6 @@ namespace umbraco.cms.presentation.user
             userInfo.Controls.Add(ppAccess);
             userInfo.Controls.Add(ppNodes);
 
-            userInfo.Controls.Add(ppModules);
             userInfo.Controls.Add(ppGroups);
 
             userInfo.HasMenu = true;
@@ -249,12 +241,6 @@ namespace umbraco.cms.presentation.user
             save.ToolTip = ui.Text("save");
             save.Text = ui.Text("save");
             save.ButtonType = MenuButtonType.Primary;
-
-            sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
-            sectionValidator.ControlToValidate = lapps.ID;
-            sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", UmbracoUser), UmbracoUser);
-            sectionValidator.CssClass = "error";
-            sectionValidator.Style.Add("color", "red");
 
             SetupForm();
             SetupChannel();
@@ -290,14 +276,6 @@ namespace umbraco.cms.presentation.user
         protected void btnRemoveFromGroup_Click(object sender, EventArgs e)
         {
             MoveItems(lstInGroups, lstNotInGroups);
-        }
-
-        void sectionValidator_ServerValidate(object source, ServerValidateEventArgs args)
-        {
-            args.IsValid = false;
-
-            if (lapps.SelectedIndex >= 0)
-                args.IsValid = true;
         }
 
         private void SetupChannel()
@@ -408,32 +386,7 @@ namespace umbraco.cms.presentation.user
 
                 contentPicker.Value = u.StartNodeId.ToString(CultureInfo.InvariantCulture);
                 mediaPicker.Value = u.StartMediaId.ToString(CultureInfo.InvariantCulture);
-
-                // get the current users applications
-                string currentUserApps = ";";
-                foreach (Application a in CurrentUser.Applications)
-                    currentUserApps += a.alias + ";";
-
-                Application[] uapps = u.Applications;
-                foreach (Application app in BusinessLogic.Application.getAll())
-                {
-                    if (CurrentUser.IsAdmin() || currentUserApps.Contains(";" + app.alias + ";"))
-                    {
-                        ListItem li = new ListItem(ui.Text("sections", app.alias), app.alias);
-                        if (!IsPostBack) foreach (Application tmp in uapps) if (app.alias == tmp.alias) li.Selected = true;
-                        lapps.Items.Add(li);
-                    }
-                }
             }
-        }
-
-        protected override void OnInit(EventArgs e)
-        {
-            base.OnInit(e);
-
-            //lapps.SelectionMode = ListSelectionMode.Multiple;
-            lapps.RepeatLayout = RepeatLayout.Flow;
-            lapps.RepeatDirection = RepeatDirection.Vertical;
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -543,11 +496,6 @@ namespace umbraco.cms.presentation.user
                     }
                     u.StartMediaId = mstartNode;
 
-                    u.ClearApplications();
-                    foreach (ListItem li in lapps.Items)
-                    {
-                        if (li.Selected) u.AddApplication(li.Value);
-                    }
 
                     u.ClearGroups();
                     foreach (ListItem li in lstInGroups.Items)

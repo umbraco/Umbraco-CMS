@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
+        IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(int entityId);
 
         /// <summary>
         /// Used to add/update published xml for the content item

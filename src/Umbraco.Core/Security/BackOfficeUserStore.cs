@@ -389,7 +389,7 @@ namespace Umbraco.Core.Security
 
 
         /// <summary>
-        /// Adds a user to a role (section)
+        /// Adds a user to a role (user group)
         /// </summary>
         /// <param name="user"/><param name="roleName"/>
         /// <returns/>
@@ -406,18 +406,19 @@ namespace Umbraco.Core.Security
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            var found = _userService.GetUserById(asInt.Result);
+            var foundUser = _userService.GetUserById(asInt.Result);
+            var foundGroup = _userService.GetUserGroupByName(roleName);
 
-            if (found != null)
+            if (foundUser != null && foundGroup != null)
             {
-                found.AddAllowedSection(roleName);
+                foundUser.AddGroup(foundGroup);
             }
 
             return Task.FromResult(0);
         }
 
         /// <summary>
-        /// Removes the role (allowed section) for the user
+        /// Removes the role (user group) for the user
         /// </summary>
         /// <param name="user"/><param name="roleName"/>
         /// <returns/>
@@ -434,18 +435,19 @@ namespace Umbraco.Core.Security
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            var found = _userService.GetUserById(asInt.Result);
+            var foundUser = _userService.GetUserById(asInt.Result);
+            var foundGroup = _userService.GetUserGroupByName(roleName);
 
-            if (found != null)
+            if (foundUser != null && foundGroup != null)
             {
-                found.RemoveAllowedSection(roleName);
+                foundUser.RemoveGroup(foundGroup);
             }
 
             return Task.FromResult(0);
         }
 
         /// <summary>
-        /// Returns the roles for this user
+        /// Returns the roles (user groups) for this user
         /// </summary>
         /// <param name="user"/>
         /// <returns/>
@@ -453,7 +455,7 @@ namespace Umbraco.Core.Security
         {            
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-            return Task.FromResult((IList<string>)user.AllowedSections.ToList());
+            return Task.FromResult((IList<string>)user.Groups.ToList());
         }
 
         /// <summary>
@@ -465,7 +467,7 @@ namespace Umbraco.Core.Security
         {            
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-            return Task.FromResult(user.AllowedSections.InvariantContains(roleName));
+            return Task.FromResult(user.Groups.InvariantContains(roleName));
         }
 
         /// <summary>
@@ -677,17 +679,21 @@ namespace Umbraco.Core.Security
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
             
-            if (user.AllowedSections.ContainsAll(identityUser.AllowedSections) == false
-                || identityUser.AllowedSections.ContainsAll(user.AllowedSections) == false)
+            if (user.Groups.Select(x => x.Name).ContainsAll(identityUser.Groups) == false
+                || identityUser.Groups.ContainsAll(user.Groups.Select(x => x.Name)) == false)
             {
                 anythingChanged = true;
-                foreach (var allowedSection in user.AllowedSections)
+                foreach (var group in user.Groups)
                 {
-                    user.RemoveAllowedSection(allowedSection);
+                    user.RemoveGroup(group);
                 }
-                foreach (var allowedApplication in identityUser.AllowedSections)
+                foreach (var group in identityUser.Groups)
                 {
-                    user.AddAllowedSection(allowedApplication);
+                    var foundGroup = _userService.GetUserGroupByName(group);
+                    if (foundGroup != null)
+                    {
+                        user.AddGroup(foundGroup);
+                    }
                 }
             }
 

@@ -48,19 +48,19 @@ namespace Umbraco.Core.Services
         IUser GetUserById(int id);
         
         /// <summary>
-        /// Removes a specific section from all users
+        /// Removes a specific section from all user groups
         /// </summary>
         /// <remarks>This is useful when an entire section is removed from config</remarks>
         /// <param name="sectionAlias">Alias of the section to remove</param>
-        void DeleteSectionFromAllUsers(string sectionAlias);
-        
+        void DeleteSectionFromAllUserGroups(string sectionAlias);
+
         /// <summary>
-        /// Add a specific section to all users or those specified as parameters
+        /// Add a specific section to all user groups or those specified as parameters
         /// </summary>
-        /// <remarks>This is useful when a new section is created to allow specific users accessing it</remarks>
+        /// <remarks>This is useful when a new section is created to allow specific user groups to  access it</remarks>
         /// <param name="sectionAlias">Alias of the section to add</param>
-        /// <param name="userIds">Specifiying nothing will add the section to all user</param>
-        void AddSectionToAllUsers(string sectionAlias, params int[] userIds);
+        /// <param name="groupIds">Specifiying nothing will add the section to all user</param>
+        void AddSectionToAllUserGroups(string sectionAlias, params int[] groupIds);
         
         /// <summary>
         /// Get permissions set for a user and optional node ids
@@ -96,24 +96,24 @@ namespace Umbraco.Core.Services
         string GetPermissionsForPath(IUserGroup group, string path);
 
         /// <summary>
-        /// Replaces the same permission set for a single user to any number of entities
+        /// Replaces the same permission set for a single group to any number of entities
         /// </summary>        
-        /// <param name="userId">Id of the user</param>
+        /// <param name="groupId">Id of the group</param>
         /// <param name="permissions">
         /// Permissions as enumerable list of <see cref="char"/>, 
-        /// if no permissions are specified then all permissions for this node are removed for this user
+        /// if no permissions are specified then all permissions for this node are removed for this group
         /// </param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
-        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
-        void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
+        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified group.</remarks>
+        void ReplaceUserGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds);
 
         /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
+        /// Assigns the same permission set for a single user group to any number of entities
         /// </summary>
-        /// <param name="userId">Id of the user</param>
+        /// <param name="groupId">Id of the group</param>
         /// <param name="permission"></param>
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
-        void AssignUserPermission(int userId, char permission, params int[] entityIds);
+        void AssignUserGroupPermission(int groupId, char permission, params int[] entityIds);
 
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects associated with a given group

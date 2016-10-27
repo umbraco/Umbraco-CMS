@@ -24,7 +24,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userIds">Ids of users</param>
         void AddUsersToGroup(int groupId, int[] userIds);
 
-        /*
         /// <summary>
         /// Gets the group permissions for the specified entities
         /// </summary>
@@ -47,6 +46,5 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="permission">Permissions as enumerable list of <see cref="char"/></param>
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
         void AssignGroupPermission(int groupId, char permission, params int[] entityIds);
-        */
     }
 }

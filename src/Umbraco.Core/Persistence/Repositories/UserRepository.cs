@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var dto = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql).FirstOrDefault();
+            var dto = Database.Fetch<UserDto>(sql).FirstOrDefault();
             
             if (dto == null)
                 return null;
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoUser.id in (@ids)", new {ids = ids});
             }
             
-            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql))
+            return ConvertFromDtos(Database.Fetch<UserDto>(sql))
                 .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
         }
         
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IUser>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql)
+            var dtos = Database.Fetch<UserDto>(sql)
                 .DistinctBy(x => x.Id);
 
             var users = ConvertFromDtos(dtos)
@@ -121,9 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(columns)
-                .From<UserDto>()
-                .LeftJoin<User2AppDto>()
-                .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
+                .From<UserDto>();
             return sql;
         }
 
@@ -139,9 +137,8 @@ namespace Umbraco.Core.Persistence.Repositories
                            {
                                "DELETE FROM cmsTask WHERE userId = @Id",
                                "DELETE FROM cmsTask WHERE parentUserId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
+                               "DELETE FROM umbracoUser2UserGroup WHERE userId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
-                               "DELETE FROM umbracoUser2app WHERE " + SqlSyntax.GetQuotedColumnName("user") + "=@Id",
                                "DELETE FROM umbracoUser WHERE id = @Id",
                                "DELETE FROM umbracoExternalLogin WHERE id = @Id"
                            };
@@ -167,13 +164,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
-
-            foreach (var sectionDto in userDto.User2AppDtos)
-            {
-                //need to set the id explicitly here
-                sectionDto.UserId = id;
-                Database.Insert(sectionDto);
-            }
 
             entity.ResetDirtyProperties();
         }
@@ -238,52 +228,23 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 Database.Update(userDto, changedCols);
             }
-            
-            //update the sections if they've changed
+
+            //update the groups 
             var user = (User)entity;
-            if (user.IsPropertyDirty("AllowedSections"))
+
+            //first delete all 
+            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId",
+                new { UserId = user.Id });
+
+            //then re-add any associated with the user
+            foreach (var group in user.Groups)
             {
-                //now we need to delete any applications that have been removed
-                foreach (var section in user.RemovedSections)
+                var dto = new User2UserGroupDto
                 {
-                    //we need to manually delete this record because it has a composite key
-                    Database.Delete<User2AppDto>("WHERE app = @Section AND " + SqlSyntax.GetQuotedColumnName("user") + "= @UserId",
-                        new { Section = section, UserId = user.Id });
-                }
-
-                //for any that exist on the object, we need to determine if we need to update or insert
-                //NOTE: the User2AppDtos collection wil always be equal to the User.AllowedSections
-                foreach (var sectionDto in userDto.User2AppDtos)
-                {
-                    //if something has been added then insert it
-                    if (user.AddedSections.Contains(sectionDto.AppAlias))
-                    {
-                        //we need to insert since this was added  
-                        Database.Insert(sectionDto);
-                    }
-                    else
-                    {
-                        //we need to manually update this record because it has a composite key
-                        Database.Update<User2AppDto>("SET app=@Section WHERE app=@Section AND " + SqlSyntax.GetQuotedColumnName("user") + "=@UserId",
-                                                     new { Section = sectionDto.AppAlias, UserId = sectionDto.UserId });
-                    }
-                }
-
-                //update the groups 
-                //first delete all 
-                Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId",
-                    new { UserId = user.Id });
-
-                //then re-add any associated with the user
-                foreach (var group in user.Groups)
-                {
-                    var dto = new User2UserGroupDto
-                    {
-                        UserGroupId = group.Id,
-                        UserId = user.Id
-                    };
-                    Database.Insert(dto);
-                }
+                    UserGroupId = group.Id,
+                    UserId = user.Id
+                };
+                Database.Insert(dto);
             }
 
             entity.ResetDirtyProperties();
@@ -314,29 +275,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<UserDto>(x => x.UserName == username);
 
             return Database.ExecuteScalar<int>(sql) > 0;
-        }
-
-        public IEnumerable<IUser> GetUsersAssignedToSection(string sectionAlias)
-        {
-            //Here we're building up a query that looks like this, a sub query is required because the resulting structure
-            // needs to still contain all of the section rows per user.
-
-            //SELECT *
-            //FROM [umbracoUser]
-            //LEFT JOIN [umbracoUser2app]
-            //ON [umbracoUser].[id] = [umbracoUser2app].[user]
-            //WHERE umbracoUser.id IN (SELECT umbracoUser.id
-            //    FROM [umbracoUser]
-            //    LEFT JOIN [umbracoUser2app]
-            //    ON [umbracoUser].[id] = [umbracoUser2app].[user]
-            //    WHERE umbracoUser2app.app = 'content')
-
-            var sql = GetBaseQuery(false);
-            var innerSql = GetBaseQuery("umbracoUser.id");
-            innerSql.Where("umbracoUser2app.app = " + SqlSyntax.GetQuotedValue(sectionAlias));
-            sql.Where(string.Format("umbracoUser.id IN ({0})", innerSql.SQL));
-
-            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
         }
 
         /// <summary>
@@ -460,42 +398,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // now get the actual users and ensure they are ordered properly (same clause)
             return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids).OrderBy(x => x.Id);
-        }
-
-        /// <summary>
-        /// Returns permissions for a given user for any number of nodes
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="entityIds"></param>
-        /// <returns></returns>        
-        public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
-        {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            return repo.GetUserPermissionsForEntities(userId, entityIds);
-        }
-
-        /// <summary>
-        /// Replaces the same permission set for a single user to any number of entities
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissions"></param>
-        /// <param name="entityIds"></param>
-        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
-        {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.ReplaceUserPermissions(userId, permissions, entityIds);
-        }
-
-        /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permission"></param>
-        /// <param name="entityIds"></param>
-        public void AssignUserPermission(int userId, char permission, params int[] entityIds)
-        {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.AssignUserPermission(userId, permission, entityIds);
         }
 
         #endregion

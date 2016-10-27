@@ -76,16 +76,15 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        /*
         /// <summary>
         /// Gets the group permissions for the specified entities
         /// </summary>
         /// <param name="groupId">Id of group</param>
         /// <param name="entityIds">Array of entity Ids</param>
-        public IEnumerable<GroupEntityPermission> GetGroupPermissionsForEntities(int groupId, params int[] entityIds)
+        public IEnumerable<EntityPermission> GetPermissionsForEntities(int groupId, params int[] entityIds)
         {
-            var repo = new GroupPermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            return repo.GetGroupPermissionsForEntities(groupId, entityIds);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            return repo.GetPermissionsForEntities(groupId, entityIds);
         }
 
         /// <summary>
@@ -96,8 +95,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
         public void ReplaceGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
         {
-            var repo = new GroupPermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.ReplaceGroupPermissions(groupId, permissions, entityIds);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            repo.ReplacePermissions(groupId, permissions, entityIds);
         }
 
         /// <summary>
@@ -108,10 +107,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
         public void AssignGroupPermission(int groupId, char permission, params int[] entityIds)
         {
-            var repo = new GroupPermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.AssignGroupPermission(groupId, permission, entityIds);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            repo.AssignPermission(groupId, permission, entityIds);
         }
-        */
 
         #region Overrides of RepositoryBase<int,IUserType>
 

@@ -48,11 +48,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 CreateUmbracoUserTypeData();
             }
 
-            if (tableName.Equals("umbracoUser2app"))
-            {
-                CreateUmbracoUser2AppData();
-            }
-
             if (tableName.Equals("cmsPropertyTypeGroup"))
             {
                 CreateCmsPropertyTypeGroupData();
@@ -168,17 +163,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 4, Alias = "translator", Name = "Translator", DefaultPermissions = "AF" });
         }
 
-        private void CreateUmbracoUser2AppData()
-        {
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Content });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Developer });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Media });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Members });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Settings });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Users });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Forms });
-        }
-        
         private void CreateCmsPropertyTypeGroupData()
         {          
             _database.Insert("cmsPropertyTypeGroup", "id", false, new PropertyTypeGroupDto { Id = 3, ContentTypeNodeId = 1032, Text = "Image", SortOrder = 1, UniqueId = new Guid(Constants.PropertyTypeGroups.Image) });

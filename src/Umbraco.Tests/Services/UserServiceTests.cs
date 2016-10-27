@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var users = MockedUser.CreateUser(userType, 10);
+            var users = MockedUser.CreateMulipleUsers(userType, 10);
             ServiceContext.UserService.Save(users);
             //don't find this
             var customUser = MockedUser.CreateUser(userType);
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var users = MockedUser.CreateUser(userType, 10);
+            var users = MockedUser.CreateMulipleUsers(userType, 10);
             ServiceContext.UserService.Save(users);
             //include this
             var customUser = MockedUser.CreateUser(userType);
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var users = MockedUser.CreateUser(userType, 10);
+            var users = MockedUser.CreateMulipleUsers(userType, 10);
             ServiceContext.UserService.Save(users);
             //include this
             var customUser = MockedUser.CreateUser(userType);
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var users = MockedUser.CreateUser(userType, 10);
+            var users = MockedUser.CreateMulipleUsers(userType, 10);
             ServiceContext.UserService.Save(users);
             //include this
             var customUser = MockedUser.CreateUser(userType);
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var users = MockedUser.CreateUser(userType, 10);
+            var users = MockedUser.CreateMulipleUsers(userType, 10);
             ServiceContext.UserService.Save(users);
 
             int totalRecs;
@@ -275,7 +275,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var users = MockedUser.CreateUser(userType, 10);
+            var users = MockedUser.CreateMulipleUsers(userType, 10);
             ServiceContext.UserService.Save(users);
             var customUser = MockedUser.CreateUser(userType);
             ServiceContext.UserService.Save(customUser);
@@ -292,7 +292,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var users = MockedUser.CreateUser(userType, 10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
+            var users = MockedUser.CreateMulipleUsers(userType, 10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
             ServiceContext.UserService.Save(users);
 
             var customUser = MockedUser.CreateUser(userType);
@@ -304,7 +304,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var users = MockedUser.CreateUser(userType, 10, (i, member) => member.IsLockedOut = i % 2 == 0);
+            var users = MockedUser.CreateMulipleUsers(userType, 10, (i, member) => member.IsLockedOut = i % 2 == 0);
             ServiceContext.UserService.Save(users);
 
             var customUser = MockedUser.CreateUser(userType);
@@ -321,7 +321,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var users = MockedUser.CreateUser(userType, 10, (i, member) => member.IsApproved = i % 2 == 0);
+            var users = MockedUser.CreateMulipleUsers(userType, 10, (i, member) => member.IsApproved = i % 2 == 0);
             ServiceContext.UserService.Save(users);
 
             var customUser = MockedUser.CreateUser(userType);
@@ -392,102 +392,124 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Add_And_Remove_Sections_From_User()
+        public void Can_Add_And_Remove_Sections_From_UserGroup()
         {
-            var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
+            var userGroup = new UserGroup
+            {
+                Id = 1,
+                Alias = "Group1",
+            };
+            userGroup.AddAllowedSection("content");
+            userGroup.AddAllowedSection("mediat");
+            ServiceContext.UserService.SaveUserGroup(userGroup);
 
-            var user1 = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com", userType);
+            var result1 = ServiceContext.UserService.GetUserGroupById(userGroup.Id);
 
-            var result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
-            //expect 2 sections by default
             Assert.AreEqual(2, result1.AllowedSections.Count());
 
             //adds some allowed sections
-            user1.AddAllowedSection("test1");
-            user1.AddAllowedSection("test2");
-            user1.AddAllowedSection("test3");
-            user1.AddAllowedSection("test4");
-            ServiceContext.UserService.Save(user1);
+            userGroup.AddAllowedSection("test1");
+            userGroup.AddAllowedSection("test2");
+            userGroup.AddAllowedSection("test3");
+            userGroup.AddAllowedSection("test4");
+            ServiceContext.UserService.SaveUserGroup(userGroup);
 
-            result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
-            //expect 6 sections including the two default sections
+            result1 = ServiceContext.UserService.GetUserGroupById(userGroup.Id);
+
             Assert.AreEqual(6, result1.AllowedSections.Count());
 
             //simulate clearing the sections
-            foreach (var s in user1.AllowedSections)
+            foreach (var s in userGroup.AllowedSections)
             {
                 result1.RemoveAllowedSection(s);
             }
+
             //now just re-add a couple
             result1.AddAllowedSection("test3");
             result1.AddAllowedSection("test4");
-            ServiceContext.UserService.Save(result1);
+            ServiceContext.UserService.SaveUserGroup(result1);
 
             //assert
             //re-get
-            result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
+            result1 = ServiceContext.UserService.GetUserGroupById(userGroup.Id);
             Assert.AreEqual(2, result1.AllowedSections.Count());
         }
 
         [Test]
-        public void Can_Remove_Section_From_All_Assigned_Users()
-        {            
-            var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
+        public void Can_Remove_Section_From_All_Assigned_UserGroups()
+        {
+            var userGroup1 = new UserGroup
+            {
+                Id = 1,
+                Alias = "Group1",
+            };
+            var userGroup2 = new UserGroup
+            {
+                Id = 2,
+                Alias = "Group2",
+            };
+            ServiceContext.UserService.SaveUserGroup(userGroup1);
+            ServiceContext.UserService.SaveUserGroup(userGroup2);
 
-            var user1 = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com", userType);
-            var user2 = ServiceContext.UserService.CreateUserWithIdentity("test2", "test2@test.com", userType);
-            
             //adds some allowed sections
-            user1.AddAllowedSection("test");
-            user2.AddAllowedSection("test");
-            ServiceContext.UserService.Save(user1);
-            ServiceContext.UserService.Save(user2);
+            userGroup1.AddAllowedSection("test");
+            userGroup2.AddAllowedSection("test");
+            ServiceContext.UserService.SaveUserGroup(userGroup1);
+            ServiceContext.UserService.SaveUserGroup(userGroup2);
 
             //now clear the section from all users
-            ServiceContext.UserService.DeleteSectionFromAllUsers("test");
+            ServiceContext.UserService.DeleteSectionFromAllUserGroups("test");
 
             //assert
-            var result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
-            var result2 = ServiceContext.UserService.GetUserById((int)user2.Id);
+            var result1 = ServiceContext.UserService.GetUserGroupById(userGroup1.Id);
+            var result2 = ServiceContext.UserService.GetUserGroupById(userGroup2.Id);
             Assert.IsFalse(result1.AllowedSections.Contains("test"));
             Assert.IsFalse(result2.AllowedSections.Contains("test"));
         }
 
         [Test]
-        public void Can_Add_Section_To_All_Users()
+        public void Can_Add_Section_To_All_UserGroups()
         {
-            var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
+            var userGroup1 = new UserGroup
+            {
+                Id = 1,
+                Alias = "Group1",
+            };
+            var userGroup2 = new UserGroup
+            {
+                Id = 2,
+                Alias = "Group2",
+            };
+            var userGroup3 = new UserGroup
+            {
+                Id = 2,
+                Alias = "Group3",
+            };
+            ServiceContext.UserService.SaveUserGroup(userGroup1);
+            ServiceContext.UserService.SaveUserGroup(userGroup2);
+            ServiceContext.UserService.SaveUserGroup(userGroup3);
 
-            var user1 = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com", userType);
-            var user2 = ServiceContext.UserService.CreateUserWithIdentity("test2", "test2@test.com", userType);
-            var user3 = ServiceContext.UserService.CreateUserWithIdentity("test3", "test3@test.com", userType);
-            var user4 = ServiceContext.UserService.CreateUserWithIdentity("test4", "test4@test.com", userType);
-
-            //now add the section to specific users
-            ServiceContext.UserService.AddSectionToAllUsers("test", (int)user1.Id, (int)user2.Id);
+            //now add the section to specific groups
+            ServiceContext.UserService.AddSectionToAllUserGroups("test", userGroup1.Id, userGroup2.Id);
 
             //assert
-            var result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
-            var result2 = ServiceContext.UserService.GetUserById((int)user2.Id);
-            var result3 = ServiceContext.UserService.GetUserById((int)user3.Id);
-            var result4 = ServiceContext.UserService.GetUserById((int)user4.Id);
+            var result1 = ServiceContext.UserService.GetUserGroupById(userGroup1.Id);
+            var result2 = ServiceContext.UserService.GetUserGroupById(userGroup2.Id);
+            var result3 = ServiceContext.UserService.GetUserGroupById(userGroup3.Id);
             Assert.IsTrue(result1.AllowedSections.Contains("test"));
             Assert.IsTrue(result2.AllowedSections.Contains("test"));
             Assert.IsFalse(result3.AllowedSections.Contains("test"));
-            Assert.IsFalse(result4.AllowedSections.Contains("test"));
 
-            //now add the section to all users
-            ServiceContext.UserService.AddSectionToAllUsers("test");
+            //now add the section to all groups
+            ServiceContext.UserService.AddSectionToAllUserGroups("test");
 
             //assert
-            result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
-            result2 = ServiceContext.UserService.GetUserById((int)user2.Id);
-            result3 = ServiceContext.UserService.GetUserById((int)user3.Id);
-            result4 = ServiceContext.UserService.GetUserById((int)user4.Id);
+            result1 = ServiceContext.UserService.GetUserGroupById(userGroup1.Id);
+            result2 = ServiceContext.UserService.GetUserGroupById(userGroup2.Id);
+            result3 = ServiceContext.UserService.GetUserGroupById(userGroup3.Id);
             Assert.IsTrue(result1.AllowedSections.Contains("test"));
             Assert.IsTrue(result2.AllowedSections.Contains("test"));
             Assert.IsTrue(result3.AllowedSections.Contains("test"));
-            Assert.IsTrue(result4.AllowedSections.Contains("test"));
         }
 
         [Test]

@@ -669,60 +669,6 @@ namespace umbraco.BusinessLogic
         }
 
         /// <summary>
-        /// Clears the list of applications the user has access to, ensure to call Save afterwords
-        /// </summary>
-        public void ClearApplications()
-        {
-            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            foreach (var s in UserEntity.AllowedSections.ToArray())
-            {
-                UserEntity.RemoveAllowedSection(s);
-            }
-        }
-
-        /// <summary>
-        /// Clears the list of applications the user has access to.
-        /// </summary>
-        [Obsolete("This method will implicitly cause a database save and will reset the current user's dirty property, do not use this method, use the ClearApplications method instead and then call Save() when you are done performing all user changes to persist the chagnes in one transaction")]
-        public void clearApplications()
-        {
-            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-
-            foreach (var s in UserEntity.AllowedSections.ToArray())
-            {
-                UserEntity.RemoveAllowedSection(s);
-            }
-
-            //For backwards compatibility this requires an implicit save
-            ApplicationContext.Current.Services.UserService.Save(UserEntity);
-        }
-
-        /// <summary>
-        /// Adds a application to the list of allowed applications, ensure to call Save() afterwords
-        /// </summary>
-        /// <param name="appAlias"></param>
-        public void AddApplication(string appAlias)
-        {
-            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            UserEntity.AddAllowedSection(appAlias);
-        }
-
-        /// <summary>
-        /// Adds a application to the list of allowed applications
-        /// </summary>
-        /// <param name="AppAlias">The app alias.</param>
-        [Obsolete("This method will implicitly cause a multiple database saves and will reset the current user's dirty property, do not use this method, use the AddApplication method instead and then call Save() when you are done performing all user changes to persist the chagnes in one transaction")]
-        public void addApplication(string AppAlias)
-        {
-            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-
-            UserEntity.AddAllowedSection(AppAlias);
-
-            //For backwards compatibility this requires an implicit save
-            ApplicationContext.Current.Services.UserService.Save(UserEntity);
-        }
-
-        /// <summary>
         /// Clears the list of groups the user is in, ensure to call Save afterwords
         /// </summary>
         public void ClearGroups()

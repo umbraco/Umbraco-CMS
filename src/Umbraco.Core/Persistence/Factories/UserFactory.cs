@@ -43,14 +43,6 @@ namespace Umbraco.Core.Persistence.Factories
                 user.LastLoginDate = dto.LastLoginDate ?? DateTime.MinValue;
                 user.LastPasswordChangeDate = dto.LastPasswordChangeDate ?? DateTime.MinValue;
 
-                if (dto.User2AppDtos != null)
-                {
-                    foreach (var app in dto.User2AppDtos)
-                    {
-                        user.AddAllowedSection(app.AppAlias);
-                    }
-                }
-
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
                 user.ResetDirtyProperties(false);
@@ -77,27 +69,12 @@ namespace Umbraco.Core.Persistence.Factories
                 UserLanguage = entity.Language,
                 UserName = entity.Name,
                 Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
-                User2AppDtos = new List<User2AppDto>(),
                 SecurityStampToken = entity.SecurityStamp,
                 FailedLoginAttempts = entity.FailedPasswordAttempts,
                 LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? (DateTime?)null : entity.LastLockoutDate,
                 LastLoginDate = entity.LastLoginDate == DateTime.MinValue ? (DateTime?)null : entity.LastLoginDate,
                 LastPasswordChangeDate = entity.LastPasswordChangeDate == DateTime.MinValue ? (DateTime?)null : entity.LastPasswordChangeDate,
             };
-
-            foreach (var app in entity.AllowedSections)
-            {
-                var appDto = new User2AppDto
-                {
-                    AppAlias = app
-                };
-                if (entity.HasIdentity)
-                {
-                    appDto.UserId = entity.Id;
-                }
-
-                dto.User2AppDtos.Add(appDto);
-            }
 
             if (entity.HasIdentity)
             {

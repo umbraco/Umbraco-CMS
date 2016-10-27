@@ -71,8 +71,6 @@ namespace Umbraco.Tests.Services
                 Username = "testUser",
                 Email = "testuser@test.com",
             };
-            user.AddAllowedSection("content");
-            user.AddAllowedSection("media");
             ServiceContext.UserService.Save(user, false);
 
             if (withGroups)

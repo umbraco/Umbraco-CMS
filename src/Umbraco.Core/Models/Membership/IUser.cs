@@ -47,10 +47,6 @@ namespace Umbraco.Core.Models.Membership
 
         IEnumerable<string> AllowedSections { get; }
 
-        void RemoveAllowedSection(string sectionAlias);
-
-        void AddAllowedSection(string sectionAlias);
-
         /// <summary>
         /// Exposes the basic profile data
         /// </summary>

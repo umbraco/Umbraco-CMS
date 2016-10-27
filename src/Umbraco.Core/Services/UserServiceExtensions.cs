@@ -10,21 +10,21 @@ namespace Umbraco.Core.Services
         /// Remove all permissions for this user for all nodes specified
         /// </summary>
         /// <param name="userService"></param>
-        /// <param name="userId"></param>
+        /// <param name="groupId"></param>
         /// <param name="entityIds"></param>
-        public static void RemoveUserPermissions(this IUserService userService, int userId, params int[] entityIds)
+        public static void RemoveUserGroupPermissions(this IUserService userService, int groupId, params int[] entityIds)
         {
-            userService.ReplaceUserPermissions(userId, new char[] {}, entityIds);
+            userService.ReplaceUserGroupPermissions(groupId, new char[] {}, entityIds);
         }
 
         /// <summary>
         /// Remove all permissions for this user for all nodes
         /// </summary>
         /// <param name="userService"></param>
-        /// <param name="userId"></param>
-        public static void RemoveUserPermissions(this IUserService userService, int userId)
+        /// <param name="groupId"></param>
+        public static void RemoveUserGroupPermissions(this IUserService userService, int groupId)
         {
-            userService.ReplaceUserPermissions(userId, new char[] { });
+            userService.ReplaceUserGroupPermissions(groupId, new char[] { });
         }
 
         /// <summary>
@@ -62,7 +62,6 @@ namespace Umbraco.Core.Services
                     member.ProviderUserKey == null ? member.UserName : member.ProviderUserKey.ToString(),
                     Guid.NewGuid().ToString("N"), //pass cannot be empty
                     writer);
-                user.AddAllowedSection(Constants.Applications.Content);
                 userService.Save(user);
                 return user;
             }

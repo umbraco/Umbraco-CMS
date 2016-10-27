@@ -79,21 +79,21 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region User permissions cache
+        #region User group permissions cache
 
-        public static void RemoveUserPermissionsCache(this DistributedCache dc, int userId)
+        public static void RemoveUserGroupPermissionsCache(this DistributedCache dc, int groupId)
         {
-            dc.Remove(DistributedCache.UserPermissionsCacheRefresherGuid, userId);
+            dc.Remove(DistributedCache.UserGroupPermissionsCacheRefresherGuid, groupId);
         }
 
-        public static void RefreshUserPermissionsCache(this DistributedCache dc, int userId)
+        public static void RefreshUserGroupPermissionsCache(this DistributedCache dc, int groupId)
         {
-            dc.Refresh(DistributedCache.UserPermissionsCacheRefresherGuid, userId);
+            dc.Refresh(DistributedCache.UserGroupPermissionsCacheRefresherGuid, groupId);
         }
 
-        public static void RefreshAllUserPermissionsCache(this DistributedCache dc)
+        public static void RefreshAllUserGroupPermissionsCache(this DistributedCache dc)
         {
-            dc.RefreshAll(DistributedCache.UserPermissionsCacheRefresherGuid);
+            dc.RefreshAll(DistributedCache.UserGroupPermissionsCacheRefresherGuid);
         }
 
         #endregion

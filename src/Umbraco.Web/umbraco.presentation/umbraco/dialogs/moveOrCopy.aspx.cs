@@ -137,10 +137,9 @@ namespace umbraco.dialogs
         /// </remarks>
         private bool CheckPermissions(IContentBase node, IAction currentAction)
         {
-            var currUserPermissions = new UserPermissions(CurrentUser);
-            var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
-
-            return lstCurrUserActions.Contains(currentAction);
+            var userService = ApplicationContext.Current.Services.UserService;
+            var currUserPermissions = userService.GetPermissions(UmbracoContext.Current.Security.CurrentUser, node.Id).FirstOrDefault();
+            return currUserPermissions != null && currUserPermissions.AssignedPermissions.Contains(currentAction.Letter.ToString());
         }
 
         private void HandleDocumentTypeCopy()

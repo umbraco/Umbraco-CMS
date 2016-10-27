@@ -13,30 +13,31 @@ namespace Umbraco.Core.Models.Membership
         public int EntityId { get; private set; }
 
         /// <summary>
-        /// The key/value pairs of user id & single permission
+        /// The key/value pairs of user group id & single permission
         /// </summary>
-        public IEnumerable<UserPermission> UserPermissionsSet { get; private set; }
+        public IEnumerable<UserGroupPermission> PermissionsSet { get; private set; }
 
-        public EntityPermissionSet(int entityId, IEnumerable<UserPermission> userPermissionsSet)
+        public EntityPermissionSet(int entityId, IEnumerable<UserGroupPermission> permissionsSet)
         {
             EntityId = entityId;
-            UserPermissionsSet = userPermissionsSet;
+            PermissionsSet = permissionsSet;
         }
 
-        public class UserPermission
+        public class UserGroupPermission
         {
-            public UserPermission(int userId, string permission)
+            public UserGroupPermission(int groupId, string permission)
             {
-                UserId = userId;
+                UserGroupId = groupId;
                 Permission = permission;
             }
 
-            public int UserId { get; private set; }
+            public int UserGroupId { get; private set; }
+
             public string Permission { get; private set; }
 
-            protected bool Equals(UserPermission other)
+            protected bool Equals(UserGroupPermission other)
             {
-                return UserId == other.UserId && string.Equals(Permission, other.Permission);
+                return UserGroupId == other.UserGroupId && string.Equals(Permission, other.Permission);
             }
 
             public override bool Equals(object obj)
@@ -44,14 +45,14 @@ namespace Umbraco.Core.Models.Membership
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((UserPermission) obj);
+                return Equals((UserGroupPermission) obj);
             }
 
             public override int GetHashCode()
             {
                 unchecked
                 {
-                    return (UserId*397) ^ Permission.GetHashCode();
+                    return (UserGroupId * 397) ^ Permission.GetHashCode();
                 }
             }
         }

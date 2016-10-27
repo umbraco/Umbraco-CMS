@@ -41,8 +41,6 @@ namespace Umbraco.Tests.Models
                 Username = "username"                            
             };
           
-            item.AddAllowedSection("test");
-
             var clone = (User)item.DeepClone();
 
             Assert.AreNotSame(clone, item);
@@ -61,17 +59,6 @@ namespace Umbraco.Tests.Models
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
             }
-
-            //ensure internal collections are differet
-            Assert.AreNotSame(item.AddedSections, clone.AddedSections);
-            Assert.AreNotSame(item.RemovedSections, clone.RemovedSections);
-
-            //ensure event handlers are still wired on clone
-            clone.AddAllowedSection("blah");
-            Assert.AreEqual(1, clone.AddedSections.Count());
-            clone.RemoveAllowedSection("blah");
-            Assert.AreEqual(1, clone.RemovedSections.Count());
-
         }
 
         [Test]
