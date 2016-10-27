@@ -31,7 +31,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMedia, MediaItemDisplay>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMedia>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMedia>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMedia, ContentItemDto<IMedia>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMedia>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
