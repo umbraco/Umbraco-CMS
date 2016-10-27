@@ -18,7 +18,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
 
             AddNewTables(tables);
-            MigratePermissionsData();
+            MigrateUserPermissions();
+            MigrateUserTypesToGroups();
             DeleteOldTables(tables);
         }
 
@@ -80,7 +81,27 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             }
         }
 
-        private void MigratePermissionsData()
+        private void MigrateUserTypesToGroups()
+        {
+            // TODO: review for MySQL and CE (tested only on SQL Express)
+
+            // Create a user group for each user type
+            Execute.Sql(@"INSERT INTO umbracoUserGroup (userGroupAlias, userGroupName, userGroupDefaultPermissions)
+                SELECT userTypeAlias, userTypeName, userTypeDefaultPermissions
+                FROM umbracoUserType");
+
+            // Add each user to the group created from their type
+            Execute.Sql(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
+                SELECT u.id,(
+	                SELECT ug.id
+	                FROM umbracoUserGroup ug
+	                INNER JOIN umbracoUserType ut ON ut.userTypeAlias = ug.userGroupAlias
+	                WHERE u.userType = ut.id
+                )
+                FROM umbracoUser u");
+        }
+
+        private void MigrateUserPermissions()
         {
             // TODO: review for MySQL and CE (tested only on SQL Express)
 
@@ -99,8 +120,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 
             // Associate those groups with the users
             Execute.Sql(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
-                SELECT (SELECT id from umbracoUser WHERE userName + 'Group' = umbracoUserGroup.userGroupAlias), id
-                FROM umbracoUserGroup");
+                SELECT u.id, ug.id
+                FROM umbracoUser u
+                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias = userName + 'Group'");
 
             // Create node permissions on the groups
             Execute.Sql(@"INSERT INTO umbracoUserGroup2NodePermission (userGroupId,nodeId,permission)
@@ -108,7 +130,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
                 FROM umbracoUserGroup ug
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
-                INNER JOIN umbracoUser2NodePermission u2np ON u2np.userId = u.id");
+                INNER JOIN umbracoUser2NodePermission u2np ON u2np.userId = u.id
+				WHERE ug.userGroupAlias NOT IN (
+					SELECT userTypeAlias
+					FROM umbracoUserType
+				)");
 
             // Create app permissions on the groups
             Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
@@ -116,7 +142,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
                 FROM umbracoUserGroup ug
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
-                INNER JOIN umbracoUser2app u2a ON u2a.[user] = u.id");
+                INNER JOIN umbracoUser2app u2a ON u2a.[user] = u.id
+				WHERE ug.userGroupAlias NOT IN (
+					SELECT userTypeAlias
+					FROM umbracoUserType
+				)");
         }
 
         private void DeleteOldTables(string[] tables)
@@ -129,6 +159,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             if (tables.InvariantContains("umbracoUser2NodePermission"))
             {
                 Delete.Table("umbracoUser2NodePermission");
+            }
+
+            if (tables.InvariantContains("umbracoUserType") && tables.InvariantContains("umbracoUser"))
+            {
+                Delete.Column("userType").FromTable("umbracoUser");
+                Delete.Table("umbracoUserType");
             }
         }
 
