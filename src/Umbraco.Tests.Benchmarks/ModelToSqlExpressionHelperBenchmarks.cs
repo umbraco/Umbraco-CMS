@@ -51,9 +51,7 @@ namespace Umbraco.Tests.Benchmarks
         private readonly ISqlSyntaxProvider _syntaxProvider = new SqlCeSyntaxProvider();
         private readonly BaseMapper _contentMapper;
         private readonly CachedExpression _cachedExpression;
-        //private static readonly Expression<Func<IContent, bool>> TemplatePredicate = content =>
-        //        content.Path.StartsWith(string.Empty) && content.Published && (content.ContentTypeId == 0 || content.ContentTypeId == 0);
-
+        
         [Benchmark(Baseline = true)]
         public void WithNonCached()
         {

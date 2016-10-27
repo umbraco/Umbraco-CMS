@@ -104,6 +104,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+        #region Static Queries
+
+        private readonly IQuery<IContent> _publishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
+
+        #endregion
+
         #region Overrides of PetaPocoRepositoryBase<IContent>
 
 
@@ -207,8 +213,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //now insert the data, again if something fails here, the whole transaction is reversed
                 if (contentTypeIds == null)
                 {
-                    var query = Query<IContent>.Builder.Where(x => x.Published == true);
-                    RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
+                    RebuildXmlStructuresProcessQuery(serializer, _publishedQuery, tr, groupSize);
                 }
                 else
                 {
