@@ -70,17 +70,7 @@ namespace Umbraco.Tests.Benchmarks
             
         }
 
-        [Benchmark]
-        public void WithSQL()
-        {
-            var subQuery = new Sql()
-                        //.Select("umbracoNode.id as nodeId")
-                        .From<ContentDto>(_syntaxProvider)
-                        .InnerJoin<NodeDto>(_syntaxProvider)
-                        .On<ContentDto, NodeDto>(_syntaxProvider, left => left.NodeId, right => right.NodeId)
-                        .WhereIn<ContentDto>(dto => dto.ContentTypeId, contentTypeIds, SqlSyntax)
-                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-        }
+        
 
         [Benchmark()]
         public void WithCachedExpression()
