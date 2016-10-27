@@ -19,7 +19,7 @@ namespace Umbraco.Tests.UmbracoExamine
     /// <summary>
     /// Tests the standard indexing capabilities
     /// </summary>
-    //[DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class IndexTest : ExamineBaseTest
 	{
