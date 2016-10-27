@@ -16,19 +16,45 @@ namespace Umbraco.Tests.Persistence.Querying
     [TestFixture]
     public class ExpressionTests : BaseUsingSqlCeSyntax
     {
-    //    [Test]
-    //    public void Can_Query_With_Content_Type_Alias()
-    //    {
-    //        //Arrange
-    //        Expression<Func<IMedia, bool>> predicate = content => content.ContentType.Alias == "Test";
-    //        var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
-    //        var result = modelToSqlExpressionHelper.Visit(predicate);
+        //    [Test]
+        //    public void Can_Query_With_Content_Type_Alias()
+        //    {
+        //        //Arrange
+        //        Expression<Func<IMedia, bool>> predicate = content => content.ContentType.Alias == "Test";
+        //        var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
+        //        var result = modelToSqlExpressionHelper.Visit(predicate);
 
-    //        Debug.Print("Model to Sql ExpressionHelper: \n" + result);
+        //        Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
-    //        Assert.AreEqual("[cmsContentType].[alias] = @0", result);
-    //        Assert.AreEqual("Test", modelToSqlExpressionHelper.GetSqlParameters()[0]);
-    //    }
+        //        Assert.AreEqual("[cmsContentType].[alias] = @0", result);
+        //        Assert.AreEqual("Test", modelToSqlExpressionHelper.GetSqlParameters()[0]);
+        //    }
+
+        [Test]
+        public void CachedExpression_Can_Verify_Path_StartsWith_Predicate_In_Same_Result()
+        {
+            //Arrange
+
+            //use a single cached expression for multiple expressions and ensure the correct output
+            // is done for both of them.
+            var cachedExpression = new CachedExpression();
+
+
+            Expression<Func<IContent, bool>> predicate1 = content => content.Path.StartsWith("-1");
+            cachedExpression.Wrap(predicate1);
+            var modelToSqlExpressionHelper1 = new ModelToSqlExpressionHelper<IContent>();
+            var result1 = modelToSqlExpressionHelper1.Visit(cachedExpression);
+            Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result1);
+            Assert.AreEqual("-1%", modelToSqlExpressionHelper1.GetSqlParameters()[0]);
+
+            Expression<Func<IContent, bool>> predicate2 = content => content.Path.StartsWith("-1,123,97");
+            cachedExpression.Wrap(predicate2);
+            var modelToSqlExpressionHelper2 = new ModelToSqlExpressionHelper<IContent>();
+            var result2 = modelToSqlExpressionHelper2.Visit(cachedExpression);
+            Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result2);
+            Assert.AreEqual("-1,123,97%", modelToSqlExpressionHelper2.GetSqlParameters()[0]);
+
+        }
 
         [Test]
         public void Can_Verify_Path_StartsWith_Predicate_In_Same_Result()
@@ -37,9 +63,7 @@ namespace Umbraco.Tests.Persistence.Querying
             Expression<Func<IContent, bool>> predicate = content => content.Path.StartsWith("-1");
             var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
-
-            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
-
+            
             Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result);
             Assert.AreEqual("-1%", modelToSqlExpressionHelper.GetSqlParameters()[0]);
         }

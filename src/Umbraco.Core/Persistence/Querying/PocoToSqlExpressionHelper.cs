@@ -9,11 +9,18 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
-    internal class PocoToSqlExpressionHelper<T> : BaseExpressionHelper<T>
+
+    /// <summary>
+    /// An expression tree parser to create SQL statements and SQL parameters based on a given strongly typed expression based on Umbraco's PetaPoco dto Models
+    /// </summary>
+    /// <remarks>
+    /// This object stores state, it cannot be re-used to parse an expression
+    /// </remarks>
+    internal class PocoToSqlExpressionHelper<T> : BaseExpressionHelper
     {
         private readonly Database.PocoData _pd;
 
-        public PocoToSqlExpressionHelper()
+        public PocoToSqlExpressionHelper() : base(SqlSyntaxContext.SqlSyntaxProvider)
         {
             _pd = new Database.PocoData(typeof(T));
         }
@@ -24,14 +31,26 @@ namespace Umbraco.Core.Persistence.Querying
                m.Expression.NodeType == ExpressionType.Parameter
                && m.Expression.Type == typeof(T))
             {
-                string field = GetFieldName(_pd, m.Member.Name);
-                return field;
+                //don't execute if compiled
+                if (IsCompiled == false)
+                {
+                    string field = GetFieldName(_pd, m.Member.Name);
+                    return field;
+                }
+                //already compiled, return
+                return string.Empty;
             }
 
             if (m.Expression != null && m.Expression.NodeType == ExpressionType.Convert)
             {
-                string field = GetFieldName(_pd, m.Member.Name);
-                return field;
+                //don't execute if compiled
+                if (IsCompiled == false)
+                {
+                    string field = GetFieldName(_pd, m.Member.Name);
+                    return field;
+                }
+                //already compiled, return
+                return string.Empty;
             }
 
             var member = Expression.Convert(m, typeof(object));
@@ -40,23 +59,21 @@ namespace Umbraco.Core.Persistence.Querying
             object o = getter();
 
             SqlParameters.Add(o);
-            return string.Format("@{0}", SqlParameters.Count - 1);
 
-            //return GetQuotedValue(o, o != null ? o.GetType() : null);
-
+            //don't execute if compiled
+            if (IsCompiled == false)
+                return string.Format("@{0}", SqlParameters.Count - 1);
+            //already compiled, return
+            return string.Empty;
         }
         
         protected virtual string GetFieldName(Database.PocoData pocoData, string name)
         {
             var column = pocoData.Columns.FirstOrDefault(x => x.Value.PropertyInfo.Name == name);
             return string.Format("{0}.{1}",
-                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
-                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
+                SqlSyntax.GetQuotedTableName(pocoData.TableInfo.TableName),
+                SqlSyntax.GetQuotedColumnName(column.Value.ColumnName));
         }
         
-        //protected bool IsFieldName(string quotedExp)
-        //{
-        //    return true;
-        //}
     }
 }

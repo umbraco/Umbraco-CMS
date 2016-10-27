@@ -11,7 +11,8 @@ namespace Umbraco.Tests.Benchmarks
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<BulkInsertBenchmarks>();
+            var summary = BenchmarkRunner.Run<ModelToSqlExpressionHelperBenchmarks>();
+            //var summary = BenchmarkRunner.Run<BulkInsertBenchmarks>();
 
             Console.ReadLine();
         }
