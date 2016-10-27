@@ -163,12 +163,12 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             //U4-8462: Pick a tab id that doesn't clash with an existing tab
-            int listViewId = display.Tabs.Max(x => x.Id) + 1;
+            int listViewTabId = display.Tabs.Max(x => x.Id) + 1;
 
             var listViewTab = new Tab<ContentPropertyDisplay>();
             listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
             listViewTab.Label = localizedTextService.Localize("content/childItems");
-            listViewTab.Id = listViewId;
+            listViewTab.Id = listViewTabId;
             listViewTab.IsActive = true;
 
             var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
