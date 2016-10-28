@@ -1,19 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using BenchmarkDotNet.Running;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<BulkInsertBenchmarks>();
-
-            Console.ReadLine();
+            if (args.Length == 0)
+            {
+                var summary = BenchmarkRunner.Run<BulkInsertBenchmarks>();
+                Console.ReadLine();
+            }
+            else if (args.Length == 1)
+            {
+                var type = Assembly.GetExecutingAssembly().GetType("Umbraco.Tests.Benchmarks." +args[0]);
+                if (type == null)
+                {
+                    Console.WriteLine("Unknown benchmark.");
+                }
+                else
+                {
+                    var summary = BenchmarkRunner.Run(type);
+                    Console.ReadLine();
+                }
+            }
+            else
+            {
+                Console.WriteLine("?");
+            }
         }
     }
 }
