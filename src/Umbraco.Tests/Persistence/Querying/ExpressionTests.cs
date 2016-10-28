@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Querying
         //    {
         //        //Arrange
         //        Expression<Func<IMedia, bool>> predicate = content => content.ContentType.Alias == "Test";
-        //        var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
+        //        var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>();
         //        var result = modelToSqlExpressionHelper.Visit(predicate);
 
         //        Debug.Print("Model to Sql ExpressionHelper: \n" + result);
@@ -42,14 +42,14 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Expression<Func<IContent, bool>> predicate1 = content => content.Path.StartsWith("-1");
             cachedExpression.Wrap(predicate1);
-            var modelToSqlExpressionHelper1 = new ModelToSqlExpressionHelper<IContent>();
+            var modelToSqlExpressionHelper1 = new ModelToSqlExpressionVisitor<IContent>();
             var result1 = modelToSqlExpressionHelper1.Visit(cachedExpression);
             Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result1);
             Assert.AreEqual("-1%", modelToSqlExpressionHelper1.GetSqlParameters()[0]);
 
             Expression<Func<IContent, bool>> predicate2 = content => content.Path.StartsWith("-1,123,97");
             cachedExpression.Wrap(predicate2);
-            var modelToSqlExpressionHelper2 = new ModelToSqlExpressionHelper<IContent>();
+            var modelToSqlExpressionHelper2 = new ModelToSqlExpressionVisitor<IContent>();
             var result2 = modelToSqlExpressionHelper2.Visit(cachedExpression);
             Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result2);
             Assert.AreEqual("-1,123,97%", modelToSqlExpressionHelper2.GetSqlParameters()[0]);
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Persistence.Querying
         {
             //Arrange
             Expression<Func<IContent, bool>> predicate = content => content.Path.StartsWith("-1");
-            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
             
             Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result);
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Persistence.Querying
         {
             //Arrange
             Expression<Func<IContent, bool>> predicate = content => content.ParentId == -1;
-            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
             Debug.Print("Model to Sql ExpressionHelper: \n" + result);
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Equals_Operator_For_Value_Gets_Escaped()
         {
             Expression<Func<IUser, bool>> predicate = user => user.Username == "hello@world.com";
-            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
             Debug.Print("Model to Sql ExpressionHelper: \n" + result);
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Equals_Method_For_Value_Gets_Escaped()
         {
             Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("hello@world.com");
-            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
             Debug.Print("Model to Sql ExpressionHelper: \n" + result);
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Persistence.Querying
             SqlSyntaxContext.SqlSyntaxProvider = new MySqlSyntaxProvider(Mock.Of<ILogger>());
 
             Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("mydomain\\myuser");
-            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
             Debug.Print("Model to Sql ExpressionHelper: \n" + result);
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Persistence.Querying
             SqlSyntaxContext.SqlSyntaxProvider = new MySqlSyntaxProvider(Mock.Of<ILogger>());
 
             Expression<Func<UserDto, bool>> predicate = user => user.Login.StartsWith("mydomain\\myuser");
-            var modelToSqlExpressionHelper = new PocoToSqlExpressionHelper<UserDto>();
+            var modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
             Debug.Print("Poco to Sql ExpressionHelper: \n" + result);
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Sql_Replace_Mapped()
         {
             Expression<Func<IUser, bool>> predicate = user => user.Username.Replace("@world", "@test") == "hello@test.com";
-            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
             Debug.Print("Model to Sql ExpressionHelper: \n" + result);

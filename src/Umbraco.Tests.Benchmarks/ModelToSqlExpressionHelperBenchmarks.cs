@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Benchmarks
                 Expression<Func<IContent, bool>> predicate = content =>
                 content.Path.StartsWith("-1") && content.Published && (content.ContentTypeId == a || content.ContentTypeId == b);
 
-                var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>(_syntaxProvider, _contentMapper);
+                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _contentMapper);
                 var result = modelToSqlExpressionHelper.Visit(predicate);
             }
             
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Benchmarks
                 Expression<Func<IContent, bool>> predicate = content =>
                 content.Path.StartsWith("-1") && content.Published && (content.ContentTypeId == a || content.ContentTypeId == b);
                 
-                var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>(_syntaxProvider, _contentMapper);
+                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _contentMapper);
 
                 //wrap it!
                 _cachedExpression.Wrap(predicate);

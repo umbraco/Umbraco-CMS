@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Querying
             if (predicate != null)
             {
                 //TODO: This should have an SqlSyntax object passed in, this ctor is relying on a singleton
-                var expressionHelper = new ModelToSqlExpressionHelper<T>();
+                var expressionHelper = new ModelToSqlExpressionVisitor<T>();
                 string whereExpression = expressionHelper.Visit(predicate);
 
                 _wheres.Add(new Tuple<string, object[]>(whereExpression, expressionHelper.GetSqlParameters()));
