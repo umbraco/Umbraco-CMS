@@ -16,11 +16,6 @@ namespace Umbraco.Core.Models.Membership
         string Language { get; set; }
 
         /// <summary>
-        /// Gets/sets the user type for the user
-        /// </summary>
-        IUserType UserType { get; set; }
-
-        /// <summary>
         /// Gets the groups that user is part of
         /// </summary>
         IEnumerable<IUserGroup> Groups { get; }

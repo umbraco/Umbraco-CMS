@@ -35,38 +35,6 @@ namespace Umbraco.Core.Services
         #region Implementation of IMembershipUserService
 
         /// <summary>
-        /// Gets the default MemberType alias
-        /// </summary>
-        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll 
-        /// return the first type that is not an admin, otherwise if there's only one we will return that one.</remarks>
-        /// <returns>Alias of the default MemberType</returns>
-        public string GetDefaultMemberType()
-        {
-            using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
-            {
-                var types = repository.GetAll().Select(x => x.Alias).ToArray();
-
-                if (types.Any() == false)
-                {
-                    throw new EntityNotFoundException("No member types could be resolved");
-                }
-
-                if (types.InvariantContains("writer"))
-                {
-                    return types.First(x => x.InvariantEquals("writer"));
-                }
-                
-                if (types.Length == 1)
-                {
-                    return types.First();
-                }
-
-                //first that is not admin
-                return types.First(x => x.InvariantEquals("admin") == false);
-            }
-        }
-
-        /// <summary>
         /// Checks if a User with the username exists
         /// </summary>
         /// <param name="username">Username to check</param>
@@ -85,11 +53,10 @@ namespace Umbraco.Core.Services
         /// <remarks>The user will be saved in the database and returned with an Id</remarks>
         /// <param name="username">Username of the user to create</param>
         /// <param name="email">Email of the user to create</param>
-        /// <param name="userType"><see cref="IUserType"/> which the User should be based on</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser CreateUserWithIdentity(string username, string email, IUserType userType)
+        public IUser CreateUserWithIdentity(string username, string email)
         {
-            return CreateUserWithIdentity(username, email, "", userType);
+            return CreateUserWithIdentity(username, email, string.Empty);
         }
 
         /// <summary>
@@ -98,17 +65,11 @@ namespace Umbraco.Core.Services
         /// <param name="username">Username of the <see cref="IUser"/> to create</param>
         /// <param name="email">Email of the <see cref="IUser"/> to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
-        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <param name="memberTypeAlias">Not used for users</param>
         /// <returns><see cref="IUser"/></returns>
         IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
         {
-            var userType = GetUserTypeByAlias(memberTypeAlias);
-            if (userType == null)
-            {
-                throw new EntityNotFoundException("The user type " + memberTypeAlias + " could not be resolved");
-            }
-
-            return CreateUserWithIdentity(username, email, passwordValue, userType);
+            return CreateUserWithIdentity(username, email, passwordValue);
         }
 
         /// <summary>
@@ -119,12 +80,9 @@ namespace Umbraco.Core.Services
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
-        /// <param name="userType">MemberType the Member should be based on</param>
         /// <returns><see cref="IUser"/></returns>
-        private IUser CreateUserWithIdentity(string username, string email, string passwordValue, IUserType userType)
+        private IUser CreateUserWithIdentity(string username, string email, string passwordValue)
         {
-            if (userType == null) throw new ArgumentNullException("userType");
-
             //TODO: PUT lock here!!
 
             var uow = UowProvider.GetUnitOfWork();
@@ -134,7 +92,7 @@ namespace Umbraco.Core.Services
                 if (loginExists)
                     throw new ArgumentException("Login already exists");
 
-                var user = new User(userType)
+                var user = new User
                 {
                     DefaultToLiveEditing = false,
                     Email = email,
@@ -358,6 +316,12 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
                 SavedUser.RaiseEvent(new SaveEventArgs<IUser>(entities, false), this);
+        }
+
+        public string GetDefaultMemberType()
+        {
+            // User types now being removed, there is no default user type to return
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -610,108 +574,7 @@ namespace Umbraco.Core.Services
                 repository.AssignGroupPermission(groupId, permission, entityIds);
             }
         }
-
-        /// <summary>
-        /// Gets all UserTypes or those specified as parameters
-        /// </summary>
-        /// <param name="ids">Optional Ids of UserTypes to retrieve</param>
-        /// <returns>An enumerable list of <see cref="IUserType"/></returns>
-        public IEnumerable<IUserType> GetAllUserTypes(params int[] ids)
-        {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateUserTypeRepository(uow))
-            {
-                return repository.GetAll(ids);
-            }
-        }
-
-        /// <summary>
-        /// Gets a UserType by its Alias
-        /// </summary>
-        /// <param name="alias">Alias of the UserType to retrieve</param>
-        /// <returns><see cref="IUserType"/></returns>
-        public IUserType GetUserTypeByAlias(string alias)
-        {
-            using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
-            {
-                var query = Query<IUserType>.Builder.Where(x => x.Alias == alias);
-                var contents = repository.GetByQuery(query);
-                return contents.SingleOrDefault();
-            }
-        }
-
-        /// <summary>
-        /// Gets a UserType by its Id
-        /// </summary>
-        /// <param name="id">Id of the UserType to retrieve</param>
-        /// <returns><see cref="IUserType"/></returns>
-        public IUserType GetUserTypeById(int id)
-        {
-            using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
-            {
-                return repository.Get(id);                
-            }
-        }
-
-        /// <summary>
-        /// Gets a UserType by its Name
-        /// </summary>
-        /// <param name="name">Name of the UserType to retrieve</param>
-        /// <returns><see cref="IUserType"/></returns>
-        public IUserType GetUserTypeByName(string name)
-        {
-            using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
-            {
-                var query = Query<IUserType>.Builder.Where(x => x.Name == name);
-                var contents = repository.GetByQuery(query);
-                return contents.SingleOrDefault();
-            }
-        }
-
-        /// <summary>
-        /// Saves a UserType
-        /// </summary>
-        /// <param name="userType">UserType to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events. 
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void SaveUserType(IUserType userType, bool raiseEvents = true)
-        {
-            if (raiseEvents)
-            {
-                if (SavingUserType.IsRaisedEventCancelled(new SaveEventArgs<IUserType>(userType), this))
-                    return;
-            }
-
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateUserTypeRepository(uow))
-            {
-                repository.AddOrUpdate(userType);
-                uow.Commit();
-            }
-
-            if (raiseEvents)
-                SavedUserType.RaiseEvent(new SaveEventArgs<IUserType>(userType, false), this);
-        }
-
-        /// <summary>
-        /// Deletes a UserType
-        /// </summary>
-        /// <param name="userType">UserType to delete</param>
-        public void DeleteUserType(IUserType userType)
-        {
-            if (DeletingUserType.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateUserTypeRepository(uow))
-            {
-                repository.Delete(userType);
-                uow.Commit();
-            }
-
-            DeletedUserType.RaiseEvent(new DeleteEventArgs<IUserType>(userType, false), this);
-        }
-
+        
         /// <summary>
         /// Gets all UserGroups or those specified as parameters
         /// </summary>
@@ -1123,26 +986,6 @@ namespace Umbraco.Core.Services
         /// Occurs after Delete
         /// </summary>
         public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> DeletedUser;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserType>> SavingUserType;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserType>> SavedUserType;
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserType>> DeletingUserType;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserType>> DeletedUserType;
 
         /// <summary>
         /// Occurs before Save

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
@@ -8,19 +7,12 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class UserFactory 
     {
-        private readonly IUserType _userType;
-
-        public UserFactory(IUserType userType)
-        {
-            _userType = userType;
-        }
-
         #region Implementation of IEntityFactory<IUser,UserDto>
 
         public IUser BuildEntity(UserDto dto)
         {
             var guidId = dto.Id.ToGuid();
-            var user = new User(_userType);
+            var user = new User();
 
             try
             {
@@ -68,7 +60,6 @@ namespace Umbraco.Core.Persistence.Factories
                 Password = entity.RawPasswordValue,
                 UserLanguage = entity.Language,
                 UserName = entity.Name,
-                Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
                 SecurityStampToken = entity.SecurityStamp,
                 FailedLoginAttempts = entity.FailedPasswordAttempts,
                 LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? (DateTime?)null : entity.LastLockoutDate,

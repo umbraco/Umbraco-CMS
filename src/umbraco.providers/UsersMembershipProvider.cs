@@ -137,17 +137,11 @@ namespace umbraco.providers
                 try
                 {
                     // Get the usertype of the current user
-                    var ut = UserType.GetUserType(1);
-                    if (BasePages.UmbracoEnsuredPage.CurrentUser != null)
-                    {
-                        ut = BasePages.UmbracoEnsuredPage.CurrentUser.UserType;
-                    }
-
                     //ensure the password is encrypted/hashed
                     string salt;
                     var encodedPass = EncryptOrHashNewPassword(password, out salt);
 
-                    User.MakeNew(username, username, FormatPasswordForStorage(encodedPass, salt), email, ut);
+                    User.MakeNew(username, username, FormatPasswordForStorage(encodedPass, salt), email);
 
                     status = MembershipCreateStatus.Success;
                 }
@@ -468,8 +462,8 @@ namespace umbraco.providers
             }
             else
             {
-                //This keeps compatibility - even though this logic to update name and user type  should not exist here
-                User.Update(m.Id, typedUser.FullName.Trim(), typedUser.UserName, typedUser.Email, user.IsApproved == false, user.IsLockedOut, typedUser.UserType);
+                //This keeps compatibility - even though this logic to update name should not exist here
+                User.Update(m.Id, typedUser.FullName.Trim(), typedUser.UserName, typedUser.Email, user.IsApproved == false, user.IsLockedOut);
             }
             
             m.Save();
@@ -562,7 +556,7 @@ namespace umbraco.providers
             return new UsersMembershipUser(base.Name, user.LoginName, user.Id, user.Email,
                                            string.Empty, string.Empty, true, user.Disabled,
                                            DateTime.Now, DateTime.Now, DateTime.Now, DateTime.Now,
-                                           DateTime.Now, user.Name, user.Language, user.UserType);
+                                           DateTime.Now, user.Name, user.Language);
         }
 
         #endregion

@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedUser
     {
-        internal static User CreateUser(IUserType userType = null, string suffix = "")
+        internal static User CreateUser(string suffix = "")
         {
-            if (userType == null)
-            {
-                userType = MockedUserType.CreateUserType();
-            }
-
-            var user = new User(userType)
+            var user = new User
                 {
                     Language = "en",
                     IsApproved = true,
@@ -32,14 +25,14 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return user;
         }
 
-        internal static IEnumerable<IUser> CreateMulipleUsers(IUserType userType, int amount, Action<int, IUser> onCreating = null)
+        internal static IEnumerable<IUser> CreateMulipleUsers(int amount, Action<int, IUser> onCreating = null)
         {
             var list = new List<IUser>();
 
             for (int i = 0; i < amount; i++)
             {
                 var name = "Member No-" + i;
-                var user = new User(name, "test" + i + "@test.com", "test" + i, "test" + i, userType);
+                var user = new User(name, "test" + i + "@test.com", "test" + i, "test" + i);
                 
                 if (onCreating != null)
                 {

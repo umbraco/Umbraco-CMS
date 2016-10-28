@@ -37,8 +37,6 @@ namespace Umbraco.Core.Models.Identity
         public string[] Groups { get; set; }
         public string Culture { get; set; }
 
-        public string UserTypeAlias { get; set; }
-
         /// <summary>
         /// Lockout is always enabled
         /// </summary>

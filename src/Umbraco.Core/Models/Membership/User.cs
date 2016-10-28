@@ -17,13 +17,8 @@ namespace Umbraco.Core.Models.Membership
     [DataContract(IsReference = true)]
     public class User : Entity, IUser
     {
-        public User(IUserType userType)
+        public User()
         {
-            if (userType == null) throw new ArgumentNullException("userType");
-
-            _userType = userType;
-            _defaultPermissions = _userType.Permissions == null ? Enumerable.Empty<string>() : new List<string>(_userType.Permissions);
-            //Groups = new List<object> { userType };
             SessionTimeout = 60;
             _groupCollection = new List<IUserGroup>();
             _language = GlobalSettings.DefaultUILanguage;
@@ -35,8 +30,8 @@ namespace Umbraco.Core.Models.Membership
             _rawPasswordValue = "";
         }
 
-        public User(string name, string email, string username, string rawPasswordValue, IUserType userType)
-            : this(userType)
+        public User(string name, string email, string username, string rawPasswordValue)
+            : this()
         {
             _name = name;
             _email = email;
@@ -48,7 +43,6 @@ namespace Umbraco.Core.Models.Membership
             _startMediaId = -1;
         }
 
-        private IUserType _userType;
         private string _name;
         private string _securityStamp;
         private List<IUserGroup> _groupCollection;
@@ -95,7 +89,6 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
 
             public readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
-            public readonly PropertyInfo UserTypeSelector = ExpressionHelper.GetPropertyInfo<User, IUserType>(x => x.UserType);
         }
         
         #region Implementation of IMembershipUser
@@ -279,21 +272,6 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return _defaultToLiveEditing; }
             set { SetPropertyValueAndDetectChanges(value, ref _defaultToLiveEditing, Ps.Value.DefaultToLiveEditingSelector); }
-        }
-
-        [IgnoreDataMember]
-        public IUserType UserType
-        {
-            get { return _userType; }
-            set
-            {
-                if (value.HasIdentity == false)
-                {
-                    throw new InvalidOperationException("Cannot assign a User Type that has not been persisted");
-                }
-
-                SetPropertyValueAndDetectChanges(value, ref _userType, Ps.Value.UserTypeSelector);                
-            }
         }
 
         /// <summary>

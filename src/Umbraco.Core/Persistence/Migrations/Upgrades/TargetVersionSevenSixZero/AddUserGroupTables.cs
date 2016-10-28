@@ -99,6 +99,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 	                WHERE u.userType = ut.id
                 )
                 FROM umbracoUser u");
+
+            Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Writers' WHERE userGroupName = 'Writer'");
+            Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Translators' WHERE userGroupName = 'Translator'");
         }
 
         private void MigrateUserPermissions()

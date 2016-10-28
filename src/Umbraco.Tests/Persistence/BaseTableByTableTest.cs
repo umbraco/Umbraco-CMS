@@ -559,7 +559,6 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
                 DatabaseSchemaHelper.CreateTable<UserDto>();
                 DatabaseSchemaHelper.CreateTable<TaskTypeDto>();
                 DatabaseSchemaHelper.CreateTable<TaskDto>();
@@ -611,20 +610,7 @@ namespace Umbraco.Tests.Persistence
 
             using (Transaction transaction = Database.GetTransaction())
             {
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
                 DatabaseSchemaHelper.CreateTable<UserDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_umbracoUserType_Table()
-        {
-
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
 
                 //transaction.Complete();
             }
@@ -648,23 +634,8 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
                 DatabaseSchemaHelper.CreateTable<UserDto>();
                 DatabaseSchemaHelper.CreateTable<User2NodeNotifyDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_umbracoUser2UserGroup_Table()
-        {
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
-                DatabaseSchemaHelper.CreateTable<UserGroupDto>();
-                DatabaseSchemaHelper.CreateTable<UserDto>();
-                DatabaseSchemaHelper.CreateTable<User2UserGroupDto>();
 
                 //transaction.Complete();
             }

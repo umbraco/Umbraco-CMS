@@ -68,10 +68,7 @@ namespace Umbraco.Core.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
-            var userType = _userService.GetUserTypeByAlias(
-                user.UserTypeAlias.IsNullOrWhiteSpace() ? _userService.GetDefaultMemberType() : user.UserTypeAlias);
-
-            var member = new User(userType)
+            var member = new User
             {
                 DefaultToLiveEditing = false,
                 Email = user.Email,

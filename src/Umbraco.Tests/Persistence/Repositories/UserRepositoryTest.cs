@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
-
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -32,10 +28,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
+        private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, userTypeRepository);
+            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
             return repository;
         }
 
@@ -46,11 +41,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
 
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
+                var user = MockedUser.CreateUser();
 
                 // Act
                 repository.AddOrUpdate(user);
@@ -67,12 +61,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
 
-                var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1");
-                var use2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2");
+                var user1 = MockedUser.CreateUser("1");
+                var use2 = MockedUser.CreateUser("2");
 
                 // Act
                 repository.AddOrUpdate(user1);
@@ -92,10 +85,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
+                var user = MockedUser.CreateUser();
                 repository.AddOrUpdate(user);
                 unitOfWork.Commit();
 
@@ -114,10 +106,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
+                var user = MockedUser.CreateUser();
                 repository.AddOrUpdate(user);
                 unitOfWork.Commit();
 
@@ -163,19 +154,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
 
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
+                var user = MockedUser.CreateUser();
 
                 // Act
                 repository.AddOrUpdate(user);
                 unitOfWork.Commit();
                 var id = user.Id;
 
-                using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-                using (var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo))
+                using (var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
                 {
                     repository2.Delete(user);
                     unitOfWork.Commit();
@@ -194,8 +183,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //    // Arrange
         //    var provider = new PetaPocoUnitOfWorkProvider(Logger);
         //    var unitOfWork = provider.GetUnitOfWork();
-        //    UserTypeRepository userTypeRepository;
-        //using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+        //using (var repository = CreateRepository(unitOfWork))
         //{
 
         //    var user = MockedUser.CreateUser(CreateAndCommitUserType());
@@ -224,10 +212,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
+                var user = MockedUser.CreateUser();
                 repository.AddOrUpdate(user);
                 unitOfWork.Commit();
 
@@ -245,8 +232,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -265,8 +251,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -286,8 +271,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -307,8 +291,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -326,8 +309,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -346,12 +328,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-            using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo))
+            using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
             { 
 
                 // Act
-                var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1");
+                var user1 = MockedUser.CreateUser("1");
                 repository.AddOrUpdate(user1);
                 unitOfWork.Commit();
 
@@ -383,27 +364,14 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository, IUnitOfWork unitOfWork)
         {
-            var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1");
-            var user2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2");
-            var user3 = MockedUser.CreateUser(CreateAndCommitUserType(), "3");
+            var user1 = MockedUser.CreateUser("1");
+            var user2 = MockedUser.CreateUser("2");
+            var user3 = MockedUser.CreateUser("3");
             repository.AddOrUpdate(user1);
             repository.AddOrUpdate(user2);
             repository.AddOrUpdate(user3);
             unitOfWork.Commit();
             return new IUser[] { user1, user2, user3 };
-        }
-
-        private IUserType CreateAndCommitUserType()
-        {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-            {
-                var userType = MockedUserType.CreateUserType();
-                repository.AddOrUpdate(userType);
-                unitOfWork.Commit();
-                return userType;
-            }
         }
     }
 }

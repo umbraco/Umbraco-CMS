@@ -256,15 +256,6 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
-        public virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
-        {
-            return new UserTypeRepository(
-                uow,
-                //There's not many user types but we query on users all the time so the result needs to be cached
-                _cacheHelper,
-                _logger, _sqlSyntax);
-        }
-
         public virtual IUserGroupRepository CreateUserGroupRepository(IDatabaseUnitOfWork uow)
         {
             return new UserGroupRepository(
@@ -279,8 +270,7 @@ namespace Umbraco.Core.Persistence
                 uow,
                 //Need to cache users - we look up user information more than anything in the back office!
                 _cacheHelper,
-                _logger, _sqlSyntax,
-                CreateUserTypeRepository(uow));
+                _logger, _sqlSyntax);
         }
 
         internal virtual IMacroRepository CreateMacroRepository(IDatabaseUnitOfWork uow)

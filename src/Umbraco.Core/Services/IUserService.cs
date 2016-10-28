@@ -129,52 +129,6 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
-        #region User types
-
-        /// <summary>
-        /// Gets all UserTypes or those specified as parameters
-        /// </summary>
-        /// <param name="ids">Optional Ids of UserTypes to retrieve</param>
-        /// <returns>An enumerable list of <see cref="IUserType"/></returns>
-        IEnumerable<IUserType> GetAllUserTypes(params int[] ids);
-        
-        /// <summary>
-        /// Gets a UserType by its Alias
-        /// </summary>
-        /// <param name="alias">Alias of the UserType to retrieve</param>
-        /// <returns><see cref="IUserType"/></returns>
-        IUserType GetUserTypeByAlias(string alias);
-
-        /// <summary>
-        /// Gets a UserType by its Id
-        /// </summary>
-        /// <param name="id">Id of the UserType to retrieve</param>
-        /// <returns><see cref="IUserType"/></returns>
-        IUserType GetUserTypeById(int id);
-
-        /// <summary>
-        /// Gets a UserType by its Name
-        /// </summary>
-        /// <param name="name">Name of the UserType to retrieve</param>
-        /// <returns><see cref="IUserType"/></returns>
-        IUserType GetUserTypeByName(string name);
-
-        /// <summary>
-        /// Saves a UserType
-        /// </summary>
-        /// <param name="userType">UserType to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events. 
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void SaveUserType(IUserType userType, bool raiseEvents = true);
-
-        /// <summary>
-        /// Deletes a UserType
-        /// </summary>
-        /// <param name="userType">UserType to delete</param>
-        void DeleteUserType(IUserType userType);
-
-        #endregion
-
         #region User groups
 
         /// <summary>

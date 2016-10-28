@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class UserGroupFactory
     {
-        #region Implementation of IEntityFactory<IUserType,UserTypeDto>
+        #region Implementation of IEntityFactory<IUserGroup,UserGroupDto>
 
         public IUserGroup BuildEntity(UserGroupDto dto)
         {

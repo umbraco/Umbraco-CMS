@@ -93,19 +93,6 @@ namespace umbraco.cms.presentation.user
                 throw new Exception("Admin users can only be edited by admins");
             }
 
-            // Populate usertype list
-            foreach (UserType ut in UserType.getAll)
-            {
-                if (CurrentUser.IsAdmin() || ut.Alias != "admin")
-                {
-                    ListItem li = new ListItem(ui.Text("user", ut.Name.ToLower(), UmbracoUser), ut.Id.ToString());
-                    if (ut.Id == u.UserType.Id)
-                        li.Selected = true;
-
-                    userType.Items.Add(li);
-                }
-            }
-            
             var userCulture = UserExtensions.GetUserCulture(u.Language, Services.TextService);
 
             // Populate ui language lsit
@@ -467,7 +454,6 @@ namespace umbraco.cms.presentation.user
                     // ok since the membership provider might be storing these details someplace totally different! But we want to keep our UI in sync.
                     u.Name = uname.Text.Trim();
                     u.Language = userLanguage.SelectedValue;
-                    u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
                     u.Email = email.Text.Trim();
                     u.LoginName = lname.Text;
                     u.Disabled = Disabled.Checked;

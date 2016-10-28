@@ -314,24 +314,6 @@ namespace umbraco.BusinessLogic
         }
 
         /// <summary>
-        /// Gets or sets the type of the user.
-        /// </summary>
-        /// <value>The type of the user.</value>
-        public UserType UserType
-        {
-            get
-            {
-                if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return new UserType(UserEntity.UserType);
-            }
-            set
-            {
-                UserEntity.UserType = value.UserTypeItem;
-            }
-        }
-
-
-        /// <summary>
         /// Gets all users
         /// </summary>
         /// <returns></returns>
@@ -447,10 +429,9 @@ namespace umbraco.BusinessLogic
         /// <param name="name">The full name.</param>
         /// <param name="lname">The login name.</param>
         /// <param name="passw">The password.</param>
-        /// <param name="ut">The user type.</param>
-        public static User MakeNew(string name, string lname, string passw, UserType ut)
+        public static User MakeNew(string name, string lname, string passw)
         {
-            var user = new Umbraco.Core.Models.Membership.User(name, "", lname, passw, ut.UserTypeItem);
+            var user = new Umbraco.Core.Models.Membership.User(name, "", lname, passw);
             ApplicationContext.Current.Services.UserService.Save(user);
 
             var u = new User(user);
@@ -467,10 +448,9 @@ namespace umbraco.BusinessLogic
         /// <param name="lname">The lname.</param>
         /// <param name="passw">The passw.</param>
         /// <param name="email">The email.</param>
-        /// <param name="ut">The ut.</param>        
-        public static User MakeNew(string name, string lname, string passw, string email, UserType ut)
+        public static User MakeNew(string name, string lname, string passw, string email)
         {
-            var user = new Umbraco.Core.Models.Membership.User(name, email, lname, passw, ut.UserTypeItem);
+            var user = new Umbraco.Core.Models.Membership.User(name, email, lname, passw);
             ApplicationContext.Current.Services.UserService.Save(user);
 
             var u = new User(user);
@@ -487,8 +467,7 @@ namespace umbraco.BusinessLogic
         /// <param name="name">The name.</param>
         /// <param name="lname">The lname.</param>
         /// <param name="email">The email.</param>
-        /// <param name="ut">The ut.</param>
-        public static void Update(int id, string name, string lname, string email, UserType ut)
+        public static void Update(int id, string name, string lname, string email)
         {
             if (EnsureUniqueLoginName(lname, GetUser(id)) == false)
                 throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
@@ -498,11 +477,10 @@ namespace umbraco.BusinessLogic
             found.Name = name;
             found.Username = lname;
             found.Email = email;
-            found.UserType = ut.UserTypeItem;
             ApplicationContext.Current.Services.UserService.Save(found);
         }
 
-        public static void Update(int id, string name, string lname, string email, bool disabled, bool noConsole, UserType ut)
+        public static void Update(int id, string name, string lname, string email, bool disabled, bool noConsole)
         {
             if (EnsureUniqueLoginName(lname, GetUser(id)) == false)
                 throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
@@ -512,7 +490,6 @@ namespace umbraco.BusinessLogic
             found.Name = name;
             found.Username = lname;
             found.Email = email;
-            found.UserType = ut.UserTypeItem;
             found.IsApproved = disabled == false;
             found.IsLockedOut = noConsole;
             ApplicationContext.Current.Services.UserService.Save(found);
@@ -681,7 +658,7 @@ namespace umbraco.BusinessLogic
         }
 
         /// <summary>
-        /// Adds a group to the list groups for the user, ensure to call Save() afterwords
+        /// Adds a group to the list of groups for the user, ensure to call Save() afterwords
         /// </summary>
         public void AddGroup(int groupId, string groupName)
         {
@@ -691,6 +668,12 @@ namespace umbraco.BusinessLogic
                 Id = groupId,
                 Name = groupName,
             });
+        }
+
+        public string[] GetGroups()
+        {
+            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+            return UserEntity.Groups.Select(x => x.Name).ToArray();
         }
 
 

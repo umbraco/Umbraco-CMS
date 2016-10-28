@@ -22,10 +22,6 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = "0")]
         public bool NoConsole { get; set; }
 
-        [Column("userType")]
-        [ForeignKey(typeof(UserTypeDto))]
-        public short Type { get; set; }
-
         [Column("startStructureID")]
         public int ContentStartId { get; set; }
 

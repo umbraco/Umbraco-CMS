@@ -58,14 +58,7 @@ namespace Umbraco.Tests.Services
 
         private IUser CreateUser(bool withGroups = false)
         {
-            var userType = new UserType
-            {
-                Alias = "TypeA",
-                Name = "Type A",
-            };
-            ServiceContext.UserService.SaveUserType(userType, false);
-
-            var user = new User(userType)
+            var user = new User
             {
                 Name = "Test user",
                 Username = "testUser",

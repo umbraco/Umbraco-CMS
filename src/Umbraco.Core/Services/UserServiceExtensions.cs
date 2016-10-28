@@ -51,17 +51,11 @@ namespace Umbraco.Core.Services
 
             if (found == null)
             {
-                var writer = userService.GetUserTypeByAlias("writer");
-                if (writer == null)
-                {
-                    throw new InvalidOperationException("Could not map the custom user to an Umbraco user, no 'writer' user type could be found");
-                }
                 var user = new User(
                     member.UserName,
                     member.Email ?? Guid.NewGuid().ToString("N") + "@example.com", //email cannot be empty
                     member.ProviderUserKey == null ? member.UserName : member.ProviderUserKey.ToString(),
-                    Guid.NewGuid().ToString("N"), //pass cannot be empty
-                    writer);
+                    Guid.NewGuid().ToString("N")); //pass cannot be empty
                 userService.Save(user);
                 return user;
             }

@@ -22,7 +22,6 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.Name, expression => expression.MapFrom(user => user.Name))
                 .ForMember(user => user.StartMediaId, expression => expression.MapFrom(user => user.StartMediaId))
                 .ForMember(user => user.StartContentId, expression => expression.MapFrom(user => user.StartContentId))
-                .ForMember(user => user.UserTypeAlias, expression => expression.MapFrom(user => user.UserType.Alias))
                 .ForMember(user => user.AccessFailedCount, expression => expression.MapFrom(user => user.FailedPasswordAttempts))
                 .ForMember(user => user.Groups, expression => expression.MapFrom(user => user.Groups.Select(x => x.Name).ToArray()))
                 .ForMember(user => user.AllowedSections, expression => expression.MapFrom(user => user.AllowedSections.ToArray()));
@@ -31,9 +30,8 @@ namespace Umbraco.Core.Models.Identity
                 .ConstructUsing((BackOfficeIdentityUser user) => new UserData(Guid.NewGuid().ToString("N"))) //this is the 'session id'
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
-                .ForMember(detail => detail.Groups, opt => opt.MapFrom(user => user.Groups))
+                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
-                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => new[] { user.UserTypeAlias }))
                 .ForMember(detail => detail.StartContentNode, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaNode, opt => opt.MapFrom(user => user.StartMediaId))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.UserName))

@@ -23,13 +23,11 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
     {
-        private readonly IUserTypeRepository _userTypeRepository;
         private readonly CacheHelper _cacheHelper;
 
-        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUserTypeRepository userTypeRepository)
+        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cacheHelper, logger, sqlSyntax)
         {
-            _userTypeRepository = userTypeRepository;
             _cacheHelper = cacheHelper;
         }
 
@@ -45,8 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var userType = _userTypeRepository.Get(dto.Type);
-            var userFactory = new UserFactory(userType);
+            var userFactory = new UserFactory();
             var user = userFactory.BuildEntity(dto);
             AssociateGroupsWithUser(user);
             return user;
@@ -152,7 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories
         
         protected override void PersistNewItem(IUser entity)
         {
-            var userFactory = new UserFactory(entity.UserType);
+            var userFactory = new UserFactory();
 
             //ensure security stamp if non
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
@@ -170,7 +167,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IUser entity)
         {
-            var userFactory = new UserFactory(entity.UserType);
+            var userFactory = new UserFactory();
 
             //ensure security stamp if non
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
@@ -404,15 +401,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos)
         {
-            var userTypeIds = dtos.Select(x => Convert.ToInt32(x.Type)).ToArray();
-
-            var allUserTypes = userTypeIds.Length == 0 ? Enumerable.Empty<IUserType>() : _userTypeRepository.GetAll(userTypeIds);
-
             return dtos.Select(dto =>
                 {   
-                    var userType = allUserTypes.Single(x => x.Id == dto.Type);
-
-                    var userFactory = new UserFactory(userType);
+                    var userFactory = new UserFactory();
                     return userFactory.BuildEntity(dto);
                 });
         }
@@ -424,17 +415,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 var userGroupFactory = new UserGroupFactory();
                 return userGroupFactory.BuildEntity(dto);
             });
-        }
-
-        /// <summary>
-        /// Dispose disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Ensure the unit of work is disposed
-        /// </remarks>
-        protected override void DisposeResources()
-        {
-            _userTypeRepository.Dispose();
         }
     }
 }

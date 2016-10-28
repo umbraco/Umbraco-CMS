@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               
                                                                               {28, typeof (TagDto)},
                                                                               {29, typeof (TagRelationshipDto)},
-                                                                              {31, typeof (UserTypeDto)},
+                                                                              // Removed in 7.6 {31, typeof (UserTypeDto)},
                                                                               {32, typeof (UserDto)},
                                                                               {33, typeof (TaskTypeDto)},
                                                                               {34, typeof (TaskDto)},

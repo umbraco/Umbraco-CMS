@@ -36,9 +36,9 @@ namespace Umbraco.Web.Cache
             SectionService.Deleted += ApplicationDeleted;
             SectionService.New += ApplicationNew;
 
-            //bind to user / user type events
-            UserService.SavedUserType += UserServiceSavedUserType;
-            UserService.DeletedUserType += UserServiceDeletedUserType;
+            //bind to user / user group events
+            UserService.SavedUserGroup += UserServiceSavedUserGroup;
+            UserService.DeletedUserGroup += UserServiceDeletedUserGroup;
             UserService.SavedUser += UserServiceSavedUser;
             UserService.DeletedUser += UserServiceDeletedUser;
 
@@ -349,19 +349,6 @@ namespace Umbraco.Web.Cache
         } 
         #endregion
 
-        #region UserType event handlers
-        static void UserServiceDeletedUserType(IUserService sender, DeleteEventArgs<IUserType> e)
-        {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserTypeCache(x.Id));
-        }
-
-        static void UserServiceSavedUserType(IUserService sender, SaveEventArgs<IUserType> e)
-        {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserTypeCache(x.Id));
-        }
-        
-        #endregion
-        
         #region Dictionary event handlers
 
         static void LocalizationServiceSavedDictionaryItem(ILocalizationService sender, SaveEventArgs<IDictionaryItem> e)
@@ -537,7 +524,17 @@ namespace Umbraco.Web.Cache
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserCache(x.Id));
         }
-        
+
+        static void UserServiceSavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> e)
+        {
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserGroupCache(x.Id));
+        }
+
+        static void UserServiceDeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)
+        {
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserGroupCache(x.Id));
+        }
+
         private static void InvalidateCacheForPermissionsChange(UserGroupPermission sender)
         {
             if (sender.UserGroup != null)
