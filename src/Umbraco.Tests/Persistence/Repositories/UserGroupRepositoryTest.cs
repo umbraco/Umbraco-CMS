@@ -325,18 +325,24 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
 
                 //add and remove a few times, this tests the internal collection
+                groups[0].ClearAllowedSections();
+                groups[0].AddAllowedSection("content");
+                groups[0].AddAllowedSection("media");
+                groups[0].RemoveAllowedSection("content");
+                groups[0].AddAllowedSection("content");
                 groups[0].AddAllowedSection("settings");
-                groups[0].AddAllowedSection("settings");
-                groups[0].RemoveAllowedSection("settings");
-                groups[0].AddAllowedSection("settings");
-
-                groups[1].AddAllowedSection("developer");
 
                 //add the same even though it's already there
-                groups[2].AddAllowedSection("content");
+                groups[0].AddAllowedSection("content");
+
+                groups[1].ClearAllowedSections();
+                groups[1].AddAllowedSection("developer");
+
+                groups[2].ClearAllowedSections();
 
                 repository.AddOrUpdate(groups[0]);
                 repository.AddOrUpdate(groups[1]);
+                repository.AddOrUpdate(groups[2]);
                 unitOfWork.Commit();
 
                 // Assert
@@ -345,13 +351,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.IsTrue(result[0].AllowedSections.Contains("content"));
                 Assert.IsTrue(result[0].AllowedSections.Contains("media"));
                 Assert.IsTrue(result[0].AllowedSections.Contains("settings"));
-                Assert.AreEqual(3, result[1].AllowedSections.Count());
-                Assert.IsTrue(result[1].AllowedSections.Contains("content"));
-                Assert.IsTrue(result[1].AllowedSections.Contains("media"));
+                Assert.AreEqual(1, result[1].AllowedSections.Count());
                 Assert.IsTrue(result[1].AllowedSections.Contains("developer"));
-                Assert.AreEqual(2, result[2].AllowedSections.Count());
-                Assert.IsTrue(result[1].AllowedSections.Contains("content"));
-                Assert.IsTrue(result[1].AllowedSections.Contains("media"));
+                Assert.AreEqual(0, result[2].AllowedSections.Count());
             }
         }
 
@@ -390,23 +392,23 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
-                var user1 = MockedUserGroup.CreateUserGroup("1", new[] { "media" });
-                var user2 = MockedUserGroup.CreateUserGroup("2", new[] { "settings" });
-                var user3 = MockedUserGroup.CreateUserGroup("3", new[] { "settings" });
+                var user1 = MockedUserGroup.CreateUserGroup("1", allowedSections: new[] { "test1" });
+                var user2 = MockedUserGroup.CreateUserGroup("2", allowedSections: new[] { "test2" });
+                var user3 = MockedUserGroup.CreateUserGroup("3", allowedSections: new[] { "test1" });
                 repository.AddOrUpdate(user1);
                 repository.AddOrUpdate(user2);
                 repository.AddOrUpdate(user3);
                 unitOfWork.Commit();
 
                 // Act
-
-                var groups = repository.GetGroupsAssignedToSection("test");
+                var groups = repository.GetGroupsAssignedToSection("test1");
 
                 // Assert            
                 Assert.AreEqual(2, groups.Count());
                 var names = groups.Select(x => x.Name).ToArray();
-                Assert.IsTrue(names.Contains("TestGroup1"));
-                Assert.IsTrue(names.Contains("TestGroup3"));
+                Assert.IsTrue(names.Contains("TestUserGroup1"));
+                Assert.IsFalse(names.Contains("TestUserGroup2"));
+                Assert.IsTrue(names.Contains("TestUserGroup3"));
             }
         }
 

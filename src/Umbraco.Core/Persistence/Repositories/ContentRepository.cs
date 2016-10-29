@@ -780,15 +780,15 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         }
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified user group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>        
-        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <param name="groupIds"></param>        
+        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.AssignEntityPermission(entity, permission, userIds);
+            repo.AssignEntityPermission(entity, permission, groupIds);
         }
 
         public IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(int entityId)

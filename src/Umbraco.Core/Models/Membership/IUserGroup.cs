@@ -28,5 +28,7 @@ namespace Umbraco.Core.Models.Membership
         void RemoveAllowedSection(string sectionAlias);
 
         void AddAllowedSection(string sectionAlias);
+
+        void ClearAllowedSections();
     }
 }

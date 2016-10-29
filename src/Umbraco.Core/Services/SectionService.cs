@@ -249,7 +249,7 @@ namespace Umbraco.Core.Services
             {
                 //delete the assigned applications
                 _uowProvider.GetUnitOfWork().Database.Execute(
-                    "delete from umbracoUser2App where app = @appAlias",
+                    "delete from umbracoUserGroup2App where app = @appAlias",
                     new { appAlias = section.Alias });
 
                 //delete the assigned trees

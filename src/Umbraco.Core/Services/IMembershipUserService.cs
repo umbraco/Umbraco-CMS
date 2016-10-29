@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Services

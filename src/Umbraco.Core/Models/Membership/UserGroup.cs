@@ -93,5 +93,10 @@ namespace Umbraco.Core.Models.Membership
                 _sectionCollection.Add(sectionAlias);
             }
         }
+
+        public void ClearAllowedSections()
+        {
+            _sectionCollection.Clear();
+        }
     }
 }

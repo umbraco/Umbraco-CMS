@@ -878,9 +878,12 @@ namespace Umbraco.Core.Services
                 var result = new List<EntityPermission>(explicitPermissions);
                 
                 // If no permissions are assigned to a particular node then we will fill in those permissions with the group's defaults
-                var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
-                result.AddRange(missingIds
-                    .Select(i => new EntityPermission(i, group.Permissions.ToArray())));
+                var missingIds = nodeIds.Except(result.Select(x => x.EntityId)).ToList();
+                if (missingIds.Any())
+                {
+                    result.AddRange(missingIds
+                        .Select(i => new EntityPermission(i, group.Permissions.ToArray())));
+                }
 
                 return result;
              }

@@ -111,13 +111,13 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <param name="groupIds"></param>
+        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> groupIds)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
-                repository.AssignEntityPermission(entity, permission, userIds);
+                repository.AssignEntityPermission(entity, permission, groupIds);
             }
         }
 

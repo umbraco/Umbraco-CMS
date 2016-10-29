@@ -1,27 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
-
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.editorControls.tinyMCE3;
-using umbraco.interfaces;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -65,6 +57,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository);
             var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
+        }
+
+        private UserGroupRepository CreateUserGroupRepository(IDatabaseUnitOfWork unitOfWork)
+        {
+            return new UserGroupRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);
         }
 
         [Test]
@@ -299,7 +296,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
-            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateUserGroupRepository(unitOfWork))
+            {
+                var userGroup = MockedUserGroup.CreateUserGroup("1");
+                repository.AddOrUpdate(userGroup);
+                unitOfWork.Commit();
+            }
+
+                ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
@@ -313,7 +317,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-                repository.AssignEntityPermission(parentPage, 'A', new int[] { 0 });
+                repository.AssignEntityPermission(parentPage, 'A', new [] { 1 });
                 var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
                 repository.AddOrUpdate(childPage);
                 unitOfWork.Commit();

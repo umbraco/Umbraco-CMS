@@ -29,34 +29,20 @@ namespace Umbraco.Tests.Services
             ServiceContext.SectionService.MakeNew("Settings", "settings", "icon-settings");
             ServiceContext.SectionService.MakeNew("Developer", "developer", "icon-developer");
         }
-
         [Test]
         public void SectionService_Can_Get_Allowed_Sections_For_User()
         {
             // Arrange
-            var user = CreateUser();
+            var user = CreateTestUser();
 
             // Act
             var result = ServiceContext.SectionService.GetAllowedSections(user.Id).ToList();
 
             // Assert
-            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(3, result.Count);
         }
 
-        [Test]
-        public void SectionService_Can_Get_Allowed_Sections_For_User_With_Groups()
-        {
-            // Arrange
-            var user = CreateUser(true);
-
-            // Act
-            var result = ServiceContext.SectionService.GetAllowedSections(user.Id).ToList();
-
-            // Assert
-            Assert.AreEqual(4, result.Count);
-        }
-
-        private IUser CreateUser(bool withGroups = false)
+        private IUser CreateTestUser()
         {
             var user = new User
             {
@@ -66,26 +52,23 @@ namespace Umbraco.Tests.Services
             };
             ServiceContext.UserService.Save(user, false);
 
-            if (withGroups)
+            var userGroupA = new UserGroup
             {
-                var userGroupA = new UserGroup
-                {
-                    Alias = "GroupA",
-                    Name = "Group A"
-                };
-                userGroupA.AddAllowedSection("media");
-                userGroupA.AddAllowedSection("settings");
-                ServiceContext.UserService.SaveUserGroup(userGroupA, true, new[] { user.Id }, false);
+                Alias = "GroupA",
+                Name = "Group A"
+            };
+            userGroupA.AddAllowedSection("media");
+            userGroupA.AddAllowedSection("settings");
+            ServiceContext.UserService.SaveUserGroup(userGroupA, true, new[] { user.Id }, false);
 
-                var userGroupB = new UserGroup
-                {
-                    Alias = "GroupB",
-                    Name = "Group B"
-                };
-                userGroupB.AddAllowedSection("settings");
-                userGroupB.AddAllowedSection("developer");
-                ServiceContext.UserService.SaveUserGroup(userGroupB, true, new[] { user.Id }, false);
-            }
+            var userGroupB = new UserGroup
+            {
+                Alias = "GroupB",
+                Name = "Group B"
+            };
+            userGroupB.AddAllowedSection("settings");
+            userGroupB.AddAllowedSection("developer");
+            ServiceContext.UserService.SaveUserGroup(userGroupB, true, new[] { user.Id }, false);
 
             return ServiceContext.UserService.GetUserById(user.Id);
         }
