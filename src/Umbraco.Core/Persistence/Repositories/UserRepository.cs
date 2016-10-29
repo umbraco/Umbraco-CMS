@@ -68,8 +68,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoUser.id in (@ids)", new {ids = ids});
             }
             
-            return ConvertFromDtos(Database.Fetch<UserDto>(sql))
+            var users = ConvertFromDtos(Database.Fetch<UserDto>(sql))
                 .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
+
+            foreach (var user in users)
+            {
+                AssociateGroupsWithUser(user);
+            }
+
+            return users;
         }
         
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
@@ -84,10 +91,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var users = ConvertFromDtos(dtos)
                 .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
 
-            // If a single user found (most likely from a look-up by an alternate key like email or username) then populate the groups
-            if (users.Length == 1)
+            foreach (var user in users)
             {
-                AssociateGroupsWithUser(users[0]);
+                AssociateGroupsWithUser(user);
             }
 
             return users;
