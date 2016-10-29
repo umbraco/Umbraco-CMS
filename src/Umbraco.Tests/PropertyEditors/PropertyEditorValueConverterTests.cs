@@ -1,8 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -58,5 +57,18 @@ namespace Umbraco.Tests.PropertyEditors
 
             Assert.AreEqual(expected, result);
         }
-	}
+
+        [TestCase("apples", new[] { "apples" })]
+        [TestCase("apples,oranges", new[] { "apples", "oranges" })]
+        [TestCase(" apples, oranges, pears ", new[] { "apples", "oranges", "pears" })]
+        [TestCase("", new string[] { })]
+        [TestCase(null, new string[] { })]
+        public void CanConvertCheckboxListPropertyEditor(object value, IEnumerable<string> expected)
+        {
+            var converter = new CheckboxListValueConverter();
+            var result = converter.ConvertSourceToObject(null, value, false);
+
+            Assert.AreEqual(expected, result);
+        }
+    }
 }
