@@ -104,6 +104,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         whereBuilder.Append(" OR ");
                     }
                 }
+
                 whereBuilder.Append(")");
             }
 

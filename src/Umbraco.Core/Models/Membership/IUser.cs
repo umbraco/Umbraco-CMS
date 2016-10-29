@@ -31,15 +31,6 @@ namespace Umbraco.Core.Models.Membership
 
         void SetGroupsLoaded();
 
-        //TODO: This should be a private set 
-        /// <summary>
-        /// The default permission set for the user
-        /// </summary>
-        /// <remarks>
-        /// Currently in umbraco each permission is a single char but with an Enumerable{string} collection this allows for flexible changes to this in the future
-        /// </remarks>
-        IEnumerable<string> DefaultPermissions { get; set; }
-
         IEnumerable<string> AllowedSections { get; }
 
         /// <summary>

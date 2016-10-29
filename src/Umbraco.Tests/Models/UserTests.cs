@@ -21,7 +21,6 @@ namespace Umbraco.Tests.Models
                 CreateDate = DateTime.Now,
                 Name = "Test",
                 Comments = "comments",
-                DefaultPermissions = new[]{"a","b","c"},
                 DefaultToLiveEditing = false,
                 Email = "test@test.com",
                 Language = "en",
@@ -48,9 +47,6 @@ namespace Umbraco.Tests.Models
 
             Assert.AreEqual(clone.AllowedSections.Count(), item.AllowedSections.Count());
 
-            Assert.AreNotSame(clone.DefaultPermissions, item.DefaultPermissions);
-            Assert.AreEqual(clone.DefaultPermissions.Count(), item.DefaultPermissions.Count());
-
             //Verify normal properties with reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)
@@ -72,7 +68,6 @@ namespace Umbraco.Tests.Models
                 CreateDate = DateTime.Now,
                 Name = "Test",
                 Comments = "comments",
-                DefaultPermissions = new[] { "a", "b", "c" },
                 DefaultToLiveEditing = false,
                 Email = "test@test.com",
                 Language = "en",

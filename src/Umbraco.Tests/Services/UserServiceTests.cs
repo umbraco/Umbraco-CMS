@@ -506,7 +506,6 @@ namespace Umbraco.Tests.Services
             Assert.IsNotNull(updatedItem);
             Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
             Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
-            Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(originalUser.DefaultPermissions));
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(originalUser.RawPasswordValue));

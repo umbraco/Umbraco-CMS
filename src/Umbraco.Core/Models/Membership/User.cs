@@ -62,8 +62,6 @@ namespace Umbraco.Core.Models.Membership
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
 
-        private IEnumerable<string> _defaultPermissions; 
-        
         private bool _defaultToLiveEditing;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
@@ -259,14 +257,6 @@ namespace Umbraco.Core.Models.Membership
             set { SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector); }
         }
 
-        //TODO: This should be a private set
-        [DataMember]
-        public IEnumerable<string> DefaultPermissions
-        {
-            get {  return _defaultPermissions;}
-            set { _defaultPermissions = value; }
-        }
-
         [IgnoreDataMember]
         internal bool DefaultToLiveEditing
         {
@@ -318,7 +308,6 @@ namespace Umbraco.Core.Models.Membership
             clone.DisableChangeTracking();
             //need to create new collections otherwise they'll get copied by ref
             clone._groupCollection = new List<IUserGroup>(_groupCollection.ToList());
-            clone._defaultPermissions = new List<string>(_defaultPermissions.ToList());
             //re-create the event handler
             //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);

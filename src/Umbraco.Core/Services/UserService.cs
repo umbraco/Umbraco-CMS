@@ -749,86 +749,41 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
             }
-        }    
+        }
 
         /// <summary>
-        /// Get permissions set for a user and optional node ids
+        /// Get permissions set for a user and node Id
         /// </summary>
-        /// <remarks>If no permissions are found for a particular entity then the user's default permissions will be applied</remarks>
         /// <param name="user">User to retrieve permissions for</param>
-        /// <param name="nodeIds">Specifiying nothing will return all user permissions for all nodes</param>
+        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            if (user.GroupsLoaded == false)
             {
-                // TODO: rework (to use groups - currently defaulting to user type)
-
-                //if no permissions are assigned to a particular node then we will fill in those permissions with the user's defaults
-                var result = new List<EntityPermission>();
-                var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
-                foreach (var id in missingIds)
-                {
-                    result.Add(
-                        new EntityPermission(
-                            id,
-                            user.DefaultPermissions.ToArray()));
-                }
-
-                return result;
+                throw new InvalidOperationException("Cannot determine permissions for user as their associated groups are not loaded");
             }
-        }
 
-        /// <summary>
-        /// Get permissions set for a group and optional node ids
-        /// </summary>
-        /// <param name="group">Group to retrieve permissions for</param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
-        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public IEnumerable<EntityPermission> GetPermissions(IUserGroup group, params int[] nodeIds)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Get permissions set for a user and optional node ids
-        /// </summary>
-        /// <param name="repository">User repository</param>
-        /// <param name="user">User to retrieve permissions for</param>
-        /// <param name="nodeIds">Specifiying nothing will return all user permissions for all nodes</param>
-        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        private IEnumerable<EntityPermission> GetPermissions(IUserRepository repository, IUser user, params int[] nodeIds)
-        {
             var result = new List<EntityPermission>();
-
-            // TODO: rework to groups first, then user type
-
-            // If no permissions are assigned to a particular node then, we will fill in those permissions with the user's defaults
-            var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
-            foreach (var id in missingIds)
-            {
-                result.Add(
-                    new EntityPermission(
-                        id,
-                        user.DefaultPermissions.ToArray()));
-            }
-
-            // Add or amend the existing permissions based on these
             foreach (var group in user.Groups)
             {
-                var groupPermissions = GetPermissions(group, nodeIds).ToList();
-                foreach (var groupPermission in groupPermissions)
+                foreach (var permission in GetPermissions(group, nodeIds))
                 {
-                    // Add group permission, ensuring we keep a unique value for the entity Id in the list
-                    AddOrAmendPermission(result, groupPermission);
+                    AddOrAmendPermissionList(result, permission);
                 }
             }
 
             return result;
         }
 
-        private void AddOrAmendPermission(IList<EntityPermission> permissions, EntityPermission groupPermission)
+        /// <summary>
+        /// For an existing list of <see cref="EntityPermission"/>, takes a new <see cref="EntityPermission"/> and aggregates it.
+        /// If a permission for the entity associated with the new permission already exists, it's updated with those permissions to create a distinct, most permissive set.
+        /// If it doesn't, it's added to the list.
+        /// </summary>
+        /// <param name="permissions">List of already found permissions</param>
+        /// <param name="groupPermission">New permission to aggregate</param>
+        private void AddOrAmendPermissionList(IList<EntityPermission> permissions, EntityPermission groupPermission)
         {
             var existingPermission = permissions
                 .SingleOrDefault(x => x.EntityId == groupPermission.EntityId);
@@ -850,51 +805,38 @@ namespace Umbraco.Core.Services
         /// <returns>String indicating permissions for provided user and path</returns>
         public string GetPermissionsForPath(IUser user, string path)
         {
-            var nodeId = GetNodeIdFromPath(path);
-
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            if (user.GroupsLoaded == false)
             {
-                // Check for permissions directly assigned to the node for the user (if we have any, they take priority
-                // over anything defined on groups; we'll take the special "null" action as not being defined
-                // as this is set if someone sets permissions on a user and then removes them)
-                var permissions = GetPermissions(repository, user, nodeId)
-                    .Where(IsNotNullActionPermission)
-                    .ToList();
-                var gotDirectlyAssignedUserPermissions = permissions.Any();
-
-                // If none found, and checking groups, get permissions from the groups
-                if (gotDirectlyAssignedUserPermissions == false)
-                {
-                    foreach (var group in user.Groups)
-                    {
-                        var groupPermissions = GetPermissions(group, nodeId).ToList();
-                        permissions.AddRange(groupPermissions);
-                    }
-                }
-
-                // If none found directly on the user, get those defined on the user type
-                if (gotDirectlyAssignedUserPermissions == false)
-                {
-                    var typePermissions = GetPermissions(repository, user, nodeId).ToList();
-                    permissions.AddRange(typePermissions);
-                }
-
-                // Extract the net permissions from the path from the set of permissions found
-                string assignedPermissions;
-                if (TryGetAssignedPermissionsForNode(permissions, nodeId, out assignedPermissions))
-                {
-                    return assignedPermissions;
-                }
-
-                // Exception to everything. If default cruds is empty and we're on root node; allow browse of root node
-                if (path == "-1")
-                {
-                    return "F";
-                }
-
-                return string.Empty;
+                throw new InvalidOperationException("Cannot determine permissions for user as their associated groups are not loaded");
             }
+            
+            var assignedPermissions = GetPermissionsForGroupsAndPath(user.Groups, path);
+            return GetAggregatePermissions(assignedPermissions);
+        }
+
+        /// <summary>
+        /// Retrieves the permissions assigned to each group for a given path
+        /// </summary>
+        /// <param name="groups">List of groups associated with the user</param>
+        /// <param name="path">Path to check permissions for</param>
+        /// <returns>List of strings indicating permissions for each groups</returns>
+        private IEnumerable<string> GetPermissionsForGroupsAndPath(IEnumerable<IUserGroup> groups, string path)
+        {
+            return groups
+                .Select(g => GetPermissionsForPath(g, path))
+                .ToList();
+        }
+
+        /// <summary>
+        /// Aggregates a set of permissions strings to return a unique permissions string containing the most permissive set
+        /// </summary>
+        /// <param name="assignedPermissions">List of permission strings</param>
+        /// <returns>Single permission string</returns>
+        private static string GetAggregatePermissions(IEnumerable<string> assignedPermissions)
+        {
+            return string.Join(string.Empty, assignedPermissions
+                .SelectMany(s => s.ToCharArray())
+                .Distinct());
         }
 
         /// <summary>
@@ -906,20 +848,43 @@ namespace Umbraco.Core.Services
         public string GetPermissionsForPath(IUserGroup group, string path)
         {
             var nodeId = GetNodeIdFromPath(path);
-
-            var permissions = GetPermissions(group).ToList();
-
-            string assignedPermissions;
-            TryGetAssignedPermissionsForNode(permissions, nodeId, out assignedPermissions);
-            return assignedPermissions;
+            return string.Join(string.Empty, GetPermissions(group, nodeId).Single().AssignedPermissions);
         }
 
+        /// <summary>
+        /// Parses a path to find the lowermost node id
+        /// </summary>
+        /// <param name="path">Path as string</param>
+        /// <returns>Node id</returns>
         private static int GetNodeIdFromPath(string path)
         {
             return path.Contains(",")
                 ? int.Parse(path.Substring(path.LastIndexOf(",", StringComparison.Ordinal) + 1))
                 : int.Parse(path);
         }
+
+        /// <summary>
+        /// Get permissions set for a group and node Id
+        /// </summary>
+        /// <param name="group">Group to retrieve permissions for</param>
+        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
+        private IEnumerable<EntityPermission> GetPermissions(IUserGroup group, params int[] nodeIds)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
+            {
+                var explicitPermissions = repository.GetPermissionsForEntities(group.Id, nodeIds);
+                var result = new List<EntityPermission>(explicitPermissions);
+                
+                // If no permissions are assigned to a particular node then we will fill in those permissions with the group's defaults
+                var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
+                result.AddRange(missingIds
+                    .Select(i => new EntityPermission(i, group.Permissions.ToArray())));
+
+                return result;
+             }
+         }
 
         private static bool IsNotNullActionPermission(EntityPermission x)
         {

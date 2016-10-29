@@ -103,7 +103,7 @@ namespace umbraco.BusinessLogic
         }
 
         /// <summary>
-        /// Gets the id the user type
+        /// Gets the id the user group
         /// </summary>
         public int Id
         {
@@ -111,7 +111,7 @@ namespace umbraco.BusinessLogic
         }
 
         /// <summary>
-        /// Gets the default permissions of the user type
+        /// Gets the default permissions of the user group
         /// </summary>
         public string DefaultPermissions
         {
@@ -238,7 +238,7 @@ namespace umbraco.BusinessLogic
         public static UserGroup MakeNew(string name, string defaultPermissions, string alias)
         {
             //ensure that the current alias does not exist
-            //get the id for the new user type
+            //get the id for the new user group
             var existing = UserGroups.Find(ut => (ut.Alias == alias));
 
             if (existing != null)
@@ -261,7 +261,7 @@ namespace umbraco.BusinessLogic
         }
 
         /// <summary>
-        /// Gets the user type with the specied ID
+        /// Gets the user group with the specfied ID
         /// </summary>
         /// <param name="id">The id.</param>
         /// <returns></returns>

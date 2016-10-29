@@ -100,6 +100,16 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
                 )
                 FROM umbracoUser u");
 
+            // Add the built-in administrator account to all apps
+            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
+                SELECT ug.id, app
+                FROM umbracoUserGroup ug
+                INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
+                INNER JOIN umbracoUser u ON u.id = u2ug.userId
+                INNER JOIN umbracoUser2app u2a ON u2a.[user] = u.id
+				WHERE u.id = 0");
+
+            // Rename some groups for consistency (plural form)
             Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Writers' WHERE userGroupName = 'Writer'");
             Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Translators' WHERE userGroupName = 'Translator'");
         }

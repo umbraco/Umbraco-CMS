@@ -72,14 +72,6 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
 
         /// <summary>
-        /// Get permissions set for a user group and optional node ids
-        /// </summary>
-        /// <param name="group">Group to retrieve permissions for</param>
-        /// <param name="nodeIds">Specifiying nothing will return all group permissions for all nodes</param>
-        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        IEnumerable<EntityPermission> GetPermissions(IUserGroup group, params int[] nodeIds);
-
-        /// <summary>
         /// Gets the permissions for the provided user and path
         /// </summary>
         /// <param name="user">User to check permissions for</param>

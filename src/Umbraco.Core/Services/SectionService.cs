@@ -184,7 +184,6 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Section> GetAllowedSections(int userId)
         {
-            
             var user = _userService.GetUserById(userId);
             if (user == null)
             {

@@ -322,33 +322,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
-        public void Default_User_Permissions_Based_On_User_Type()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-            { 
-
-                // Act
-                var user1 = MockedUser.CreateUser("1");
-                repository.AddOrUpdate(user1);
-                unitOfWork.Commit();
-
-                // Assert
-                Assert.AreEqual(3, user1.DefaultPermissions.Count());
-                Assert.AreEqual("A", user1.DefaultPermissions.ElementAt(0));
-                Assert.AreEqual("B", user1.DefaultPermissions.ElementAt(1));
-                Assert.AreEqual("C", user1.DefaultPermissions.ElementAt(2));
-            }
-        }
-
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
         {
             Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
             Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
-            Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(originalUser.DefaultPermissions));
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(originalUser.RawPasswordValue));
