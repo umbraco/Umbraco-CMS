@@ -18,10 +18,10 @@ namespace umbraco.cms.presentation.user
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
     [ScriptService]
-    public class GroupPermissionsHandler
+    public class PermissionsHandler
     {
         /// <summary>
-        /// Loads the GroupNodePermissions UserControl with the appropriate properties, renders the contents and returns the output html.
+        /// Loads the NodePermissions UserControl with the appropriate properties, renders the contents and returns the output html.
         /// </summary>
         /// <returns></returns>
         [WebMethod]
