@@ -428,7 +428,8 @@ namespace Umbraco.Web.Security
             var viewProperties = new List<UmbracoProperty>();
 
             foreach (var prop in memberType.PropertyTypes
-                    .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias)))
+                    .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias))
+                    .OrderBy(p => p.SortOrder))
             {
                 var value = string.Empty;
                 if (member != null)
