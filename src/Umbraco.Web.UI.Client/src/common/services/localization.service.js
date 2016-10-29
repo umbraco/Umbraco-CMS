@@ -1,6 +1,30 @@
+/**
+ * @ngdoc service
+ * @name umbraco.services.localizationService
+ *
+ * @requires $http
+ * @requires $q
+ * @requires $window
+ * @requires $filter
+ *
+ * @description
+ * Application-wide service for handling localization
+ *
+ * ##usage
+ * To use, simply inject the localizationService into any controller that needs it, and make
+ * sure the umbraco.services module is accesible - which it should be by default.
+ *
+ * <pre>
+ *    localizationService.localize("area_key").then(function(value){
+ *        element.html(value);
+ *    });
+ * </pre>
+ */
+
 angular.module('umbraco.services')
 .factory('localizationService', function ($http, $q, eventsService, $window, $filter, userService) {
 
+    //TODO: This should be injected as server vars
     var url = "LocalizedText";
     var resourceFileLoadStatus = "none";
     var resourceLoadingPromise = [];
@@ -37,6 +61,11 @@ angular.module('umbraco.services')
         initLocalizedResources: function () {
             var deferred = $q.defer();
 
+            if (resourceFileLoadStatus === "loaded") {
+                deferred.resolve(service.dictionary);
+                return deferred.promise;
+            }
+
             //if the resource is already loading, we don't want to force it to load another one in tandem, we'd rather
             // wait for that initial http promise to finish and then return this one with the dictionary loaded
             if (resourceFileLoadStatus === "loading") {
@@ -72,7 +101,17 @@ angular.module('umbraco.services')
             return deferred.promise;
         },
 
-        //helper to tokenize and compile a localization string
+        /**
+         * @ngdoc method
+         * @name umbraco.services.localizationService#tokenize
+         * @methodOf umbraco.services.localizationService
+         *
+         * @description
+         * Helper to tokenize and compile a localization string
+         * @param {String} value the value to tokenize
+         * @param {Object} scope the $scope object 
+         * @returns {String} tokenized resource string
+         */
         tokenize: function (value, scope) {
             if (value) {
                 var localizer = value.split(':');
@@ -89,27 +128,25 @@ angular.module('umbraco.services')
             return value;
         },
 
-        // checks the dictionary for a localized resource string
+        /**
+         * @ngdoc method
+         * @name umbraco.services.localizationService#localize
+         * @methodOf umbraco.services.localizationService
+         *
+         * @description
+         * Checks the dictionary for a localized resource string
+         * @param {String} value the area/key to localize
+         * @param {Array} tokens if specified this array will be sent as parameter values 
+         * @returns {String} localized resource string
+         */
         localize: function (value, tokens) {
-            var deferred = $q.defer();
-
-            if (resourceFileLoadStatus === "loaded") {
-                var val = _lookup(value, tokens, service.dictionary);
-                deferred.resolve(val);
-            } else {
-                service.initLocalizedResources().then(function (dic) {
-                    var val = _lookup(value, tokens, dic);
-                    deferred.resolve(val);
-                });
-            }
-
-            return deferred.promise;
+            return service.initLocalizedResources().then(function (dic) {
+                var val = _lookup(value, tokens, dic);
+                return val;
+            });
         },
-        
-    };
 
-    // force the load of the resource file
-    service.initLocalizedResources();
+    };
 
     //This happens after login / auth and assets loading
     eventsService.on("app.authenticated", function () {

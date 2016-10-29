@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -26,24 +27,13 @@ namespace Umbraco.Web.Mvc
             get
             {
                 //we should always try to return the context from the data tokens just in case its a custom context and not 
-                //using the UmbracoContext.Current.
-                //we will fallback to the singleton if necessary.
-                if (ViewContext.RouteData.DataTokens.ContainsKey("umbraco-context"))
-                {
-                    return (UmbracoContext)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context");
-                }
-                //next check if it is a child action and see if the parent has it set in data tokens
-                if (ViewContext.IsChildAction)
-                {
-                    if (ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey("umbraco-context"))
-                    {
-                        return (UmbracoContext)ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context");
-                    }
-                }
-
-                //lastly, we will use the singleton, the only reason this should ever happen is is someone is rendering a page that inherits from this
-                //class and are rendering it outside of the normal Umbraco routing process. Very unlikely.
-                return UmbracoContext.Current;
+                //using the UmbracoContext.Current, we will fallback to the singleton if necessary.
+                var umbCtx = ViewContext.GetUmbracoContext()
+                    //lastly, we will use the singleton, the only reason this should ever happen is is someone is rendering a page that inherits from this
+                    //class and are rendering it outside of the normal Umbraco routing process. Very unlikely.
+                    ?? UmbracoContext.Current;
+                
+                return umbCtx;
             }
         }
 
@@ -65,16 +55,16 @@ namespace Umbraco.Web.Mvc
                 //we should always try to return the object from the data tokens just in case its a custom object and not 
                 //using the UmbracoContext.Current.
                 //we will fallback to the singleton if necessary.
-                if (ViewContext.RouteData.DataTokens.ContainsKey("umbraco-doc-request"))
+                if (ViewContext.RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken))
                 {
-                    return (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
+                    return (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject(Core.Constants.Web.PublishedDocumentRequestDataToken);
                 }
                 //next check if it is a child action and see if the parent has it set in data tokens
                 if (ViewContext.IsChildAction)
                 {
-                    if (ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey("umbraco-doc-request"))
+                    if (ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken))
                     {
-                        return (PublishedContentRequest)ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
+                        return (PublishedContentRequest)ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(Core.Constants.Web.PublishedDocumentRequestDataToken);
                     }
                 }
 
@@ -130,6 +120,9 @@ namespace Umbraco.Web.Mvc
             base.InitializePage();
             if (ViewContext.IsChildAction == false)
             {
+                //this is used purely for partial view macros that contain forms 
+                // and mostly just when rendered within the RTE - This should already be set with the 
+                // EnsurePartialViewMacroViewContextFilterAttribute
                 if (ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext) == false)
                 {
                     ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, ViewContext);
@@ -141,90 +134,56 @@ namespace Umbraco.Web.Mvc
         // maps model
         protected override void SetViewData(ViewDataDictionary viewData)
         {
-            // if view data contains no model, nothing to do
-            var source = viewData.Model;
-            if (source == null)
-            {
-                base.SetViewData(viewData);
-                return;
-            }
+            // capture the model before we tinker with the viewData
+            var viewDataModel = viewData.Model;
 
-            // get the type of the view data model (what we have)
-            // get the type of this view model (what we want)
-            var sourceType = source.GetType();
-            var targetType = typeof (TModel);
+            // map the view data (may change its type, may set model to null)
+            viewData = MapViewDataDictionary(viewData, typeof (TModel));
 
-            // it types already match, nothing to do
-            if (sourceType.Inherits<TModel>()) // includes ==
-            {
-                base.SetViewData(viewData);
-                return;
-            }
+            var culture = CultureInfo.CurrentCulture;
+            // bind the model (use context culture as default, if available)
+            if (UmbracoContext.PublishedContentRequest != null && UmbracoContext.PublishedContentRequest.Culture != null)
+                culture = UmbracoContext.PublishedContentRequest.Culture;
+            viewData.Model = RenderModelBinder.BindModel(viewDataModel, typeof (TModel), culture);
 
-            // try to grab the content
-            // if no content is found, return, nothing we can do
-            var sourceContent = source as IPublishedContent; // check if what we have is an IPublishedContent
-            if (sourceContent == null && sourceType.Implements<IRenderModel>())
-            {
-                // else check if it's an IRenderModel => get the content
-                sourceContent = ((IRenderModel)source).Content;
-            }
-            if (sourceContent == null)
-            {
-                // else check if we can convert it to a content
-                var attempt = source.TryConvertTo<IPublishedContent>();
-                if (attempt.Success) sourceContent = attempt.Result;
-            }
-
-            var ok = sourceContent != null;
-            if (sourceContent != null)
-            {
-                // try to grab the culture
-                // using context's culture by default
-                var culture = UmbracoContext.PublishedContentRequest.Culture;
-                var sourceRenderModel = source as RenderModel;
-                if (sourceRenderModel != null)
-                    culture = sourceRenderModel.CurrentCulture;
-
-                // reassign the model depending on its type
-                if (targetType.Implements<IPublishedContent>())
-                {
-                    // it TModel implements IPublishedContent then use the content
-                    // provided that the content is of the proper type
-                    if ((sourceContent is TModel) == false)
-                        throw new InvalidCastException(string.Format("Cannot cast source content type {0} to view model type {1}.",
-                            sourceContent.GetType(), targetType));
-                    viewData.Model = sourceContent;
-                }
-                else if (targetType == typeof(RenderModel))
-                {
-                    // if TModel is a basic RenderModel just create it
-                    viewData.Model = new RenderModel(sourceContent, culture);
-                }
-                else if (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(RenderModel<>))
-                {
-                    // if TModel is a strongly-typed RenderModel<> then create it
-                    // provided that the content is of the proper type
-                    var targetContentType = targetType.GetGenericArguments()[0];
-                    if ((sourceContent.GetType().Inherits(targetContentType)) == false)
-                        throw new InvalidCastException(string.Format("Cannot cast source content type {0} to view model content type {1}.",
-                            sourceContent.GetType(), targetContentType));
-                    viewData.Model = Activator.CreateInstance(targetType, sourceContent, culture);
-                }
-                else
-                {
-                    ok = false;
-                }
-            }
-
-            if (ok == false)
-            {
-                // last chance : try to convert
-                var attempt = source.TryConvertTo<TModel>();
-                if (attempt.Success) viewData.Model = attempt.Result;
-            }
-
+            // set the view data
             base.SetViewData(viewData);
+        }
+
+        // viewData is the ViewDataDictionary (maybe <TModel>) that we have
+        // modelType is the type of the model that we need to bind to
+        //
+        // figure out whether viewData can accept modelType else replace it
+        //
+        private static ViewDataDictionary MapViewDataDictionary(ViewDataDictionary viewData, Type modelType)
+        {
+            var viewDataType = viewData.GetType();
+
+            // if viewData is not generic then it is a simple ViewDataDictionary instance and its
+            // Model property is of type 'object' and will accept anything, so it is safe to use
+            // viewData
+            if (viewDataType.IsGenericType == false)
+                return viewData;
+
+            // ensure it is the proper generic type
+            var def = viewDataType.GetGenericTypeDefinition();
+            if (def != typeof(ViewDataDictionary<>))
+                throw new Exception("Could not map viewData of type \"" + viewDataType.FullName + "\".");
+
+            // get the viewData model type and compare with the actual view model type:
+            // viewData is ViewDataDictionary<viewDataModelType> and we will want to assign an
+            // object of type modelType to the Model property of type viewDataModelType, we
+            // need to check whether that is possible
+            var viewDataModelType = viewDataType.GenericTypeArguments[0];
+
+            if (viewDataModelType.IsAssignableFrom(modelType))
+                return viewData;
+
+            // if not possible then we need to create a new ViewDataDictionary
+            var nViewDataType = typeof(ViewDataDictionary<>).MakeGenericType(modelType);
+            var tViewData = new ViewDataDictionary(viewData) { Model = null }; // temp view data to copy values
+            var nViewData = (ViewDataDictionary)Activator.CreateInstance(nViewDataType, tViewData);
+            return nViewData;
         }
 
         /// <summary>
@@ -238,7 +197,7 @@ namespace Umbraco.Web.Mvc
             {
                 if (UmbracoContext.Current.IsDebug || UmbracoContext.Current.InPreviewMode)
                 {
-                    var text = value.ToString().ToLowerInvariant();
+                    var text = value.ToString();
                     var pos = text.IndexOf("</body>", StringComparison.InvariantCultureIgnoreCase);
 
                     if (pos > -1)

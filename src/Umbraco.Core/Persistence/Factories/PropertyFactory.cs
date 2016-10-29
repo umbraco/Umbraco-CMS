@@ -42,12 +42,22 @@ namespace Umbraco.Core.Persistence.Factories
                                    : propertyType.CreatePropertyFromRawValue(propertyDataDto.GetValue,
                                                                              propertyDataDto.VersionId.Value,
                                                                              propertyDataDto.Id);
-                //on initial construction we don't want to have dirty properties tracked
-                property.CreateDate = _createDate;
-                property.UpdateDate = _updateDate;
-                // http://issues.umbraco.org/issue/U4-1946
-                property.ResetDirtyProperties(false);
-                properties.Add(property);
+                try
+                {
+                    //on initial construction we don't want to have dirty properties tracked
+                    property.DisableChangeTracking();
+
+                    property.CreateDate = _createDate;
+                    property.UpdateDate = _updateDate;
+                    // http://issues.umbraco.org/issue/U4-1946
+                    property.ResetDirtyProperties(false);
+                    properties.Add(property);
+                }
+                finally
+                {
+                    property.EnableChangeTracking();
+                }
+                
             }
 
             return properties;
@@ -63,7 +73,9 @@ namespace Umbraco.Core.Persistence.Factories
 
                 //Check if property has an Id and set it, so that it can be updated if it already exists
                 if (property.HasIdentity)
+                {
                     dto.Id = property.Id;
+                }
 
                 if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
                 {
@@ -82,11 +94,21 @@ namespace Umbraco.Core.Persistence.Factories
                         }
                     }
                 }
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Decimal && property.Value != null)
+                {
+                    decimal val;
+                    if (decimal.TryParse(property.Value.ToString(), out val))
+                    {
+                        dto.Decimal = val; // property value should be normalized already
+                    }
+                }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
                 {
                     DateTime date;
-                    if(DateTime.TryParse(property.Value.ToString(), out date))
+                    if (DateTime.TryParse(property.Value.ToString(), out date))
+                    {
                         dto.Date = date;
+                    }
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext && property.Value != null)
                 {

@@ -1,8 +1,8 @@
 function RowConfigController($scope) {
-    
-    $scope.currentRow = angular.copy($scope.dialogOptions.currentRow);
-    $scope.editors = $scope.dialogOptions.editors;
-    $scope.columns = $scope.dialogOptions.columns;
+
+    $scope.currentRow = $scope.model.currentRow;
+    $scope.editors = $scope.model.editors;
+    $scope.columns = $scope.model.columns;
 
     $scope.scaleUp = function(section, max, overflow) {
         var add = 1;
@@ -14,7 +14,7 @@ function RowConfigController($scope) {
     };
 
     $scope.scaleDown = function(section) {
-        var remove = (section.grid > 1) ? 1 : section.grid;
+        var remove = (section.grid > 1) ? 1 : 0;
         section.grid = section.grid - remove;
     };
 
@@ -58,9 +58,14 @@ function RowConfigController($scope) {
         }
     };
 
-    $scope.deleteArea = function(index) {
-        $scope.currentRow.areas.splice(index, 1);
+    $scope.deleteArea = function (cell, row) {
+    	if ($scope.currentCell === cell) {
+    		$scope.currentCell = undefined;
+    	}
+    	var index = row.areas.indexOf(cell)
+    	row.areas.splice(index, 1);
     };
+
     $scope.closeArea = function() {
         $scope.currentCell = undefined;
     };
@@ -88,10 +93,6 @@ function RowConfigController($scope) {
         }
     }, true);
 
-    $scope.complete = function () {
-        angular.extend($scope.dialogOptions.currentRow, $scope.currentRow);
-        $scope.close();
-    }
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController", RowConfigController);

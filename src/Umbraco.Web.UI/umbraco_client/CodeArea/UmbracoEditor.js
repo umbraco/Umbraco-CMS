@@ -35,9 +35,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                     this._control.val(code);
                 }
                 else {
-                    //this is a wrapper for CodeMirror
+					//this is a wrapper for CodeMirror
                     this._editor.focus();
+
+                    var codeChanged = this._editor.getValue() != code;
+                    var cursor = this._editor.doc.getCursor();
+
                     this._editor.setValue(code);
+
+                    // Restore cursor position if the server saved code matches.
+                    if (!codeChanged)
+                        this._editor.setCursor(cursor);
+
                     this._editor.focus();
                 }
             },

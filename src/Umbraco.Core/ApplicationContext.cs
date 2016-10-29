@@ -283,7 +283,12 @@ namespace Umbraco.Core
                 {
                     var configStatus = ConfigurationStatus;
                     var currentVersion = UmbracoVersion.GetSemanticVersion();
-                    var ok = configStatus == currentVersion;
+
+                    var ok =
+                        //we are not configured if this is null    
+                        string.IsNullOrWhiteSpace(configStatus) == false
+                        //they must match
+                        && configStatus == currentVersion;
 
                     if (ok)
                     {
@@ -308,8 +313,9 @@ namespace Umbraco.Core
 
                     return ok;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    LogHelper.Error<ApplicationContext>("Error determining if application is configured, returning false", ex);
                     return false;
                 }
 
@@ -400,7 +406,8 @@ namespace Umbraco.Core
                 //clear the cache
                 if (ApplicationCache != null)
                 {
-                    ApplicationCache.ClearAllCache();    
+                    ApplicationCache.RuntimeCache.ClearAllCache();
+                    ApplicationCache.IsolatedRuntimeCache.ClearAllCaches();
                 }
                 //reset all resolvers
                 ResolverCollection.ResetAll();

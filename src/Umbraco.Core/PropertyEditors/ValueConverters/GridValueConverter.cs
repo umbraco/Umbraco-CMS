@@ -12,6 +12,9 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    /// <summary>
+    /// This ensures that the grid config is merged in with the front-end value
+    /// </summary>
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
     [PropertyValueType(typeof(JToken))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
@@ -90,7 +93,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<JsonValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
+                    LogHelper.Error<GridValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
                 }
             }
 

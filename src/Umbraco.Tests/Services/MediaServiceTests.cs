@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -95,6 +96,40 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
 
+        }
+
+        [Test]
+        public void Can_Get_Media_By_Path()
+        {
+            var mediaService = ServiceContext.MediaService;
+            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            ServiceContext.ContentTypeService.Save(mediaType);
+
+            var media = MockedMedia.CreateMediaImage(mediaType, -1);
+            mediaService.Save(media);
+
+            var mediaPath = "/media/test-image.png";
+            var resolvedMedia = mediaService.GetMediaByPath(mediaPath);
+            
+            Assert.IsNotNull(resolvedMedia);
+            Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString() == mediaPath);
+        }
+
+        [Test]
+        public void Can_Get_Media_With_Crop_By_Path()
+        {
+            var mediaService = ServiceContext.MediaService;
+            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            ServiceContext.ContentTypeService.Save(mediaType);
+
+            var media = MockedMedia.CreateMediaImageWithCrop(mediaType, -1);
+            mediaService.Save(media);
+
+            var mediaPath = "/media/test-image.png";
+            var resolvedMedia = mediaService.GetMediaByPath(mediaPath);
+
+            Assert.IsNotNull(resolvedMedia);
+            Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString().Contains(mediaPath));
         }
 
         private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()

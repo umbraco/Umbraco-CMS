@@ -1,0 +1,91 @@
+<div ng-controller="Umbraco.PropertyEditors.ListView.GridLayoutController as vm">
+
+   <div
+      ng-if="entityType !== 'media'">
+
+      <umb-content-grid
+         ng-if="items"
+         content="items"
+         content-properties="options.includeProperties"
+         on-click="vm.selectContentItem"
+         on-click-name="vm.goToItem">
+      </umb-content-grid>
+
+      <umb-empty-state
+          ng-if="!items && options.filter.length === 0 && !vm.isRecycleBin"
+          position="center">
+          <div ng-if="entityType === 'content'">No content has been added</div>
+          <div ng-if="entityType === 'member'">No members have been added</div>
+      </umb-empty-state>
+
+      <umb-empty-state
+          ng-if="!items && options.filter.length > 0"
+          position="center">
+          <localize key="general_searchNoResult"></localize>
+      </umb-empty-state>
+
+      <umb-empty-state
+          ng-if="!items && options.filter.length == 0 && vm.isRecycleBin"
+          position="center">
+          <localize key="general_recycleBinEmpty"></localize>
+      </umb-empty-state>
+
+   </div>
+
+   <div
+   ng-if="entityType === 'media'"
+   on-drag-leave="vm.dragLeave()"
+   on-drag-end="vm.dragLeave()"
+   on-drag-enter="vm.dragEnter()">
+
+      <umb-file-dropzone
+         ng-if="!vm.isRecycleBin"
+         parent-id="{{vm.nodeId}}"
+         files-uploaded="vm.onUploadComplete"
+         accept="{{vm.acceptedFileTypes}}"
+         max-file-size="{{vm.maxFileSize}}"
+         hide-dropzone="{{ options.filter.length > 0 }}"
+         compact="{{ items.length > 0 }}"
+         files-queued="vm.onFilesQueue">
+      </umb-file-dropzone>
+
+      <umb-folder-grid
+         ng-if="folders.length > 0 && !vm.isRecycleBin"
+         folders="folders"
+         on-click="vm.selectFolder"
+         on-click-name="vm.goToItem">
+      </umb-folder-grid>
+
+      <umb-media-grid
+         items="vm.itemsWithoutFolders"
+         on-details-hover="vm.hoverMediaItemDetails"
+         on-click="vm.selectItem"
+         on-click-name="vm.goToItem">
+      </umb-media-grid>
+
+      <umb-tooltip
+         ng-if="vm.mediaDetailsTooltip.show"
+         event="vm.mediaDetailsTooltip.event">
+         <ul class="umb-tooltip-list">
+            <li class="umb-tooltip-list__item" ng-repeat="property in options.includeProperties">
+               <div class="umb-tooltip-list__item-label">{{ property.header }}</div>
+               <div class="umb-tooltip-list__item-value">{{ vm.mediaDetailsTooltip.item[property.alias] }}</div>
+            </li>
+         </ul>
+      </umb-tooltip>
+
+      <umb-empty-state
+          ng-if="vm.itemsWithoutFolders.length === 0 && options.filter.length == 0 && vm.isRecycleBin"
+          position="center">
+          <localize key="general_recycleBinEmpty"></localize>
+      </umb-empty-state>
+
+      <umb-empty-state
+          ng-if="vm.itemsWithoutFolders.length === 0 && options.filter.length > 0"
+          position="center">
+          <localize key="general_searchNoResult"></localize>
+      </umb-empty-state>
+
+    </div>
+
+</div>

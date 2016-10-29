@@ -40,24 +40,28 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Method to call when Entity is being saved
+        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
         /// </summary>
-        /// <remarks>Created date is set and a Unique key is assigned</remarks>
-        internal override void AddingEntity()
+        /// <returns></returns>
+        public IMediaType DeepCloneWithResetIdentities(string alias)
         {
-            base.AddingEntity();
+            var clone = (MediaType)DeepClone();
+            clone.Alias = alias;
+            clone.Key = Guid.Empty;
+            foreach (var propertyGroup in clone.PropertyGroups)
+            {
+                propertyGroup.ResetIdentity();
+                propertyGroup.ResetDirtyProperties(false);
+            }
+            foreach (var propertyType in clone.PropertyTypes)
+            {
+                propertyType.ResetIdentity();
+                propertyType.ResetDirtyProperties(false);
+            }
 
-            if (Key == Guid.Empty)
-                Key = Guid.NewGuid();
-        }
-
-        /// <summary>
-        /// Method to call when Entity is being updated
-        /// </summary>
-        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
-        internal override void UpdatingEntity()
-        {
-            base.UpdatingEntity();
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+            return clone;
         }
     }
 }

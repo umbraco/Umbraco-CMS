@@ -4,6 +4,18 @@ namespace Umbraco.Core.Events
 {
 	public class SaveEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
 	{
+        /// <summary>
+        /// Constructor accepting multiple entities that are used in the saving operation
+        /// </summary>
+        /// <param name="eventObject"></param>
+        /// <param name="canCancel"></param>
+        /// <param name="messages"></param>
+        /// <param name="additionalData"></param>
+	    public SaveEventArgs(IEnumerable<TEntity> eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData) 
+            : base(eventObject, canCancel, messages, additionalData)
+	    {
+	    }
+
 	    /// <summary>
 	    /// Constructor accepting multiple entities that are used in the saving operation
 	    /// </summary>
@@ -25,12 +37,24 @@ namespace Umbraco.Core.Events
         {
         }
 
-	    /// <summary>
-	    /// Constructor accepting a single entity instance
-	    /// </summary>
-	    /// <param name="eventObject"></param>
-	    /// <param name="eventMessages"></param>
-	    public SaveEventArgs(TEntity eventObject, EventMessages eventMessages)
+        /// <summary>
+        /// Constructor accepting a single entity instance
+        /// </summary>
+        /// <param name="eventObject"></param>
+        /// <param name="canCancel"></param>
+        /// <param name="messages"></param>
+        /// <param name="additionalData"></param>
+        public SaveEventArgs(TEntity eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
+            : base(new List<TEntity> { eventObject }, canCancel, messages, additionalData)
+        {
+        }
+
+        /// <summary>
+        /// Constructor accepting a single entity instance
+        /// </summary>
+        /// <param name="eventObject"></param>
+        /// <param name="eventMessages"></param>
+        public SaveEventArgs(TEntity eventObject, EventMessages eventMessages)
             : base(new List<TEntity> { eventObject }, eventMessages)
         {
         }

@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for MySql
     /// </summary>
-    [SqlSyntaxProviderAttribute("MySql.Data.MySqlClient")]
+    [SqlSyntaxProvider(Constants.DatabaseProviders.MySql)]
     public class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
     {
         private readonly ILogger _logger;
@@ -18,9 +18,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public MySqlSyntaxProvider(ILogger logger)
         {
             _logger = logger;
-            DefaultStringLength = 255;
-            StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
-            StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
 
             AutoIncrementDefinition = "AUTO_INCREMENT";
             IntColumnDefinition = "int(11)";
@@ -30,9 +27,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             DecimalColumnDefinition = "decimal(38,6)";
             GuidColumnDefinition = "char(36)";
 
-            InitColumnTypeMap();
-
             DefaultValueFormat = "DEFAULT {0}";
+
+            InitColumnTypeMap();
         }
 
         public override IEnumerable<string> GetTablesInSchema(Database db)
@@ -179,6 +176,11 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             }
 
             return result > 0;
+        }
+
+        public override Sql SelectTop(Sql sql, int top)
+        {
+            return new Sql(string.Concat(sql.SQL, " LIMIT ", top), sql.Arguments);
         }
 
         public override bool SupportsClustered()
@@ -329,13 +331,13 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             {
                 case SystemMethods.NewGuid:
                     return null; // NOT SUPPORTED!
-                    //return "NEWID()";                
+                                 //return "NEWID()";                
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
-                //case SystemMethods.NewSequentialId:
-                //    return "NEWSEQUENTIALID()";
-                //case SystemMethods.CurrentUTCDateTime:
-                //    return "GETUTCDATE()";
+                    //case SystemMethods.NewSequentialId:
+                    //    return "NEWSEQUENTIALID()";
+                    //case SystemMethods.CurrentUTCDateTime:
+                    //    return "GETUTCDATE()";
             }
 
             return null;
@@ -363,6 +365,9 @@ ORDER BY TABLE_NAME, INDEX_NAME",
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
         public override string RenameColumn { get { return "ALTER TABLE {0} CHANGE {1} {2}"; } }
+        public override string ConvertIntegerToOrderableString { get { return "LPAD(FORMAT({0}, 0), 8, '0')"; } }
+        public override string ConvertDateToOrderableString { get { return "DATE_FORMAT({0}, '%Y%m%d')"; } }
+        public override string ConvertDecimalToOrderableString { get { return "LPAD(FORMAT({0}, 9), 20, '0')"; } }
 
         public override bool? SupportsCaseInsensitiveQueries(Database db)
         {

@@ -4,9 +4,9 @@ using log4net.Core;
 namespace Umbraco.Core.Logging
 {
     /// <remarks>
-    /// Based on https://github.com/cjbhaines/Log4Net.Async
+    /// Borrowed from https://github.com/cjbhaines/Log4Net.Async - will reference Nuget packages directly in v8
     /// </remarks>
-    internal class LoggingEventHelper
+    internal sealed class LoggingEventHelper
     {
         // needs to be a seperate class so that location is determined correctly by log4net when required
 
@@ -23,8 +23,10 @@ namespace Umbraco.Core.Logging
 
         public LoggingEvent CreateLoggingEvent(Level level, string message, Exception exception)
         {
-            var loggingEvent = new LoggingEvent(HelperType, null, loggerName, level, message, exception);
-            loggingEvent.Fix = Fix;
+            var loggingEvent = new LoggingEvent(HelperType, null, loggerName, level, message, exception)
+            {
+                Fix = Fix
+            };
             return loggingEvent;
         }
     }

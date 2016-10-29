@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -100,6 +102,8 @@ namespace Umbraco.Core.Services
 
             xml.Add(new XAttribute("loginName", member.Username));
             xml.Add(new XAttribute("email", member.Email));
+            
+            xml.Add(new XAttribute("icon", member.ContentType.Icon));
 
             return xml;
         }
@@ -159,6 +163,20 @@ namespace Umbraco.Core.Services
             xml.Add(new XAttribute("Id", dataTypeDefinition.PropertyEditorAlias));
             xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
             xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
+
+            var folderNames = string.Empty;
+            if (dataTypeDefinition.Level != 1)
+            {
+                //get url encoded folder names
+                var folders = dataTypeService.GetContainers(dataTypeDefinition)
+                    .OrderBy(x => x.Level)
+                    .Select(x => HttpUtility.UrlEncode(x.Name));
+
+                folderNames = string.Join("/", folders.ToArray());
+            }
+
+            if (string.IsNullOrWhiteSpace(folderNames) == false)
+                xml.Add(new XAttribute("Folders", folderNames));            
 
             return xml;
         }
@@ -249,11 +267,15 @@ namespace Umbraco.Core.Services
                 structure.Add(new XElement("MediaType", allowedType.Alias));
             }
 
-            var genericProperties = new XElement("GenericProperties");
+            var genericProperties = new XElement("GenericProperties"); // actually, all of them
             foreach (var propertyType in mediaType.PropertyTypes)
             {
                 var definition = dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
-                var propertyGroup = mediaType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+
+                var propertyGroup = propertyType.PropertyGroupId == null // true generic property
+                    ? null
+                    : mediaType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
@@ -319,9 +341,10 @@ namespace Umbraco.Core.Services
         /// Exports an <see cref="IContentType"/> item to xml as an <see cref="XElement"/>
         /// </summary>
         /// <param name="dataTypeService"></param>
+        /// <param name="contentTypeService"></param>
         /// <param name="contentType">Content type to export</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IContentType object</returns>
-        public XElement Serialize(IDataTypeService dataTypeService, IContentType contentType)
+        public XElement Serialize(IDataTypeService dataTypeService, IContentTypeService contentTypeService, IContentType contentType)
         {
             var info = new XElement("Info",
                                     new XElement("Name", contentType.Name),
@@ -362,14 +385,14 @@ namespace Umbraco.Core.Services
                 structure.Add(new XElement("DocumentType", allowedType.Alias));
             }
 
-            var genericProperties = new XElement("GenericProperties");
+            var genericProperties = new XElement("GenericProperties"); // actually, all of them
             foreach (var propertyType in contentType.PropertyTypes)
             {
                 var definition = dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
 
-                var propertyGroup = propertyType.PropertyGroupId == null
-                                                ? null
-                                                : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                var propertyGroup = propertyType.PropertyGroupId == null // true generic property
+                    ? null
+                    : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
 
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
@@ -377,9 +400,11 @@ namespace Umbraco.Core.Services
                                                    new XElement("Type", propertyType.PropertyEditorAlias),
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
+                                                   new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
-                                                   new XElement("Validation", propertyType.ValidationRegExp),
-                                                   new XElement("Description", new XCData(propertyType.Description)));
+                                                   propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
+                                                   propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
+                
                 genericProperties.Add(genericProperty);
             }
 
@@ -393,11 +418,28 @@ namespace Umbraco.Core.Services
                 tabs.Add(tab);
             }
 
-            return new XElement("DocumentType",
-                                   info,
-                                   structure,
-                                   genericProperties,
-                                   tabs);
+            var xml = new XElement("DocumentType",
+                info,
+                structure,
+                genericProperties,
+                tabs);
+
+            var folderNames = string.Empty;
+            //don't add folders if this is a child doc type
+            if (contentType.Level != 1 && masterContentType == null)
+            {
+                //get url encoded folder names
+                var folders = contentTypeService.GetContentTypeContainers(contentType)
+                    .OrderBy(x => x.Level)
+                    .Select(x => HttpUtility.UrlEncode(x.Name));
+
+                folderNames = string.Join("/", folders.ToArray());
+            }
+
+            if (string.IsNullOrWhiteSpace(folderNames) == false)
+                xml.Add(new XAttribute("Folders", folderNames));
+
+            return xml;
         }
 
         /// <summary>

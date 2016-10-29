@@ -1,0 +1,185 @@
+/*
+	Library of card related compoents, like the right-hand icon list on the grid "cards"
+*/
+
+.umb-card{
+	position: relative;
+	padding: 5px 10px 5px 10px;
+    background: white;
+
+    .title{padding: 12px; color: @gray; border-bottom: 1px solid @grayLight; font-weight: 400; font-size: 16px; text-transform: none; margin: 0 -10px 10px -10px;}
+
+}
+
+.umb-card-thumb{
+    text-align: center;
+
+    i{
+        text-align: center;
+        font-size: 20px;
+        line-height: 40px;
+        color: @blue;
+        display: block;
+        padding-top: 5px
+    }
+}
+
+.umb-card-content{
+    .item-title{color: @blackLight; font-weight: 400; border: none; font-size: 16px; text-transform: none; margin-bottom: 3px;}
+    p{color: @gray; margin-bottom: 1px;}
+}
+
+.umb-card-actions{
+    padding-top: 10px;
+    border-top: @grayLighter 1px solid;
+    clear: both;
+}
+
+.umb-card-icons{
+	text-align: center;
+	vertical-align: middle;
+	display: block;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.umb-card-icons.vertical{
+	position: absolute;
+	top: 7px;
+	right: 7px;
+	text-align: right;
+	width: 1px;
+}
+
+.umb-card-icons li{
+	display: inline-block;
+	margin: 0 2px 0 2px;
+}
+
+.umb-card-icons.vertical li{
+	float: right;
+	display: block;
+	margin-bottom: 3px;
+}
+
+//card iocn list
+.umb-card-list{
+     display: block;
+     padding: 0;
+     margin: 0;
+ }
+
+.umb-card-list li{
+    border-bottom: @grayLighter 1px solid;
+    padding-bottom: 3px;
+    display: block;
+}
+
+
+
+
+//Card icon grid for picking items off a card
+.umb-card-grid{
+	padding: 0;
+	margin: 0 auto;
+	list-style: none;
+
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+}
+
+.umb-card-grid li {
+	padding: 5px;
+	overflow: hidden;
+	font-size: 11px;
+	text-align: center;
+
+	width: 100px;
+	height: 105px;
+
+	box-sizing: border-box;
+}
+
+.umb-card-grid li.-four-in-row {
+	flex: 0 0 25%;
+}
+
+.umb-card-grid li.-three-in-row {
+	flex: 0 0 33.33%;
+}
+
+.umb-card-grid .umb-card-grid-item {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+
+ .umb-card-grid .umb-card-grid-item:hover,
+ .umb-card-grid .umb-card-grid-item:focus,
+ .umb-card-grid .umb-card-grid-item:hover > *,
+ .umb-card-grid .umb-card-grid-item:focus > *  {
+	background: @blue;
+	color: white;
+	cursor: pointer;
+	outline: none;
+}
+
+.umb-card-grid a {
+     color: #222;
+     text-decoration: none;
+ }
+
+.umb-card-grid i {
+     font-size: 30px;
+     line-height: 50px;
+     display: block;
+	  color: @grayDark;
+ }
+
+
+
+
+
+//Round icon-like button - this should be somewhere else
+.umb-btn-round{
+	padding: 4px 6px 4px 6px;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 200px;
+    background: rgba(255,255,255, 1);
+    border:1px solid rgb(182, 182, 182);
+    margin: 2px;
+}
+
+.umb-btn-round:hover, .umb-btn-round:hover *{
+  background: @blue !important;
+  color: white !important;
+  border-color: @blue !important;
+  text-decoration:none;
+ }
+
+ .umb-btn-round a:hover {
+     text-decoration:none;
+     color: white !important;
+ }
+
+ .umb-btn-round i {
+     font-size:16px !important;
+     color: #grayLight;
+     display:block;
+ }
+
+ .umb-btn-round.alert:hover, .umb-btn-round.alert:hover *{
+ 	background: @red !important;
+  	color: white !important;
+  	border-color: @red !important;
+  	text-decoration:none;
+ }
+
+.umb-btn-round.no-border{
+    border: none !important;
+    background: none !important;
+}

@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private int _sortOrder;
-        private string _icon = "folder.png";
+        private string _icon = "icon-folder";
         private string _thumbnail = "folder.png";
         private int _creatorId;
         private bool _allowedAsRoot;
@@ -67,33 +67,38 @@ namespace Umbraco.Core.Models
             _additionalData = new Dictionary<string, object>();
         }
 
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.ParentId);
-        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.SortOrder);
-        private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.Level);
-        private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Path);
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Alias);
-        private static readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Description);
-        private static readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Icon);
-        private static readonly PropertyInfo ThumbnailSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Thumbnail);
-        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.CreatorId);
-        private static readonly PropertyInfo AllowedAsRootSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.AllowedAsRoot);
-        private static readonly PropertyInfo IsContainerSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsContainer);
-        private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
-        private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
-        private static readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
-        private static readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
-        private static readonly PropertyInfo HasPropertyTypeBeenRemovedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.HasPropertyTypeBeenRemoved);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
+            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.ParentId);
+            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.SortOrder);
+            public readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.Level);
+            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Path);
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Alias);
+            public readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Description);
+            public readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Icon);
+            public readonly PropertyInfo ThumbnailSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Thumbnail);
+            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.CreatorId);
+            public readonly PropertyInfo AllowedAsRootSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.AllowedAsRoot);
+            public readonly PropertyInfo IsContainerSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsContainer);
+            public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
+            public readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
+            public readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
+            public readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
+            public readonly PropertyInfo HasPropertyTypeBeenRemovedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.HasPropertyTypeBeenRemoved);
+        }
 
 
         protected void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(PropertyGroupCollectionSelector);
+            OnPropertyChanged(Ps.Value.PropertyGroupCollectionSelector);
         }
 
         protected void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(PropertyTypeCollectionSelector);
+            OnPropertyChanged(Ps.Value.PropertyTypeCollectionSelector);
         }
 
         /// <summary>
@@ -115,7 +120,7 @@ namespace Umbraco.Core.Models
             set
             {
                 _parentId = new Lazy<int>(() => value);
-                OnPropertyChanged(ParentIdSelector);
+                OnPropertyChanged(Ps.Value.ParentIdSelector);
             }
         }
 
@@ -126,14 +131,7 @@ namespace Umbraco.Core.Models
         public virtual string Name
         {
             get { return _name; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -143,14 +141,7 @@ namespace Umbraco.Core.Models
         public virtual int Level //NOTE Is this relevant for a ContentType?
         {
             get { return _level; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _level = value;
-                    return _level;
-                }, _level, LevelSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector); }
         }
 
         /// <summary>
@@ -160,14 +151,7 @@ namespace Umbraco.Core.Models
         public virtual string Path //NOTE Is this relevant for a ContentType?
         {
             get { return _path; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _path = value;
-                    return _path;
-                }, _path, PathSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector); }
         }
 
         /// <summary>
@@ -179,12 +163,10 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                    {
-                        //_alias = value.ToSafeAlias();
-                        _alias = value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
-                        return _alias;
-                    }, _alias, AliasSelector);
+                SetPropertyValueAndDetectChanges(
+                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), 
+                    ref _alias, 
+                    Ps.Value.AliasSelector);
             }
         }
 
@@ -195,14 +177,7 @@ namespace Umbraco.Core.Models
         public virtual string Description
         {
             get { return _description; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _description = value;
-                    return _description;
-                }, _description, DescriptionSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector); }
         }
 
         /// <summary>
@@ -212,14 +187,7 @@ namespace Umbraco.Core.Models
         public virtual int SortOrder
         {
             get { return _sortOrder; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _sortOrder = value;
-                    return _sortOrder;
-                }, _sortOrder, SortOrderSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
@@ -229,14 +197,7 @@ namespace Umbraco.Core.Models
         public virtual string Icon
         {
             get { return _icon; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _icon = value;
-                    return _icon;
-                }, _icon, IconSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector); }
         }
 
         /// <summary>
@@ -246,14 +207,7 @@ namespace Umbraco.Core.Models
         public virtual string Thumbnail
         {
             get { return _thumbnail; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _thumbnail = value;
-                    return _thumbnail;
-                }, _thumbnail, ThumbnailSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _thumbnail, Ps.Value.ThumbnailSelector); }
         }
 
         /// <summary>
@@ -263,14 +217,7 @@ namespace Umbraco.Core.Models
         public virtual int CreatorId
         {
             get { return _creatorId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _creatorId = value;
-                    return _creatorId;
-                }, _creatorId, CreatorIdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
         }
 
         /// <summary>
@@ -280,14 +227,7 @@ namespace Umbraco.Core.Models
         public virtual bool AllowedAsRoot
         {
             get { return _allowedAsRoot; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _allowedAsRoot = value;
-                    return _allowedAsRoot;
-                }, _allowedAsRoot, AllowedAsRootSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _allowedAsRoot, Ps.Value.AllowedAsRootSelector); }
         }
 
         /// <summary>
@@ -300,14 +240,7 @@ namespace Umbraco.Core.Models
         public virtual bool IsContainer
         {
             get { return _isContainer; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _isContainer = value;
-                    return _isContainer;
-                }, _isContainer, IsContainerSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _isContainer, Ps.Value.IsContainerSelector); }
         }
 
         /// <summary>
@@ -318,14 +251,7 @@ namespace Umbraco.Core.Models
         public virtual bool Trashed //NOTE Is this relevant for a ContentType?
         {
             get { return _trashed; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _trashed = value;
-                    return _trashed;
-                }, _trashed, TrashedSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector); }
         }
 
         private IDictionary<string, object> _additionalData;
@@ -347,15 +273,11 @@ namespace Umbraco.Core.Models
             get { return _allowedContentTypes; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _allowedContentTypes = value;
-                    return _allowedContentTypes;
-                }, _allowedContentTypes, AllowedContentTypesSelector,
+                SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector,
                     //Custom comparer for enumerable
                     new DelegateEqualityComparer<IEnumerable<ContentTypeSort>>(
                         (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
-                        sorts => sorts.GetHashCode()));
+                        sorts => sorts.GetHashCode()));                
             }
         }
 
@@ -373,43 +295,35 @@ namespace Umbraco.Core.Models
             {
                 _propertyGroups = value;
                 _propertyGroups.CollectionChanged += PropertyGroupsChanged;
+                PropertyGroupsChanged(_propertyGroups, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
         }
 
         /// <summary>
-        /// List of PropertyTypes available on this ContentType.
-        /// This list aggregates PropertyTypes across the PropertyGroups.
+        /// Gets all property types, across all property groups.
         /// </summary>
-        /// <remarks>
-        /// 
-        /// The setter is used purely to set the property types that DO NOT belong to a group!
-        /// 
-        /// Marked as DoNotClone because the result of this property is not the natural result of the data, it is 
-        /// a union of data so when auto-cloning if the setter is used it will be setting the unnatural result of the 
-        /// data. We manually clone this instead. 
-        /// </remarks>
         [IgnoreDataMember]
         [DoNotClone]
         public virtual IEnumerable<PropertyType> PropertyTypes
         {
             get
             {
-                var types = _propertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
-                return types;
-            }
-            internal set
-            {
-                _propertyTypes = new PropertyTypeCollection(value);
-                _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                return _propertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
             }
         }
 
         /// <summary>
-        /// Returns the property type collection containing types that are non-groups - used for tests
+        /// Gets or sets the property types that are not in a group.
         /// </summary>
-        internal IEnumerable<PropertyType> NonGroupedPropertyTypes
+        public IEnumerable<PropertyType> NoGroupPropertyTypes
         {
             get { return _propertyTypes; }
+            set
+            {
+                _propertyTypes = new PropertyTypeCollection(value);
+                _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                PropertyTypesChanged(_propertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            }
         }
 
             /// <summary>
@@ -426,7 +340,7 @@ namespace Umbraco.Core.Models
             private set
             {
                 _hasPropertyTypeBeenRemoved = value;
-                OnPropertyChanged(HasPropertyTypeBeenRemovedSelector);
+                OnPropertyChanged(Ps.Value.HasPropertyTypeBeenRemovedSelector);
             }
         }
 
@@ -460,11 +374,6 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
         public bool AddPropertyType(PropertyType propertyType)
         {
-            if (propertyType.HasIdentity == false)
-            {
-                propertyType.Key = Guid.NewGuid();
-            }
-
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
                 _propertyTypes.Add(propertyType);                
@@ -480,24 +389,34 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
         /// <param name="propertyGroupName">Name of the PropertyGroup to move the PropertyType to</param>
         /// <returns></returns>
+        /// <remarks>If <paramref name="propertyGroupName"/> is null then the property is moved back to 
+        /// "generic properties" ie does not have a tab anymore.</remarks>
         public bool MovePropertyType(string propertyTypeAlias, string propertyGroupName)
         {
-            if (PropertyTypes.Any(x => x.Alias == propertyTypeAlias) == false || PropertyGroups.Any(x => x.Name == propertyGroupName) == false)
-                return false;
+            // note: not dealing with alias casing at all here?
 
-            var propertyType = PropertyTypes.First(x => x.Alias == propertyTypeAlias);
-            //The PropertyType already belongs to a PropertyGroup, so we have to remove the PropertyType from that group
-            if (PropertyGroups.Any(x => x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias)))
-            {
-                var oldPropertyGroup = PropertyGroups.First(x => x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
+            // get property, ensure it exists
+            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
+            if (propertyType == null) return false;
+
+            // get new group, if required, and ensure it exists
+            var newPropertyGroup = propertyGroupName == null
+                ? null
+                : PropertyGroups.FirstOrDefault(x => x.Name == propertyGroupName);
+            if (propertyGroupName != null && newPropertyGroup == null) return false;
+
+            // get old group
+            var oldPropertyGroup = PropertyGroups.FirstOrDefault(x => 
+                x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
+
+            // set new group
+            propertyType.PropertyGroupId = newPropertyGroup == null ? null : new Lazy<int>(() => newPropertyGroup.Id, false);
+
+            // remove from old group, if any - add to new group, if any
+            if (oldPropertyGroup != null)
                 oldPropertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
-            }
-
-            propertyType.PropertyGroupId = new Lazy<int>(() => default(int));
-            propertyType.ResetDirtyProperties();
-
-            var propertyGroup = PropertyGroups.First(x => x.Name == propertyGroupName);
-            propertyGroup.PropertyTypes.Add(propertyType);
+            if (newPropertyGroup != null)
+                newPropertyGroup.PropertyTypes.Add(propertyType);
 
             return true;
         }
@@ -533,8 +452,20 @@ namespace Umbraco.Core.Models
         /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup"/> to remove</param>
         public void RemovePropertyGroup(string propertyGroupName)
         {
+            // if no group exists with that name, do nothing
+            var group = PropertyGroups[propertyGroupName];
+            if (group == null) return;
+
+            // re-assign the group's properties to no group
+            foreach (var property in group.PropertyTypes)
+            {
+                property.PropertyGroupId = null;
+                _propertyTypes.Add(property);
+            }
+
+            // actually remove the group
             PropertyGroups.RemoveItem(propertyGroupName);
-            OnPropertyChanged(PropertyGroupCollectionSelector);
+            OnPropertyChanged(Ps.Value.PropertyGroupCollectionSelector);
         }
 
         /// <summary>

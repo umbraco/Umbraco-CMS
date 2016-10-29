@@ -49,20 +49,32 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            using (DisposableTimer.DebugDuration<ScheduledPublishing>(() => "Scheduled publishing executing", () => "Scheduled publishing complete"))
+            string umbracoAppUrl;
+            try
             {
-                string umbracoAppUrl = null;
-
-                try
+                umbracoAppUrl = _appContext == null || _appContext.UmbracoApplicationUrl.IsNullOrWhiteSpace()
+                        ? null
+                        : _appContext.UmbracoApplicationUrl;
+                if (umbracoAppUrl.IsNullOrWhiteSpace())
                 {
-                    umbracoAppUrl = _appContext.UmbracoApplicationUrl;
-                    if (umbracoAppUrl.IsNullOrWhiteSpace())
-                    {
-                        LogHelper.Warn<ScheduledPublishing>("No url for service (yet), skip.");
-                        return true; // repeat
-                    }
+                    LogHelper.Warn<ScheduledPublishing>("No url for service (yet), skip.");
+                    return true; // repeat
+                }
+            }
+            catch (Exception e)
+            {
+                LogHelper.Error<ScheduledPublishing>("Could not acquire application url", e);
+                return true; // repeat
+            }
 
-                    var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
+            var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
+
+            using (DisposableTimer.DebugDuration<ScheduledPublishing>(
+                () => string.Format("Scheduled publishing executing @ {0}", url), 
+                () => "Scheduled publishing complete"))
+            {                
+                try
+                {   
                     using (var wc = new HttpClient())
                     {
                         var request = new HttpRequestMessage(HttpMethod.Post, url)

@@ -1,0 +1,143 @@
+.umb-media-grid {
+   display: flex;
+   flex-wrap: wrap;
+   flex-direction: row;
+   flex-wrap: wrap;
+   align-items: center;
+   width: 100%;
+   margin-bottom: 30px;
+}
+
+.umb-media-grid__item {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    align-content: center;
+    align-items: center;
+    align-self: stretch;
+
+    margin: 10px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
+
+    transition: box-shadow 100ms;
+}
+
+.umb-media-grid__item.-file {
+    background-color: @grayLighter;
+}
+
+.umb-media-grid__item.-selected {
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,.35);
+}
+
+.umb-media-grid__item:hover {
+   text-decoration: none;
+}
+
+.umb-media-grid__item-image {
+   max-width: 100% !important;
+   height: auto;
+   position: relative;
+}
+
+.umb-media-grid__item-image-placeholder {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    position: relative;
+}
+
+.umb-media-grid__image-background {
+    content: "";
+    background: url("../img/checkered-background.png");
+    background-repeat: repeat;
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+}
+
+.umb-media-grid__item-overlay {
+   display: flex;
+   opacity: 0;
+   position: absolute;
+   right: 0;
+   bottom: 0;
+   left: 0;
+   z-index: 100;
+   padding: 5px 10px;
+   box-sizing: border-box;
+   font-size: 11px;
+   overflow: hidden;
+   color: white;
+   white-space: nowrap;
+   background: @blue;
+   transition: opacity 150ms;
+}
+
+.umb-media-grid__item.-file .umb-media-grid__item-overlay {
+    opacity: 1;
+    color: @gray;
+    background: @grayLighter;
+}
+
+.umb-media-grid__item.-file:hover .umb-media-grid__item-overlay,
+.umb-media-grid__item.-file.-selected .umb-media-grid__item-overlay {
+    color: @white;
+    background: @blue;
+}
+
+.umb-media-grid__info {
+    margin-right: 5px;
+}
+
+.umb-media-grid__item-overlay.-locked {
+    opacity: 1;
+}
+
+.umb-media-grid__item:hover .umb-media-grid__item-overlay {
+   opacity: 1;
+}
+
+.umb-media-grid__item-name {
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+
+.umb-media-grid__item-icon {
+   color: @gray;
+   position: absolute;
+   top: 45%;
+   left: 50%;
+   font-size: 40px !important;
+   transform: translate(-50%,-50%);
+}
+
+.umb-media-grid__checkmark {
+    position: absolute;
+    z-index: 2;
+    top: 10px;
+    right: 10px;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #ffffff;
+    background: @blue;
+    border-radius: 50px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    margin-left: 7px;
+    transition: background 100ms;
+}

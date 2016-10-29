@@ -7,7 +7,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.IO
 {
-    internal class ViewHelper
+    public class ViewHelper
     {
         private readonly IFileSystem _viewFileSystem;
 
@@ -66,17 +66,58 @@ namespace Umbraco.Core.IO
             return viewContent;
         }
 
-        internal static string GetDefaultFileContent(string layoutPageAlias = null)
+        public static string GetDefaultFileContent(string layoutPageAlias = null, string modelClassName = null, string modelNamespace = null, string modelNamespaceAlias = null)
         {
-            var design = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
-@{
-    Layout = null;
-}";
+            var content = new StringBuilder();
 
-            if (layoutPageAlias.IsNullOrWhiteSpace() == false)
-                design = design.Replace("null", string.Format("\"{0}.cshtml\"", layoutPageAlias));
+            if (string.IsNullOrWhiteSpace(modelNamespaceAlias))
+                modelNamespaceAlias = "ContentModels";
 
-            return design;
+            // either
+            // @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+            // @inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ModelClass>
+            // @inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.ModelClass>
+            content.Append("@inherits Umbraco.Web.Mvc.UmbracoTemplatePage");
+            if (modelClassName.IsNullOrWhiteSpace() == false)
+            {
+                content.Append("<");
+                if (modelNamespace.IsNullOrWhiteSpace() == false)
+                {
+                    content.Append(modelNamespaceAlias);
+                    content.Append(".");
+                }
+                content.Append(modelClassName);
+                content.Append(">");
+            }
+            content.Append("\r\n");
+
+            // if required, add
+            // @using ContentModels = ModelNamespace;
+            if (modelClassName.IsNullOrWhiteSpace() == false && modelNamespace.IsNullOrWhiteSpace() == false)
+            {
+                content.Append("@using ");
+                content.Append(modelNamespaceAlias);
+                content.Append(" = ");
+                content.Append(modelNamespace);
+                content.Append(";\r\n");
+            }
+
+            // either
+            // Layout = null;
+            // Layout = "layoutPage.cshtml";
+            content.Append("@{\r\n\tLayout = ");
+            if (layoutPageAlias.IsNullOrWhiteSpace())
+            {
+                content.Append("null");
+            }
+            else
+            {
+                content.Append("\"");
+                content.Append(layoutPageAlias);
+                content.Append(".cshtml\"");
+            }
+            content.Append(";\r\n}");
+            return content.ToString();
         }
 
         private string SaveTemplateToFile(ITemplate template)

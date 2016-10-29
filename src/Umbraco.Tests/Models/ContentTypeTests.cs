@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -205,7 +206,7 @@ namespace Umbraco.Tests.Models
             }
             Assert.AreNotSame(clone.PropertyTypes, contentType.PropertyTypes);
             Assert.AreEqual(clone.PropertyTypes.Count(), contentType.PropertyTypes.Count());
-            Assert.AreEqual(0, ((ContentTypeBase)clone).NonGroupedPropertyTypes.Count());
+            Assert.AreEqual(0, clone.NoGroupPropertyTypes.Count());
             for (var index = 0; index < contentType.PropertyTypes.Count(); index++)
             {
                 Assert.AreNotSame(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
@@ -285,7 +286,7 @@ namespace Umbraco.Tests.Models
 
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
 
         [Test]
@@ -390,7 +391,7 @@ namespace Umbraco.Tests.Models
 
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
 
         [Test]
@@ -498,7 +499,7 @@ namespace Umbraco.Tests.Models
 
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
     }
 }

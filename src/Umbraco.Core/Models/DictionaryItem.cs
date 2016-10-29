@@ -14,6 +14,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class DictionaryItem : Entity, IDictionaryItem
     {
+        public Func<int, ILanguage> GetLanguage { get; set; }
         private Guid? _parentId;
         private string _itemKey;
         private IEnumerable<IDictionaryTranslation> _translations;
@@ -29,9 +30,14 @@ namespace Umbraco.Core.Models
             _translations = new List<IDictionaryTranslation>();
         }
 
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, Guid?>(x => x.ParentId);
-        private static readonly PropertyInfo ItemKeySelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, string>(x => x.ItemKey);
-        private static readonly PropertyInfo TranslationsSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, IEnumerable<IDictionaryTranslation>>(x => x.Translations);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, Guid?>(x => x.ParentId);
+            public readonly PropertyInfo ItemKeySelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, string>(x => x.ItemKey);
+            public readonly PropertyInfo TranslationsSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, IEnumerable<IDictionaryTranslation>>(x => x.Translations);
+        }
 
         /// <summary>
         /// Gets or Sets the Parent Id of the Dictionary Item
@@ -40,14 +46,7 @@ namespace Umbraco.Core.Models
         public Guid? ParentId
         {
             get { return _parentId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _parentId = value;
-                    return _parentId;
-                }, _parentId, ParentIdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector); }
         }
 
         /// <summary>
@@ -57,14 +56,7 @@ namespace Umbraco.Core.Models
         public string ItemKey
         {
             get { return _itemKey; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _itemKey = value;
-                    return _itemKey;
-                }, _itemKey, ItemKeySelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _itemKey, Ps.Value.ItemKeySelector); }
         }
 
         /// <summary>
@@ -76,27 +68,22 @@ namespace Umbraco.Core.Models
             get { return _translations; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
+                var asArray = value.ToArray();
+                //ensure the language callback is set on each translation
+                if (GetLanguage != null)
                 {
-                    _translations = value;
-                    return _translations;
-                }, _translations, TranslationsSelector,
+                    foreach (var translation in asArray.OfType<DictionaryTranslation>())
+                    {
+                        translation.GetLanguage = GetLanguage;
+                    }
+                }
+
+                SetPropertyValueAndDetectChanges(asArray, ref _translations, Ps.Value.TranslationsSelector,
                     //Custom comparer for enumerable
                     new DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>>(
                         (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
-                        enumerable => enumerable.GetHashCode()));
+                        enumerable => enumerable.GetHashCode()));                
             }
         }
-
-        /// <summary>
-        /// Method to call before inserting a new entity in the db
-        /// </summary>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            Key = Guid.NewGuid();            
-        }
-        
     }
 }

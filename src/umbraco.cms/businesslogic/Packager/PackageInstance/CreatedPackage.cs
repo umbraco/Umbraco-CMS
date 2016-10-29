@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using File = System.IO.File;
 using Template = umbraco.cms.businesslogic.template.Template;
 
@@ -31,8 +32,10 @@ namespace umbraco.cms.businesslogic.packager
 
         public static CreatedPackage MakeNew(string name)
         {
-            var pack = new CreatedPackage();
-            pack.Data = data.MakeNew(name, IOHelper.MapPath(Settings.CreatedPackagesSettings));
+            var pack = new CreatedPackage
+            {
+                Data = data.MakeNew(name, IOHelper.MapPath(Settings.CreatedPackagesSettings))
+            };
 
             var e = new NewEventArgs();
             pack.OnNew(e);
@@ -221,8 +224,9 @@ namespace umbraco.cms.businesslogic.packager
 
                     }
                 }
+                
                 foreach (DocumentType d in dtl)
-                {
+                {                   
                     docTypes.AppendChild(d.ToXml(_packageManifest));
                 }
 
@@ -242,12 +246,13 @@ namespace umbraco.cms.businesslogic.packager
 
                 //Stylesheets
                 var stylesheets = _packageManifest.CreateElement("Stylesheets");
-                foreach (var ssId in pack.Stylesheets)
+                foreach (var stylesheetName in pack.Stylesheets)
                 {
-                    if (int.TryParse(ssId, out outInt))
+                    if (stylesheetName.IsNullOrWhiteSpace()) continue;
+                    var stylesheetXmlNode = utill.Stylesheet(stylesheetName, true, _packageManifest);
+                    if (stylesheetXmlNode != null)
                     {
-                        var s = new StyleSheet(outInt);
-                        stylesheets.AppendChild(s.ToXml(_packageManifest));
+                        stylesheets.AppendChild(stylesheetXmlNode);
                     }
                 }
                 AppendElement(stylesheets);
@@ -371,16 +376,14 @@ namespace umbraco.cms.businesslogic.packager
             }
 
         }
-
+        
         private void AddDocumentType(DocumentType dt, ref List<DocumentType> dtl)
         {
-            if (dt.MasterContentType != 0)
+            if (dt.MasterContentType != 0 && dt.Parent.nodeObjectType == Constants.ObjectTypes.DocumentTypeGuid)
             {
                 //first add masters
                 var mDocT = new DocumentType(dt.MasterContentType);
-
                 AddDocumentType(mDocT, ref dtl);
-
             }
 
             if (dtl.Contains(dt) == false)

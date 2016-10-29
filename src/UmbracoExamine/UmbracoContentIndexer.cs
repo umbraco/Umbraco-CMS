@@ -25,6 +25,7 @@ using UmbracoExamine.Config;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using umbraco.BasePages;
+using Umbraco.Core.Persistence.Querying;
 using IContentService = Umbraco.Core.Services.IContentService;
 using UmbracoExamine.LocalStorage;
 using IMediaService = Umbraco.Core.Services.IMediaService;
@@ -348,50 +349,55 @@ namespace UmbracoExamine
 
         protected override void PerformIndexAll(string type)
         {
-            
-            const int pageSize = 1000;
+            const int pageSize = 10000;
             var pageIndex = 0;
 
             switch (type)
             {
                 case IndexTypes.Content:
-                    if (this.SupportUnpublishedContent == false)
+
+
+                    var contentParentId = -1;
+                    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
                     {
-                        //use the base implementation which will use the published XML cache to perform the lookups
-                        base.PerformIndexAll(type);
+                        contentParentId = IndexerData.ParentNodeId.Value;
                     }
-                    else
+                    IContent[] content;
+
+                    do
                     {
-                        var contentParentId = -1;
-                        if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+                        long total;
+
+                        IEnumerable<IContent> descendants;
+                        if (SupportUnpublishedContent)
                         {
-                            contentParentId = IndexerData.ParentNodeId.Value;
+                            descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
                         }
-                        IContent[] content;
-
-                        do
+                        else
                         {
-                            long total;
-                            var descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
+                            //add the published filter
+                            var qry = Query<IContent>.Builder.Where(x => x.Published == true);
 
-                            //if specific types are declared we need to post filter them
-                            //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                            if (IndexerData.IncludeNodeTypes.Any())
-                            {
-                                content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
-                            }
-                            else
-                            {
-                                content = descendants.ToArray();
-                            }
+                            descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, qry);
+                        }                        
 
-                            AddNodesToIndex(GetSerializedContent(content), type);
-                            pageIndex++;
+                        //if specific types are declared we need to post filter them
+                        //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                        if (IndexerData.IncludeNodeTypes.Any())
+                        {
+                            content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
+                        }
+                        else
+                        {
+                            content = descendants.ToArray();
+                        }
+
+                        AddNodesToIndex(GetSerializedContent(content), type);
+                        pageIndex++;
 
 
-                        } while (content.Length == pageSize);
+                    } while (content.Length == pageSize);
 
-                    }
                     break;
                 case IndexTypes.Media:
 

@@ -1,0 +1,15 @@
+<div>
+  <ul class="umb-sub-views-nav" ng-if="showNavigation">
+      <li ng-repeat="item in navigation">
+         <a tabindex="-1"
+         class="umb-sub-views-nav-item"
+         href=""
+         ng-click="clickNavigationItem(item)"
+         hotkey="{{$index+1}}"
+         ng-class="{'is-active': item.active, '-has-error': item.hasError}">
+            <i class="icon {{ item.icon }}"></i>
+            <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
+         </a>
+      </li>
+  </ul>
+</div>

@@ -18,18 +18,22 @@ namespace Umbraco.Web.WebApi
     [IsBackOffice]
     [UmbracoUserTimeoutFilter]
     [UmbracoAuthorize]
+    [DisableBrowserCache]
+    [UmbracoWebApiRequireHttps]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
         protected UmbracoAuthorizedApiController()
         {
-            
         }
 
-        protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
+        protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext) : base(umbracoContext)
         {
         }
-        
+
+        protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper) : base(umbracoContext, umbracoHelper)
+        {
+        }
+
         private bool _userisValidated = false;
         
         /// <summary>

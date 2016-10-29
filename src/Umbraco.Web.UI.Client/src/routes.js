@@ -1,11 +1,11 @@
 app.config(function ($routeProvider) {
-    
-    /** This checks if the user is authenticated for a route and what the isRequired is set to. 
+
+    /** This checks if the user is authenticated for a route and what the isRequired is set to.
         Depending on whether isRequired = true, it first check if the user is authenticated and will resolve successfully
         otherwise the route will fail and the $routeChangeError event will execute, in that handler we will redirect to the rejected
         path that is resolved from this method and prevent default (prevent the route from executing) */
     var canRoute = function(isRequired) {
-        
+
         return {
             /** Checks that the user is authenticated, then ensures that are requires assets are loaded */
             isAuthenticatedAndReady: function ($q, userService, $route, assetsService, appState) {
@@ -17,12 +17,12 @@ app.config(function ($routeProvider) {
                     deferred.resolve(true);
                     return deferred.promise;
                 }
-                
+
                 userService.isAuthenticated()
                     .then(function () {
 
                         assetsService._loadInitAssets().then(function() {
-                            
+
                             //This could be the first time has loaded after the user has logged in, in this case
                             // we need to broadcast the authenticated event - this will be handled by the startup (init)
                             // handler to set/broadcast the ready state
@@ -59,7 +59,7 @@ app.config(function ($routeProvider) {
                             //this will resolve successfully so the route will continue
                             deferred.resolve(true);
                         }
-                    });                
+                    });
                 return deferred.promise;
             }
         };
@@ -85,18 +85,18 @@ app.config(function ($routeProvider) {
     $routeProvider
         .when('/login', {
             templateUrl: 'views/common/login.html',
-            //ensure auth is *not* required so it will redirect to / 
+            //ensure auth is *not* required so it will redirect to /
             resolve: canRoute(false)
         })
         .when('/login/:check', {
             templateUrl: 'views/common/login.html',
-            //ensure auth is *not* required so it will redirect to / 
+            //ensure auth is *not* required so it will redirect to /
             resolve: canRoute(false)
         })
-         .when('/logout', {
-             redirectTo: '/login/false',             
-             resolve: doLogout()
-         })
+        .when('/logout', {
+             redirectTo: '/login/false',
+            resolve: doLogout()
+        })
         .when('/:section', {
             templateUrl: function (rp) {
                 if (rp.section.toLowerCase() === "default" || rp.section.toLowerCase() === "umbraco" || rp.section === "")
@@ -118,7 +118,7 @@ app.config(function ($routeProvider) {
                 return 'views/common/legacy.html';
             },
             resolve: canRoute(true)
-        })              
+        })
         .when('/:section/:tree/:method', {
             templateUrl: function (rp) {
                 if (!rp.method)
@@ -130,7 +130,7 @@ app.config(function ($routeProvider) {
                 // angular dashboards working. Perhaps a normal section dashboard would list out the registered
                 // dashboards (as tabs if we wanted) and each tab could actually be a route link to one of these views?
 
-                return 'views/' + rp.tree + '/' + rp.method + '.html';
+                return ('views/' + rp.tree + '/' + rp.method + '.html');
             },
             resolve: canRoute(true)
         })
@@ -147,27 +147,27 @@ app.config(function ($routeProvider) {
                 // Here we need to figure out if this route is for a package tree and if so then we need
                 // to change it's convention view path to:
                 // /App_Plugins/{mypackage}/backoffice/{treetype}/{method}.html
-                
+
                 // otherwise if it is a core tree we use the core paths:
                 // views/{treetype}/{method}.html
 
                 var packageTreeFolder = treeService.getTreePackageFolder($routeParams.tree);
 
                 if (packageTreeFolder) {
-                    $scope.templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
+                    $scope.templateUrl = (Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
                         "/" + packageTreeFolder +
-                        "/backoffice/" + $routeParams.tree + "/" + $routeParams.method + ".html";
+                        "/backoffice/" + $routeParams.tree + "/" + $routeParams.method + ".html");
                 }
                 else {
-                    $scope.templateUrl = 'views/' + $routeParams.tree + '/' + $routeParams.method + '.html';
+                    $scope.templateUrl = ('views/' + $routeParams.tree + '/' + $routeParams.method + '.html');
                 }
-                
-            },            
+
+            },
             resolve: canRoute(true)
-        })        
+        })
         .otherwise({ redirectTo: '/login' });
     }).config(function ($locationProvider) {
 
         //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
         // $locationProvider.html5Mode(true);         //turn html5 mode on
-});
+    });

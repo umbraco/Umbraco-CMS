@@ -1,0 +1,60 @@
+<div>
+    <div class="umb-table" ng-if="items">
+        <!-- Listviews head section -->
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell">
+                    <input class="umb-table__input" type="checkbox"
+                           ng-if="allowSelectAll"
+                           ng-click="selectAll($event)"
+                           ng-checked="isSelectedAll()">
+                </div>
+                <div class="umb-table-cell umb-table__name">
+                    <a class="umb-table-head__link sortable" href="#" ng-click="sort('Name', true, true)" prevent-default>
+                        <localize key="general_name">Name</localize>
+                        <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': isSortDirection('Name', 'asc'), 'icon-navigation-down': isSortDirection('Name', 'desc')}"></i>
+                    </a>
+                </div>
+                <div class="umb-table-cell" ng-repeat="column in itemProperties">
+                    <a class="umb-table-head__link" title="Sort by {{ column.header }}" href="#"
+                       ng-click="sort(column.alias, column.allowSorting, column.isSystem)"
+                       ng-class="{'sortable':column.allowSorting}" prevent-default>
+                        <span ng-bind="column.header"></span>
+                        <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': isSortDirection(column.alias, 'asc'), 'icon-navigation-down': isSortDirection(column.alias, 'desc')}"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- Listview body section -->
+        <div class="umb-table-body">
+            <div class="umb-table-row"
+                 ng-repeat="item in items"
+                 ng-class="{
+                    '-selected':item.selected,
+                    '-published':item.published,
+                    '-unpublished':!item.published
+                }"
+                 ng-click="selectItem(item, $index, $event)">
+
+                <div class="umb-table-cell" ng-class="{'has-unpublished-version':!item.published && item.hasPublishedVersion}">
+                    <i class="umb-table-body__icon umb-table-body__fileicon {{item.icon}}" ng-class="getIcon(item)"></i>
+                    <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                </div>
+                <div class="umb-table-cell umb-table__name">
+                    <a title="{{ item.name }}" class="umb-table-body__link" href=""
+                       ng-click="clickItem(item, $event)"
+                       ng-bind="item.name">
+                    </a>
+                </div>
+                <div class="umb-table-cell" ng-repeat="column in itemProperties">
+                    <span title="{{column.header}}: {{item[column.alias]}}">{{item[column.alias]}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- If list is empty, then display -->
+    <umb-empty-state ng-if="!items"
+                     position="center">
+        <localize key="content_listViewNoItems">There are no items show in the list.</localize>
+    </umb-empty-state>
+</div>

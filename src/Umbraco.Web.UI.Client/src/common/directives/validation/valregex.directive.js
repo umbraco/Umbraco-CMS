@@ -13,51 +13,65 @@ function valRegex() {
         link: function (scope, elm, attrs, ctrl) {
 
             var flags = "";
-            if (attrs.valRegexFlags) {
-                try {
-                    flags = scope.$eval(attrs.valRegexFlags);
-                    if (!flags) {
-                        flags = attrs.valRegexFlags;
+            var regex;
+            var eventBindings = [];
+
+            attrs.$observe("valRegexFlags", function (newVal) {
+                if (newVal) {
+                    flags = newVal;
+                }
+            });
+
+            attrs.$observe("valRegex", function (newVal) {
+                if (newVal) {
+                    try {
+                        var resolved = newVal;
+                        if (resolved) {
+                            regex = new RegExp(resolved, flags);
+                        }
+                        else {
+                            regex = new RegExp(attrs.valRegex, flags);
+                        }
+                    }
+                    catch (e) {
+                        regex = new RegExp(attrs.valRegex, flags);
                     }
                 }
-                catch (e) {
-                    flags = attrs.valRegexFlags;
+            });
+
+            eventBindings.push(scope.$watch('ngModel', function(newValue, oldValue){
+                if(newValue && newValue !== oldValue) {
+                    patternValidator(newValue);
                 }
-            }
-            var regex;
-            try {
-                var resolved = scope.$eval(attrs.valRegex);                
-                if (resolved) {
-                    regex = new RegExp(resolved, flags);
-                }
-                else {
-                    regex = new RegExp(attrs.valRegex, flags);
-                }
-            }
-            catch(e) {
-                regex = new RegExp(attrs.valRegex, flags);
-            }
+            }));
 
             var patternValidator = function (viewValue) {
-                //NOTE: we don't validate on empty values, use required validator for that
-                if (!viewValue || regex.test(viewValue)) {
-                    // it is valid
-                    ctrl.$setValidity('valRegex', true);
-                    //assign a message to the validator
-                    ctrl.errorMsg = "";
-                    return viewValue;
-                }
-                else {
-                    // it is invalid, return undefined (no model update)
-                    ctrl.$setValidity('valRegex', false);
-                    //assign a message to the validator
-                    ctrl.errorMsg = "Value is invalid, it does not match the correct pattern";
-                    return undefined;
+                if (regex) {
+                    //NOTE: we don't validate on empty values, use required validator for that
+                if (!viewValue || regex.test(viewValue.toString())) {
+                        // it is valid
+                        ctrl.$setValidity('valRegex', true);
+                        //assign a message to the validator
+                        ctrl.errorMsg = "";
+                        return viewValue;
+                    }
+                    else {
+                        // it is invalid, return undefined (no model update)
+                        ctrl.$setValidity('valRegex', false);
+                        //assign a message to the validator
+                        ctrl.errorMsg = "Value is invalid, it does not match the correct pattern";
+                        return undefined;
+                    }
                 }
             };
 
-            ctrl.$formatters.push(patternValidator);
-            ctrl.$parsers.push(patternValidator);
+            scope.$on('$destroy', function(){
+              // unbind watchers
+              for(var e in eventBindings) {
+                eventBindings[e]();
+               }
+            });
+
         }
     };
 }

@@ -1,3 +1,4 @@
+
 LazyLoad.js([
       '../lib/jquery/jquery.min.js',
       '../lib/jquery-ui/jquery-ui.min.js',
@@ -10,11 +11,10 @@ LazyLoad.js([
       '../js/umbraco.security.js',
       '../ServerVariables',
       '../lib/spectrum/spectrum.js',
-      
+
       '../js/canvasdesigner.panel.js',
 ], function () {
     jQuery(document).ready(function () {
         angular.bootstrap(document, ['Umbraco.canvasdesigner']);
     });
-}
-);
+});

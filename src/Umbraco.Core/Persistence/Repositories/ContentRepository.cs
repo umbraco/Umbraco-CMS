@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
@@ -63,9 +64,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .Where<DocumentDto>(x => x.Newest)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -105,6 +106,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of PetaPocoRepositoryBase<IContent>
 
+
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=1)",
@@ -142,6 +144,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
+                               "DELETE FROM umbracoRedirectUrl WHERE contentKey IN (SELECT uniqueID FROM umbracoNode WHERE id = @Id)",
                                "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
@@ -155,8 +158,8 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id",
-                               "DELETE FROM umbracoAccess WHERE nodeId = @Id"
+                               "DELETE FROM umbracoAccess WHERE nodeId = @Id",
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }
@@ -180,30 +183,25 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (contentTypeIds == null)
                 {
                     var subQuery = new Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<DocumentDto>()
-                            .On<ContentXmlDto, DocumentDto>(left => left.NodeId, right => right.NodeId);
+                        .Select("id")
+                        .From<NodeDto>(SqlSyntax)
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
                     var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
                 }
                 else
                 {
-                    foreach (var id in contentTypeIds)
-                    {
-                        var id1 = id;
-                        var subQuery = new Sql()
-                            .Select("cmsDocument.nodeId")
-                            .From<DocumentDto>()
-                            .InnerJoin<ContentDto>()
-                            .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<DocumentDto>(dto => dto.Published)
-                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+                    var subQuery = new Sql()
+                        .Select("umbracoNode.id as nodeId")
+                        .From<ContentDto>(SqlSyntax)                        
+                        .InnerJoin<NodeDto>(SqlSyntax)
+                        .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                        .WhereIn<ContentDto>(dto => dto.ContentTypeId, contentTypeIds, SqlSyntax)
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
-                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        Database.Execute(deleteSql);
-                    }
+                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    Database.Execute(deleteSql);
                 }
 
                 //now insert the data, again if something fails here, the whole transaction is reversed
@@ -234,16 +232,23 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                //NOTE: This is an important call, we cannot simply make a call to:
+                //  GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                // because that method is used to query 'latest' content items where in this case we don't necessarily
+                // want latest content items because a pulished content item might not actually be the latest.
+                // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
+                var descendants = GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out total,
+                    new Tuple<string, string>("cmsDocument", "nodeId"),
+                    ProcessQuery, "Path", Direction.Ascending, true);
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() });
 
                 //bulk insert it into the database
-                Database.BulkInsertRecords(xmlItems, tr);
+                var count = Database.BulkInsertRecords(xmlItems, tr, SqlSyntax);
 
-                processed += xmlItems.Length;
+                processed += count;
 
                 pageIndex++;
             } while (processed < total);
@@ -679,11 +684,81 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+
+        /// <summary>
+        /// This builds the Xml document used for the XML cache
+        /// </summary>
+        /// <returns></returns>
+        public XmlDocument BuildXmlCache()
+        {
+            //TODO: This is what we should do , but converting to use XDocument would be breaking unless we convert
+            // to XmlDocument at the end of this, but again, this would be bad for memory... though still not nearly as
+            // bad as what is happening before!
+            // We'll keep using XmlDocument for now though, but XDocument xml generation is much faster:
+            // https://blogs.msdn.microsoft.com/codejunkie/2008/10/08/xmldocument-vs-xelement-performance/
+            // I think we already have code in here to convert XDocument to XmlDocument but in case we don't here
+            // it is: https://blogs.msdn.microsoft.com/marcelolr/2009/03/13/fast-way-to-convert-xmldocument-into-xdocument/
+
+            //// Prepare an XmlDocument with an appropriate inline DTD to match
+            //// the expected content
+            //var parent = new XElement("root", new XAttribute("id", "-1"));
+            //var xmlDoc = new XDocument(
+            //    new XDocumentType("root", null, null, DocumentType.GenerateDtd()),
+            //    parent);
+
+            var xmlDoc = new XmlDocument();
+            var doctype = xmlDoc.CreateDocumentType("root", null, null,
+                ApplicationContext.Current.Services.ContentTypeService.GetContentTypesDtd());
+            xmlDoc.AppendChild(doctype);
+            var parent = xmlDoc.CreateElement("root");
+            var pIdAtt = xmlDoc.CreateAttribute("id");
+            pIdAtt.Value = "-1";
+            parent.Attributes.Append(pIdAtt);
+            xmlDoc.AppendChild(parent);
+
+            const string sql = @"select umbracoNode.id, umbracoNode.parentID, umbracoNode.sortOrder, cmsContentXml.xml, umbracoNode.level from umbracoNode
+inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
+where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1)
+order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
+
+            XmlElement last = null;
+
+            //NOTE: Query creates a reader - does not load all into memory
+            foreach (var row in Database.Query<dynamic>(sql, new { type = new Guid(Constants.ObjectTypes.Document) }))
+            {
+                string parentId = ((int)row.parentID).ToInvariantString();
+                string xml = row.xml;
+                int sortOrder = row.sortOrder;
+
+                //if the parentid is changing
+                if (last != null && last.GetAttribute("parentID") != parentId)
+                {
+                    parent = xmlDoc.GetElementById(parentId);
+                    if (parent == null)
+                    {
+                        //Need to short circuit here, if the parent is not there it means that the parent is unpublished
+                        // and therefore the child is not published either so cannot be included in the xml cache
+                        continue;
+                    }
+                }
+
+                var xmlDocFragment = xmlDoc.CreateDocumentFragment();
+                xmlDocFragment.InnerXml = xml;
+
+                last = (XmlElement)parent.AppendChild(xmlDocFragment);
+
+                // fix sortOrder - see notes in UpdateSortOrder
+                last.Attributes["sortOrder"].Value = sortOrder.ToInvariantString();
+            }
+
+            return xmlDoc;
+
+        }
+
         public int CountPublished()
         {
             var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
-                .Where<DocumentDto>(x => x.Published == true)
-                .Where<DocumentDto>(x => x.Newest == true);
+                .Where<DocumentDto>(x => x.Published == true);
             return Database.ExecuteScalar<int>(sql);
         }
 
@@ -728,7 +803,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="content"></param>
         /// <param name="xml"></param>
         public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
-        {           
+        {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(content, xml));
         }
 
@@ -760,29 +835,30 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null)
         {
 
             //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
             // what we always require for a paged result, so we'll ensure it's included in the filter
-
-            var args = new List<object>();
-            var sbWhere = new StringBuilder("AND (cmsDocument.newest = 1)");
-
-            if (filter.IsNullOrWhiteSpace() == false)
+            
+            var filterSql = new Sql().Append("AND (cmsDocument.newest = 1)");
+            if (filter != null)
             {
-                sbWhere.Append(" AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
-                args.Add("%" + filter + "%");
+                foreach (var filterClaus in filter.GetWhereClauses())
+                {
+                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
+                }
             }
-
-            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString(), args.ToArray());
+            
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);
 
             return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsDocument", "nodeId"),
-                ProcessQuery, orderBy, orderDirection,
+                ProcessQuery, orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }
@@ -826,11 +902,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
-            
+
             var ids = dtos
                 .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
                 .Select(x => x.TemplateId.Value).ToArray();
-            
+
             //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
             var templates = ids.Length == 0 ? Enumerable.Empty<ITemplate>() : _templateRepository.GetAll(ids).ToArray();
 

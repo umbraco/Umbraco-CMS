@@ -1,0 +1,57 @@
+version: '{build}'
+shallow_clone: true
+build_script:
+- cmd: >-
+    cd build
+
+    SET "release="
+
+    FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
+
+    SET nuGetFolder=C:\Users\appveyor\.nuget\packages
+
+    ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
+
+    ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+
+    IF EXIST ..\src\umbraco.businesslogic\packages.config ..\src\.nuget\NuGet.exe install ..\src\umbraco.businesslogic\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+
+    ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Core\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+
+    ECHO Building Release %release% build%APPVEYOR_BUILD_NUMBER%
+    
+    SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+    
+    SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
+
+    XCOPY "..\src\Umbraco.Tests\unit-test-log4net.CI.config" "..\src\Umbraco.Tests\unit-test-log4net.config" /Y
+    
+    %MSBUILD% "..\src\Umbraco.Tests\Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly
+    
+    build.bat nopause %release% build%APPVEYOR_BUILD_NUMBER%
+    
+    ECHO %PATH%
+test:
+  assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
+artifacts:
+- path: build\UmbracoCms.*
+  name: UmbracoFiles
+- path: build\msbuild.log
+  name: BuildLog
+deploy:
+- provider: AzureBlob
+  storage_account_name: umbraconightlies
+  storage_access_key:
+    secure: bmEMml2SF7QLHULiePa/a01XOeIa2SxJeXuaZ+1R27b+Vb2nNUQVYiPlUyF2cZAFSHI/zO/LekRsVU1rTescGhJjF7SSjKybymI3p+F/OWpwqiu2WfFee1ofXBFx8QHw
+  container: umbraco-750
+  artifact: UmbracoFiles
+  on:
+    branch: dev-v7
+notifications:
+- provider: Slack
+  auth_token:
+    secure: v2csJi2V5ghR0rPdODK8GJdOGNCA+XaK84iQ9MdPOClqB+VU+40ybdKp6gPirGSH
+  channel: '#build-umbraco-core'
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: false

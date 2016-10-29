@@ -56,18 +56,20 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @param {Object} editor the TinyMCE editor instance        
         * @param {Object} $scope the current controller scope
         */
-        createInsertEmbeddedMedia: function (editor, $scope) {
+        createInsertEmbeddedMedia: function (editor, scope, callback) {
             editor.addButton('umbembeddialog', {
                 icon: 'custom icon-tv',
                 tooltip: 'Embed',
                 onclick: function () {
-                    dialogService.embedDialog({
-                        callback: function (data) {
-                            editor.insertContent(data);
-                        }
-                    });
+                    if (callback) {
+                        callback();
+                    }
                 }
             });
+        },
+
+        insertEmbeddedMediaInEditor: function(editor, preview) {
+            editor.insertContent(preview);
         },
 
         /**
@@ -81,7 +83,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @param {Object} editor the TinyMCE editor instance        
         * @param {Object} $scope the current controller scope
         */
-        createMediaPicker: function (editor) {
+        createMediaPicker: function (editor, scope, callback) {
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
@@ -101,50 +103,46 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     }
 
                     userService.getCurrentUser().then(function(userData) {
-                        dialogService.mediaPicker({
-                            currentTarget: currentTarget,
-                            onlyImages: true,
-                            showDetails: true,
-                            startNodeId: userData.startMediaId,
-                            callback: function (img) {
-
-                                if (img) {
-
-                                    var data = {
-                                        alt: img.altText || "",
-                                        src: (img.url) ? img.url : "nothing.jpg",
-                                        rel: img.id,
-                                        'data-id': img.id,
-                                        id: '__mcenew'
-                                    };
-
-                                    editor.insertContent(editor.dom.createHTML('img', data));
-
-                                    $timeout(function () {
-                                        var imgElm = editor.dom.get('__mcenew');
-                                        var size = editor.dom.getSize(imgElm);
-
-                                        if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
-                                            var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
-
-                                            var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
-                                            editor.dom.setAttrib(imgElm, 'style', s);
-                                            editor.dom.setAttrib(imgElm, 'id', null);
-
-                                            if (img.url) {
-                                                var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
-                                                editor.dom.setAttrib(imgElm, 'data-mce-src', src);
-                                            }
-                                        }
-                                    }, 500);
-                                }
-                            }
-                        });
+                        if(callback) {
+                            callback(currentTarget, userData);
+                        }
                     });
 
-                    
                 }
             });
+        },
+
+        insertMediaInEditor: function(editor, img) {
+            if(img) {
+
+               var data = {
+                   alt: img.altText || "",
+                   src: (img.url) ? img.url : "nothing.jpg",
+                   rel: img.id,
+                   'data-id': img.id,
+                   id: '__mcenew'
+               };
+
+               editor.insertContent(editor.dom.createHTML('img', data));
+
+               $timeout(function () {
+                   var imgElm = editor.dom.get('__mcenew');
+                   var size = editor.dom.getSize(imgElm);
+
+                   if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
+                        var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
+
+                        var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
+                        editor.dom.setAttrib(imgElm, 'style', s);
+                        editor.dom.setAttrib(imgElm, 'id', null);
+
+                        if (img.url) {
+                            var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
+                            editor.dom.setAttrib(imgElm, 'data-mce-src', src);
+                        }
+                   }
+               }, 500);
+            }
         },
 
         /**
@@ -158,8 +156,10 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @param {Object} editor the TinyMCE editor instance      
         * @param {Object} $scope the current controller scope
         */
-        createInsertMacro: function (editor, $scope) {
-            
+        createInsertMacro: function (editor, $scope, callback) {
+
+            var createInsertMacroScope = this;
+
             /** Adds custom rules for the macro plugin and custom serialization */
             editor.on('preInit', function (args) {
                 //this is requires so that we tell the serializer that a 'div' is actually allowed in the root, otherwise the cleanup will strip it out
@@ -195,45 +195,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 return null;
             }
 
-            /** loads in the macro content async from the server */
-            function loadMacroContent($macroDiv, macroData) {
-                
-                //if we don't have the macroData, then we'll need to parse it from the macro div
-                if (!macroData) {                    
-                    var contents = $macroDiv.contents();
-                    var comment = _.find(contents, function (item) {
-                        return item.nodeType === 8;
-                    });
-                    if (!comment) {
-                        throw "Cannot parse the current macro, the syntax in the editor is invalid";
-                    }
-                    var syntax = comment.textContent.trim();
-                    var parsed = macroService.parseMacroSyntax(syntax);
-                    macroData = parsed;
-                }
-
-                var $ins = $macroDiv.find("ins");
-
-                //show the throbber
-                $macroDiv.addClass("loading");
-
-                var contentId = $routeParams.id;
-
-                //need to wrap in safe apply since this might be occuring outside of angular
-                angularHelper.safeApply($scope, function() {
-                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
-                    .then(function (htmlResult) {
-
-                        $macroDiv.removeClass("loading");
-                        htmlResult = htmlResult.trim();
-                        if (htmlResult !== "") {
-                            $ins.html(htmlResult);
-                        }
-                    });
-                });
-                
-            }
-            
             /** Adds the button instance */
             editor.addButton('umbmacro', {
                 icon: 'custom icon-settings-alt',
@@ -336,8 +297,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         
                         //get all macro divs and load their content
                         $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function() {
-                            loadMacroContent($(this));
-                        });                        
+                            createInsertMacroScope.loadMacroContent($(this), null, $scope);
+                        });
 
                     });
                     
@@ -460,33 +421,355 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         };
                     }
 
-                    dialogService.macroPicker({
-                        dialogData : dialogData,
-                        callback: function(data) {
-
-                            //put the macro syntax in comments, we will parse this out on the server side to be used
-                            //for persisting.
-                            var macroSyntaxComment = "<!-- " + data.syntax + " -->";
-                            //create an id class for this element so we can re-select it after inserting
-                            var uniqueId = "umb-macro-" + editor.dom.uniqueId();
-                            var macroDiv = editor.dom.create('div',
-                                {
-                                    'class': 'umb-macro-holder ' + data.macroAlias + ' mceNonEditable ' + uniqueId
-                                },
-                                macroSyntaxComment + '<ins>Macro alias: <strong>' + data.macroAlias + '</strong></ins>');
-
-                            editor.selection.setNode(macroDiv);
-                            
-                            var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
-
-                            //async load the macro content
-                            loadMacroContent($macroDiv, data);                          
-                        }
-                    });
+                    if(callback) {
+                        callback(dialogData);
+                    }
 
                 }
             });
+        },
+
+        insertMacroInEditor: function(editor, macroObject, $scope) {
+
+            //put the macro syntax in comments, we will parse this out on the server side to be used
+            //for persisting.
+            var macroSyntaxComment = "<!-- " + macroObject.syntax + " -->";
+            //create an id class for this element so we can re-select it after inserting
+            var uniqueId = "umb-macro-" + editor.dom.uniqueId();
+            var macroDiv = editor.dom.create('div',
+                {
+                    'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
+                },
+                macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
+
+            editor.selection.setNode(macroDiv);
+
+            var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+
+            //async load the macro content
+            this.loadMacroContent($macroDiv, macroObject, $scope);
+
+        },
+
+        /** loads in the macro content async from the server */
+        loadMacroContent: function($macroDiv, macroData, $scope) {
+
+            //if we don't have the macroData, then we'll need to parse it from the macro div
+            if (!macroData) {
+                var contents = $macroDiv.contents();
+                var comment = _.find(contents, function (item) {
+                    return item.nodeType === 8;
+                });
+                if (!comment) {
+                    throw "Cannot parse the current macro, the syntax in the editor is invalid";
+                }
+                var syntax = comment.textContent.trim();
+                var parsed = macroService.parseMacroSyntax(syntax);
+                macroData = parsed;
+            }
+
+            var $ins = $macroDiv.find("ins");
+
+            //show the throbber
+            $macroDiv.addClass("loading");
+
+            var contentId = $routeParams.id;
+
+            //need to wrap in safe apply since this might be occuring outside of angular
+            angularHelper.safeApply($scope, function() {
+                macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
+                .then(function (htmlResult) {
+
+                    $macroDiv.removeClass("loading");
+                    htmlResult = htmlResult.trim();
+                    if (htmlResult !== "") {
+                        $ins.html(htmlResult);
+                    }
+                });
+            });
+
+        },
+
+        createLinkPicker: function(editor, $scope, onClick) {
+
+            function createLinkList(callback) {
+                return function() {
+                    var linkList = editor.settings.link_list;
+
+                    if (typeof(linkList) === "string") {
+                        tinymce.util.XHR.send({
+                            url: linkList,
+                            success: function(text) {
+                                callback(tinymce.util.JSON.parse(text));
+                            }
+                        });
+                    } else {
+                        callback(linkList);
+                    }
+                };
+            }
+
+            function showDialog(linkList) {
+                var data = {}, selection = editor.selection, dom = editor.dom, selectedElm, anchorElm, initialText;
+                var win, linkListCtrl, relListCtrl, targetListCtrl;
+
+                function linkListChangeHandler(e) {
+                    var textCtrl = win.find('#text');
+
+                    if (!textCtrl.value() || (e.lastControl && textCtrl.value() === e.lastControl.text())) {
+                        textCtrl.value(e.control.text());
+                    }
+
+                    win.find('#href').value(e.control.value());
+                }
+
+                function buildLinkList() {
+                    var linkListItems = [{
+                        text: 'None',
+                        value: ''
+                    }];
+
+                    tinymce.each(linkList, function(link) {
+                        linkListItems.push({
+                            text: link.text || link.title,
+                            value: link.value || link.url,
+                            menu: link.menu
+                        });
+                    });
+
+                    return linkListItems;
+                }
+
+                function buildRelList(relValue) {
+                    var relListItems = [{
+                        text: 'None',
+                        value: ''
+                    }];
+
+                    tinymce.each(editor.settings.rel_list, function(rel) {
+                        relListItems.push({
+                            text: rel.text || rel.title,
+                            value: rel.value,
+                            selected: relValue === rel.value
+                        });
+                    });
+
+                    return relListItems;
+                }
+
+                function buildTargetList(targetValue) {
+                    var targetListItems = [{
+                        text: 'None',
+                        value: ''
+                    }];
+
+                    if (!editor.settings.target_list) {
+                        targetListItems.push({
+                            text: 'New window',
+                            value: '_blank'
+                        });
+                    }
+
+                    tinymce.each(editor.settings.target_list, function(target) {
+                        targetListItems.push({
+                            text: target.text || target.title,
+                            value: target.value,
+                            selected: targetValue === target.value
+                        });
+                    });
+
+                    return targetListItems;
+                }
+
+                function buildAnchorListControl(url) {
+                    var anchorList = [];
+
+                    tinymce.each(editor.dom.select('a:not([href])'), function(anchor) {
+                        var id = anchor.name || anchor.id;
+
+                        if (id) {
+                            anchorList.push({
+                                text: id,
+                                value: '#' + id,
+                                selected: url.indexOf('#' + id) !== -1
+                            });
+                        }
+                    });
+
+                    if (anchorList.length) {
+                        anchorList.unshift({
+                            text: 'None',
+                            value: ''
+                        });
+
+                        return {
+                            name: 'anchor',
+                            type: 'listbox',
+                            label: 'Anchors',
+                            values: anchorList,
+                            onselect: linkListChangeHandler
+                        };
+                    }
+                }
+
+                function updateText() {
+                    if (!initialText && data.text.length === 0) {
+                        this.parent().parent().find('#text')[0].value(this.value());
+                    }
+                }
+
+                selectedElm = selection.getNode();
+                anchorElm = dom.getParent(selectedElm, 'a[href]');
+
+                data.text = initialText = anchorElm ? (anchorElm.innerText || anchorElm.textContent) : selection.getContent({format: 'text'});
+                data.href = anchorElm ? dom.getAttrib(anchorElm, 'href') : '';
+                data.target = anchorElm ? dom.getAttrib(anchorElm, 'target') : '';
+                data.rel = anchorElm ? dom.getAttrib(anchorElm, 'rel') : '';
+
+                if (selectedElm.nodeName === "IMG") {
+                    data.text = initialText = " ";
+                }
+
+                if (linkList) {
+                    linkListCtrl = {
+                        type: 'listbox',
+                        label: 'Link list',
+                        values: buildLinkList(),
+                        onselect: linkListChangeHandler
+                    };
+                }
+
+                if (editor.settings.target_list !== false) {
+                    targetListCtrl = {
+                        name: 'target',
+                        type: 'listbox',
+                        label: 'Target',
+                        values: buildTargetList(data.target)
+                    };
+                }
+
+                if (editor.settings.rel_list) {
+                    relListCtrl = {
+                        name: 'rel',
+                        type: 'listbox',
+                        label: 'Rel',
+                        values: buildRelList(data.rel)
+                    };
+                }
+
+                var injector = angular.element(document.getElementById("umbracoMainPageBody")).injector();
+                var dialogService = injector.get("dialogService");
+                var currentTarget = null;
+
+                //if we already have a link selected, we want to pass that data over to the dialog
+                if(anchorElm){
+                    var anchor = $(anchorElm);
+                    currentTarget = {
+                        name: anchor.attr("title"),
+                        url: anchor.attr("href"),
+                        target: anchor.attr("target")
+                    };
+
+                    //locallink detection, we do this here, to avoid poluting the dialogservice
+                    //so the dialog service can just expect to get a node-like structure
+                    if(currentTarget.url.indexOf("localLink:") > 0){
+                        currentTarget.id = currentTarget.url.substring(currentTarget.url.indexOf(":")+1,currentTarget.url.length-1);
+                    }
+                }
+
+                if(onClick) {
+                    onClick(currentTarget, anchorElm);
+                }
+
+            }
+
+            editor.addButton('link', {
+                icon: 'link',
+                tooltip: 'Insert/edit link',
+                shortcut: 'Ctrl+K',
+                onclick: createLinkList(showDialog),
+                stateSelector: 'a[href]'
+            });
+
+            editor.addButton('unlink', {
+                icon: 'unlink',
+                tooltip: 'Remove link',
+                cmd: 'unlink',
+                stateSelector: 'a[href]'
+            });
+
+            editor.addShortcut('Ctrl+K', '', createLinkList(showDialog));
+            this.showDialog = showDialog;
+
+            editor.addMenuItem('link', {
+                icon: 'link',
+                text: 'Insert link',
+                shortcut: 'Ctrl+K',
+                onclick: createLinkList(showDialog),
+                stateSelector: 'a[href]',
+                context: 'insert',
+                prependToContext: true
+            });
+
+        },
+
+        insertLinkInEditor: function(editor, target, anchorElm) {
+
+            var href = target.url;
+
+            function insertLink() {
+                if (anchorElm) {
+                    editor.dom.setAttribs(anchorElm, {
+                        href: href,
+                        title: target.name,
+                        target: target.target ? target.target : null,
+                        rel: target.rel ? target.rel : null,
+                        'data-id': target.id ? target.id : null
+                    });
+
+                    editor.selection.select(anchorElm);
+                    editor.execCommand('mceEndTyping');
+                } else {
+                    editor.execCommand('mceInsertLink', false, {
+                        href: href,
+                        title: target.name,
+                        target: target.target ? target.target : null,
+                        rel: target.rel ? target.rel : null,
+                        'data-id': target.id ? target.id : null
+                    });
+                }
+            }
+
+            if (!href) {
+                editor.execCommand('unlink');
+                return;
+            }
+
+            //if we have an id, it must be a locallink:id, aslong as the isMedia flag is not set
+            if(target.id && (angular.isUndefined(target.isMedia) || !target.isMedia)){
+                href = "/{localLink:" + target.id + "}";
+                insertLink();
+                return;
+            }
+
+            // Is email and not //user@domain.com
+            if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf('mailto:') === -1) {
+                href = 'mailto:' + href;
+                insertLink();
+                return;
+            }
+
+            // Is www. prefixed
+            if (/^\s*www\./i.test(href)) {
+                href = 'http://' + href;
+                insertLink();
+                return;
+            }
+
+            insertLink();
+
         }
+
     };
 }
 

@@ -1,6 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CopyUmbracoFilesToWebRootForDeploy" AfterTargets="CopyAllFilesToSingleFolderForMsdeploy">
+    <PropertyGroup>
+      <UmbracoFilesFolder>$(MSBuildThisFileDirectory)..\UmbracoFiles\</UmbracoFilesFolder>
+    </PropertyGroup>
+    <ItemGroup>
+      <UmbracoFiles Include="$(UmbracoFilesFolder)**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="%(UmbracoFiles.FullPath)" DestinationFiles="$(_PackageTempDir)\%(RecursiveDir)%(Filename)%(Extension)" Condition="!Exists('%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>  
   <Target Name="CopyUmbracoFilesToWebRoot" BeforeTargets="AfterBuild">
+	<!-- This copies the files listed in `AddUmbracoFilesToOutput` to the webroot during NuGet install and should -->
+	<!-- not be altered to support automated builds, use `CopyUmbracoFilesToWebRootForDeploy` for that instead -->
     <PropertyGroup>
       <UmbracoFilesFolder>$(MSBuildThisFileDirectory)..\UmbracoFiles\</UmbracoFilesFolder>
     </PropertyGroup>

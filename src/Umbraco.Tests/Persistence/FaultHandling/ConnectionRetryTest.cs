@@ -1,6 +1,7 @@
 ﻿using System.Data.SqlClient;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
@@ -13,7 +14,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
         public void PetaPocoConnection_Cant_Connect_To_SqlDatabase_With_Invalid_User()
         {
             // Arrange
-            const string providerName = "System.Data.SqlClient";
+            const string providerName = Constants.DatabaseProviders.SqlServer;
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=x;password=umbraco";
             var factory = new DefaultDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>());
             var database = factory.CreateDatabase();
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
         public void PetaPocoConnection_Cant_Connect_To_SqlDatabase_Because_Of_Network()
         {
             // Arrange
-            const string providerName = "System.Data.SqlClient";
+            const string providerName = Constants.DatabaseProviders.SqlServer;
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco";
             var factory = new DefaultDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>());
             var database = factory.CreateDatabase();

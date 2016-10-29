@@ -18,12 +18,22 @@
 .controls-row img {
 	max-width: none;
 }
+
+.thumbnail {
+    border-radius: 0px;
+}
+
 .thumbnail img {
-	max-width: 100% !important
+	max-width: 100% !important;
+    width: 100%;
 }
 
 #mapCanvas img {
   max-width: none !important;
+}
+
+.btn-group .dropdown-backdrop {
+    display: none;
 }
 
 /* loading animation for iframes and content pages */
@@ -48,14 +58,18 @@ iframe, .content-column-body {
   transform: translate(-300px, 0) scale(4);
   font-size: 23px;
   direction: ltr;
-  cursor: pointer; 
+  cursor: pointer;
 }
 
 
 /*tree legacy icon*/
-.legacy-custom-file{
-  width: 16px; height: 16px; margin-right: 11px; display: inline-block;
+.legacy-custom-file {
+  width: 16px;
+  height: 16px;
+  min-width: 20px; /* this ensure the icon takes up same space as font-icon (20px) */
+  display: inline-block;
   background-position: center center;
+  background-repeat: no-repeat;
 }
 
 /*
@@ -67,4 +81,141 @@ iframe, .content-column-body {
 }
 .icon-chevron-down:before {
 	content: "\e0c9";
+}
+
+
+/* Styling for validation in Public Access */
+
+.pa-umb-overlay {
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.pa-umb-overlay + .pa-umb-overlay {
+    padding-top: 30px;
+    border-top: 1px solid @grayLight;
+}
+
+.pa-select-type {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+
+    margin-top: 15px;
+}
+
+.pa-select-type label {
+    padding: 0 20px;
+}
+
+.pa-access-header {
+    font-weight: bold;
+    margin: 0 0 3px 0;
+    padding-bottom: 0;
+}
+
+.pa-access-description {
+    color: #b3b3b3;
+    margin: 0;
+}
+
+.pa-validation-message {
+    padding: 6px 12px !important;
+    margin: 5px 0 0 0 !important;
+    display: inline-block;
+}
+
+.pa-select-pages label {
+    margin: 0;
+    font-size: 15px;
+}
+
+.pa-select-pages label + .controls-row {
+    padding-top: 0;
+}
+
+.pa-select-pages .umb-detail {
+    font-size: 13px;
+    margin: 2px 0 5px;
+}
+
+.pa-choose-page a {
+    color: @blue;
+    font-size: 15px;
+}
+
+.pa-choose-page a:hover, .pa-choose-page a:active, .pa-choose-page a:focus {
+    color: @blueDark;
+    text-decoration: none;
+}
+
+.pa-choose-page a:before {
+    content:"+";
+    margin-right: 3px;
+    font-weight: bold;
+}
+
+.pa-choose-page .treePickerTitle {
+    font-weight: bold;
+    font-size: 13px;
+    font-style: italic;
+    background: whitesmoke;
+    padding: 3px 5px;
+    color: grey;
+
+    border-bottom: none;
+}
+
+
+.pa-form + .pa-form {
+    margin-top: 10px;
+}
+
+
+// The below adds a default selector to all pre elements to ensure that styles are applied 
+// without having to add the class ".code" to the element. Styles have been created by 
+// combining the various declarations from the Bootstrap code.less file and fixing some mistakes
+// in Bootstrap 2.
+// This fixes issues with the markdown editor preview and should not cause issues with any other editor. 
+
+// Inline code
+// 1: Revert border radius to match look and feel of 7.4+
+code{
+  .border-radius(@baseBorderRadius); // 1
+}
+
+// Blocks of code
+// 1: Wrapping code is unreadable on small devices.
+pre {
+  display: block;
+  padding: (@baseLineHeight - 1) / 2;
+  margin: 0 0 @baseLineHeight / 2;
+  #font > #family > .monospace;
+  font-size: @baseFontSize - 1; // 14px to 13px
+  color: @grayDark;
+  line-height: @baseLineHeight;
+  white-space: pre; // 1
+  overflow-x: auto; // 1
+  background-color: #f5f5f5;
+  border: 1px solid #ccc; // fallback for IE7-8
+  border: 1px solid rgba(0,0,0,.15);
+  .border-radius(@baseBorderRadius);
+
+
+  // Make prettyprint styles more spaced out for readability
+  &.prettyprint {
+    margin-bottom: @baseLineHeight;
+  }
+
+  // Account for some code outputs that place code tags in pre tags
+  code {
+    padding: 0;
+    white-space: pre; // 1 
+    word-wrap: normal; // 1
+    background-color: transparent;
+    border: 0;
+  }
 }

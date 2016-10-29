@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Security;
 
@@ -266,7 +267,7 @@ namespace Umbraco.Core.Services
                 //should never be null but it could have been deleted by another thread.
                 user.RawPasswordValue = result.RawPasswordValue;
                 user.LastPasswordChangeDate = result.LastPasswordChangeDate;
-                user.UpdateDate = user.UpdateDate;
+                user.UpdateDate = result.UpdateDate;
             }
         }
 
@@ -503,6 +504,15 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
                 return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
+            }
+        }
+
+        internal IEnumerable<IUser> GetNextUsers(int id, int count)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = (UserRepository) RepositoryFactory.CreateUserRepository(uow))
+            {
+                return repository.GetNextUsers(id, count);
             }
         }
 

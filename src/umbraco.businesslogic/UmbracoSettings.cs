@@ -103,6 +103,14 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Enable the UI and API to allow back-office users to reset their passwords? Default is true
+        /// </summary>
+        public static bool AllowPasswordReset
+        {
+            get { return UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset; }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the logs will be auto cleaned
         /// </summary>
         /// <value><c>true</c> if logs are to be automatically cleaned; otherwise, <c>false</c></value>
@@ -607,6 +615,17 @@ namespace umbraco
         public static string DefaultDocumentTypeProperty
         {
             get { return UmbracoConfig.For.UmbracoSettings().Content.DefaultDocumentTypeProperty; }
+        }
+
+        /// <summary>
+        /// Enables inherited document types.
+        /// This feature is not recommended and therefore is not enabled by default in new installations.
+        /// Inherited document types will not be supported in v8.
+        /// </summary>
+        //[Obsolete("This will not be supported in v8")]
+        public static bool EnableInheritedDocumentTypes
+        {
+            get { return UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes; }
         }
 
         private static string _path;

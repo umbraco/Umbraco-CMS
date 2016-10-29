@@ -58,7 +58,7 @@ namespace Umbraco.Web
 		/// <param name="cacheHelper"></param>
 		public static void ClearPartialViewCache(this CacheHelper cacheHelper)
 		{
-			cacheHelper.ClearCacheByKeySearch(PartialViewCacheKey);
+			cacheHelper.RuntimeCache.ClearCacheByKeySearch(PartialViewCacheKey);
 		}
 	}
 }

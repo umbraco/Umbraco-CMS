@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -32,7 +33,6 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplatesSection _templateConfig;
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
-        private readonly RepositoryCacheOptions _cacheOptions;
 
         internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
             : base(work, cache, logger, sqlSyntax)
@@ -41,41 +41,27 @@ namespace Umbraco.Core.Persistence.Repositories
             _viewsFileSystem = viewFileSystem;
             _templateConfig = templateConfig;
             _viewHelper = new ViewHelper(_viewsFileSystem);
-            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
-
-            _cacheOptions = new RepositoryCacheOptions
-            {
-                //Allow a zero count cache entry because GetAll() gets used quite a lot and we want to ensure
-                // if there are no templates, that it doesn't keep going to the db.
-                GetAllCacheAllowZeroCount = true,
-                //GetAll gets called a lot, we want to ensure that all templates are in the cache, default is 100 which
-                // would normally be fine but we'll increase it in case people have a ton of templates.
-                GetAllCacheThresholdLimit = 500
-            };
+            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);            
         }
 
 
-        /// <summary>
-        /// Returns the repository cache options
-        /// </summary>
-        protected override RepositoryCacheOptions RepositoryCacheOptions
+        private FullDataSetRepositoryCachePolicyFactory<ITemplate, int> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<ITemplate, int> CachePolicyFactory
         {
-            get { return _cacheOptions; }
+            get
+            {
+                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ITemplate, int>(
+                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
+            }
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>
 
         protected override ITemplate PerformGet(int id)
         {
-            var sql = GetBaseQuery(false).Where<TemplateDto>(x => x.NodeId == id);
-            var result = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
-            if (result == null) return null;
-
-            //look up the simple template definitions that have a master template assigned, this is used 
-            // later to populate the template item's properties
-            var childIds = GetAxisDefinitions(result).ToArray();
-
-            return MapFromDto(result, childIds);
+            //use the underlying GetAll which will force cache all templates
+            return base.GetAll().FirstOrDefault(x => x.Id == id);
         }
 
         protected override IEnumerable<ITemplate> PerformGetAll(params int[] ids)
@@ -479,126 +465,102 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ITemplate Get(string alias)
         {
-            var sql = GetBaseQuery(false).Where<TemplateDto>(x => x.Alias == alias);
-
-            var dto = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            return MapFromDto(dto, GetAxisDefinitions(dto).ToArray());
+            return GetAll(alias).FirstOrDefault();
         }
 
         public IEnumerable<ITemplate> GetAll(params string[] aliases)
         {
-            var sql = GetBaseQuery(false);
+            //We must call the base (normal) GetAll method
+            // which is cached. This is a specialized method and unfortunatley with the params[] it
+            // overlaps with the normal GetAll method.
+            if (aliases.Any() == false) return base.GetAll();
 
-            if (aliases.Any())
-            {
-                sql.Where("cmsTemplate.alias IN (@aliases)", new {aliases = aliases});
-            }
-
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
-            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
-
-            var axisDefos = GetAxisDefinitions(dtos).ToArray();
-            return dtos.Select(x => MapFromDto(x, axisDefos));
+            //return from base.GetAll, this is all cached
+            return base.GetAll().Where(x => aliases.InvariantContains(x.Alias));
         }
 
         public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
         {
-            var sql = GetBaseQuery(false);         
-            if (masterTemplateId <= 0)
-            {
-                sql.Where<NodeDto>(x => x.ParentId <= 0);
-            }
-            else
-            {
-                sql.Where<NodeDto>(x => x.ParentId == masterTemplateId);
-            }
+            //return from base.GetAll, this is all cached
+            var all = base.GetAll().ToArray();
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
-            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
+            if (masterTemplateId <= 0) return all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
 
-            var axisDefos = GetAxisDefinitions(dtos).ToArray();
-            return dtos.Select(x => MapFromDto(x, axisDefos));
+            var parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+            if (parent == null) return Enumerable.Empty<ITemplate>();
+
+            var children = all.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
+            return children;
         }
 
         public IEnumerable<ITemplate> GetChildren(string alias)
         {
-            var sql = GetBaseQuery(false);
-            if (alias.IsNullOrWhiteSpace())
-            {
-                sql.Where<NodeDto>(x => x.ParentId <= 0);
-            }
-            else
-            {
-                //unfortunately SQLCE doesn't support scalar subqueries in the where clause, otherwise we could have done this
-                // in a single query, now we have to lookup the path to acheive the same thing
-                var parent = Database.ExecuteScalar<int?>(new Sql().Select("nodeId").From<TemplateDto>(SqlSyntax).Where<TemplateDto>(dto => dto.Alias == alias));
-                if (parent.HasValue == false) return Enumerable.Empty<ITemplate>();
-
-                sql.Where<NodeDto>(x => x.ParentId == parent.Value);
-            }
-
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
-            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
-
-            var axisDefos = GetAxisDefinitions(dtos).ToArray();
-            return dtos.Select(x => MapFromDto(x, axisDefos));
+            //return from base.GetAll, this is all cached
+            return base.GetAll().Where(x => alias.IsNullOrWhiteSpace()
+                ? x.MasterTemplateAlias.IsNullOrWhiteSpace()
+                : x.MasterTemplateAlias.InvariantEquals(alias));
         }
 
         public IEnumerable<ITemplate> GetDescendants(int masterTemplateId)
         {
-            var sql = GetBaseQuery(false);
+            //return from base.GetAll, this is all cached
+            var all = base.GetAll().ToArray();
+            var descendants = new List<ITemplate>();
             if (masterTemplateId > 0)
             {
-                //unfortunately SQLCE doesn't support scalar subqueries in the where clause, otherwise we could have done this
-                // in a single query, now we have to lookup the path to acheive the same thing
-                var path = Database.ExecuteScalar<string>(
-                    new Sql().Select(SqlSyntax.GetQuotedColumnName("path"))
-                        .From<TemplateDto>(SqlSyntax)
-                        .InnerJoin<NodeDto>(SqlSyntax)
-                        .On<TemplateDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
-                        .Where<NodeDto>(dto => dto.NodeId == masterTemplateId));
-
-                if (path.IsNullOrWhiteSpace()) return Enumerable.Empty<ITemplate>();
-
-                sql.Where(@"(umbracoNode." + SqlSyntax.GetQuotedColumnName("path") + @" LIKE @query)", new { query = path + ",%" });
+                var parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+                if (parent == null) return Enumerable.Empty<ITemplate>();
+                //recursively add all children with a level
+                AddChildren(all, descendants, parent.Alias);
+            }
+            else
+            {
+                descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
+                foreach (var parent in descendants)
+                {
+                    //recursively add all children with a level
+                    AddChildren(all, descendants, parent.Alias);
+                }
             }
 
-            sql.OrderBy("umbracoNode." + SqlSyntax.GetQuotedColumnName("level"));
-
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
-            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
-
-            var axisDefos = GetAxisDefinitions(dtos).ToArray();
-            return dtos.Select(x => MapFromDto(x, axisDefos));
-
+            //return the list - it will be naturally ordered by level
+            return descendants;
         }
-
+        
         public IEnumerable<ITemplate> GetDescendants(string alias)
         {
-            var sql = GetBaseQuery(false);
+            var all = base.GetAll().ToArray();
+            var descendants = new List<ITemplate>();
             if (alias.IsNullOrWhiteSpace() == false)
             {
-                //unfortunately SQLCE doesn't support scalar subqueries in the where clause, otherwise we could have done this
-                // in a single query, now we have to lookup the path to acheive the same thing
-                var path = Database.ExecuteScalar<string>(
-                    "SELECT umbracoNode.path FROM cmsTemplate INNER JOIN umbracoNode ON cmsTemplate.nodeId = umbracoNode.id WHERE cmsTemplate.alias = @alias", new { alias = alias });
-
-                if (path.IsNullOrWhiteSpace()) return Enumerable.Empty<ITemplate>();
-
-                sql.Where(@"(umbracoNode." + SqlSyntax.GetQuotedColumnName("path") + @" LIKE @query)", new {query = path + ",%" });
+                var parent = all.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+                if (parent == null) return Enumerable.Empty<ITemplate>();
+                //recursively add all children
+                AddChildren(all, descendants, parent.Alias);
             }
+            else
+            {
+                descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
+                foreach (var parent in descendants)
+                {
+                    //recursively add all children with a level
+                    AddChildren(all, descendants, parent.Alias);
+                }
+            }
+            //return the list - it will be naturally ordered by level
+            return descendants;
+        }
 
-            sql.OrderBy("umbracoNode." + SqlSyntax.GetQuotedColumnName("level"));
-
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
-            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
-
-            var axisDefos = GetAxisDefinitions(dtos).ToArray();
-            return dtos.Select(x => MapFromDto(x, axisDefos));
+        private void AddChildren(ITemplate[] all, List<ITemplate> descendants, string masterAlias)
+        {
+            var c = all.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
+            descendants.AddRange(c);
+            if (c.Any() == false) return;
+            //recurse through all children
+            foreach (var child in c)
+            {
+                AddChildren(all, descendants, child.Alias);
+            }
         }
 
         /// <summary>
@@ -610,9 +572,9 @@ namespace Umbraco.Core.Persistence.Repositories
         public TemplateNode GetTemplateNode(string alias)
         {            
             //first get all template objects
-            var allTemplates = GetAll().ToArray();
+            var allTemplates = base.GetAll().ToArray();
 
-            var selfTemplate = allTemplates.SingleOrDefault(x => x.Alias == alias);
+            var selfTemplate = allTemplates.SingleOrDefault(x => x.Alias.InvariantEquals(alias));
             if (selfTemplate == null)
             {
                 return null;
@@ -621,11 +583,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var top = selfTemplate;
             while (top.MasterTemplateAlias.IsNullOrWhiteSpace() == false)
             {
-                top = allTemplates.Single(x => x.Alias == top.MasterTemplateAlias);
+                top = allTemplates.Single(x => x.Alias.InvariantEquals(top.MasterTemplateAlias));
             }
 
             var topNode = new TemplateNode(allTemplates.Single(x => x.Id == top.Id));
-            var childTemplates = allTemplates.Where(x => x.MasterTemplateAlias == top.Alias);
+            var childTemplates = allTemplates.Where(x => x.MasterTemplateAlias.InvariantEquals(top.Alias));
             //This now creates the hierarchy recursively
             topNode.Children = CreateChildren(topNode, childTemplates, allTemplates);
 
@@ -633,10 +595,11 @@ namespace Umbraco.Core.Persistence.Repositories
             return FindTemplateInTree(topNode, alias);
         }
 
+        [Obsolete("Only used by obsolete code")]
         private static TemplateNode WalkTree(TemplateNode current, string alias)
         {
             //now walk the tree to find the node
-            if (current.Template.Alias == alias)
+            if (current.Template.Alias.InvariantEquals(alias))
             {
                 return current;
             }
@@ -682,14 +645,16 @@ namespace Umbraco.Core.Persistence.Repositories
         public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
         {
             var engine = _templateConfig.DefaultRenderingEngine;
-
-            if (template.Content.IsNullOrWhiteSpace() == false && MasterPageHelper.IsMasterPageSyntax(template.Content))
+            var viewHelper = new ViewHelper(_viewsFileSystem);
+            if (viewHelper.ViewExists(template) == false)
             {
-                //there is a design but its definitely a webforms design
-                return RenderingEngine.WebForms;
+                if (template.Content.IsNullOrWhiteSpace() == false && MasterPageHelper.IsMasterPageSyntax(template.Content))
+                {
+                    //there is a design but its definitely a webforms design and we haven't got a MVC view already for it
+                    return RenderingEngine.WebForms;
+                }
             }
 
-            var viewHelper = new ViewHelper(_viewsFileSystem);
             var masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
 
             switch (engine)
@@ -766,7 +731,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 //get this node's children
                 var local = childTemplate;
-                var kids = allTemplates.Where(x => x.MasterTemplateAlias == local.Alias);
+                var kids = allTemplates.Where(x => x.MasterTemplateAlias.InvariantEquals(local.Alias));
 
                 //recurse
                 child.Children = CreateChildren(child, kids, allTemplates);
@@ -796,7 +761,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private bool AliasAlreadExists(ITemplate template)
         {
-            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias == template.Alias && x.NodeId != template.Id);
+            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
             var count = Database.ExecuteScalar<int>(sql);
             return count > 0;
         }

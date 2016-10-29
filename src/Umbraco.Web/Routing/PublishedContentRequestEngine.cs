@@ -84,6 +84,11 @@ namespace Umbraco.Web.Routing
 			//   so that they point to a non-existing page eg /redirect-404.aspx
 			//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
 
+            // trigger the Preparing event - at that point anything can still be changed
+            // the idea is that it is possible to change the uri
+            //
+		    _pcr.OnPreparing();
+
 			//find domain
 			FindDomain();
 
@@ -515,11 +520,11 @@ namespace Umbraco.Web.Routing
 				{
 					// redirect to another page
                     var node = _routingContext.UmbracoContext.ContentCache.GetById(internalRedirectId);
-
-                    _pcr.SetInternalRedirectPublishedContent(node); // don't use .PublishedContent here
+                    
                     if (node != null)
 					{
-						redirect = true;
+                        _pcr.SetInternalRedirectPublishedContent(node); // don't use .PublishedContent here
+                        redirect = true;
 						ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
 					}
 					else

@@ -3,12 +3,18 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using ClientDependency.Core.Config;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web
 {
+    using Umbraco.Core.Configuration;
+
     /// <summary>
     /// HtmlHelper extensions for the back office
     /// </summary>
@@ -30,6 +36,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl)
         {
+            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
             var str = @"<script type=""text/javascript"">
                 var Umbraco = {};
                 Umbraco.Sys = {};
@@ -39,8 +46,13 @@ namespace Umbraco.Web
                         ""serverVarsJs"": """ + uri.GetUrlWithCacheBust("ServerVariables", "BackOffice") + @""",
                         ""externalLoginsUrl"": """ + externalLoginsUrl + @"""
                     },
+                    ""umbracoSettings"": {
+                        ""allowPasswordReset"": " + (UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset ? "true" : "false") + @"
+                    },
                     ""application"": {
-                        ""applicationPath"": """ + html.ViewContext.HttpContext.Request.ApplicationPath + @"""
+                        ""applicationPath"": """ + html.ViewContext.HttpContext.Request.ApplicationPath + @""",
+                        ""version"": """ + version + @""",
+                        ""cdf"": """ + ClientDependencySettings.Instance.Version + @"""
                     },
                     ""isDebuggingEnabled"" : " + html.ViewContext.HttpContext.IsDebuggingEnabled.ToString().ToLowerInvariant() + @"
                 };       
@@ -50,12 +62,12 @@ namespace Umbraco.Web
         }      
 
         /// <summary>
-        /// Used to render the script that will pass in the angular externalLoginInfo service on page load
+        /// Used to render the script that will pass in the angular "externalLoginInfo" service/value on page load
         /// </summary>
         /// <param name="html"></param>
         /// <param name="externalLoginErrors"></param>
         /// <returns></returns>
-        public static IHtmlString AngularExternalLoginInfoValuesScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
+        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
         {
             var loginProviders = html.ViewContext.HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
                 .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
@@ -83,6 +95,39 @@ namespace Umbraco.Web
             sb.AppendLine(@"errors: errors,");
             sb.Append(@"providers: ");
             sb.AppendLine(JsonConvert.SerializeObject(loginProviders));
+            sb.AppendLine(@"});");
+
+            return html.Raw(sb.ToString());
+        }
+
+        /// <summary>
+        /// Used to render the script that will pass in the angular "resetPasswordCodeInfo" service/value on page load
+        /// </summary>
+        /// <param name="html"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static IHtmlString AngularValueResetPasswordCodeInfoScript(this HtmlHelper html, object val)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine();
+            sb.AppendLine(@"var errors = [];");
+
+            var errors = val as IEnumerable<string>;
+            if (errors != null)
+            {
+                foreach (var error in errors)
+                {
+                    sb.AppendFormat(@"errors.push(""{0}"");", error).AppendLine();
+                }
+            }
+
+            var resetCodeModel = val as ValidatePasswordResetCodeModel;
+
+
+            sb.AppendLine(@"app.value(""resetPasswordCodeInfo"", {");
+            sb.AppendLine(@"errors: errors,");            
+            sb.Append(@"resetCodeModel: ");
+            sb.AppendLine(JsonConvert.SerializeObject(resetCodeModel));
             sb.AppendLine(@"});");
 
             return html.Raw(sb.ToString());

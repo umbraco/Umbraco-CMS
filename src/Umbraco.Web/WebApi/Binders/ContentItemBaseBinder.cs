@@ -162,18 +162,20 @@ namespace Umbraco.Web.WebApi.Binders
                 //finally, let's lookup the real content item and create the DTO item
                 model.PersistedContent = GetExisting(model);                
             }
-
+            
             //create the dto from the persisted model
             if (model.PersistedContent != null)
             {
-                model.ContentDto = MapFromPersisted(model);    
+                model.ContentDto = MapFromPersisted(model);  
             }
             if (model.ContentDto != null)
             {
                 //now map all of the saved values to the dto
                 MapPropertyValuesFromSaved(model, model.ContentDto);    
             }
-            
+
+            model.Name = model.Name.Trim();
+
             return model;
         }
 
@@ -184,9 +186,15 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="dto"></param>
         private static void MapPropertyValuesFromSaved(TModelSave saveModel, ContentItemDto<TPersisted> dto)
         {
-            foreach (var p in saveModel.Properties.Where(p => dto.Properties.Any(x => x.Alias == p.Alias)))
+            //NOTE: Don't convert this to linq, this is much quicker
+            foreach (var p in saveModel.Properties)
             {
-                dto.Properties.Single(x => x.Alias == p.Alias).Value = p.Value;
+                foreach (var propertyDto in dto.Properties)
+                {
+                    if (propertyDto.Alias != p.Alias) continue;
+                    propertyDto.Value = p.Value;                        
+                    break;
+                }
             }
         }
 

@@ -64,7 +64,7 @@ namespace Umbraco.Core.Dynamics
 	/// </summary>
 	public class DynamicXmlConverter : TypeConverter
 	{
-		public override bool CanConvertTo(ITypeDescriptorContext context, Type sourceType)
+		public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
 		{
 			var convertableTypes = new[]
 			    {
@@ -78,8 +78,8 @@ namespace Umbraco.Core.Dynamics
                     typeof(RawXmlDocument)
 			    };
 
-			return convertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, sourceType)) 
-			       || base.CanConvertFrom(context, sourceType);
+			return convertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, destinationType)) 
+			       || base.CanConvertFrom(context, destinationType);
 		}
 
 		public override object ConvertTo(

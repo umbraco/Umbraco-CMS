@@ -11,8 +11,12 @@ namespace Umbraco.Core.Macros
 	/// </summary>
 	internal class MacroTagParser
 	{
-        private static readonly Regex MacroRteContent = new Regex(@"(<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(\s*?-->)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static readonly Regex MacroPersistedFormat = new Regex(@"(<\?UMBRACO_MACRO (?:.+?)?macroAlias=[""']([^""\'\n\r]+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+	    private static readonly Regex MacroRteContent = new Regex(@"(<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(\s*?-->)",
+	        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
+
+	    private static readonly Regex MacroPersistedFormat =
+	        new Regex(@"(<\?UMBRACO_MACRO (?:.+?)??macroAlias=[""']([^""\'\n\r]+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)",
+	            RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
 	    /// <summary>
 	    /// This formats the persisted string to something useful for the rte so that the macro renders properly since we 

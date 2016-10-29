@@ -1,0 +1,35 @@
+<div class="btn-group umb-button">
+
+   <div class="icon-check umb-button__success" ng-class="{'-hidden': state !== 'success', '-white': style}"></div>
+
+   <div class="icon-delete umb-button__error" ng-class="{'-hidden': state !== 'error', '-white': style}"></div>
+
+   <div class="umb-button__progress" ng-class="{'-hidden': state !== 'busy', '-white': style}"></div>
+
+   <div ng-if="state !== 'init'" class="umb-button__overlay"></div>
+
+   <a ng-if="type === 'link'" href="{{href}}" class="btn umb-button__button {{style}}" ng-click="action(model)" hotkey="{{shortcut}}" hotkey-when-hidden="{{shortcutWhenHidden}}">
+      <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
+         <i ng-if="icon && buttonStyle==='link'" class="{{icon}} umb-button__icon"></i>
+         <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
+         <span ng-if="!labelKey">{{label}}</span>
+      </span>
+   </a>
+
+   <button ng-if="type === 'button'" type="button" class="btn umb-button__button {{style}}" ng-click="action(model)" hotkey="{{shortcut}}" hotkey-when-hidden="{{shortcutWhenHidden}}" ng-disabled="disabled">
+      <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
+         <i ng-if="icon && buttonStyle==='link'" class="{{icon}} umb-button__icon"></i>
+         <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
+         <span ng-if="!labelKey">{{label}}</span>
+      </span>
+   </button>
+
+   <button ng-if="type === 'submit'" type="submit" class="btn umb-button__button {{style}}" hotkey="{{shortcut}}" hotkey-when-hidden="{{shortcutWhenHidden}}" ng-disabled="disabled">
+      <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
+         <i ng-if="icon && buttonStyle==='link'" class="{{icon}} umb-button__icon"></i>
+         <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
+         <span ng-if="!labelKey">{{label}}</span>
+      </span>
+   </button>
+
+</div>

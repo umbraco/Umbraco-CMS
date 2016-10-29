@@ -4,7 +4,7 @@
 	ng-model="renderModel">	
 	<li ng-repeat="node in renderModel">
 
-		<i class="icon icon-delete red hover-show pull-right" ng-click="remove($index)"></i>
+		<a href="" class="hover-show pull-right"><i class="icon icon-delete red" ng-click="remove($index, $event)"></i></a>
 
 		<i class="icon {{node.icon}} hover-hide"></i>
 		<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
@@ -19,4 +19,12 @@
 		</a>
 	</li>
 </ul>
+
+<umb-overlay
+	ng-if="contentPickerOverlay.show"
+	model="contentPickerOverlay"
+	position="right"
+	view="contentPickerOverlay.view">
+</umb-overlay>
+
 </div>

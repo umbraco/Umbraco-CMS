@@ -70,7 +70,7 @@ namespace Umbraco.Web.Scheduling
 
                 try
                 {
-                    var result = await wc.SendAsync(request, token);
+                    var result = await wc.SendAsync(request, token).ConfigureAwait(false); // ConfigureAwait(false) is recommended? http://blog.stephencleary.com/2012/07/dont-block-on-async-code.html
                     return result.StatusCode == HttpStatusCode.OK;
                 }
                 catch (Exception ex)

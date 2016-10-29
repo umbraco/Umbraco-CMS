@@ -8,7 +8,9 @@ describe('contentEditingHelper tests', function () {
     //Only for 1.2: beforeEach(module('ngRoute'));
 
 
-    beforeEach(inject(function ($injector) {
+    beforeEach(inject(function ($injector, localizationMocks) {
+        localizationMocks.register();
+
         contentEditingHelper = $injector.get('contentEditingHelper');
         $routeParams = $injector.get('$routeParams');
         serverValidationManager = $injector.get('serverValidationManager');
@@ -108,7 +110,7 @@ describe('contentEditingHelper tests', function () {
             var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            formHelper.handleServerValidation({ "Property.bodyText": ["Required"] });
+            formHelper.handleServerValidation({ "_Properties.bodyText": ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -124,7 +126,7 @@ describe('contentEditingHelper tests', function () {
             var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            formHelper.handleServerValidation({ "Property.bodyText.value": ["Required"] });
+            formHelper.handleServerValidation({ "_Properties.bodyText.value": ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -144,8 +146,8 @@ describe('contentEditingHelper tests', function () {
                 {
                     "Name": ["Required"],
                     "UpdateDate": ["Invalid date"],
-                    "Property.bodyText.value": ["Required field"],
-                    "Property.textarea": ["Invalid format"]
+                    "_Properties.bodyText.value": ["Required field"],
+                    "_Properties.textarea": ["Invalid format"]
                 });
 
             //assert

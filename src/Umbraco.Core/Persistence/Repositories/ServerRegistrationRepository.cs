@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override int PerformCount(IQuery<IServerRegistration> query)
         {
-            throw new NotSupportedException("This repository does not support this method");
+            throw new NotSupportedException("This repository does not support this method.");
         }
 
         protected override bool PerformExists(int id)
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IServerRegistration> PerformGetByQuery(IQuery<IServerRegistration> query)
         {
-            throw new NotSupportedException("This repository does not support this method");
+            throw new NotSupportedException("This repository does not support this method.");
         }
 
         protected override Sql GetBaseQuery(bool isCount)

@@ -2,9 +2,9 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditor.LayoutConfigController",
     function ($scope) {
 
-    		$scope.currentLayout = $scope.dialogOptions.currentLayout;
-    		$scope.columns = $scope.dialogOptions.columns;
-    		$scope.rows = $scope.dialogOptions.rows;
+    		$scope.currentLayout = $scope.model.currentLayout;
+    		$scope.columns = $scope.model.columns;
+    		$scope.rows = $scope.model.rows;
 
     		$scope.scaleUp = function(section, max, overflow){
     		   var add = 1;
@@ -16,7 +16,7 @@ angular.module("umbraco")
     		};
 
     		$scope.scaleDown = function(section){
-    		   var remove = (section.grid > 1) ? 1 : section.grid;
+    		   var remove = (section.grid > 1) ? 1 : 0;
     		   section.grid = section.grid-remove;
     		};
 
@@ -49,9 +49,12 @@ angular.module("umbraco")
     		    $scope.currentSection = section;
     		};
 
-
-    		$scope.deleteSection = function(index){
-    		    $scope.currentTemplate.sections.splice(index, 1);
+    		$scope.deleteSection = function(section, template) {
+    			if ($scope.currentSection === section) {
+    				$scope.currentSection = undefined;
+    			}
+    			var index = template.sections.indexOf(section)
+    			template.sections.splice(index, 1);
     		};
     		
     		$scope.closeSection = function(){
