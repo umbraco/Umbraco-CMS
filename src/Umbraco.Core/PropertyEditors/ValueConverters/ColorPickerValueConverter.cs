@@ -1,8 +1,9 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using System;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    public class ColorPickerValueConverter : PropertyValueConverterBase
+    public class ColorPickerValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
@@ -13,6 +14,16 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             // make sure it's a string
             return source.ToString();
+        }
+
+        public Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof(string);
+        }
+
+        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
+        {
+            return PropertyCacheLevel.Content;
         }
     }
 }
