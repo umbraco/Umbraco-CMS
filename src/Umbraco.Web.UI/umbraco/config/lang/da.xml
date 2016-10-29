@@ -1146,4 +1146,21 @@ Mange hilsner fra Umbraco robotten
       <key alias="enterCustomValidation">...eller indtast din egen validering</key>
       <key alias="fieldIsMandatory">Feltet er påkrævet</key>
   </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">Slå URL tracker fra</key>
+    <key alias="enableUrlTracker">Slå URL tracker til</key>
+    <key alias="originalUrl">Original URL</key>
+    <key alias="redirectedTo">Omdirigeret til</key>
+    <key alias="noRedirects">Der er ikke oprettet nogen omdirigeringer</key>
+    <key alias="noRedirectsDescription">Når en publiceret side bliver omdøbt eller flyttet, vil der automatisk blive oprettet en omdirigering til den nye side.</key>
+    <key alias="removeButton">Fjern</key>
+    <key alias="confirmRemove">Er du sikker på du vil fjerne omdirigeringen fra '%0%' til '%1%'?</key>
+    <key alias="redirectRemoved">Omdirigering fjernet.</key>
+    <key alias="redirectRemoveError">Fejl ved fjernelse af omdirigering.</key>
+    <key alias="confirmDisable">Er du sikker på du vil slå URL trackeren fra?</key>
+    <key alias="disabledConfirm">URL trackeren er blevet slået fra.</key>
+    <key alias="disableError">Der skete en fejl ved frakobling af trackeren. Du kan hente mere information i logfilen.</key>
+    <key alias="enabledConfirm">URL trackeren er blevet slået til.</key>
+    <key alias="enableError">Der skete en fejl ved tilkobling af trackeren. Du kan hente mere information i logfilen.</key>
+  </area>
 </language>
