@@ -52,7 +52,7 @@ namespace Umbraco.Web.Cache
 
         private Attempt<IRuntimeCacheProvider> UserGroupPermissionsCache
         {
-            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<UserGroupEntityPermission>(); }
+            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
         }
     }
 }

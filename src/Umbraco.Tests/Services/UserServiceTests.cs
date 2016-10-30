@@ -93,7 +93,72 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Count());
             Assert.AreEqual(1, permissions.ElementAt(2).AssignedPermissions.Count());
         }
-        
+
+        [Test]
+        public void UserService_Get_UserGroup_Assigned_Permissions()
+        {
+            // Arrange
+            var userService = ServiceContext.UserService;
+            var userGroup = CreateTestUserGroup();
+
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            var content = new[]
+                {
+                    MockedContent.CreateSimpleContent(contentType),
+                    MockedContent.CreateSimpleContent(contentType),
+                    MockedContent.CreateSimpleContent(contentType)
+                };
+            ServiceContext.ContentService.Save(content);
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionBrowse.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionDelete.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionMove.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionBrowse.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionDelete.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(2), ActionBrowse.Instance.Letter, new int[] { userGroup.Id });
+
+            // Act
+            var permissions = userService.GetPermissions(userGroup, true, content.ElementAt(0).Id, content.ElementAt(1).Id, content.ElementAt(2).Id);
+
+            //assert
+            Assert.AreEqual(3, permissions.Count());
+            Assert.AreEqual(3, permissions.ElementAt(0).AssignedPermissions.Count());
+            Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Count());
+            Assert.AreEqual(1, permissions.ElementAt(2).AssignedPermissions.Count());
+        }
+
+        [Test]
+        public void UserService_Get_UserGroup_Assigned_And_Default_Permissions()
+        {
+            // Arrange
+            var userService = ServiceContext.UserService;
+            var userGroup = CreateTestUserGroup();
+
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            var content = new[]
+                {
+                    MockedContent.CreateSimpleContent(contentType),
+                    MockedContent.CreateSimpleContent(contentType),
+                    MockedContent.CreateSimpleContent(contentType)
+                };
+            ServiceContext.ContentService.Save(content);
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionBrowse.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionDelete.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionMove.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionBrowse.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionDelete.Instance.Letter, new int[] { userGroup.Id });
+
+            // Act
+            var permissions = userService.GetPermissions(userGroup, false, content.ElementAt(0).Id, content.ElementAt(1).Id, content.ElementAt(2).Id);
+
+            //assert
+            Assert.AreEqual(3, permissions.Count());
+            Assert.AreEqual(3, permissions.ElementAt(0).AssignedPermissions.Count());
+            Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Count());
+            Assert.AreEqual(17, permissions.ElementAt(2).AssignedPermissions.Count());
+        }
+
         [Test]
         public void Can_Delete_User()
         {
@@ -525,6 +590,17 @@ namespace Umbraco.Tests.Services
 
         private IUser CreateTestUser()
         {
+            var userGroup = CreateTestUserGroup();
+
+            var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
+            user.AddGroup(userGroup);
+            user.SetGroupsLoaded();
+            ServiceContext.UserService.Save(user);
+            return user;
+        }
+
+        private UserGroup CreateTestUserGroup()
+        {
             var userGroup = new UserGroup
             {
                 Id = 1,
@@ -535,12 +611,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.SaveUserGroup(userGroup);
             ServiceContext.UserService.AddSectionToAllUserGroups("content", 1);
             ServiceContext.UserService.AddSectionToAllUserGroups("media", 1);
-
-            var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
-            user.AddGroup(userGroup);
-            user.SetGroupsLoaded();
-            ServiceContext.UserService.Save(user);
-            return user;
+            return userGroup;
         }
     }
 }

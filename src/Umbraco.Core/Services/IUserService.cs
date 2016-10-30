@@ -72,6 +72,18 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
 
         /// <summary>
+        /// Get permissions set for a group and optional node Ids
+        /// </summary>
+        /// <param name="group">Group to retrieve permissions for</param>
+        /// <param name="directlyAssignedOnly">
+        /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
+        /// or fall back to the group's default permissions when nothing is directly assigned
+        /// </param>
+        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
+        IEnumerable<EntityPermission> GetPermissions(IUserGroup group, bool directlyAssignedOnly, params int[] nodeIds);
+
+        /// <summary>
         /// Gets the permissions for the provided user and path
         /// </summary>
         /// <param name="user">User to check permissions for</param>
@@ -84,8 +96,12 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="group">User to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
+        /// <param name="directlyAssignedOnly">
+        /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
+        /// or fall back to the group's default permissions when nothing is directly assigned
+        /// </param>
         /// <returns>String indicating permissions for provided user and path</returns>
-        string GetPermissionsForPath(IUserGroup group, string path);
+        string GetPermissionsForPath(IUserGroup group, string path, bool directlyAssignedOnly = true);
 
         /// <summary>
         /// Replaces the same permission set for a single group to any number of entities
