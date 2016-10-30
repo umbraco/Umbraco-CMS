@@ -212,7 +212,7 @@ namespace Umbraco.Core.Services
         public void MakeNew(string name, string alias, string icon)
         {
             var sections = GetSections();
-            var nextSortOrder = sections != null ? GetSections().Max(x => x.SortOrder) + 1 : 1;
+            var nextSortOrder = sections != null ? sections.Max(x => x.SortOrder) + 1 : 1;
             MakeNew(name, alias, icon, nextSortOrder);
         }
 
