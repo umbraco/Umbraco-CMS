@@ -66,41 +66,39 @@ namespace umbraco.dialogs
             }
 
             ht.Rows.Add(names);
-            
-            foreach (var u in BusinessLogic.User.getAll())
+
+            var userService = ApplicationContext.Current.Services.UserService;
+            foreach (var group in userService.GetAllUserGroups())
             {
-                // Not disabled users and not system account
-                if (u.Disabled == false && u.Id > 0)
-                {
-                    var hc = new HtmlTableCell("th")
-                        {
-                            InnerText = u.Name
-                        };
-                    hc.Style.Add("text-align", "center");
-                    hc.Style.Add("border", "none");
-                    names.Cells.Add(hc);
-
-                    foreach (var a in ActionsResolver.Current.Actions)
+                var hc = new HtmlTableCell("th")
                     {
-                        var chk = new CheckBox
-                            {
-                                //Each checkbox is named with the user _ permission alias so we can parse
-                                ID = u.Id + "_" + a.Letter                                
-                            };
+                        InnerText = group.Name
+                    };
+                hc.Style.Add("text-align", "center");
+                hc.Style.Add("border", "none");
+                names.Cells.Add(hc);
 
-                        if (a.CanBePermissionAssigned == false) continue;
-
-                        if (u.GetPermissions(_node.Path).IndexOf(a.Letter) > -1)
+                foreach (var a in ActionsResolver.Current.Actions)
+                {
+                    var chk = new CheckBox
                         {
-                            chk.Checked = true;
-                        }
+                            //Each checkbox is named with the group _ permission alias so we can parse
+                            ID = group.Id + "_" + a.Letter                                
+                        };
 
-                        var cell = new HtmlTableCell();
-                        cell.Style.Add("text-align", "center");
-                        cell.Controls.Add(chk);
+                    if (a.CanBePermissionAssigned == false) continue;
 
-                        _permissions[a.Alias].Cells.Add(cell);
+                    var permissions = userService.GetPermissionsForPath(group, _node.Path);
+                    if (permissions.Contains(a.Letter))
+                    {
+                        chk.Checked = true;
                     }
+
+                    var cell = new HtmlTableCell();
+                    cell.Style.Add("text-align", "center");
+                    cell.Controls.Add(chk);
+
+                    _permissions[a.Alias].Cells.Add(cell);
                 }
             }
 
@@ -116,11 +114,11 @@ namespace umbraco.dialogs
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            //get non disabled, non admin users and project to a dictionary, 
+            //get user groups and project to a dictionary, 
             // the string (value) portion will store the array of chars = their permissions
-            var usersPermissions = BusinessLogic.User.getAll()
-                                                .Where(user => user.Disabled == false && user.Id > 0)
-                                                .ToDictionary(user => user, user => "");
+            var userService = ApplicationContext.Current.Services.UserService;
+            var groupsPermissions = userService.GetAllUserGroups()
+                .ToDictionary(group => group, group => string.Empty);
             
             //iterate over each row which equals:
             // * a certain permission and the user's who will be allowed/denied that permission
@@ -137,18 +135,18 @@ namespace umbraco.dialogs
                     {
                         //now we will parse the checkbox ID which is the userId_permissionAlias
                         var split = chk.ID.Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
-                        //get the reference to the user
-                        var user = usersPermissions.Keys.Single(x => x.Id == int.Parse(split[0]));
+                        //get the reference to the group
+                        var group = groupsPermissions.Keys.Single(x => x.Id == int.Parse(split[0]));
                         //get the char permission
                         var permAlias = split[1];
                         //now append that char permission to the user
-                        usersPermissions[user] += permAlias;    
+                        groupsPermissions[group] += permAlias;    
                     }
                 }
             }
             
             // Loop through the users and update their permissions
-            foreach (var user in usersPermissions)
+            foreach (var user in groupsPermissions)
             {
                 //default to "-" for whatever reason (was here before so we'll leave it)
                 var cruds = "-";
@@ -165,8 +163,6 @@ namespace umbraco.dialogs
             feedback1.Text = ui.Text("rights") + " " + ui.Text("ok");
             PlaceHolder1.Visible = false;
             panel_buttons.Visible = false;
-
-
         }
 
         /// <summary>

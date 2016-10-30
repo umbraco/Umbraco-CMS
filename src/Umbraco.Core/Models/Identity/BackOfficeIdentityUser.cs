@@ -34,9 +34,8 @@ namespace Umbraco.Core.Models.Identity
         public int StartContentId { get; set; }
         public int StartMediaId { get; set; }
         public string[] AllowedSections { get; set; }
+        public string[] Groups { get; set; }
         public string Culture { get; set; }
-
-        public string UserTypeAlias { get; set; }
 
         /// <summary>
         /// Lockout is always enabled

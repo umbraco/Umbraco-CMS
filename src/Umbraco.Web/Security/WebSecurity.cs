@@ -66,8 +66,8 @@ namespace Umbraco.Web.Security
         {
             get
             {
-                //only load it once per instance!
-                if (_currentUser == null)
+                //only load it once per instance! (but make sure groups are loaded)
+                if (_currentUser == null || _currentUser.GroupsLoaded == false)
                 {
                     var id = GetUserId();
                     if (id == -1)
@@ -229,9 +229,6 @@ namespace Umbraco.Web.Security
             //if we already have a user object in Umbraco we don't need to do anything, otherwise we need to create a mapped Umbraco account.
             if (user != null) return user;
 
-            //we need to create an Umbraco IUser of a 'writer' type with access to only content - this was how v6 operates.
-            var writer = _applicationContext.Services.UserService.GetUserTypeByAlias("writer");
-            
             var email = membershipUser.Email;
             if (email.IsNullOrWhiteSpace())
             {
@@ -239,7 +236,7 @@ namespace Umbraco.Web.Security
                 email = Guid.NewGuid().ToString("N") + "@example.com";
             }
 
-            user = new Core.Models.Membership.User(writer)
+            user = new Core.Models.Membership.User
             {
                 Email = email,
                 Language = GlobalSettings.DefaultUILanguage,
@@ -251,7 +248,6 @@ namespace Umbraco.Web.Security
                 IsLockedOut = false,
                 IsApproved = true
             };
-            user.AddAllowedSection("content");
 
             _applicationContext.Services.UserService.Save(user);
 

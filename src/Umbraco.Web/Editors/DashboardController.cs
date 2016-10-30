@@ -37,13 +37,12 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.InternalServerError);
 
             var user = Security.CurrentUser;
-            var userType = user.UserType.Alias;
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
             var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
-            var url = string.Format(baseUrl + "{0}?section={0}&type={1}&allowed={2}&lang={3}&version={4}", section, userType, allowedSections, language, version);
-            var key = "umbraco-dynamic-dashboard-" + userType + language + allowedSections.Replace(",", "-") + section;
+            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}", section, allowedSections, language, version);
+            var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<JObject>(key);
             var result = new JObject();

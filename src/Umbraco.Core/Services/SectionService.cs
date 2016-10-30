@@ -184,7 +184,6 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Section> GetAllowedSections(int userId)
         {
-            
             var user = _userService.GetUserById(userId);
             if (user == null)
             {
@@ -250,7 +249,7 @@ namespace Umbraco.Core.Services
             {
                 //delete the assigned applications
                 _uowProvider.GetUnitOfWork().Database.Execute(
-                    "delete from umbracoUser2App where app = @appAlias",
+                    "delete from umbracoUserGroup2App where app = @appAlias",
                     new { appAlias = section.Alias });
 
                 //delete the assigned trees

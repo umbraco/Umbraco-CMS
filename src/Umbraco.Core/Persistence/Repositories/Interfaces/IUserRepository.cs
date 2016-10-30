@@ -23,10 +23,23 @@ namespace Umbraco.Core.Persistence.Repositories
         bool Exists(string username);
 
         /// <summary>
-        /// This is useful when an entire section is removed from config
+        /// Gets all groups for a given user
         /// </summary>
-        /// <param name="sectionAlias"></param>
-        IEnumerable<IUser> GetUsersAssignedToSection(string sectionAlias);
+        /// <param name="userId">Id of user</param>
+        /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
+        IEnumerable<IUserGroup> GetGroupsForUser(int userId);
+
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        IEnumerable<IUser> GetAllInGroup(int groupId);
+
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects not associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
         /// <summary>
         /// Gets paged member results
@@ -38,30 +51,5 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderBy"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
-        
-        
-        /// <summary>
-        /// Gets the user permissions for the specified entities
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="entityIds"></param>
-        /// <returns></returns>
-        IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds);
-
-        /// <summary>
-        /// Replaces the same permission set for a single user to any number of entities
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissions"></param>
-        /// <param name="entityIds"></param>
-        void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
-
-        /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permission"></param>
-        /// <param name="entityIds"></param>
-        void AssignUserPermission(int userId, char permission, params int[] entityIds);
     }
 }
