@@ -211,7 +211,9 @@ namespace Umbraco.Core.Services
         /// <param name="icon">The application icon, which has to be located in umbraco/images/tray folder.</param>
         public void MakeNew(string name, string alias, string icon)
         {
-            MakeNew(name, alias, icon, GetSections().Max(x => x.SortOrder) + 1);
+            var sections = GetSections();
+            var nextSortOrder = sections != null ? GetSections().Max(x => x.SortOrder) + 1 : 1;
+            MakeNew(name, alias, icon, nextSortOrder);
         }
 
         /// <summary>

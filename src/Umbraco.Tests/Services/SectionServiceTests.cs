@@ -29,6 +29,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.SectionService.MakeNew("Settings", "settings", "icon-settings");
             ServiceContext.SectionService.MakeNew("Developer", "developer", "icon-developer");
         }
+
         [Test]
         public void SectionService_Can_Get_Allowed_Sections_For_User()
         {
