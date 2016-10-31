@@ -411,19 +411,12 @@ namespace umbraco.cms.businesslogic.packager
                     #endregion
 
                     #region Macros
-                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("//macro"))
+                    var macroItemsElement = rootElement.Descendants("Macros").FirstOrDefault();
+                    if (macroItemsElement != null)
                     {
-                        //TODO: Fix this, this should not use the legacy API
-                        Macro m = Macro.Import(n);
-
-                        if (m != null)
-                        {
-                            insPack.Data.Macros.Add(m.Id.ToString(CultureInfo.InvariantCulture));
-                            //saveNeeded = true;
-                        }
+                        var insertedMacros = packagingService.ImportMacros(macroItemsElement);
+                        insPack.Data.Macros.AddRange(insertedMacros.Select(m => m.Id.ToString()));
                     }
-
-                    //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
                     #endregion
 
                     #region Templates
