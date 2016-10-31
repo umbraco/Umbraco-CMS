@@ -474,7 +474,7 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower(); // fixme - er... why?
 
-            MediaHelper.SetUploadFile(content, propertyTypeAlias, filename, value.InputStream);
+            FileSystemProviderManager.Current.MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, value.InputStream);
         }
 
         /// <summary>
@@ -519,7 +519,7 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower(); // fixme - er... why?
 
-            MediaHelper.SetUploadFile(content, propertyTypeAlias, filename, filestream);
+            FileSystemProviderManager.Current.MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, filestream);
         }
 
         /// <summary>
@@ -543,7 +543,7 @@ namespace Umbraco.Core.Models
             var propertyType = content.GetContentType()
                 .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null) throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
-            return MediaHelper.StoreFile(content, propertyType, filename, filestream, filepath);
+            return FileSystemProviderManager.Current.MediaFileSystem.StoreFile(content, propertyType, filename, filestream, filepath);
         }
 
         #endregion

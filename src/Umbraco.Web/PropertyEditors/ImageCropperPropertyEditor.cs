@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
@@ -36,6 +37,12 @@ namespace Umbraco.Web.PropertyEditors
                 };
         }
 
+        private static MediaFileSystem MediaFileSystem
+        {
+            // v8 will get rid of singletons
+            get { return FileSystemProviderManager.Current.MediaFileSystem; }
+        }
+
         /// <summary>
         /// Creates the corresponding property value editor.
         /// </summary>
@@ -43,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors
         protected override PropertyValueEditor CreateValueEditor()
         {
             var baseEditor = base.CreateValueEditor();
-            return new ImageCropperPropertyValueEditor(baseEditor);
+            return new ImageCropperPropertyValueEditor(baseEditor, MediaFileSystem);
         }
 
         /// <summary>
@@ -100,14 +107,12 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="properties">The properties that were deleted.</param>
         static IEnumerable<string> GetFilesToDelete(IEnumerable<Property> properties)
         {
-            var fs = MediaHelper.FileSystem;
-
             return properties.Where(x => IsCropperField(x, true)).Select(x =>
             {
                 var jo = GetJObject((string) x.Value, true);
                 if (jo == null || jo["src"] == null) return null;
                 var src = jo["src"].Value<string>();
-                return string.IsNullOrWhiteSpace(src) ? null : fs.GetRelativePath(src);
+                return string.IsNullOrWhiteSpace(src) ? null : MediaFileSystem.GetRelativePath(src);
             }).WhereNotNull();
         }
 
@@ -123,7 +128,6 @@ namespace Umbraco.Web.PropertyEditors
 
             // copy files
             var isUpdated = false;
-            var fs = MediaHelper.FileSystem;
             foreach (var property in properties)
             {
                 var jo = GetJObject((string) property.Value, true);
@@ -132,9 +136,9 @@ namespace Umbraco.Web.PropertyEditors
                 var src = jo["src"].Value<string>();
                 if (string.IsNullOrWhiteSpace(src)) continue;
 
-                var sourcePath = fs.GetRelativePath(src);
-                var copyPath = MediaHelper.CopyFile(args.Copy, property.PropertyType, sourcePath);
-                jo["src"] = fs.GetUrl(copyPath);
+                var sourcePath = MediaFileSystem.GetRelativePath(src);
+                var copyPath = MediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
+                jo["src"] = MediaFileSystem.GetUrl(copyPath);
                 args.Copy.SetValue(property.Alias, jo.ToString());
                 isUpdated = true;
             }
@@ -183,17 +187,16 @@ namespace Umbraco.Web.PropertyEditors
         static void AutoFillProperties(IContentBase content)
         {
             var properties = content.Properties.Where(x => IsCropperField(x, false));
-            var fs = MediaHelper.FileSystem;
 
             foreach (var property in properties)
             {
-                var autoFillConfig = UploadAutoFillProperties.GetConfig(property.Alias);
+                var autoFillConfig = MediaFileSystem.UploadAutoFillProperties.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
                 var svalue = property.Value as string;
                 if (string.IsNullOrWhiteSpace(svalue))
                 {
-                    UploadAutoFillProperties.Reset(content, autoFillConfig);
+                    MediaFileSystem.UploadAutoFillProperties.Reset(content, autoFillConfig);
                     continue;
                 }
 
@@ -218,9 +221,9 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 if (src == null)
-                    UploadAutoFillProperties.Reset(content, autoFillConfig);
+                    MediaFileSystem.UploadAutoFillProperties.Reset(content, autoFillConfig);
                 else
-                    UploadAutoFillProperties.Populate(content, autoFillConfig, fs.GetRelativePath(src));
+                    MediaFileSystem.UploadAutoFillProperties.Populate(content, autoFillConfig, MediaFileSystem.GetRelativePath(src));
             }            
         }
 

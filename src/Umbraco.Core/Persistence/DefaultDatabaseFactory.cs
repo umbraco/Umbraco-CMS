@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence
 	    private readonly ILogger _logger;
 	    public string ConnectionString { get; private set; }
         public string ProviderName { get; private set; }
-        
+
         // NO! see notes in v8 HybridAccessorBase
         //[ThreadStatic]
         //private static volatile UmbracoDatabase _nonHttpInstance;

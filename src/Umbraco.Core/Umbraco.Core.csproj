@@ -146,6 +146,7 @@
     <Compile Include="Attempt{T}.cs" />
     <Compile Include="Auditing\Audit.cs" />
     <Compile Include="Auditing\AuditTypes.cs" />
+    <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
@@ -356,6 +357,7 @@
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
+    <Compile Include="ICompletable.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="IO\ShadowFileSystem.cs" />
     <Compile Include="IO\ShadowFileSystemsScope.cs" />
@@ -371,7 +373,7 @@
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
-    <Compile Include="Media\MediaHelper.cs" />
+    <Compile Include="Media\ImageExtensions.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
@@ -581,7 +583,6 @@
     <Compile Include="Manifest\ParameterEditorConverter.cs" />
     <Compile Include="Manifest\PreValueFieldConverter.cs" />
     <Compile Include="Manifest\PropertyEditorConverter.cs" />
-    <Compile Include="Media\ImageHelper.cs" />
     <Compile Include="ModelMapperHelper.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />

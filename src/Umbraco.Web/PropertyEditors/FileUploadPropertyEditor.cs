@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Media;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -14,6 +14,12 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
     public class FileUploadPropertyEditor : PropertyEditor, IApplicationEventHandler
     {
+        private static MediaFileSystem MediaFileSystem
+        {
+            // v8 will get rid of singletons
+            get { return FileSystemProviderManager.Current.MediaFileSystem; }
+        }
+
         /// <summary>
         /// Creates the corresponding property value editor.
         /// </summary>
@@ -22,7 +28,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             var baseEditor = base.CreateValueEditor();            
             baseEditor.Validators.Add(new UploadFileTypeValidator());
-            return new FileUploadPropertyValueEditor(baseEditor);
+            return new FileUploadPropertyValueEditor(baseEditor, MediaFileSystem);
         }
 
         /// <summary>
@@ -55,11 +61,9 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="properties">The properties that were deleted.</param>
         static IEnumerable<string> GetFilesToDelete(IEnumerable<Property> properties)
         {
-            var fs = MediaHelper.FileSystem;
-            
             return properties
                 .Where(x => IsUploadField(x, true))
-                .Select(x => fs.GetRelativePath((string) x.Value))
+                .Select(x => MediaFileSystem.GetRelativePath((string) x.Value))
                 .ToList();
         }
 
@@ -75,12 +79,11 @@ namespace Umbraco.Web.PropertyEditors
 
             // copy files
             var isUpdated = false;
-            var fs = MediaHelper.FileSystem;
             foreach (var property in properties)
             {
-                var sourcePath = fs.GetRelativePath((string) property.Value);
-                var copyPath = MediaHelper.CopyFile(args.Copy, property.PropertyType, sourcePath);
-                args.Copy.SetValue(property.Alias, fs.GetUrl(copyPath));
+                var sourcePath = MediaFileSystem.GetRelativePath((string) property.Value);
+                var copyPath = MediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
+                args.Copy.SetValue(property.Alias, MediaFileSystem.GetUrl(copyPath));
                 isUpdated = true;
             }
 
@@ -128,18 +131,17 @@ namespace Umbraco.Web.PropertyEditors
         static void AutoFillProperties(IContentBase content)
         {
             var properties = content.Properties.Where(x => IsUploadField(x, false));
-            var fs = MediaHelper.FileSystem;
 
             foreach (var property in properties)
             {
-                var autoFillConfig = UploadAutoFillProperties.GetConfig(property.Alias);
+                var autoFillConfig = MediaFileSystem.UploadAutoFillProperties.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
                 var svalue = property.Value as string;
                 if (string.IsNullOrWhiteSpace(svalue))
-                    UploadAutoFillProperties.Reset(content, autoFillConfig);
+                    MediaFileSystem.UploadAutoFillProperties.Reset(content, autoFillConfig);
                 else
-                    UploadAutoFillProperties.Populate(content, autoFillConfig, fs.GetRelativePath(svalue));
+                    MediaFileSystem.UploadAutoFillProperties.Populate(content, autoFillConfig, MediaFileSystem.GetRelativePath(svalue));
             }            
         }
 

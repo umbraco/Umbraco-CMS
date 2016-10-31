@@ -104,11 +104,11 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private HttpResponseMessage GetResized(string imagePath, int width, string sizeName)
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.MediaFileSystem;
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
-            if (ImageHelper.IsImageFile(ext) == false)
+            if (fs.IsImageFile(ext) == false)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file

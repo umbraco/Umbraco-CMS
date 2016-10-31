@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Media;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
-using umbraco;
-using umbraco.cms.businesslogic.Files;
-using Umbraco.Core;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -24,9 +16,13 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class FileUploadPropertyValueEditor : PropertyValueEditorWrapper
     {
-        public FileUploadPropertyValueEditor(PropertyValueEditor wrapped) 
+        private readonly MediaFileSystem _mediaFileSystem;
+
+        public FileUploadPropertyValueEditor(PropertyValueEditor wrapped, MediaFileSystem mediaFileSystem)
             : base(wrapped)
-        { }
+        {
+            _mediaFileSystem = mediaFileSystem;
+        }
 
         /// <summary>
         /// Converts the value received from the editor into the value can be stored in the database.
@@ -65,17 +61,16 @@ namespace Umbraco.Web.PropertyEditors
                 return currentValue;
 
             // get the current file paths
-            var fs = MediaHelper.FileSystem;
             var currentPaths = currentValue.ToString()
                 .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => fs.GetRelativePath(x)) // get the fs-relative path
+                .Select(x => _mediaFileSystem.GetRelativePath(x)) // get the fs-relative path
                 .ToArray();
 
             // if clearing, remove these files and return
             if (clears)
             {
                 foreach (var pathToRemove in currentPaths)
-                    ImageHelper.DeleteFile(fs, pathToRemove, true);
+                    _mediaFileSystem.DeleteFile(pathToRemove, true);
                 return string.Empty; // no more files
             }
 
@@ -108,19 +103,19 @@ namespace Umbraco.Web.PropertyEditors
                 // get the filepath
                 // in case we are using the old path scheme, try to re-use numbers (bah...)
                 var reuse = i < currentPaths.Length ? currentPaths[i] : null; // this would be WRONG with many files
-                var filepath = MediaHelper.GetMediaPath(file.FileName, reuse, cuid, puid); // fs-relative path
+                var filepath = _mediaFileSystem.GetMediaPath(file.FileName, reuse, cuid, puid); // fs-relative path
 
                 using (var filestream = File.OpenRead(file.TempFilePath))
                 {
-                    fs.AddFile(filepath, filestream, true); // must overwrite!
+                    _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
 
-                    var ext = fs.GetExtension(filepath);
-                    if (ImageHelper.IsImageFile(ext))
+                    var ext = _mediaFileSystem.GetExtension(filepath);
+                    if (_mediaFileSystem.IsImageFile(ext))
                     {
                         var preValues = editorValue.PreValues.FormatAsDictionary();
                         var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
                         using (var image = Image.FromStream(filestream))
-                            ImageHelper.GenerateThumbnails(fs, image, filepath, sizes);
+                            _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
                     }
 
                     // all related properties (auto-fill) are managed by FileUploadPropertyEditor
@@ -136,10 +131,10 @@ namespace Umbraco.Web.PropertyEditors
 
             // remove files that are not there anymore
             foreach (var pathToRemove in currentPaths.Except(newPaths))
-                ImageHelper.DeleteFile(fs, pathToRemove, true);
+                _mediaFileSystem.DeleteFile(pathToRemove, true);
 
 
-            return string.Join(",", newPaths.Select(x => fs.GetUrl(x)));
+            return string.Join(",", newPaths.Select(x => _mediaFileSystem.GetUrl(x)));
         }
     }
 }

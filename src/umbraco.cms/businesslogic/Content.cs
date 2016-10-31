@@ -632,7 +632,7 @@ namespace umbraco.cms.businesslogic
                     }
                     else
                     {
-                        ImageHelper.DeleteFile(fs, relativeFilePath, true);
+                        fs.DeleteFile(relativeFilePath, true);
                     }
                 }
             }

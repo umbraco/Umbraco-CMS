@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Umbraco.Core.IO
 {
-    public class ShadowFileSystem : IFileSystem2
+    internal class ShadowFileSystem : IFileSystem2
     {
         private readonly IFileSystem _fs;
         private readonly IFileSystem2 _sfs;

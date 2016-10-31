@@ -119,7 +119,7 @@ namespace Umbraco.Core.IO
 
         public bool SupportsResizing
         {
-            get { return ImageHelper.IsImageFile(Extension); }
+            get { return _fs.IsImageFile(Extension); }
         }
 
         public string GetFriendlyName()
@@ -137,7 +137,7 @@ namespace Umbraco.Core.IO
 
                 using (var fs = _fs.OpenFile(Path))
                 {
-                    _size = ImageHelper.GetDimensions(fs);
+                    _size = _fs.GetDimensions(fs);
                 }
             }
             else
@@ -171,7 +171,7 @@ namespace Umbraco.Core.IO
             using (var filestream = _fs.OpenFile(Path))
             using (var image = Image.FromStream(filestream))
             {
-                return ImageHelper.GenerateResized(_fs, image, Path, sizeName, maxWidthHeight, width, height).Filepath;
+                return _fs.GenerateResized(image, Path, sizeName, maxWidthHeight, width, height).Filepath;
             }
         }
 

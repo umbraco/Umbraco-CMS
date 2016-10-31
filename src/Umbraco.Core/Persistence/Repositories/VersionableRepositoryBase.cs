@@ -657,7 +657,7 @@ WHERE EXISTS(
 
             var allsuccess = true;
 
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.MediaFileSystem;
             Parallel.ForEach(files, file =>
             {
                 try
@@ -677,7 +677,7 @@ WHERE EXISTS(
                     }
                     else
                     {
-                        ImageHelper.DeleteFile(fs, file, true);
+                        fs.DeleteFile(file, true);
                     }
                 }
                 catch (Exception e)

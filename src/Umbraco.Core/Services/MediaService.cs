@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
@@ -33,6 +34,7 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
+        private readonly MediaFileSystem _mediaFileSystem = FileSystemProviderManager.Current.MediaFileSystem;
 
         public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IDataTypeService dataTypeService, IUserService userService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
@@ -1295,11 +1297,11 @@ namespace Umbraco.Core.Services
 
         public Stream GetMediaFileContentStream(string filepath)
         {
-            if (MediaHelper.FileSystem.FileExists(filepath) == false)
+            if (_mediaFileSystem.FileExists(filepath) == false)
                 return null;
             try
             {
-                return MediaHelper.FileSystem.OpenFile(filepath);
+                return _mediaFileSystem.OpenFile(filepath);
             }
             catch
             {
@@ -1309,19 +1311,19 @@ namespace Umbraco.Core.Services
 
         public void SetMediaFileContent(string filepath, Stream stream)
         {
-            MediaHelper.FileSystem.AddFile(filepath, stream, true);
+            _mediaFileSystem.AddFile(filepath, stream, true);
         }
 
         public void DeleteMediaFile(string filepath)
         {
-            ImageHelper.DeleteFile(MediaHelper.FileSystem, filepath, true);
+            _mediaFileSystem.DeleteFile(filepath, true);
         }
 
         public void GenerateThumbnails(string filepath, PropertyType propertyType)
         {
-            using (var filestream = MediaHelper.FileSystem.OpenFile(filepath))
+            using (var filestream = _mediaFileSystem.OpenFile(filepath))
             {
-                ImageHelper.GenerateThumbnails(MediaHelper.FileSystem, filestream, filepath, propertyType);
+                _mediaFileSystem.GenerateThumbnails(filestream, filepath, propertyType);
             }
         }
 

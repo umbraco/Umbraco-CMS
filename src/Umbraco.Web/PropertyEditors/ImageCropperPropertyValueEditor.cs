@@ -28,8 +28,13 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class ImageCropperPropertyValueEditor : PropertyValueEditorWrapper
     {
-        public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
-        { }
+        private MediaFileSystem _mediaFileSystem;
+
+        public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped, MediaFileSystem mediaFileSystem) 
+            : base(wrapped)
+        {
+            _mediaFileSystem = mediaFileSystem;
+        }
 
         /// <summary>
         /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
@@ -65,8 +70,6 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
-            var fs = MediaHelper.FileSystem;
-
             // get the current path
             var currentPath = string.Empty;
             try
@@ -82,7 +85,7 @@ namespace Umbraco.Web.PropertyEditors
                 LogHelper.WarnWithException<ImageCropperPropertyValueEditor>("Could not parse current db value to a JObject.", ex);
             }
             if (string.IsNullOrWhiteSpace(currentPath) == false)
-                currentPath = fs.GetRelativePath(currentPath);
+                currentPath = _mediaFileSystem.GetRelativePath(currentPath);
 
             // get the new json and path
             JObject editorJson = null;
@@ -122,7 +125,7 @@ namespace Umbraco.Web.PropertyEditors
                 // value is unchanged.
                 if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
                 {
-                    ImageHelper.DeleteFile(fs, currentPath, true);
+                    _mediaFileSystem.DeleteFile(currentPath, true);
                     return null; // clear
                 }
 
@@ -130,7 +133,7 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             // process the file
-            var filepath = editorJson == null ? null : ProcessFile(editorValue, file, fs, currentPath, cuid, puid);
+            var filepath = editorJson == null ? null : ProcessFile(editorValue, file, currentPath, cuid, puid);
 
             // remove all temp files
             foreach (var f in files)
@@ -138,15 +141,15 @@ namespace Umbraco.Web.PropertyEditors
 
             // remove current file if replaced
             if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
-                ImageHelper.DeleteFile(fs, currentPath, true);
+                _mediaFileSystem.DeleteFile(currentPath, true);
 
             // update json and return
             if (editorJson == null) return null;
-            editorJson["src"] = filepath == null ? string.Empty : fs.GetUrl(filepath);
+            editorJson["src"] = filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
             return editorJson.ToString();
         }
 
-        private string ProcessFile(ContentPropertyData editorValue, ContentItemFile file, IFileSystem fs, string currentPath, Guid cuid, Guid puid)
+        private string ProcessFile(ContentPropertyData editorValue, ContentItemFile file, string currentPath, Guid cuid, Guid puid)
         {
             // process the file
             // no file, invalid file, reject change
@@ -155,19 +158,19 @@ namespace Umbraco.Web.PropertyEditors
 
             // get the filepath
             // in case we are using the old path scheme, try to re-use numbers (bah...)
-            var filepath = MediaHelper.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
+            var filepath = _mediaFileSystem.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
 
             using (var filestream = File.OpenRead(file.TempFilePath))
             {
-                fs.AddFile(filepath, filestream, true); // must overwrite!
+                _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
 
-                var ext = fs.GetExtension(filepath);
-                if (ImageHelper.IsImageFile(ext))
+                var ext = _mediaFileSystem.GetExtension(filepath);
+                if (_mediaFileSystem.IsImageFile(ext))
                 {
                     var preValues = editorValue.PreValues.FormatAsDictionary();
                     var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
                     using (var image = Image.FromStream(filestream))
-                        ImageHelper.GenerateThumbnails(fs, image, filepath, sizes);
+                        _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
                 }
 
                 // all related properties (auto-fill) are managed by ImageCropperPropertyEditor
@@ -194,6 +197,4 @@ namespace Umbraco.Web.PropertyEditors
             return newVal;
         }
     }
-
-        
 }

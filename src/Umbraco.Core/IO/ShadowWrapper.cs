@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Hosting;
 
 namespace Umbraco.Core.IO
 {
-    public class ShadowWrapper : IFileSystem2
+    internal class ShadowWrapper : IFileSystem2
     {
         private readonly IFileSystem _innerFileSystem;
         private readonly string _shadowPath;

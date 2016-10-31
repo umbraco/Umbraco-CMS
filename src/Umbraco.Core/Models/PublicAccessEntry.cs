@@ -107,10 +107,7 @@ namespace Umbraco.Core.Models
 
         public void ClearRules()
         {
-            for (var i = _ruleCollection.Count - 1; i >= 0; i--)
-            {
-                RemoveRule(_ruleCollection[i]);
-            }
+            _ruleCollection.Clear();
         }
 
         [DataMember]
