@@ -396,7 +396,7 @@ namespace umbraco.cms.businesslogic.packager
                     if (languageItemsElement != null)
                     {
                         var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
-                        insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString()));
+                        insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString(CultureInfo.InvariantCulture)));
                     }
 
                     #endregion
@@ -406,7 +406,7 @@ namespace umbraco.cms.businesslogic.packager
                     if (dictionaryItemsElement != null)
                     {
                         var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
-                        insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString()));
+                        insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString(CultureInfo.InvariantCulture)));
                     }
                     #endregion
 
@@ -415,7 +415,7 @@ namespace umbraco.cms.businesslogic.packager
                     if (macroItemsElement != null)
                     {
                         var insertedMacros = packagingService.ImportMacros(macroItemsElement);
-                        insPack.Data.Macros.AddRange(insertedMacros.Select(m => m.Id.ToString()));
+                        insPack.Data.Macros.AddRange(insertedMacros.Select(m => m.Id.ToString(CultureInfo.InvariantCulture)));
                     }
                     #endregion
 
@@ -454,7 +454,7 @@ namespace umbraco.cms.businesslogic.packager
                     {
                         StyleSheet s = StyleSheet.Import(n, currentUser);
 
-                        insPack.Data.Stylesheets.Add(s.Id.ToString());
+                        insPack.Data.Stylesheets.Add(s.Id.ToString(CultureInfo.InvariantCulture));
                         //saveNeeded = true;
                     }
 
