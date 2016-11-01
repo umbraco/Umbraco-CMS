@@ -83,5 +83,18 @@ namespace Umbraco.Tests.PropertyEditors
 
             Assert.AreEqual(expected, result);
 	    }
+
+        [TestCase("100", new[] {100})]
+        [TestCase("100,200", new[] {100, 200})]
+        [TestCase("100 , 200, 300 ", new[] {100, 200, 300})]
+        [TestCase("", new int[] {})]
+        [TestCase(null, new int[] {})]
+	    public void CanConvertDropdownListMultipleWithKeysPropertyEditor(object value, IEnumerable<int> expected)
+	    {
+	        var converter = new DropdownListMultipleWithKeysValueConverter();
+	        var result = converter.ConvertDataToSource(null, value, false);
+
+            Assert.AreEqual(expected, result);
+	    }
     }
 }
