@@ -70,5 +70,18 @@ namespace Umbraco.Tests.PropertyEditors
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCase("apples", new[] {"apples"})]
+        [TestCase("apples,oranges", new[] {"apples", "oranges"})]
+        [TestCase("apples , oranges, pears ", new[] {"apples", "oranges", "pears"})]
+        [TestCase("", new string[] {})]
+        [TestCase(null, new string[] {})]
+	    public void CanConvertDropdownListMultiplePropertyEditor(object value, IEnumerable<string> expected)
+	    {
+	        var converter = new DropdownListMultipleValueConverter();
+	        var result = converter.ConvertSourceToObject(null, value, false);
+
+            Assert.AreEqual(expected, result);
+	    }
     }
 }
