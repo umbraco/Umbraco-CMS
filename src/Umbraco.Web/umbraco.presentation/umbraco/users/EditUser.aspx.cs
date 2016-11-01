@@ -173,9 +173,29 @@ namespace umbraco.cms.presentation.user
             passw.Controls.Add(passwordChanger);
             passw.Controls.Add(validatorContainer);
 
+            // Add email validator
+            var emailValidation = new CustomValidator
+            {
+                ID = "EmailValidator",
+                ErrorMessage = ui.Text("errorHandling", "errorRegExpWithoutTab", "E-mail", CurrentUser),
+                Display = ValidatorDisplay.None
+            };
+            emailValidation.ServerValidate += EmailValidator_OnServerValidate;
+
+           var validationSummary = new ValidationSummary
+            {
+                ID = "validationSummary",
+                DisplayMode = ValidationSummaryDisplayMode.BulletList,
+                CssClass = "error"
+            };
+
+            pp.addProperty(validationSummary);
+
             pp.addProperty(ui.Text("user", "username", UmbracoUser), uname);
             pp.addProperty(ui.Text("user", "loginname", UmbracoUser), lname);
             pp.addProperty(ui.Text("user", "password", UmbracoUser), passw);
+
+            pp.addProperty(emailValidation);
             pp.addProperty(ui.Text("email", UmbracoUser), email);
             pp.addProperty(ui.Text("user", "usertype", UmbracoUser), userType);
             pp.addProperty(ui.Text("user", "language", UmbracoUser), userLanguage);
@@ -227,6 +247,10 @@ namespace umbraco.cms.presentation.user
                 .SyncTree(UID.ToString(), IsPostBack);
         }
 
+        private void EmailValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            args.IsValid = MembershipProviderBase.IsEmailValid(email.Text);
+        }
 
         void sectionValidator_ServerValidate(object source, ServerValidateEventArgs args)
         {
