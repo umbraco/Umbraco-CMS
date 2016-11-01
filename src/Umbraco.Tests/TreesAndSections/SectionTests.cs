@@ -70,64 +70,6 @@ namespace Umbraco.Tests.TreesAndSections
             Assert.IsNull(ApplicationContext.Current.Services.SectionService.GetByAlias(name));
         }
 
-        /// <summary>
-        /// Creates a new user, assigns the user to existing application, 
-        /// then deletes the user
-        /// </summary>
-        [Test()]
-        public void Application_Create_New_User_Assign_Application_And_Delete_User()
-        {
-            var name = Guid.NewGuid().ToString("N");
-         
-            //new user
-            var ut = UserType.GetAllUserTypes().First();
-            var user = User.MakeNew(name, name, name, ut);
-
-            //get application
-            //var app = Application.getAll().First();
-
-            //assign the app
-            user.addApplication(Constants.Applications.Content);
-            //ensure it's added
-            Assert.AreEqual(1, user.Applications.Count(x => x.alias == Constants.Applications.Content));
-
-            //delete the user
-            user.delete();
-
-            //make sure the assigned applications are gone
-            Assert.AreEqual(0, user.Applications.Count(x => x.alias == name));
-        }
-
-        /// <summary>
-        /// create a new application and assigne an new user and deletes the application making sure the assignments are removed
-        /// </summary>
-        [Test()]
-        public void Application_Make_New_Assign_User_And_Delete()
-        {
-            var name = Guid.NewGuid().ToString("N");
-
-            //new user
-            var ut = UserType.GetAllUserTypes().First();
-            var user = User.MakeNew(name, name, name, ut);
-
-            ApplicationContext.Current.Services.SectionService.MakeNew(name, name, "icon.jpg");
-
-            //check if it exists
-            var app = ApplicationContext.Current.Services.SectionService.GetByAlias(name);
-            Assert.IsNotNull(app);
-
-            //assign the app
-            user.addApplication(app.Alias);
-            //ensure it's added
-            Assert.AreEqual(1, user.Applications.Count(x => x.alias == app.Alias));
-
-            //delete the app
-            ApplicationContext.Current.Services.SectionService.DeleteSection(app);
-
-            //make sure the assigned applications are gone
-            Assert.AreEqual(0, user.Applications.Count(x => x.alias == name));
-        }
-
         #region Tests to write
 
 

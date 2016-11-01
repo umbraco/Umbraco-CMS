@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new User(new UserType(){Id = 3})
+            var item = new User()
             {
                 Id = 3,                
                 Key = Guid.NewGuid(),
@@ -21,7 +21,6 @@ namespace Umbraco.Tests.Models
                 CreateDate = DateTime.Now,
                 Name = "Test",
                 Comments = "comments",
-                DefaultPermissions = new[]{"a","b","c"},
                 DefaultToLiveEditing = false,
                 Email = "test@test.com",
                 Language = "en",
@@ -41,19 +40,12 @@ namespace Umbraco.Tests.Models
                 Username = "username"                            
             };
           
-            item.AddAllowedSection("test");
-
             var clone = (User)item.DeepClone();
 
             Assert.AreNotSame(clone, item);
             Assert.AreEqual(clone, item);
 
-            Assert.AreNotSame(clone.UserType, item.UserType);
-            Assert.AreEqual(clone.UserType, item.UserType);
             Assert.AreEqual(clone.AllowedSections.Count(), item.AllowedSections.Count());
-
-            Assert.AreNotSame(clone.DefaultPermissions, item.DefaultPermissions);
-            Assert.AreEqual(clone.DefaultPermissions.Count(), item.DefaultPermissions.Count());
 
             //Verify normal properties with reflection
             var allProps = clone.GetType().GetProperties();
@@ -61,17 +53,6 @@ namespace Umbraco.Tests.Models
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
             }
-
-            //ensure internal collections are differet
-            Assert.AreNotSame(item.AddedSections, clone.AddedSections);
-            Assert.AreNotSame(item.RemovedSections, clone.RemovedSections);
-
-            //ensure event handlers are still wired on clone
-            clone.AddAllowedSection("blah");
-            Assert.AreEqual(1, clone.AddedSections.Count());
-            clone.RemoveAllowedSection("blah");
-            Assert.AreEqual(1, clone.RemovedSections.Count());
-
         }
 
         [Test]
@@ -79,7 +60,7 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var item = new User(new UserType() { Id = 3 })
+            var item = new User
             {
                 Id = 3,
                 Key = Guid.NewGuid(),
@@ -87,7 +68,6 @@ namespace Umbraco.Tests.Models
                 CreateDate = DateTime.Now,
                 Name = "Test",
                 Comments = "comments",
-                DefaultPermissions = new[] { "a", "b", "c" },
                 DefaultToLiveEditing = false,
                 Email = "test@test.com",
                 Language = "en",

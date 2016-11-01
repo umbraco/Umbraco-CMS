@@ -603,6 +603,7 @@
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
+    <Content Include="Umbraco\Users\EditUserGroup.aspx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
@@ -2254,7 +2255,6 @@
     <Content Include="Umbraco\tree.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
     <Content Include="Umbraco\Users\EditUser.aspx" />
-    <Content Include="Umbraco\Users\EditUserType.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="Umbraco\Webservices\ajax.js" />
     <Content Include="Umbraco\Webservices\CacheRefresher.asmx">

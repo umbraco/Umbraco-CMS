@@ -248,7 +248,7 @@ AND umbracoNode.id <> @id",
             Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @Id", new { Id = entity.Id });
 
             //Remove Permissions
-            Database.Delete<User2NodePermissionDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            Database.Delete<UserGroup2NodePermissionDto>("WHERE nodeId = @Id", new { Id = entity.Id });
 
             //Remove associated tags
             Database.Delete<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = entity.Id });

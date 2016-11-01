@@ -36,9 +36,9 @@ namespace Umbraco.Web.Cache
             SectionService.Deleted += ApplicationDeleted;
             SectionService.New += ApplicationNew;
 
-            //bind to user / user type events
-            UserService.SavedUserType += UserServiceSavedUserType;
-            UserService.DeletedUserType += UserServiceDeletedUserType;
+            //bind to user / user group events
+            UserService.SavedUserGroup += UserServiceSavedUserGroup;
+            UserService.DeletedUserGroup += UserServiceDeletedUserGroup;
             UserService.SavedUser += UserServiceSavedUser;
             UserService.DeletedUser += UserServiceDeletedUser;
 
@@ -259,7 +259,7 @@ namespace Umbraco.Web.Cache
             var permissionsChanged = ((Content)e.Copy).WasPropertyDirty("PermissionsChanged");
             if (permissionsChanged)
             {
-                DistributedCache.Instance.RefreshAllUserPermissionsCache();
+                DistributedCache.Instance.RefreshAllUserGroupPermissionsCache();
             }
 
             //run the un-published cache refresher since copied content is not published
@@ -286,11 +286,11 @@ namespace Umbraco.Web.Cache
         /// stay up-to-date for unpublished content.
         /// 
         /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the 
-        /// case then we need to clear all user permissions cache.
+        /// case then we need to clear all user group permissions cache.
         /// </remarks>
         static void ContentServiceSaved(IContentService sender, SaveEventArgs<IContent> e)
         {
-            var clearUserPermissions = false;
+            var clearUserGroupPermissions = false;
             e.SavedEntities.ForEach(x =>
             {
                 //check if it is new
@@ -300,14 +300,14 @@ namespace Umbraco.Web.Cache
                     var permissionsChanged = ((Content)x).WasPropertyDirty("PermissionsChanged");
                     if (permissionsChanged)
                     {
-                        clearUserPermissions = true;                        
+                        clearUserGroupPermissions = true;                        
                     }    
                 }
             });
 
-            if (clearUserPermissions)
+            if (clearUserGroupPermissions)
             {
-                DistributedCache.Instance.RefreshAllUserPermissionsCache();
+                DistributedCache.Instance.RefreshAllUserGroupPermissionsCache();
             }
 
             //filter out the entities that have only been saved (not newly published) since
@@ -349,19 +349,6 @@ namespace Umbraco.Web.Cache
         } 
         #endregion
 
-        #region UserType event handlers
-        static void UserServiceDeletedUserType(IUserService sender, DeleteEventArgs<IUserType> e)
-        {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserTypeCache(x.Id));
-        }
-
-        static void UserServiceSavedUserType(IUserService sender, SaveEventArgs<IUserType> e)
-        {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserTypeCache(x.Id));
-        }
-        
-        #endregion
-        
         #region Dictionary event handlers
 
         static void LocalizationServiceSavedDictionaryItem(ILocalizationService sender, SaveEventArgs<IDictionaryItem> e)
@@ -507,23 +494,23 @@ namespace Umbraco.Web.Cache
         
         #region User/permissions event handlers
 
-        static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
+        static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<UserGroupEntityPermission> e)
         {
-            var userIds = e.SavedEntities.Select(x => x.UserId).Distinct();
-            userIds.ForEach(x => DistributedCache.Instance.RefreshUserPermissionsCache(x));
+            var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
+            groupIds.ForEach(x => DistributedCache.Instance.RefreshUserGroupPermissionsCache(x));
         }
 
-        static void PermissionDeleted(UserPermission sender, DeleteEventArgs e)
-        {
-            InvalidateCacheForPermissionsChange(sender);
-        }
-
-        static void PermissionUpdated(UserPermission sender, SaveEventArgs e)
+        static void PermissionDeleted(UserGroupPermission sender, DeleteEventArgs e)
         {
             InvalidateCacheForPermissionsChange(sender);
         }
 
-        static void PermissionNew(UserPermission sender, NewEventArgs e)
+        static void PermissionUpdated(UserGroupPermission sender, SaveEventArgs e)
+        {
+            InvalidateCacheForPermissionsChange(sender);
+        }
+
+        static void PermissionNew(UserGroupPermission sender, NewEventArgs e)
         {
             InvalidateCacheForPermissionsChange(sender);
         }
@@ -537,20 +524,30 @@ namespace Umbraco.Web.Cache
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserCache(x.Id));
         }
-        
-        private static void InvalidateCacheForPermissionsChange(UserPermission sender)
+
+        static void UserServiceSavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> e)
         {
-            if (sender.User != null)
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserGroupCache(x.Id));
+        }
+
+        static void UserServiceDeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)
+        {
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserGroupCache(x.Id));
+        }
+
+        private static void InvalidateCacheForPermissionsChange(UserGroupPermission sender)
+        {
+            if (sender.UserGroup != null)
             {
-                DistributedCache.Instance.RefreshUserPermissionsCache(sender.User.Id);
+                DistributedCache.Instance.RefreshUserGroupPermissionsCache(sender.UserGroup.Id);
             }
             else if (sender.UserId > -1)
             {
-                DistributedCache.Instance.RefreshUserPermissionsCache(sender.UserId);
+                DistributedCache.Instance.RefreshUserGroupPermissionsCache(sender.UserId);
             }
             else if (sender.NodeIds.Any())
             {
-                DistributedCache.Instance.RefreshAllUserPermissionsCache();
+                DistributedCache.Instance.RefreshAllUserGroupPermissionsCache();
             }
         }
 
