@@ -279,6 +279,7 @@
     <key alias="createFolder">Opret mappe...</key>
 
     <key alias="relateToOriginalLabel">Relatér til original</key>
+    <key alias="includeDescendants">Inkludér undersider</key>
 
     <key alias="linkToPage">Link til side</key>
 
