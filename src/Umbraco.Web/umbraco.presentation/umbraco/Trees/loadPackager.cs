@@ -30,7 +30,8 @@ namespace umbraco
     /// <summary>
     /// Handles loading of the packager application into the developer application tree
     /// </summary>
-    [Tree(Constants.Applications.Developer, "packager", "Packages", sortOrder: 3)]
+    //[Tree(Constants.Applications.Developer, "packager", "Packages", sortOrder: 3)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadPackager : BaseTree
     {
         #region TreeI Members

@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class MigrationDto
     {
         [Column("id")]
-        [PrimaryKeyColumn(AutoIncrement = true)]
+        [PrimaryKeyColumn(AutoIncrement = true, IdentitySeed = 100)]
         public int Id { get; set; }
 
         [Column("name")]

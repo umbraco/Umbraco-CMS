@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.Select("*")
                 .From("[cmsContentType]")
                 .InnerJoin("[umbracoNode]").On("[cmsContentType].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = @0", new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e"));
+                .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e"));
 
             var sql = new Sql();
             sql.Select("*")
@@ -36,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
             }
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
     }
 }

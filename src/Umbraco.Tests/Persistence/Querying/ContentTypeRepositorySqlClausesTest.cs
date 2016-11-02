@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
@@ -22,18 +23,18 @@ namespace Umbraco.Tests.Persistence.Querying
                 .On("[cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId]")
                 .InnerJoin("[umbracoNode]")
                 .On("[cmsContentType].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = @0", new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"))
-                .Where("[cmsDocumentType].[IsDefault] = @0", true);
+                .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"))
+                .Where("([cmsDocumentType].[IsDefault] = @0)", true);
 
             var sql = new Sql();
             sql.Select("*")
-                .From<DocumentTypeDto>()
+                .From<ContentTypeTemplateDto>()
                 .RightJoin<ContentTypeDto>()
-                .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
+                .On<ContentTypeDto, ContentTypeTemplateDto>(left => left.NodeId, right => right.ContentTypeNodeId)
                 .InnerJoin<NodeDto>()
                 .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectType)
-                .Where<DocumentTypeDto>(x => x.IsDefault == true);
+                .Where<ContentTypeTemplateDto>(x => x.IsDefault == true);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -43,7 +44,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
             }
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -58,19 +59,19 @@ namespace Umbraco.Tests.Persistence.Querying
                 .On("[cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId]")
                 .InnerJoin("[umbracoNode]")
                 .On("[cmsContentType].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = @0", new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"))
+                .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"))
                 .Where("[cmsDocumentType].[IsDefault] = @0", true)
-                .Where("[umbracoNode].[id] = @0", 1050);
+                .Where("([umbracoNode].[id] = @0)", 1050);
 
             var sql = new Sql();
             sql.Select("*")
-                .From<DocumentTypeDto>()
+                .From<ContentTypeTemplateDto>()
                 .RightJoin<ContentTypeDto>()
-                .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
+                .On<ContentTypeDto, ContentTypeTemplateDto>(left => left.NodeId, right => right.ContentTypeNodeId)
                 .InnerJoin<NodeDto>()
                 .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectType)
-                .Where<DocumentTypeDto>(x => x.IsDefault)
+                .Where<ContentTypeTemplateDto>(x => x.IsDefault)
                 .Where<NodeDto>(x => x.NodeId == 1050);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
@@ -81,7 +82,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
             }
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -103,7 +104,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -112,7 +113,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var expected = new Sql();
             expected.Select("*")
                 .From("[cmsContentTypeAllowedContentType]")
-                .Where("[cmsContentTypeAllowedContentType].[Id] = @0", 1050);
+                .Where("([cmsContentTypeAllowedContentType].[Id] = @0)", 1050);
 
             var sql = new Sql();
             sql.Select("*")
@@ -127,7 +128,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
             }
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -138,7 +139,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .From("[cmsPropertyTypeGroup]")
                 .RightJoin("[cmsPropertyType]").On("[cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]")
                 .InnerJoin("[cmsDataType]").On("[cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]")
-                .Where("[cmsPropertyType].[contentTypeId] = @0", 1050);
+                .Where("([cmsPropertyType].[contentTypeId] = @0)", 1050);
 
             var sql = new Sql();
             sql.Select("*")
@@ -157,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
             }
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
     }
 }

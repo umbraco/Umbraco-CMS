@@ -63,7 +63,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 
 			    var newRelationTypeId = relationService.GetRelationTypeByAlias(newRelationTypeAlias).Id;
 
-				ClientTools.ChangeContentFrameUrl("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + newRelationTypeId).CloseModalWindow().ChildNodeCreated();
+				ClientTools.ChangeContentFrameUrl("developer/RelationTypes/EditRelationType.aspx?id=" + newRelationTypeId).CloseModalWindow().ChildNodeCreated();
 			}
 		}
 

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Sync;
@@ -37,6 +38,9 @@ namespace Umbraco.Web.Cache
         public const string ContentTypeCacheRefresherId = "6902E22C-9C10-483C-91F3-66B7CAE9E2F5";
         public const string LanguageCacheRefresherId = "3E0F95D8-0BE5-44B8-8394-2B8750B62654";
         public const string DomainCacheRefresherId = "11290A79-4B57-4C99-AD72-7748A3CF38AF";
+
+        [Obsolete("This is no longer used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public const string StylesheetCacheRefresherId = "E0633648-0DEB-44AE-9A48-75C3A55CB670";
         public const string StylesheetPropertyCacheRefresherId = "2BC7A3A4-6EB1-4FBC-BAA3-C9E7B6D36D38";
         public const string DataTypeCacheRefresherId = "35B16C25-A17E-45D7-BC8F-EDAB1DCC28D2";
@@ -192,24 +196,27 @@ namespace Umbraco.Web.Cache
         public void RefreshAll(Guid factoryGuid)
         {
             if (factoryGuid == Guid.Empty) return;
-            RefreshAll(factoryGuid, true);
+
+            ServerMessengerResolver.Current.Messenger.PerformRefreshAll(
+                ServerRegistrarResolver.Current.Registrar.Registrations,
+                GetRefresherById(factoryGuid));
         }
 
-        /// <summary>
-        /// Notifies the distributed cache of a global invalidation for a specified <see cref="ICacheRefresher"/>.
-        /// </summary>
-        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
-        /// <param name="allServers">If true, all servers in the load balancing environment are notified; otherwise,
-        /// only the local server is notified.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method is no longer in use and does not work as advertised, the allServers parameter doesnt have any affect for database server messengers, do not use!")]
         public void RefreshAll(Guid factoryGuid, bool allServers)
         {
             if (factoryGuid == Guid.Empty) return;
-
-            ServerMessengerResolver.Current.Messenger.PerformRefreshAll(
-                allServers 
-                    ? ServerRegistrarResolver.Current.Registrar.Registrations
-                    : Enumerable.Empty<IServerAddress>(), //this ensures it will only execute against the current server
-                GetRefresherById(factoryGuid));
+            if (allServers)
+            {
+                RefreshAll(factoryGuid);
+            }
+            else
+            {
+                ServerMessengerResolver.Current.Messenger.PerformRefreshAll(
+                    Enumerable.Empty<IServerAddress>(),
+                    GetRefresherById(factoryGuid));
+            }
         }
 
         /// <summary>

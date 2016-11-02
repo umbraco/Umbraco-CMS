@@ -2,10 +2,10 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Core.Services
 {
-
     /// <summary>
     /// Extension methods for ILocalizedTextService
     /// </summary>
@@ -60,6 +60,44 @@ namespace Umbraco.Core.Services
 
             return variables.Select((s, i) => new { index = i.ToString(CultureInfo.InvariantCulture), value = s })
                 .ToDictionary(keyvals => keyvals.index, keyvals => keyvals.value);
+        }
+
+        private static ICultureDictionary _cultureDictionary;
+
+        /// <summary>
+        /// TODO: We need to refactor how we work with ICultureDictionary - this is supposed to be the 'fast' way to
+        /// do readonly access to the Dictionary without using the ILocalizationService. See TODO Notes in `DefaultCultureDictionary`
+        /// Also NOTE that the ICultureDictionary is based on the ILocalizationService not the ILocalizedTextService (which is used
+        /// only for the localization files - not the dictionary)
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text)
+        {
+            var cultureDictionary = CultureDictionary;
+            return UmbracoDictionaryTranslate(text, cultureDictionary);
+        }
+
+        private static string UmbracoDictionaryTranslate(string text, ICultureDictionary cultureDictionary)
+        {
+            if (text == null)
+                return null;
+
+            if (text.StartsWith("#") == false)
+                return text;
+
+            text = text.Substring(1);
+            return cultureDictionary[text].IfNullOrWhiteSpace(text);
+        }
+
+        private static ICultureDictionary CultureDictionary
+        {
+            get
+            {
+                return _cultureDictionary
+                    ?? (_cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
+            }
         }
     }
 }

@@ -11,6 +11,20 @@ namespace Umbraco.Core.Models
     internal static class UmbracoEntityExtensions
     {
 
+        public static bool HasChildren(this IUmbracoEntity entity)
+        {
+            if (entity.AdditionalData.ContainsKey("HasChildren"))
+            {
+                var convert = entity.AdditionalData["HasChildren"].TryConvertTo<bool>();
+                if (convert)
+                {
+                    return convert.Result;
+                }
+            }
+            return false;
+        }
+
+    
         public static object GetAdditionalDataValueIgnoreCase(this IUmbracoEntity entity, string key, object defaultVal)
         {
             if (entity.AdditionalData.ContainsKeyIgnoreCase(key) == false) return defaultVal;

@@ -26,6 +26,7 @@ namespace Umbraco.Web.WebServices
     /// This isn't fully implemented yet but we should migrate all of the logic in the umbraco.presentation.webservices.codeEditorSave
     /// over to this controller.
     /// </remarks>
+    [ValidateMvcAngularAntiForgeryToken]
     public class SaveFileController : UmbracoAuthorizedController
     {
         /// <summary>
@@ -107,6 +108,9 @@ namespace Umbraco.Web.WebServices
                 currentView.Path = filename;
             currentView.Content = contents;
 
+            
+
+
             Attempt<IPartialView> attempt;
             try
             {
@@ -128,7 +132,8 @@ namespace Umbraco.Web.WebServices
                                 attempt.Exception);
             }
 
-            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
+
+            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"), new { name = currentView.Name, path = currentView.Path });
         }
 
         /// <summary>
@@ -151,8 +156,8 @@ namespace Umbraco.Web.WebServices
             {
                 t = new Template(templateId)
                 {
-                    Text = templateName,
-                    Alias = templateAlias,
+                    Text = templateName.CleanForXss('[', ']', '(', ')', ':'),
+                    Alias = templateAlias.CleanForXss('[', ']', '(', ')', ':'),
                     Design = templateContents
                 };
 
@@ -187,7 +192,8 @@ namespace Umbraco.Web.WebServices
                     new
                     {
                         path = syncPath,
-                        contents = t.Design
+                        contents = t.Design,
+                        alias = t.Alias // might have been updated!
                     });
             }
             catch (Exception ex)

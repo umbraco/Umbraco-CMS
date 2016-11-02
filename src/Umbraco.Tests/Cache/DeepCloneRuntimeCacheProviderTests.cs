@@ -1,12 +1,15 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Tests.Collections;
 
 namespace Umbraco.Tests.Cache
 {
@@ -34,6 +37,23 @@ namespace Umbraco.Tests.Cache
         internal override IRuntimeCacheProvider RuntimeProvider
         {
             get { return _provider; }
+        }
+
+        [Test]
+        public void Clones_List()
+        {
+            var original = new DeepCloneableList<DeepCloneableListTests.TestClone>(ListCloneBehavior.Always);
+            original.Add(new DeepCloneableListTests.TestClone());
+            original.Add(new DeepCloneableListTests.TestClone());
+            original.Add(new DeepCloneableListTests.TestClone());
+
+            var val = _provider.GetCacheItem<DeepCloneableList<DeepCloneableListTests.TestClone>>("test", () => original);
+
+            Assert.AreEqual(original.Count, val.Count);
+            foreach (var item in val)
+            {
+                Assert.IsTrue(item.IsClone);
+            }
         }
 
         [Test]
@@ -69,7 +89,7 @@ namespace Umbraco.Tests.Cache
 
         private static string GetValue(int i)
         {
-            Console.WriteLine("get" + i);
+            Debug.Print("get" + i);
             if (i < 3)
                 throw new Exception("fail");
             return "succ" + i;
@@ -82,20 +102,18 @@ namespace Umbraco.Tests.Cache
                 CloneId = Guid.NewGuid();
             }
 
-            private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Name);
+            private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+            private class PropertySelectors
+            {
+                public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Name);
+            }
 
             private string _name;
             public string Name
             {
                 get { return _name; }
-                set
-                {
-                    SetPropertyValueAndDetectChanges(o =>
-                    {
-                        _name = value;
-                        return _name;
-                    }, _name, WriterSelector);
-                }
+                set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.WriterSelector); }
             }
 
             public Guid CloneId { get; set; }

@@ -16,7 +16,7 @@ namespace umbraco.cms.helpers
             treePath.Add("-1");
             treePath.Add("init");
             string[] pathPaths = filePath.Split('/');
-            pathPaths.Reverse();
+            
             for (int p = 0; p < pathPaths.Length; p++)
             {
                 treePath.Add(string.Join("/", pathPaths.Take(p + 1).ToArray()));

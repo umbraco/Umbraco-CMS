@@ -206,7 +206,7 @@ namespace Umbraco.Core
                 /// </summary>
                 internal const string StandardPropertiesGroupName = "Membership";
 
-		        internal static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
+		        public static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
 		        {
 		            return new Dictionary<string, PropertyType>
 		                {

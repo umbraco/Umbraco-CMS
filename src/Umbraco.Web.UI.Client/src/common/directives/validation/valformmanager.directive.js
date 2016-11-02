@@ -16,6 +16,27 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
     return {
         require: "form",
         restrict: "A",
+        controller: function($scope) {
+            //This exposes an API for direct use with this directive
+
+            var unsubscribe = [];
+            var self = this;
+
+            //This is basically the same as a directive subscribing to an event but maybe a little
+            // nicer since the other directive can use this directive's API instead of a magical event
+            this.onValidationStatusChanged = function (cb) {
+                unsubscribe.push($scope.$on("valStatusChanged", function(evt, args) {
+                    cb.apply(self, [evt, args]);
+                }));
+            };
+
+            //Ensure to remove the event handlers when this instance is destroyted
+            $scope.$on('$destroy', function () {
+                for (var u in unsubscribe) {
+                    unsubscribe[u]();
+                }
+            });
+        },
         link: function (scope, element, attr, formCtrl) {
 
             scope.$watch(function () {

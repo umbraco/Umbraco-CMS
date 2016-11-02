@@ -79,6 +79,21 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return content;
         }
 
+        public static Content CreateSimpleContentWithSpecialDatabaseTypes(IContentType contentType, string name, int parentId, string decimalValue, string intValue, DateTime datetimeValue)
+        {
+            var content = new Content(name, parentId, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0 };
+            object obj = new
+            {
+                decimalProperty = decimalValue,
+                intProperty = intValue,
+                datetimeProperty = datetimeValue
+            };
+
+            content.PropertyValues(obj);
+            content.ResetDirtyProperties(false);
+            return content;
+        }
+
         public static Content CreateAllTypesContent(IContentType contentType, string name, int parentId)
         {
             var content = new Content("Random Content Name", parentId, contentType) { Language = "en-US", Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
@@ -92,7 +107,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
             content.SetValue("label", "Non-editable label");
             content.SetValue("dateTime", DateTime.Now.AddDays(-20));
             content.SetValue("colorPicker", "black");
-            content.SetValue("folderBrowser", "");
+            //that one is gone in 7.4
+            //content.SetValue("folderBrowser", "");
             content.SetValue("ddlMultiple", "1234,1235");
             content.SetValue("rbList", "random");
             content.SetValue("date", DateTime.Now.AddDays(-10));

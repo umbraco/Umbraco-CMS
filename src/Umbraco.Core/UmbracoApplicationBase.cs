@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using log4net;
@@ -47,6 +48,9 @@ namespace Umbraco.Core
                 LogHelper.Error<UmbracoApplicationBase>(msg, exception);
             };
 
+            // this only gets called when an assembly can't be resolved
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
+
             //boot up the application
             GetBootManager()
                 .Initialize()
@@ -58,18 +62,40 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Called when an assembly can't be resolved. In here we can do magic with the assembly name and try loading another.
+        /// This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
+            // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stackoverflow
+            if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
+                return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
+            return null;
+        }
+
+        /// <summary>
         /// Initializes the Umbraco application
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         protected void Application_Start(object sender, EventArgs e)
         {
+            Thread.CurrentThread.SanitizeThreadCulture();
             StartApplication(sender, e);
         }
 
         /// <summary>
         /// Override init and raise the event
         /// </summary>
+        /// <remarks>
+        /// DID YOU KNOW? The Global.asax Init call is the thing that initializes all of the httpmodules, ties up a bunch of stuff with IIS, etc...
+        /// Therefore, since OWIN is an HttpModule when running in IIS/ASP.Net the OWIN startup is not executed until this method fires and by that
+        /// time, Umbraco has performed it's bootup sequence.
+        /// </remarks>
         public override void Init()
         {
             base.Init();

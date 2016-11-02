@@ -19,7 +19,8 @@
 				<umbraco:TreeControl runat="server" ID="JTree" App="content"
 				    Mode="Checkbox" CssClass="clearfix"></umbraco:TreeControl>				
 			</div>
-			<div id="permissionsPanel">
+
+			<div id="permissionsPanel" style="margin-top: -35px">
 				<user:NodePermissions ID="nodePermissions" runat="server" />
 			</div>			
 			

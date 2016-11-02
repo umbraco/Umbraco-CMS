@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -11,9 +12,8 @@ namespace Umbraco.Web.Mvc
 	/// Ensures that if an action for the Template name is not explicitly defined by a user, that the 'Index' action will execute
 	/// </summary>
     public class RenderActionInvoker : AsyncControllerActionInvoker
-	{
+	{        
 
-	    private static readonly ConcurrentDictionary<Type, ActionDescriptor> IndexDescriptors = new ConcurrentDictionary<Type, ActionDescriptor>(); 
 
 		/// <summary>
 		/// Ensures that if an action for the Template name is not explicitly defined by a user, that the 'Index' action will execute
@@ -29,22 +29,14 @@ namespace Umbraco.Web.Mvc
 			//now we need to check if it exists, if not we need to return the Index by default
 			if (ad == null)
 			{
-                //check if the controller is an instance of IRenderMvcController
-				if (controllerContext.Controller is IRenderMvcController)
+                //check if the controller is an instance of IRenderController and find the index
+                if (controllerContext.Controller is IRenderController)
 				{
-					var methodInfo = controllerContext.Controller.GetType().GetMethods()
-						.First(x => x.Name == "Index" &&
-							        x.GetCustomAttributes(typeof (NonActionAttribute), false).Any() == false);
-
-					ad = typeof (Task).IsAssignableFrom(methodInfo.ReturnType)
-						? new TaskAsyncActionDescriptor(methodInfo, "Index", controllerDescriptor)
-						: (ActionDescriptor) new ReflectedActionDescriptor(methodInfo, "Index", controllerDescriptor);
-
-					return IndexDescriptors.GetOrAdd(controllerContext.Controller.GetType(), type => ad);
-				}
+					return controllerDescriptor.FindAction(controllerContext, "Index");
+                }
 			}
 			return ad;
 		}
-
+        
 	}
 }

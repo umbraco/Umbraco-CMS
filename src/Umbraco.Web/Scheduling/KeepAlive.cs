@@ -32,7 +32,7 @@ namespace Umbraco.Web.Scheduling
             // ensure we do not run if not main domain, but do NOT lock it
             if (_appContext.MainDom.IsMainDom == false)
             {
-                LogHelper.Debug<ScheduledPublishing>("Does not run if not MainDom.");
+                LogHelper.Debug<KeepAlive>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
             }
 

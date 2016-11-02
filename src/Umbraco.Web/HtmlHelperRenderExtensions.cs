@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -197,50 +198,22 @@ namespace Umbraco.Web
 
         #region GetCropUrl
 
-        /// <summary>
-        /// Gets the ImageProcessor Url of a media item by the crop alias (using default media item property alias of "umbracoFile")
-        /// </summary>
-        /// <param name="htmlHelper"></param>
-        /// <param name="mediaItem"></param>
-        /// <param name="cropAlias"></param>
-        /// <returns></returns>
+        [Obsolete("Use the UrlHelper.GetCropUrl extension instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper, IPublishedContent mediaItem, string cropAlias)
         {
             return new HtmlString(mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true));
         }
 
-        /// <summary>
-        /// Gets the ImageProcessor Url of a media item by the property alias and crop alias.
-        /// </summary>
-        /// <param name="htmlHelper"></param>
-        /// <param name="mediaItem"></param>
-        /// <param name="propertyAlias"></param>
-        /// <param name="cropAlias"></param>
-        /// <returns></returns>
+        [Obsolete("Use the UrlHelper.GetCropUrl extension instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
             return new HtmlString(mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true));
         }
 
-        /// <summary>
-        /// Gets the ImageProcessor Url of a media item
-        /// </summary>
-        /// <param name="htmlHelper"></param>
-        /// <param name="mediaItem"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="propertyAlias"></param>
-        /// <param name="cropAlias"></param>
-        /// <param name="quality"></param>
-        /// <param name="imageCropMode"></param>
-        /// <param name="imageCropAnchor"></param>
-        /// <param name="preferFocalPoint"></param>
-        /// <param name="useCropDimensions"></param>
-        /// <param name="cacheBuster"></param>
-        /// <param name="furtherOptions"></param>
-        /// <param name="ratioMode"></param>
-        /// <param name="upScale"></param>
-        /// <returns></returns>
+        [Obsolete("Use the UrlHelper.GetCropUrl extension instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper,
             IPublishedContent mediaItem,
             int? width = null,
@@ -263,25 +236,8 @@ namespace Umbraco.Web
                     upScale));
         }
 
-        /// <summary>
-        /// Gets the ImageProcessor Url from the media path
-        /// </summary>
-        /// <param name="htmlHelper"></param>
-        /// <param name="imageUrl"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="imageCropperValue"></param>
-        /// <param name="cropAlias"></param>
-        /// <param name="quality"></param>
-        /// <param name="imageCropMode"></param>
-        /// <param name="imageCropAnchor"></param>
-        /// <param name="preferFocalPoint"></param>
-        /// <param name="useCropDimensions"></param>
-        /// <param name="cacheBusterValue"></param>
-        /// <param name="furtherOptions"></param>
-        /// <param name="ratioMode"></param>
-        /// <param name="upScale"></param>
-        /// <returns></returns>
+        [Obsolete("Use the UrlHelper.GetCropUrl extension instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper,
             string imageUrl,
             int? width = null,
@@ -868,8 +824,7 @@ namespace Umbraco.Web
 		}
 
 		#endregion
-
-
+        
 		#region Wrap
 
 		public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, params IHtmlTagWrapper[] children)
@@ -928,14 +883,74 @@ namespace Umbraco.Web
 		{
 			var item = html.Wrap(tag, innerText, anonymousAttributes, children);
 			item.Visible = visible;
-			foreach (var child in children)
-			{
-				item.AddChild(child);
-			}
 			return item;
 		}
 
-		#endregion
+        #endregion
 
-	}
+        #region canvasdesigner
+
+        public static IHtmlString EnableCanvasDesigner(this HtmlHelper html, 
+            UrlHelper url,
+            UmbracoContext umbCtx)
+        {
+            return html.EnableCanvasDesigner(url, umbCtx, string.Empty, string.Empty);
+        }
+
+        public static IHtmlString EnableCanvasDesigner(this HtmlHelper html,
+            UrlHelper url,
+            UmbracoContext umbCtx, string canvasdesignerConfigPath)
+        {
+            return html.EnableCanvasDesigner(url, umbCtx, canvasdesignerConfigPath, string.Empty);
+        }
+
+        public static IHtmlString EnableCanvasDesigner(this HtmlHelper html,
+            UrlHelper url,
+            UmbracoContext umbCtx, string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
+        {
+            
+            var umbracoPath = url.Content(SystemDirectories.Umbraco);
+
+            string previewLink = @"<script src=""{0}/lib/jquery/jquery.min.js"" type=""text/javascript""></script>" +
+                                 @"<script src=""{1}"" type=""text/javascript""></script>" +
+                                 @"<script src=""{2}"" type=""text/javascript""></script>" +
+                                 @"<script type=""text/javascript"">var pageId = '{3}'</script>" +
+                                 @"<script src=""{0}/js/canvasdesigner.front.js"" type=""text/javascript""></script>";
+
+            string noPreviewLinks = @"<link href=""{1}"" type=""text/css"" rel=""stylesheet"" data-title=""canvasdesignerCss"" />";
+
+            // Get page value
+            int pageId = umbCtx.PublishedContentRequest.UmbracoPage.PageID;
+            string[] path = umbCtx.PublishedContentRequest.UmbracoPage.SplitPath;
+            string result = string.Empty;
+            string cssPath = CanvasDesignerUtility.GetStylesheetPath(path, false);
+
+            if (umbCtx.InPreviewMode)
+            {
+                canvasdesignerConfigPath = string.IsNullOrEmpty(canvasdesignerConfigPath) == false 
+                    ? canvasdesignerConfigPath 
+                    : string.Format("{0}/js/canvasdesigner.config.js", umbracoPath);
+                canvasdesignerPalettesPath = string.IsNullOrEmpty(canvasdesignerPalettesPath) == false 
+                    ? canvasdesignerPalettesPath 
+                    : string.Format("{0}/js/canvasdesigner.palettes.js", umbracoPath);
+
+                if (string.IsNullOrEmpty(cssPath) == false)
+                    result = string.Format(noPreviewLinks, cssPath) + Environment.NewLine;
+
+                result = result + string.Format(previewLink, umbracoPath, canvasdesignerConfigPath, canvasdesignerPalettesPath, pageId);
+            }
+            else
+            {
+                // Get css path for current page
+                if (string.IsNullOrEmpty(cssPath) == false)
+                    result = string.Format(noPreviewLinks, cssPath);
+            }
+
+            return new HtmlString(result);
+
+        }
+
+        #endregion
+
+    }
 }

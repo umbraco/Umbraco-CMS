@@ -1,22 +1,17 @@
 using System;
-using System.IO;
 using System.Web.Mvc;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
 
     /// <summary>
-    /// A controller to render front-end requests
+    /// The default controller to render front-end requests
     /// </summary>
-    [PreRenderViewActionFilter]
+    [PreRenderViewActionFilter]    
     public class RenderMvcController : UmbracoController, IRenderMvcController
     {
 
@@ -64,11 +59,11 @@ namespace Umbraco.Web.Mvc
             {
                 if (_publishedContentRequest != null)
                     return _publishedContentRequest;
-                if (!RouteData.DataTokens.ContainsKey("umbraco-doc-request"))
+                if (RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken) == false)
                 {
                     throw new InvalidOperationException("DataTokens must contain an 'umbraco-doc-request' key with a PublishedContentRequest object");
                 }
-                _publishedContentRequest = (PublishedContentRequest)RouteData.DataTokens["umbraco-doc-request"];
+                _publishedContentRequest = (PublishedContentRequest)RouteData.DataTokens[Core.Constants.Web.PublishedDocumentRequestDataToken];
                 return _publishedContentRequest;
             }
         }
@@ -111,10 +106,10 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
+        [RenderIndexActionSelector]
         public virtual ActionResult Index(RenderModel model)
         {
             return CurrentTemplate(model);
         }
-
     }
 }

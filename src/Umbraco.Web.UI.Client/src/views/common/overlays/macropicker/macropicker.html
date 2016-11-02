@@ -1,0 +1,42 @@
+<div ng-controller="Umbraco.Overlays.MacroPickerController">
+
+    <div ng-switch="wizardStep">
+
+        <umb-control-group label="Choose a macro" ng-switch-when="macroSelect">
+            <select class="umb-editor" ng-change="changeMacro()"
+                    name="selectedMacro"
+                    ng-model="model.selectedMacro"
+                    ng-options="m as m.name for m in macros"
+                    required>
+                <option value=""><localize key="choose" />...</option>
+            </select>
+            <span class="help-inline" val-msg-for="selectedMacro" val-toggle-msg="required"><localize key="required" /></span>
+        </umb-control-group>
+
+
+        <div ng-switch-when="paramSelect">
+
+            <h5>{{model.selectedMacro.name}}</h5>
+
+            <ul class="unstyled">
+                <li ng-repeat="param in model.macroParams">
+
+                    <ng-form name="parameterForm">
+                        <umb-control-group label="{{param.name}}">
+                            <umb-editor model="param"></umb-editor>
+                        </umb-control-group>
+                    </ng-form>
+
+                </li>
+            </ul>
+
+            <umb-empty-state
+                ng-if="noMacroParams"
+                position="center">
+                <localize key="defaultdialogs_noMacroParams">There are no parameters for this macro</localize>
+            </umb-empty-state>
+
+        </div>
+    </div>
+
+</div>

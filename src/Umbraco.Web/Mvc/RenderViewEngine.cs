@@ -93,7 +93,7 @@ namespace Umbraco.Web.Mvc
 		/// <returns></returns>
         private bool ShouldFindView(ControllerContext controllerContext, bool isPartial)
         {
-            var umbracoToken = controllerContext.GetDataTokenInViewContextHierarchy("umbraco");
+            var umbracoToken = controllerContext.GetDataTokenInViewContextHierarchy(Core.Constants.Web.UmbracoDataToken);
 
             //first check if we're rendering a partial view for the back office, or surface controller, etc...
             //anything that is not IUmbracoRenderModel as this should only pertain to Umbraco views.

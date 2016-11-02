@@ -42,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
 
             config.CreateMap<IUser, UserData>()
-                .ConstructUsing((IUser user) => new UserData(Guid.NewGuid().ToString("N"))) //this is the 'session id'
+                .ConstructUsing((IUser user) => new UserData())
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
-
+            
         } 
      
         private static int GetIntId(object id)

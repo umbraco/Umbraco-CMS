@@ -83,7 +83,7 @@ namespace umbraco.presentation.preview
 
             var previewNodes = new List<Document>();
 
-            var parentId = documentObject.Level == 1 ? -1 : documentObject.Parent.Id;
+            var parentId = documentObject.Level == 1 ? -1 : documentObject.ParentId;
 
             while (parentId > 0 && XmlContent.GetElementById(parentId.ToString(CultureInfo.InvariantCulture)) == null)
             {
@@ -97,7 +97,7 @@ namespace umbraco.presentation.preview
             foreach (var document in previewNodes)
             {
                 //Inject preview xml
-                parentId = document.Level == 1 ? -1 : document.Parent.Id;
+                parentId = document.Level == 1 ? -1 : document.ParentId;
                 var previewXml = document.ToPreviewXml(XmlContent);
                 if (document.ContentEntity.Published == false 
                     && ApplicationContext.Current.Services.ContentService.HasPublishedVersion(document.Id))

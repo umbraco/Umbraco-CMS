@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using umbraco.interfaces;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
@@ -20,6 +21,8 @@ namespace Umbraco.Web.Strategies.Migrations
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
+            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+
             var target720 = new Version(7, 2, 0);
 
             if (e.ConfiguredVersion <= target720)
@@ -95,7 +98,7 @@ namespace Umbraco.Web.Strategies.Migrations
                         e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataTypePreValues"))));
                 }
 
-                
+
 
                 transaction.Complete();
             }

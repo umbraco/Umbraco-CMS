@@ -24,9 +24,10 @@ module.exports = function(karma) {
          
 
          'lib/../build/belle/lib/underscore/underscore-min.js',
+         'lib/../build/belle/lib/moment/moment-with-locales.js',
          'lib/umbraco/Extensions.js', 
          'lib/../build/belle/lib/rgrove-lazyload/lazyload.js',
-
+         'lib/../build/belle/lib/angular-local-storage/angular-local-storage.min.js',
 
          'test/config/app.unit.js',
          'src/common/mocks/umbraco.servervariables.js',

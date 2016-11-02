@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -10,7 +9,7 @@ namespace Umbraco.Web.Models
     [DataContract(Name = "packageInstallModel")]
     public class PackageInstallModel
     {
-        [DataMember(Name="id")]
+        [DataMember(Name = "id")]
         public int Id { get; set; }
 
         [DataMember(Name = "packageGuid")]
@@ -24,5 +23,7 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "zipFilePath")]
         public string ZipFilePath { get; set; }
+
+        
     }
 }

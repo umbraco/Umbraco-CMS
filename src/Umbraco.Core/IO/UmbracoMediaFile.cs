@@ -86,7 +86,7 @@ namespace Umbraco.Core.IO
         private void Initialize()
         {
             Filename = _fs.GetFileName(Path);
-            Extension = _fs.GetExtension(Path) != null
+            Extension = string.IsNullOrEmpty(_fs.GetExtension(Path)) == false
                 ? _fs.GetExtension(Path).Substring(1).ToLowerInvariant()
                 : "";
             Url = _fs.GetUrl(Path);
@@ -199,8 +199,8 @@ namespace Umbraco.Core.IO
                 using (var image = Image.FromStream(fs))
                 {
                     var fileNameThumb = string.IsNullOrWhiteSpace(fileNameAddition)
-                        ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)))
-                        : string.Format("{0}_{1}.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)), fileNameAddition);
+                        ? string.Format("{0}_UMBRACOSYSTHUMBNAIL." + Extension, Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)))
+                        : string.Format("{0}_{1}." + Extension, Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)), fileNameAddition);
 
                     var thumbnail = maxWidthHeight == -1
                         ? ImageHelper.GenerateThumbnail(image, width, height, fileNameThumb, Extension, _fs)

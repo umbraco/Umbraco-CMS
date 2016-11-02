@@ -1,0 +1,59 @@
+.umb-child-selector__child {
+  background: @grayLighter;
+  padding: 5px 15px;
+  margin-bottom: 5px;
+  min-width: 300px;
+  display: flex;
+  animation: fadeIn 0.5s;
+}
+
+.umb-child-selector__child.-parent {
+  background: #f1f1f1;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.umb-child-selector__child.-placeholder {
+  border: 1px dashed @grayLight;
+  background: none;
+  cursor: pointer;
+  text-align: center;
+  justify-content: center;
+}
+
+.umb-child-selector__children-container {
+  margin-left: 30px;
+}
+
+.umb-child-selector__child-description {
+  flex: 1;
+}
+
+.umb-child-selector__child-icon-holder {
+  margin-right: 5px;
+  width: 20px;
+  text-align: center;
+  display: inline-block;
+}
+
+.umb-child-selector__child-icon {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.umb-child-selector__child-name {
+  font-size: 13px;
+}
+
+.umb-child-selector__child-name.-blue {
+  color: @blue;
+}
+
+.umb-child-selector__child-actions {
+  flex: 0 0 50px;
+  text-align: right;
+}
+
+.umb-child-selector__child-remove {
+  cursor: pointer;
+}

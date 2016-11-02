@@ -109,10 +109,15 @@ namespace Umbraco.Core.Models
             IsApproved = true;
         }
 
-        private static readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
-        private static readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
-        private static readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
-        private static readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
+            public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
+            public readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
+            public readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
+        }
 
         /// <summary>
         /// Gets or sets the Username
@@ -121,14 +126,7 @@ namespace Umbraco.Core.Models
         public string Username
         {
             get { return _username; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _username = value;
-                    return _username;
-                }, _username, UsernameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _username, Ps.Value.UsernameSelector); }
         }
 
         /// <summary>
@@ -138,14 +136,7 @@ namespace Umbraco.Core.Models
         public string Email
         {
             get { return _email; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _email = value;
-                    return _email;
-                }, _email, EmailSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
         }
 
         /// <summary>
@@ -155,14 +146,7 @@ namespace Umbraco.Core.Models
         public string RawPasswordValue
         {
             get { return _rawPasswordValue; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _rawPasswordValue = value;
-                    return _rawPasswordValue;
-                }, _rawPasswordValue, PasswordSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector); }
         }
 
         /// <summary>
@@ -280,7 +264,7 @@ namespace Umbraco.Core.Models
                     //This is the default value if the prop is not found
                     true);
                 if (a.Success == false) return a.Result;
-
+                if (Properties[Constants.Conventions.Member.IsApproved].Value == null) return true;
                 var tryConvert = Properties[Constants.Conventions.Member.IsApproved].Value.TryConvertTo<bool>();
                 if (tryConvert.Success)
                 {
@@ -313,7 +297,7 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsLockedOut, "IsLockedOut", false);
                 if (a.Success == false) return a.Result;
-                
+                if (Properties[Constants.Conventions.Member.IsLockedOut].Value == null) return false;
                 var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].Value.TryConvertTo<bool>();
                 if (tryConvert.Success)
                 {
@@ -346,7 +330,7 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLoginDate, "LastLoginDate", default(DateTime));
                 if (a.Success == false) return a.Result;
-                
+                if (Properties[Constants.Conventions.Member.LastLoginDate].Value == null) return default(DateTime);
                 var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].Value.TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
@@ -379,7 +363,7 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastPasswordChangeDate, "LastPasswordChangeDate", default(DateTime));
                 if (a.Success == false) return a.Result;
-
+                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value == null) return default(DateTime);
                 var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value.TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
@@ -412,7 +396,7 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLockoutDate, "LastLockoutDate", default(DateTime));
                 if (a.Success == false) return a.Result;
-                
+                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value == null) return default(DateTime);
                 var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].Value.TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
@@ -446,7 +430,7 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.FailedPasswordAttempts, "FailedPasswordAttempts", 0);
                 if (a.Success == false) return a.Result;
-                
+                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value == null) return default(int);
                 var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value.TryConvertTo<int>();
                 if (tryConvert.Success)
                 {
@@ -490,14 +474,7 @@ namespace Umbraco.Core.Models
             {
                 return _providerUserKey;
             }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _providerUserKey = value;
-                    return _providerUserKey;
-                }, _providerUserKey, ProviderUserKeySelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _providerUserKey, Ps.Value.ProviderUserKeySelector); }
         }
 
       
@@ -509,11 +486,8 @@ namespace Umbraco.Core.Models
         {
             base.AddingEntity();
 
-            if (Key == Guid.Empty)
-            {
-                Key = Guid.NewGuid();
+            if (ProviderUserKey == null)
                 ProviderUserKey = Key;
-            }
         }
 
         /// <summary>

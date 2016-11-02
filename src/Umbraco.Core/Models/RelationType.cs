@@ -35,11 +35,16 @@ namespace Umbraco.Core.Models
             Name = name;
         }
 
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<RelationType, string>(x => x.Name);
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<RelationType, string>(x => x.Alias);
-        private static readonly PropertyInfo IsBidirectionalSelector = ExpressionHelper.GetPropertyInfo<RelationType, bool>(x => x.IsBidirectional);
-        private static readonly PropertyInfo ParentObjectTypeSelector = ExpressionHelper.GetPropertyInfo<RelationType, Guid>(x => x.ParentObjectType);
-        private static readonly PropertyInfo ChildObjectTypeSelector = ExpressionHelper.GetPropertyInfo<RelationType, Guid>(x => x.ChildObjectType);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<RelationType, string>(x => x.Name);
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<RelationType, string>(x => x.Alias);
+            public readonly PropertyInfo IsBidirectionalSelector = ExpressionHelper.GetPropertyInfo<RelationType, bool>(x => x.IsBidirectional);
+            public readonly PropertyInfo ParentObjectTypeSelector = ExpressionHelper.GetPropertyInfo<RelationType, Guid>(x => x.ParentObjectType);
+            public readonly PropertyInfo ChildObjectTypeSelector = ExpressionHelper.GetPropertyInfo<RelationType, Guid>(x => x.ChildObjectType);
+        }
 
         /// <summary>
         /// Gets or sets the Name of the RelationType
@@ -48,14 +53,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get { return _name; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -65,14 +63,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _alias = value;
-                    return _alias;
-                }, _alias, AliasSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
@@ -82,14 +73,7 @@ namespace Umbraco.Core.Models
         public bool IsBidirectional
         {
             get { return _isBidrectional; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _isBidrectional = value;
-                    return _isBidrectional;
-                }, _isBidrectional, IsBidirectionalSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _isBidrectional, Ps.Value.IsBidirectionalSelector); }
         }
 
         /// <summary>
@@ -100,14 +84,7 @@ namespace Umbraco.Core.Models
         public Guid ParentObjectType
         {
             get { return _parentObjectType; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _parentObjectType = value;
-                    return _parentObjectType;
-                }, _parentObjectType, ParentObjectTypeSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _parentObjectType, Ps.Value.ParentObjectTypeSelector); }
         }
 
         /// <summary>
@@ -118,14 +95,7 @@ namespace Umbraco.Core.Models
         public Guid ChildObjectType
         {
             get { return _childObjectType; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _childObjectType = value;
-                    return _childObjectType;
-                }, _childObjectType, ChildObjectTypeSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _childObjectType, Ps.Value.ChildObjectTypeSelector); }
         }
 
     }

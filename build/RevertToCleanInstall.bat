@@ -45,9 +45,6 @@ del ..\src\Umbraco.Web.UI\UserControls\*.*
 echo Removing masterpage files
 del ..\src\Umbraco.Web.UI\masterpages\*.*
 
-echo Removing view files
-del ..\src\Umbraco.Web.UI\Views\*.*
-
 echo Removing razor files
 del ..\src\Umbraco.Web.UI\macroScripts\*.*
 
@@ -104,7 +101,9 @@ echo Removing user control files
 FOR %%A IN (..\src\Umbraco.Web.UI\usercontrols\*.*) DO DEL %%A
 
 echo Removing view files
-FOR %%A IN (..\src\Umbraco.Web.UI\Views\*.*) DO DEL %%A
+ATTRIB +H ..\src\Umbraco.Web.UI\Views\Partials\Grid\*.cshtml /S
+FOR %%A IN (..\src\Umbraco.Web.UI\Views\) DO DEL /Q /S *.cshtml -H
+ATTRIB -H ..\src\Umbraco.Web.UI\Views\Partials\Grid\*.cshtml /S
 
 echo Removing razor files
 FOR %%A IN (..\src\Umbraco.Web.UI\macroScripts\*.*) DO DEL %%A

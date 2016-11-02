@@ -6,6 +6,7 @@
     <div class="umb-panel umb-dialogs-mediapicker" ng-if="target">
         <div class="umb-panel-body no-header with-footer compact">
             <umb-pane>
+
                 <umb-control-group ng-if="target.url">
 
                     <div class="clearfix">
@@ -59,26 +60,29 @@
     </div>
 
 
-    <div class="umb-panel umb-dialogs-mediapicker browser" ng-hide="target" ng-style="{opacity: dropping == true ? '0.25' : '1.0'}">
+    <div class="umb-panel umb-dialogs-mediapicker browser"
+          on-drag-leave="dragLeave()"
+          on-drag-end="dragLeave()"
+          on-drag-enter="dragEnter()" 
+          ng-hide="target">
+
+          
         <div class="umb-panel-header">
 
-            <div class="umb-el-wrap umb-panel-buttons">
-                <div class="span5">
-                    <div class="form-search">
-                        <i class="icon-search"></i>
-                        <input type="text"
-                               ng-model="searchTerm"
-                               class="umb-search-field search-query"
-                               placeholder="Filter...">
-                    </div>
+            <div class="umb-el-wrap umb-panel-buttons umb-mediapicker-upload">
+	            <div class="form-search">
+	                <i class="icon-search"></i>
+	                <input type="text"
+	                       ng-model="searchTerm"
+	                       class="umb-search-field search-query"
+	                       placeholder="Filter...">
                 </div>
 
-                <div class="pull-right">
-                    <span class="btn fileinput-button" ng-class="{disabled: disabled}">
+                <div class="upload-button">
+                    <button class="btn fileinput-button" ng-click="upload()" ng-class="{disabled: disabled}">
                         <i class="icon-page-up"></i>
-                        <input type="file" name="files[]" multiple ng-disabled="disabled" class="uploader">
                         <localize key="general_upload">Upload</localize>
-                    </span>
+                    </button>
                 </div>
 
             </div>
@@ -92,7 +96,7 @@
                     <li ng-repeat="item in path">
                         <a href ng-click="gotoFolder(item)" prevent-default>{{item.name}}</a> /
                     </li>
-
+ 
                     <li>
                         <a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
                             <i class="icon icon-add small"></i>
@@ -103,24 +107,32 @@
                                ng-show="showFolderInput"
                                ng-model="newFolderName"
                                ng-keydown="submitFolder($event)"
-                               on-blur="showFolderInput = false">
+                               on-blur="showFolderInput = false"
+                               focus-when="{{showFolderInput}}">
                     </li>
                 </ul>
             </div>
         </div>
+  
 
         <div class="umb-panel-body with-footer">
             
-            <umb-image-upload-progress ng-show="filesUploading > 0"></umb-image-upload-progress>
+            <umb-file-dropzone 
+                hide-dropzone="{{!activeDrag && images.length > 0}}" 
+                parent-id="{{currentFolder.id}}"
+                files-uploaded="onUploadComplete"
+                files-queued="onFilesQueue">
+            </umb-file-dropzone>
 
-            <umb-photo-folder min-height="105"
-                              min-width="150"
-                              max-height="250"
-                              ideal-items-per-row="3"
-                              on-click="clickHandler"
-                              ng-model="images"
-                              images-only="{{onlyImages}}"
-                              filter-by="searchTerm" />
+            <umb-photo-folder 
+                min-height="105"
+                min-width="150"
+                max-height="250"
+                ideal-items-per-row="3"
+                on-click="clickHandler"
+                ng-model="images"
+                images-only="{{onlyImages}}"
+                filter-by="searchTerm" />
         </div>
 
 
@@ -144,4 +156,4 @@
 
     </div>
 
-</form>
+</div>

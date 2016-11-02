@@ -169,6 +169,12 @@ namespace umbraco.cms.businesslogic
                 }
             }
 
+            public void setKey(string value)
+            {
+                key = value;
+                Save();
+            }
+
             public string Value(int languageId)
             {
                 if (languageId == 0)

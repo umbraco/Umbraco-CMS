@@ -16,14 +16,7 @@
  <meta name="description" content="">
  <meta name="author" content="">
 
- <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,600' rel='stylesheet' type='text/css'>
- <link href='https://fonts.googleapis.com/css?family=Asap:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-
  <link rel="stylesheet" href="../../Umbraco/assets/css/nonodes.style.min.css" />
-
- <!--[if lt IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
- <![endif]-->
 
 </head>
 <body>
@@ -34,7 +27,7 @@
 			<div class="logo"></div>
 
 			<h1>Welcome to your Umbraco installation</h1>
-			<h3>You're seeing the wonderful page because your website doesn't contain any published content yet.</h3>
+			<h3>You're seeing this wonderful page because your website doesn't contain any published content yet.</h3>
 
 			<div class="cta">
 				<a href="<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>" class="button">Open Umbraco</a>
@@ -51,7 +44,7 @@
 
 				<div class="col">
 					<h2>Be a part of the community</h2>
-					<p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, we’re sure that you can get your answers from the community.</p>
+					<p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, weâ€™re sure that you can get your answers from the community.</p>
 					
 					<a href="http://our.umbraco.org?ref=ourFromInstaller" target="_blank">our.Umbraco &rarr;</a>
 				</div>

@@ -25,7 +25,7 @@ namespace Umbraco.Core
         private readonly AsyncLock _asyncLock;
         private IDisposable _asyncLocker;
 
-        // event wait handle used to notify current main domain that it should 
+        // event wait handle used to notify current main domain that it should
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
 
@@ -97,7 +97,7 @@ namespace Umbraco.Core
 
             try
             {
-                _logger.Debug<MainDom>("Stopping...");
+                _logger.Info<MainDom>("Stopping...");
                 foreach (var callback in _callbacks.Values)
                 {
                     try
@@ -109,7 +109,7 @@ namespace Umbraco.Core
                         _logger.Error<MainDom>("Error while running callback, remaining callbacks will not run.", e);
                         throw;
                     }
-                    
+
                 }
                 _logger.Debug<MainDom>("Stopped.");
             }
@@ -118,7 +118,7 @@ namespace Umbraco.Core
                 // in any case...
                 _isMainDom = false;
                 _asyncLocker.Dispose();
-                _logger.Debug<MainDom>("Released MainDom.");
+                _logger.Info<MainDom>("Released MainDom.");
             }
         }
 
@@ -131,11 +131,11 @@ namespace Umbraco.Core
                 // the handler is not installed so that would be the hosting environment
                 if (_signaled)
                 {
-                    _logger.Debug<MainDom>("Cannot acquire MainDom (signaled).");
+                    _logger.Info<MainDom>("Cannot acquire MainDom (signaled).");
                     return false;
                 }
 
-                _logger.Debug<MainDom>("Acquiring MainDom...");
+                _logger.Info<MainDom>("Acquiring MainDom...");
 
                 // signal other instances that we want the lock, then wait one the lock,
                 // which may timeout, and this is accepted - see comments below
@@ -162,7 +162,7 @@ namespace Umbraco.Core
 
                 HostingEnvironment.RegisterObject(this);
 
-                _logger.Debug<MainDom>("Acquired MainDom.");
+                _logger.Info<MainDom>("Acquired MainDom.");
                 return true;
             }
         }

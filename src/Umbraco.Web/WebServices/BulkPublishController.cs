@@ -15,6 +15,7 @@ namespace Umbraco.Web.WebServices
     /// <summary>
     /// A REST controller used for the publish dialog in order to publish bulk items at once
     /// </summary>
+    [ValidateMvcAngularAntiForgeryToken]
     public class BulkPublishController : UmbracoAuthorizedController
     {
         /// <summary>

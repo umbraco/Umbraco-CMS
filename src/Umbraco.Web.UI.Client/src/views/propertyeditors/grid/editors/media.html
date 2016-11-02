@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.PropertyEditors.Grid.MediaController">
 
-	<div class="usky-editor-placeholder" ng-click="setImage()" ng-if="control.value === null">
+	<div class="umb-editor-placeholder" ng-click="setImage()" ng-if="control.value === null">
 		<i class="icon icon-picture"></i>
         <div ng-id="!control.$inserted" class="help-text"><localize key="grid_clickToInsertImage">Click to insert image</localize></div>
 	</div>
@@ -13,4 +13,12 @@
 			class="fullSizeImage" />
         <input type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
  	</div>
+
+	<umb-overlay
+		ng-if="mediaPickerOverlay.show"
+		model="mediaPickerOverlay"
+		view="mediaPickerOverlay.view"
+		position="right">
+	</umb-overlay>
+
 </div>

@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Security.Permissions;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.Events
 {
@@ -11,11 +14,19 @@ namespace Umbraco.Core.Events
 	{
 		private bool _cancel;
 
+        public CancellableEventArgs(bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
+        {
+            CanCancel = canCancel;
+            Messages = messages;
+            AdditionalData = new ReadOnlyDictionary<string, object>(additionalData);
+        }
+
         public CancellableEventArgs(bool canCancel, EventMessages eventMessages)
         {
             if (eventMessages == null) throw new ArgumentNullException("eventMessages");
             CanCancel = canCancel;
             Messages = eventMessages;
+            AdditionalData = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
         }
 
         public CancellableEventArgs(bool canCancel)
@@ -23,6 +34,7 @@ namespace Umbraco.Core.Events
 			CanCancel = canCancel;
             //create a standalone messages
             Messages = new EventMessages();
+            AdditionalData = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
         }
 
         public CancellableEventArgs(EventMessages eventMessages)
@@ -78,5 +90,14 @@ namespace Umbraco.Core.Events
         /// Returns the EventMessages object which is used to add messages to the message collection for this event
         /// </summary>
         public EventMessages Messages { get; private set; }
+
+        /// <summary>
+        /// In some cases raised evens might need to contain additional arbitrary readonly data which can be read by event subscribers
+        /// </summary>
+        /// <remarks>
+        /// This allows for a bit of flexibility in our event raising - it's not pretty but we need to maintain backwards compatibility 
+        /// so we cannot change the strongly typed nature for some events.
+        /// </remarks>
+        public ReadOnlyDictionary<string, object> AdditionalData { get; private set; } 
     }
 }

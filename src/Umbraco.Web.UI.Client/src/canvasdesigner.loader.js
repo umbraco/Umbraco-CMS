@@ -1,19 +1,20 @@
+
 LazyLoad.js([
-      '/Umbraco/lib/jquery/jquery.min.js',
-      '/Umbraco/lib/jquery-ui/jquery-ui.min.js',
-      '/Umbraco/lib/angular/1.1.5/angular.min.js',
-      '/Umbraco/lib/underscore/underscore-min.js',
-      '/Umbraco/js/app.js',
-      '/Umbraco/js/umbraco.resources.js',
-      '/Umbraco/js/umbraco.services.js',
-      '/Umbraco/js/umbraco.security.js',
-      '/Umbraco/ServerVariables',
-      '/Umbraco/lib/spectrum/spectrum.js',
-      'https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js',
-      '/umbraco/js/canvasdesigner.panel.js',
+      '../lib/jquery/jquery.min.js',
+      '../lib/jquery-ui/jquery-ui.min.js',
+      '../lib/angular/1.1.5/angular.min.js',
+      '../lib/underscore/underscore-min.js',
+      '../lib/umbraco/Extensions.js',
+      '../js/app.js',
+      '../js/umbraco.resources.js',
+      '../js/umbraco.services.js',
+      '../js/umbraco.security.js',
+      '../ServerVariables',
+      '../lib/spectrum/spectrum.js',
+
+      '../js/canvasdesigner.panel.js',
 ], function () {
     jQuery(document).ready(function () {
         angular.bootstrap(document, ['Umbraco.canvasdesigner']);
     });
-}
-);
+});
