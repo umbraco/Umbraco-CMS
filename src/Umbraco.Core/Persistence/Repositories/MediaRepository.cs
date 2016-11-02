@@ -163,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return media;
         }
 
-        public void RebuildXmlStructures(Func<IMedia, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public void RebuildXmlStructures(Func<IMedia, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null)
         {
             // the previous way of doing this was to run it all in one big transaction,
             // and to bulk-insert groups of xml rows - which works, until the transaction

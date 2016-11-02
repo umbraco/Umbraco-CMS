@@ -173,7 +173,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of VersionableRepositoryBase<IContent>
 
-        public void RebuildXmlStructures(Func<IContent, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public void RebuildXmlStructures(Func<IContent, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null)
         {
             // the previous way of doing this was to run it all in one big transaction,
             // and to bulk-insert groups of xml rows - which works, until the transaction
