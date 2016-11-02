@@ -509,6 +509,7 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MemberGroupPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RadioButtonListValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\UserPickerValueConverter.cs" />
     <Compile Include="PublishedContentTypeConverter.cs" />
     <Compile Include="Publishing\UnPublishedStatusType.cs" />
     <Compile Include="Publishing\UnPublishStatus.cs" />
