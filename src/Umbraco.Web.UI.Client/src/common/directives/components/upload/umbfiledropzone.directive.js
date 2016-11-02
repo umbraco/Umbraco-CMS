@@ -25,7 +25,7 @@ TODO
 
 angular.module("umbraco.directives")
 
-.directive('umbFileDropzone', function ($timeout, Upload, localizationService, umbRequestHelper) {
+.directive('umbFileDropzone', function ($timeout, Upload, localizationService, umbRequestHelper, editorState) {
 	return {
 
 		restrict: 'E',
@@ -42,6 +42,7 @@ angular.module("umbraco.directives")
 
 			compact: '@',
 			hideDropzone: '@',
+			acceptedMediatypes: '=',
 
 			filesQueued: '=',
 			handleFile: '=',
@@ -49,14 +50,15 @@ angular.module("umbraco.directives")
 		},
 
 		link: function(scope, element, attrs) {
-
+			
 			scope.queue = [];
 			scope.done = [];
 			scope.rejected = [];
+
 			scope.currentFile = undefined;
 
 			function _filterFile(file) {
-
+				
 				var ignoreFileNames = ['Thumbs.db'];
 				var ignoreFileTypes = ['directory'];
 
@@ -85,20 +87,38 @@ angular.module("umbraco.directives")
 						} else {
 							scope.queue.push(file);
 						}
-
 					}
 
 				});
-
+				
 				//when queue is done, kick the uploader
 				if(!scope.working){
-					_processQueueItem();
-				}
+
+					// Upload not allowed
+					if(!scope.acceptedMediatypes || !scope.acceptedMediatypes.length){
+						files.map(function(file){
+							file.uploadStatus = "error";
+							file.serverErrorMessage = "File type is not allowed here";
+							scope.rejected.push(file);
+						});
+						scope.queue = [];
+					}	
+
+					// One allowed mediaType, pick this one 
+					if(scope.acceptedMediatypes && scope.acceptedMediatypes.length === 1){
+						scope.contentTypeAlias = scope.acceptedMediatypes[0].alias;
+						_processQueueItem();
+					}
+					
+					// More than one, open dialog
+					if(scope.acceptedMediatypes && scope.acceptedMediatypes.length > 1){
+						_chooseMediaType();
+					}
+				}				
 			}
 
-
 			function _processQueueItem(){
-
+											
 				if(scope.queue.length > 0){
 					scope.currentFile = scope.queue.shift();
 					_upload(scope.currentFile);
@@ -118,10 +138,10 @@ angular.module("umbraco.directives")
 			}
 
 			function _upload(file) {
-
+							
 				scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
 				scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "Image";
-
+				
 				Upload.upload({
 					url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
 					fields: {
@@ -204,18 +224,48 @@ angular.module("umbraco.directives")
 				});
 			}
 
+			function _chooseMediaType() {
+				
+				scope.mediatypepickerOverlay = {
+					view: "mediatypepicker",
+					title: "Choose media type",
+					acceptedMediatypes: scope.acceptedMediatypes,
+					hideSubmitButton: true,
+					show: true,
+					submit: function(model) {
+						scope.contentTypeAlias = model.selectedType.alias;
+																					  
+						scope.mediatypepickerOverlay.show = false;
+						scope.mediatypepickerOverlay = null;
+						
+						_processQueueItem();
+					},
+					close: function(oldModel) {
+						
+						scope.queue.map(function(file){
+							file.uploadStatus = "error";
+							file.serverErrorMessage = "Cannot upload this file, no mediatype selected";
+							scope.rejected.push(file);
+						});
+						scope.queue = [];
+
+						scope.mediatypepickerOverlay.show = false;
+						scope.mediatypepickerOverlay = null;
+						
+					}
+				};				
+            
+            }
 
 			scope.handleFiles = function(files, event){
 				if(scope.filesQueued){
 					scope.filesQueued(files, event);
 				}
-
-				_filesQueued(files, event);
+				
+				_filesQueued(files, event);				
 
 			};
 
-			}
-
-
-		};
-	});
+		}
+	};
+});

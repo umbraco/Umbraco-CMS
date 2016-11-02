@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Overlays.MediaPickerController",
-        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $element, $timeout, $cookies, $cookieStore, localizationService) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, mediaTypeHelper, eventsService, treeService, $element, $timeout, $cookies, $cookieStore, localizationService) {
 
             if(!$scope.model.title) {
                 $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
@@ -25,6 +25,11 @@ angular.module("umbraco")
             $scope.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
 
             $scope.model.selectedImages = [];
+
+            $scope.acceptedMediatypes = [];
+            mediaTypeHelper.getAllowedImagetypes($scope.startNodeId).then(function(types){
+                $scope.acceptedMediatypes = types;
+            });
 
             //preload selected item
             $scope.target = undefined;
@@ -96,6 +101,10 @@ angular.module("umbraco")
                             $scope.path = _.filter(anc, function (f) {
                                 return f.path.indexOf($scope.startNodeId) !== -1;
                             });
+                        });
+
+                        mediaTypeHelper.getAllowedImagetypes(folder.id).then(function(types){
+                            $scope.acceptedMediatypes = types;
                         });
                 }
                 else {
