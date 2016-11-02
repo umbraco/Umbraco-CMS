@@ -31,6 +31,8 @@
     <key alias="republish">Genudgiv hele sitet</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
+     <key alias="chooseWhereToMove">Hvor vil du flytte</key>
+    <key alias="toInTheTreeStructureBelow">hen til i træstrukturen?</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
