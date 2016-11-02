@@ -120,9 +120,13 @@ namespace Umbraco.Web.Mvc
             base.InitializePage();
             if (ViewContext.IsChildAction == false)
             {
-                //always ensure the special data token is set - this is used purely for partial view macros that contain forms 
-                // and mostly just when rendered within the RTE
-                ViewContext.RouteData.DataTokens[Constants.DataTokenCurrentViewContext] = ViewContext;                
+                //this is used purely for partial view macros that contain forms 
+                // and mostly just when rendered within the RTE - This should already be set with the 
+                // EnsurePartialViewMacroViewContextFilterAttribute
+                if (ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext) == false)
+                {
+                    ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, ViewContext);
+                }
             }
 
         }

@@ -21,20 +21,46 @@ namespace Umbraco.Web.Mvc
     /// </remarks>
     internal class EnsurePartialViewMacroViewContextFilterAttribute : ActionFilterAttribute
     {
+        /// <summary>
+        /// Ensures the custom ViewContext datatoken is set before the RenderController action is invoked,
+        /// this ensures that any calls to GetPropertyValue with regards to RTE or Grid editors can still
+        /// render any PartialViewMacro with a form and maintain ModelState
+        /// </summary>
+        /// <param name="filterContext"></param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             //ignore anything that is not IRenderController
-            if ((filterContext.Controller is IRenderController) == false)
+            if ((filterContext.Controller is IRenderController) == false && filterContext.IsChildAction == false)
                 return;
 
+            SetViewContext(filterContext);
+        }
+
+        /// <summary>
+        /// Ensures that the custom ViewContext datatoken is set after the RenderController action is invoked,
+        /// this ensures that any custom ModelState that may have been added in the RenderController itself is 
+        /// passed onwards in case it is required when rendering a PartialViewMacro with a form
+        /// </summary>
+        /// <param name="filterContext">The filter context.</param>
+        public override void OnResultExecuting(ResultExecutingContext filterContext)
+        {
+            //ignore anything that is not IRenderController
+            if ((filterContext.Controller is IRenderController) == false && filterContext.IsChildAction == false)
+                return;
+
+            SetViewContext(filterContext);
+        }
+
+        private void SetViewContext(ControllerContext controllerContext)
+        {
             var viewCtx = new ViewContext(
-                filterContext.Controller.ControllerContext, 
-                new DummyView(), 
-                filterContext.Controller.ViewData, filterContext.Controller.TempData, 
+                controllerContext,
+                new DummyView(),
+                controllerContext.Controller.ViewData, controllerContext.Controller.TempData,
                 new StringWriter());
 
             //set the special data token
-            filterContext.RequestContext.RouteData.DataTokens[Constants.DataTokenCurrentViewContext] = viewCtx;
+            controllerContext.RequestContext.RouteData.DataTokens[Constants.DataTokenCurrentViewContext] = viewCtx;
         }
 
         private class DummyView : IView

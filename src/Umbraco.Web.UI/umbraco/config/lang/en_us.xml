@@ -271,7 +271,8 @@
 
     <key alias="externalLoginProviders">External login providers</key>
     <key alias="exceptionDetail">Exception Details</key>
-    <key alias="stracktrace">Stacktrace</key>
+    <key alias="stacktrace">Stacktrace</key>
+    <key alias="innerException">Inner Exception</key>
 
     <key alias="linkYour">Link your</key>
     <key alias="unLinkYour">Un-Link your</key>

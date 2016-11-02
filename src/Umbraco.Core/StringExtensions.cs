@@ -1380,6 +1380,30 @@ namespace Umbraco.Core
             */
         }
 
+        public static string EscapeRegexSpecialCharacters(this string text)
+        {
+            var regexSpecialCharacters = new Dictionary<string, string>
+            {
+                {".", @"\."},
+                {"(", @"\("},
+                {")", @"\)"},
+                {"]", @"\]"},
+                {"[", @"\["},
+                {"{", @"\{"},
+                {"}", @"\}"},
+                {"?", @"\?"},
+                {"!", @"\!"},
+                {"$", @"\$"},
+                {"^", @"\^"},
+                {"+", @"\+"},
+                {"*", @"\*"},
+                {"|", @"\|"},
+                {"<", @"\<"},
+                {">", @"\>"}
+            };
+            return ReplaceMany(text, regexSpecialCharacters);
+        }
+
         public static bool ContainsAny(this string haystack, IEnumerable<string> needles, StringComparison comparison = StringComparison.CurrentCulture)
         {
             if (haystack == null) throw new ArgumentNullException("haystack");

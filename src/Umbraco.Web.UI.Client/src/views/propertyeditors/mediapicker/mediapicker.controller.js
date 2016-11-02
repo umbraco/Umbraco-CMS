@@ -12,10 +12,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 $scope.model.config.startNodeId = userData.startMediaId;
             });
         }
-         
+
         function setupViewModel() {
             $scope.images = [];
-            $scope.ids = []; 
+            $scope.ids = [];
 
             if ($scope.model.value) {
                 var ids = $scope.model.value.split(',');
@@ -30,16 +30,16 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 entityResource.getByIds(ids, "Media").then(function (medias) {
 
                     _.each(medias, function (media, i) {
-                        
+
                         //only show non-trashed items
                         if (media.parentId >= -1) {
 
-                            if (!media.thumbnail) { 
+                            if (!media.thumbnail) {
                                 media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                             }
 
                             $scope.images.push(media);
-                            $scope.ids.push(media.id);   
+                            $scope.ids.push(media.id);
                         }
                     });
 
@@ -67,6 +67,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                title: "Select media",
                startNodeId: $scope.model.config.startNodeId,
                multiPicker: multiPicker,
+               onlyImages: onlyImages,
                show: true,
                submit: function(model) {
 
@@ -93,8 +94,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
        $scope.sortableOptions = {
            update: function(e, ui) {
                var r = [];
-               //TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the 
-               // content picker. THen we don't have to worry about setting ids, render models, models, we just set one and let the 
+               //TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the
+               // content picker. THen we don't have to worry about setting ids, render models, models, we just set one and let the
                // watch do all the rest.
                 $timeout(function(){
                     angular.forEach($scope.images, function(value, key){
