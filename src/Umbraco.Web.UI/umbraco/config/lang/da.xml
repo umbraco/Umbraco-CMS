@@ -282,7 +282,7 @@
 
     <key alias="linkToPage">Link til side</key>
 
-    <key alias="openInNewWindow">Åbner det linket dokument i et nyt vindue eller fane</key>
+    <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="openInFullBody">Åbner det linket dokument i fuld visning af vinduet</key>
     <key alias="openInParentFrame">Åbner det linket dokument i "parent frame"</key>
 
