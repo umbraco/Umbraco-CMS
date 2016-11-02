@@ -380,6 +380,12 @@
 		Ниже Вы можете указать различные переводы данной статьи словаря '<em>%0%</em>'<br/>Добавить другие языки можно, воспользовавшись пунктом 'Языки' в меню слева
 		]]></key>
     <key alias="displayName">Название языка (культуры)</key>
+    <key alias="changeKey">Редактировать элемент (ключ) словаря</key>
+    <key alias="changeKeyError">
+      <![CDATA[
+      Ключ '%0%' уже существует в словаре.
+   ]]>
+    </key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Допустим как корневой</key>
@@ -655,7 +661,7 @@
     <key alias="xmlDataIntegrityCheckMedia">Медиа - всего в XML: %0%, всего: %1%Б с ошибками: %2%</key>
     <key alias="xmlDataIntegrityCheckContent">Содержимое - всего в XML: %0%, всего опубликовано: %1%, с ошибками: %2%</key>
 
-    <key alias="httpsCheckValidCertificate">Сертификат Вашего сайта отмечен как проверенный.</key>
+    <key alias="httpsCheckValidCertificate">Сертификат Вашего веб-сайта отмечен как проверенный.</key>
     <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
     <key alias="httpsCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Сейчас Вы %0% просматриваете сайт, используя протокол HTTPS.</key>
