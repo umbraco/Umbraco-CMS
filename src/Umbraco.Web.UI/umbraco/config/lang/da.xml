@@ -30,6 +30,7 @@
     <key alias="refreshNode">Genindlæs elementer</key>
     <key alias="republish">Genudgiv hele sitet</key>
     <key alias="restore" version="7.3.0">Gendan</key>
+    <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
