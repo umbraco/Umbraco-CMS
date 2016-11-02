@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function ListViewSettingsDirective(contentTypeResource, dataTypeResource, dataTypeHelper) {
+  function ListViewSettingsDirective(contentTypeResource, dataTypeResource, dataTypeHelper, listViewPrevalueHelper) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -20,6 +20,7 @@
 
               scope.dataType = dataType;
 
+              listViewPrevalueHelper.setPrevalues(dataType.preValues);
               scope.customListViewCreated = checkForCustomListView();
 
             });

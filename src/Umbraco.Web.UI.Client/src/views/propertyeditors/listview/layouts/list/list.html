@@ -49,6 +49,13 @@
             on-sort="vm.sort">
         </umb-table>
 
+        <umb-empty-state
+            ng-if="!items && options.filter.length === 0 && !vm.isRecycleBin"
+            position="center">
+            <div ng-if="entityType === 'content'">No content has been added</div>
+            <div ng-if="entityType === 'member'">No members have been added</div>
+        </umb-empty-state>
+
     </div>
 
     <umb-empty-state
@@ -58,7 +65,7 @@
     </umb-empty-state>
 
     <umb-empty-state
-        ng-if="!items && vm.isRecycleBin"
+        ng-if="!items && options.filter.length == 0 && vm.isRecycleBin"
         position="center">
         <localize key="general_recycleBinEmpty"></localize>
     </umb-empty-state>

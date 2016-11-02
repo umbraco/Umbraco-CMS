@@ -6,6 +6,8 @@
 
         bool HideDisabledUsersInBackoffice { get; }
 
+        bool AllowPasswordReset { get; }
+
         string AuthCookieName { get; }
 
         string AuthCookieDomain { get; }

@@ -53,6 +53,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore())
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.ProfilingLogger.Logger));
 
@@ -72,7 +73,8 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore());
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM IMedia TO ContentItemDto<IMedia>
             config.CreateMap<IMedia, ContentItemDto<IMedia>>()
@@ -82,7 +84,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore());
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore());
         }
 
         private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, ILogger logger)

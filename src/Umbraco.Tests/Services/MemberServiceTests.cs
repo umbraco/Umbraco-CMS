@@ -8,6 +8,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -31,6 +32,34 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        [Test]
+        public void Can_Create_Member()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            ServiceContext.MemberService.Save(member);
+
+            Assert.AreNotEqual(0, member.Id);
+            var foundMember = ServiceContext.MemberService.GetById(member.Id);
+            Assert.IsNotNull(foundMember);
+            Assert.AreEqual("test@test.com", foundMember.Email);
+        }
+
+        [Test]
+        public void Can_Create_Member_With_Long_TLD_In_Email()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.marketing", "pass", "test");
+            ServiceContext.MemberService.Save(member);
+
+            Assert.AreNotEqual(0, member.Id);
+            var foundMember = ServiceContext.MemberService.GetById(member.Id);
+            Assert.IsNotNull(foundMember);
+            Assert.AreEqual("test@test.marketing", foundMember.Email);
         }
 
         [Test]

@@ -118,6 +118,12 @@ body {
     }
 }
 
+@media (max-width: 500px) {
+    #search-form .form-search {
+        width: ~"(calc(~'100%' - ~'80px'))";
+    }
+}
+
 #navigation {
   left: 80px;
   top: 0;
@@ -217,19 +223,17 @@ body {
     padding-left:20px
 }
 
-
-
 @media (max-width: 767px) {
 
     // make leftcolumn smaller on tablets
     #leftcolumn {
-      width: 60px;
+        width: 61px;
     }
     #applications ul.sections {
-        width: 60px;
+        width: 61px;
     }
     ul.sections.sections-tray {
-        width: 60px;
+        width: 61px;
     }
     #applications-tray {
         left: 60px;
@@ -241,35 +245,24 @@ body {
         left: 30px;
     }
     #umbracoMainPageBody .umb-modal-left.fade.in {
-      margin-left: 60px;
+        margin-left: 61px;
     }
 }
-
-
 
 @media (max-width: 500px) {
 
     // make leftcolumn smaller on mobiles
     #leftcolumn {
-      width: 40px;
+        width: 41px;
     }
     #applications ul.sections {
-        width: 40px;
-    }
-    ul.sections li [class^="icon-"]:before {
-        font-size: 25px!important;
-    }
-    #applications ul.sections li.avatar a img  {
-        width: 25px;
-    }
-    ul.sections a span {
-        display:none !important;
+        width: 41px;
     }
     #applications ul.sections-tray {
-        width: 40px;
+        width: 41px;
     }
     ul.sections.sections-tray {
-        width: 40px;
+        width: 41px;
     }
     #applications-tray {
         left: 40px;
@@ -281,7 +274,7 @@ body {
         left: 20px;
     }
     #umbracoMainPageBody .umb-modal-left.fade.in {
-        margin-left: 40px;
+        margin-left: 41px;
         width: 85%!important;
     }
 }

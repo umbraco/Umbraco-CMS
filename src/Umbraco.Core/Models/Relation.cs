@@ -26,10 +26,15 @@ namespace Umbraco.Core.Models
             _relationType = relationType;
         }
 
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Relation, int>(x => x.ParentId);
-        private static readonly PropertyInfo ChildIdSelector = ExpressionHelper.GetPropertyInfo<Relation, int>(x => x.ChildId);
-        private static readonly PropertyInfo RelationTypeSelector = ExpressionHelper.GetPropertyInfo<Relation, IRelationType>(x => x.RelationType);
-        private static readonly PropertyInfo CommentSelector = ExpressionHelper.GetPropertyInfo<Relation, string>(x => x.Comment);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Relation, int>(x => x.ParentId);
+            public readonly PropertyInfo ChildIdSelector = ExpressionHelper.GetPropertyInfo<Relation, int>(x => x.ChildId);
+            public readonly PropertyInfo RelationTypeSelector = ExpressionHelper.GetPropertyInfo<Relation, IRelationType>(x => x.RelationType);
+            public readonly PropertyInfo CommentSelector = ExpressionHelper.GetPropertyInfo<Relation, string>(x => x.Comment);
+        }
 
         /// <summary>
         /// Gets or sets the Parent Id of the Relation (Source)
@@ -38,14 +43,7 @@ namespace Umbraco.Core.Models
         public int ParentId
         {
             get { return _parentId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _parentId = value;
-                    return _parentId;
-                }, _parentId, ParentIdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector); }
         }
 
         /// <summary>
@@ -55,14 +53,7 @@ namespace Umbraco.Core.Models
         public int ChildId
         {
             get { return _childId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _childId = value;
-                    return _childId;
-                }, _childId, ChildIdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _childId, Ps.Value.ChildIdSelector); }
         }
 
         /// <summary>
@@ -72,14 +63,7 @@ namespace Umbraco.Core.Models
         public IRelationType RelationType
         {
             get { return _relationType; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _relationType = value;
-                    return _relationType;
-                }, _relationType, RelationTypeSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _relationType, Ps.Value.RelationTypeSelector); }
         }
 
         /// <summary>
@@ -89,14 +73,7 @@ namespace Umbraco.Core.Models
         public string Comment
         {
             get { return _comment; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _comment = value;
-                    return _comment;
-                }, _comment, CommentSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _comment, Ps.Value.CommentSelector); }
         }
 
         /// <summary>

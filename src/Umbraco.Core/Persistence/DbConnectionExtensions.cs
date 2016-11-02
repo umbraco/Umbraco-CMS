@@ -42,13 +42,13 @@ namespace Umbraco.Core.Persistence
             {
                 case DatabaseProviders.SqlServer:
                 case DatabaseProviders.SqlAzure:
-                    factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
+                    factory = DbProviderFactories.GetFactory(Constants.DatabaseProviders.SqlServer);
                     break;
                 case DatabaseProviders.SqlServerCE:
                     factory = DbProviderFactories.GetFactory("System.Data.SqlServerCe.4.0");
                     break;
                 case DatabaseProviders.MySql:
-                    factory = DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
+                    factory = DbProviderFactories.GetFactory(Constants.DatabaseProviders.MySql);
                     break;
                 case DatabaseProviders.PostgreSQL:
                 case DatabaseProviders.Oracle:

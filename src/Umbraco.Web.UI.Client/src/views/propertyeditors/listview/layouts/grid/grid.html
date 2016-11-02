@@ -12,13 +12,20 @@
       </umb-content-grid>
 
       <umb-empty-state
+          ng-if="!items && options.filter.length === 0 && !vm.isRecycleBin"
+          position="center">
+          <div ng-if="entityType === 'content'">No content has been added</div>
+          <div ng-if="entityType === 'member'">No members have been added</div>
+      </umb-empty-state>
+
+      <umb-empty-state
           ng-if="!items && options.filter.length > 0"
           position="center">
           <localize key="general_searchNoResult"></localize>
       </umb-empty-state>
 
       <umb-empty-state
-          ng-if="!items && vm.isRecycleBin"
+          ng-if="!items && options.filter.length == 0 && vm.isRecycleBin"
           position="center">
           <localize key="general_recycleBinEmpty"></localize>
       </umb-empty-state>
@@ -68,7 +75,7 @@
       </umb-tooltip>
 
       <umb-empty-state
-          ng-if="vm.itemsWithoutFolders.length === 0 && vm.isRecycleBin"
+          ng-if="vm.itemsWithoutFolders.length === 0 && options.filter.length == 0 && vm.isRecycleBin"
           position="center">
           <localize key="general_recycleBinEmpty"></localize>
       </umb-empty-state>

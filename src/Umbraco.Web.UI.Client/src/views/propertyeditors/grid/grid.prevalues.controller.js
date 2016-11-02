@@ -48,6 +48,7 @@ angular.module("umbraco")
 
             layouts:[
                 {
+                    label: "Headline",
                     name: "Headline",
                     areas: [
                         {
@@ -57,6 +58,7 @@ angular.module("umbraco")
                     ]
                 },
                 {
+                    label: "Article",
                     name: "Article",
                     areas: [
                         {

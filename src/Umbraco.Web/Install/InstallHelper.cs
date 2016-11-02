@@ -42,7 +42,7 @@ namespace Umbraco.Web.Install
         {
             return new List<InstallSetupStep>
             {
-                new NewInstallStep(_umbContext.Application),
+                new NewInstallStep(_umbContext.HttpContext, _umbContext.Application),
                 new UpgradeStep(),
                 new FilePermissionsStep(),
                 new MajorVersion7UpgradeReport(_umbContext.Application),

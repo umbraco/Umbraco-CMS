@@ -17,8 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
-        {            
-        }
+        { }
 
         private FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid> _cachePolicyFactory;
         protected override IRepositoryCachePolicyFactory<PublicAccessEntry, Guid> CachePolicyFactory
@@ -46,6 +45,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoAccess.id IN (@ids)", new { ids = ids });
             }
 
+            sql.OrderBy<AccessDto>(x => x.NodeId, SqlSyntax);
+
             var factory = new PublicAccessEntryFactory();
             var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
             return dtos.Select(factory.BuildEntity);
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .From<AccessDto>(SqlSyntax)
                 .LeftJoin<AccessRuleDto>(SqlSyntax)
                 .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
-                
+
             return sql;
         }
 
@@ -162,7 +163,5 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return entity.Key;
         }
-
-    
     }
 }

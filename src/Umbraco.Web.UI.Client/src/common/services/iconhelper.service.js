@@ -109,11 +109,16 @@ function iconHelper($q, $timeout) {
         },
         formatContentTypeIcons: function (contentTypes) {
             for (var i = 0; i < contentTypes.length; i++) {
-                contentTypes[i].icon = this.convertFromLegacyIcon(contentTypes[i].icon);
+                if (!contentTypes[i].icon) {
+                    //just to be safe (e.g. when focus was on close link and hitting save)
+                    contentTypes[i].icon = "icon-document"; // default icon
+                } else {
+                    contentTypes[i].icon = this.convertFromLegacyIcon(contentTypes[i].icon);
+                }
 
                 //couldnt find replacement
                 if(contentTypes[i].icon.indexOf(".") > 0){
-                     contentTypes[i].icon = "icon-document-dashed-line";   
+                     contentTypes[i].icon = "icon-document-dashed-line";
                 }
             }
             return contentTypes;
@@ -128,6 +133,10 @@ function iconHelper($q, $timeout) {
         },
         /** If the icon is legacy */
         isLegacyIcon: function (icon) {
+            if(!icon) {
+                return false;
+            }
+
             if(icon.startsWith('..')){
                 return false;
             }

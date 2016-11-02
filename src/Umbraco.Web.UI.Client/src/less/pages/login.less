@@ -13,7 +13,9 @@
     left: 0;
     margin: 0 !important;
     padding: 0;
+    border: none;
     border-radius: 0;
+    overflow-y: auto;
 }
 
 
@@ -50,7 +52,7 @@
 }
 
 .login-overlay .form {
-    position:fixed;
+    position:relative;
     display: block;
     top: 100px;
     left: 165px;
@@ -66,7 +68,7 @@
     font-weight: normal;
 }
 
-.login-overlay .alert.alert-error {
+.login-overlay .alert {
     display: inline-block;
     padding-right: 6px;
     padding-left: 6px;
@@ -74,11 +76,34 @@
     text-align: center;
 }
 
+.login-overlay .switch-view {
+    margin-top: 10px;    
+}
+
+@media (max-width: 767px) and (max-height: 420px) and (orientation: landscape) {
+  // Move form closer to top on narrow screen sizes
+  .login-overlay .form {
+    top: 50px;
+  }
+}
+
 @media (max-width: 565px) {
   // Remove padding on login-form on smaller devices
   .login-overlay .form {
+    top: 60px;
+    right: 25px;
     left: inherit;
-    right:25px;
+    padding-left: 25px;
+    padding-right:25px;
+    width: auto;
+  }
+}
+
+@media (max-width: 339px) {
+  .login-overlay .form {
+    input[type="text"], input[type="password"] {
+      width: 250px;
+    }
   }
 }
 
@@ -108,3 +133,9 @@
     margin: auto;
     color: @grayLight;
 }
+
+.login-overlay .text-error, 
+.login-overlay .text-info 
+{
+    font-weight:bold;
+} 

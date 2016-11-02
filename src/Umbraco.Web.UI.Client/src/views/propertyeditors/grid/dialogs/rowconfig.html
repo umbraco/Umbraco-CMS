@@ -6,9 +6,14 @@
       <p><localize key="grid_addRowConfigurationDetail" /></p>
 
       <div class="alert alert-warn ng-scope" ng-show="nameChanged">
-          Modifying a row configuration name will result in loss of
-          data for any existing content that is based on this configuration.
+          <p>Modifying a row configuration name will result in loss of
+          data for any existing content that is based on this configuration.</p>
+          <p><strong>Modifying only the label will not result in data loss.</strong></p>
       </div>
+       
+       <umb-control-group label="@general_label">
+           <input type="text" ng-model="currentRow.label" placeholder="Overrides name" />
+       </umb-control-group>
 
       <umb-control-group label="@general_name">
           <input type="text" ng-model="currentRow.name" />
@@ -75,6 +80,7 @@
                                   checklist-model="currentCell.allowed"
                                   checklist-value="editor.alias">
                                    <i class="icon {{editor.icon}}"></i> {{editor.name}}
+                                   <small class="input-label--small">({{editor.alias}})</small>
                           </label>
                       </li>
                   </ul>

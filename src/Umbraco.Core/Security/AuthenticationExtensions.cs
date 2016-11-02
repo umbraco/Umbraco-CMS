@@ -307,11 +307,9 @@ namespace Umbraco.Core.Security
             }
             catch (Exception)
             {
-                //TODO: Do we need to do more here?? need to make sure that the forms cookie is gone, but is that
-                // taken care of in our custom middleware somehow?
                 ctx.Authentication.SignOut(
-                    Core.Constants.Security.BackOfficeAuthenticationType,
-                    Core.Constants.Security.BackOfficeExternalAuthenticationType);
+                    Constants.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeExternalAuthenticationType);
                 return null;
             }
         }

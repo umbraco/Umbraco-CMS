@@ -73,6 +73,11 @@
             /// </summary>
 			public const string DataTypes = "dataTypes";
 
+            /// <summary>
+            /// alias for the packages tree
+            /// </summary>
+            public const string Packages = "packager";
+
 			/// <summary>
 			/// alias for the dictionary tree.
 			/// </summary>

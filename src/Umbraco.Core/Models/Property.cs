@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -45,8 +43,42 @@ namespace Umbraco.Core.Models
             Value = value;
         }
 
-        private static readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Value);
-        private static readonly PropertyInfo VersionSelector = ExpressionHelper.GetPropertyInfo<Property, Guid>(x => x.Version);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Value);
+            public readonly PropertyInfo VersionSelector = ExpressionHelper.GetPropertyInfo<Property, Guid>(x => x.Version);
+        }
+
+        private static readonly DelegateEqualityComparer<object> ValueComparer = new DelegateEqualityComparer<object>(
+            (o, o1) =>
+            {
+                if (o == null && o1 == null) return true;
+
+                //custom comparer for strings.                        
+                if (o is string || o1 is string)
+                {
+                    //if one is null and another is empty then they are the same
+                    if ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace())
+                    {
+                        return true;
+                    }
+                    if (o == null || o1 == null) return false;
+                    return o.Equals(o1);
+                }
+
+                if (o == null || o1 == null) return false;
+
+                //Custom comparer for enumerable if it is enumerable
+                var enum1 = o as IEnumerable;
+                var enum2 = o1 as IEnumerable;
+                if (enum1 != null && enum2 != null)
+                {
+                    return enum1.Cast<object>().UnsortedSequenceEqual(enum2.Cast<object>());
+                }
+                return o.Equals(o1);
+            }, o => o.GetHashCode());
         
         /// <summary>
         /// Returns the instance of the tag support, by default tags are not enabled
@@ -98,14 +130,14 @@ namespace Umbraco.Core.Models
         public Guid Version
         {
             get { return _version; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _version = value;
-                    return _version;
-                }, _version, VersionSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _version, Ps.Value.VersionSelector); }
+        }
+
+        private static void ThrowTypeException(object value, Type expected, string alias)
+        {
+            throw new InvalidOperationException(string.Format("Value \"{0}\" of type \"{1}\" could not be converted"
+                + " to type \"{2}\" which is expected by property type \"{3}\".",
+                value, value.GetType(), expected, alias));
         }
 
         /// <summary>
@@ -121,47 +153,54 @@ namespace Umbraco.Core.Models
             get { return _value; }
             set
             {
-                bool typeValidation = _propertyType.IsPropertyTypeValid(value);
+                var isOfExpectedType = _propertyType.IsPropertyTypeValid(value);
 
-                if (typeValidation == false)
-                    throw new Exception(
-                        string.Format(
-                            "Type validation failed. The value type: '{0}' does not match the DataType in PropertyType with alias: '{1}'",
-                            value == null ? "null" : value.GetType().Name, Alias));
-
-                SetPropertyValueAndDetectChanges(o =>
+                if (isOfExpectedType == false) // isOfExpectedType is true if value is null - so if false, value is *not* null
                 {
-                    _value = value;
-                    return _value;
-                }, _value, ValueSelector, 
-                new DelegateEqualityComparer<object>(
-                    (o, o1) =>
+                    // "garbage-in", accept what we can & convert
+                    // throw only if conversion is not possible
+
+                    var s = value.ToString();
+
+                    switch (_propertyType.DataTypeDatabaseType)
                     {
-                        if (o == null && o1 == null) return true;
-
-                        //custom comparer for strings.                        
-                        if (o is string || o1 is string)                            
-                        {
-                            //if one is null and another is empty then they are the same
-                            if ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace())
+                        case DataTypeDatabaseType.Nvarchar:
+                        case DataTypeDatabaseType.Ntext:
+                            value = s;
+                            break;
+                        case DataTypeDatabaseType.Integer:
+                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
+                            else
                             {
-                                return true;   
+                                var convInt = value.TryConvertTo<int>();
+                                if (convInt == false) ThrowTypeException(value, typeof(int), _propertyType.Alias);
+                                value = convInt.Result;
                             }
-                            if (o == null || o1 == null) return false;
-                            return o.Equals(o1);
-                        }
-                        
-                        if (o == null || o1 == null) return false;
+                            break;
+                        case DataTypeDatabaseType.Decimal:
+                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
+                            else
+                            {
+                                var convDecimal = value.TryConvertTo<decimal>();
+                                if (convDecimal == false) ThrowTypeException(value, typeof (decimal), _propertyType.Alias);
+                                // need to normalize the value (change the scaling factor and remove trailing zeroes)
+                                // because the underlying database is going to mess with the scaling factor anyways.
+                                value = convDecimal.Result.Normalize();
+                            }
+                            break;
+                        case DataTypeDatabaseType.Date:
+                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
+                            else
+                            {
+                                var convDateTime = value.TryConvertTo<DateTime>();
+                                if (convDateTime == false) ThrowTypeException(value, typeof (DateTime), _propertyType.Alias);
+                                value = convDateTime.Result;
+                            }
+                            break;
+                    }
+                }
 
-                        //Custom comparer for enumerable if it is enumerable
-                        var enum1 = o as IEnumerable;
-                        var enum2 = o1 as IEnumerable;
-                        if (enum1 != null && enum2 != null)
-                        {
-                            return enum1.Cast<object>().UnsortedSequenceEqual(enum2.Cast<object>());
-                        }
-                        return o.Equals(o1);
-                    }, o => o.GetHashCode()));
+                SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector, ValueComparer);
             }
         }
 
