@@ -3,7 +3,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultipleMediaPickerAlias, "Media Picker", "mediapicker", Group = "media", Icon = "icon-pictures-alt-2")]
+    [PropertyEditor(Constants.PropertyEditors.MultipleMediaPickerAlias, "Media Picker", "mediapicker", Group = "media", Icon = "icon-pictures-alt-2", ValueType = PropertyEditorValueTypes.Text)]
     public class MultipleMediaPickerPropertyEditor : MediaPickerPropertyEditor
     {
         public MultipleMediaPickerPropertyEditor()

@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePickerAlias, "Multinode Treepicker", "contentpicker", Group="pickers", Icon="icon-page-add")]
+    [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePickerAlias, "Multinode Treepicker", "contentpicker", Group="pickers", Icon="icon-page-add", ValueType=PropertyEditorValueTypes.Text)]
     public class MultiNodeTreePickerPropertyEditor : PropertyEditor
     {
         public MultiNodeTreePickerPropertyEditor()
