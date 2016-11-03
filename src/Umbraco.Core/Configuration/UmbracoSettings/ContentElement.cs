@@ -304,6 +304,18 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        [ConfigurationProperty("EnablePropertyValueConverters")]
+        internal InnerTextConfigurationElement<bool> EnablePropertyValueConverters
+        {
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                       (InnerTextConfigurationElement<bool>)this["EnablePropertyValueConverters"],
+                       //set the default
+                       false);
+            }
+        }
+
         string IContentSection.NotificationEmailAddress
         {
             get { return Notifications.NotificationEmailAddress; }
@@ -447,6 +459,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.EnableInheritedMediaTypes
         {
             get { return EnableInheritedMediaTypes; }
+        }
+        bool IContentSection.EnablePropertyValueConverters
+        {
+            get { return EnablePropertyValueConverters; }
         }
     }
 }

@@ -396,6 +396,7 @@
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\LegacyRelatedLinksEditorValueConvertor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultipleMediaPickerPropertyConverter.cs" />

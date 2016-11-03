@@ -10,6 +10,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -35,7 +36,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias);
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias);
+            }
+            return false;
         }
 
         /// <summary>

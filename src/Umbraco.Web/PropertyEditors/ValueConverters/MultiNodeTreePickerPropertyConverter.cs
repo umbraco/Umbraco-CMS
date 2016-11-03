@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -44,7 +45,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias);
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias);
+            }
+            return false;
         }
 
         /// <summary>
