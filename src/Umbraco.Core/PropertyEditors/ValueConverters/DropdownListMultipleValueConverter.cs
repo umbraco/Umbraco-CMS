@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -9,7 +10,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.DropDownListMultipleAlias);
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.DropDownListMultipleAlias);
+            }
+            return false;
         }
 
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)

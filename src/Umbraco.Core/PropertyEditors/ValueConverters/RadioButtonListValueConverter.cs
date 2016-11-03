@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -7,7 +8,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.RadioButtonListAlias);
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.RadioButtonListAlias);
+            }
+            return false;
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
@@ -24,8 +29,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return typeof(int);
         }
 
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType,
-                                                        PropertyCacheValue cacheValue)
+        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
         {
             return PropertyCacheLevel.Content;
         }

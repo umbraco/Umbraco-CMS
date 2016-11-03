@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -7,9 +8,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return
-                propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors
-                                                                          .DropdownlistPublishingKeysAlias);
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.DropdownlistPublishingKeysAlias);
+            }
+            return false;
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

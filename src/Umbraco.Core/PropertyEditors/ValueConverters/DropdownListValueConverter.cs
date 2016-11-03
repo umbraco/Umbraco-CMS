@@ -20,8 +20,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return typeof(string);
         }
 
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType,
-                                                        PropertyCacheValue cacheValue)
+        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
         {
             return PropertyCacheLevel.Content;
         }
