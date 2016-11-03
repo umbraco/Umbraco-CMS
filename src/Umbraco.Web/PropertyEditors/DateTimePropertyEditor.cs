@@ -21,7 +21,9 @@ namespace Umbraco.Web.PropertyEditors
                     //a pre-value indicating if the client/server time should be offset, when set to true the date/time seen
                     // by the client will be offset with the server time.
                     // For example, this is forced to true for scheduled publishing date/time pickers
-                    {"offsetTime", "0"}
+                    {"offsetTime", "0"},
+                    {"lowestYear", 1900 },
+                    {"numberOfYearsIntoTheFuture", 100 }
                 };
         }
 

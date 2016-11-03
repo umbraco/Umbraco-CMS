@@ -4,7 +4,9 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     var config = {
         pickDate: true,
         pickTime: true,
-		useSeconds: true,
+        useSeconds: true,
+        minDate: moment({ y: 1900 }),
+        maxDate: moment().add(100, 'y'),
         format: "YYYY-MM-DD HH:mm:ss",
 		icons: {
                     time: "icon-time",
@@ -19,9 +21,27 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     $scope.model.config = angular.extend(config, $scope.model.config);
     //ensure the format doesn't get overwritten with an empty string
     if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
+
         $scope.model.config.format = $scope.model.config.pickTime ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD";
     }
 
+    
+    if (!($scope.model.config.numberOfYearsIntoTheFuture === "" || $scope.model.config.numberOfYearsIntoTheFuture === undefined || $scope.model.config.numberOfYearsIntoTheFuture === null) && Number.isInteger($scope.model.config.numberOfYearsIntoTheFuture) && $scope.model.config.numberOfYearsIntoTheFuture > 0) {
+
+        var m = moment();
+        if (m.get('y') + $scope.model.config.numberOfYearsIntoTheFuture > 9999)
+            $scope.model.config.maxDate = moment().add(9999 - m.get('y'), 'y');
+        else
+            $scope.model.config.maxDate = moment().add($scope.model.config.numberOfYearsIntoTheFuture, 'y');
+    }
+
+    //limited to 19753 due to supporting SQLCE
+    if (!($scope.model.config.lowestYear === "" || $scope.model.config.lowestYear === undefined ||
+        $scope.model.config.lowestYear === null) && Number.isInteger($scope.model.config.lowestYear) && $scope.model.config.lowestYear > 1753) {
+
+        $scope.model.config.minDate = moment({ y: $scope.model.config.lowestYear });
+
+    }
 
 
     $scope.hasDatetimePickerValue = $scope.model.value ? true : false;
