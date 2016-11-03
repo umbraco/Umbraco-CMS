@@ -1346,7 +1346,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
 
     <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
-    <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely when there's any errors in macros. Rectifying this will set the value to '%1%'.</key>
+    <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.</key>
     <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
 
     <!-- The following keys get these tokens passed in:
