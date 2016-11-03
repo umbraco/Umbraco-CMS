@@ -8,7 +8,36 @@
         "localizationService",
         function (scope, contentTypeResource, navigationService, notificationsService, localizationService) {
             var notificationHeader;
-            localizationService.localize("general_renamed")
+
+            function reportSuccessAndClose() {
+                var lastComma = scope.currentNode.path.lastIndexOf(","),
+                    path = lastComma === -1
+                        ? scope.currentNode.path
+                        : scope.currentNode.path.substring(0, lastComma - 1);
+
+                navigationService.syncTree({
+                    tree: "documenttypes",
+                    path: path,
+                    forceReload: true,
+                    activate: true
+                });
+
+                localizationService.localize(
+                    "renamecontainer_folderWasRenamed",
+                    [scope.currentNode.name, scope.model.folderName])
+                    .then(function (msg) {
+                        notificationsService.showNotification({
+                            type: 0,
+                            header: notificationHeader,
+                            message: msg
+                        });
+                    });
+
+                navigationService.hideMenu();
+            }
+
+
+            localizationService.localize("renamecontainer_renamed")
                 .then(function(s) { notificationHeader = s; });
 
             scope.model = {
@@ -18,28 +47,7 @@
             scope.renameContainer = function () {
 
                 contentTypeResource.renameContainer(scope.currentNode.id, scope.model.folderName)
-                    .then(function() {
-
-                        localizationService.localize("renamecontainer_folderWasRenamed",
-                                scope.currentNode.name,
-                                scope.model.folderName)
-                            .then(function(msg) {
-                                notificationsService.showNotification({
-                                    type: 0,
-                                    header: notificationHeader,
-                                    message: msg
-                                });
-                            });
-
-                        //notificationsService.showNotification({
-                        //    type: 0,
-                        //    header: notificationHeader,
-                        //    message: scope.currentNode.name + " was renamed to " + scope.model.folderName
-                        //});
-
-                        navigationService.hideMenu();
-
-                    }, function (err) {
+                    .then(reportSuccessAndClose, function (err) {
                         scope.error = err;
 
                         if (angular.isArray(err.data.notifications)) {

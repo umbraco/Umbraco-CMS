@@ -426,6 +426,7 @@
     <key alias="removeListView" version="7.2">Remove custom list view</key>
   </area>
   <area alias="renamecontainer">
+    <key alias="renamed">Renamed</key>
     <key alias="enterNewFolderName">Enter a new folder name here</key>
     <key alias="folderWasRenamed">%0% was renamed to %1%</key>
   </area>
