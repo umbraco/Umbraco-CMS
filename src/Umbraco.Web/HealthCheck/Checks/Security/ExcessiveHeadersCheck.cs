@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Security
@@ -48,7 +49,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var url = HealthCheckContext.HttpContext.Request.Url;
 
             // Access the site home page and check for the headers
-            var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);
+            var useSsl = GlobalSettings.UseSSL || HealthCheckContext.HttpContext.Request.ServerVariables["SERVER_PORT"] == "443";
+            var address = string.Format("http{0}://{1}:{2}", useSsl ? "s" : "", url.Host.ToLower(), url.Port);
             var request = WebRequest.Create(address);
             request.Method = "HEAD";
             try

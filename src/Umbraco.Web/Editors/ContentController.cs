@@ -467,7 +467,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Change the sort order for media
+        /// Change the sort order for content
         /// </summary>
         /// <param name="sorted"></param>
         /// <returns></returns>
@@ -485,23 +485,24 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            var contentService = Services.ContentService;
-            var sortedContent = new List<IContent>();
             try
             {
-                sortedContent.AddRange(Services.ContentService.GetByIds(sorted.IdSortOrder));
+                var contentService = Services.ContentService;
+
+                // content service GetByIds does order the content items based on the order of Ids passed in
+                var content = contentService.GetByIds(sorted.IdSortOrder);
 
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(sortedContent) == false)
+                if (contentService.Sort(content) == false)
                 {
-                    LogHelper.Warn<MediaController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    LogHelper.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                LogHelper.Error<MediaController>("Could not update content sort order", ex);
+                LogHelper.Error<ContentController>("Could not update content sort order", ex);
                 throw;
             }
         }

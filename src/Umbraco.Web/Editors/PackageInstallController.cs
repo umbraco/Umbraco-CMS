@@ -2,31 +2,22 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.UI.WebControls;
 using System.Xml;
-using System.Xml.Linq;
 using umbraco;
-using Umbraco.Core.Auditing;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.packager;
 using umbraco.cms.businesslogic.packager.repositories;
-using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.presentation.developer.packages;
-using umbraco.webservices;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -36,7 +27,6 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
-using Settings = umbraco.cms.businesslogic.packager.Settings;
 using Version = System.Version;
 
 namespace Umbraco.Web.Editors
@@ -212,6 +202,9 @@ namespace Umbraco.Web.Editors
                 var file = IOHelper.FindFile(item);
                 if (file != null)
                 {
+                    if (file.StartsWith("/") == false)
+                        file = string.Format("/{0}", file);
+
                     var filePath = IOHelper.MapPath(file);
                     if (File.Exists(filePath))
                     {

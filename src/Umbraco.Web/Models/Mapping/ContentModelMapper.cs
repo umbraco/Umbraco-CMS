@@ -31,10 +31,10 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IContent, ContentItemDisplay>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(
                     dto => dto.Updater,
-                    expression => expression.ResolveUsing<CreatorResolver>())
+                    expression => expression.ResolveUsing(new CreatorResolver()))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -81,10 +81,10 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(
                     dto => dto.Updater,
-                    expression => expression.ResolveUsing<CreatorResolver>())
+                    expression => expression.ResolveUsing(new CreatorResolver()))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IContent, ContentItemDto<IContent>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(
                     dto => dto.HasPublishedVersion,
                     expression => expression.MapFrom(content => content.HasPublishedVersion))

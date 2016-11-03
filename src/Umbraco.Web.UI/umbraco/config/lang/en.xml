@@ -147,9 +147,9 @@
     <key alias="nodeName">Page Title</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
-    <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error - see log)</key>
-    <key alias="getUrlException">Oops: could not get the url (internal error - see log)</key>
-    <key alias="routeError">Oops: this document is published but its url would collide with content %0%</key>
+    <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
+    <key alias="getUrlException">Could not get the url</key>
+    <key alias="routeError">This document is published but its url would collide with content %0%</key>
     <key alias="publish">Publish</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="releaseDate">Publish at</key>
@@ -327,6 +327,12 @@
       Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left
    ]]></key>
     <key alias="displayName">Culture Name</key>
+    <key alias="changeKey">Edit the key of the dictionary item.</key>
+    <key alias="changeKeyError">
+      <![CDATA[
+      The key '%0%' already exists.
+   ]]>
+    </key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -1356,6 +1362,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid %2%</key>
 	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid %2%</key>
 
+	  <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
 	  <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
 	  <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
 	  <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
@@ -1395,11 +1402,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="requiredFilePermissionFailed"><![CDATA[The following files must be set up with write permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
     <key alias="optionalFilePermissionFailed"><![CDATA[The following files must be set up with write permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
 
-    <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMed by another was found.]]></key>
-    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMed by another was not found.]]></key>
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was not found.]]></key>
     <key alias="clickJackingSetHeaderInConfig">Set Header in Config</key>
-    <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMed by other websites.</key>
-    <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMing of the site by other websites has been added to your web.config file.</key>
+    <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMEd by other websites.</key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMEing of the site by other websites has been added to your web.config file.</key>
     <key alias="clickJackingSetHeaderInConfigError">Could not update web.config file. Error: %0%</key>
 
     <!-- The following key get these tokens passed in:
@@ -1415,5 +1422,22 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">Disable URL tracker</key>
+    <key alias="enableUrlTracker">Enable URL tracker</key>
+    <key alias="originalUrl">Original URL</key>
+    <key alias="redirectedTo">Redirected To</key>
+    <key alias="noRedirects">No redirects have been made</key>
+    <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
+    <key alias="removeButton">Remove</key>
+    <key alias="confirmRemove">Are you sure you want to remove the redirect from '%0%' to '%1%'?</key>
+    <key alias="redirectRemoved">Redirect URL removed.</key>
+    <key alias="redirectRemoveError">Error removing redirect URL.</key>
+    <key alias="confirmDisable">Are you sure you want to disable the URL tracker?</key>
+    <key alias="disabledConfirm">URL tracker has now been disabled.</key>
+    <key alias="disableError">Error disabling the URL tracker, more information can be found in your log file.</key>
+    <key alias="enabledConfirm">URL tracker has now been enabled.</key>
+    <key alias="enableError">Error enabling the URL tracker, more information can be found in your log file.</key>
   </area>
 </language>

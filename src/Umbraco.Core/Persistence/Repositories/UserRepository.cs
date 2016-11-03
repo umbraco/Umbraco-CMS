@@ -320,51 +320,51 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </remarks>
         public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy)
         {
-            if (orderBy == null) throw new ArgumentNullException("orderBy");
+            if (orderBy == null)
+                throw new ArgumentNullException("orderBy");
 
-            var sql = new Sql();
-            sql.Select("*").From<UserDto>();
-
-            Sql resultQuery;
-            if (query != null)
-            {
-                var translator = new SqlTranslator<IUser>(sql, query);
-                resultQuery = translator.Translate();
-            }
-            else
-            {
-                resultQuery = sql;
-            }
-
-            //get the referenced column name
+            // get the referenced column name and find the corresp mapped column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
-            //now find the mapped column name
             var mapper = MappingResolver.Current.ResolveMapperByType(typeof(IUser));
             var mappedField = mapper.Map(expressionMember.Name);
+
             if (mappedField.IsNullOrWhiteSpace())
-            {
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
-            }
-            //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
-            resultQuery.OrderBy(string.Format("({0})", mappedField));
 
-            var pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, resultQuery);
+            var sql = new Sql()
+                .Select("umbracoUser.Id")
+                .From<UserDto>(SqlSyntax);
 
-            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            var idsQuery = query == null ? sql : new SqlTranslator<IUser>(sql, query).Translate();
 
-            //now that we have the user dto's we need to construct true members from the list.
+            // need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
+            idsQuery.OrderBy("(" + mappedField + ")");
+            var page = Database.Page<int>(pageIndex + 1, pageSize, idsQuery);
+            totalRecords = Convert.ToInt32(page.TotalItems);
+
             if (totalRecords == 0)
-            {
                 return Enumerable.Empty<IUser>();
-            }
 
-            var ids = pagedResult.Items.Select(x => x.Id).ToArray();
-            var result = ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids);
-
-            //now we need to ensure this result is also ordered by the same order by clause
-            return result.OrderBy(orderBy.Compile());
+            // now get the actual users and ensure they are ordered properly (same clause)
+            var ids = page.Items.ToArray();
+            return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids).OrderBy(orderBy.Compile());
         }
-        
+
+        internal IEnumerable<IUser> GetNextUsers(int id, int count)
+        {
+            var idsQuery = new Sql()
+                .Select("umbracoUser.Id")
+                .From<UserDto>(SqlSyntax)
+                .Where<UserDto>(x => x.Id >= id)
+                .OrderBy<UserDto>(x => x.Id, SqlSyntax);
+
+            // first page is index 1, not zero
+            var ids = Database.Page<int>(1, count, idsQuery).Items.ToArray();
+
+            // now get the actual users and ensure they are ordered properly (same clause)
+            return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids).OrderBy(x => x.Id);
+        }
+
         /// <summary>
         /// Returns permissions for a given user for any number of nodes
         /// </summary>

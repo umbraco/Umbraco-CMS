@@ -565,7 +565,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var array = tagsToInsert
                 .Select(tag =>
-                    string.Format("select '{0}' as Tag, '{1}' as " + SqlSyntax.GetQuotedColumnName("group") + @"",
+                    string.Format("select N'{0}' as Tag, '{1}' as " + SqlSyntax.GetQuotedColumnName("group") + @"",
                         PetaPocoExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")), tag.Group))
                 .ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
