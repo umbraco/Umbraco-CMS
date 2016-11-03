@@ -82,7 +82,7 @@
             };
 
             $scope.delete = function (idx) {               
-                $scope.model.value.splice(idx, 1);               
+                $scope.model.value.splice(idx, 1);
             };
 
             $scope.add = function ($event) {
@@ -99,6 +99,10 @@
                             this.type = "external";
                             this.title = $scope.newCaption;
                         };
+
+                        if ($scope.model.value == '') {
+                            $scope.model.value = [];
+                        }
                         $scope.model.value.push(newExtLink);
                     } else {
                         var newIntLink = new function() {
