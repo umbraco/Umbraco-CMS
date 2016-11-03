@@ -1,13 +1,14 @@
 ﻿angular.module("umbraco")
-    .controller("Umbraco.Editors.DocumentTypes.RenameController",
+    .controller("Umbraco.Editors.ContentTypeContainers.RenameController",
     [
         "$scope",
-        "contentTypeResource",
+        "$injector",
         "navigationService",
         "notificationsService",
         "localizationService",
-        function (scope, contentTypeResource, navigationService, notificationsService, localizationService) {
-            var notificationHeader;
+        function (scope, injector, navigationService, notificationsService, localizationService) {
+            var notificationHeader,
+                resource = injector.get(scope.resource);
 
             function reportSuccessAndClose() {
                 var lastComma = scope.currentNode.path.lastIndexOf(","),
@@ -16,7 +17,7 @@
                         : scope.currentNode.path.substring(0, lastComma - 1);
 
                 navigationService.syncTree({
-                    tree: "documenttypes",
+                    tree: scope.tree,
                     path: path,
                     forceReload: true,
                     activate: true
@@ -46,7 +47,7 @@
 
             scope.renameContainer = function () {
 
-                contentTypeResource.renameContainer(scope.currentNode.id, scope.model.folderName)
+                resource.renameContainer(scope.currentNode.id, scope.model.folderName)
                     .then(reportSuccessAndClose, function (err) {
                         scope.error = err;
 

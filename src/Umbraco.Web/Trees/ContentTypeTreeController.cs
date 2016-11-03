@@ -102,11 +102,10 @@ namespace Umbraco.Web.Trees
                 }
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
-                var menuItem = new MenuItem("rename", Services.TextService.Localize(String.Format("actions/{0}", "rename")))
+                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize(String.Format("actions/{0}", "rename")))
                 { 
                     Icon = "icon icon-edit"
-                };
-                menu.Items.Add(menuItem);
+                });
             }
             else
             {
