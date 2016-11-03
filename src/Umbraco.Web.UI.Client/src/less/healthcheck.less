@@ -1,12 +1,20 @@
-/* Vars */
-	@red-orange: #FF3F34;
-	@sunrise: #F5D226;
-	@emerald: #50C878;
-
 
 .umb-healthcheck {
 	display: flex;
 	flex-wrap: wrap;
+	margin-left: -10px;
+	margin-right: -10px;
+}
+
+.umb-healthcheck-help-text {
+	line-height: 1.6em;
+	margin-bottom: 30px;
+}
+
+.umb-healthcheck-action-bar {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 20px;
 }
 
 
@@ -42,7 +50,6 @@
 
 /* Title */
 .umb-healthcheck-title {
-	margin-bottom: 15px;
 	font-size: 14px;
 	font-weight: bold;
 }
@@ -50,28 +57,26 @@
 
 /* Messages */
 .umb-healthcheck-messages {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
+	margin-top: 15px;
 }
 
 .umb-healthcheck-message {
 	position: relative;
 	background: #fff;
     border-radius: 50px;
-    display: flex;
-    align-items: center;
-    flex: 1 1 auto;
-    padding: 5px 10px;
+    display: inline-flex;
+	align-items: center;
+	padding-left: 8px;
+	padding-right: 8px;
     margin-bottom: 5px;
     color: #000;
     font-weight: bold;
+	font-size: 13px;
 }
 
 .umb-healthcheck-message i {
-	font-size: 20px;
-	margin-right: 5px;
+	font-size: 15px;
+	margin-right: 3px;
 }
 
 .umb-healthcheck-details-link {
@@ -99,11 +104,11 @@
     font-size: 14px;
     font-weight: bold;
 
-    height: 38px;
+    height: 40px;
     line-height: 1;
 
     max-width: 100%;
-    padding: 0 18px;
+    padding: 0 15px;
 
     color: #484848;
     background-color: #e0e0e0;
@@ -144,6 +149,15 @@
 
 .umb-era-button.-blue:hover {
 	background-color: @blueDark;
+}
+
+.umb-era-button.-red {
+	background: @btnDangerBackground;
+	color: white;
+}
+
+.umb-era-button.-red:hover {
+	background-color: darken(@btnDangerBackground, 5%);
 }
 
 .umb-era-button.-link {
@@ -235,12 +249,13 @@
 }
 
 .umb-healthcheck-group__details-checks {
-	border: 2px solid @grayLight;
+	border: 1px solid @grayLight;
 	border-top: none;
 	border-radius: 0 0 3px 3px;
 }
 
 .umb-healthcheck-group__details-check {
+	position: relative;
 }
 
 .umb-healthcheck-group__details-check-title {
@@ -252,20 +267,19 @@
 	font-size: 14px;
 	color: @black;
 	font-weight: bold;
+	margin-bottom: 2px;
 }
 
 .umb-healthcheck-group__details-check-description {
 	font-size: 12px;
 	color: @grayMed;
-	line-height: 1.6rem;
-	//margin-top: 10px;
+	line-height: 1.6em;
 }
 
 .umb-healthcheck-group__details-status {
 	padding: 15px 0;
 	display: flex;
 	border-bottom: 2px solid @grayLighter;
-	position: relative;
 }
 
 .umb-healthcheck-group__details-status-overlay {
@@ -328,6 +342,6 @@
 }
 
 .umb-healthcheck-group__details-status-action-description {
-	margin-top: 10px;
-	font-size: 13px;
+	margin-top: 5px;
+	font-size: 11px;
 }

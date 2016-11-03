@@ -199,6 +199,9 @@ namespace Umbraco.Web.Editors
                 var file = IOHelper.FindFile(item);
                 if (file != null)
                 {
+                    if (file.StartsWith("/") == false)
+                        file = string.Format("/{0}", file);
+
                     var filePath = IOHelper.MapPath(file);
                     if (File.Exists(filePath))
                     {

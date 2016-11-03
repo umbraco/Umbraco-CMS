@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("umbracoRedirectUrl")]
-    [PrimaryKey("id")]
+    [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     class RedirectUrlDto
     {
@@ -22,8 +22,8 @@ namespace Umbraco.Core.Models.Rdbms
         // inserts, and much faster on reads, so... we have an index on a hash.
 
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 1, Name = "PK_umbracoRedirectUrl")]
-        public int Id { get; set; }
+        [PrimaryKeyColumn(Name = "PK_umbracoRedirectUrl", AutoIncrement = false)]
+        public Guid Id { get; set; }
 
         [ResultColumn]
         public int ContentId { get; set; }
@@ -39,12 +39,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("url")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        //[Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "url, createDateUtc")]
         public string Url { get; set; }
 
         [Column("urlHash")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "urlHash, contentKey, createDateUtc")]
+        [Length(40)]
         public string UrlHash { get; set; }
     }
 }

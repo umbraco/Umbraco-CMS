@@ -38,6 +38,10 @@ namespace Umbraco.Web.Install.Controllers
 
             if (_runtime.Level == RuntimeLevel.Upgrade)
             {
+                // Update ClientDependency version
+                var clientDependencyConfig = new ClientDependencyConfiguration(_logger);
+                var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
+
                 var result = _umbracoContext.Security.ValidateCurrentUser(false);
 
                 switch (result)

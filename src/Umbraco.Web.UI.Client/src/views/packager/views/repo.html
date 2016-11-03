@@ -153,12 +153,13 @@
                 <div class="umb-package-details__sidebar">
 
                     <div class="umb-package-details__section">
-                        <button class="umb-era-button -blue -full-width" 
+                        <button class="umb-era-button -blue -full-width"
                                 ng-if="vm.package.isValid === true"
                                 ng-click="vm.downloadPackage(vm.package)">Install package</button>
-                        <div class="umb-info-local-item text-error" ng-if="vm.package.isValid === false">
-                            <localize key="packager_packageAlreadyInstalled">The package and version chosen is already installed</localize>
-                        </div>
+
+                        <button class="umb-era-button -inactive -full-width" ng-if="vm.package.isValid === false" disabled>
+                            <localize key="packager_packageAlreadyInstalled">Package is already installed</localize>
+                        </button>
                     </div>
 
                     <div class="umb-package-details__section">
@@ -198,7 +199,7 @@
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.created">
                                 <div class="umb-package-details__information-item-label">Created:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.created}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.created | date:'yyyy-MM-dd HH:mm:ss'}}</div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.latestVersion">
@@ -312,7 +313,7 @@
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
                                 <label for="license-accept" class="umb-package-installer-label">
                                     <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
-                                    <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}">terms of use</a></strong>
+                                    <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">terms of use</a></strong>
                                 </label>
                                 <button type="button"
                                         ng-if="vm.installState.type !== 'error'"
@@ -334,7 +335,7 @@
                             <div class="umb-info-local-item text-error" ng-if="!vm.localPackage.isCompatible">
                                 This package cannot be installed, it requires a minimum Umbraco version of {{vm.localPackage.umbracoVersion}}
                             </div>
-                            
+
                             <div class="umb-info-local-item text-info" ng-class="{'text-info' : vm.installState.type !== 'error'}">
                                 <p>{{vm.installState.status}}</p>
                             </div>

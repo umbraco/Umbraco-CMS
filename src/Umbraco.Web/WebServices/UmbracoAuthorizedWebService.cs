@@ -40,7 +40,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool ValidateCredentials(string username, string password)
         {
-            return UmbracoContext.Security.ValidateBackOfficeCredentials(username, password);            
+            return UmbracoContext.Security.ValidateBackOfficeCredentials(username, password);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Web.WebServices
         {
             //ensure we have a valid user first!
             if (!AuthorizeRequest(throwExceptions)) return false;
-                
+
             //if it is empty, don't validate
             if (app.IsNullOrWhiteSpace())
             {

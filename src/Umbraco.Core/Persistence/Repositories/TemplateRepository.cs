@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _viewsFileSystem = viewFileSystem;
             _templateConfig = templateConfig;
             _viewHelper = new ViewHelper(_viewsFileSystem);
-            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);            
+            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
         protected override IRepositoryCachePolicy<ITemplate, int> CachePolicy
@@ -198,29 +198,7 @@ namespace Umbraco.Core.Persistence.Repositories
             template.Path = nodeDto.Path;
 
             //now do the file work
-
-            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
-            {
-                var result = _viewHelper.CreateView(template, true);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
-            else
-            {
-                var result = _masterPageHelper.CreateMasterPage(template, this, true);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
+            SaveFile(template, dto);
 
             template.ResetDirtyProperties();
 
@@ -270,35 +248,50 @@ namespace Umbraco.Core.Persistence.Repositories
             template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
 
             //now do the file work
-
-            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
-            {
-                var result = _viewHelper.UpdateViewFile(entity, originalAlias);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
-            else
-            {
-                var result = _masterPageHelper.UpdateMasterPageFile(entity, originalAlias, this);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
+            SaveFile((Template) entity, dto, originalAlias);
 
             entity.ResetDirtyProperties();
 
             // ensure that from now on, content is lazy-loaded
             if (template.GetFileContent == null)
                 template.GetFileContent = file => GetFileContent((Template) file, false);
+        }
+
+        private void SaveFile(Template template, TemplateDto dto, string originalAlias = null)
+        {
+            string content;
+
+            var templateOnDisk = template as TemplateOnDisk;
+            if (templateOnDisk != null && templateOnDisk.IsOnDisk)
+            {
+                // if "template on disk" load content from disk
+                content = _viewHelper.GetFileContents(template);
+            }
+            else
+            {
+                // else, create or write template.Content to disk
+                if (DetermineTemplateRenderingEngine(template) == RenderingEngine.Mvc)
+                {
+                    content = originalAlias == null
+                        ? _viewHelper.CreateView(template, true)
+                        : _viewHelper.UpdateViewFile(template, originalAlias);
+                }
+                else
+                {
+                    content = originalAlias == null
+                        ? _masterPageHelper.CreateMasterPage(template, this, true)
+                        : _masterPageHelper.UpdateMasterPageFile(template, originalAlias, this);
+                }
+            }
+
+            // once content has been set, "template on disk" are not "on disk" anymore
+            template.Content = content;
+
+            if (dto.Design == content) return;
+            dto.Design = content;
+            Database.Update(dto); // though... we don't care about the db value really??!!
+
+            SetVirtualPath(template);
         }
 
         protected override void PersistDeletedItem(ITemplate entity)
@@ -396,6 +389,50 @@ namespace Umbraco.Core.Persistence.Repositories
             return template;
         }
 
+        private void SetVirtualPath(ITemplate template)
+        {
+            var path = template.OriginalPath;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                // we need to discover the path
+                path = string.Concat(template.Alias, ".cshtml");
+                if (_viewsFileSystem.FileExists(path))
+                {
+                    template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                    return;
+                }
+                path = string.Concat(template.Alias, ".vbhtml");
+                if (_viewsFileSystem.FileExists(path))
+                {
+                    template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                    return;
+                }
+                path = string.Concat(template.Alias, ".master");
+                if (_masterpagesFileSystem.FileExists(path))
+                {
+                    template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
+                    return;
+                }
+            }
+            else
+            {
+                // we know the path already
+                var ext = Path.GetExtension(path);
+                switch (ext)
+                {
+                    case ".cshtml":
+                    case ".vbhtml":
+                        template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                        return;
+                    case ".master":
+                        template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
+                        return;
+                }
+            }
+
+            template.VirtualPath = string.Empty; // file not found...
+        }
+
         private string GetFileContent(ITemplate template, bool init)
         {
             var path = template.OriginalPath;
@@ -423,20 +460,10 @@ namespace Umbraco.Core.Persistence.Repositories
                         return GetFileContent(template, _viewsFileSystem, path, init);
                     case ".master":
                         return GetFileContent(template, _masterpagesFileSystem, path, init);
-                    default:
-                        return string.Empty;
                 }
             }
 
-            var fsname = string.Concat(template.Alias, ".cshtml");
-            if (_viewsFileSystem.FileExists(fsname))
-                return GetFileContent(template, _viewsFileSystem, fsname, init);
-            fsname = string.Concat(template.Alias, ".vbhtml");
-            if (_viewsFileSystem.FileExists(fsname))
-                return GetFileContent(template, _viewsFileSystem, fsname, init);
-            fsname = string.Concat(template.Alias, ".master");
-            if (_masterpagesFileSystem.FileExists(fsname))
-                return GetFileContent(template, _masterpagesFileSystem, fsname, init);
+            template.VirtualPath = string.Empty; // file not found...
             return string.Empty;
         }
 
@@ -469,6 +496,45 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return reader.ReadToEnd();
             }
+        }
+
+        public Stream GetFileContentStream(string filepath)
+        {
+            var fs = GetFileSystem(filepath);
+            if (fs.FileExists(filepath) == false) return null;
+
+            try
+            {
+                return GetFileSystem(filepath).OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
+        }
+
+        public void SetFileContent(string filepath, Stream content)
+        {
+            GetFileSystem(filepath).AddFile(filepath, content, true);
+        }
+
+        private IFileSystem GetFileSystem(string filepath)
+        {
+            var ext = Path.GetExtension(filepath);
+            IFileSystem fs;
+            switch (ext)
+            {
+                case ".cshtml":
+                case ".vbhtml":
+                    fs = _viewsFileSystem;
+                    break;
+                case ".master":
+                    fs = _masterpagesFileSystem;
+                    break;
+                default:
+                    throw new Exception("Unsupported extension " + ext + ".");
+            }
+            return fs;
         }
 
         #region Implementation of ITemplateRepository
@@ -536,7 +602,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //return the list - it will be naturally ordered by level
             return descendants;
         }
-        
+
         public IEnumerable<ITemplate> GetDescendants(string alias)
         {
             var all = base.GetAll().ToArray();

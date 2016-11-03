@@ -29,14 +29,6 @@ namespace Umbraco.Core.DI
             // register repository factory
             container.RegisterSingleton<RepositoryFactory>();
 
-            // register file systems
-            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Scripts), "ScriptFileSystem");
-            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/"), "PartialViewFileSystem");
-            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews + "/MacroPartials/"), "PartialViewMacroFileSystem");
-            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Css), "StylesheetFileSystem");
-            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Masterpages), "MasterpageFileSystem");
-            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews), "ViewFileSystem");
-
             // register cache helpers
             // the main cache helper is registered by CoreBootManager and is used by most repositories
             // the disabled one is used by those repositories that have an annotated ctor parameter

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Threading;
+using System.Web;
 using LightInject;
 using Semver;
 using Umbraco.Core.Cache;
@@ -78,6 +79,9 @@ namespace Umbraco.Core
                 "Booted.",
                 "Boot failed."))
             {
+                // throws if not full-trust
+                new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
+
                 try
                 {
                     Logger.Debug<CoreRuntime>($"Runtime: {GetType().FullName}");

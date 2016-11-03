@@ -12,7 +12,6 @@ namespace Umbraco.Web.DependencyInjection
             container.Register<ContentTypeModelMapper>();
             container.Register<DataTypeModelMapper>();
             container.Register<EntityModelMapper>();
-            container.Register<LogModelMapper>();
             container.Register<MacroModelMapper>();
             container.Register<MediaModelMapper>();
             container.Register<MemberModelMapper>();
@@ -20,6 +19,7 @@ namespace Umbraco.Web.DependencyInjection
             container.Register<SectionModelMapper>();
             container.Register<TabModelMapper>();
             container.Register<UserModelMapper>();
+            container.Register<DashboardModelsMapper>();
         }
     }
 }

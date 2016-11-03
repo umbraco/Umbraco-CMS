@@ -38,6 +38,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return n?.Published;
         }
 
+        public override IPublishedContent GetById(bool preview, Guid contentId)
+        {
+            // fixme - test + implement in a more efficient way
+            const string xpath = "//* [@isDoc and @key=$guid]";
+            return GetSingleByXPath(preview, xpath, new[] { new XPathVariable("guid", contentId.ToString()) });
+        }
+
         public override bool HasById(bool preview, int contentId)
         {
             var n = _snapshot.Get(contentId);

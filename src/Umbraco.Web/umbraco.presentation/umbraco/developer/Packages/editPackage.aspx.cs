@@ -1,6 +1,7 @@
 using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -118,16 +119,18 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /*Stylesheets */
-                    StyleSheet[] sheets = StyleSheet.GetAll();
-                    foreach (StyleSheet st in sheets)
+                    var sheets = Services.FileService.GetStylesheets();
+                    foreach (var st in sheets)
                     {
-                        ListItem li = new ListItem(st.Text, st.Id.ToString());
-                        if (pack.Stylesheets.Contains(st.Id.ToString()))
-                            li.Selected = true;
-
-                        stylesheets.Items.Add(li);
-
+                        if (string.IsNullOrEmpty(st.Name) == false)
+                        {
+                            var li = new ListItem(st.Alias, st.Name);
+                            if (pack.Stylesheets.Contains(st.Name))
+                                li.Selected = true;
+                            stylesheets.Items.Add(li);
+                        }
                     }
+
                     /* MACROS */
                     Macro[] umbMacros = Macro.GetAll();
                     foreach (Macro m in umbMacros)
@@ -198,27 +201,35 @@ namespace umbraco.presentation.developer.packages
             }
         }
 
-        protected void validateActions(object sender, ServerValidateEventArgs e) {
+        protected void validateActions(object sender, ServerValidateEventArgs e)
+        {
             string actions = tb_actions.Text;
-            if (!string.IsNullOrEmpty(actions)) {
+            if (!string.IsNullOrEmpty(actions))
+            {
 
                 actions = "<Actions>" + actions + "</Actions>";
-                
-                try {
+
+                try
+                {
                     //we try to load an xml document with the potential malformed xml to ensure that this is actual action xml... 
                     XmlDocument xd = new XmlDocument();
                     xd.LoadXml(actions);
                     e.IsValid = true;
-                } catch {
+                }
+                catch
+                {
                     e.IsValid = false;
                 }
-            }else
+            }
+            else
                 e.IsValid = true;
         }
 
-        protected void saveOrPublish(object sender, CommandEventArgs e) {
+        protected void saveOrPublish(object sender, CommandEventArgs e)
+        {
 
-            if (!Page.IsValid) {
+            if (!Page.IsValid)
+            {
                 this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Saved failed.", "Some fields have not been filled-out correctly");
             }
             else
@@ -226,30 +237,38 @@ namespace umbraco.presentation.developer.packages
                 if (e.CommandName == "save")
                     SavePackage(true);
 
-                if (e.CommandName == "publish") {
+                if (e.CommandName == "publish")
+                {
                     SavePackage(false);
                     int packageID = int.Parse(Request.QueryString["id"]);
                     //string packFileName = cms.businesslogic.packager. Publish.publishPackage(packageID);
 
                     createdPackage.Publish();
-                    
 
-                    if (!string.IsNullOrEmpty(pack.PackagePath)) {
+
+                    if (!string.IsNullOrEmpty(pack.PackagePath))
+                    {
 
                         packageUmbFile.Text = " &nbsp; <a href='" + IOHelper.ResolveUrl(pack.PackagePath) + "'>Download</a>";
 
                         this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Success, "Package saved and published", "");
-                    } else {
+                    }
+                    else
+                    {
                         this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Save failed", "check your umbraco log.");
                     }
                 }
             }
         }
 
-        protected void generateXML(object sender, EventArgs e) {
+        [Obsolete("This is not used")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected void generateXML(object sender, EventArgs e)
+        {
         }
 
-        private void SavePackage(bool showNotification) {
+        private void SavePackage(bool showNotification)
+        {
             pack.Author = packageAuthorName.Text;
             pack.AuthorUrl = packageAuthorUrl.Text;
 
@@ -267,14 +286,15 @@ namespace umbraco.presentation.developer.packages
 
             pack.ContentLoadChildNodes = packageContentSubdirs.Checked;
 
-            if (!String.IsNullOrEmpty(cp.Value))
+            if (string.IsNullOrEmpty(cp.Value) == false)
                 pack.ContentNodeId = cp.Value;
             else
                 pack.ContentNodeId = "";
 
 
             string tmpStylesheets = "";
-            foreach (ListItem li in stylesheets.Items) {
+            foreach (ListItem li in stylesheets.Items)
+            {
                 if (li.Selected)
                     tmpStylesheets += li.Value + ",";
             }
@@ -282,7 +302,8 @@ namespace umbraco.presentation.developer.packages
 
 
             string tmpDoctypes = "";
-            foreach (ListItem li in documentTypes.Items) {
+            foreach (ListItem li in documentTypes.Items)
+            {
                 if (li.Selected)
                     tmpDoctypes += li.Value + ",";
             }
@@ -290,7 +311,8 @@ namespace umbraco.presentation.developer.packages
 
 
             string tmpMacros = "";
-            foreach (ListItem li in macros.Items) {
+            foreach (ListItem li in macros.Items)
+            {
                 if (li.Selected)
                     tmpMacros += li.Value + ",";
             }
@@ -298,40 +320,44 @@ namespace umbraco.presentation.developer.packages
 
 
             string tmpLanguages = "";
-            foreach (ListItem li in languages.Items) {
+            foreach (ListItem li in languages.Items)
+            {
                 if (li.Selected)
                     tmpLanguages += li.Value + ",";
             }
             pack.Languages = new List<string>(tmpLanguages.Trim(',').Split(','));
 
             string tmpDictionaries = "";
-            foreach (ListItem li in dictionary.Items) {
+            foreach (ListItem li in dictionary.Items)
+            {
                 if (li.Selected)
                     tmpDictionaries += li.Value + ",";
             }
             pack.DictionaryItems = new List<string>(tmpDictionaries.Trim(',').Split(','));
-    
+
 
             string tmpTemplates = "";
-            foreach (ListItem li in templates.Items) {
+            foreach (ListItem li in templates.Items)
+            {
                 if (li.Selected)
                     tmpTemplates += li.Value + ",";
             }
             pack.Templates = new List<string>(tmpTemplates.Trim(',').Split(','));
 
             string tmpDataTypes = "";
-            foreach (ListItem li in cbl_datatypes.Items) {
+            foreach (ListItem li in cbl_datatypes.Items)
+            {
                 if (li.Selected)
                     tmpDataTypes += li.Value + ",";
             }
             pack.DataTypes = new List<string>(tmpDataTypes.Trim(',').Split(','));
-            
+
             pack.LoadControl = packageControlPath.Text;
 
-            
+
             createdPackage.Save();
 
-            if(showNotification)
+            if (showNotification)
                 this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, "Package Saved", "");
         }
 
@@ -360,7 +386,7 @@ namespace umbraco.presentation.developer.packages
             TextBox filePathControl = (TextBox)((Control)sender).Parent.FindControl("packageFilePath");
             filePathControl.Text = "";
 
-            string tmpFilePathString = ""; 
+            string tmpFilePathString = "";
             foreach (RepeaterItem rItem in packageFilesRepeater.Items)
             {
                 string tmpFFFF = ((TextBox)rItem.FindControl("packageFilePath")).Text;
@@ -370,7 +396,7 @@ namespace umbraco.presentation.developer.packages
 
             cms.businesslogic.packager.CreatedPackage createdPackage = cms.businesslogic.packager.CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
             cms.businesslogic.packager.PackageInstance pack = createdPackage.Data;
-          
+
             pack.Files = new List<string>(tmpFilePathString.Trim('¤').Split('¤'));
             pack.Files.TrimExcess();
 
@@ -389,7 +415,7 @@ namespace umbraco.presentation.developer.packages
             packageInfo.Controls.Add(Pane1_1);
             packageInfo.Controls.Add(Pane1_2);
             packageInfo.Controls.Add(Pane1_3);
-            
+
 
             packageContents = TabView1.NewTabPage("Package Contents");
             packageContents.Controls.Add(Pane2);
@@ -422,11 +448,11 @@ namespace umbraco.presentation.developer.packages
             saves.ButtonType = uicontrols.MenuButtonType.Primary;
             saves.ID = "save";
 
-           
 
-            
+
+
             base.OnInit(e);
         }
-    
+
     }
 }

@@ -108,16 +108,14 @@
         </div>
     </asp:PlaceHolder>
 
-    <asp:PlaceHolder ID="SaveAndCancelPlaceholder" runat="server">
-        <br />
-        <p>
+    <div class="btn-toolbar umb-btn-toolbar">
+        <asp:PlaceHolder ID="SaveAndCancelPlaceholder" runat="server">
+            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>
             <asp:PlaceHolder ID="SavePlaceholder" runat="server">        
-                <asp:Button ID="ValidateAndSave" runat="server" OnClick="ValidateAndSave_Click" />
-                <em> <%= Services.TextService.Localize("or") %> </em>
-            </asp:PlaceHolder>        
-            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>  
-        </p>
-    </asp:PlaceHolder>
-  
+                <asp:Button ID="ValidateAndSave" runat="server" CssClass="btn btn-primary" Text="Create" OnClick="ValidateAndSave_Click"></asp:Button>
+            </asp:PlaceHolder>
+        </asp:Placeholder>
+    </div>
+     
 </asp:Content>
   

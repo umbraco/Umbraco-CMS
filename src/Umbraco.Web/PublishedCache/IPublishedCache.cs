@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.XPath;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 
@@ -23,10 +23,27 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Gets a content identified by its unique identifier.
         /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="contentId">The content unique identifier.</param>
+        /// <returns>The content, or null.</returns>
+        /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
+        IPublishedContent GetById(bool preview, Guid contentId);
+
+        /// <summary>
+        /// Gets a content identified by its unique identifier.
+        /// </summary>
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
         IPublishedContent GetById(int contentId);
+
+        /// <summary>
+        /// Gets a content identified by its unique identifier.
+        /// </summary>
+        /// <param name="contentId">The content unique identifier.</param>
+        /// <returns>The content, or null.</returns>
+        /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+        IPublishedContent GetById(Guid contentId);
 
         /// <summary>
         /// Gets a value indicating whether the cache contains a specified content.

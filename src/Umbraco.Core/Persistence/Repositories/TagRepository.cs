@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -29,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var tagDto = Database.Fetch<TagDto>(sql).FirstOrDefault();
+            var tagDto = Database.Fetch<TagDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (tagDto == null)
                 return null;
 
@@ -550,7 +549,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var array = tagsToInsert
                 .Select(tag =>
-                    string.Format("select '{0}' as Tag, '{1}' as " + SqlSyntax.GetQuotedColumnName("group") + @"",
+                    string.Format("select N'{0}' as Tag, '{1}' as " + SqlSyntax.GetQuotedColumnName("group") + @"",
                         NPocoDatabaseExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")), tag.Group))
                 .ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";

@@ -179,6 +179,11 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             return result > 0;
         }
 
+        public override Sql<SqlContext> SelectTop(Sql<SqlContext> sql, int top)
+        {
+            return new Sql<SqlContext>(sql.SqlContext, string.Concat(sql.SQL, " LIMIT ", top), sql.Arguments);
+        }
+
         public override bool SupportsClustered()
         {
             return true;

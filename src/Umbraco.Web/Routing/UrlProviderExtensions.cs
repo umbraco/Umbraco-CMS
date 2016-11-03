@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Routing
 {
@@ -10,6 +11,7 @@ namespace Umbraco.Web.Routing
         // fixme inject
         private static ILocalizedTextService TextService => Current.Services.TextService;
         private static IContentService ContentService => Current.Services.ContentService;
+        private static ILogger Logger => Current.Logger;
 
         /// <summary>
         /// Gets the URLs for the content item
@@ -34,8 +36,17 @@ namespace Umbraco.Web.Routing
                 return urls;
             }
 
+            string url;
             var urlProvider = umbracoContext.UrlProvider;
-            var url = urlProvider.GetUrl(content.Id);            
+            try
+            {
+                url = urlProvider.GetUrl(content.Id);
+            }
+            catch (Exception e)
+            {
+                Logger.Error<UrlProvider>("GetUrl exception.", e);
+                url = "#ex";
+            }
             if (url == "#")
             {
                 // document as a published version yet it's url is "#" => a parent must be
@@ -50,6 +61,10 @@ namespace Umbraco.Web.Routing
                 urls.Add(parent == null 
                     ? TextService.Localize("content/parentNotPublishedAnomaly") // oops - internal error
                     : TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
+            }
+            else if (url == "#ex")
+            {
+                urls.Add(TextService.Localize("content/getUrlException"));
             }
             else if (url.StartsWith("#err-"))
             {

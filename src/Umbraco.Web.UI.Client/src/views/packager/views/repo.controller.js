@@ -31,6 +31,7 @@
         vm.closeLightbox = closeLightbox;
         vm.search = search;
 
+        var currSort = "Latest";
         //used to cancel any request in progress if another one needs to take it's place
         var canceler = null;
 
@@ -59,7 +60,7 @@
                     .then(function(pack) {
                         vm.popular = pack.packages;
                     }),
-                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize)
+                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort)
                     .then(function(pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -89,12 +90,14 @@
                 searchCategory = "";
             }
 
+            currSort = "Latest";
+
             $q.all([
                     ourPackageRepositoryResource.getPopular(8, searchCategory)
                     .then(function(pack) {
                         vm.popular = pack.packages;
                     }),
-                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, searchCategory, vm.searchQuery)
+                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort, searchCategory, vm.searchQuery)
                     .then(function(pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -132,7 +135,7 @@
         }
 
         function nextPage(pageNumber) {
-            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, getActiveCategory(), vm.searchQuery)
+            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, currSort, getActiveCategory(), vm.searchQuery)
                 .then(function (pack) {
                     vm.packages = pack.packages;
                     vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -140,7 +143,7 @@
         }
 
         function prevPage(pageNumber) {
-            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, getActiveCategory(), vm.searchQuery)
+            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, currSort, getActiveCategory(), vm.searchQuery)
                 .then(function (pack) {
                     vm.packages = pack.packages;
                     vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -148,7 +151,7 @@
         }
 
         function goToPage(pageNumber) {
-            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, getActiveCategory(), vm.searchQuery)
+            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, currSort, getActiveCategory(), vm.searchQuery)
                 .then(function (pack) {
                     vm.packages = pack.packages;
                     vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -248,8 +251,11 @@
                     canceler = $q.defer();
                 }
 
+                currSort = vm.searchQuery ? "Default" : "Latest";
+
                 ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1,
                         vm.pagination.pageSize,
+                        currSort,
                         "",
                         vm.searchQuery,
                         canceler)

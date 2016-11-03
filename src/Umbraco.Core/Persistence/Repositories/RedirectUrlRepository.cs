@@ -14,7 +14,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class RedirectUrlRepository : NPocoRepositoryBase<int, IRedirectUrl>, IRedirectUrlRepository
+    internal class RedirectUrlRepository : NPocoRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
     {
         public RedirectUrlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers) 
             : base(work, cache, logger, mappers)
@@ -25,19 +25,19 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new NotSupportedException("This repository does not support this method.");
         }
 
-        protected override bool PerformExists(int id)
+        protected override bool PerformExists(Guid id)
         {
             return PerformGet(id) != null;
         }
 
-        protected override IRedirectUrl PerformGet(int id)
+        protected override IRedirectUrl PerformGet(Guid id)
         {
             var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Id == id);
-            var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<RedirectUrlDto>(sql.SelectTop(1)).FirstOrDefault();
             return dto == null ? null : Map(dto);
         }
 
-        protected override IEnumerable<IRedirectUrl> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IRedirectUrl> PerformGetAll(params Guid[] ids)
         {
             if (ids.Length > 2000)
                 throw new NotSupportedException("This repository does not support more than 2000 ids.");
@@ -88,7 +88,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
         {
             var dto = Map(entity);
             Database.Insert(dto);
-            entity.Id = dto.Id;
+            entity.Id = entity.Key.GetHashCode();
         }
 
         protected override void PersistUpdatedItem(IRedirectUrl entity)
@@ -103,11 +103,11 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
             return new RedirectUrlDto
             {
-                Id = redirectUrl.Id,
+                Id = redirectUrl.Key,
                 ContentKey = redirectUrl.ContentKey,
                 CreateDateUtc = redirectUrl.CreateDateUtc,
                 Url = redirectUrl.Url,
-                UrlHash = HashUrl(redirectUrl.Url)
+                UrlHash = redirectUrl.Url.ToSHA1()
             };
         }
 
@@ -119,7 +119,8 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             try
             {
                 url.DisableChangeTracking();
-                url.Id = dto.Id;
+                url.Key = dto.Id;
+                url.Id = dto.Id.GetHashCode();
                 url.ContentId = dto.ContentId;
                 url.ContentKey = dto.ContentKey;
                 url.CreateDateUtc = dto.CreateDateUtc;
@@ -134,7 +135,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl Get(string url, Guid contentKey)
         {
-            var urlHash = HashUrl(url);
+            var urlHash = url.ToSHA1();
             var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash && x.ContentKey == contentKey);
             var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
@@ -150,14 +151,14 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             Database.Execute("DELETE FROM umbracoRedirectUrl WHERE contentKey=@contentKey", new { contentKey });
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             Database.Delete<RedirectUrlDto>(id);
         }
 
         public IRedirectUrl GetMostRecentUrl(string url)
         {
-            var urlHash = HashUrl(url);
+            var urlHash = url.ToSHA1();
             var sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash)
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
@@ -187,7 +188,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
         public IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total)
         {
             var sql = GetBaseQuery(false)
-                .Where("umbracoNode.path LIKE @path", new { path = "%," + rootContentId + ",%" })
+                .Where(string.Format("{0}.{1} LIKE @path", SqlSyntax.GetQuotedTableName("umbracoNode"), SqlSyntax.GetQuotedColumnName("path")), new { path = "%," + rootContentId + ",%" })
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             var result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
             total = Convert.ToInt32(result.TotalItems);
@@ -196,12 +197,16 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             return rules;
         }
 
-        private static string HashUrl(string url)
+        public IEnumerable<IRedirectUrl> SearchUrls(string searchTerm, long pageIndex, int pageSize, out long total)
         {
-            var crypto = new MD5CryptoServiceProvider();
-            var inputBytes = Encoding.UTF8.GetBytes(url);
-            var hashedBytes = crypto.ComputeHash(inputBytes);
-            return Encoding.UTF8.GetString(hashedBytes);
-        }
+            var sql = GetBaseQuery(false)
+                .Where(string.Format("{0}.{1} LIKE @url", SqlSyntax.GetQuotedTableName("umbracoRedirectUrl"), SqlSyntax.GetQuotedColumnName("Url")), new { url = "%" + searchTerm.Trim().ToLowerInvariant() + "%" })
+                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
+            var result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
+            total = Convert.ToInt32(result.TotalItems);
+
+            var rules = result.Items.Select(Map);
+            return rules;
+        }     
     }
 }

@@ -9,6 +9,14 @@
     padding: 20px 60px;
 }
 
+@media (max-width: 768px) {
+
+    .umb-packages-view-wrapper {
+        padding: 0;
+    }
+
+}
+
 .umb-packages-section {
     margin-bottom: 40px;
 }
@@ -323,6 +331,11 @@
     width: 100%;
 }
 
+.umb-era-button.umb-button--s {
+    height: 30px;
+    font-size: 13px;
+}
+
 
 /* CATEGORIES */
 
@@ -426,17 +439,35 @@ a.umb-package-details__back-link {
 }
 
 
-@sidebarwidthFlax: 350px; // Width of sidebar. Ugly hack because of old version of Less
+@sidebarwidth: 350px; // Width of sidebar. Ugly hack because of old version of Less
 
 .umb-package-details__main-content {
     flex: 1 1 auto;
     margin-right: 40px;
-
-    width: ~"calc(100% - @{sidebarwidthFlax})"; // Make sure that the main content area doesn't gets affected by inline styling
+    width: ~"(calc(~'100%' - ~'@{sidebarwidth}' - ~'40px'))"; // Make sure that the main content area doesn't gets affected by inline styling
 }
 
 .umb-package-details__sidebar {
-    flex: 0 0 350px;
+    flex: 0 0 @sidebarwidth;
+}
+
+@media (max-width: 768px) {
+
+    .umb-package-details {
+        flex-direction: column;
+    }
+
+    .umb-package-details__main-content {
+        flex: 1 1 auto;
+        width: 100%;
+        margin-bottom: 30px;
+        margin-right: 0;
+    }
+
+    .umb-package-details__sidebar {
+        flex: 1 1 auto;
+        width: 100%;
+    }
 }
 
 .umb-package-details__section {
@@ -515,6 +546,7 @@ a.umb-package-details__back-link {
 }
 .umb-package-details__owner-profile-avatar {
     margin-right: 15px;
+    flex: 0 0 auto;
 }
 
 .umb-package-details__owner-profile-name {

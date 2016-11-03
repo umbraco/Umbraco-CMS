@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.IO
@@ -24,23 +22,26 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Get_Base_File_System()
         {
-            var fs = FileSystemProviderManager.Current.GetUnderlyingFileSystemProvider(Constants.IO.MediaFileSystemProvider);
+            var fileSystems = new FileSystems(Mock.Of<ILogger>());
+            var fileSystem = fileSystems.GetUnderlyingFileSystemProvider(Constants.IO.MediaFileSystemProvider);
 
-            Assert.NotNull(fs);
+            Assert.NotNull(fileSystem);
         }
 
         [Test]
         public void Can_Get_Typed_File_System()
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var fileSystems = new FileSystems(Mock.Of<ILogger>());
+            var fileSystem = fileSystems.GetFileSystem<MediaFileSystem>();
 
-            Assert.NotNull(fs);
+            Assert.NotNull(fileSystem);
         }
 
 		[Test]
         public void Exception_Thrown_On_Invalid_Typed_File_System()
 		{
-			Assert.Throws<InvalidOperationException>(() => FileSystemProviderManager.Current.GetFileSystemProvider<InvalidTypedFileSystem>());
+            var fileSystems = new FileSystems(Mock.Of<ILogger>());
+            Assert.Throws<InvalidOperationException>(() => fileSystems.GetFileSystem<InvalidTypedFileSystem>());
 		}
 
 
@@ -54,6 +55,5 @@ namespace Umbraco.Tests.IO
 		    {
 		    }
 	    }
-
 	}
 }

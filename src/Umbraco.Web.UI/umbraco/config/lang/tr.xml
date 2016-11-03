@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="tr" intName="Turkish" localName="Türkçe" lcid="" culture="tr-TR">
   <creator>
-    <name>Umbraco</name>
-    <link>http://kayadata.com</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Kültür ve Hostnames</key>
     <key alias="auditTrail">Denetim Trail</key>
-    <key alias="browse">Düğüm Araçtır</key>
+    <key alias="browse">Düğüm Araştır</key>
     <key alias="changeDocType">Belge Türü Değiştir</key>
     <key alias="copy">Kopya</key>
     <key alias="create">Oluştur</key>
@@ -54,8 +54,8 @@
     <key alias="orEdit">Geçerli domain düzenle</key>
     <key alias="domainHelp">
       <![CDATA[
-    Geçerli alan adları şunlardır : " kayadata.com ", " www.kayadata.com ", " kayadata.com:8080 " ya da
-        " https://www.kayadata.com/ " . <br /> etki /> bir düzey yollar desteklenir <br , örneğin . " kayadata.com/en " . Bununla birlikte,
+    Geçerli alan adları şunlardır : " umbraco.com ", " www.umbraco.com ", " umbraco.com:8080 " ya da
+        " https://www.umbraco.com/ " . <br /> etki /> bir düzey yollar desteklenir <br , örneğin . " umbraco.com/en " . Bununla birlikte,
         kaçınılmalıdır. Daha yukarıdaki kültür ayarını kullanın 
     ]]>
     </key>
@@ -456,7 +456,7 @@
               <p>
               <strong>Tekrar dene</strong>. 
               <br />
-              <a href="https://azmisahin.github.io/" target="_blank">
+              <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              Burada düzenleme web.config Hakkında Daha Fazla Bilgi.</a></p>]]>
     </key>
     <key alias="databaseText">
@@ -617,7 +617,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="greeting6">İçerik Yönetim Sistemi</key>
     <key alias="instruction">Giriş Yapın</key>
     <key alias="timeout">Oturum zaman aşımına uğradı</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2015 - %0% <br /><a href="http://kayadata.com" style="text-decoration: none" target="_blank">kayadata.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2015 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Gösterge Paneli</key>
@@ -786,25 +786,25 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noColors">You have not configured any approved colours</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="enterExternal">enter external link</key>
-    <key alias="chooseInternal">choose internal page</key>
-    <key alias="caption">Caption</key>
-    <key alias="link">Link</key>
-    <key alias="newWindow">New window</key>
-    <key alias="captionPlaceholder">Enter a new caption</key>
-    <key alias="externalLinkPlaceholder">Enter the link</key>
+    <key alias="enterExternal">harici bağlantı gir</key>
+    <key alias="chooseInternal">iç sayfa seç</key>
+    <key alias="caption">Altyazı</key>
+    <key alias="link">Bağlantı</key>
+    <key alias="newWindow">yeni pencere</key>
+    <key alias="captionPlaceholder">Yeni altyazı gir</key>
+    <key alias="externalLinkPlaceholder">Bağlantı gir</key>
   </area>
   <area alias="imagecropper">
-    <key alias="reset">Reset</key>
+    <key alias="reset">Sıfırla</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Current version</key>
+    <key alias="currentVersion">Varolan versiyon</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
-    <key alias="selectVersion">Select version</key>
-    <key alias="view">View</key>
+    <key alias="selectVersion">Versiyon seç</key>
+    <key alias="view">Görünüm</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Düzenleme komut dosyası</key>
@@ -834,7 +834,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Varsayılan şablonu</key>
-    <key alias="dictionary editor egenskab">Sözlük Key</key>
+    <key alias="dictionary editor egenskab">Sözlük Anahtarı</key>
     <key alias="importDocumentTypeHelp">To import a document type, find the ".udt" file on your computer by clicking the "Browse" button and click "Import" (you'll be asked for confirmation on the next screen)</key>
     <key alias="newtabname">New Tab Title</key>
     <key alias="nodetype">Node type</key>
@@ -863,71 +863,71 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="operationCancelledHeader">İptal Edildi</key>
     <key alias="operationCancelledText">İşleminiz 3.Parti yazılım tarafından iptal edildi.</key>
     <key alias="contentPublishedFailedByEvent">Sayfa yayınlama 3.Parti yazılım tarafından iptal edildi.</key>
-    <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
-    <key alias="contentTypePropertyTypeCreated">Property type created</key>
+    <key alias="contentTypeDublicatePropertyType">Property type zaten bulunuyor</key>
+    <key alias="contentTypePropertyTypeCreated">Property type oluşturuldu</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Name: %0% <br /> DataType: %1%]]></key>
-    <key alias="contentTypePropertyTypeDeleted">Propertytype deleted</key>
-    <key alias="contentTypeSavedHeader">Document Type saved</key>
-    <key alias="contentTypeTabCreated">Tab created</key>
-    <key alias="contentTypeTabDeleted">Tab deleted</key>
-    <key alias="contentTypeTabDeletedText">Tab with id: %0% deleted</key>
-    <key alias="cssErrorHeader">Stylesheet not saved</key>
-    <key alias="cssSavedHeader">Stylesheet saved</key>
-    <key alias="cssSavedText">Stylesheet saved without any errors</key>
-    <key alias="dataTypeSaved">Datatype saved</key>
-    <key alias="dictionaryItemSaved">Dictionary item saved</key>
-    <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
-    <key alias="editContentPublishedHeader">Content published</key>
-    <key alias="editContentPublishedText">and visible at the website</key>
-    <key alias="editContentSavedHeader">Content saved</key>
+    <key alias="contentTypePropertyTypeDeleted">Propertytype silindi</key>
+    <key alias="contentTypeSavedHeader">Döküman Tipi kaydedildi</key>
+    <key alias="contentTypeTabCreated">Tab oluşturuldu</key>
+    <key alias="contentTypeTabDeleted">Tab silindi</key>
+    <key alias="contentTypeTabDeletedText">Tab id: %0% silindi</key>
+    <key alias="cssErrorHeader">Stylesheet kaydedilmedi</key>
+    <key alias="cssSavedHeader">Stylesheet kaydedildi</key>
+    <key alias="cssSavedText">Stylesheet sorunsuz kaydedildi</key>
+    <key alias="dataTypeSaved">Data tipi kaydedildi</key>
+    <key alias="dictionaryItemSaved">Sözlük elemanı kaydedildi</key>
+    <key alias="editContentPublishedFailedByParent">Bağlı olduğu sayfa yayınlanmadığından dolayı işlem başarısız oldu.</key>
+    <key alias="editContentPublishedHeader">İçerik yayınlandı</key>
+    <key alias="editContentPublishedText">ve web sitesinde görülebilir.</key>
+    <key alias="editContentSavedHeader">İçeirk kaydedildi.</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
-    <key alias="editContentSendToPublish">Sent For Approval</key>
-    <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
-    <key alias="editMediaSaved">Media saved</key>
-    <key alias="editMediaSavedText">Media saved without any errors</key>
-    <key alias="editMemberSaved">Member saved</key>
-    <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
-    <key alias="editStylesheetSaved">Stylesheet saved</key>
-    <key alias="editTemplateSaved">Template saved</key>
-    <key alias="editUserError">Error saving user (check log)</key>
-    <key alias="editUserSaved">User Saved</key>
-    <key alias="editUserTypeSaved">User type saved</key>
-    <key alias="fileErrorHeader">File not saved</key>
-    <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
-    <key alias="fileSavedHeader">File saved</key>
-    <key alias="fileSavedText">File saved without any errors</key>
-    <key alias="languageSaved">Language saved</key>
-    <key alias="pythonErrorHeader">Python script not saved</key>
-    <key alias="pythonErrorText">Python script could not be saved due to error</key>
-    <key alias="pythonSavedHeader">Python script saved</key>
-    <key alias="pythonSavedText">No errors in python script</key>
-    <key alias="templateErrorHeader">Template not saved</key>
-    <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
-    <key alias="templateSavedHeader">Template saved</key>
-    <key alias="templateSavedText">Template saved without any errors!</key>
-    <key alias="xsltErrorHeader">XSLT not saved</key>
-    <key alias="xsltErrorText">XSLT contained an error</key>
-    <key alias="xsltPermissionErrorText">XSLT could not be saved, check file permissions</key>
-    <key alias="xsltSavedHeader">XSLT saved</key>
-    <key alias="xsltSavedText">No errors in XSLT</key>
-    <key alias="contentUnpublished">Content unpublished</key>
-    <key alias="partialViewSavedHeader">Partial view saved</key>
-    <key alias="partialViewSavedText">Partial view saved without any errors!</key>
-    <key alias="partialViewErrorHeader">Partial view not saved</key>
-    <key alias="partialViewErrorText">An error occurred saving the file.</key>
-    <key alias="scriptSavedHeader">Script view saved</key>
-    <key alias="scriptSavedText">Script view saved without any errors!</key>
-    <key alias="scriptErrorHeader">Script view not saved</key>
-    <key alias="scriptErrorText">An error occurred saving the file.</key>
-    <key alias="cssErrorText">An error occurred saving the file.</key>
+    <key alias="editContentSendToPublish">Onaya gönder</key>
+    <key alias="editContentSendToPublishText">Değişiklikler onaya gönderildi</key>
+    <key alias="editMediaSaved">Medya kaydedildi</key>
+    <key alias="editMediaSavedText">Medya sorunsuz kaydedildi</key>
+    <key alias="editMemberSaved">Üye kaydedildi</key>
+    <key alias="editStylesheetPropertySaved">Stylesheet Property kaydedildi</key>
+    <key alias="editStylesheetSaved">Stylesheet kaydedildi</key>
+    <key alias="editTemplateSaved">Template kaydedildi</key>
+    <key alias="editUserError">Kullanıcı kaydedilirken hata oluştu (log kontrol)</key>
+    <key alias="editUserSaved">Kullanıcı kaydedildi</key>
+    <key alias="editUserTypeSaved">Kullanıcı tipi kaydedildi</key>
+    <key alias="fileErrorHeader">Dosya kaydedilemedi</key>
+    <key alias="fileErrorText">dosya kaydedilemedi. Lütfen dosya izinlerini kontrol edin</key>
+    <key alias="fileSavedHeader">Dosya kaydedildi</key>
+    <key alias="fileSavedText">Dosya sorunsuz kaydedildi</key>
+    <key alias="languageSaved">Dil kaydedildi</key>
+    <key alias="pythonErrorHeader">Python script kaydedilemedi</key>
+    <key alias="pythonErrorText">Python scripti oluşan hata nedeniyle kaydedilemedi</key>
+    <key alias="pythonSavedHeader">Python script kaydedildi</key>
+    <key alias="pythonSavedText">Python scriptinde hata buluanamadı</key>
+    <key alias="templateErrorHeader">Template kaydedilmedi</key>
+    <key alias="templateErrorText">Aynı isim ile 2 template bulunmadığından emin olun</key>
+    <key alias="templateSavedHeader">Template kaydedildi</key>
+    <key alias="templateSavedText">Template sorunsuz kaydedildi!</key>
+    <key alias="xsltErrorHeader">XSLT kaydedilmedi</key>
+    <key alias="xsltErrorText">XSLT hata içeriyor</key>
+    <key alias="xsltPermissionErrorText">XSLT kaydedilemedi, dosya izinlerini kontrol edin</key>
+    <key alias="xsltSavedHeader">XSLT kaydedildi</key>
+    <key alias="xsltSavedText">XSLT'de hata içermiyor</key>
+    <key alias="contentUnpublished">İçerik yayından kaldırıldı</key>
+    <key alias="partialViewSavedHeader">Partial view kaydedildi</key>
+    <key alias="partialViewSavedText">Partial view sorunsuz kaydedildi!</key>
+    <key alias="partialViewErrorHeader">Partial view kaydedilmedi</key>
+    <key alias="partialViewErrorText">Dosya kaydedilirken bir hata oluştu.</key>
+    <key alias="scriptSavedHeader">Script view kaydedildi</key>
+    <key alias="scriptSavedText">Script view sorunsuz kaydedildi!</key>
+    <key alias="scriptErrorHeader">Script view kaydedilmedi</key>
+    <key alias="scriptErrorText">Dosya kaydedilirken bir hata oluştu.</key>
+    <key alias="cssErrorText">Dosya kaydedilirken bir hata oluştu.</key>
   </area>
   <area alias="stylesheet">
-    <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
-    <key alias="editstylesheet">Edit stylesheet</key>
-    <key alias="editstylesheetproperty">Edit stylesheet property</key>
-    <key alias="nameHelp">Name to identify the style property in the rich text editor  </key>
-    <key alias="preview">Preview</key>
-    <key alias="styles">Styles</key>
+    <key alias="aliasHelp">CSS sözdizimi kullanımları. örneğin: h1, .redHeader, .blueTex</key>
+    <key alias="editstylesheet">Stil dosyası düzenle</key>
+    <key alias="editstylesheetproperty">Stil dosyası özelliği düzenle</key>
+    <key alias="nameHelp">Name to identify the style property in the rich text editor</key>
+    <key alias="preview">Ön izleme</key>
+    <key alias="styles">Stiller</key>
   </area>
   <area alias="template">
     <key alias="edittemplate">Edit template</key>
@@ -1047,94 +1047,94 @@ To manage your website, simply open the Umbraco back office and start adding con
     </key>
     <key alias="pageHasBeenSendToTranslation">The page '%0%' has been send to translation</key>
     <key alias="sendToTranslate">Send the page '%0%' to translation</key>
-    <key alias="taskAssignedBy">Assigned by</key>
-    <key alias="taskOpened">Task opened</key>
-    <key alias="totalWords">Total words</key>
+    <key alias="taskAssignedBy">Atanan</key>
+    <key alias="taskOpened">Görev açıldı</key>
+    <key alias="totalWords">Toplam kelime</key>
     <key alias="translateTo">Translate to</key>
-    <key alias="translationDone">Translation completed.</key>
+    <key alias="translationDone">Çeviri tamamlandı.</key>
     <key alias="translationDoneHelp">You can preview the pages, you've just translated, by clicking below. If the original page is found, you will get a comparison of the 2 pages.</key>
     <key alias="translationFailed">Translation failed, the XML file might be corrupt</key>
-    <key alias="translationOptions">Translation options</key>
-    <key alias="translator">Translator</key>
+    <key alias="translationOptions">Çeviri opsiyonları</key>
+    <key alias="translator">Çevirmen</key>
     <key alias="uploadTranslationXml">Upload translation XML</key>
   </area>
   <area alias="treeHeaders">
     <key alias="cacheBrowser">Cache Browser</key>
-    <key alias="contentRecycleBin">Recycle Bin</key>
-    <key alias="createdPackages">Created packages</key>
-    <key alias="datatype">Data Types</key>
-    <key alias="dictionary">Dictionary</key>
-    <key alias="installedPackages">Installed packages</key>
-    <key alias="installSkin">Install skin</key>
-    <key alias="installStarterKit">Install starter kit</key>
-    <key alias="languages">Languages</key>
-    <key alias="localPackage">Install local package</key>
-    <key alias="macros">Macros</key>
-    <key alias="mediaTypes">Media Types</key>
-    <key alias="member">Members</key>
-    <key alias="memberGroup">Member Groups</key>
-    <key alias="memberRoles">Roles</key>
-    <key alias="memberType">Member Types</key>
-    <key alias="nodeTypes">Document Types</key>
-    <key alias="packager">Packages</key>
-    <key alias="packages">Packages</key>
-    <key alias="python">Python Files</key>
-    <key alias="repositories">Install from repository</key>
+    <key alias="contentRecycleBin">Çöp Kutusu</key>
+    <key alias="createdPackages">Oluşturulan Paketler</key>
+    <key alias="datatype">Data Tipleri</key>
+    <key alias="dictionary">Sözlük</key>
+    <key alias="installedPackages">Kurulu paketler</key>
+    <key alias="installSkin">Görünüm kur</key>
+    <key alias="installStarterKit">Başlangıç kiti kur</key>
+    <key alias="languages">Diller</key>
+    <key alias="localPackage">Yerel paket yükle</key>
+    <key alias="macros">Makrolar</key>
+    <key alias="mediaTypes">Medya Tipleri</key>
+    <key alias="member">Üyeler</key>
+    <key alias="memberGroup">Üye Grupları</key>
+    <key alias="memberRoles">Roller</key>
+    <key alias="memberType">Üye Tipleri</key>
+    <key alias="nodeTypes">Döküman Tipleri</key>
+    <key alias="packager">Paketler</key>
+    <key alias="packages">Paketler</key>
+    <key alias="python">Python Dosyaları</key>
+    <key alias="repositories">Depodan kurulum yap</key>
     <key alias="runway">Install Runway</key>
-    <key alias="runwayModules">Runway modules</key>
-    <key alias="scripting">Scripting Files</key>
-    <key alias="scripts">Scripts</key>
-    <key alias="stylesheets">Stylesheets</key>
-    <key alias="templates">Templates</key>
-    <key alias="xslt">XSLT Files</key>
-    <key alias="analytics">Analytics</key>
+    <key alias="runwayModules">Runway modülleri</key>
+    <key alias="scripting">Scripting Dosyaları</key>
+    <key alias="scripts">Scriptler</key>
+    <key alias="stylesheets">Stil dosyaları</key>
+    <key alias="templates">Şablonlar</key>
+    <key alias="xslt">XSLT Dosyaları</key>
+    <key alias="analytics">Analitikler</key>
   </area>
   <area alias="update">
-    <key alias="updateAvailable">New update ready</key>
-    <key alias="updateDownloadText">%0% is ready, click here for download</key>
-    <key alias="updateNoServer">No connection to server</key>
-    <key alias="updateNoServerError">Error checking for update. Please review trace-stack for further information</key>
+    <key alias="updateAvailable">Yeni bir güncelleme geldi</key>
+    <key alias="updateDownloadText">%0% hazır, indirimek için tıklayın</key>
+    <key alias="updateNoServer">Sunucu bağlantısı yok</key>
+    <key alias="updateNoServerError">Güncelleme için kontrol hatası. Daha fazla bilgi için iz yığını gözden geçirin.</key>
   </area>
   <area alias="user">
-    <key alias="administrators">Yönetici</key>
+    <key alias="administrators">Yöneticiler</key>
     <key alias="categoryField">Kategori alanı</key>
     <key alias="changePassword">Şifreni değiştir</key>
-    <key alias="newPassword">Şifreni değiştir</key>
-    <key alias="confirmNewPassword">Yeni şifreyi onaylad</key>
+    <key alias="newPassword">Yeni şifre</key>
+    <key alias="confirmNewPassword">Yeni şifreyi onayla</key>
     <key alias="changePasswordDescription">Aşağıdaki formu doldurarak CMS Geri Office'i erişmek için parolanızı değiştirmeniz ve ' Şifre Değiştir ' düğmesine tıklayabilirsiniz</key>
-    <key alias="contentChannel">İçerik Kanal</key>
+    <key alias="contentChannel">İçerik Kanalı</key>
     <key alias="descriptionField">Açıklama alanı</key>
-    <key alias="disabled">Kullanıcıyı Devre Dışı Bırak</key>
-    <key alias="documentType">Belge Türü</key>
+    <key alias="disabled">Kullanıcıyı devre dışı bırak</key>
+    <key alias="documentType">Döküman Tipi</key>
     <key alias="editors">editör</key>
     <key alias="excerptField">Alıntı alan</key>
     <key alias="language">Dil</key>
     <key alias="loginname">Kullanıcı adı</key>
-    <key alias="mediastartnode">Medya Kütüphane düğüm başlatın</key>
+    <key alias="mediastartnode">Medya kütüphane düğüm başlatın</key>
     <key alias="modules">Bölümler</key>
     <key alias="noConsole">CMS Erişim devre dışı bırakma</key>
     <key alias="password">Parola</key>
-    <key alias="resetPassword">Şifre sıfırlamak</key>
+    <key alias="resetPassword">Şifrenizi sıfırlayın</key>
     <key alias="passwordChanged">Şifreniz değiştirildi!</key>
-    <key alias="passwordConfirm">Yeni parolayı onaylayın Lütfen</key>
+    <key alias="passwordConfirm">Yeni parolayı onaylayın</key>
     <key alias="passwordEnterNew">Yeni şifrenizi girin</key>
-    <key alias="passwordIsBlank">Yeni şifre boş olamaz !</key>
+    <key alias="passwordIsBlank">Yeni şifre boş olamaz!</key>
     <key alias="passwordCurrent">Mevcut Şifre</key>
-    <key alias="passwordInvalid">Geçersiz Geçerli şifre</key>
+    <key alias="passwordInvalid">Geçersiz şifre</key>
     <key alias="passwordIsDifferent">Yeni şifre ile teyit şifre arasında bir fark yoktu. Lütfen tekrar deneyin!</key>
     <key alias="passwordMismatch">Teyit şifre yeni bir şifre eşleşmiyor !</key>
     <key alias="permissionReplaceChildren">Alt düğümü izinlerini değiştirin</key>
     <key alias="permissionSelectedPages">Şu anda sayfaları için izinleri değiştiriyorsunuz:</key>
     <key alias="permissionSelectPages">Onların izinlerini değiştirmek için sayfaları seçin</key>
-    <key alias="searchAllChildren">Tüm çocukların ara</key>
-    <key alias="startnode">içerikte Düğüm başlat</key>
-    <key alias="username">İsim</key>
+    <key alias="searchAllChildren">Tüm alt düğümlerde ara</key>
+    <key alias="startnode">içerikte düğüm başlat</key>
+    <key alias="username">Kullanıcı adı</key>
     <key alias="userPermissions">Kullanıcı izinleri</key>
     <key alias="usertype">Kullanıcı türü</key>
     <key alias="userTypes">Kullanıcı tipleri</key>
     <key alias="writer">Yazar</key>
-    <key alias="translator">Translator</key>
-    <key alias="change">Change</key>
+    <key alias="translator">Çevirmen</key>
+    <key alias="change">Değiştir</key>
     <key alias="yourProfile" version="7.0">Profiliniz</key>
     <key alias="yourHistory" version="7.0">Son tarih</key>
     <key alias="sessionExpires" version="7.0">Oturum sona eriyor</key>

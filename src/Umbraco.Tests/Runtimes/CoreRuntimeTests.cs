@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Hosting;
 using LightInject;
 using Moq;
 using NUnit.Framework;
@@ -121,7 +122,7 @@ namespace Umbraco.Tests.Runtimes
 
             public override void Terminate()
             {
-                _mainDom.Stop(false);
+                ((IRegisteredObject) _mainDom).Stop(false);
                 base.Terminate();
             }
 

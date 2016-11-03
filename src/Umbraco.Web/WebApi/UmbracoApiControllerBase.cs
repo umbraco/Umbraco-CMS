@@ -66,6 +66,17 @@ namespace Umbraco.Web.WebApi
         public ProfilingLogger ProfilingLogger { get; set; }
 
         /// <summary>
+        /// Gets or sets the runtime state.
+        /// </summary>
+        [Inject]
+        internal RuntimeState RuntimeState { get; set; }
+
+        /// <summary>
+        /// Gets the application url.
+        /// </summary>
+        protected Uri ApplicationUrl => RuntimeState.ApplicationUrl;
+
+        /// <summary>
         /// Gets the membership helper.
         /// </summary>
         public MembershipHelper Members => Umbraco.MembershipHelper;

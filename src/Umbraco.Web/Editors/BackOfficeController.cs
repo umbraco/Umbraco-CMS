@@ -35,6 +35,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebServices;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 
@@ -53,7 +54,7 @@ namespace Umbraco.Web.Editors
     public class BackOfficeController : UmbracoController
     {
         private readonly IRuntimeState _runtime;
-        private BackOfficeUserManager _userManager;
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
         private const string TokenExternalSignInError = "ExternalSignInError";
@@ -65,9 +66,9 @@ namespace Umbraco.Web.Editors
             _runtime = runtime;
         }
 
-        protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.Get<BackOfficeSignInManager>());
+        protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
 
-        protected BackOfficeUserManager UserManager => _userManager ?? (_userManager = OwinContext.GetUserManager<BackOfficeUserManager>());
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager());
 
         protected IAuthenticationManager AuthenticationManager => OwinContext.Authentication;
 
@@ -220,6 +221,10 @@ namespace Umbraco.Web.Editors
                             {"gridConfig", Url.Action("GetGridConfig", "BackOffice")},
                             {"serverVarsJs", Url.Action("Application", "BackOffice")},
                             //API URLs
+                            {
+                                "redirectUrlManagementApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
+                                    controller => controller.GetEnableState())
+                            },
                             {
                                 "embedApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
                                     controller => controller.GetEmbed("", 0, 0))

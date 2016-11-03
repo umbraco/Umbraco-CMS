@@ -27,18 +27,18 @@ namespace Umbraco.Web.PropertyEditors
         private static void Initialize(FileUploadPropertyEditor fileUpload)
         {
             MediaService.Saving += fileUpload.MediaServiceSaving;
-            MediaService.Created += fileUpload.MediaServiceCreating;
+            MediaService.Created += fileUpload.MediaServiceCreated;
             ContentService.Copied += fileUpload.ContentServiceCopied;
 
-            MediaService.Deleted += (sender, args) 
+            MediaService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            MediaService.EmptiedRecycleBin += (sender, args) 
+            MediaService.EmptiedRecycleBin += (sender, args)
                 => args.Files.AddRange(fileUpload.ServiceEmptiedRecycleBin(args.AllPropertyData));
-            ContentService.Deleted += (sender, args) 
+            ContentService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            ContentService.EmptiedRecycleBin += (sender, args) 
+            ContentService.EmptiedRecycleBin += (sender, args)
                 => args.Files.AddRange(fileUpload.ServiceEmptiedRecycleBin(args.AllPropertyData));
-            MemberService.Deleted += (sender, args) 
+            MemberService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
         }
 
@@ -48,15 +48,15 @@ namespace Umbraco.Web.PropertyEditors
             MediaService.Created += imageCropper.MediaServiceCreated;
             ContentService.Copied += imageCropper.ContentServiceCopied;
 
-            MediaService.Deleted += (sender, args) 
+            MediaService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            MediaService.EmptiedRecycleBin += (sender, args) 
+            MediaService.EmptiedRecycleBin += (sender, args)
                 => args.Files.AddRange(imageCropper.ServiceEmptiedRecycleBin(args.AllPropertyData));
-            ContentService.Deleted += (sender, args) 
+            ContentService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            ContentService.EmptiedRecycleBin += (sender, args) 
+            ContentService.EmptiedRecycleBin += (sender, args)
                 => args.Files.AddRange(imageCropper.ServiceEmptiedRecycleBin(args.AllPropertyData));
-            MemberService.Deleted += (sender, args) 
+            MemberService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
         }
     }

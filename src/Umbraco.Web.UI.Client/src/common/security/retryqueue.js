@@ -5,10 +5,12 @@ angular.module('umbraco.security.retryQueue', [])
 .factory('securityRetryQueue', ['$q', '$log', function ($q, $log) {
 
   var retryQueue = [];
+  var retryUser = null;
+
   var service = {
     // The security service puts its own handler in here!
     onItemAddedCallbacks: [],
-    
+
     hasMore: function() {
       return retryQueue.length > 0;
     },
@@ -23,12 +25,19 @@ angular.module('umbraco.security.retryQueue', [])
         }
       });
     },
-    pushRetryFn: function(reason, retryFn) {
+    pushRetryFn: function(reason, userName, retryFn) {
       // The reason parameter is optional
-      if ( arguments.length === 1) {
-        retryFn = reason;
+      if ( arguments.length === 2) {
+        retryFn = userName;
+        userName = reason;
         reason = undefined;
       }
+
+      if ((retryUser && retryUser !== userName) || userName === null) {
+        throw new Error('invalid user');
+      }
+      
+      retryUser = userName;
 
       // The deferred object that will be resolved or rejected by calling retry or cancel
       var deferred = $q.defer();
@@ -59,8 +68,19 @@ angular.module('umbraco.security.retryQueue', [])
       while(service.hasMore()) {
         retryQueue.shift().cancel();
       }
+      retryUser = null;
     },
-    retryAll: function() {
+    retryAll: function (userName) {
+
+      if (retryUser == null) {
+        return;
+      } 
+      
+      if (retryUser !== userName) {
+        service.cancelAll();
+        return;
+      }
+
       while(service.hasMore()) {
         retryQueue.shift().retry();
       }

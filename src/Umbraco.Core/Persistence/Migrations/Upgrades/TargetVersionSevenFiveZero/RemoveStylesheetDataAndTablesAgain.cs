@@ -19,22 +19,32 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
 
         public override void Up()
         {
+            // defer, because we are making decisions based upon what's in the database
+            Execute.Code(MigrationCode);
+        }
+
+        private string MigrationCode(UmbracoDatabase database)
+        {
+            var localContext = new LocalMigrationContext(database, Logger);
+            
             //Clear all stylesheet data if the tables exist
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
             if (tables.InvariantContains("cmsStylesheetProperty"))
             {
-                Delete.FromTable("cmsStylesheetProperty").AllRows();
-                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) });
+                localContext.Delete.FromTable("cmsStylesheetProperty").AllRows();
+                localContext.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) });
 
-                Delete.Table("cmsStylesheetProperty");
+                localContext.Delete.Table("cmsStylesheetProperty");
             }
             if (tables.InvariantContains("cmsStylesheet"))
             {
-                Delete.FromTable("cmsStylesheet").AllRows();
-                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.Stylesheet) });
+                localContext.Delete.FromTable("cmsStylesheet").AllRows();
+                localContext.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.Stylesheet) });
 
-                Delete.Table("cmsStylesheet");
+                localContext.Delete.Table("cmsStylesheet");
             }
+
+            return localContext.GetSql();
         }
 
         public override void Down()

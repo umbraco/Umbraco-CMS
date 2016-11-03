@@ -173,24 +173,6 @@ namespace umbraco.cms.presentation.developer
 		protected global::System.Web.UI.WebControls.TextBox xsltFileName;
 
 		/// <summary>
-		/// pp_testing control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_testing;
-
-		/// <summary>
-		/// SkipTesting control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.CheckBox SkipTesting;
-
-		/// <summary>
 		/// pp_errorMsg control.
 		/// </summary>
 		/// <remarks>

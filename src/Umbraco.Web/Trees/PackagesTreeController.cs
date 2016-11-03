@@ -93,6 +93,9 @@ namespace Umbraco.Web.Trees
             }
             else if (id == "created")
             {
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
+                    .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
+
                 menu.Items.Add<RefreshNode, ActionRefresh>(
                     Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
             }

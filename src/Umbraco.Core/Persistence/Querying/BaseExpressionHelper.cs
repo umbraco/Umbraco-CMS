@@ -448,6 +448,55 @@ namespace Umbraco.Core.Persistence.Querying
                     }
 
                     return HandleStringComparison(visitedObjectForMethod, compareValue, m.Method.Name, colType);
+
+                case "Replace":
+                    string searchValue;
+
+                    if (methodArgs[0].NodeType != ExpressionType.Constant)
+                    {
+                        //This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
+                        // So we'll go get the value:
+                        var member = Expression.Convert(methodArgs[0], typeof(object));
+                        var lambda = Expression.Lambda<Func<object>>(member);
+                        var getter = lambda.Compile();
+                        searchValue = getter().ToString();
+                    }
+                    else
+                    {
+                        searchValue = methodArgs[0].ToString();
+                    }
+
+                    if (methodArgs[0].Type != typeof(string) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(methodArgs[0].Type))
+                    {
+                        throw new NotSupportedException("An array Contains method is not supported");
+                    }
+
+                    string replaceValue;
+
+                    if (methodArgs[1].NodeType != ExpressionType.Constant)
+                    {
+                        //This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
+                        // So we'll go get the value:
+                        var member = Expression.Convert(methodArgs[1], typeof(object));
+                        var lambda = Expression.Lambda<Func<object>>(member);
+                        var getter = lambda.Compile();
+                        replaceValue = getter().ToString();
+                    }
+                    else
+                    {
+                        replaceValue = methodArgs[1].ToString();
+                    }
+
+                    if (methodArgs[1].Type != typeof(string) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(methodArgs[1].Type))
+                    {
+                        throw new NotSupportedException("An array Contains method is not supported");
+                    }
+
+                    SqlParameters.Add(RemoveQuote(searchValue));
+
+                    SqlParameters.Add(RemoveQuote(replaceValue));
+
+                    return string.Format("replace({0}, @{1}, @{2})", visitedObjectForMethod, SqlParameters.Count - 2, SqlParameters.Count - 1);
                 //case "Substring":
                 //    var startIndex = Int32.Parse(args[0].ToString()) + 1;
                 //    if (args.Count == 2)

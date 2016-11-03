@@ -34,7 +34,7 @@ namespace Umbraco.Core.Xml
                 return;
             }
             if (n.Attributes[name] == null)
-            {                
+            {
                 var a = xml.CreateAttribute(name);
                 a.Value = value;
                 n.Attributes.Append(a);
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Xml
 
                 //var name = nav.LocalName; // must not match an excluded tag
                 //if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) return true;
-                
+
                 return true;
             }
 
@@ -157,14 +157,14 @@ namespace Umbraco.Core.Xml
             // used apart from for tests so don't think this matters. In any case, we no longer check for this!
 
             //var name = elt.Name.LocalName; // must not match an excluded tag
-            //if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) 
+            //if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false))
             //    return true;
             //elt = null;
             //return false;
 
             return true;
         }
-        
+
         /// <summary>
         /// Sorts the children of a parentNode.
         /// </summary>
@@ -172,7 +172,7 @@ namespace Umbraco.Core.Xml
         /// <param name="childNodesXPath">An XPath expression to select children of <paramref name="parentNode"/> to sort.</param>
         /// <param name="orderBy">A function returning the value to order the nodes by.</param>
         internal static void SortNodes(
-            XmlNode parentNode, 
+            XmlNode parentNode,
             string childNodesXPath,
             Func<XmlNode, int> orderBy)
         {
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Xml
         /// <param name="node">The child node to sort.</param>
         /// <param name="orderBy">A function returning the value to order the nodes by.</param>
         /// <returns>A value indicating whether sorting was needed.</returns>
-        /// <remarks>Assuming all nodes but <paramref name="node"/> are sorted, this will move the node to 
+        /// <remarks>Assuming all nodes but <paramref name="node"/> are sorted, this will move the node to
         /// the right position without moving all the nodes (as SortNodes would do) - should improve perfs.</remarks>
         internal static bool SortNode(
             XmlNode parentNode,
@@ -425,13 +425,32 @@ namespace Umbraco.Core.Xml
         }
 
         /// <summary>
+        /// Sets or creates an Xml node from its inner Xml.
+        /// </summary>
+        /// <param name="xd">The xmldocument.</param>
+        /// <param name="parent">The node to set or create the child text node on</param>
+        /// <param name="name">The node name.</param>
+        /// <param name="value">The node inner Xml.</param>
+        /// <returns>a XmlNode</returns>
+        public static XmlNode SetInnerXmlNode(XmlDocument xd, XmlNode parent, string name, string value)
+        {
+            if (xd == null) throw new ArgumentNullException(nameof(xd));
+            if (parent == null) throw new ArgumentNullException(nameof(parent));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
+
+            var child = parent.SelectSingleNode(name) ?? xd.CreateNode(XmlNodeType.Element, name, "");
+            child.InnerXml = value;
+            return child;
+        }
+
+        /// <summary>
         /// Creates a cdata XmlNode with the specified name and value
         /// </summary>
         /// <param name="xd">The xmldocument.</param>
         /// <param name="name">The node name.</param>
         /// <param name="value">The node value.</param>
         /// <returns>A XmlNode</returns>
-		public static XmlNode AddCDataNode(XmlDocument xd, string name, string value)
+        public static XmlNode AddCDataNode(XmlDocument xd, string name, string value)
         {
             if (xd == null) throw new ArgumentNullException("xd");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));

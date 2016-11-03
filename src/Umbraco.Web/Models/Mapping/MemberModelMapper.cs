@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models.Mapping
             //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, IMember>()
                 .ConstructUsing(user => MemberService.CreateGenericMembershipProviderMember(user.UserName, user.Email, user.UserName, ""))
-                //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
+                //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(member => member.Comments, expression => expression.MapFrom(user => user.Comment))
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
@@ -101,6 +101,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore())
                 .AfterMap((member, display) => MapGenericCustomProperties(_memberService, member, display, _textService));
 
             //FROM IMember TO MemberBasic
@@ -123,11 +124,12 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore());
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
-                //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
+                //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
@@ -154,7 +156,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(x => x.ContentTypeAlias, expression => expression.Ignore());
+                .ForMember(x => x.ContentTypeAlias, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
             config.CreateMap<IMember, ContentItemDto<IMember>>()
@@ -165,6 +168,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
                 .ForMember(dto => dto.Properties, expression => expression.ResolveUsing<MemberDtoPropertiesValueResolver>());
 
@@ -200,7 +204,7 @@ namespace Umbraco.Web.Models.Mapping
                 var url = urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(display.Key.ToString("N"), null));
                 display.TreeNodeUrl = url;
             }
-            
+
             var genericProperties = new List<ContentPropertyDisplay>
             {
                 new ContentPropertyDisplay
@@ -251,7 +255,7 @@ namespace Umbraco.Web.Models.Mapping
 
 
             TabsAndPropertiesResolver.MapGenericProperties(member, display, localizedText, genericProperties);
-            
+
             //check if there's an approval field
             var provider = membersProvider as IUmbracoMemberTypeMembershipProvider;
             if (member.HasIdentity == false && provider != null)
@@ -275,7 +279,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <returns></returns>
         /// <remarks>
         /// If the membership provider installed is the umbraco membership provider, then we will allow changing the username, however if
-        /// the membership provider is a custom one, we cannot allow chaning the username because MembershipProvider's do not actually natively 
+        /// the membership provider is a custom one, we cannot allow chaning the username because MembershipProvider's do not actually natively
         /// allow that.
         /// </remarks>
         internal static ContentPropertyDisplay GetLoginProperty(IMemberService memberService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
@@ -284,11 +288,11 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("login"),
-                    Value = display.Username            
+                    Value = display.Username
                 };
 
             var scenario = memberService.GetMembershipScenario();
-            
+
             //only allow editing if this is a new member, or if the membership provider is the umbraco one
             if (member.HasIdentity == false || scenario == MembershipScenario.NativeUmbraco)
             {
@@ -304,20 +308,21 @@ namespace Umbraco.Web.Models.Mapping
 
         internal static IDictionary<string, bool> GetMemberGroupValue(string username)
         {
-            var result = new Dictionary<string, bool>();
-            foreach (var role in Roles.GetAllRoles().Distinct())
-            {
+            var userRoles = username.IsNullOrWhiteSpace() ? null : Roles.GetRolesForUser(username);
+
+            // create a dictionary of all roles (except internal roles) + "false"
+            var result = Roles.GetAllRoles().Distinct()
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
-                if (role.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
-                {
-                    result.Add(role, false);
-                    if (username.IsNullOrWhiteSpace()) continue;
-                    if (Roles.IsUserInRole(username, role))
-                    {
-                        result[role] = true;
-                    }
-                }
-            }
+                .Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
+                .ToDictionary(x => x, x => false);
+
+            // if user has no roles, just return the dictionary
+            if (userRoles == null) return result;
+
+            // else update the dictionary to "true" for the user roles (except internal roles)
+            foreach (var userRole in userRoles.Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
+                result[userRole] = true;
+
             return result;
         }
 
@@ -335,7 +340,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 //remove all membership properties, these values are set with the membership provider.
                 var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
-                
+
                 return source.Properties
                              .Where(x => exclude.Contains(x.Alias) == false)
                              .Select(Mapper.Map<Property, ContentPropertyDto>);
@@ -348,7 +353,7 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         /// <remarks>
         /// This also ensures that the IsLocked out property is readonly when the member is not locked out - this is because
-        /// an admin cannot actually set isLockedOut = true, they can only unlock. 
+        /// an admin cannot actually set isLockedOut = true, they can only unlock.
         /// </remarks>
         internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver
         {
@@ -387,7 +392,7 @@ namespace Umbraco.Web.Models.Mapping
                         isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
                     }
 
-                    return result;    
+                    return result;
                 }
                 else
                 {
@@ -403,10 +408,10 @@ namespace Umbraco.Web.Models.Mapping
                         isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
                     }
 
-                    return result;    
+                    return result;
                 }
 
-                
+
             }
         }
 
@@ -450,7 +455,7 @@ namespace Umbraco.Web.Models.Mapping
                         {Constants.Conventions.Member.IsLockedOut, Constants.Conventions.Member.IsLockedOut},
                         {Constants.Conventions.Member.IsApproved, Constants.Conventions.Member.IsApproved},
                         {Constants.Conventions.Member.Comments, Constants.Conventions.Member.Comments}
-                    };    
+                    };
                 }
                 else
                 {
@@ -461,12 +466,12 @@ namespace Umbraco.Web.Models.Mapping
                         {Constants.Conventions.Member.IsLockedOut, umbracoProvider.LockPropertyTypeAlias},
                         {Constants.Conventions.Member.IsApproved, umbracoProvider.ApprovedPropertyTypeAlias},
                         {Constants.Conventions.Member.Comments, umbracoProvider.CommentPropertyTypeAlias}
-                    };    
+                    };
                 }
 
-                
+
             }
-        } 
+        }
 
     }
 }

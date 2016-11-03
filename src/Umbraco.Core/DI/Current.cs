@@ -3,6 +3,7 @@ using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
@@ -74,6 +75,9 @@ namespace Umbraco.Core.DI
                         ?? new PluginManager(ApplicationCache.RuntimeCache, ProfilingLogger)); }
             set { _pluginManager = value; }
         }
+
+        public static FileSystems FileSystems
+            => Container.GetInstance<FileSystems>();
 
         public static UrlSegmentProviderCollection UrlSegmentProviders
             => Container.GetInstance<UrlSegmentProviderCollection>();

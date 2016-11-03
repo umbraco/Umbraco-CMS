@@ -210,6 +210,11 @@ order by T.name, I.name");
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;
         }
 
+        public override Sql<SqlContext> SelectTop(Sql<SqlContext> sql, int top)
+        {
+            return new Sql<SqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
+        }
+
         private static string GetIdentityString(ColumnDefinition column)
         {
             return "IDENTITY(1,1)";

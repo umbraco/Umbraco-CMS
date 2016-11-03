@@ -9,7 +9,16 @@ namespace Umbraco.Web.Security.Identity
 {
     public static class AuthenticationOptionsExtensions
     {
-     
+
+        /// <summary>
+        /// When trying to implement an Azure AD B2C provider or other OAuth provider that requires a customized Challenge Result in order to work then
+        /// this must be used.
+        /// </summary>
+        /// <param name="authOptions"></param>
+        /// <param name="authProperties"></param>
+        /// <remarks>
+        /// See: http://issues.umbraco.org/issue/U4-7353
+        /// </remarks>
         public static void SetSignInChallengeResultCallback(
             this AuthenticationOptions authOptions,
             Func<IOwinContext, AuthenticationProperties> authProperties)

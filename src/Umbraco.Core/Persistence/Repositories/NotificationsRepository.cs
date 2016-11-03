@@ -20,6 +20,26 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork = unitOfWork;
         }
 
+        public IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
+        {
+            var nodeIdsA = nodeIds.ToArray();
+            var sql = _unitOfWork.Database.Sql()
+                    .Select("DISTINCT umbracoNode.id nodeId, umbracoUser.id userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
+                    .From<User2NodeNotifyDto>()
+                    .InnerJoin<NodeDto>().On<User2NodeNotifyDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<UserDto>().On<User2NodeNotifyDto, UserDto>(left => left.UserId, right => right.Id)
+                    .Where<NodeDto>(x => x.NodeObjectType == objectType)
+                    .Where<UserDto>(x => x.Disabled == false) // only approved users
+                    .Where<User2NodeNotifyDto>(x => x.Action == action); // on the specified action
+            if (nodeIdsA.Length > 0)
+                sql
+                    .WhereIn<NodeDto>(x => x.NodeId, nodeIdsA); // for the specified nodes
+            sql
+                .OrderBy<UserDto>(x => x.Id)
+                .OrderBy<NodeDto>(dto => dto.NodeId);
+            return _unitOfWork.Database.Fetch<dynamic>(sql).Select(x => new Notification(x.nodeId, x.userId, x.action, objectType));
+        }
+
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
             var sql = _unitOfWork.Database.Sql()

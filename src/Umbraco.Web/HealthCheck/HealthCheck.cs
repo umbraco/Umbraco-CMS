@@ -50,6 +50,5 @@ namespace Umbraco.Web.HealthCheck
         public abstract HealthCheckStatus ExecuteAction(HealthCheckAction action);
 
         //TODO: What else?
-
     }
 }

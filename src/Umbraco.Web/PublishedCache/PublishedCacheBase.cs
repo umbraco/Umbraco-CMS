@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.XPath;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
@@ -18,6 +19,13 @@ namespace Umbraco.Web.PublishedCache
         public abstract IPublishedContent GetById(bool preview, int contentId);
 
         public IPublishedContent GetById(int contentId)
+        {
+            return GetById(PreviewDefault, contentId);
+        }
+
+        public abstract IPublishedContent GetById(bool preview, Guid contentId);
+
+        public IPublishedContent GetById(Guid contentId)
         {
             return GetById(PreviewDefault, contentId);
         }

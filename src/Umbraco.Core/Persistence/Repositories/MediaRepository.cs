@@ -58,7 +58,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Fetch<ContentVersionDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto>(sql.SelectTop(1)).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -369,6 +369,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 foreach (var property in entity.Properties)
                 {
+                    if (keyDictionary.ContainsKey(property.PropertyTypeId) == false) continue;
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
@@ -420,7 +421,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
-                MapQueryDtos, orderBy, orderDirection, orderBySystemField,
+                MapQueryDtos, orderBy, orderDirection, orderBySystemField, "cmsContentVersion",
                 filterSql);
         }
 

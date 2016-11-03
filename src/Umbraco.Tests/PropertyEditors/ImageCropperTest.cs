@@ -183,8 +183,17 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_SpecifiedCropModeTest()
         {
+            var urlStringMin = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Min);
+            var urlStringBoxPad = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.BoxPad);
+            var urlStringPad = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Pad);
             var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode:ImageCropMode.Max);
+            var urlStringStretch = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Stretch);
+            
+            Assert.AreEqual(MediaPath + "?mode=min&width=300&height=150", urlStringMin);
+            Assert.AreEqual(MediaPath + "?mode=boxpad&width=300&height=150", urlStringBoxPad);
+            Assert.AreEqual(MediaPath + "?mode=pad&width=300&height=150", urlStringPad);
             Assert.AreEqual(MediaPath + "?mode=max&width=300&height=150", urlString);
+            Assert.AreEqual(MediaPath + "?mode=stretch&width=300&height=150", urlStringStretch);
         }
 
         /// <summary>

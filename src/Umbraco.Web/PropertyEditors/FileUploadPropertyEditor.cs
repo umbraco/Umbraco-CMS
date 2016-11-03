@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -17,8 +18,8 @@ namespace Umbraco.Web.PropertyEditors
     public class FileUploadPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
-        private readonly IContentSection _contentSettings;
         private readonly ILocalizedTextService _textService;
+        private readonly UploadAutoFillProperties _autoFillProperties;
 
         public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings, ILocalizedTextService textService)
             : base(logger)
@@ -28,24 +29,45 @@ namespace Umbraco.Web.PropertyEditors
             if (textService == null) throw new ArgumentNullException(nameof(textService));
 
             _mediaFileSystem = mediaFileSystem;
-            _contentSettings = contentSettings;
-            _textService = textService;           
+            _textService = textService;
+
+            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, Logger, contentSettings);
         }
 
         /// <summary>
-        /// Creates our custom value editor
+        /// Creates the corresponding property value editor.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The corresponding property value editor.</returns>
         protected override PropertyValueEditor CreateValueEditor()
         {
             var baseEditor = base.CreateValueEditor();            
             baseEditor.Validators.Add(new UploadFileTypeValidator());
-            return new FileUploadPropertyValueEditor(baseEditor, _mediaFileSystem, _contentSettings);
+            return new FileUploadPropertyValueEditor(baseEditor, _mediaFileSystem);
         }
 
+        /// <summary>
+        /// Creates the corresponding preValue editor.
+        /// </summary>
+        /// <returns>The corresponding preValue editor.</returns>
         protected override PreValueEditor CreatePreValueEditor()
         {
             return new FileUploadPreValueEditor(_textService, Logger);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether a property is an upload field.
+        /// </summary>
+        /// <param name="property">The property.</param>
+        /// <param name="ensureValue">A value indicating whether to check that the property has a non-empty value.</param>
+        /// <returns>A value indicating whether a property is an upload field, and (optionaly) has a non-empty value.</returns>
+        private static bool IsUploadField(Property property, bool ensureValue)
+        {
+            if (property.PropertyType.PropertyEditorAlias != Constants.PropertyEditors.UploadFieldAlias)
+                return false;
+            if (ensureValue == false)
+                return true;
+            var stringValue = property.Value as string;
+            return string.IsNullOrWhiteSpace(stringValue) == false;
         }
 
         /// <summary>
@@ -54,20 +76,10 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="allPropertyData"></param>
         internal IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
         {
-            var list = new List<string>();
-            //Get all values for any image croppers found
-            foreach (var uploadVal in allPropertyData
-                .SelectMany(x => x.Value)
-                .Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
-                .Select(x => x.Value)
-                .WhereNotNull())
-            {
-                if (uploadVal.ToString().IsNullOrWhiteSpace() == false)
-                {
-                    list.Add(uploadVal.ToString());
-                }
-            }
-            return list;
+            return allPropertyData.SelectMany(x => x.Value)
+                .Where (x => IsUploadField(x, true))
+                .Select(x => _mediaFileSystem.GetRelativePath((string)x.Value))
+                .ToList();
         }
 
         /// <summary>
@@ -76,90 +88,87 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="deletedEntities"></param>
         internal IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
         {
-            var list = new List<string>();
-            foreach (var property in deletedEntities.SelectMany(deletedEntity => deletedEntity
-                .Properties
-                .Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
-                            && x.Value != null
-                            && string.IsNullOrEmpty(x.Value.ToString()) == false)))
-            {
-                if (property.Value != null && property.Value.ToString().IsNullOrWhiteSpace() == false)
-                {
-                    list.Add(property.Value.ToString());
-                }
-            }
-            return list;
+            return deletedEntities.SelectMany(x => x.Properties)
+                .Where(x => IsUploadField(x, true))
+                .Select(x => _mediaFileSystem.GetRelativePath((string) x.Value))
+                .ToList();
         }
 
         /// <summary>
-        /// After the content is copied we need to check if there are files that also need to be copied
+        /// After a content has been copied, also copy uploaded files.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        internal void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
+        /// <param name="sender">The event sender.</param>
+        /// <param name="args">The event arguments.</param>
+        internal void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> args)
         {
-            if (e.Original.Properties.Any(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias))
+            // get the upload field properties with a value
+            var properties = args.Original.Properties.Where(x => IsUploadField(x, true));
+
+            // copy files
+            var isUpdated = false;
+            foreach (var property in properties)
             {
-                bool isUpdated = false;
-                var fs = _mediaFileSystem;
-
-                //Loop through properties to check if the content contains media that should be deleted
-                foreach (var property in e.Original.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
-                    && x.Value != null                                                   
-                    && string.IsNullOrEmpty(x.Value.ToString()) == false))
-                {
-                    if (fs.FileExists(fs.GetRelativePath(property.Value.ToString())))
-                    {
-                        var currentPath = fs.GetRelativePath(property.Value.ToString());
-                        var propertyId = e.Copy.Properties.First(x => x.Alias == property.Alias).Id;
-                        var newPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(currentPath));
-
-                        fs.CopyFile(currentPath, newPath);
-                        e.Copy.SetValue(property.Alias, fs.GetUrl(newPath));
-
-                        //Copy thumbnails
-                        foreach (var thumbPath in fs.GetThumbnails(currentPath))
-                        {
-                            var newThumbPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(thumbPath));
-                            fs.CopyFile(thumbPath, newThumbPath);
-                        }
-                        isUpdated = true;
-                    }
-                }
-
-                if (isUpdated)
-                {
-                    //need to re-save the copy with the updated path value
-                    sender.Save(e.Copy);
-                }
+                var sourcePath = _mediaFileSystem.GetRelativePath((string) property.Value);
+                var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
+                args.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath));
+                isUpdated = true;
             }
+
+            // if updated, re-save the copy with the updated value
+            if (isUpdated)
+                sender.Save(args.Copy);
         }
 
-        internal void MediaServiceCreating(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
+        /// <summary>
+        /// After a media has been created, auto-fill the properties.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="args">The event arguments.</param>
+        internal void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> args)
         {
-            AutoFillProperties(e.Entity);
+            AutoFillProperties(args.Entity);
         }
 
-        internal void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
+        /// <summary>
+        /// After a media has been saved, auto-fill the properties.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="args">The event arguments.</param>
+        internal void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> args)
         {
-            foreach (var m in e.SavedEntities)
+            foreach (var entity in args.SavedEntities)
+                AutoFillProperties(entity);
+        }
+
+        /// <summary>
+        /// After a content item has been saved, auto-fill the properties.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="args">The event arguments.</param>
+        internal void ContentServiceSaving(IContentService sender, Core.Events.SaveEventArgs<IContent> args)
+        {
+            foreach (var entity in args.SavedEntities)
+                AutoFillProperties(entity);
+        }
+
+        /// <summary>
+        /// Auto-fill properties (or clear).
+        /// </summary>
+        /// <param name="model">The content.</param>
+        private void AutoFillProperties(IContentBase model)
+        {
+            var properties = model.Properties.Where(x => IsUploadField(x, false));
+
+            foreach (var property in properties)
             {
-                AutoFillProperties(m);
-            }
-        }
+                var autoFillConfig = _autoFillProperties.GetConfig(property.Alias);
+                if (autoFillConfig == null) continue;
 
-        void AutoFillProperties(IContentBase model)
-        {
-            foreach (var p in model.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias))
-            {
-                var uploadFieldConfigNode =
-                    _contentSettings.ImageAutoFillProperties
-                                        .FirstOrDefault(x => x.Alias == p.Alias);
-
-                if (uploadFieldConfigNode != null)
-                {
-                    model.PopulateFileMetaDataProperties(uploadFieldConfigNode, p.Value == null ? string.Empty : p.Value.ToString());
-                }
+                var svalue = property.Value as string;
+                if (string.IsNullOrWhiteSpace(svalue))
+                    _autoFillProperties.Reset(model, autoFillConfig);
+                else
+                    _autoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue));
             }            
         }
 
@@ -194,14 +203,12 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     //there should only be one val
                     var delimited = dictionary.First().Value.Value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    for (var index = 0; index < delimited.Length; index++)
-                    {
-                        result.Add(new PreValue(index, delimited[index]));
-                    }
+                    var i = 0;
+                    result.AddRange(delimited.Select(x => new PreValue(i++, x)));
                 }
 
                 //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
-                return new Dictionary<string, object> { { "items", result.ToDictionary(x => x.Id, x => PreValueAsDictionary(x)) } };
+                return new Dictionary<string, object> { { "items", result.ToDictionary(x => x.Id, PreValueAsDictionary) } };
             }
 
             private IDictionary<string, object> PreValueAsDictionary(PreValue preValue)

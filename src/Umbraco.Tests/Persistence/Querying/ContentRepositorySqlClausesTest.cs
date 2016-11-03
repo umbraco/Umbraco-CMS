@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"))
                 .Where("([umbracoNode].[id] = @0)", 1050)
                 .Where("([cmsContentVersion].[VersionId] = @0)", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"))
-                .OrderBy("[cmsContentVersion].[VersionDate] DESC");
+                .OrderBy("([cmsContentVersion].[VersionDate]) DESC");
 
             var sql = Sql();
             sql.SelectAll()

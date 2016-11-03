@@ -315,8 +315,7 @@ AND umbracoNode.id <> @id",
             }
 
             //Delete the allowed content type entries before adding the updated collection
-            Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { Id = entity.Id });
-            //Insert collection of allowed content types
+            Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { entity.Id });
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
@@ -327,24 +326,23 @@ AND umbracoNode.id <> @id",
                                     });
             }
 
+            // fixme below, manage the property type
 
-            if (((ICanBeDirty)entity).IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
+            // delete ??? fixme wtf is this?
+            // ... by excepting entries from db with entries from collections
+            if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
             {
-                //Delete PropertyTypes by excepting entries from db with entries from collections
-                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = entity.Id });
+                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { entity.Id });
                 var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
                 var entityPropertyTypes = entity.PropertyTypes.Where(x => x.HasIdentity).Select(x => x.Id);
                 var items = dbPropertyTypeAlias.Except(entityPropertyTypes);
                 foreach (var item in items)
-                {
-                    //Before a PropertyType can be deleted, all Properties based on that PropertyType should be deleted.
-                    Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = item });
-                    Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = item });
-                    Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
-                                                     new { Id = entity.Id, PropertyTypeId = item });
-                }
+                    DeletePropertyType(entity.Id, item);
             }
 
+            // delete tabs
+            // ... by excepting entries from db with entries from collections
+            List<int> orphanPropertyTypeIds = null;
             if (entity.IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
             {
                 // todo
@@ -363,68 +361,96 @@ AND umbracoNode.id <> @id",
                 // (all gone)
 
                 // delete tabs that do not exist anymore
-                // get the tabs that are currently existing (in the db)
-                // get the tabs that we want, now
-                // and derive the tabs that we want to delete
+                // get the tabs that are currently existing (in the db), get the tabs that we want,
+                // now, and derive the tabs that we want to delete
                 var existingPropertyGroups = Database.Fetch<PropertyTypeGroupDto>("WHERE contentTypeNodeId = @id", new { id = entity.Id })
                     .Select(x => x.Id)
                     .ToList();
                 var newPropertyGroups = entity.PropertyGroups.Select(x => x.Id).ToList();
-                var tabsToDelete = existingPropertyGroups
+                var groupsToDelete = existingPropertyGroups
                     .Except(newPropertyGroups)
                     .ToArray();
 
-                // move properties to generic properties, and delete the tabs
-                if (tabsToDelete.Length > 0)
+                // delete the tabs
+                if (groupsToDelete.Length > 0)
                 {
-                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId=NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = tabsToDelete });
-                    Database.Delete<PropertyTypeGroupDto>("WHERE id IN (@ids)", new { ids = tabsToDelete });
+                    // if the tab contains properties, take care of them
+                    // - move them to 'generic properties' so they remain consistent
+                    // - keep track of them, later on we'll figure out what to do with them
+                    // see http://issues.umbraco.org/issue/U4-8663
+                    orphanPropertyTypeIds = Database.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete })
+                        .Select(x => x.Id).ToList();
+                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId=NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete });
+
+                    // now we can delete the tabs
+                    Database.Delete<PropertyTypeGroupDto>("WHERE id IN (@ids)", new { ids = groupsToDelete });
                 }
             }
             var propertyGroupFactory = new PropertyGroupFactory(entity.Id);
 
-            //Run through all groups to insert or update entries
+            // insert or update groups, assign properties
             foreach (var propertyGroup in entity.PropertyGroups)
             {
-                var tabDto = propertyGroupFactory.BuildGroupDto(propertyGroup);
-                int groupPrimaryKey = propertyGroup.HasIdentity
-                                          ? Database.Update(tabDto)
-                                          : Convert.ToInt32(Database.Insert(tabDto));
+                // insert or update group
+                var groupDto = propertyGroupFactory.BuildGroupDto(propertyGroup);
+                var groupId = propertyGroup.HasIdentity
+                    ? Database.Update(groupDto)
+                    : Convert.ToInt32(Database.Insert(groupDto));
                 if (propertyGroup.HasIdentity == false)
-                    propertyGroup.Id = groupPrimaryKey; //Set Id on new PropertyGroup
+                    propertyGroup.Id = groupId;
+                else
+                    groupId = propertyGroup.Id;
 
-                //Ensure that the PropertyGroup's Id is set on the PropertyTypes within a group
-                //unless the PropertyGroupId has already been changed.
+                // assign properties to the group
+                // (all of them, even those that have .IsPropertyDirty("PropertyGroupId") == true,
+                //  because it should have been set to this group anyways and better be safe)
                 foreach (var propertyType in propertyGroup.PropertyTypes)
-                {
-                    if (propertyType.IsPropertyDirty("PropertyGroupId") == false)
-                    {
-                        var tempGroup = propertyGroup;
-                        propertyType.PropertyGroupId = new Lazy<int>(() => tempGroup.Id);
-                    }
-                }
+                    propertyType.PropertyGroupId = new Lazy<int>(() => groupId);
             }
 
-            //Run through all PropertyTypes to insert or update entries
+            // insert or update properties
+            // all of them, no-group and in-groups
             foreach (var propertyType in entity.PropertyTypes)
             {
-                var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default(int);
-                //If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
+                var groupId = propertyType.PropertyGroupId?.Value ?? default(int);
+                // if the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
                 if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
-                {
                     AssignDataTypeFromPropertyEditor(propertyType);
-                }
 
-                //validate the alias!
+                // validate the alias
                 ValidateAlias(propertyType);
 
-                var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(tabId, propertyType);
-                int typePrimaryKey = propertyType.HasIdentity
-                                         ? Database.Update(propertyTypeDto)
-                                         : Convert.ToInt32(Database.Insert(propertyTypeDto));
+                // insert or update property
+                var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(groupId, propertyType);
+                var typeId = propertyType.HasIdentity
+                    ? Database.Update(propertyTypeDto)
+                    : Convert.ToInt32(Database.Insert(propertyTypeDto));
                 if (propertyType.HasIdentity == false)
-                    propertyType.Id = typePrimaryKey; //Set Id on new PropertyType
+                    propertyType.Id = typeId;
+                else
+                    typeId = propertyType.Id;
+
+                // not an orphan anymore
+                if (orphanPropertyTypeIds != null)
+                    orphanPropertyTypeIds.Remove(typeId);
             }
+
+            // deal with orphan properties: those that were in a deleted tab,
+            // and have not been re-mapped to another tab or to 'generic properties'
+            if (orphanPropertyTypeIds != null)
+                foreach (var id in orphanPropertyTypeIds)
+                    DeletePropertyType(entity.Id, id);
+        }
+
+        private void DeletePropertyType(int contentTypeId, int propertyTypeId)
+        {
+            // first clear dependencies
+            Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
+            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyTypeId });
+
+            // then delete the property type
+            Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
+                new { Id = contentTypeId, PropertyTypeId = propertyTypeId });
         }
 
         protected IEnumerable<ContentTypeSort> GetAllowedContentTypeIds(int id)

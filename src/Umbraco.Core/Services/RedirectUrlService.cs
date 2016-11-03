@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
                 if (redir != null)
                     redir.CreateDateUtc = DateTime.UtcNow;
                 else
-                    redir = new RedirectUrl { Url = url, ContentKey = contentKey };
+                    redir = new RedirectUrl { Key = Guid.NewGuid(), Url = url, ContentKey = contentKey };
                 repo.AddOrUpdate(redir);
                 uow.Complete();
             }
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
@@ -108,6 +108,16 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IRedirectUrlRepository>();
                 var rules = repo.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
+                uow.Complete();
+                return rules;
+            }
+        }
+        public IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repo = uow.CreateRepository<IRedirectUrlRepository>();
+                var rules = repo.SearchUrls(searchTerm, pageIndex, pageSize, out total);
                 uow.Complete();
                 return rules;
             }

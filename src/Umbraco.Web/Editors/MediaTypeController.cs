@@ -66,16 +66,18 @@ namespace Umbraco.Web.Editors
         /// Returns the avilable compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
-        /// <param name="contentTypeId"></param>
-        /// <param name="filterContentTypes">
+        /// <param name="filter.contentTypeId"></param>
+        /// <param name="filter.ContentTypes">
         /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
         /// along with any content types that have matching property types that are included in the filtered content types
         /// </param>
-        /// <param name="filterPropertyTypes">
+        /// <param name="filter.PropertyTypes">
         /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
         /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
         /// be looked up via the db, they need to be passed in.
         /// </param>
+        /// <param name="filter">
+        /// Filter applied when resolving compositions</param>
         /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage GetAvailableCompositeMediaTypes(GetAvailableCompositionsFilter filter)
@@ -91,8 +93,7 @@ namespace Umbraco.Web.Editors
 
         public MediaTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new MediaType(parentId);
-            ct.Icon = "icon-picture";
+            var ct = new MediaType(parentId) {Icon = "icon-picture"};
 
             var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
             return dto;

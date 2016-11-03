@@ -303,7 +303,11 @@ namespace Umbraco.Web
                     }
                 }
 
-                if (quality != null)
+                var hasFormat = furtherOptions != null && furtherOptions.InvariantContains("&format=");
+
+                //Only put quality here, if we don't have a format specified. 
+                //Otherwise we need to put quality at the end to avoid it being overridden by the format.
+                if (quality != null && hasFormat == false)
                 {
                     imageProcessorUrl.Append("&quality=" + quality);
                 }
@@ -350,6 +354,12 @@ namespace Umbraco.Web
                 if (furtherOptions != null)
                 {
                     imageProcessorUrl.Append(furtherOptions);
+                }
+
+                //If furtherOptions contains a format, we need to put the quality after the format.
+                if (quality != null && hasFormat)
+                {
+                    imageProcessorUrl.Append("&quality=" + quality);
                 }
 
                 if (cacheBusterValue != null)

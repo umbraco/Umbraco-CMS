@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -18,6 +16,7 @@ namespace Umbraco.Core.Models
         /// </returns>
         public static bool IsAdmin(this IUser user)
         {
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return user.UserType.Alias == "admin";
         }
 
@@ -38,8 +37,8 @@ namespace Umbraco.Core.Models
         /// <returns></returns>      
         public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService)
         {
-            if (user == null) throw new ArgumentNullException("user");
-            if (textService == null) throw new ArgumentNullException("textService");
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (textService == null) throw new ArgumentNullException(nameof(textService));
             return GetUserCulture(user.Language, textService);
         }
 
@@ -69,8 +68,8 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         internal static bool HasPathAccess(this IUser user, IContent content)
         {
-            if (user == null) throw new ArgumentNullException("user");
-            if (content == null) throw new ArgumentNullException("content");
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (content == null) throw new ArgumentNullException(nameof(content));
             return HasPathAccess(content.Path, user.StartContentId, Constants.System.RecycleBinContent);
         }
 
@@ -99,9 +98,9 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         internal static bool HasPathAccess(this IUser user, IMedia media)
         {
-            if (user == null) throw new ArgumentNullException("user");
-            if (media == null) throw new ArgumentNullException("media");
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (media == null) throw new ArgumentNullException(nameof(media));
             return HasPathAccess(media.Path, user.StartMediaId, Constants.System.RecycleBinMedia);
         }
-    }
+   }
 }

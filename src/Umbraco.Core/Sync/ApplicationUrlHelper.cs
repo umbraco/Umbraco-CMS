@@ -113,7 +113,8 @@ namespace Umbraco.Core.Sync
                 ? ":" + request.ServerVariables["SERVER_PORT"]
                 : "";
 
-            var ssl = GlobalSettings.UseSSL ? "s" : ""; // force, whatever the first request
+            var useSsl = GlobalSettings.UseSSL || port == "443";
+            var ssl = useSsl ? "s" : ""; // force, whatever the first request
             var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
             return url.TrimEnd('/');

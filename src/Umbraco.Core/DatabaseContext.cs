@@ -456,14 +456,7 @@ namespace Umbraco.Core
                 var schemaResult = ValidateDatabaseSchema();
 
                 var installedSchemaVersion = new SemVersion(schemaResult.DetermineInstalledVersion());
-
-                var installedMigrationVersion = new SemVersion(0);
-                //we cannot check the migrations table if it doesn't exist, this will occur when upgrading to 7.3
-                if (schemaResult.ValidTables.Any(x => x.InvariantEquals("umbracoMigration")))
-                {
-                    installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);
-                }
-
+                var installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);    
                 var targetVersion = UmbracoVersion.Current;
 
                 //In some cases - like upgrading from 7.2.6 -> 7.3, there will be no migration information in the database and therefore it will

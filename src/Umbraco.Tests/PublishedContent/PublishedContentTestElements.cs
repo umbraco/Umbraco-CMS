@@ -74,6 +74,11 @@ namespace Umbraco.Tests.PublishedContent
             return _content.ContainsKey(contentId) ? _content[contentId] : null;
         }
 
+        public override IPublishedContent GetById(bool preview, Guid contentId)
+        {
+            throw new NotImplementedException();
+        }
+
         public override bool HasById(bool preview, int contentId)
         {
             return _content.ContainsKey(contentId);

@@ -41,6 +41,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.WebRequest" />
@@ -69,6 +70,7 @@
     <Compile Include="AsyncLock.cs" />
     <Compile Include="AttemptOfTResult.cs" />
     <Compile Include="AttemptOfTResultTStatus.cs" />
+    <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="Cache\CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
@@ -280,9 +282,13 @@
       <DependentUpon>Files.resx</DependentUpon>
     </Compile>
     <Compile Include="IRuntimeState.cs" />
+    <Compile Include="Logging\VoidProfiler.cs" />
+    <Compile Include="Logging\WebProfilerProvider.cs" />
+    <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Macros\XsltExtensionCollection.cs" />
     <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
+    <Compile Include="Media\ImageExtensions.cs" />
     <Compile Include="Models\DictionaryItemExtensions.cs" />
     <Compile Include="Models\PublishedContent\IPublishedFragment.cs" />
     <Compile Include="Models\PublishedContent\NoopPublishedContentModelFactory.cs" />
@@ -301,6 +307,9 @@
     <Compile Include="Plugins\HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="IO\ShadowFileSystem.cs" />
+    <Compile Include="IO\ShadowFileSystemsScope.cs" />
+    <Compile Include="IO\ShadowWrapper.cs" />
     <Compile Include="DI\LightInjectExtensions.cs" />
     <Compile Include="ListExtensions.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
@@ -315,6 +324,7 @@
     <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Mandate.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
+    <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
     <Compile Include="Models\ContentTypeAvailableCompositionsResult.cs" />
@@ -331,6 +341,7 @@
     <Compile Include="Models\IMigrationEntry.cs" />
     <Compile Include="Models\IRedirectUrl.cs" />
     <Compile Include="Models\IServerRegistration.cs" />
+    <Compile Include="Models\IXsltFile.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
     <Compile Include="Models\PartialViewType.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
@@ -368,9 +379,12 @@
     <Compile Include="Models\Rdbms\MigrationDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployChecksumDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployDependencyDto.cs" />
+    <Compile Include="Models\XsltFile.cs" />
+    <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
+    <Compile Include="SafeCallContext.cs" />
     <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
     <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
     <Compile Include="Persistence\Factories\MigrationEntryFactory.cs" />
@@ -382,9 +396,6 @@
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddRedirectUrlTable4.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddRedirectUrlTable3.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddRedirectUrlTable2.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddRedirectUrlTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\RemoveStylesheetDataAndTablesAgain.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\UpdateUniqueIndexOnCmsPropertyData.cs" />
@@ -449,12 +460,14 @@
     <Compile Include="Persistence\Repositories\Interfaces\IPublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRedirectUrlRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IServerRegistrationRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IXsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\MediaTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepository.cs" />
+    <Compile Include="Persistence\Repositories\XsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\TupleExtensions.cs" />
@@ -477,7 +490,6 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
     <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
-    <Compile Include="SafeCallContext.cs" />
     <Compile Include="Serialization\ForceInt32Converter.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
@@ -488,21 +500,23 @@
     <Compile Include="Services\Changes\DomainChangeTypes.cs" />
     <Compile Include="Services\UnPublishedStatusType.cs" />
     <Compile Include="Services\UnPublishStatus.cs" />
+    <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
     <Compile Include="Security\BackOfficeSignInManager.cs" />
     <Compile Include="Security\BackOfficeUserManager.cs" />
+    <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
+    <Compile Include="Security\IBackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\MembershipPasswordHasher.cs" />
     <Compile Include="Security\EmailService.cs" />
+    <Compile Include="Security\OwinExtensions.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
-    <Compile Include="IO\ResizedImage.cs" />
-    <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\AppDomainTokenConverter.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
@@ -558,7 +572,6 @@
     <Compile Include="Manifest\PreValueFieldConverter.cs" />
     <Compile Include="Manifest\PropertyEditorConverter.cs" />
     <Compile Include="Media\ImageHelper.cs" />
-    <Compile Include="Media\MediaSubfolderCounter.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Enum.cs" />
@@ -1046,7 +1059,6 @@
     <Compile Include="Logging\IProfiler.cs" />
     <Compile Include="Logging\LogProfiler.cs" />
     <Compile Include="Logging\ProfilerExtensions.cs" />
-    <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="PropertyEditors\DelimitedManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IntegerValidator.cs" />
     <Compile Include="PropertyEditors\ManifestPropertyValidator.cs" />
@@ -1304,7 +1316,7 @@
     <Compile Include="IfExtensions.cs" />
     <Compile Include="Plugins\PluginManager.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
-    <Compile Include="IO\FileSystemProviderManager.cs" />
+    <Compile Include="IO\FileSystems.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="IO\IOHelper.cs" />
     <Compile Include="IO\PhysicalFileSystem.cs" />

@@ -6,7 +6,7 @@ namespace Umbraco.Core.Logging
     /// <summary>
     /// Implements <see cref="ILogger"/> on top of <see cref="System.Diagnostics"/>.
     /// </summary>
-    internal class DebugDiagnosticsLogger : ILogger
+    public class DebugDiagnosticsLogger : ILogger
     {
         /// <inheritdoc/>
         public void Error(Type reporting, string message, Exception exception = null)

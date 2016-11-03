@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Umbraco.Core.Configuration;
+using System.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -382,5 +383,33 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user creating the media item</param>
         /// <returns><see cref="IMedia"/></returns>
         IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = 0);
+
+        /// <summary>
+        /// Gets the content of a media as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        /// <returns>The content of the media.</returns>
+        Stream GetMediaFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a media.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        /// <param name="content">The content of the media.</param>
+        void SetMediaFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Deletes a media file and all thumbnails.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        void DeleteMediaFile(string filepath);
+
+        /// <summary>
+        /// Generates thumbnails.
+        /// </summary>
+        /// <param name="filepath">The filesystem-relative path to the original image.</param>
+        /// <param name="propertyType">The property type.</param>
+        /// <remarks>This should be obsoleted, we should not generate thumbnails.</remarks>
+        void GenerateThumbnails(string filepath, PropertyType propertyType);
     }
 }

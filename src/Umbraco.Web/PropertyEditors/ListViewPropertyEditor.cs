@@ -61,8 +61,16 @@ namespace Umbraco.Web.PropertyEditors
         {
             [PreValueField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
             public int DisplayAtTabNumber { get; set; }
+
             [PreValueField("pageSize", "Page Size", "number", Description = "Number of items per page")]
             public int PageSize { get; set; }
+
+            [PreValueField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
+            public int Layouts { get; set; }
+
+            [PreValueField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html",
+                Description = "The properties that will be displayed for each column")]
+            public object IncludeProperties { get; set; }
 
             [PreValueField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
                 Description = "The default sort order for the list")]
@@ -71,15 +79,10 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
             public int OrderDirection { get; set; }
 
-            [PreValueField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
-            public int Layouts { get; set; }
-
-            [PreValueField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html", 
-                Description = "The properties that will be displayed for each column")]
-            public object IncludeProperties { get; set; }
             [PreValueField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
                 Description = "The bulk actions that are allowed from the list view")]
             public BulkActionPermissionSettings BulkActionPermissions { get; set; }
+
             internal class BulkActionPermissionSettings
             {
                 public bool AllowBulkPublish { get; set; }

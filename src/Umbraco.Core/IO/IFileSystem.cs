@@ -16,7 +16,7 @@ namespace Umbraco.Core.IO
         void DeleteDirectory(string path, bool recursive);
 
         bool DirectoryExists(string path);
-        
+
         void AddFile(string path, Stream stream);
 
         void AddFile(string path, Stream stream, bool overrideIfExists);
@@ -31,7 +31,6 @@ namespace Umbraco.Core.IO
 
         bool FileExists(string path);
 
-
         string GetRelativePath(string fullPathOrUrl);
 
         string GetFullPath(string path);
@@ -41,5 +40,11 @@ namespace Umbraco.Core.IO
         DateTimeOffset GetLastModified(string path);
 
         DateTimeOffset GetCreated(string path);
+    }
+
+    // this should be part of IFileSystem but we don't want to change the interface
+    public interface IFileSystem2 : IFileSystem
+    {
+        long GetSize(string path);
     }
 }

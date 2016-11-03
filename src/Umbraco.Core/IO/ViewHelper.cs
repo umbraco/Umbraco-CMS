@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.IO
@@ -13,19 +12,36 @@ namespace Umbraco.Core.IO
 
         public ViewHelper(IFileSystem viewFileSystem)
         {
-            if (viewFileSystem == null) throw new ArgumentNullException("viewFileSystem");
+            if (viewFileSystem == null) throw new ArgumentNullException(nameof(viewFileSystem));
             _viewFileSystem = viewFileSystem;
         }
 
         internal bool ViewExists(ITemplate t)
         {
             return _viewFileSystem.FileExists(ViewPath(t.Alias));
-        }     
+        }
+
+        internal string GetFileContents(ITemplate t)
+        {
+            var viewContent = "";
+            var path = ViewPath(t.Alias);
+
+            if (_viewFileSystem.FileExists(path))
+            {
+                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
+                {
+                    viewContent = tr.ReadToEnd();
+                    tr.Close();
+                }
+            }
+
+            return viewContent;
+        }
 
         public string CreateView(ITemplate t, bool overWrite = false)
         {
             string viewContent;
-            string path = ViewPath(t.Alias);
+            var path = ViewPath(t.Alias);
 
             if (_viewFileSystem.FileExists(path) == false || overWrite)
             {
@@ -138,18 +154,14 @@ namespace Umbraco.Core.IO
         public string ViewPath(string alias)
         {
             return _viewFileSystem.GetRelativePath(alias.Replace(" ", "") + ".cshtml");
-
-            //return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
         }
 
-        private string EnsureInheritedLayout(ITemplate template)
+        private static string EnsureInheritedLayout(ITemplate template)
         {
-            string design = template.Content;
+            var design = template.Content;
 
             if (string.IsNullOrEmpty(design))
-            {
                 design = GetDefaultFileContent(template.MasterTemplateAlias);
-            }
 
             return design;
         }

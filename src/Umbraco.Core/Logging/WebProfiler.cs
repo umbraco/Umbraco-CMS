@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Web;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
@@ -10,29 +11,56 @@ namespace Umbraco.Core.Logging
     /// </summary>
     internal class WebProfiler : IProfiler
     {
-        private readonly IRuntimeState _runtime;
+        private const string BootRequestItemKey = "Umbraco.Core.Logging.WebProfiler__isBootRequest";
+        private readonly WebProfilerProvider _provider;
+        private int _first;
 
-        public WebProfiler(IRuntimeState runtime)
+        public WebProfiler()
         {
-            _runtime = runtime;
-        }
+            // create our own provider, which can provide a profiler even during boot
+            _provider = new WebProfilerProvider();
 
-        public void UmbracoApplicationEndRequest(object sender, EventArgs e)
-        {
-            if (CanPerformProfilingAction(sender))
-                Stop();
+            // settings
+            MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
+            MiniProfiler.Settings.StackMaxLength = 5000;
+            MiniProfiler.Settings.ProfilerProvider = _provider;
         }
 
         public void UmbracoApplicationBeginRequest(object sender, EventArgs e)
         {
-            if (CanPerformProfilingAction(sender))
+            // if this is the first request, notify our own provider that this request is the boot request
+            var first = Interlocked.Exchange(ref _first, 1) == 0;
+            if (first)
+            {
+                _provider.BeginBootRequest();
+                ((HttpApplication) sender).Context.Items[BootRequestItemKey] = true;
+                // and no need to start anything, profiler is already there
+            }
+            // else start a profiler, the normal way
+            else if (ShouldProfile(sender))
                 Start();
         }
 
-        private static bool CanPerformProfilingAction(object sender)
+        public void UmbracoApplicationEndRequest(object sender, EventArgs e)
+        {
+            // if this is the boot request, or if we should profile this request, stop
+            // (the boot request is always profiled, no matter what)
+            var isBootRequest = ((HttpApplication) sender).Context.Items[BootRequestItemKey] != null; // fixme perfs
+            if (isBootRequest)
+                _provider.EndBootRequest();
+            if (isBootRequest || ShouldProfile(sender))
+                Stop();
+        }
+
+        private static bool ShouldProfile(object sender)
         {
             var request = TryGetRequest(sender);
-            return request.Success && request.Result.Url.IsClientSideRequest() == false;
+            if (request.Success == false) return false;
+
+            if (request.Result.Url.IsClientSideRequest()) return false;
+            if (string.IsNullOrEmpty(request.Result.QueryString["umbDebug"])) return false;
+            if (request.Result.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)) return false;
+            return true;
         }
 
         /// <inheritdoc/>
@@ -44,14 +72,12 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public IDisposable Step(string name)
         {
-            return _runtime.Debug ? MiniProfiler.Current.Step(name) : null;
+            return MiniProfiler.Current.Step(name);
         }
 
         /// <inheritdoc/>
         public void Start()
         {
-            MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
-            MiniProfiler.Settings.StackMaxLength = 5000;
             MiniProfiler.Start();
         }
 

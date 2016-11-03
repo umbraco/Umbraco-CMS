@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
@@ -15,22 +16,24 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     [HealthCheck(
         "ED0D7E40-971E-4BE8-AB6D-8CC5D0A6A5B0",
         "Click-Jacking Protection",
-        Description = "Checks if your site is allowed to be IFRAMed by another site and thus would be susceptible to click-jacking.",
+        Description = "Checks if your site is allowed to be IFRAMEd by another site and thus would be susceptible to click-jacking.",
         Group = "Security")]
     public class ClickJackingCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
         private readonly IRuntimeState _runtime;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private const string SetFrameOptionsHeaderInConfigActiobn = "setFrameOptionsHeaderInConfig";
 
         private const string XFrameOptionsHeader = "X-Frame-Options";
         private const string XFrameOptionsValue = "sameorigin"; // Note can't use "deny" as that would prevent Umbraco itself using IFRAMEs
 
-        public ClickJackingCheck(ILocalizedTextService textService, IRuntimeState runtime)
+        public ClickJackingCheck(ILocalizedTextService textService, IRuntimeState runtime, IHttpContextAccessor httpContextAccessor)
         {
             _textService = textService;
             _runtime = runtime;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -66,7 +69,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var url = _runtime.ApplicationUrl;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);
+            var useSsl = GlobalSettings.UseSSL || _httpContextAccessor.HttpContext.Request.ServerVariables["SERVER_PORT"] == "443";
+            var address = string.Format("http{0}://{1}:{2}", useSsl ? "s" : "", url.Host.ToLower(), url.Port);
             var request = WebRequest.Create(address);
             request.Method = "GET";
             try

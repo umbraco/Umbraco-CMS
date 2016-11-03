@@ -95,7 +95,7 @@ namespace umbraco.cms.businesslogic.packager
 
             var package = this;
             var pack = package.Data;
-            
+
             var outInt = 0;
 
             //Path checking...
@@ -125,7 +125,7 @@ namespace umbraco.cms.businesslogic.packager
 
                     //load content from umbraco.
                     var umbDocument = new Document(contentNodeId);
-                        
+
                     documentSet.AppendChild(umbDocument.ToXml(_packageManifest, pack.ContentLoadChildNodes));
 
                     AppendElement(documents);
@@ -135,7 +135,7 @@ namespace umbraco.cms.businesslogic.packager
                     //XmlNode tagProps = _packageManifest.CreateElement("TagProperties");
 
                     ////before we try to populate this, we'll do a quick lookup to see if any of the documents
-                    //// being exported contain published tags. 
+                    //// being exported contain published tags.
                     //var allExportedIds = documents.SelectNodes("//@id").Cast<XmlNode>()
                     //    .Select(x => x.Value.TryConvertTo<int>())
                     //    .Where(x => x.Success)
@@ -143,7 +143,7 @@ namespace umbraco.cms.businesslogic.packager
                     //    .ToArray();
                     //var allContentTags = new List<ITag>();
                     //foreach (var exportedId in allExportedIds)
-                    //{                            
+                    //{
                     //    allContentTags.AddRange(
                     //        Current.Services.TagService.GetTagsForEntity(exportedId));
                     //}
@@ -174,7 +174,7 @@ namespace umbraco.cms.businesslogic.packager
                     //        var propertyAlias = _packageManifest.CreateAttribute("propertyAlias", "");
                     //        propertyAlias.Value = taggedProperty.PropertyTypeAlias;
                     //        tagProp.Attributes.Append(propertyAlias);
-                                
+
                     //        var group = _packageManifest.CreateAttribute("group", "");
                     //        group.Value = taggedProperty.Tags.First().Group;
                     //        tagProp.Attributes.Append(group);
@@ -204,9 +204,9 @@ namespace umbraco.cms.businesslogic.packager
 
                 }
             }
-                
+
             foreach (DocumentType d in dtl)
-            {                   
+            {
                 docTypes.AppendChild(d.ToXml(_packageManifest));
             }
 
@@ -226,13 +226,12 @@ namespace umbraco.cms.businesslogic.packager
 
             //Stylesheets
             var stylesheets = _packageManifest.CreateElement("Stylesheets");
-            foreach (var ssId in pack.Stylesheets)
+            foreach (var stylesheetName in pack.Stylesheets)
             {
-                if (int.TryParse(ssId, out outInt))
-                {
-                    var s = new StyleSheet(outInt);
-                    stylesheets.AppendChild(s.ToXml(_packageManifest));
-                }
+                if (stylesheetName.IsNullOrWhiteSpace()) continue;
+                var stylesheetXmlNode = PackagerUtility.Stylesheet(stylesheetName, true, _packageManifest);
+                if (stylesheetXmlNode != null)
+                    stylesheets.AppendChild(stylesheetXmlNode);
             }
             AppendElement(stylesheets);
 
@@ -255,7 +254,7 @@ namespace umbraco.cms.businesslogic.packager
                 {
                     var di = Current.Services.LocalizationService.GetDictionaryItemById(outInt);
                     var entitySerializer = new EntityXmlSerializer();
-                    var xmlNode = entitySerializer.Serialize(di).GetXmlNode(_packageManifest);                    
+                    var xmlNode = entitySerializer.Serialize(di).GetXmlNode(_packageManifest);
                     dictionaryItems.AppendChild(xmlNode);
                 }
             }
@@ -355,7 +354,7 @@ namespace umbraco.cms.businesslogic.packager
             File.Delete(localPath + "/package.xml");
             Directory.Delete(localPath, true);
         }
-        
+
         private void AddDocumentType(DocumentType dt, ref List<DocumentType> dtl)
         {
             if (dt.MasterContentType != 0 && dt.Parent.nodeObjectType == Constants.ObjectTypes.DocumentTypeGuid)

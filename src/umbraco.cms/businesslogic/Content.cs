@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Media;
 using File = System.IO.File;
 
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;

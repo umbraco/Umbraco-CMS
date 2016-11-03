@@ -51,12 +51,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var macroDto = Database.Fetch<ExternalLoginDto>(sql).FirstOrDefault();
-            if (macroDto == null)
+            var dto = Database.Fetch<ExternalLoginDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+            if (dto == null)
                 return null;
 
             var factory = new ExternalLoginFactory();
-            var entity = factory.BuildEntity(macroDto);
+            var entity = factory.BuildEntity(dto);
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

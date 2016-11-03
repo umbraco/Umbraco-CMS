@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Owin;
 using Umbraco.Core;
@@ -7,7 +6,6 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Security.Identity;
-using Umbraco.Web.SignalR;
 
 [assembly: OwinStartup("UmbracoDefaultOwinStartup", typeof(UmbracoDefaultOwinStartup))]
 

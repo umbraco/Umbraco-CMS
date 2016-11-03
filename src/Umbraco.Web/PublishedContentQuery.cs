@@ -50,6 +50,13 @@ namespace Umbraco.Web
                 : _query.Content(id);
         }
 
+        public IPublishedContent Content(Guid id)
+        {
+            return _query == null
+                ? ItemById(id, _contentCache)
+                : _query.Content(id);
+        }
+
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
             return _query == null
@@ -58,6 +65,13 @@ namespace Umbraco.Web
         }
         
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
+        {
+            return _query == null
+                ? ItemsByIds(_contentCache, ids)
+                : _query.Content(ids);
+        }
+
+        public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids)
         {
             return _query == null
                 ? ItemsByIds(_contentCache, ids)
@@ -95,7 +109,7 @@ namespace Umbraco.Web
                 ? ItemById(id, _mediaCache)
                 : _query.Media(id);
         }
-        
+
         public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
         {
             return _query == null
@@ -121,6 +135,12 @@ namespace Umbraco.Web
             return doc;
         }
 
+        private static IPublishedContent ItemById(Guid id, IPublishedCache cache)
+        {
+            var doc = cache.GetById(id);
+            return doc;
+        }
+
         private static IPublishedContent ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
         {
             var doc = cache.GetSingleByXPath(xpath, vars);
@@ -135,6 +155,11 @@ namespace Umbraco.Web
         //}        
 
         private static IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<int> ids)
+        {
+            return ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
+        }
+
+        private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<Guid> ids)
         {
             return ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
         }

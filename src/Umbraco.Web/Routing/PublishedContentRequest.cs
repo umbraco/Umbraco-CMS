@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Web;
 using umbraco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -10,16 +12,16 @@ namespace Umbraco.Web.Routing
 {
     // todo - rename to FacadeRequest as soon as acceptable
 
-	/// <summary>
-	/// Represents a request for one specified Umbraco IPublishedContent to be rendered
-	/// by one specified template, using one specified Culture and RenderingEngine.
-	/// </summary>
-	public class PublishedContentRequest
-	{
+    /// <summary>
+    /// Represents a request for one specified Umbraco IPublishedContent to be rendered
+    /// by one specified template, using one specified Culture and RenderingEngine.
+    /// </summary>
+    public class PublishedContentRequest
+    {
 	    private readonly FacadeRouter _facadeRouter;
 
-	    private bool _readonly; // after prepared
-	    private bool _readonlyUri; // after preparing
+        private bool _readonly; // after prepared
+        private bool _readonlyUri; // after preparing
         private Uri _uri; // clean uri, no virtual dir, no trailing slash nor .aspx, nothing
         private ITemplate _template; // template model if any else null
         private bool _is404;
@@ -50,21 +52,22 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public UmbracoContext UmbracoContext { get; }
 
-		/// <summary>
-		/// Gets or sets the cleaned up Uri used for routing.
-		/// </summary>
-		/// <remarks>The cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.</remarks>
-		public Uri Uri {
-		    get
-		    {
-		        return _uri;
-		    }
-		    set
-		    {
+        /// <summary>
+        /// Gets or sets the cleaned up Uri used for routing.
+        /// </summary>
+        /// <remarks>The cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.</remarks>
+        public Uri Uri
+        {
+            get
+            {
+                return _uri;
+            }
+            set
+            {
                 if (_readonlyUri)
                     throw new InvalidOperationException("Cannot modify Uri after Preparing has triggered.");
-		        _uri = value;
-		    }
+                _uri = value;
+            }
         }
 
         // utility for ensuring it is ok to set some properties
@@ -131,18 +134,18 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <remarks>Setting the requested content clears <c>Template</c>.</remarks>
         public IPublishedContent PublishedContent
-		{
-			get { return _publishedContent; }
-			set
-			{
+        {
+            get { return _publishedContent; }
+            set
+            {
                 EnsureWriteable();
-				_publishedContent = value;
+                _publishedContent = value;
                 IsInternalRedirectPublishedContent = false;
-				TemplateModel = null;
-			}
-		}
+                TemplateModel = null;
+            }
+        }
 
-		/// <summary>
+        /// <summary>
         /// Sets the requested content, following an internal redirect.
         /// </summary>
         /// <param name="content">The requested content.</param>
@@ -151,7 +154,7 @@ namespace Umbraco.Web.Routing
         public void SetInternalRedirectPublishedContent(IPublishedContent content)
         {
 		    if (content == null) throw new ArgumentNullException(nameof(content));
-		    EnsureWriteable();
+            EnsureWriteable();
 
             // unless a template has been set already by the finder,
             // template should be null at that point.
@@ -175,7 +178,7 @@ namespace Umbraco.Web.Routing
 
             // set published content - this resets the template, and sets IsInternalRedirect to false
             PublishedContent = content;
-		    IsInternalRedirectPublishedContent = isInternalRedirect;
+            IsInternalRedirectPublishedContent = isInternalRedirect;
 
             // must restore the template if it's an internal redirect & the config option is set
             if (isInternalRedirect && UmbracoConfig.For.UmbracoSettings().WebRouting.InternalRedirectPreservesTemplate)
@@ -193,9 +196,9 @@ namespace Umbraco.Web.Routing
 		/// before anything such as 404, redirect... took place.</remarks>
 		public IPublishedContent InitialPublishedContent => _initialPublishedContent;
 
-	    /// <summary>
-		/// Gets value indicating whether the current published content is the initial one.
-		/// </summary>
+        /// <summary>
+        /// Gets value indicating whether the current published content is the initial one.
+        /// </summary>
 		public bool IsInitialPublishedContent => _initialPublishedContent != null && _initialPublishedContent == _publishedContent;
 
 	    /// <summary>
@@ -223,11 +226,11 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public bool HasPublishedContent => PublishedContent != null;
 
-	    #endregion
+        #endregion
 
-		#region Template
+        #region Template
 
-	    /// <summary>
+        /// <summary>
         /// Gets or sets the template model to use to display the requested content.
         /// </summary>
         internal ITemplate TemplateModel
@@ -297,10 +300,10 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <remarks>The <c>RenderingEngine</c> becomes unknown.</remarks>
 	    public void ResetTemplate()
-	    {
-	        EnsureWriteable();
-	        TemplateModel = null;
-	    }
+        {
+            EnsureWriteable();
+            TemplateModel = null;
+        }
 
         /// <summary>
         /// Gets a value indicating whether the content request has a template.
@@ -350,9 +353,9 @@ namespace Umbraco.Web.Routing
                 EnsureWriteable();
                 _culture = value;
             }
-	    }
+        }
 
-		// note: do we want to have an ordered list of alternate cultures,
+        // note: do we want to have an ordered list of alternate cultures,
         // to allow for fallbacks when doing dictionnary lookup and such?
 
 		#endregion
@@ -476,6 +479,28 @@ namespace Umbraco.Web.Routing
             ResponseStatusCode = code;
             ResponseStatusDescription = description;
         }
+
+        #endregion
+
+        #region Response Cache
+
+        /// <summary>
+        /// Gets or sets the <c>System.Web.HttpCacheability</c>
+        /// </summary>
+        // Note: we used to set a default value here but that would then be the default
+        // for ALL requests, we shouldn't overwrite it though if people are using [OutputCache] for example
+        // see: https://our.umbraco.org/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
+        internal HttpCacheability Cacheability { get; set; }
+
+        /// <summary>
+        /// Gets or sets a list of Extensions to append to the Response.Cache object.
+        /// </summary>
+        internal List<string> CacheExtensions { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Gets or sets a dictionary of Headers to append to the Response object.
+        /// </summary>
+        internal Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 
         #endregion
 

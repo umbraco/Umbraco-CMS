@@ -1,11 +1,17 @@
 ﻿using System.Linq;
 using System.Xml.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Models
 {
@@ -20,8 +26,18 @@ namespace Umbraco.Tests.Models
             var mediaType = MockedContentTypes.CreateImageMediaType("image2");
             ServiceContext.MediaTypeService.Save(mediaType);
 
+            // reference, so static ctor runs, so event handlers register
+            // and then, this will reset the width, height... because the file does not exist, of course ;-(
+            var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), new MediaFileSystem(Mock.Of<IFileSystem2>()), Mock.Of<IContentSection>(), Mock.Of<ILocalizedTextService>());
+
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             ServiceContext.MediaService.Save(media, 0);
+
+            // so we have to force-reset these values because the property editor has cleared them
+            media.SetValue(Constants.Conventions.Media.Width, "200");
+            media.SetValue(Constants.Conventions.Media.Height, "200");
+            media.SetValue(Constants.Conventions.Media.Bytes, "100");
+            media.SetValue(Constants.Conventions.Media.Extension, "png");
 
             var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
             var urlName = media.GetUrlSegment(new[] { new DefaultUrlSegmentProvider() });

@@ -114,8 +114,8 @@ namespace Umbraco.Core.Security
 
             //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
             var claimsIdentity = http.User.Identity as ClaimsIdentity;
-            if (claimsIdentity != null && claimsIdentity.IsAuthenticated)
-            {                
+            if (claimsIdentity != null && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
+            {                 
                 try
                 {
                     return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);

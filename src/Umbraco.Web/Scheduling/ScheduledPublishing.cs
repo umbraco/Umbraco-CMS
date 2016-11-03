@@ -51,20 +51,28 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            using (_proflog.DebugDuration<ScheduledPublishing>("Scheduled publishing executing", "Scheduled publishing complete"))
+            string umbracoAppUrl;
+            try
             {
-                string umbracoAppUrl = null;
+                umbracoAppUrl = _runtime.ApplicationUrl.ToString();
+                if (umbracoAppUrl.IsNullOrWhiteSpace())
+                {
+                    _logger.Warn<ScheduledPublishing>("No url for service (yet), skip.");
+                    return true; // repeat
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.Error<ScheduledPublishing>("Could not acquire application url", e);
+                return true; // repeat
+            }
 
+            var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
+
+            using (_proflog.DebugDuration<ScheduledPublishing>($"Scheduled publishing executing at {url}",  "Scheduled publishing complete"))
+            {
                 try
                 {
-                    umbracoAppUrl = _runtime.ApplicationUrl.ToString();
-                    if (umbracoAppUrl.IsNullOrWhiteSpace())
-                    {
-                        _logger.Warn<ScheduledPublishing>("No url for service (yet), skip.");
-                        return true; // repeat
-                    }
-
-                    var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
                     using (var wc = new HttpClient())
                     {
                         var request = new HttpRequestMessage(HttpMethod.Post, url)
@@ -79,21 +87,15 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<ScheduledPublishing>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
+                    _logger.Error<ScheduledPublishing>($"Failed (at \"{umbracoAppUrl}\").", e);
                 }
             }
 
             return true; // repeat
         }
 
-        public override bool IsAsync
-        {
-            get { return true; }
-        }
+        public override bool IsAsync => true;
 
-        public override bool RunsOnShutdown
-        {
-            get { return false; }
-        }
+        public override bool RunsOnShutdown => false;
     }
 }

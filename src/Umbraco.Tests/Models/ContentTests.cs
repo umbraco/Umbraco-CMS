@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Models
             var dataTypeService = Mock.Of<IDataTypeService>();
 
             // Assert
-            content.SetValue("title", postedFileMock.Object, dataTypeService);
+            content.SetValue("title", postedFileMock.Object);
 
             // Assert
             Assert.That(content.Properties.Any(), Is.True);

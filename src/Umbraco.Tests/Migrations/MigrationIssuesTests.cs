@@ -120,10 +120,7 @@ namespace Umbraco.Tests.Migrations
 
                 //pass in explicit migrations
                 new DeleteRedirectUrlTable(migrationContext),
-                new AddRedirectUrlTable(migrationContext),
-                new AddRedirectUrlTable2(migrationContext),
-                new AddRedirectUrlTable3(migrationContext),
-                new AddRedirectUrlTable4(migrationContext)
+                new AddRedirectUrlTable(migrationContext)
             );
 
             var upgraded = migrationRunner.Execute(migrationContext, true);

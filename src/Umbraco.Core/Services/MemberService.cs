@@ -21,6 +21,7 @@ namespace Umbraco.Core.Services
     public class MemberService : RepositoryService, IMemberService
     {
         private readonly IMemberGroupService _memberGroupService;
+        private readonly MediaFileSystem _mediaFileSystem;
 
         #region Constructor
 
@@ -28,11 +29,14 @@ namespace Umbraco.Core.Services
             IDatabaseUnitOfWorkProvider provider,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
-            IMemberGroupService memberGroupService)
+            IMemberGroupService memberGroupService, 
+            MediaFileSystem mediaFileSystem)
             : base(provider, logger, eventMessagesFactory)
         {
             if (memberGroupService == null) throw new ArgumentNullException(nameof(memberGroupService));
+            if (mediaFileSystem == null) throw new ArgumentNullException(nameof(mediaFileSystem));
             _memberGroupService = memberGroupService;
+            _mediaFileSystem = mediaFileSystem;
         }
 
         #endregion
@@ -949,7 +953,7 @@ namespace Umbraco.Core.Services
             repository.Delete(member);
             var args = new DeleteEventArgs<IMember>(member, false); // raise event & get flagged files
             Deleted.RaiseEvent(args, this);
-            IOHelper.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
+            _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
                 (file, e) => Logger.Error<MemberService>("An error occurred while deleting file attached to nodes: " + file, e));
         }
 

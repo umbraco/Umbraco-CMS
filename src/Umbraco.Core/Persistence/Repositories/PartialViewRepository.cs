@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -106,6 +105,25 @@ namespace Umbraco.Core.Persistence.Repositories
             var isValidPath = IOHelper.VerifyEditPath(fullPath, validDir);
             var isValidExtension = IOHelper.VerifyFileExtension(fullPath, ValidExtensions);
             return isValidPath && isValidExtension;
+        }
+
+        public Stream GetFileContentStream(string filepath)
+        {
+            if (FileSystem.FileExists(filepath) == false) return null;
+
+            try
+            {
+                return FileSystem.OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
+        }
+
+        public void SetFileContent(string filepath, Stream content)
+        {
+            FileSystem.AddFile(filepath, content, true);
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
@@ -56,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<MemberDto>(sql.SelectTop(1)).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -374,6 +375,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 foreach (var property in ((Member)entity).Properties)
                 {
+                    if (keyDictionary.ContainsKey(property.PropertyTypeId) == false) continue;
+
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
@@ -554,12 +557,29 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var filterSql = filter.IsNullOrWhiteSpace()
                 ? null
-                : Sql().Append("AND ((umbracoNode. " + SqlSyntax.GetQuotedColumnName("text") + " LIKE @0) " +
-                        "OR (cmsMember.LoginName LIKE @0))", "%" + filter + "%");
+                : Sql().Append(GetPagedResultsByQueryWhere(), $"%{filter}%");
+
+            // note: need to test whether NPoco gets confused by the same parameter being used twice,
+            // as PetaPoco supposedly was, in which case we'd need to use two parameters. in any case,
+            // better to create the query text only once!
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-                MapQueryDtos, orderBy, orderDirection, orderBySystemField,
+                MapQueryDtos, orderBy, orderDirection, orderBySystemField, "cmsMember",
                 filterSql);
+        }
+
+        private string _pagedResultsByQueryWhere;
+
+        private string GetPagedResultsByQueryWhere()
+        {
+            if (_pagedResultsByQueryWhere == null)
+                _pagedResultsByQueryWhere = " AND ("
+                    + $"({SqlSyntax.GetQuotedTableName("umbracoNode")}.{SqlSyntax.GetQuotedColumnName("text")} LIKE @0)"
+                    + " OR "
+                    + $"({SqlSyntax.GetQuotedTableName("cmsMember")}.{SqlSyntax.GetQuotedColumnName("LoginName")} LIKE @0)"
+                    + ")";
+
+            return _pagedResultsByQueryWhere;
         }
 
         protected override string GetDatabaseFieldNameForOrderBy(string orderBy)

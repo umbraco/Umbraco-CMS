@@ -12,7 +12,6 @@ using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using System.Diagnostics;
 using Umbraco.Core.Models;
-using System.Security;
 using Umbraco.Core.DI;
 using Umbraco.Core.Xml;
 using File = System.IO.File;
@@ -21,12 +20,6 @@ using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace umbraco.cms.businesslogic.packager
 {
-    public enum RequirementsType
-    {
-        Strict,
-        Legacy
-    }
-
     /// <summary>
     /// The packager is a component which enables sharing of both data and functionality components between different umbraco installations.
     /// 
@@ -188,8 +181,16 @@ namespace umbraco.cms.businesslogic.packager
                     // Check if the file is a valid package
                     if (fi.Extension.ToLower() == ".umb")
                     {
-                        tempDir = UnPack(fi.FullName, deleteFile);
-                        LoadConfig(tempDir);
+                        try
+                        {
+                            tempDir = UnPack(fi.FullName, deleteFile);
+                            LoadConfig(tempDir);
+                        }
+                        catch (Exception exception)
+                        {
+                            Current.Logger.Error<Installer>(string.Format("Error importing file {0}", fi.FullName), exception);
+                            throw;
+                        }
                     }
                     else
                         throw new Exception("Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
@@ -272,24 +273,57 @@ namespace umbraco.cms.businesslogic.packager
                 //string virtualBasePath = System.Web.HttpContext.Current.Request.ApplicationPath;
                 string basePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
 
-                foreach (XmlNode n in Config.DocumentElement.SelectNodes("//file"))
+                try
                 {
-                    var destPath = GetFileName(basePath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
-                    var sourceFile = GetFileName(tempDir, XmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
-                    var destFile = GetFileName(destPath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("//file"))
+                    {
+                        var destPath = GetFileName(basePath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
+                        var sourceFile = GetFileName(tempDir, XmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
+                        var destFile = GetFileName(destPath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
 
-                    // Create the destination directory if it doesn't exist
-                    if (Directory.Exists(destPath) == false)
-                        Directory.CreateDirectory(destPath);
-                    //If a file with this name exists, delete it
-                    else if (File.Exists(destFile))
-                        File.Delete(destFile);
+                        // Create the destination directory if it doesn't exist
+                        if (Directory.Exists(destPath) == false)
+                            Directory.CreateDirectory(destPath);
+                        //If a file with this name exists, delete it
+                        else if (File.Exists(destFile))
+                            File.Delete(destFile);
 
-                    // Move the file
-                    File.Move(sourceFile, destFile);
+                        // Copy the file
+                        // SJ: Note - this used to do a move but some packages included the same file to be
+                        // copied to multiple locations like so:
+                        //
+                        // <file>
+                        //   <guid>my-icon.png</guid>
+                        //   <orgPath>/umbraco/Images/</orgPath>
+                        //   <orgName>my-icon.png</orgName>
+                        // </file> 
+                        // <file>
+                        //   <guid>my-icon.png</guid>
+                        //   <orgPath>/App_Plugins/MyPlugin/Images</orgPath>
+                        //   <orgName>my-icon.png</orgName>
+                        // </file> 
+                        //
+                        // Since this file unzips as a flat list of files, moving the file the first time means
+                        // that when you try to do that a second time, it would result in a FileNotFoundException
+                        File.Copy(sourceFile, destFile);
 
-                    //PPH log file install
-                    insPack.Data.Files.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+                        //PPH log file install
+                        insPack.Data.Files.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+
+                    }
+
+                    // Once we're done copying, remove all the files 
+                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("//file"))
+                    {
+                        var sourceFile = GetFileName(tempDir, XmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
+                        if (File.Exists(sourceFile))
+                            File.Delete(sourceFile);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Current.Logger.Error<Installer>("Package install error", exception);
+                    throw;
                 }
 
                 // log that a user has install files
@@ -301,8 +335,6 @@ namespace umbraco.cms.businesslogic.packager
                 }
 
                 insPack.Save();
-
-                
             }
         }
 
@@ -312,144 +344,153 @@ namespace umbraco.cms.businesslogic.packager
                 "Installing business logic for package id " + packageId + " into temp folder " + tempDir,
                 "Package business logic installation complete for package id " + packageId))
             {
-                //retrieve the manifest to continue installation
-                var insPack = InstalledPackage.GetById(packageId);
-                //bool saveNeeded = false;
-
-                // Get current user, with a fallback
-                var currentUser = Current.Services.UserService.GetUserById(0);
-
-                //TODO: Get rid of this entire class! Until then all packages will be installed by the admin user
-                
-
-                //Xml as XElement which is used with the new PackagingService
-                var rootElement = Config.DocumentElement.GetXElement();
-                var packagingService = Current.Services.PackagingService;
-
-                //Perhaps it would have been a good idea to put the following into methods eh?!?
-
-                #region DataTypes
-                var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
-                if (dataTypeElement != null)
+                InstalledPackage insPack;
+                try
                 {
-                    var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
-                    foreach (var dataTypeDefinition in dataTypeDefinitions)
+                    //retrieve the manifest to continue installation
+                    insPack = InstalledPackage.GetById(packageId);
+                    //bool saveNeeded = false;
+
+                    // Get current user, with a fallback
+                    var currentUser = Current.Services.UserService.GetUserById(0);
+
+                    //TODO: Get rid of this entire class! Until then all packages will be installed by the admin user
+
+
+                    //Xml as XElement which is used with the new PackagingService
+                    var rootElement = Config.DocumentElement.GetXElement();
+                    var packagingService = Current.Services.PackagingService;
+
+                    //Perhaps it would have been a good idea to put the following into methods eh?!?
+
+                    #region DataTypes
+                    var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
+                    if (dataTypeElement != null)
                     {
-                        insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
-                    }
-                }
-                #endregion
-
-                #region Languages
-                var languageItemsElement = rootElement.Descendants("Languages").FirstOrDefault();
-                if (languageItemsElement != null)
-                {
-                    var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
-                    insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString()));
-                }
-
-                #endregion
-
-                #region Dictionary items
-                var dictionaryItemsElement = rootElement.Descendants("DictionaryItems").FirstOrDefault();
-                if (dictionaryItemsElement != null)
-                {
-                    var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
-                    insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString()));
-                }
-                #endregion
-
-                #region Macros
-                foreach (XmlNode n in Config.DocumentElement.SelectNodes("//macro"))
-                {
-                    //TODO: Fix this, this should not use the legacy API
-                    Macro m = Macro.Import(n);
-
-                    if (m != null)
-                    {
-                        insPack.Data.Macros.Add(m.Id.ToString(CultureInfo.InvariantCulture));
-                        //saveNeeded = true;
-                    }
-                }
-
-                //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
-                #endregion
-
-                #region Templates
-                var templateElement = rootElement.Descendants("Templates").FirstOrDefault();
-                if (templateElement != null)
-                {
-                    var templates = packagingService.ImportTemplates(templateElement, currentUser.Id);
-                    foreach (var template in templates)
-                    {
-                        insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
-                    }
-                }
-                #endregion
-
-                #region DocumentTypes
-                //Check whether the root element is a doc type rather then a complete package
-                var docTypeElement = rootElement.Name.LocalName.Equals("DocumentType") ||
-                                     rootElement.Name.LocalName.Equals("DocumentTypes")
-                                         ? rootElement
-                                         : rootElement.Descendants("DocumentTypes").FirstOrDefault();
-
-                if (docTypeElement != null)
-                {
-                    var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
-                    foreach (var contentType in contentTypes)
-                    {
-                        insPack.Data.Documenttypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
-                        //saveNeeded = true;
-                    }
-                }
-                #endregion
-
-                #region Stylesheets
-                foreach (XmlNode n in Config.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
-                {
-                    StyleSheet s = StyleSheet.Import(n, currentUser);
-
-                    insPack.Data.Stylesheets.Add(s.Id.ToString());
-                    //saveNeeded = true;
-                }
-
-                //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
-                #endregion
-
-                #region Documents
-                var documentElement = rootElement.Descendants("DocumentSet").FirstOrDefault();
-                if (documentElement != null)
-                {
-                    var content = packagingService.ImportContent(documentElement, -1, currentUser.Id);
-                    var firstContentItem = content.First();
-                    insPack.Data.ContentNodeId = firstContentItem.Id.ToString(CultureInfo.InvariantCulture);
-                }
-                #endregion
-
-                #region Package Actions
-                foreach (XmlNode n in Config.DocumentElement.SelectNodes("Actions/Action"))
-                {
-                    if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true")
-                    {
-                        insPack.Data.Actions += n.OuterXml;
-                    }
-
-                    //Run the actions tagged only for 'install'
-
-                    if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install")
-                    {
-                        var alias = n.Attributes["alias"] != null ? n.Attributes["alias"].Value : "";
-
-                        if (alias.IsNullOrWhiteSpace() == false)
+                        var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
+                        foreach (var dataTypeDefinition in dataTypeDefinitions)
                         {
-                            PackageAction.RunPackageAction(insPack.Data.Name, alias, n);
+                            insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
                         }
                     }
-                }
-                #endregion
+                    #endregion
+
+                    #region Languages
+                    var languageItemsElement = rootElement.Descendants("Languages").FirstOrDefault();
+                    if (languageItemsElement != null)
+                    {
+                        var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
+                        insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString()));
+                    }
+
+                    #endregion
+
+                    #region Dictionary items
+                    var dictionaryItemsElement = rootElement.Descendants("DictionaryItems").FirstOrDefault();
+                    if (dictionaryItemsElement != null)
+                    {
+                        var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
+                        insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString()));
+                    }
+                    #endregion
+
+                    #region Macros
+                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("//macro"))
+                    {
+                        //TODO: Fix this, this should not use the legacy API
+                        Macro m = Macro.Import(n);
+
+                        if (m != null)
+                        {
+                            insPack.Data.Macros.Add(m.Id.ToString(CultureInfo.InvariantCulture));
+                            //saveNeeded = true;
+                        }
+                    }
+
+                    //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+                    #endregion
+
+                    #region Templates
+                    var templateElement = rootElement.Descendants("Templates").FirstOrDefault();
+                    if (templateElement != null)
+                    {
+                        var templates = packagingService.ImportTemplates(templateElement, currentUser.Id);
+                        foreach (var template in templates)
+                        {
+                            insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
+                        }
+                    }
+                    #endregion
+
+                    #region DocumentTypes
+                    //Check whether the root element is a doc type rather then a complete package
+                    var docTypeElement = rootElement.Name.LocalName.Equals("DocumentType") ||
+                                         rootElement.Name.LocalName.Equals("DocumentTypes")
+                        ? rootElement
+                        : rootElement.Descendants("DocumentTypes").FirstOrDefault();
+
+                    if (docTypeElement != null)
+                    {
+                        var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
+                        foreach (var contentType in contentTypes)
+                        {
+                            insPack.Data.Documenttypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
+                            //saveNeeded = true;
+                        }
+                    }
+                    #endregion
+
+                    #region Stylesheets
+                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
+                    {
+                        StyleSheet s = StyleSheet.Import(n, currentUser);
+
+                        insPack.Data.Stylesheets.Add(s.Id.ToString());
+                        //saveNeeded = true;
+                    }
+
+                    //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+                    #endregion
+
+                    #region Documents
+                    var documentElement = rootElement.Descendants("DocumentSet").FirstOrDefault();
+                    if (documentElement != null)
+                    {
+                        var content = packagingService.ImportContent(documentElement, -1, currentUser.Id);
+                        var firstContentItem = content.First();
+                        insPack.Data.ContentNodeId = firstContentItem.Id.ToString(CultureInfo.InvariantCulture);
+                    }
+                    #endregion
+
+                    #region Package Actions
+                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("Actions/Action"))
+                    {
+                        if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true")
+                        {
+                            insPack.Data.Actions += n.OuterXml;
+                        }
+
+                        //Run the actions tagged only for 'install'
+
+                        if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install")
+                        {
+                            var alias = n.Attributes["alias"] != null ? n.Attributes["alias"].Value : "";
+
+                            if (alias.IsNullOrWhiteSpace() == false)
+                            {
+                                PackageAction.RunPackageAction(insPack.Data.Name, alias, n);
+                            }
+                        }
+                    }
+                    #endregion
                 
-                insPack.Save();
+                    insPack.Save();
+                }
+                catch (Exception exception)
+                {
+                    Current.Logger.Error<Installer>("Error installing businesslogic", exception);
+                    throw;
+                }
 
                 OnPackageBusinessLogicInstalled(insPack);
             }
@@ -488,15 +529,15 @@ namespace umbraco.cms.businesslogic.packager
             RequirementsPatch = int.Parse(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/patch").FirstChild.Value);
 
             var reqNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements");
-            RequirementsType = reqNode != null && reqNode.Attributes != null && reqNode.Attributes["type"] != null 
-                ? Enum<RequirementsType>.Parse(reqNode.Attributes["type"].Value, true) 
+            RequirementsType = reqNode != null && reqNode.Attributes != null && reqNode.Attributes["type"] != null
+                ? Enum<RequirementsType>.Parse(reqNode.Attributes["type"].Value, true)
                 : RequirementsType.Legacy;
             var iconNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/iconUrl");
             if (iconNode != null && iconNode.FirstChild != null)
             {
                 IconUrl = iconNode.FirstChild.Value;
             }
-            
+
             Author = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/name").FirstChild.Value;
             AuthorUrl = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/website").FirstChild.Value;
 
@@ -600,7 +641,7 @@ namespace umbraco.cms.businesslogic.packager
                 Control = XmlHelper.GetNodeValue(controlNode);
             }
         }
-        
+
         /// <summary>
         /// This uses the old method of fetching and only supports the packages.umbraco.org repository.
         /// </summary>
@@ -730,7 +771,7 @@ namespace umbraco.cms.businesslogic.packager
             {
                 File.Delete(zipName);
             }
-            
+
 
             return tempDir;
 

@@ -12,7 +12,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
     [HealthCheck(
         "D999EB2B-64C2-400F-B50C-334D41F8589A",
         "XML Data Integrity",
-        Description = "Checks the integrity of the XML data in Umbraco",
+        Description = "This checks the data integrity for the xml structures for content, media and members that are stored in the cmsContentXml table. This does not check the data integrity of the xml cache file, only the xml structures stored in the database used to create the xml cache file.",
         Group = "Data Integrity")]
     [HideFromTypeFinder] // only if running the Xml cache! added by XmlCacheComponent!
     public class XmlDataIntegrityHealthCheck : HealthCheck

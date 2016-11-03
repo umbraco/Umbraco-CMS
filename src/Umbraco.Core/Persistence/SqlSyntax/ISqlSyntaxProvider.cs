@@ -68,6 +68,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string Format(ForeignKeyDefinition foreignKey);
         string FormatColumnRename(string tableName, string oldName, string newName);
         string FormatTableRename(string oldName, string newName);
+        Sql<SqlContext> SelectTop(Sql<SqlContext> sql, int top);
         bool SupportsClustered();
         bool SupportsIdentityInsert();
         bool? SupportsCaseInsensitiveQueries(Database db);

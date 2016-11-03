@@ -12,6 +12,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using Umbraco.Core.Models.Identity;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Web.Security
@@ -96,23 +97,9 @@ namespace Umbraco.Web.Security
             }
         }
 
-        private BackOfficeUserManager _userManager;
-        protected BackOfficeUserManager UserManager
-        {
-            get
-            {
-                if (_userManager == null)
-                {
-                    var mgr = _httpContext.GetOwinContext().GetUserManager<BackOfficeUserManager>();
-                    if (mgr == null)
-                    {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeUserManager) + " from the " + typeof(IOwinContext) + " GetUserManager method");
-                    }
-                    _userManager = mgr;
-                }
-                return _userManager;
-            }
-        }
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
+            => _userManager ?? (_userManager = _httpContext.GetOwinContext().GetBackOfficeUserManager());
 
         /// <summary>
         /// Logs a user in.

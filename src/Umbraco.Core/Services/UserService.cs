@@ -526,6 +526,17 @@ namespace Umbraco.Core.Services
             }
         }
 
+        internal IEnumerable<IUser> GetNextUsers(int id, int count)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = (UserRepository) uow.CreateRepository<IUserRepository>();
+                var users = repository.GetNextUsers(id, count);
+                uow.Complete();
+                return users;
+            }
+        }
+
         #endregion
 
         #region Implementation of IUserService

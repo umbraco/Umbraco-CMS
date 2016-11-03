@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false).Where(GetBaseWhereClause(), new { id = id, NodeObjectType = NodeObjectTypeId });
 
-            var nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
+            var nodeDto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             return nodeDto == null ? null : CreateEntity(nodeDto);
         }
 

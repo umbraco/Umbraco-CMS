@@ -447,7 +447,7 @@ namespace Umbraco.Web.Editors
                Services.MediaService, parentId) == false)
             {
                 return Request.CreateResponse(
-                    HttpStatusCode.Unauthorized,
+                    HttpStatusCode.Forbidden,
                     new SimpleNotificationModel(new Notification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
@@ -537,7 +537,7 @@ namespace Umbraco.Web.Editors
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fs)
                     {
-                        f.SetValue(Constants.Conventions.Media.File, fileName, fs, Services.DataTypeService);
+                        f.SetValue(Constants.Conventions.Media.File, fileName, fs);
                     }
 
                     var saveResult = mediaService.WithResult().Save(f, Security.CurrentUser.Id);

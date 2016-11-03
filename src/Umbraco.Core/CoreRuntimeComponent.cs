@@ -39,8 +39,15 @@ namespace Umbraco.Core
             //TODO: Don't think we'll need this when the resolvers are all container resolvers
             composition.Container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
 
-            composition.Container.Register(factory 
-                => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
+            // register filesystems
+            composition.Container.Register<FileSystems>();
+            composition.Container.Register(factory => factory.GetInstance<FileSystems>().MediaFileSystem);
+            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().ScriptsFileSystem, "ScriptFileSystem");
+            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().PartialViewsFileSystem, "PartialViewFileSystem");
+            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().MacroPartialsFileSystem, "PartialViewMacroFileSystem");
+            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().StylesheetsFileSystem, "StylesheetFileSystem");
+            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().MasterPagesFileSystem, "MasterpageFileSystem");
+            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().MvcViewsFileSystem, "ViewFileSystem");
 
             // register manifest builder, will be injected in eg PropertyEditorCollectionBuilder
             composition.Container.RegisterSingleton(factory

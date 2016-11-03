@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security.DataProtection;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 
@@ -15,6 +16,8 @@ namespace Umbraco.Core.Security
     /// </summary>
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {
+        public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
+
         public BackOfficeUserManager(IUserStore<BackOfficeIdentityUser, int> store)
             : base(store)
         {
@@ -26,9 +29,8 @@ namespace Umbraco.Core.Security
             MembershipProviderBase membershipProvider)
             : base(store)
         {
-            if (options == null) throw new ArgumentNullException("options");
-            var manager = new BackOfficeUserManager(store);
-            InitUserManager(manager, membershipProvider, options);
+            if (options == null) throw new ArgumentNullException("options");;
+            InitUserManager(this, membershipProvider, options);
         }
 
         #region Static Create methods
@@ -73,7 +75,7 @@ namespace Umbraco.Core.Security
         {
             var manager = new BackOfficeUserManager(customUserStore, options, membershipProvider);
             return manager;
-        } 
+        }
         #endregion
 
         /// <summary>
@@ -83,65 +85,15 @@ namespace Umbraco.Core.Security
         /// <param name="membershipProvider"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        protected void InitUserManager(BackOfficeUserManager manager, MembershipProviderBase membershipProvider, IdentityFactoryOptions<BackOfficeUserManager> options)
+        protected void InitUserManager(
+            BackOfficeUserManager manager,
+            MembershipProviderBase membershipProvider,
+            IdentityFactoryOptions<BackOfficeUserManager> options)
         {
-            // Configure validation logic for usernames
-            manager.UserValidator = new UserValidator<BackOfficeIdentityUser, int>(manager)
-            {
-                AllowOnlyAlphanumericUserNames = false,
-                RequireUniqueEmail = true
-            };
-
-            // Configure validation logic for passwords
-            manager.PasswordValidator = new PasswordValidator
-            {
-                RequiredLength = membershipProvider.MinRequiredPasswordLength,
-                RequireNonLetterOrDigit = membershipProvider.MinRequiredNonAlphanumericCharacters > 0,
-                RequireDigit = false,
-                RequireLowercase = false,
-                RequireUppercase = false
-                //TODO: Do we support the old regex match thing that membership providers used?
-            };
-
-            //use a custom hasher based on our membership provider
-            manager.PasswordHasher = new MembershipPasswordHasher(membershipProvider);
-
-            var dataProtectionProvider = options.DataProtectionProvider;
-            if (dataProtectionProvider != null)
-            {
-                manager.UserTokenProvider = new DataProtectorTokenProvider<BackOfficeIdentityUser, int>(dataProtectionProvider.Create("ASP.NET Identity"));
-            }
-
-            manager.UserLockoutEnabledByDefault = true;
-            manager.MaxFailedAccessAttemptsBeforeLockout = membershipProvider.MaxInvalidPasswordAttempts;
-            //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
-            // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
-            // locked out or not.
-            manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(30);
-
-            //custom identity factory for creating the identity object for which we auth against in the back office
-            manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();
-
-            manager.EmailService = new EmailService();
-            
-            //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
-
-            //// Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
-            //// You can write your own provider and plug in here.
-            //manager.RegisterTwoFactorProvider("PhoneCode", new PhoneNumberTokenProvider<ApplicationUser>
-            //{
-            //    MessageFormat = "Your security code is: {0}"
-            //});
-            //manager.RegisterTwoFactorProvider("EmailCode", new EmailTokenProvider<ApplicationUser>
-            //{
-            //    Subject = "Security Code",
-            //    BodyFormat = "Your security code is: {0}"
-            //});
-
-            //manager.SmsService = new SmsService();            
+            //NOTE: This method is mostly here for backwards compat
+            base.InitUserManager(manager, membershipProvider, options.DataProtectionProvider);
         }
 
-        
     }
 
     /// <summary>
@@ -183,6 +135,73 @@ namespace Umbraco.Core.Security
             get { return false; }
         }
         #endregion
+
+        /// <summary>
+        /// Initializes the user manager with the correct options
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="membershipProvider"></param>
+        /// <param name="dataProtectionProvider"></param>
+        /// <returns></returns>
+        protected void InitUserManager(
+            BackOfficeUserManager<T> manager, 
+            MembershipProviderBase membershipProvider, 
+            IDataProtectionProvider dataProtectionProvider)
+        {
+            // Configure validation logic for usernames
+            manager.UserValidator = new UserValidator<T, int>(manager)
+            {
+                AllowOnlyAlphanumericUserNames = false,
+                RequireUniqueEmail = true
+            };
+
+            // Configure validation logic for passwords
+            manager.PasswordValidator = new PasswordValidator
+            {
+                RequiredLength = membershipProvider.MinRequiredPasswordLength,
+                RequireNonLetterOrDigit = membershipProvider.MinRequiredNonAlphanumericCharacters > 0,
+                RequireDigit = false,
+                RequireLowercase = false,
+                RequireUppercase = false
+                //TODO: Do we support the old regex match thing that membership providers used?
+            };
+
+            //use a custom hasher based on our membership provider
+            manager.PasswordHasher = new MembershipPasswordHasher(membershipProvider);
+            
+            if (dataProtectionProvider != null)
+            {
+                manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"));
+            }
+
+            manager.UserLockoutEnabledByDefault = true;
+            manager.MaxFailedAccessAttemptsBeforeLockout = membershipProvider.MaxInvalidPasswordAttempts;
+            //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
+            // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
+            // locked out or not.
+            manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(30);
+
+            //custom identity factory for creating the identity object for which we auth against in the back office
+            manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory<T>();
+
+            manager.EmailService = new EmailService();
+
+            //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
+
+            //// Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
+            //// You can write your own provider and plug in here.
+            //manager.RegisterTwoFactorProvider("PhoneCode", new PhoneNumberTokenProvider<ApplicationUser>
+            //{
+            //    MessageFormat = "Your security code is: {0}"
+            //});
+            //manager.RegisterTwoFactorProvider("EmailCode", new EmailTokenProvider<ApplicationUser>
+            //{
+            //    Subject = "Security Code",
+            //    BodyFormat = "Your security code is: {0}"
+            //});
+
+            //manager.SmsService = new SmsService();            
+        }
 
         /// <summary>
         /// Logic used to validate a username and password

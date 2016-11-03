@@ -26,6 +26,8 @@ namespace Umbraco.Web.WebServices
         //TODO: Fix all of this for searchers/indexers that are not configured via code (i.e. the core ones once we do that)
         // We will need to be able to search an index directly without having to go through all of the searchers
 
+        private ExamineManager _examineManager;
+
         /// <summary>
         /// Checks if the member internal index is consistent with the data stored in the database
         /// </summary>
@@ -35,10 +37,9 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MemberService.Count();
 
-            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"]
-                .CreateSearchCriteria().RawQuery("__IndexType:member");
-            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"].Search(criteria);
-
+            var searcher = _examineManager.GetSearcher(Constants.Examine.InternalMemberIndexer);
+            var criteria = searcher.CreateSearchCriteria().RawQuery("__IndexType:member");
+            var totalIndexed = searcher.Search(criteria);
             return total == totalIndexed.TotalItemCount;
         }
 
@@ -51,10 +52,9 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MediaService.Count();
 
-            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"]
-                .CreateSearchCriteria().RawQuery("__IndexType:media");
-            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"].Search(criteria);
-
+            var searcher = _examineManager.GetSearcher(Constants.Examine.InternalIndexer);
+            var criteria = searcher.CreateSearchCriteria().RawQuery("__IndexType:media");
+            var totalIndexed = searcher.Search(criteria);
             return total == totalIndexed.TotalItemCount;
         }
 
@@ -67,10 +67,9 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.ContentService.Count();
 
-            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"]
-                .CreateSearchCriteria().RawQuery("__IndexType:content");
-            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"].Search(criteria);
-
+            var searcher = _examineManager.GetSearcher(Constants.Examine.InternalIndexer);
+            var criteria = searcher.CreateSearchCriteria().RawQuery("__IndexType:content");
+            var totalIndexed = searcher.Search(criteria);
             return total == totalIndexed.TotalItemCount;
         }
 

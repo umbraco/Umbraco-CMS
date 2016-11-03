@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var dto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
             return dto == null ? null : _modelFactory.BuildEntity(dto);
         }

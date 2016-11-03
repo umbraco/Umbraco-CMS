@@ -47,10 +47,6 @@ namespace Umbraco.Web.Install.InstallSteps
             // Update configurationStatus
             GlobalSettings.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
 
-            // Update ClientDependency version
-            var clientDependencyConfig = new ClientDependencyConfiguration(_logger);
-            var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
-
             //reports the ended install
             _installHelper.InstallStatus(true, "");
 

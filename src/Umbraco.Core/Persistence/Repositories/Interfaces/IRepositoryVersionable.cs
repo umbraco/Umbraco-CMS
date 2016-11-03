@@ -25,11 +25,19 @@ namespace Umbraco.Core.Persistence.Repositories
         int CountDescendants(int parentId, string contentTypeAlias = null);
 
         /// <summary>
-        /// Gets a list of all versions for an <see cref="TEntity"/>.
+        /// Gets a list of all versions for an <see cref="TEntity"/> ordered so latest is first
         /// </summary>
         /// <param name="id">Id of the <see cref="TEntity"/> to retrieve versions from</param>
         /// <returns>An enumerable list of the same <see cref="TEntity"/> object with different versions</returns>
-        IEnumerable<TEntity> GetAllVersions(int id);
+        IEnumerable<TEntity> GetAllVersions(int id);        
+
+        /// <summary>
+        /// Gets a list of all version Ids for the given content item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        IEnumerable<Guid> GetVersionIds(int id, int maxRows);
 
         /// <summary>
         /// Gets a specific version of an <see cref="TEntity"/>.

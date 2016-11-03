@@ -20,8 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers)
             : base(work, cache, logger, mappers)
-        {            
-        }
+        { }
 
         protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CachePolicy
         {
@@ -49,6 +48,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Where("umbracoAccess.id IN (@ids)", new { ids = ids });
             }
+
+            sql.OrderBy<AccessDto>(x => x.NodeId);
 
             var factory = new PublicAccessEntryFactory();
             var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
@@ -163,8 +164,6 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Guid GetEntityId(PublicAccessEntry entity)
         {
             return entity.Key;
-        }
-
-
+        }    
     }
 }

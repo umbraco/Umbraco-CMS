@@ -262,10 +262,8 @@ namespace Umbraco.Core.Persistence
 
         protected override void DisposeResources()
         {
-            // this is weird, because _nonHttpInstance is thread-static, so we would need
-            // to dispose the factory in each thread where a database has been used - else
-            // it only disposes the current thread's database instance.
-            //
+            // this is weird, because hybrid accessors store different databases per
+            // thread, so we don't really know what we are disposing here...
             // besides, we don't really want to dispose the factory, which is a singleton...
 
             var db = _umbracoDatabaseAccessor.UmbracoDatabase;

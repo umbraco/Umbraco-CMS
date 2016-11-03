@@ -102,8 +102,7 @@ namespace Umbraco.Tests.Persistence.Querying
             Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
             Assert.AreEqual("upper(`umbracoUser`.`userLogin`) = upper(@0)", result);
-            Assert.AreEqual("mydomain\\myuser", modelToSqlExpressionHelper.GetSqlParameters()[0]);
-            
+            Assert.AreEqual("mydomain\\myuser", modelToSqlExpressionHelper.GetSqlParameters()[0]);            
         }
 
         [Test]
@@ -121,6 +120,21 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.AreEqual("upper(`umbracoUser`.`userLogin`) LIKE upper(@0)", result);
             Assert.AreEqual("mydomain\\myuser%", modelToSqlExpressionHelper.GetSqlParameters()[0]);
+        }
+
+        [Test]
+        public void Sql_Replace_Mapped()
+        {
+            Expression<Func<IUser, bool>> predicate = user => user.Username.Replace("@world", "@test") == "hello@test.com";
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>(SqlContext.SqlSyntax, new UserMapper());
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("(replace([umbracoUser].[userLogin], @1, @2) = @0)", result);
+            Assert.AreEqual("hello@test.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
+            Assert.AreEqual("@world", modelToSqlExpressionHelper.GetSqlParameters()[1]);
+            Assert.AreEqual("@test", modelToSqlExpressionHelper.GetSqlParameters()[2]);
         }
 
     }

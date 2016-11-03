@@ -3,8 +3,10 @@ using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using NPoco;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
@@ -26,9 +28,24 @@ namespace Umbraco.Core.Persistence
 
         public static Sql<SqlContext> WhereIn<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> fieldSelector, IEnumerable values)
         {
-            var expresionist = new PocoToSqlExpressionHelper<T>(sql.SqlContext);
-            var fieldExpression = expresionist.Visit(fieldSelector);
-            sql.Where(fieldExpression + " IN (@values)", new { /*@values =*/ values });
+            var fieldName = GetFieldName(fieldSelector, sql.SqlContext.SqlSyntax);
+            sql.Where(fieldName + " IN (@values)", new { values });
+            return sql;
+        }
+
+        public static Sql WhereAnyIn<TDto>(this Sql<SqlContext> sql, Expression<Func<TDto, object>>[] fieldSelectors, IEnumerable values)
+        {
+            var fieldNames = fieldSelectors.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+            var sb = new StringBuilder();
+            sb.Append("(");
+            for (var i = 0; i < fieldNames.Length; i++)
+            {
+                if (i > 0) sb.Append(" OR ");
+                sb.Append(fieldNames[i]);
+                sql.Append(" IN (@values)");
+            }
+            sb.Append(")");
+            sql.Where(sb.ToString(), new { values });
             return sql;
         }
 
@@ -39,8 +56,7 @@ namespace Umbraco.Core.Persistence
         public static Sql<SqlContext> From<T>(this Sql<SqlContext> sql)
         {
             var type = typeof (T);
-            var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
-            var tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
+            var tableName = type.GetTableName();
 
             sql.From(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
             return sql;
@@ -52,33 +68,14 @@ namespace Umbraco.Core.Persistence
 
         public static Sql<SqlContext> OrderBy<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> columnMember)
         {
-            var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
-            var columnName = column.FirstAttribute<ColumnAttribute>().Name;
-
-            var type = typeof (T);
-            var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
-            var tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
-
-            // need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
-            var sqlSyntax = sql.SqlContext.SqlSyntax;
-            var syntax = $"({sqlSyntax.GetQuotedTableName(tableName)}.{sqlSyntax.GetQuotedColumnName(columnName)})";
-
+            var syntax = "(" + GetFieldName(columnMember, sql.SqlContext.SqlSyntax) + ")";
             sql.OrderBy(syntax);
             return sql;
         }
 
         public static Sql<SqlContext> OrderByDescending<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> columnMember)
         {
-            var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
-            var columnName = column.FirstAttribute<ColumnAttribute>().Name;
-
-            var type = typeof(T);
-            var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
-            var tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
-
-            var sqlSyntax = sql.SqlContext.SqlSyntax;
-            var syntax = $"{sqlSyntax.GetQuotedTableName(tableName)}.{sqlSyntax.GetQuotedColumnName(columnName)} DESC";
-
+            var syntax = "(" + GetFieldName(columnMember, sql.SqlContext.SqlSyntax) + ") DESC";
             sql.OrderBy(syntax);
             return sql;
         }
@@ -92,7 +89,7 @@ namespace Umbraco.Core.Persistence
         public static Sql<SqlContext> GroupBy<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> columnMember)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
-            var columnName = column.FirstAttribute<ColumnAttribute>().Name;
+            var columnName = column.GetColumnName();
 
             sql.GroupBy(sql.SqlContext.SqlSyntax.GetQuotedColumnName(columnName));
             return sql;
@@ -105,8 +102,7 @@ namespace Umbraco.Core.Persistence
         public static Sql<SqlContext>.SqlJoinClause<SqlContext>  InnerJoin<T>(this Sql<SqlContext> sql)
         {
             var type = typeof(T);
-            var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
-            var tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
+            var tableName = type.GetTableName();
 
             return sql.InnerJoin(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
         }
@@ -114,8 +110,7 @@ namespace Umbraco.Core.Persistence
         public static Sql<SqlContext>.SqlJoinClause<SqlContext> LeftJoin<T>(this Sql<SqlContext> sql)
         {
             var type = typeof(T);
-            var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
-            var tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
+            var tableName = type.GetTableName();
 
             return sql.LeftJoin(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
         }
@@ -123,8 +118,7 @@ namespace Umbraco.Core.Persistence
         public static Sql<SqlContext>.SqlJoinClause<SqlContext> RightJoin<T>(this Sql<SqlContext> sql)
         {
             var type = typeof(T);
-            var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
-            var tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
+            var tableName = type.GetTableName();
 
             return sql.RightJoin(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
         }
@@ -137,21 +131,27 @@ namespace Umbraco.Core.Persistence
 
             var leftType = typeof (TLeft);
             var rightType = typeof (TRight);
-            var leftTableName = sqlSyntax.GetQuotedTableName(leftType.FirstAttribute<TableNameAttribute>().Value);
-            var rightTableName = sqlSyntax.GetQuotedTableName(rightType.FirstAttribute<TableNameAttribute>().Value);
+            var leftTableName = leftType.GetTableName();
+            var rightTableName = rightType.GetTableName();
 
-            var left = ExpressionHelper.FindProperty(leftMember) as PropertyInfo;
-            var right = ExpressionHelper.FindProperty(rightMember) as PropertyInfo;
-            var leftColumnName = sqlSyntax.GetQuotedColumnName(left.FirstAttribute<ColumnAttribute>().Name);
-            var rightColumnName = sqlSyntax.GetQuotedColumnName(right.FirstAttribute<ColumnAttribute>().Name);
+            var leftColumn = ExpressionHelper.FindProperty(leftMember) as PropertyInfo;
+            var rightColumn = ExpressionHelper.FindProperty(rightMember) as PropertyInfo;
 
-            var onClause = $"{leftTableName}.{leftColumnName} = {rightTableName}.{rightColumnName}";
+            var leftColumnName = leftColumn.GetColumnName();
+            var rightColumnName = rightColumn.GetColumnName();
+
+            string onClause = $"{sqlSyntax.GetQuotedTableName(leftTableName)}.{sqlSyntax.GetQuotedColumnName(leftColumnName)} = {sqlSyntax.GetQuotedTableName(rightTableName)}.{sqlSyntax.GetQuotedColumnName(rightColumnName)}";
             return clause.On(onClause);
         }
 
         #endregion
 
         #region Select
+
+        public static Sql<SqlContext> SelectTop(this Sql<SqlContext> sql, int count)
+        {
+            return sql.SqlContext.SqlSyntax.SelectTop(sql, count);
+        }
 
         public static Sql<SqlContext> SelectCount(this Sql<SqlContext> sql)
         {
@@ -234,6 +234,36 @@ namespace Umbraco.Core.Persistence
             columnName = dbType.EscapeSqlIdentifier(columnName);
             columnAlias = dbType.EscapeSqlIdentifier((referenceName == null ? "" : (referenceName + "__")) + columnAlias);
             return tableName + "." + columnName + " AS " + columnAlias;
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private static string GetTableName(this Type type)
+        {
+            // todo: returning string.Empty for now
+            // BUT the code bits that calls this method cannot deal with string.Empty so we
+            // should either throw, or fix these code bits...
+            var attr = type.FirstAttribute<TableNameAttribute>();
+            return string.IsNullOrWhiteSpace(attr?.Value) ? string.Empty : attr.Value;
+        }
+
+        private static string GetColumnName(this PropertyInfo column)
+        {
+            var attr = column.FirstAttribute<ColumnAttribute>();
+            return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
+        }
+
+        private static string GetFieldName<T>(Expression<Func<T, object>> fieldSelector, ISqlSyntaxProvider sqlSyntax)
+        {
+            var field = ExpressionHelper.FindProperty(fieldSelector) as PropertyInfo;
+            var fieldName = field.GetColumnName();
+
+            var type = typeof(T);
+            var tableName = type.GetTableName();
+
+            return sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(fieldName);
         }
 
         #endregion

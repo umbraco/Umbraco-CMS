@@ -46,8 +46,13 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// <returns></returns>
         public SemVersion DetermineInstalledVersionByMigrations(IMigrationEntryService migrationEntryService)
         {
-            var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
-            var mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
+            SemVersion mostrecent = null;
+
+            if (ValidTables.Any(x => x.InvariantEquals("umbracoMigration")))
+            {
+                var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
+                 mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
+            }
 
             return mostrecent ?? new SemVersion(new Version(0, 0, 0));
         }
@@ -119,13 +124,19 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             //if the error is for umbracoAccess it must be the previous version to 7.3 since that is when it is added
             if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoAccess"))))
             {
-                return new Version(7, 2, 5);
+                return new Version(7, 2, 0);
             }
 
             //if the error is for umbracoDeployChecksum it must be the previous version to 7.4 since that is when it is added
             if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoDeployChecksum"))))
             {
-                return new Version(7, 3, 4);
+                return new Version(7, 3, 0);
+            }
+
+            //if the error is for umbracoRedirectUrl it must be the previous version to 7.5 since that is when it is added
+            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoRedirectUrl"))))
+            {
+                return new Version(7, 4, 0);
             }
 
             return UmbracoVersion.Current;

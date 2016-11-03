@@ -10,6 +10,7 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Xml;
 using umbraco.DataLayer.Utility;
 using Umbraco.Core.DI;
@@ -344,5 +345,111 @@ namespace umbraco.DataLayer
         { }
 
         #endregion
+
+        #region Evil Reflection
+
+        internal CurrentConnectionUsing UseCurrentConnection
+        {
+            get { return new CurrentConnectionUsing(); }
+        }
+
+        #endregion
     }
+
+    #region Evil Reflection
+
+    internal class CurrentConnectionUsing : IDisposable
+    {
+        public static MethodInfo OpenMethod { get; private set; }
+        public static MethodInfo CloseMethod { get; private set; }
+
+        private static readonly object Factory;
+        private static readonly MethodInfo CreateMethod;
+        private static readonly PropertyInfo ConnectionProperty;
+        private static readonly FieldInfo TransactionField;
+        private static readonly PropertyInfo InnerConnectionProperty;
+        private static readonly PropertyInfo InnerTransactionProperty;
+        private static readonly object[] NoArgs = new object[0];
+
+        private readonly object _database;
+
+        static CurrentConnectionUsing()
+        {
+            var coreAssembly = Assembly.Load("Umbraco.Core");
+
+            var applicationContextType = coreAssembly.GetType("Umbraco.Core.ApplicationContext");
+            var databaseContextType = coreAssembly.GetType("Umbraco.Core.DatabaseContext");
+            var defaultDatabaseFactoryType = coreAssembly.GetType("Umbraco.Core.Persistence.DefaultDatabaseFactory");
+            var umbracoDatabaseType = coreAssembly.GetType("Umbraco.Core.Persistence.UmbracoDatabase");
+            var databaseType = coreAssembly.GetType("Umbraco.Core.Persistence.Database");
+
+            var currentProperty = applicationContextType.GetProperty("Current", BindingFlags.Static | BindingFlags.Public);
+            var applicationContext = currentProperty.GetValue(null, NoArgs);
+
+            var databaseContextProperty = applicationContextType.GetProperty("DatabaseContext", BindingFlags.Instance | BindingFlags.Public);
+            var databaseContext = databaseContextProperty.GetValue(applicationContext, NoArgs);
+
+            var factoryField = databaseContextType.GetField("_factory", BindingFlags.Instance | BindingFlags.NonPublic);
+            Factory = factoryField.GetValue(databaseContext);
+
+            CreateMethod = defaultDatabaseFactoryType.GetMethod("CreateDatabase", BindingFlags.Instance | BindingFlags.Public);
+
+            OpenMethod = databaseType.GetMethod("OpenSharedConnection", BindingFlags.Instance | BindingFlags.Public);
+            CloseMethod = databaseType.GetMethod("CloseSharedConnection", BindingFlags.Instance | BindingFlags.Public);
+
+            ConnectionProperty = umbracoDatabaseType.GetProperty("Connection", BindingFlags.Instance | BindingFlags.Public);
+            TransactionField = databaseType.GetField("_transaction", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var profilerAssembly = Assembly.Load("MiniProfiler");
+            var profiledDbConnectionType = profilerAssembly.GetType("StackExchange.Profiling.Data.ProfiledDbConnection");
+            InnerConnectionProperty = profiledDbConnectionType.GetProperty("InnerConnection", BindingFlags.Instance | BindingFlags.Public);
+            var profiledDbTransactionType = profilerAssembly.GetType("StackExchange.Profiling.Data.ProfiledDbTransaction");
+            InnerTransactionProperty = profiledDbTransactionType.GetProperty("WrappedTransaction", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        public CurrentConnectionUsing()
+        {
+            _database = CreateMethod.Invoke(Factory, NoArgs);
+
+            var connection = ConnectionProperty.GetValue(_database, NoArgs);
+            // we have to open to make sure that we *do* have a connection
+            if (connection == null)
+                OpenMethod.Invoke(_database, NoArgs);
+        }
+
+        public IDbConnection Connection
+        {
+            get
+            {
+                var connection = ConnectionProperty.GetValue(_database, NoArgs);
+                if (connection == null) return null;
+                var inner = InnerConnectionProperty.GetValue(connection, NoArgs);
+                return inner as IDbConnection;
+            }
+        }
+
+        public IDbTransaction Transaction
+        {
+            get
+            {
+                var transaction = TransactionField.GetValue(_database);
+                if (transaction == null) return null;
+                var inner = InnerTransactionProperty.GetValue(transaction, NoArgs);
+                return inner as IDbTransaction;
+            }
+        }
+
+        public void Dispose()
+        {
+            // this was required when we *always* opened the connection
+            // but now we open it only if it's not opened already and then,
+            // we assume that Core will dispose of it somehow - since it
+            // hasn't been opened twice.
+
+            // we have to close since we have opened
+            //CloseMethod.Invoke(_database, NoArgs);
+        }
+    }
+    
+    #endregion
 }

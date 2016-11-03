@@ -6,7 +6,6 @@ using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
@@ -49,7 +48,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (previewToken.IsNullOrWhiteSpace() == false)
                 _previewContent = new PreviewContent(_xmlStore, previewToken);
         }
-
 
         #region Unit Tests
 
@@ -284,6 +282,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     	{
     		return ConvertToDocument(GetXml(preview).GetElementById(nodeId.ToString(CultureInfo.InvariantCulture)), preview);
     	}
+
+        public override IPublishedContent GetById(bool preview, Guid nodeId)
+        {
+            // todo - implement in a more efficient way
+            const string xpath = "//* [@isDoc and @key=$guid]";
+            return GetSingleByXPath(preview, xpath, new [] { new XPathVariable("guid", nodeId.ToString()) });
+        }
 
         public override bool HasById(bool preview, int contentId)
         {

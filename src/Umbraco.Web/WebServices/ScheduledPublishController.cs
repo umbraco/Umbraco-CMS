@@ -28,7 +28,11 @@ namespace Umbraco.Web.WebServices
             lock (Locker)
             {
                 if (_isPublishingRunning)
+                {
+                    Logger.Debug<ScheduledPublishController>(() => "Already executing, skipping.");
                     return null;
+                }
+
                 _isPublishingRunning = true;
             }
 

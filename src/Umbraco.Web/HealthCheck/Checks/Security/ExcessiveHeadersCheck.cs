@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 
@@ -17,11 +18,13 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     {
         private readonly ILocalizedTextService _textService;
         private readonly IRuntimeState _runtime;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ExcessiveHeadersCheck(ILocalizedTextService textService, IRuntimeState runtime)
+        public ExcessiveHeadersCheck(ILocalizedTextService textService, IRuntimeState runtime, IHttpContextAccessor httpContextAccessor)
         {
             _textService = textService;
             _runtime = runtime;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -51,7 +54,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var url = _runtime.ApplicationUrl;
 
             // Access the site home page and check for the headers
-            var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);
+            var useSsl = GlobalSettings.UseSSL || _httpContextAccessor.HttpContext.Request.ServerVariables["SERVER_PORT"] == "443";
+            var address = string.Format("http{0}://{1}:{2}", useSsl ? "s" : "", url.Host.ToLower(), url.Port);
             var request = WebRequest.Create(address);
             request.Method = "HEAD";
             try

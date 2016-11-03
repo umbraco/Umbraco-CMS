@@ -19,27 +19,21 @@ namespace Umbraco.Core.Logging
 
         public void Initialize(IProfiler profiler, ILogger logger, IRuntimeState runtime)
         {
-            // although registered in WebRuntime.Compose, ensure that we have
-            // not been replaced by another component, and we are still "the" profiler
+            // although registered in WebRuntime.Compose, ensure that we have not 
+            // been replaced by another component, and we are still "the" profiler
             _profiler = profiler as WebProfiler;
-            if (_profiler == null) return;
+            if (_profiler == null)
+            {
+                // if VoidProfiler was registered, let it be known
+                var vp = profiler as VoidProfiler;
+                if (vp != null)
+                    logger.Info<WebProfilerComponent>("Profiler is VoidProfiler, not profiling (must run debug mode to profile).");
+                return;
+            }
 
-            if (SystemUtilities.GetCurrentTrustLevel() < AspNetHostingPermissionLevel.High)
-            {
-                // if we don't have a high enough trust level we cannot bind to the events
-                logger.Info<WebProfilerComponent>("Cannot install when the application is running in Medium trust.");
-            }
-            else if (runtime.Debug == false)
-            {
-                // only when debugging
-                logger.Info<WebProfilerComponent>("Cannot install when the application is not running in debug mode.");
-            }
-            else
-            {
-                // bind to ApplicationInit - ie execute the application initialization for *each* application
-                // it would be a mistake to try and bind to the current application events
-                UmbracoApplicationBase.ApplicationInit += InitializeApplication;
-            }
+            // bind to ApplicationInit - ie execute the application initialization for *each* application
+            // it would be a mistake to try and bind to the current application events
+            UmbracoApplicationBase.ApplicationInit += InitializeApplication;
         }
 
         private void InitializeApplication(object sender, EventArgs args)

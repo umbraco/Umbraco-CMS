@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Xml;
 using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<DocumentDto>(x => x.Newest)
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto>(sql.SelectTop(1)).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -401,7 +402,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                entity.UpdateDate = DateTime.Now;
+                if (entity.IsPropertyDirty("UpdateDate") == false || entity.UpdateDate == default(DateTime))
+                    entity.UpdateDate = DateTime.Now;
             }
 
             //Ensure unique name on the same level
@@ -699,7 +701,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 MapQueryDtos,
-                orderBy, orderDirection, orderBySystemField,
+                orderBy, orderDirection, orderBySystemField, "cmsDocument",
                 filterSql);
         }
 

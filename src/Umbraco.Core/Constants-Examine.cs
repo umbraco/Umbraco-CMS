@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Umbraco.Core
+﻿namespace Umbraco.Core
 {
     public static partial class Constants
     {
@@ -19,6 +13,11 @@ namespace Umbraco.Core
             /// The alias of the internal content indexer
             /// </summary>
             public const string InternalIndexer = "InternalIndexer";
+
+            /// <summary>
+            /// The alias of the external content indexer
+            /// </summary>
+            public const string ExternalIndexer = "ExternalIndexer";
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -19,15 +20,19 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class MediaService : RepositoryService, IMediaService, IMediaServiceOperations
     {
+        private readonly MediaFileSystem _mediaFileSystem;
 
         #region Constructors
 
         public MediaService(
             IDatabaseUnitOfWorkProvider provider,
+            MediaFileSystem mediaFileSystem,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
-        { }
+        {
+            _mediaFileSystem = mediaFileSystem;
+        }
 
         #endregion
 
@@ -864,7 +869,7 @@ namespace Umbraco.Core.Services
                 var args = new DeleteEventArgs<IMedia>(c, false); // raise event & get flagged files
                 Deleted.RaiseEvent(args, this);
 
-                IOHelper.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
+                _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
                     (file, e) => Logger.Error<MediaService>("An error occurred while deleting file attached to nodes: " + file, e));
             }
         }
@@ -1182,6 +1187,43 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
                 uow.Complete();
+            }
+        }
+
+        #endregion
+
+        #region File Management
+
+        public Stream GetMediaFileContentStream(string filepath)
+        {
+            if (_mediaFileSystem.FileExists(filepath) == false)
+                return null;
+
+            try
+            {
+                return _mediaFileSystem.OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
+        }
+
+        public void SetMediaFileContent(string filepath, Stream stream)
+        {
+            _mediaFileSystem.AddFile(filepath, stream, true);
+        }
+
+        public void DeleteMediaFile(string filepath)
+        {
+            _mediaFileSystem.DeleteFile(filepath, true);
+        }
+
+        public void GenerateThumbnails(string filepath, PropertyType propertyType)
+        {
+            using (var filestream = _mediaFileSystem.OpenFile(filepath))
+            {
+                _mediaFileSystem.GenerateThumbnails(filestream, filepath, propertyType);
             }
         }
 

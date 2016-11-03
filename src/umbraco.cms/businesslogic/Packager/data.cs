@@ -238,7 +238,7 @@ namespace umbraco.cms.businesslogic.packager
 
                 retVal.ContentNodeId = SafeAttribute("nodeId", n.SelectSingleNode("content"));
                 retVal.ContentLoadChildNodes = bool.Parse(SafeAttribute("loadChildNodes", n.SelectSingleNode("content")));
-                
+
                 retVal.Macros = new List<string>(SafeNodeValue(n.SelectSingleNode("macros")).Trim(',').Split(','));
                 retVal.Macros = new List<string>(SafeNodeValue(n.SelectSingleNode("macros")).Trim(',').Split(','));
                 retVal.Templates = new List<string>(SafeNodeValue(n.SelectSingleNode("templates")).Trim(',').Split(','));
@@ -266,7 +266,7 @@ namespace umbraco.cms.businesslogic.packager
             // Remove physical xml file if any
             //PackageInstance p = new PackageInstance(Id);
 
-            //TODO DELETE PACKAGE FOLDER... 
+            //TODO DELETE PACKAGE FOLDER...
             //p.Folder
 
             XmlNode n = data.GetFromId(Id, dataSource, true);
@@ -325,7 +325,7 @@ namespace umbraco.cms.businesslogic.packager
             XmlHelper.SetAttribute(Source, authorNode, "url", package.AuthorUrl);
 
             XmlHelper.SetCDataNode(Source, xmlDef, "readme", package.Readme);
-            XmlHelper.SetTextNode(Source, xmlDef, "actions", package.Actions);
+            XmlHelper.SetInnerXmlNode(Source, xmlDef, "actions", package.Actions);
 
             var contentNode = xmlDef.SelectSingleNode("content");
             if (contentNode == null)

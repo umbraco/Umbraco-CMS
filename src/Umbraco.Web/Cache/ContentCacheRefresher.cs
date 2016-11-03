@@ -37,7 +37,13 @@ namespace Umbraco.Web.Cache
         public override void Refresh(JsonPayload[] payloads)
         {
             var runtimeCache = Current.ApplicationCache.RuntimeCache;
+
             runtimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+
+            // fixme - this is for entity service, not sure why we do it here and nowhere else?
+            runtimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+            runtimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+
             foreach (var payload in payloads)
             {
                 // remove that one

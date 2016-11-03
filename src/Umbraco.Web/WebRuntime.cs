@@ -4,6 +4,7 @@ using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.DI;
 using Umbraco.Core.Persistence;
 
@@ -15,6 +16,8 @@ namespace Umbraco.Web
     /// <remarks>On top of CoreRuntime, handles all of the web-related runtime aspects of Umbraco.</remarks>
     public class WebRuntime : CoreRuntime
     {
+        private IProfiler _webProfiler;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
@@ -26,6 +29,20 @@ namespace Umbraco.Web
         /// <inheritdoc/>
         public override void Boot(ServiceContainer container)
         {
+            // create and start asap to profile boot
+            var debug = GlobalSettings.DebugMode;
+            if (debug)
+            {
+                _webProfiler = new WebProfiler();
+                _webProfiler.Start();
+            }
+            else
+            {
+                // should let it be null, that's how MiniProfiler is meant to work,
+                // but our own IProfiler expects an instance so let's get one
+                _webProfiler = new VoidProfiler();
+            }
+
             base.Boot(container);
 
             // now (and only now) is the time to switch over to perWebRequest scopes
@@ -40,7 +57,7 @@ namespace Umbraco.Web
             base.Compose(container);
 
             // replace CoreRuntime's IProfiler registration
-            container.RegisterSingleton<IProfiler, WebProfiler>();
+            container.RegisterSingleton<IProfiler>(_ => _webProfiler);
 
             // replace CoreRuntime's CacheHelper registration
             container.RegisterSingleton(_ => new CacheHelper(

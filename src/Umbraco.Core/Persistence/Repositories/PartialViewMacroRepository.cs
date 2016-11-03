@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using LightInject;
+﻿using LightInject;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;

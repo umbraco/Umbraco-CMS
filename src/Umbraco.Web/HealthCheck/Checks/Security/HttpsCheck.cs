@@ -87,6 +87,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
             var actions = new List<HealthCheckAction>();
 
+            if (success)
+                message = _textService.Localize("healthcheck/httpsCheckValidCertificate");
+
             return
                 new HealthCheckStatus(message)
                 {

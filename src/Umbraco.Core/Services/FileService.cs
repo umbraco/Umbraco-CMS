@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Text.RegularExpressions;
-using System.Web;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -139,9 +135,31 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Stream GetStylesheetFileContentStream(string filepath)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IStylesheetRepository>();
+                var stream = repository.GetFileContentStream(filepath);
+                uow.Complete();
+                return stream;
+            }
+        }
+
+        public void SetStylesheetFileContent(string filepath, Stream content)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IStylesheetRepository>();
+                repository.SetFileContent(filepath, content);
+                uow.Complete();
+            }
+        }
+
         #endregion
 
         #region Scripts
+
         /// <summary>
         /// Gets a list of all <see cref="Script"/> objects
         /// </summary>
@@ -256,6 +274,27 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IScriptRepository>();
                 ((ScriptRepository) repository).DeleteFolder(folderPath);
+                uow.Complete();
+            }
+        }
+
+        public Stream GetScriptFileContentStream(string filepath)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IScriptRepository>();
+                var stream = repository.GetFileContentStream(filepath);
+                uow.Complete();
+                return stream;
+            }
+        }
+
+        public void SetScriptFileContent(string filepath, Stream content)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IScriptRepository>();
+                repository.SetFileContent(filepath, content);
                 uow.Complete();
             }
         }
@@ -614,6 +653,27 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Stream GetTemplateFileContentStream(string filepath)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<ITemplateRepository>();
+                var stream = repository.GetFileContentStream(filepath);
+                uow.Complete();
+                return stream;
+            }
+        }
+
+        public void SetTemplateFileContent(string filepath, Stream content)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<ITemplateRepository>();
+                repository.SetFileContent(filepath, content);
+                uow.Complete();
+            }
+        }
+
         #endregion
 
         #region Partial Views
@@ -673,6 +733,39 @@ namespace Umbraco.Core.Services
                 var view = repository.Get(path);
                 uow.Complete();
                 return view;
+            }
+        }
+
+        public IEnumerable<IPartialView> GetPartialViewMacros(params string[] names)
+        {
+            using (var uow = _fileUowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IPartialViewMacroRepository>();
+                var views = repository.GetAll(names).OrderBy(x => x.Name);
+                uow.Complete();
+                return views;
+            }
+        }
+
+        public IXsltFile GetXsltFile(string path)
+        {
+            using (var uow = _fileUowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IXsltFileRepository>();
+                var file = repository.Get(path);
+                uow.Complete();
+                return file;
+            }
+        }
+
+        public IEnumerable<IXsltFile> GetXsltFiles(params string[] names)
+        {
+            using (var uow = _fileUowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IXsltFileRepository>();
+                var files = repository.GetAll(names).OrderBy(x => x.Name);
+                uow.Complete();
+                return files;
             }
         }
 
@@ -842,6 +935,73 @@ namespace Umbraco.Core.Services
                 : Attempt<string>.Fail();
         }
 
+        public Stream GetPartialViewMacroFileContentStream(string filepath)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreatePartialViewRepository(PartialViewType.PartialViewMacro);
+                var stream = repository.GetFileContentStream(filepath);
+                uow.Complete();
+                return stream;
+            }
+        }
+
+        public void SetPartialViewMacroFileContent(string filepath, Stream content)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreatePartialViewRepository(PartialViewType.PartialViewMacro);
+                repository.SetFileContent(filepath, content);
+                uow.Complete();
+            }
+        }
+
+        public Stream GetPartialViewFileContentStream(string filepath)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreatePartialViewRepository(PartialViewType.PartialView);
+                var stream = repository.GetFileContentStream(filepath);
+                uow.Complete();
+                return stream;
+            }
+        }
+
+        public void SetPartialViewFileContent(string filepath, Stream content)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreatePartialViewRepository(PartialViewType.PartialView);
+                repository.SetFileContent(filepath, content);
+                uow.Complete();
+            }
+        }
+
+        #endregion
+
+        #region Xslt
+
+        public Stream GetXsltFileContentStream(string filepath)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IXsltFileRepository>();
+                var stream = repository.GetFileContentStream(filepath);
+                uow.Complete();
+                return stream;
+            }
+        }
+
+        public void SetXsltFileContent(string filepath, Stream content)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IXsltFileRepository>();
+                repository.SetFileContent(filepath, content);
+                uow.Complete();
+            }
+        }
+        
         #endregion
 
         private void Audit(AuditType type, string message, int userId, int objectId)

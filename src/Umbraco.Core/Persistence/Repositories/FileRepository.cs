@@ -217,10 +217,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected string GetFileContent(string filename)
         {
-            using (var stream = FileSystem.OpenFile(filename))
-            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+            if (FileSystem.FileExists(filename) == false)
+                return null;
+
+            try
             {
-                return reader.ReadToEnd();
+                using (var stream = FileSystem.OpenFile(filename))
+                using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+            catch
+            {
+                return null; // deal with race conds
             }
         }
 

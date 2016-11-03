@@ -7,8 +7,16 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
-    // represents the main domain
-    class MainDom : IRegisteredObject
+    /// <summary>
+    /// Represents the main AppDomain running for a given application.
+    /// </summary>
+    /// <remarks>
+    /// <para>There can be only one "main" AppDomain running for a given application at a time.</para>
+    /// <para>When an AppDomain starts, it tries to acquire the main domain status.</para>
+    /// <para>When an AppDomain stops (eg the application is restarting) it should release the main domain status.</para>
+    /// <para>It is possible to register against the MainDom and be notified when it is released.</para>
+    /// </remarks>
+    internal class MainDom : IRegisteredObject
     {
         #region Vars
 
@@ -39,7 +47,7 @@ namespace Umbraco.Core
         #region Ctor
 
         // initializes a new instance of MainDom
-        public MainDom(ILogger logger)
+        internal MainDom(ILogger logger)
         {
             _logger = logger;
 
@@ -48,22 +56,47 @@ namespace Umbraco.Core
             if (HostingEnvironment.ApplicationID != null)
                 appId = HostingEnvironment.ApplicationID.ReplaceNonAlphanumericChars(string.Empty);
 
-            var lockName = "UMBRACO-" + appId + "-MAINDOM-LCK";
+            // combining with the physical path because if running on eg IIS Express,
+            // two sites could have the same appId even though they are different.
+            //
+            // now what could still collide is... two sites, running in two different processes
+            // and having the same appId, and running on the same app physical path
+            //
+            // we *cannot* use the process ID here because when an AppPool restarts it is
+            // a new process for the same application path
+
+            var appPath = HostingEnvironment.ApplicationPhysicalPath;
+            var hash = (appId + ":::" + appPath).ToSHA1();
+
+            var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
             _asyncLock = new AsyncLock(lockName);
 
-            var eventName = "UMBRACO-" + appId + "-MAINDOM-EVT";
+            var eventName = "UMBRACO-" + hash + "-MAINDOM-EVT";
             _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
         }
 
         #endregion
 
-        // register a main domain consumer
+        /// <summary>
+        /// Registers a resource that requires the current AppDomain to be the main domain to function.
+        /// </summary>
+        /// <param name="release">An action to execute before the AppDomain releases the main domain status.</param>
+        /// <param name="weight">An optional weight (lower goes first).</param>
+        /// <returns>A value indicating whether it was possible to register.</returns>
         public bool Register(Action release, int weight = 100)
         {
             return Register(null, release, weight);
         }
 
-        // register a main domain consumer
+        /// <summary>
+        /// Registers a resource that requires the current AppDomain to be the main domain to function.
+        /// </summary>
+        /// <param name="install">An action to execute when registering.</param>
+        /// <param name="release">An action to execute before the AppDomain releases the main domain status.</param>
+        /// <param name="weight">An optional weight (lower goes first).</param>
+        /// <returns>A value indicating whether it was possible to register.</returns>
+        /// <remarks>If registering is successful, then the <paramref name="install"/> action 
+        /// is guaranteed to execute before the AppDomain releases the main domain status.</remarks>
         public bool Register(Action install, Action release, int weight = 100)
         {
             lock (_locko)
@@ -118,7 +151,7 @@ namespace Umbraco.Core
         }
 
         // acquires the main domain
-        public bool Acquire()
+        internal bool Acquire()
         {
             lock (_locko) // we don't want the hosting environment to interfere by signaling
             {
@@ -166,7 +199,7 @@ namespace Umbraco.Core
         public bool IsMainDom => _isMainDom;
 
         // IRegisteredObject
-        public void Stop(bool immediate)
+        void IRegisteredObject.Stop(bool immediate)
         {
             try
             {

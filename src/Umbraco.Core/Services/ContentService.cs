@@ -20,15 +20,18 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ContentService : RepositoryService, IContentService, IContentServiceOperations
     {
+        private readonly MediaFileSystem _mediaFileSystem;
 
         #region Constructors
 
         public ContentService(
             IDatabaseUnitOfWorkProvider provider,
             ILogger logger,
-            IEventMessagesFactory eventMessagesFactory)
+            IEventMessagesFactory eventMessagesFactory,
+            MediaFileSystem mediaFileSystem)
             : base(provider, logger, eventMessagesFactory)
         {
+            _mediaFileSystem = mediaFileSystem;
         }
 
         #endregion
@@ -366,7 +369,14 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
                 var items = repository.GetAll(idsA);
                 uow.Complete();
-                return items;
+
+                var index = items.ToDictionary(x => x.Id, x => x);
+
+                return idsA.Select(x =>
+                {
+                    IContent c;
+                    return index.TryGetValue(x, out c) ? c : null;
+                }).WhereNotNull();
             }
         }
 
@@ -467,6 +477,23 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var versions = repository.GetAllVersions(id);
+                uow.Complete();
+                return versions;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all version Ids for the given content item ordered so latest is first
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        public IEnumerable<Guid> GetVersionIds(int id, int maxRows)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IContentRepository>();
+                var versions = repository.GetVersionIds(id, maxRows);
                 uow.Complete();
                 return versions;
             }
@@ -1317,7 +1344,7 @@ namespace Umbraco.Core.Services
                 var args = new DeleteEventArgs<IContent>(c, false); // raise event & get flagged files
                 Deleted.RaiseEvent(args, this);
 
-                IOHelper.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
+                _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
                     (file, e) => Logger.Error<ContentService>("An error occurred while deleting file attached to nodes: " + file, e));
             }
         }

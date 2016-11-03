@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models
     public abstract class ContentBase : Entity, IContentBase
     {
         protected IContentTypeComposition ContentTypeBase;
-        
+
         private Lazy<int> _parentId;
         private string _name;//NOTE Once localization is introduced this will be the localized Name of the Content/Media.
         private int _sortOrder;
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
-        }        
+        }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -183,7 +183,7 @@ namespace Umbraco.Core.Models
             get { return _creatorId; }
             set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
         }
-        
+
         /// <summary>
         /// Boolean indicating whether this Content is Trashed or not.
         /// If Content is Trashed it will be located in the Recyclebin.
@@ -303,7 +303,7 @@ namespace Umbraco.Core.Models
                 return;
             }
 
-            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature 
+            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
             ((dynamic)this).SetPropertyValue(propertyTypeAlias, (dynamic)value);
         }
 
@@ -382,7 +382,7 @@ namespace Umbraco.Core.Models
         /// Sets the <see cref="System.Web.HttpPostedFile"/> value of a Property
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>        
+        /// <param name="value">Value to set for the Property</param>
         public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFile value)
         {
             ContentExtensions.SetValue(this, propertyTypeAlias, value);
@@ -393,14 +393,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
-        /// <param name="dataTypeService"></param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileBase value, IDataTypeService dataTypeService)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value, dataTypeService);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload with the IDataTypeService parameter instead")]
         public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileBase value)
         {
             ContentExtensions.SetValue(this, propertyTypeAlias, value);
@@ -461,7 +453,7 @@ namespace Umbraco.Core.Models
         #region Dirty property handling
 
         /// <summary>
-        /// We will override this method to ensure that when we reset the dirty properties that we 
+        /// We will override this method to ensure that when we reset the dirty properties that we
         /// also reset the dirty changes made to the content's Properties (user defined)
         /// </summary>
         /// <param name="rememberPreviouslyChangedProperties"></param>
@@ -516,8 +508,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="propertyName">Name of the property to check</param>
         /// <returns>
-        /// True if any of the class properties are dirty or 
-        /// True if any of the user defined PropertyType properties are dirty based on their alias, 
+        /// True if any of the class properties are dirty or
+        /// True if any of the user defined PropertyType properties are dirty based on their alias,
         /// otherwise False
         /// </returns>
         public override bool IsPropertyDirty(string propertyName)
@@ -539,8 +531,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="propertyName">Name of the property to check</param>
         /// <returns>
-        /// True if any of the class properties are dirty or 
-        /// True if any of the user defined PropertyType properties are dirty based on their alias, 
+        /// True if any of the class properties are dirty or
+        /// True if any of the user defined PropertyType properties are dirty based on their alias,
         /// otherwise False
         /// </returns>
         public override bool WasPropertyDirty(string propertyName)

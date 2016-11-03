@@ -1,7 +1,7 @@
 ﻿{
   "dependencies": {
     "AutoMapper": "4.2.1",
-    "ClientDependency": "1.8.4",
+    "ClientDependency": "1.9.1",
     "CSharpTest.Net.Collections": "14.906.1403.1082",
     "dotless": "1.4.1.0",
     "Examine": "2.0.0-beta2",
@@ -18,7 +18,7 @@
     "Microsoft.AspNet.Identity.Owin": "2.2.1",
     "Microsoft.AspNet.Mvc": "5.2.3",
     "Microsoft.AspNet.Razor": "3.2.3",
-    "Microsoft.AspNet.SignalR.Core": "2.2.0",
+    "Microsoft.AspNet.SignalR.Core": "2.2.1",
     "Microsoft.AspNet.WebApi": "5.2.3",
     "Microsoft.AspNet.WebApi.Client": "5.2.3",
     "Microsoft.AspNet.WebApi.Core": "5.2.3",
@@ -36,6 +36,7 @@
     "Owin": "1.0.*",
     "semver": "1.1.2",
     "SharpZipLib": "0.86.0",
+    "System.Threading.Tasks.Dataflow": "4.6.0",
     "UrlRewritingNet.UrlRewriter": "2.0.7",
     "xmlrpcnet": "2.5.0"
   },

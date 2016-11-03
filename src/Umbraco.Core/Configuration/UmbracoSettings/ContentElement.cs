@@ -244,7 +244,19 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     true);
             }
         }
-        
+
+        [ConfigurationProperty("EnableInheritedMediaTypes")]
+        internal InnerTextConfigurationElement<bool> EnableInheritedMediaTypes
+        {
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["EnableInheritedMediaTypes"],
+                    //set the default
+                    true);
+            }
+        }
+
         string IContentSection.NotificationEmailAddress
         {
             get { return Notifications.NotificationEmailAddress; }
@@ -368,6 +380,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.EnableInheritedDocumentTypes
         {
             get { return EnableInheritedDocumentTypes; }
+        }
+
+        bool IContentSection.EnableInheritedMediaTypes
+        {
+            get { return EnableInheritedMediaTypes; }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Umbraco.Core;
+﻿using System.Collections.Generic;
+using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
@@ -35,6 +37,14 @@ namespace Umbraco.Web.Routing
                 : frequest.Uri.GetAbsolutePathDecoded();
 
             var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route);
+
+            // From: http://stackoverflow.com/a/22468386/5018
+            // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532
+            // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads 
+            // to problems if you rename a page back to it's original name or create a new page with the original name
+            frequest.Cacheability = HttpCacheability.NoCache;
+            frequest.CacheExtensions = new List<string> { "no-store, must-revalidate" };
+            frequest.Headers = new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } };
 
             if (redirectUrl == null)
             {
