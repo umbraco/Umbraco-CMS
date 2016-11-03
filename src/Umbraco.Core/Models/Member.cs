@@ -96,7 +96,8 @@ namespace Umbraco.Core.Models
         /// The password value passed in to this parameter should be the encoded/encrypted/hashed format of the member's password
         /// </param>
         /// <param name="contentType"></param>
-        public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType)
+        /// <param name="isApproved">Optional IsApproved parameter</param>
+        public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved = true)
             : base(name, -1, contentType, new PropertyCollection())
         {
             Mandate.ParameterNotNull(contentType, "contentType");
@@ -106,7 +107,7 @@ namespace Umbraco.Core.Models
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
-            IsApproved = true;
+            IsApproved = isApproved;
         }
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
