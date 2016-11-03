@@ -27,6 +27,8 @@
    border-radius: 0;
    position: relative;
    margin-bottom: 0;
+   max-height: calc(75vh);
+   overflow: auto;   
 }
 
 .umb-notifications__notification.-extra-padding {
@@ -35,8 +37,7 @@
 }
 
 .umb-notifications__notification .close {
-    position: absolute;
-    bottom: 5px;
-    right: 21px;
+    position: fixed;
     top: initial;
+    right: 25px;
 }
