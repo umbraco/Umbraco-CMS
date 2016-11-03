@@ -105,8 +105,8 @@ namespace Umbraco.Core
                     //if the resolution was success, return it, otherwise just return the path, we've detected
                     // it's a path but maybe it's relative and resolution has failed, etc... in which case we're just
                     // returning what was given to us.
-                    return resolvedUrlResult.Success 
-                        ? resolvedUrlResult 
+                    return resolvedUrlResult.Success
+                        ? resolvedUrlResult
                         : Attempt.Succeed(input);
                 }
             }
@@ -128,7 +128,7 @@ namespace Umbraco.Core
         }
 
         internal static readonly Regex Whitespace = new Regex(@"\s+", RegexOptions.Compiled);
-        internal static readonly string[] JsonEmpties = new [] { "[]", "{}" };
+        internal static readonly string[] JsonEmpties = new[] { "[]", "{}" };
         internal static bool DetectIsEmptyJson(this string input)
         {
             return JsonEmpties.Contains(Whitespace.Replace(input, string.Empty));
@@ -1470,5 +1470,29 @@ namespace Umbraco.Core
             byte[] hash = md5.ComputeHash(myStringBytes);
             return new Guid(hash);
         }
+
+
+        /// <summary>
+        /// Converts a file name to a friendly name for a content item
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string friendlyNameFromFilename(this string fileName)
+        {
+            // strip the file extension
+            fileName = StripFileExtension(fileName);
+
+            // underscores and dashes to spaces
+            fileName = ReplaceMany(fileName, new char[] { '_', '-' }, ' ');
+
+            // any other conversions ?
+
+            // Pascalcase (to be done last)
+            fileName = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(fileName);
+
+
+            return fileName;
+        }
+
     }
 }
