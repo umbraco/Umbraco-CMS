@@ -7,6 +7,7 @@
 <style type="text/css">
 .gridHeader{border-bottom:2px solid #D9D7D7;}
 .gridItem{border-color: #D9D7D7;}
+html, body {overflow: initial;}
 </style>
 
 <umb:CssInclude ID="CssInclude2" runat="server" FilePath="Tree/treeIcons.css" PathNameAlias="UmbracoClient" />
