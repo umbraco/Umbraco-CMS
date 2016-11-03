@@ -26,12 +26,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
         public override void Up()
         {
             // get all data
-            var sql = $@"
+            var sql = string.Format(@"
              SELECT    pd.id, pd.dataNvarchar from cmsPropertyData pd
              JOIN      cmsPropertyType pt on pd.propertyTypeId = pt.id
              JOIN      cmsDataType dt on dt.nodeid = pt.dataTypeId
-             WHERE     dt.propertyEditorAlias in ('{Constants.PropertyEditors.MultiNodeTreePickerAlias}','{Constants.PropertyEditors.MultipleMediaPickerAlias}')
-             AND       dt.dbType = 'Nvarchar'";
+             WHERE     dt.propertyEditorAlias in ('{0}','{1}')
+             AND       dt.dbType = 'Nvarchar'", Constants.PropertyEditors.MultiNodeTreePickerAlias, Constants.PropertyEditors.MultipleMediaPickerAlias);
 
             var multiNodeRelations = Context.Database.Fetch<PropertyDataDto>(sql);
 
