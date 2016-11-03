@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
             //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, IMember>()
                 .ConstructUsing(user => MemberService.CreateGenericMembershipProviderMember(user.UserName, user.Email, user.UserName, ""))
-                //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
+                //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(member => member.Comments, expression => expression.MapFrom(user => user.Comment))
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, MemberDisplay>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -78,7 +78,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Tabs,
                     expression => expression.ResolveUsing(new MemberTabsAndPropertiesResolver(applicationContext.Services.TextService)))
                 .ForMember(display => display.MemberProviderFieldMapping,
-                    expression => expression.ResolveUsing<MemberProviderFieldMappingResolver>())
+                    expression => expression.ResolveUsing(new MemberProviderFieldMappingResolver()))
                 .ForMember(display => display.MembershipScenario,
                     expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => applicationContext.Services.MemberTypeService))))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
@@ -97,7 +97,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, MemberBasic>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -118,7 +118,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
-                //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
+                //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
@@ -152,14 +152,14 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, ContentItemDto<IMember>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
-                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing<MemberDtoPropertiesValueResolver>());
+                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(new MemberDtoPropertiesValueResolver()));
         }
 
         /// <summary>

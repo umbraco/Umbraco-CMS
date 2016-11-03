@@ -199,7 +199,7 @@
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.created">
                                 <div class="umb-package-details__information-item-label">Created:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.created}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.created | date:'yyyy-MM-dd HH:mm:ss'}}</div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.latestVersion">
