@@ -279,7 +279,7 @@
         vm.reloadPage = function () {
             //reload on next digest (after cookie)
             $timeout(function () {
-                $window.location.reload(true);
+                window.location.reload(true);
             });
         }
 
