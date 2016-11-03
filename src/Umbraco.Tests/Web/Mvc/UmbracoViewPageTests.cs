@@ -410,7 +410,14 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<INotificationService>().Object,
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IAuditService>(),
-                Mock.Of<IDomainService>());
+                Mock.Of<IDomainService>(),
+                Mock.Of<ITaskService>(),
+                Mock.Of<IMacroService>(),
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IExternalLoginService>(),
+                Mock.Of<IMigrationEntryService>(),
+                Mock.Of<IRedirectUrlService>(),
+                Mock.Of<IServerRegistrationService>());
             return svcCtx;
         }
 

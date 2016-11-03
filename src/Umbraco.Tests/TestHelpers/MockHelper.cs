@@ -35,7 +35,12 @@ namespace Umbraco.Tests.TestHelpers
                 new Mock<IAuditService>().Object,
                 new Mock<IDomainService>().Object,
                 new Mock<ITaskService>().Object,
-                new Mock<IMacroService>().Object);
+                new Mock<IMacroService>().Object, 
+                new Mock<IPublicAccessService>().Object,
+                new Mock<IExternalLoginService>().Object,
+                new Mock<IMigrationEntryService>().Object,
+                new Mock<IRedirectUrlService>().Object,
+                new Mock<IServerRegistrationService>().Object);
         }
     }
 }
