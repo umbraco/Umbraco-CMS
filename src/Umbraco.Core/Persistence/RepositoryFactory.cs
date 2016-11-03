@@ -197,7 +197,7 @@ namespace Umbraco.Core.Persistence
         {
             return new RelationRepository(
                 uow,
-                _cacheHelper,
+                _noCache,
                 _logger, _sqlSyntax,
                 CreateRelationTypeRepository(uow));
         }
