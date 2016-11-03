@@ -53,5 +53,24 @@ namespace Umbraco.Core.Services
         ///// <param name="alias">Alias to retrieve an <see cref="IMacroPropertyType"/> for</param>
         ///// <returns>An <see cref="IMacroPropertyType"/> object</returns>
         //IMacroPropertyType GetMacroPropertyTypeByAlias(string alias);
+
+        /// <summary>
+        /// Creates and saves an <see cref="IMacro"/>.
+        /// Use <see cref="Save"/> method if needed.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="useInEditor"></param>
+        /// <param name="cacheDuration"></param>
+        /// <param name="alias"></param>
+        /// <param name="name"></param>
+        /// <param name="controlType"></param>
+        /// <param name="controlAssembly"></param>
+        /// <param name="xsltPath"></param>
+        /// <param name="cacheByPage"></param>
+        /// <param name="cacheByMember"></param>
+        /// <param name="dontRender"></param>
+        /// <param name="scriptPath"></param>
+        /// <returns></returns>
+        IMacro CreateMacro(int id, bool useInEditor, int cacheDuration, string @alias, string name, string controlType, string controlAssembly, string xsltPath, bool cacheByPage, bool cacheByMember, bool dontRender, string scriptPath, int userId = 0);
     }
 }

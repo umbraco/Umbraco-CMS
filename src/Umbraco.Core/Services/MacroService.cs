@@ -156,6 +156,29 @@ namespace Umbraco.Core.Services
 
 	        Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
         }
+        /// <summary>
+        /// Creates and saves an <see cref="IMacro"/>.
+        /// Use <see cref="Save"/> method if needed.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="useInEditor"></param>
+        /// <param name="cacheDuration"></param>
+        /// <param name="alias"></param>
+        /// <param name="name"></param>
+        /// <param name="controlType"></param>
+        /// <param name="controlAssembly"></param>
+        /// <param name="xsltPath"></param>
+        /// <param name="cacheByPage"></param>
+        /// <param name="cacheByMember"></param>
+        /// <param name="dontRender"></param>
+        /// <param name="scriptPath"></param>
+        /// <returns></returns>
+        public IMacro CreateMacro(int id, bool useInEditor, int cacheDuration, string @alias, string name, string controlType, string controlAssembly, string xsltPath, bool cacheByPage, bool cacheByMember, bool dontRender, string scriptPath, int userId = 0)
+        {
+            var macro = new Macro(id, useInEditor, cacheDuration, @alias, name, controlType, controlAssembly, xsltPath, cacheByPage, cacheByMember, dontRender, scriptPath);
+            Save(macro, userId);
+            return macro;
+        }
 
         ///// <summary>
         ///// Gets a list all available <see cref="IMacroPropertyType"/> plugins
