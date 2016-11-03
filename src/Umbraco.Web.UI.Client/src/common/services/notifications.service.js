@@ -38,6 +38,26 @@ angular.module('umbraco.services')
 		return view;
 	}
 
+	function findView(viewName) {
+	    var viewPath = setViewPath(viewName).toLowerCase();
+	    return _.find(nArray, function (notification) {
+	        return notification.view.toLowerCase() === viewPath;
+	    });
+	}
+
+	function remove(index) {
+	    if (angular.isObject(index)) {
+	        var i = nArray.indexOf(index);
+	        angularHelper.safeApply($rootScope, function () {
+	            nArray.splice(i, 1);
+	        });
+	    } else {
+	        angularHelper.safeApply($rootScope, function () {
+	            nArray.splice(index, 1);
+	        });
+	    }
+	}
+
 	var service = {
 
 		/**
@@ -244,18 +264,7 @@ angular.module('umbraco.services')
 		 *
 		 * @param {Int} index index where the notication should be removed from
 		 */
-		remove: function (index) {
-			if(angular.isObject(index)){
-				var i = nArray.indexOf(index);
-				angularHelper.safeApply($rootScope, function() {
-				    nArray.splice(i, 1);
-				});
-			}else{
-				angularHelper.safeApply($rootScope, function() {
-				    nArray.splice(index, 1);
-				});	
-			}
-		},
+		remove: remove,
 
 		/**
 		 * @ngdoc method
@@ -269,7 +278,21 @@ angular.module('umbraco.services')
 	        angularHelper.safeApply($rootScope, function() {
 	            nArray = [];
 	        });
-		},
+	    },
+
+	     /**
+         * @ngdoc method
+         * @name umbraco.services.notificationsService#removeByName
+         * @methodOf umbraco.services.notificationsService
+         *
+         * @description
+         * Removes single notification by name
+         */
+	    removeByName: function (viewName) {
+	        var view = findView(viewName);
+	        var index = nArray.indexOf(view);
+	        remove(index);
+	    },
 
 		/**
 		 * @ngdoc property

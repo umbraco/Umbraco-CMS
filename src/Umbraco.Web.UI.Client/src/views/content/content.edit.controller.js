@@ -89,6 +89,10 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
             init($scope.content);
             syncTreeNode($scope.content, data.path);
 
+            if (notificationsService.hasView("confirmroutechange")) {
+                notificationsService.removeByName("confirmroutechange");
+            }
+
             $scope.page.buttonGroupState = "success";
 
             deferred.resolve(data);
