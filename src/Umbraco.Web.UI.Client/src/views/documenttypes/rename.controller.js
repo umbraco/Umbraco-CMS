@@ -7,17 +7,16 @@
         "notificationsService",
         "localizationService",
         function (scope, injector, navigationService, notificationsService, localizationService) {
-            var notificationHeader,
-                resource = injector.get(scope.resource);
+            var notificationHeader;
 
-            function reportSuccessAndClose() {
+            function reportSuccessAndClose(treeName) {
                 var lastComma = scope.currentNode.path.lastIndexOf(","),
                     path = lastComma === -1
                         ? scope.currentNode.path
                         : scope.currentNode.path.substring(0, lastComma - 1);
 
                 navigationService.syncTree({
-                    tree: scope.tree,
+                    tree: treeName,
                     path: path,
                     forceReload: true,
                     activate: true
@@ -37,18 +36,20 @@
                 navigationService.hideMenu();
             }
 
-
             localizationService.localize("renamecontainer_renamed")
-                .then(function(s) { notificationHeader = s; });
+                .then(function (s) { notificationHeader = s; });
 
             scope.model = {
-                folderName: scope.currentNode.name 
+                folderName: scope.currentNode.name
             }
 
-            scope.renameContainer = function () {
+            scope.renameContainer = function (resourceKey, treeName) {
+                var resource = injector.get(resourceKey);
 
                 resource.renameContainer(scope.currentNode.id, scope.model.folderName)
-                    .then(reportSuccessAndClose, function (err) {
+                    .then(function () {
+                        reportSuccessAndClose(treeName);
+                    }, function (err) {
                         scope.error = err;
 
                         if (angular.isArray(err.data.notifications)) {
@@ -57,8 +58,6 @@
                             }
                         }
                     });
-
             }
-
         }
     ]);
