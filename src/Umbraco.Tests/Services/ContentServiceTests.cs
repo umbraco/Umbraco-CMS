@@ -73,16 +73,15 @@ namespace Umbraco.Tests.Services
 
             // Act
             var content = contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
-            for (int i = 0; i < 20; i++)
+            for (var i = 0; i < 20; i++)
             {
                 content.SetValue("bodyText", "hello world " + Guid.NewGuid());
                 contentService.SaveAndPublishWithStatus(content);
             }
 
-
             // Assert
             var allVersions = contentService.GetVersionIds(content.Id, int.MaxValue);
-            Assert.AreEqual(21, allVersions.Count());
+            Assert.AreEqual(20, allVersions.Count());
 
             var topVersions = contentService.GetVersionIds(content.Id, 4);
             Assert.AreEqual(4, topVersions.Count());
@@ -96,7 +95,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             var results = new List<IContent>();
-            for (int i = 0; i < 20; i++)
+            for (var i = 0; i < 20; i++)
             {
                 results.Add(contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0));
             }

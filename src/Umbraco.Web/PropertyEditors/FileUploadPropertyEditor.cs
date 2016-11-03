@@ -7,7 +7,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -19,7 +18,6 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly MediaFileSystem _mediaFileSystem;
         private readonly ILocalizedTextService _textService;
-        private readonly UploadAutoFillProperties _autoFillProperties;
 
         public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings, ILocalizedTextService textService)
             : base(logger)
@@ -30,8 +28,6 @@ namespace Umbraco.Web.PropertyEditors
 
             _mediaFileSystem = mediaFileSystem;
             _textService = textService;
-
-            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, Logger, contentSettings);
         }
 
         /// <summary>
@@ -161,14 +157,14 @@ namespace Umbraco.Web.PropertyEditors
 
             foreach (var property in properties)
             {
-                var autoFillConfig = _autoFillProperties.GetConfig(property.Alias);
+                var autoFillConfig = _mediaFileSystem.UploadAutoFillProperties.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
                 var svalue = property.Value as string;
                 if (string.IsNullOrWhiteSpace(svalue))
-                    _autoFillProperties.Reset(model, autoFillConfig);
+                    _mediaFileSystem.UploadAutoFillProperties.Reset(model, autoFillConfig);
                 else
-                    _autoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue));
+                    _mediaFileSystem.UploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue));
             }            
         }
 

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Hosting;
 
 namespace Umbraco.Core.IO
 {
-    public class ShadowWrapper : IFileSystem2
+    public class ShadowWrapper : IFileSystem
     {
         private readonly IFileSystem _innerFileSystem;
         private readonly string _shadowPath;
@@ -148,12 +147,7 @@ namespace Umbraco.Core.IO
 
         public long GetSize(string path)
         {
-            var filesystem = FileSystem; // will be either a ShadowFileSystem OR the actual underlying IFileSystem
-
-            // and the underlying filesystem can be IFileSystem2... or just IFileSystem
-            // figure it out and use the most effective GetSize method
-            var filesystem2 = filesystem as IFileSystem2;
-            return filesystem2 == null ? filesystem.GetSize(path) : filesystem2.GetSize(path);
+            return FileSystem.GetSize(path);
         }
     }
 }

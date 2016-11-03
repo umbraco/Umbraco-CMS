@@ -5,11 +5,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
+using LightInject;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DI;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -24,17 +26,27 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentTests : TestWithSettingsBase
     {
-        [SetUp]
-        public void Init()
+        private ServiceContainer _container;
+
+        public override void SetUp()
         {
+            base.SetUp();
+
             var config = SettingsForTests.GetDefault();
             SettingsForTests.ConfigureSettings(config);
+
+            _container = new ServiceContainer();
+            _container.ConfigureUmbracoCore();
+            _container.Register(_ => Mock.Of<ILogger>());
+            _container.Register<FileSystems>();
+            _container.Register(_ => Mock.Of<IDataTypeService>());
+            _container.Register(_ => Mock.Of<IContentSection>());
         }
 
-        [TearDown]
-        public void Dispose()
+        public override void TearDown()
         {
-
+            base.TearDown();
+            _container.Dispose();
         }
 
         [Test]

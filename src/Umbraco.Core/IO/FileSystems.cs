@@ -27,7 +27,7 @@ namespace Umbraco.Core.IO
 
         #region Singleton & Constructor
 
-        internal FileSystems(ILogger logger)
+        public FileSystems(ILogger logger)
         {
             _config = (FileSystemProvidersSection) ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
             _logger = logger;
@@ -59,13 +59,13 @@ namespace Umbraco.Core.IO
 
         #region Well-Known FileSystems
 
-        public IFileSystem2 MacroPartialsFileSystem { get; }
-        public IFileSystem2 PartialViewsFileSystem { get; }
-        public IFileSystem2 StylesheetsFileSystem { get; }
-        public IFileSystem2 ScriptsFileSystem { get; }
-        public IFileSystem2 XsltFileSystem { get; }
-        public IFileSystem2 MasterPagesFileSystem { get; }
-        public IFileSystem2 MvcViewsFileSystem { get; }
+        public IFileSystem MacroPartialsFileSystem { get; }
+        public IFileSystem PartialViewsFileSystem { get; }
+        public IFileSystem StylesheetsFileSystem { get; }
+        public IFileSystem ScriptsFileSystem { get; }
+        public IFileSystem XsltFileSystem { get; }
+        public IFileSystem MasterPagesFileSystem { get; }
+        public IFileSystem MvcViewsFileSystem { get; }
         public MediaFileSystem MediaFileSystem { get; }
 
         #endregion

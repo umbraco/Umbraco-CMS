@@ -104,7 +104,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem2>());
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
 
             var migrationEntryService = GetLazyService<IMigrationEntryService>(container, () => new MigrationEntryService(provider, logger, eventMessagesFactory));
             var externalLoginService = GetLazyService<IExternalLoginService>(container, () => new ExternalLoginService(provider, logger, eventMessagesFactory));

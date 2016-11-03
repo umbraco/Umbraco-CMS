@@ -91,8 +91,7 @@ namespace Umbraco.Tests.Runtimes
                 container.RegisterSingleton(factory => new ProfilingLogger(factory.GetInstance<ILogger>(), factory.GetInstance<IProfiler>()));
 
                 // must override the database factory
-                container.RegisterSingleton(_ => GetDatabaseFactory()); // fixme painful, is it... singleton? or what?
-                //container.RegisterKnownService(_ => GetDatabaseFactory()); // fixme - would pick the correct LifeTime!
+                container.RegisterSingleton(_ => GetDatabaseFactory());
             }
 
             // must override the database factory

@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.IO
 {
@@ -30,20 +31,8 @@ namespace Umbraco.Tests.IO
 
         private static void ClearFiles()
         {
-            var path = IOHelper.MapPath("FileSysTests");
-            if (Directory.Exists(path))
-            {
-                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
-                    File.Delete(file);
-                Directory.Delete(path, true);
-            }
-            path = IOHelper.MapPath("App_Data");
-            if (Directory.Exists(path))
-            {
-                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
-                    File.Delete(file);
-                Directory.Delete(path, true);
-            }
+            TestHelper.DeleteDirectory(IOHelper.MapPath("FileSysTests"));
+            TestHelper.DeleteDirectory(IOHelper.MapPath("App_Data"));
         }
 
         private static string NormPath(string path)
@@ -343,8 +332,7 @@ namespace Umbraco.Tests.IO
 
             Assert.IsTrue(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt"));
 
-            // kill everything and let the shadow fs die
-            Directory.Delete(path + "/ShadowSystem", true);
+            // let the shadow fs die
         }
 
         [Test]
@@ -424,7 +412,7 @@ namespace Umbraco.Tests.IO
             Assert.AreEqual(1, Directory.GetDirectories(appdata + "/Shadow").Length);
             scope.Complete();
             Assert.IsTrue(fs.FileExists("sub/f4.txt"));
-            Assert.AreEqual(0, Directory.GetDirectories(appdata + "/Shadow").Length);
+            TestHelper.TryAssert(() => Assert.AreEqual(0, Directory.GetDirectories(appdata + "/Shadow").Length));
             scope.Dispose();
             Assert.IsTrue(fs.FileExists("sub/f4.txt"));
             Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
@@ -481,7 +469,7 @@ namespace Umbraco.Tests.IO
             Assert.IsTrue(fs.FileExists("sub/f2.txt"));
             scope.Dispose();
             Assert.IsTrue(fs.FileExists("sub/f2.txt"));
-            Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
+            TestHelper.TryAssert(() => Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id)));
 
             string text;
             using (var s = fs.OpenFile("sub/f2.txt"))
@@ -584,9 +572,8 @@ namespace Umbraco.Tests.IO
             File.WriteAllText(path + "/test/inner/f3.txt", "foo");
 
             path = NormPath(path);
-            Directory.Delete(path, true);
-
-            Assert.IsFalse(File.Exists(path + "/test/inner/f3.txt"));
+            TestHelper.Try(() => Directory.Delete(path, true));
+            TestHelper.TryAssert(() => Assert.IsFalse(File.Exists(path + "/test/inner/f3.txt")));
         }
     }
 }

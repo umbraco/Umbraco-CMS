@@ -4,9 +4,6 @@ using System.IO;
 
 namespace Umbraco.Core.IO
 {
-    //TODO: There is no way to create a directory here without creating a file in a directory and then deleting it
-    //TODO: Should probably implement a rename?
-
 	public interface IFileSystem
     {
         IEnumerable<string> GetDirectories(string path);
@@ -40,11 +37,14 @@ namespace Umbraco.Core.IO
         DateTimeOffset GetLastModified(string path);
 
         DateTimeOffset GetCreated(string path);
-    }
 
-    // this should be part of IFileSystem but we don't want to change the interface
-    public interface IFileSystem2 : IFileSystem
-    {
         long GetSize(string path);
+
+        // TODO: implement these
+        //
+        //void CreateDirectory(string path);
+        //
+        //// move or rename, directory or file
+        //void Move(string source, string target);
     }
 }

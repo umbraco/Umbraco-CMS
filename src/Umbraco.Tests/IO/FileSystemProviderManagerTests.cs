@@ -1,9 +1,13 @@
 ﻿using System;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DI;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.IO
@@ -11,12 +15,28 @@ namespace Umbraco.Tests.IO
     [TestFixture]
     public class FileSystemProviderManagerTests
     {
+        private ServiceContainer _container;
+
         [SetUp]
         public void Setup()
         {
             //init the config singleton
             var config = SettingsForTests.GetDefault();
             SettingsForTests.ConfigureSettings(config);
+
+            _container = new ServiceContainer();
+            _container.ConfigureUmbracoCore();
+            _container.Register(_ => Mock.Of<ILogger>());
+            _container.Register<FileSystems>();
+            _container.Register(_ => Mock.Of<IDataTypeService>());
+            _container.Register(_ => Mock.Of<IContentSection>());
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Current.Reset();
+            _container.Dispose();
         }
 
         [Test]

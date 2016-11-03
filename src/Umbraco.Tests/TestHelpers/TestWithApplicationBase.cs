@@ -129,7 +129,7 @@ namespace Umbraco.Tests.TestHelpers
             Container.RegisterSingleton(factory => settings.Content);
             Container.RegisterSingleton(factory => settings.Templates);
             Container.Register<IServiceProvider, ActivatorServiceProvider>();
-            Container.Register(factory => new MediaFileSystem(Mock.Of<IFileSystem2>()));
+            Container.Register(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
             Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
 
             // replace some stuff

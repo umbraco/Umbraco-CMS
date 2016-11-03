@@ -47,7 +47,7 @@ namespace Umbraco.Core
         #region Ctor
 
         // initializes a new instance of MainDom
-        internal MainDom(ILogger logger)
+        public MainDom(ILogger logger)
         {
             _logger = logger;
 

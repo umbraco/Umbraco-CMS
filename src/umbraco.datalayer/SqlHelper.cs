@@ -364,9 +364,10 @@ namespace umbraco.DataLayer
         public static MethodInfo CloseMethod { get; private set; }
 
         private static readonly object Factory;
-        private static readonly MethodInfo CreateMethod;
+        private static readonly MethodInfo GetMethod;
         private static readonly PropertyInfo ConnectionProperty;
         private static readonly FieldInfo TransactionField;
+        private static readonly FieldInfo InnerConnectionField;
         private static readonly PropertyInfo InnerConnectionProperty;
         private static readonly PropertyInfo InnerTransactionProperty;
         private static readonly object[] NoArgs = new object[0];
@@ -377,28 +378,30 @@ namespace umbraco.DataLayer
         {
             var coreAssembly = Assembly.Load("Umbraco.Core");
 
-            var applicationContextType = coreAssembly.GetType("Umbraco.Core.ApplicationContext");
             var databaseContextType = coreAssembly.GetType("Umbraco.Core.DatabaseContext");
             var defaultDatabaseFactoryType = coreAssembly.GetType("Umbraco.Core.Persistence.DefaultDatabaseFactory");
             var umbracoDatabaseType = coreAssembly.GetType("Umbraco.Core.Persistence.UmbracoDatabase");
-            var databaseType = coreAssembly.GetType("Umbraco.Core.Persistence.Database");
 
-            var currentProperty = applicationContextType.GetProperty("Current", BindingFlags.Static | BindingFlags.Public);
-            var applicationContext = currentProperty.GetValue(null, NoArgs);
+            var nPocoAssembly = Assembly.Load("NPoco");
+            var databaseType = nPocoAssembly.GetType("NPoco.Database");
 
-            var databaseContextProperty = applicationContextType.GetProperty("DatabaseContext", BindingFlags.Instance | BindingFlags.Public);
-            var databaseContext = databaseContextProperty.GetValue(applicationContext, NoArgs);
+            var currentType = coreAssembly.GetType("Umbraco.Core.DI.Current");
+            var databaseContextProperty = currentType.GetProperty("DatabaseContext", BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
+            var databaseContext = databaseContextProperty.GetValue(null);
 
             var factoryField = databaseContextType.GetField("_factory", BindingFlags.Instance | BindingFlags.NonPublic);
             Factory = factoryField.GetValue(databaseContext);
 
-            CreateMethod = defaultDatabaseFactoryType.GetMethod("CreateDatabase", BindingFlags.Instance | BindingFlags.Public);
+            GetMethod = defaultDatabaseFactoryType.GetMethod("GetDatabase", BindingFlags.Instance | BindingFlags.Public);
 
             OpenMethod = databaseType.GetMethod("OpenSharedConnection", BindingFlags.Instance | BindingFlags.Public);
             CloseMethod = databaseType.GetMethod("CloseSharedConnection", BindingFlags.Instance | BindingFlags.Public);
 
             ConnectionProperty = umbracoDatabaseType.GetProperty("Connection", BindingFlags.Instance | BindingFlags.Public);
             TransactionField = databaseType.GetField("_transaction", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var retryDbConnectionType = coreAssembly.GetType("Umbraco.Core.Persistence.FaultHandling.RetryDbConnection");
+            InnerConnectionField = retryDbConnectionType.GetField("_inner", BindingFlags.Instance | BindingFlags.NonPublic);
 
             var profilerAssembly = Assembly.Load("MiniProfiler");
             var profiledDbConnectionType = profilerAssembly.GetType("StackExchange.Profiling.Data.ProfiledDbConnection");
@@ -409,7 +412,7 @@ namespace umbraco.DataLayer
 
         public CurrentConnectionUsing()
         {
-            _database = CreateMethod.Invoke(Factory, NoArgs);
+            _database = GetMethod.Invoke(Factory, NoArgs);
 
             var connection = ConnectionProperty.GetValue(_database, NoArgs);
             // we have to open to make sure that we *do* have a connection
@@ -423,7 +426,8 @@ namespace umbraco.DataLayer
             {
                 var connection = ConnectionProperty.GetValue(_database, NoArgs);
                 if (connection == null) return null;
-                var inner = InnerConnectionProperty.GetValue(connection, NoArgs);
+                var inner = InnerConnectionField.GetValue(connection);
+                inner = InnerConnectionProperty.GetValue(inner, NoArgs);
                 return inner as IDbConnection;
             }
         }

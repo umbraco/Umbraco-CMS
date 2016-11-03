@@ -35,10 +35,10 @@ namespace Umbraco.Core.IO
 
         private ShadowFileSystemsScope(Guid id, ShadowWrapper[] wrappers, ILogger logger)
         {
+            _logger = logger;
             _logger.Debug<ShadowFileSystemsScope>("Shadow " + id + ".");
             _id = id;
             _wrappers = wrappers;
-            _logger = logger;
             foreach (var wrapper in _wrappers)
                 wrapper.Shadow(id);
         }

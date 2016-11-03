@@ -301,6 +301,20 @@ namespace Umbraco.Core.Persistence.Repositories
             else
                 psql.OrderByDescending(dbfield);
 
+            // no matter what we always MUST order the result also by umbracoNode.id to ensure that all records being ordered by are unique.
+            // if we do not do this then we end up with issues where we are ordering by a field that has duplicate values (i.e. the 'text' column
+            // is empty for many nodes)
+            // see: http://issues.umbraco.org/issue/U4-8831
+            dbfield = GetDatabaseFieldNameForOrderBy("umbracoNode", "id");
+            var matches = VersionableRepositoryBaseAliasRegex.For(SqlSyntax).Matches(sql.SQL);
+            var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
+            if (match != null)
+                dbfield = match.Groups[2].Value;
+            psql.OrderBy(dbfield);
+
+            // fixme - temp - for the time being NPoco PagingHelper cannot deal with multiline
+            psql = new Sql<SqlContext>(psql.SqlContext, psql.SQL.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " "), psql.Arguments);
+
             return psql;
         }
 
@@ -364,9 +378,9 @@ namespace Umbraco.Core.Persistence.Repositories
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
             var outerJoinTempTable = $@"LEFT OUTER JOIN (
                     SELECT CASE
-                        WHEN dataInt Is Not Null THEN {sortedInt}
-                        WHEN dataDecimal Is Not Null THEN {sortedDecimal}
-                        WHEN dataDate Is Not Null THEN {sortedDate}
+                        WHEN dataInt IS NOT NULL THEN {sortedInt}
+                        WHEN dataDecimal IS NOT NULL THEN {sortedDecimal}
+                        WHEN dataDate IS NOT NULL THEN {sortedDate}
                         ELSE {sortedString}
                     END AS CustomPropVal,
                     cd.{idField} AS CustomPropValContentId
@@ -374,11 +388,11 @@ namespace Umbraco.Core.Persistence.Repositories
                     INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.{idField}{andVersion}
                     INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
                     WHERE cpt.Alias = @{sql.Arguments.Length}{andNewest}) AS CustomPropData
-                    ON CustomPropData.CustomPropValContentId = umbracoNode.id";
+                    ON CustomPropData.CustomPropValContentId = umbracoNode.id "; // trailing space is important!
 
             // insert this just above the first LEFT OUTER JOIN (for cmsDocument) or the last WHERE (everything else)
             string newSql;
-            if (table == "document")
+            if (table == "cmsDocument")
             {
                 // insert the SQL fragment just above the LEFT OUTER JOIN [cmsDocument] [cmsDocument2] ...
                 // ensure it's there, 'cos, someone's going to edit the query, inevitably!
@@ -402,12 +416,6 @@ namespace Umbraco.Core.Persistence.Repositories
             newSql = newSql.Insert("SELECT ".Length, "CustomPropData.CustomPropVal, ");
 
             sql = new Sql<SqlContext>(sql.SqlContext, newSql, newArgs.ToArray());
-
-            // no matter what we always MUST order the result also by umbracoNode.id to ensure that all records being ordered by are unique.
-            // if we do not do this then we end up with issues where we are ordering by a field that has duplicate values (i.e. the 'text' column
-            // is empty for many nodes)
-            // see: http://issues.umbraco.org/issue/U4-8831
-            sql.OrderBy("umbracoNode.id");
 
             // and order by the custom field
             return "CustomPropData.CustomPropVal";

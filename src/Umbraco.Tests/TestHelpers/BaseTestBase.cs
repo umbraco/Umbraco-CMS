@@ -9,6 +9,7 @@ namespace Umbraco.Tests.TestHelpers
     /// <remarks>
     /// <para>Ensures that Current is properly resetted before and after each test executes.</para>
     /// <para>Defines the SetUp and TearDown methods with proper attributes (not needed on overrides).</para>
+    /// <para>Attributes rules: use [TestFixture] on concrete fixtures only, and don't repeat the [SetUp] and [TearDown] attributes.</para>
     /// </remarks>
     public abstract class BaseTestBase
     {

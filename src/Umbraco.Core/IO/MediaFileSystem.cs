@@ -8,10 +8,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LightInject;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DI;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Media.Exif;
 using Umbraco.Core.Models;
@@ -25,12 +27,7 @@ namespace Umbraco.Core.IO
 	[FileSystemProvider("media")]
 	public class MediaFileSystem : FileSystemWrapper
 	{
-	    private readonly IContentSection _contentConfig;
-	    private readonly ImageHelper _imageHelper;
-        private readonly UploadAutoFillProperties _uploadAutoFillProperties;
-        private readonly IDataTypeService _dataTypeService;
-
-        private readonly object _folderCounterLock = new object();
+	    private readonly object _folderCounterLock = new object();
         private long _folderCounter;
         private bool _folderCounterInitialized;
 
@@ -40,48 +37,30 @@ namespace Umbraco.Core.IO
             { 500, "big-thumb" }
         };
 
-        // FIXME
-        // explain the two ctors
-        // fix the whole mediaHelper, imageHelper, autofill props mess
-        // also
-        // what shannon says: this is an "enhanced filesystem" so it's OK to use it with extra stuff!
-
-        public MediaFileSystem(IFileSystem2 wrapped)
-			: this(wrapped, UmbracoConfig.For.UmbracoSettings().Content)
-		{ }
-
-        public MediaFileSystem(IFileSystem2 wrapped, IContentSection contentConfig) : base(wrapped)
+        public MediaFileSystem(IFileSystem wrapped) 
+            : base(wrapped)
         {
-            _contentConfig = contentConfig;
-            _imageHelper = new ImageHelper(contentConfig); // FIXME inject or KILL
+            // due to how FileSystems is written at the moment, the ctor cannot be used to inject
+            // dependencies, so we have to rely on property injection for anything we might need
+            Current.Container.InjectProperties(this);
+
+            UploadAutoFillProperties = new UploadAutoFillProperties(this, Logger, ContentConfig);
         }
 
-        // note - this is currently experimental / being developed
+        [Inject]
+        internal IContentSection ContentConfig { get; set; }
+
+        [Inject]
+        internal ILogger Logger { get; set; }
+
+        [Inject]
+        internal IDataTypeService DataTypeService { get; set; }
+
+        internal UploadAutoFillProperties UploadAutoFillProperties { get; }
+
+	    // note - this is currently experimental / being developed
         //public static bool UseTheNewMediaPathScheme { get; set; }
         public const bool UseTheNewMediaPathScheme = false;
-
-        // none of the methods below are used in Core anymore
-        // fixme FIX THEM WTF WTF WTF?!
-
-        [Obsolete("This low-level method should NOT exist.")]
-        public string GetRelativePath(int propertyId, string fileName)
-		{
-            var sep = _contentConfig.UploadAllowDirectories
-				? Path.DirectorySeparatorChar
-				: '-';
-
-			return propertyId.ToString(CultureInfo.InvariantCulture) + sep + fileName;
-		}
-
-        [Obsolete("This low-level method should NOT exist.", false)]
-        public string GetRelativePath(string subfolder, string fileName)
-        {
-            var sep = _contentConfig.UploadAllowDirectories
-                ? Path.DirectorySeparatorChar
-                : '-';
-
-            return subfolder + sep + fileName;
-        }
 
         /// <summary>
         /// Deletes all files passed in.
@@ -109,7 +88,7 @@ namespace Umbraco.Core.IO
                     var parentDirectory = Path.GetDirectoryName(relativeFilePath);
 
                     // don't want to delete the media folder if not using directories.
-                    if (_contentConfig.UploadAllowDirectories && parentDirectory != rootRelativePath)
+                    if (ContentConfig.UploadAllowDirectories && parentDirectory != rootRelativePath)
                     {
                         //issue U4-771: if there is a parent directory the recursive parameter should be true
                         DeleteDirectory(parentDirectory, string.IsNullOrEmpty(parentDirectory) == false);
@@ -242,7 +221,7 @@ namespace Umbraco.Core.IO
                         _folderCounter = folderNumber;
                 }
 
-                // note: not multi-domains ie LB safe as another domain could create directories 
+                // note: not multi-domains ie LB safe as another domain could create directories
                 // while we read and parse them - don't fix, move to new scheme eventually
 
                 _folderCounterInitialized = true;
@@ -352,7 +331,7 @@ namespace Umbraco.Core.IO
             var svalue = property.Value as string;
             var oldpath = svalue == null ? null : GetRelativePath(svalue); // FIXME DELETE?
             if (string.IsNullOrWhiteSpace(oldpath) == false && oldpath != filepath)
-                DeleteFile(oldpath);
+                DeleteFile(oldpath, true);
             property.Value = GetUrl(filepath);
             using (var filestream = OpenFile(filepath))
             {
@@ -366,7 +345,7 @@ namespace Umbraco.Core.IO
         {
             // check if file is an image (and supports resizing and thumbnails etc)
             var extension = Path.GetExtension(filepath);
-            var isImage = _imageHelper.IsImageFile(extension);
+            var isImage = IsImageFile(extension);
 
             // specific stuff for images (thumbnails etc)
             if (isImage)
@@ -375,13 +354,13 @@ namespace Umbraco.Core.IO
                 {
                     // use one image for all
                     GenerateThumbnails(image, filepath, property.PropertyType);
-                    _uploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream, image);
+                    UploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream, image);
                 }
             }
             else
             {
                 // will use filepath for extension, and filestream for length
-                _uploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream);
+                UploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream);
             }
         }
 
@@ -398,7 +377,7 @@ namespace Umbraco.Core.IO
         {
             if (extension == null) return false;
             extension = extension.TrimStart('.');
-            return _contentConfig.ImageFileTypes.InvariantContains(extension);
+            return ContentConfig.ImageFileTypes.InvariantContains(extension);
         }
 
         /// <summary>
@@ -442,7 +421,7 @@ namespace Umbraco.Core.IO
                 return new Size(fileWidth, fileHeight);
             }
         }
-        
+
         #endregion
 
         #region Manage thumbnails
@@ -461,7 +440,7 @@ namespace Umbraco.Core.IO
 
         public void DeleteFile(string path, bool deleteThumbnails)
         {
-            DeleteFile(path);
+            base.DeleteFile(path);
 
             if (deleteThumbnails == false)
                 return;
@@ -472,7 +451,7 @@ namespace Umbraco.Core.IO
         public void DeleteThumbnails(string path)
         {
             GetThumbnails(path)
-                .ForEach(DeleteFile);
+                .ForEach(x => base.DeleteFile(x));
         }
 
         public void CopyThumbnails(string sourcePath, string targetPath)
@@ -543,7 +522,7 @@ namespace Umbraco.Core.IO
             // that can be defined in the prevalue for the property data type. otherwise,
             // just use the default sizes.
             var sizes = propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
-                ? _dataTypeService
+                ? DataTypeService
                     .GetPreValuesByDataTypeId(propertyType.DataTypeDefinitionId)
                     .FirstOrDefault()
                 : string.Empty;
