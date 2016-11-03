@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -20,6 +21,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         public bool DisableAlternativeTemplates
         {
             get { return (bool) base["disableAlternativeTemplates"]; }
+        }
+
+        [ConfigurationProperty("disableNotPermittedAlternativeTemplates", DefaultValue = "false")]
+        public bool DisableNotPermittedAlternativeTemplates
+        {
+            get { return (bool)base["disableNotPermittedAlternativeTemplates"]; }
         }
         [ConfigurationProperty("disableFindContentByIdPath", DefaultValue = "false")]
         public bool DisableFindContentByIdPath

@@ -99,6 +99,28 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Determines if AllowedTemplates contains templateId
+        /// </summary>
+        /// <param name="templateId">The template id to check</param>
+        /// <returns>True if AllowedTemplates contains the templateId else False</returns>
+        public bool IsAllowedTemplate(int templateId)
+        {
+            var allowedTemplates = AllowedContentTypes ?? new ContentTypeSort[0];
+            return allowedTemplates.Any(t => t.Id.Value == templateId);
+        }
+
+        /// <summary>
+        /// Determines if AllowedTemplates contains templateId
+        /// </summary>
+        /// <param name="templateAlias">The template alias to check</param>
+        /// <returns>True if AllowedTemplates contains the templateAlias else False</returns>
+        public bool IsAllowedTemplate(string templateAlias)
+        {
+            var allowedTemplates = AllowedContentTypes ?? new ContentTypeSort[0];
+            return allowedTemplates.Any(t => t.Alias.Equals(templateAlias, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        /// <summary>
         /// Sets the default template for the ContentType
         /// </summary>
         /// <param name="template">Default <see cref="ITemplate"/></param>

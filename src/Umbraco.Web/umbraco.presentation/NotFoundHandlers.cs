@@ -281,7 +281,20 @@ namespace umbraco {
                 {
                     _redirectID = int.Parse(urlNode.Attributes.GetNamedItem("id").Value);
 
-                    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false)
+                    var altTemplateAllowed = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false;
+
+                    //Query: Is it worth the overhead of the DB request here? The usage of AltTemplate is checked later.
+                    if (altTemplateAllowed && UmbracoConfig.For.UmbracoSettings().WebRouting.DisableNotPermittedAlternativeTemplates == true)
+                    {
+                        var nodeTypeAlias = urlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
+                        var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(nodeTypeAlias);
+                        if (publishedContentContentType != null)
+                        {
+                            altTemplateAllowed = publishedContentContentType.IsAllowedTemplate(templateAlias);
+                        }
+                    }
+
+                    if (altTemplateAllowed)
                     {
                         HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate] = templateAlias;
                         HttpContext.Current.Trace.Write("umbraco.altTemplateHandler",

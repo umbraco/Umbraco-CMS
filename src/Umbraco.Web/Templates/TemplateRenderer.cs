@@ -80,10 +80,32 @@ namespace Umbraco.Web.Templates
 			
 			//set the doc that was found by id
 			contentRequest.PublishedContent = doc;
-			//set the template, either based on the AltTemplate found or the standard template of the doc
-			contentRequest.TemplateModel = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false
-                ? _umbracoContext.Application.Services.FileService.GetTemplate(doc.TemplateId)
-                : _umbracoContext.Application.Services.FileService.GetTemplate(AltTemplate.Value);
+            //set the template, either based on the AltTemplate found or the standard template of the doc
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false)
+            {
+                contentRequest.TemplateModel = _umbracoContext.Application.Services.FileService.GetTemplate(doc.TemplateId);
+            }
+            else
+            {
+                var template = _umbracoContext.Application.Services.FileService.GetTemplate(AltTemplate.Value);
+                if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableNotPermittedAlternativeTemplates == false)
+                {
+                    contentRequest.TemplateModel = template;
+                }
+                else
+                {
+                    //Check if we're allowed to show the selected template
+                    var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(contentRequest.PublishedContent.DocumentTypeId);
+                    if (publishedContentContentType != null)
+                    {
+                        var isAllowedTemplate = publishedContentContentType.IsAllowedTemplate(template.Id);
+                        if (isAllowedTemplate == true)
+                        {
+                            contentRequest.TemplateModel = template;
+                        }
+                    }
+                }
+            }
 
 			//if there is not template then exit
 			if (!contentRequest.HasTemplate)

@@ -8,6 +8,8 @@
 
         bool DisableAlternativeTemplates { get; }
 
+        bool DisableNotPermittedAlternativeTemplates { get; }
+        
         bool DisableFindContentByIdPath { get; }
 		
         bool DisableRedirectUrlTracking { get; }

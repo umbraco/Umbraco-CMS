@@ -24,6 +24,12 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
+        public void DisableNotPermittedAlternativeTemplates()
+        {
+            Assert.IsTrue(SettingsSection.WebRouting.DisableNotPermittedAlternativeTemplates == false);
+        }
+
+        [Test]
         public void DisableFindContentByIdPath()
         {
             Assert.IsTrue(SettingsSection.WebRouting.DisableFindContentByIdPath == false);

@@ -152,9 +152,10 @@ namespace umbraco
 		public page(XmlNode node)
 		{			
 			populatePageData(node);
-
-		    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false)
+                        
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false)
 		    {
+                var templateSet = false;
                 // Check for alternative template
 		        if (HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate] != null &&
 		            HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString() != String.Empty)
@@ -162,16 +163,29 @@ namespace umbraco
 		            _template =
 		                umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
 		                    HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString());
-		            _elements.Add("template", _template.ToString());
+                    templateSet = true;
 		        }
 		        else if (helper.Request(Constants.Conventions.Url.AltTemplate) != String.Empty)
 		        {
 		            _template =
 		                umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
 		                    helper.Request(Constants.Conventions.Url.AltTemplate).ToLower());
-		            _elements.Add("template", _template.ToString());
+                    templateSet = true;
 		        }
-		    }
+
+                if (templateSet == true && UmbracoConfig.For.UmbracoSettings().WebRouting.DisableNotPermittedAlternativeTemplates == true)
+                {
+                    var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(_nodeTypeAlias);
+                    if (publishedContentContentType != null && publishedContentContentType.IsAllowedTemplate(_template))
+                    {
+                        _elements.Add("template", _template.ToString());
+                    }
+                }
+                else if(templateSet == true)
+                {
+                    _elements.Add("template", _template.ToString());
+                }
+            }
 
 		    if (_template == 0)
 			{
