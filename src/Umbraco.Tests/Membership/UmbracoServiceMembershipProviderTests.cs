@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
                 service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
-                        .Callback((string u, string e, bool a, string p, string m, bool isApproved) =>
+                        .Callback((string u, string e, string p, string m, bool isApproved) =>
                         {
                             createdMember = new Member("test", e, u, p, memberType, isApproved);
                         })
