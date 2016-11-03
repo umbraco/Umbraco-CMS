@@ -145,7 +145,7 @@ namespace Umbraco.Web.Editors
         public MemberListDisplay GetListNodeDisplay(string listName)
         {
             var userTicket = new HttpContextWrapper(HttpContext.Current).GetUmbracoAuthTicket();
-            var user = ApplicationContext.Current.Services.UserService.GetByUsername(userTicket.Name) ?? null;
+            var user = ApplicationContext.Current.Services.UserService.GetByUsername(userTicket.Name);
     
             var display = new MemberListDisplay
             {
