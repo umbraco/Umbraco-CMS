@@ -3,7 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Web.PropertyEditors.ValueConverters
+namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// The upload property value converter.
@@ -72,24 +72,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
         {
-            PropertyCacheLevel returnLevel;
-            switch (cacheValue)
-            {
-                case PropertyCacheValue.Object:
-                    returnLevel = PropertyCacheLevel.ContentCache;
-                    break;
-                case PropertyCacheValue.Source:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                case PropertyCacheValue.XPath:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                default:
-                    returnLevel = PropertyCacheLevel.None;
-                    break;
-            }
-
-            return returnLevel;
+            return PropertyCacheLevel.Content;
         }
 
     }
