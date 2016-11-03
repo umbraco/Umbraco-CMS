@@ -47,6 +47,9 @@
                     <table id="sortableNodes">
                         <thead>
                             <tr>
+                                <% if (Request.QueryString["app"] == "media") { %>
+                                <th></th>
+                                <% } %>
                                 <th style="width: 100%"><%= umbraco.ui.Text("general", "name") %></th>
                                 <th class="nowrap" style="display: <%= HideDateColumn ? "none" : "table-cell" %>;"><%= umbraco.ui.Text("sort", "sortCreationDate") %></th>
                                 <th class="nowrap"><%= umbraco.ui.Text("sort", "sortOrder") %></th>

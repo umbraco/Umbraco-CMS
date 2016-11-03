@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Globalization;
 using System.Linq;
 using System.Web.UI.WebControls;
-using System.Xml;
 using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.BasePages;
-using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.web;
 using System.Web.UI;
 using System.Collections.Generic;
 
@@ -22,11 +15,12 @@ namespace umbraco.cms.presentation
     public partial class sort : UmbracoEnsuredPage
     {
         private readonly List<SortableNode> _nodes = new List<SortableNode>();
+        private readonly UmbracoHelper _umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
 
         protected bool HideDateColumn
         {
             set { ViewState["HideDateColumn"] = value; }
-            get { return ViewState["HideDateColumn"] == null ? false : (bool) ViewState["HideDateColumn"]; }
+            get { return ViewState["HideDateColumn"] == null ? false : (bool)ViewState["HideDateColumn"]; }
         }
 
         protected override void OnInit(EventArgs e)
@@ -62,13 +56,17 @@ namespace umbraco.cms.presentation
                     if (parentId == -1)
                     {
                         foreach (var child in mediaService.GetRootMedia().ToList().OrderBy(x => x.SortOrder))
-                            _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
+                        {
+                            _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, CreateThumbnailUrl(child.Id, icon, child.Name)));
+                        }
                     }
                     else
                     {
                         var children = mediaService.GetChildren(parentId);
                         foreach (var child in children.OrderBy(x => x.SortOrder))
-                            _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
+                        {
+                            _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, CreateThumbnailUrl(child.Id, icon, child.Name)));
+                        }
                     }
                 }
 
@@ -88,8 +86,8 @@ namespace umbraco.cms.presentation
                             _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                 }
-                
-                bindNodesToList(string.Empty);
+
+                bindNodesToList(string.Empty, app);
             }
             else
             {
@@ -101,23 +99,23 @@ namespace umbraco.cms.presentation
                     HideDateColumn = true;
 
                     var stylesheetName = Request.GetItemAsString("ID");
-                    if (stylesheetName.IsNullOrWhiteSpace())throw new NullReferenceException("No Id passed in to editor");
+                    if (stylesheetName.IsNullOrWhiteSpace()) throw new NullReferenceException("No Id passed in to editor");
                     var stylesheet = Services.FileService.GetStylesheetByName(stylesheetName.EnsureEndsWith(".css"));
                     if (stylesheet == null) throw new InvalidOperationException("No stylesheet found by name " + stylesheetName);
 
                     var sort = 0;
                     foreach (var child in stylesheet.Properties)
-                    {                        
+                    {
                         _nodes.Add(CreateNode(child.Name, sort, child.Name, DateTime.Now, icon));
                         sort++;
                     }
-                    
-                    bindNodesToList(string.Empty);
+
+                    bindNodesToList(string.Empty, app);
                 }
             }
         }
 
-        public void bindNodesToList(string sortBy)
+        public void bindNodesToList(string sortBy, string app)
         {
             if (string.IsNullOrEmpty(sortBy) == false)
             {
@@ -134,21 +132,52 @@ namespace umbraco.cms.presentation
 
             foreach (var n in _nodes)
                 lt_nodes.Text += string.Format(
-                    "<tr id='node_{0}'><td>{1}</td><td class='nowrap' style='display:{5};'>{2} {3}</td><td style='text-align: center;'>{4}</td></tr>",
-                    n.id, n.Name, n.createDate.ToShortDateString(), n.createDate.ToShortTimeString(), n.sortOrder, HideDateColumn ? "none" : "table-cell");
+                    "<tr id='node_{0}'>{1}<td>{2}</td><td class='nowrap' style='display:{6};'>{3} {4}</td><td style='text-align: center;'>{5}</td></tr>",
+                    n.id,
+                    app == Constants.Applications.Media ? string.Format("<td style='text-align: center;'>{0}</td>", n.icon, n.Name) : string.Empty,
+                    n.Name,
+                    n.createDate.ToShortDateString(),
+                    n.createDate.ToShortTimeString(),
+                    n.sortOrder,
+                    HideDateColumn ? "none" : "table-cell");
         }
 
         private static SortableNode CreateNode(string id, int sortOrder, string name, DateTime createDateTime, string icon)
         {
             var node = new SortableNode
-                            {
-                                id = id,
-                                sortOrder = sortOrder,
-                                Name = name,
-                                icon = icon,
-                                createDate = createDateTime
-                            };
+            {
+                id = id,
+                sortOrder = sortOrder,
+                Name = name,
+                icon = icon,
+                createDate = createDateTime
+            };
             return node;
+        }
+
+        private string CreateThumbnailUrl(int nodeId, string icon, string altName)
+        {
+            // We can determine what we want to display for different media types
+            var iconOriginal = icon;
+            var typedMedia = _umbracoHelper.TypedMedia(nodeId);
+
+            var mediaType = typedMedia.DocumentTypeAlias;
+            if (mediaType == Constants.Conventions.MediaTypes.Image)
+            {
+                iconOriginal = typedMedia.GetCropUrl(100);
+
+                return string.Format("<img src='{0}' alt='{1}' />", iconOriginal, altName);
+            }
+            else if (mediaType == Constants.Conventions.MediaTypes.File)
+            {
+                return "<i class='icon umb-tree-icon sprTree icon-document'></i>";
+            }
+            else if (mediaType == Constants.Conventions.MediaTypes.Folder)
+            {
+                return "<i class='icon umb-tree-icon sprTree icon-folder'></i>";
+            }
+
+            return "<i class='icon umb-tree-icon sprTree icon-document'></i>";
         }
 
         public struct SortableNode
