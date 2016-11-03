@@ -825,7 +825,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="installStateInstalling">Installing...</key>
     <key alias="installStateRestarting">Restarting, please wait...</key>
     <key alias="installStateComplete">All done, your browser will now refresh, please wait...</key>
-
+    <key alias="installStateCompleted">Please click finish to complete installation and reload page.</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>
