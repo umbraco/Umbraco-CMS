@@ -11,7 +11,7 @@
 			<img ng-if="image.extension === 'svg'" ng-src="{{image.file}}" alt="" />
 
 			<!-- FILE -->
-			<span class="icon-holder" ng-hide="image.thumbnail || image.metaData.umbracoExtension.Value === 'svg' || image.extension === 'svg'">
+			<span class="umb-icon-holder" ng-hide="image.thumbnail || image.metaData.umbracoExtension.Value === 'svg' || image.extension === 'svg'">
 				<i class="icon {{image.icon}} large"></i>
 				<small>{{image.name}}</small>
 			</span>

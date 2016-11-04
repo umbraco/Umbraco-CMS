@@ -135,7 +135,7 @@ namespace Umbraco.Core
 
             try
             {
-                _logger.Debug<MainDom>("Stopping...");
+                _logger.Info<MainDom>("Stopping...");
                 foreach (var callback in _callbacks.Values)
                 {
                     try
@@ -156,7 +156,7 @@ namespace Umbraco.Core
                 // in any case...
                 _isMainDom = false;
                 _asyncLocker.Dispose();
-                _logger.Debug<MainDom>("Released MainDom.");
+                _logger.Info<MainDom>("Released MainDom.");
             }
         }
 
@@ -169,11 +169,11 @@ namespace Umbraco.Core
                 // the handler is not installed so that would be the hosting environment
                 if (_signaled)
                 {
-                    _logger.Debug<MainDom>("Cannot acquire MainDom (signaled).");
+                    _logger.Info<MainDom>("Cannot acquire MainDom (signaled).");
                     return false;
                 }
 
-                _logger.Debug<MainDom>("Acquiring MainDom...");
+                _logger.Info<MainDom>("Acquiring MainDom...");
 
                 // signal other instances that we want the lock, then wait one the lock,
                 // which may timeout, and this is accepted - see comments below
@@ -200,7 +200,7 @@ namespace Umbraco.Core
 
                 HostingEnvironment.RegisterObject(this);
 
-                _logger.Debug<MainDom>("Acquired MainDom.");
+                _logger.Info<MainDom>("Acquired MainDom.");
                 return true;
             }
         }

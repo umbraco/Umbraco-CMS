@@ -389,36 +389,26 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
                 if (contentTypeIds == null)
                 {
-                    var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
                     var subQuery = new Sql()
-                        .Select("DISTINCT cmsContentXml.nodeId")
-                        .From<ContentXmlDto>()
-                        .InnerJoin<NodeDto>()
-                        .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                        .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
+                        .Select("id")
+                        .From<NodeDto>(SqlSyntax)
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
                     var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
                 }
                 else
                 {
-                    foreach (var id in contentTypeIds)
-                    {
-                        var id1 = id;
-                        var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-                        var subQuery = new Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<NodeDto>()
-                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .InnerJoin<ContentDto>()
-                            .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType)
-                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+                    var subQuery = new Sql()
+                        .Select("umbracoNode.id as nodeId")
+                        .From<ContentDto>(SqlSyntax)
+                        .InnerJoin<NodeDto>(SqlSyntax)
+                        .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                        .WhereIn<ContentDto>(dto => dto.ContentTypeId, contentTypeIds, SqlSyntax)
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
-                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        Database.Execute(deleteSql);
-                    }
+                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    Database.Execute(deleteSql);                    
                 }
 
                 //now insert the data, again if something fails here, the whole transaction is reversed

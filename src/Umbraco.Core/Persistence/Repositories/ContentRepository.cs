@@ -183,30 +183,25 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (contentTypeIds == null)
                 {
                     var subQuery = new Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<DocumentDto>()
-                            .On<ContentXmlDto, DocumentDto>(left => left.NodeId, right => right.NodeId);
+                        .Select("id")
+                        .From<NodeDto>(SqlSyntax)
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
                     var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
                 }
                 else
                 {
-                    foreach (var id in contentTypeIds)
-                    {
-                        var id1 = id;
-                        var subQuery = new Sql()
-                            .Select("cmsDocument.nodeId")
-                            .From<DocumentDto>()
-                            .InnerJoin<ContentDto>()
-                            .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<DocumentDto>(dto => dto.Published)
-                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+                    var subQuery = new Sql()
+                        .Select("umbracoNode.id as nodeId")
+                        .From<ContentDto>(SqlSyntax)                        
+                        .InnerJoin<NodeDto>(SqlSyntax)
+                        .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                        .WhereIn<ContentDto>(dto => dto.ContentTypeId, contentTypeIds, SqlSyntax)
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
-                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        Database.Execute(deleteSql);
-                    }
+                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    Database.Execute(deleteSql);
                 }
 
                 //now insert the data, again if something fails here, the whole transaction is reversed
@@ -248,12 +243,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() });
 
                 //bulk insert it into the database
-                Database.BulkInsertRecords(xmlItems, tr);
+                var count = Database.BulkInsertRecords(xmlItems, tr, SqlSyntax);
 
-                processed += xmlItems.Length;
+                processed += count;
 
                 pageIndex++;
             } while (processed < total);
