@@ -215,6 +215,13 @@ namespace Umbraco.Web
 
                                     if (!lengthReached && currentTextLength >= length)
                                     {
+                                        // if the last character added was the first of a two character unicode pair, add the second character
+                                        if (Char.IsHighSurrogate((char)ic))
+                                        {
+                                            var lowSurrogate = tr.Read();
+                                            outputtw.Write((char)lowSurrogate);
+                                        }
+
                                         // Reached truncate limit.
                                         if (addElipsis)
                                         {

@@ -17,6 +17,11 @@ namespace Umbraco.Core.Persistence
             return databaseType is NPoco.DatabaseTypes.SqlServerDatabaseType;
         }
 
+        public static bool IsSqlServer2008OrLater(this DatabaseType databaseType)
+        {
+            return databaseType is NPoco.DatabaseTypes.SqlServer2008DatabaseType;
+        }
+
         public static bool IsSqlCe(this DatabaseType databaseType)
         {
             return databaseType is NPoco.DatabaseTypes.SqlServerCEDatabaseType;

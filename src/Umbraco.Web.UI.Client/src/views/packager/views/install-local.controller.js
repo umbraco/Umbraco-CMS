@@ -34,6 +34,9 @@
                 file: file
             }).progress(function (evt) {
 
+                // set view state to uploading
+                vm.state = 'uploading';
+
                 // calculate progress in percentage
                 var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
 

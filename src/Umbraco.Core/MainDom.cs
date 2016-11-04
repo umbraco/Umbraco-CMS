@@ -95,7 +95,7 @@ namespace Umbraco.Core
         /// <param name="release">An action to execute before the AppDomain releases the main domain status.</param>
         /// <param name="weight">An optional weight (lower goes first).</param>
         /// <returns>A value indicating whether it was possible to register.</returns>
-        /// <remarks>If registering is successful, then the <paramref name="install"/> action 
+        /// <remarks>If registering is successful, then the <paramref name="install"/> action
         /// is guaranteed to execute before the AppDomain releases the main domain status.</remarks>
         public bool Register(Action install, Action release, int weight = 100)
         {
@@ -125,7 +125,7 @@ namespace Umbraco.Core
 
             try
             {
-                _logger.Debug<MainDom>("Stopping.");
+                _logger.Info<MainDom>("Stopping.");
                 foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                 {
                     try
@@ -146,7 +146,7 @@ namespace Umbraco.Core
                 // in any case...
                 _isMainDom = false;
                 _asyncLocker.Dispose();
-                _logger.Debug<MainDom>("Released.");
+                _logger.Info<MainDom>("Released.");
             }
         }
 
@@ -159,11 +159,11 @@ namespace Umbraco.Core
                 // the handler is not installed so that would be the hosting environment
                 if (_signaled)
                 {
-                    _logger.Debug<MainDom>("Cannot acquire (signaled).");
+                    _logger.Info<MainDom>("Cannot acquire (signaled).");
                     return false;
                 }
 
-                _logger.Debug<MainDom>("Acquiring.");
+                _logger.Info<MainDom>("Acquiring.");
 
                 // signal other instances that we want the lock, then wait one the lock,
                 // which may timeout, and this is accepted - see comments below
@@ -190,7 +190,7 @@ namespace Umbraco.Core
 
                 HostingEnvironment.RegisterObject(this);
 
-                _logger.Debug<MainDom>("Acquired.");
+                _logger.Info<MainDom>("Acquired.");
                 return true;
             }
         }

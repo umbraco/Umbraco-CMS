@@ -15,6 +15,11 @@ namespace Umbraco.Tests.IO
     [TestFixture]
     public class ShadowFileSystemTests
     {
+        // tested:
+        // only 1 instance of this class is created
+        // SetUp and TearDown run before/after each test
+        // SetUp does not start before the previous TearDown returns
+
         [SetUp]
         public void SetUp()
         {

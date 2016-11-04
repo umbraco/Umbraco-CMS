@@ -305,7 +305,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // that has been deleted, hence is not in the Examine index anymore (for a good reason). try to get
             // the media from the service, first
             var media = _mediaService.GetById(id);
-            if (media == null) return null; // not found, ok
+            if (media == null || media.Trashed) return null; // not found, ok
 
             // so, the media was not found in Examine's index *yet* it exists, which probably indicates that
             // the index is corrupted. Or not up-to-date. Log a warning, but only once, and only if seeing the

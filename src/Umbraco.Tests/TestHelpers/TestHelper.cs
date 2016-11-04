@@ -205,16 +205,16 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void DeleteDirectory(string path)
         {
-            if (Directory.Exists(path) == false) return;
-
             Try(() =>
             {
+                if (Directory.Exists(path) == false) return;
                 foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
                     File.Delete(file);
             });
 
             Try(() =>
             {
+                if (Directory.Exists(path) == false) return;
                 Directory.Delete(path, true);
             });
         }

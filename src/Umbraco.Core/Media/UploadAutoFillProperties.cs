@@ -138,7 +138,7 @@ namespace Umbraco.Core.Media
                     using (var filestream = _mediaFileSystem.OpenFile(filepath))
                     {
                         var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                        var size = _mediaFileSystem.IsImageFile(extension) ? (Size?)_mediaFileSystem.GetDimensions(filestream) : null;
+                        var size = _mediaFileSystem.IsImageFile(extension) ? (Size?) _mediaFileSystem.GetDimensions(filestream) : null;
                         SetProperties(content, autoFillConfig, size, filestream.Length, extension);
                     }
                 }

@@ -27,7 +27,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                var recommendedValue = _serverVersion >= new Version("7.5.0")
+                // beware! 7.5 and 7.5.0 are not the same thing!
+                var recommendedValue = _serverVersion >= new Version("7.5")
                     ? bool.TrueString.ToLower()
                     : bool.FalseString.ToLower();
                 return new List<AcceptableConfiguration> { new AcceptableConfiguration { IsRecommended =  true, Value = recommendedValue } };
@@ -39,7 +40,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get
             {
                 return TextService.Localize("healthcheck/trySkipIisCustomErrorsCheckSuccessMessage",
-                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, _serverVersion.ToString() });
+                    new[] { Values.First(v => v.IsRecommended).Value, _serverVersion.ToString() });
             }
         }
 

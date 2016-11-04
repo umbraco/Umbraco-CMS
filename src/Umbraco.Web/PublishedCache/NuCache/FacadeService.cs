@@ -1242,7 +1242,7 @@ WHERE cmsContentNu.nodeId IN (
                 }
                 items.AddRange(guids.Select(x => GetDto(repository.GetByVersion(x), true)));
 
-                db.BulkInsertRecords(db.SqlSyntax, items);
+                db.BulkInsertRecords(items);
                 processed += items.Count;
             } while (processed < total);
         }
@@ -1302,7 +1302,7 @@ WHERE cmsContentNu.nodeId IN (
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => GetDto(m, true)).ToArray();
-                db.BulkInsertRecords(db.SqlSyntax, items);
+                db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
         }
@@ -1362,7 +1362,7 @@ WHERE cmsContentNu.nodeId IN (
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => GetDto(m, true)).ToArray();
-                db.BulkInsertRecords(db.SqlSyntax, items);
+                db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
         }

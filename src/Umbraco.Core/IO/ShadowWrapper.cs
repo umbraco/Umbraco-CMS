@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Umbraco.Core.IO
 {
-    public class ShadowWrapper : IFileSystem
+    internal class ShadowWrapper : IFileSystem
     {
         private readonly IFileSystem _innerFileSystem;
         private readonly string _shadowPath;

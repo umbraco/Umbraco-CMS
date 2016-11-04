@@ -304,8 +304,16 @@
     <key alias="selectEditor">Vælg editor</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder. Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
+    <key alias="description"><![CDATA[
+      Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder.<br />Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
+      ]]></key>
     <key alias="displayName">Kulturnavn</key>
+    <key alias="changeKey">Rediger navnet på ordbogselementet.</key>
+    <key alias="changeKeyError">
+      <![CDATA[
+      Navnet '%0%' eksisterer allerede.
+   ]]>
+    </key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>

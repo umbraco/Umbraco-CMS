@@ -63,10 +63,9 @@ namespace Umbraco.Web.PropertyEditors
                 return currentValue;
 
             // get the current file paths
-            var fs = _mediaFileSystem;
             var currentPaths = currentValue.ToString()
                 .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => fs.GetRelativePath(x)) // get the fs-relative path
+                .Select(x => _mediaFileSystem.GetRelativePath(x)) // get the fs-relative path
                 .ToArray();
 
             // if clearing, remove these files and return
@@ -110,9 +109,9 @@ namespace Umbraco.Web.PropertyEditors
 
                 using (var filestream = File.OpenRead(file.TempFilePath))
                 {
-                    fs.AddFile(filepath, filestream, true); // must overwrite!
+                    _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
 
-                    var ext = fs.GetExtension(filepath);
+                    var ext = _mediaFileSystem.GetExtension(filepath);
                     if (_mediaFileSystem.IsImageFile(ext))
                     {
                         var preValues = editorValue.PreValues.FormatAsDictionary();
@@ -137,7 +136,7 @@ namespace Umbraco.Web.PropertyEditors
                 _mediaFileSystem.DeleteFile(pathToRemove, true);
 
 
-            return string.Join(",", newPaths.Select(x => fs.GetUrl(x)));
+            return string.Join(",", newPaths.Select(x => _mediaFileSystem.GetUrl(x)));
         }
     }
 }

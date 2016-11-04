@@ -89,7 +89,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Tabs,
                     expression => expression.ResolveUsing(new MemberTabsAndPropertiesResolver(_textService)))
                 .ForMember(display => display.MemberProviderFieldMapping,
-                    expression => expression.ResolveUsing<MemberProviderFieldMappingResolver>())
+                    expression => expression.ResolveUsing(new MemberProviderFieldMappingResolver()))
                 .ForMember(display => display.MembershipScenario,
                     expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => _memberTypeService))))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
@@ -170,7 +170,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
-                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing<MemberDtoPropertiesValueResolver>());
+                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(new MemberDtoPropertiesValueResolver()));
 
             //FROM IMemberGroup TO MemberGroupDisplay
             config.CreateMap<IMemberGroup, MemberGroupDisplay>()

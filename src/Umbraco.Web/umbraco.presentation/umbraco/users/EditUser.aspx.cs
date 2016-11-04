@@ -22,6 +22,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
+using System.Text.RegularExpressions;
+using System.Text;
+using Umbraco.Core.Security;
 
 namespace umbraco.cms.presentation.user
 {
@@ -35,11 +38,16 @@ namespace umbraco.cms.presentation.user
             CurrentApp = Constants.Applications.Users.ToString();
         }
         protected HtmlTable macroProperties;
-        protected TextBox uname = new TextBox();
-        protected TextBox lname = new TextBox();
+        protected TextBox uname = new TextBox() { ID = "uname" };
+        protected RequiredFieldValidator unameValidator = new RequiredFieldValidator();
+        protected TextBox lname = new TextBox() { ID = "lname" };
+        protected RequiredFieldValidator lnameValidator = new RequiredFieldValidator();
+        protected CustomValidator lnameCustomValidator = new CustomValidator();
         protected PlaceHolder passw = new PlaceHolder();
         protected CheckBoxList lapps = new CheckBoxList();
-        protected TextBox email = new TextBox();
+        protected TextBox email = new TextBox() { ID = "email" };
+        protected RequiredFieldValidator emailValidator = new RequiredFieldValidator();
+        protected CustomValidator emailCustomValidator = new CustomValidator();
         protected DropDownList userType = new DropDownList();
         protected DropDownList userLanguage = new DropDownList();
         protected CheckBox NoConsole = new CheckBox();
@@ -140,8 +148,7 @@ namespace umbraco.cms.presentation.user
                 contentPicker.Value = "-1";
 
             content.Controls.Add(contentPicker);
-
-
+            
             // Add password changer
             var passwordChanger = (passwordChanger)LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider;
@@ -165,10 +172,20 @@ namespace umbraco.cms.presentation.user
             passw.Controls.Add(passwordChanger);
             passw.Controls.Add(validatorContainer);
 
-            pp.addProperty(Services.TextService.Localize("user/username"), uname);
-            pp.addProperty(Services.TextService.Localize("user/loginname"), lname);
+            var validationSummary = new ValidationSummary
+            {
+                ID = "validationSummary",
+                DisplayMode = ValidationSummaryDisplayMode.BulletList,
+                CssClass = "error"
+            };
+
+            pp.addProperty(validationSummary);
+
+            pp.addProperty(Services.TextService.Localize("user/username"), uname, unameValidator);
+            pp.addProperty(Services.TextService.Localize("user/loginname"), lname, lnameValidator, lnameCustomValidator);
             pp.addProperty(Services.TextService.Localize("user/password"), passw);
-            pp.addProperty(Services.TextService.Localize("email"), email);
+
+            pp.addProperty(Services.TextService.Localize("general/email"), email, emailValidator, emailCustomValidator);
             pp.addProperty(Services.TextService.Localize("user/usertype"), userType);
             pp.addProperty(Services.TextService.Localize("user/language"), userLanguage);
 
@@ -205,11 +222,55 @@ namespace umbraco.cms.presentation.user
             save.Text = Services.TextService.Localize("save");
             save.ButtonType = MenuButtonType.Primary;
 
-            sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
+            sectionValidator.ServerValidate += SectionValidator_OnServerValidate;
             sectionValidator.ControlToValidate = lapps.ID;
             sectionValidator.ErrorMessage = Services.TextService.Localize("errorHandling/errorMandatoryWithoutTab", new[] { Services.TextService.Localize("user/modules") });
             sectionValidator.CssClass = "error";
             sectionValidator.Style.Add("color", "red");
+
+            unameValidator.ControlToValidate = uname.ID;
+            unameValidator.Display = ValidatorDisplay.Dynamic;
+            unameValidator.ErrorMessage = Services.TextService.Localize("defaultdialogs/requiredField");
+            unameValidator.CssClass = "error";
+            unameValidator.Style.Add("color", "red");
+            unameValidator.Style.Add("margin-left", "5px");
+            unameValidator.Style.Add("line-height", "28px");
+
+            lnameValidator.ControlToValidate = lname.ID;
+            lnameValidator.Display = ValidatorDisplay.Dynamic;
+            lnameValidator.ErrorMessage = Services.TextService.Localize("defaultdialogs/requiredField");
+            lnameValidator.CssClass = "error";
+            lnameValidator.Style.Add("color", "red");
+            lnameValidator.Style.Add("margin-left", "5px");
+            lnameValidator.Style.Add("line-height", "28px");
+
+            lnameCustomValidator.ServerValidate += LnameCustomValidator_OnServerValidate;
+            lnameCustomValidator.Display = ValidatorDisplay.Dynamic;
+            lnameCustomValidator.ControlToValidate = lname.ID;
+            var localizedLname = Services.TextService.Localize("user/loginname");
+            lnameCustomValidator.ErrorMessage = Services.TextService.Localize("errorHandling/errorExistsWithoutTab", localizedLname);
+            lnameCustomValidator.CssClass = "error";
+            lnameCustomValidator.Style.Add("color", "red");
+            lnameCustomValidator.Style.Add("margin-left", "5px");
+            lnameCustomValidator.Style.Add("line-height", "28px");
+
+            emailValidator.ControlToValidate = email.ID;
+            emailValidator.Display = ValidatorDisplay.Dynamic;
+            emailValidator.ErrorMessage = Services.TextService.Localize("defaultdialogs/requiredField");
+            emailValidator.CssClass = "error";
+            emailValidator.Style.Add("color", "red");
+            emailValidator.Style.Add("margin-left", "5px");
+            emailValidator.Style.Add("line-height", "28px");
+
+            emailCustomValidator.ServerValidate += EmailCustomValidator_OnServerValidate;
+            emailCustomValidator.Display = ValidatorDisplay.Dynamic;
+            emailCustomValidator.ControlToValidate = email.ID;
+            var localizedEmail = Services.TextService.Localize("general/email");
+            emailCustomValidator.ErrorMessage = Services.TextService.Localize("errorHandling/errorRegExpWithoutTab", localizedEmail);
+            emailCustomValidator.CssClass = "error";
+            emailCustomValidator.Style.Add("color", "red");
+            emailCustomValidator.Style.Add("margin-left", "5px");
+            emailCustomValidator.Style.Add("line-height", "28px");
 
             SetupForm();
 
@@ -218,8 +279,18 @@ namespace umbraco.cms.presentation.user
                 .SyncTree(UID.ToString(), false);
         }
 
+        private void LnameCustomValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            var usersWithLoginName = Services.UserService.GetByUsername(lname.Text);
+            args.IsValid = usersWithLoginName == null || usersWithLoginName.Id == u.Id;
+        }
 
-        void sectionValidator_ServerValidate(object source, ServerValidateEventArgs args)
+        private void EmailCustomValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            args.IsValid = MembershipProviderBase.IsEmailValid(email.Text.Trim());
+        }
+
+        private void SectionValidator_OnServerValidate(object source, ServerValidateEventArgs args)
         {
             args.IsValid = false || lapps.SelectedIndex >= 0;
         }
@@ -392,7 +463,9 @@ namespace umbraco.cms.presentation.user
             }
             else
             {
-                ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, Services.TextService.Localize("speechBubbles/editUserError"), "");
+                ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, 
+                    Services.TextService.Localize("speechBubbles/validationFailedHeader"), 
+                    Services.TextService.Localize("speechBubbles/validationFailedMessage"));
             }
         }
 

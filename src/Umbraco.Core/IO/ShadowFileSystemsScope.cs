@@ -5,7 +5,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
-    public class ShadowFileSystemsScope : IDisposable
+    internal class ShadowFileSystemsScope : ICompletable
     {
         // note: taking a reference to the _manager instead of using manager.Current
         // to avoid using Current everywhere but really, we support only 1 scope at

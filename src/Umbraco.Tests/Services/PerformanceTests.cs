@@ -200,7 +200,7 @@ namespace Umbraco.Tests.Services
 
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
-                    DatabaseContext.Database.BulkInsertRecordsWithTransaction(SqlSyntax, xmlItems);
+                    DatabaseContext.Database.BulkInsertRecordsWithTransaction(xmlItems);
                 }
             }
 
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Services
                                                     INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
 
-                        DatabaseContext.Database.BulkInsertRecords(SqlSyntax, xmlItems);
+                        DatabaseContext.Database.BulkInsertRecords(xmlItems);
 
                         tr.Complete();
                     }
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.Services
                     Path = ""
                 });
             }
-            DatabaseContext.Database.BulkInsertRecordsWithTransaction(SqlSyntax, nodes);
+            DatabaseContext.Database.BulkInsertRecordsWithTransaction(nodes);
 
             //re-get the nodes with ids
             var sql = DatabaseContext.Database.Sql();
@@ -299,11 +299,11 @@ namespace Umbraco.Tests.Services
             //create the cmsContent data, each with a new content type id (so we can query on it later if needed)
             var contentTypeId = 0;
             var cmsContentItems = nodes.Select(node => new ContentDto { NodeId = node.NodeId, ContentTypeId = contentTypeId++ }).ToList();
-            DatabaseContext.Database.BulkInsertRecordsWithTransaction(SqlSyntax, cmsContentItems);
+            DatabaseContext.Database.BulkInsertRecordsWithTransaction(cmsContentItems);
 
             //create the xml data
             var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = TestXmlStructure }).ToList();
-            DatabaseContext.Database.BulkInsertRecordsWithTransaction(SqlSyntax, xmlItems);
+            DatabaseContext.Database.BulkInsertRecordsWithTransaction(xmlItems);
 
             return nodes;
         }

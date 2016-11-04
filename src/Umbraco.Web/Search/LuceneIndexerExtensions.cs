@@ -5,6 +5,8 @@ using Examine.LuceneEngine.Providers;
 using Examine.Providers;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
+using Lucene.Net.Store;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Search
 {
@@ -21,12 +23,20 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexDocumentCount(this LuceneIndexer indexer)
         {
-            var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
-            if (searcher == null) return 0;
-            using (searcher)
-            using (var reader = searcher.IndexReader)
+            try
             {
-                return reader.NumDocs();
+                var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
+                if (searcher == null) return 0;
+                using (searcher)
+                using (var reader = searcher.IndexReader)
+                {
+                    return reader.NumDocs();
+                }
+            }
+            catch (AlreadyClosedException)
+            {
+                Current.Logger.Warn(typeof(ExamineExtensions), "Cannot get GetIndexDocumentCount, the writer is already closed");
+                return 0;
             }
         }
 
@@ -37,12 +47,22 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexFieldCount(this LuceneIndexer indexer)
         {
-            var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
-            if (searcher == null) return 0;
-            using (searcher)
-            using (var reader = searcher.IndexReader)
+            //TODO: check for closing! and AlreadyClosedException
+
+            try
             {
-                return reader.GetFieldNames(IndexReader.FieldOption.ALL).Count;
+                var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
+                if (searcher == null) return 0;
+                using (searcher)
+                using (var reader = searcher.IndexReader)
+                {
+                    return reader.GetFieldNames(IndexReader.FieldOption.ALL).Count;
+                }
+            }
+            catch (AlreadyClosedException)
+            {
+                Current.Logger.Warn(typeof(ExamineExtensions), "Cannot get GetIndexFieldCount, the writer is already closed");
+                return 0;
             }
         }
 
@@ -53,12 +73,20 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static bool IsIndexOptimized(this LuceneIndexer indexer)
         {
-            var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
-            if (searcher == null) return true;
-            using (searcher)
-            using (var reader = searcher.IndexReader)
+            try
             {
-                return reader.IsOptimized();
+                var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
+                if (searcher == null) return true;
+                using (searcher)
+                using (var reader = searcher.IndexReader)
+                {
+                    return reader.IsOptimized();
+                }
+            }
+            catch (AlreadyClosedException)
+            {
+                Current.Logger.Warn(typeof(ExamineExtensions), "Cannot get IsIndexOptimized, the writer is already closed");
+                return false;
             }
         }
 
@@ -83,12 +111,20 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetDeletedDocumentsCount(this LuceneIndexer indexer)
         {
-            var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
-            if (searcher == null) return 0;
-            using (searcher)
-            using (var reader = searcher.IndexReader)
+            try
             {
-                return reader.NumDeletedDocs;
+                var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
+                if (searcher == null) return 0;
+                using (searcher)
+                using (var reader = searcher.IndexReader)
+                {
+                    return reader.NumDeletedDocs;
+                }
+            }
+            catch (AlreadyClosedException)
+            {
+                Current.Logger.Warn(typeof(ExamineExtensions), "Cannot get GetDeletedDocumentsCount, the writer is already closed");
+                return 0;
             }
         }
     }

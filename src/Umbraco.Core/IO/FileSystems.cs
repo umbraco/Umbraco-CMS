@@ -195,7 +195,7 @@ namespace Umbraco.Core.IO
         //    _shadowEnabled = true;
         //}
 
-        public ShadowFileSystemsScope Shadow(Guid id)
+        public ICompletable Shadow(Guid id)
         {
             var typed = _wrappers.ToArray();
             var wrappers = new ShadowWrapper[typed.Length + 7];

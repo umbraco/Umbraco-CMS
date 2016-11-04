@@ -145,7 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            _unitOfWork.Database.BulkInsertRecords(SqlSyntax, toInsert);
+            db.BulkInsertRecords(toInsert);
 
             //Raise the event
             AssignedPermissions.RaiseEvent(
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 UserId = userId
             }).ToArray();
 
-            _unitOfWork.Database.BulkInsertRecords(SqlSyntax, actions);
+            db.BulkInsertRecords(actions);
 
             //Raise the event
             AssignedPermissions.RaiseEvent(
@@ -209,7 +209,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 UserId = id
             }).ToArray();
 
-            _unitOfWork.Database.BulkInsertRecords(SqlSyntax, actions);
+            db.BulkInsertRecords(actions);
 
             //Raise the event
             AssignedPermissions.RaiseEvent(
@@ -237,7 +237,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 UserId = p.UserId
             }).ToArray();
 
-            _unitOfWork.Database.BulkInsertRecords(SqlSyntax, actions);
+            db.BulkInsertRecords(actions);
 
             //Raise the event
             AssignedPermissions.RaiseEvent(

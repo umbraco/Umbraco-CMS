@@ -288,7 +288,6 @@
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Macros\XsltExtensionCollection.cs" />
     <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
-    <Compile Include="Media\ImageExtensions.cs" />
     <Compile Include="Models\DictionaryItemExtensions.cs" />
     <Compile Include="Models\PublishedContent\IPublishedFragment.cs" />
     <Compile Include="Models\PublishedContent\NoopPublishedContentModelFactory.cs" />
@@ -306,6 +305,7 @@
     <Compile Include="Persistence\ThreadStaticUmbracoDatabaseAccessor.cs" />
     <Compile Include="Plugins\HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
+    <Compile Include="ICompletable.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="IO\ShadowFileSystem.cs" />
     <Compile Include="IO\ShadowFileSystemsScope.cs" />
@@ -324,6 +324,7 @@
     <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Mandate.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
+    <Compile Include="Media\ImageExtensions.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
@@ -384,6 +385,7 @@
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
+    <Compile Include="Persistence\BulkDataReader.cs" />
     <Compile Include="SafeCallContext.cs" />
     <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
     <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
@@ -439,6 +441,7 @@
     <Compile Include="Media\Exif\TIFFStrip.cs" />
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeOne\UpdateUserLanguagesToIsoCode.cs" />
+    <Compile Include="Persistence\PocoDataDataReader.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
