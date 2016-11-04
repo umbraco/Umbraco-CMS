@@ -138,6 +138,8 @@ namespace Umbraco.Core.Persistence.FaultHandling
             _cmdRetryPolicy = cmdRetryPolicy ?? RetryPolicy.NoRetry;
         }
 
+        public DbCommand Inner => _inner;
+
         protected override void Dispose(bool disposing)
         {
             if (disposing && _inner != null)

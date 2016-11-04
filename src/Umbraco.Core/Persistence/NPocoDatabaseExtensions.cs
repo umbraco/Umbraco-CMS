@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NPoco;
 using StackExchange.Profiling.Data;
+using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -199,9 +200,11 @@ namespace Umbraco.Core.Persistence
 
             if (database.DatabaseType.IsSqlCe())
             {
-                return useNativeBulkInsert
-                    ? BulkInsertRecordsSqlCe(database, pocoData, recordsA)
-                    : BulkInsertRecordsWithCommands(database, recordsA);
+                if (useNativeBulkInsert) return BulkInsertRecordsSqlCe(database, pocoData, recordsA);
+                // else, no other choice
+                foreach (var record in recordsA)
+                    database.Insert(record);
+                return recordsA.Length;
             }
 
             if (database.DatabaseType.IsSqlServer())
@@ -318,34 +321,33 @@ namespace Umbraco.Core.Persistence
             using (var command = database.CreateCommand(database.Connection, CommandType.TableDirect, string.Empty))
             {
                 command.CommandText = pocoData.TableInfo.TableName;
+                command.CommandType = CommandType.TableDirect; // fixme - why repeat?
                 // fixme - not supporting transactions?
                 //cmd.Transaction = GetTypedTransaction<SqlCeTransaction>(db.Connection.);
 
-                // fixme - why the double 'using' here?
                 var count = 0;
-                using (var tCommand = GetTypedCommand<SqlCeCommand>(command)) // execute on the real command
-                {
-                    // seems to cause problems, I think this is primarily used for retrieval, not inserting.
-                    // see: https://msdn.microsoft.com/en-us/library/system.data.sqlserverce.sqlcecommand.indexname%28v=vs.100%29.aspx?f=255&MSPPError=-2147217396
-                    //sqlCeCommand.IndexName = pd.TableInfo.PrimaryKey;
+                var tCommand = GetTypedCommand<SqlCeCommand>(command); // execute on the real command
 
-                    using (var resultSet = tCommand.ExecuteResultSet(ResultSetOptions.Updatable))
+                // seems to cause problems, I think this is primarily used for retrieval, not inserting.
+                // see: https://msdn.microsoft.com/en-us/library/system.data.sqlserverce.sqlcecommand.indexname%28v=vs.100%29.aspx?f=255&MSPPError=-2147217396
+                //tCommand.IndexName = pd.TableInfo.PrimaryKey;
+
+                using (var resultSet = tCommand.ExecuteResultSet(ResultSetOptions.Updatable))
+                {
+                    var updatableRecord = resultSet.CreateRecord();
+                    foreach (var record in records)
                     {
-                        var updatableRecord = resultSet.CreateRecord();
-                        foreach (var record in records)
+                        for (var i = 0; i < columns.Length; i++)
                         {
-                            for (var i = 0; i < columns.Length; i++)
+                            // skip the index if this shouldn't be included (i.e. PK)
+                            if (IncludeColumn(pocoData, columns[i]))
                             {
-                                // skip the index if this shouldn't be included (i.e. PK)
-                                if (IncludeColumn(pocoData, columns[i]))
-                                {
-                                    var val = columns[i].Value.GetValue(record);
-                                    updatableRecord.SetValue(i, val);
-                                }
+                                var val = columns[i].Value.GetValue(record);
+                                updatableRecord.SetValue(i, val);
                             }
-                            resultSet.Insert(updatableRecord);
-                            count++;
                         }
+                        resultSet.Insert(updatableRecord);
+                        count++;
                     }
                 }
 
@@ -420,8 +422,11 @@ namespace Umbraco.Core.Persistence
         private static TCommand GetTypedCommand<TCommand>(IDbCommand command)
             where TCommand : class, IDbCommand
         {
+            var faultHandling = command as FaultHandlingDbCommand;
+            if (faultHandling != null) command = faultHandling.Inner;
             var profiled = command as ProfiledDbCommand;
-            return profiled == null ? command as TCommand : profiled.InternalCommand as TCommand;
+            if (profiled != null) command = profiled.InternalCommand;
+            return command as TCommand;
         }
 
         public static void TruncateTable(this IDatabase db, ISqlSyntaxProvider sqlSyntax, string tableName)
