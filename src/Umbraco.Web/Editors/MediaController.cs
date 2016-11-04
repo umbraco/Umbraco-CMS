@@ -531,16 +531,16 @@ namespace Umbraco.Web.Editors
                 {
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
-                    if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
+                    if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.Image)
                     {
-                        if (result.FormData.ContainsKey("contentTypeAlias"))
-                        {
-                            mediaType = result.FormData["contentTypeAlias"];
-                        }
-                        else
+                        if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }
+                    }
+                    else
+                    {
+                        mediaType = result.FormData["contentTypeAlias"];
                     }
 
                     //TODO: make the media item name "nice" since file names could be pretty ugly, we have
