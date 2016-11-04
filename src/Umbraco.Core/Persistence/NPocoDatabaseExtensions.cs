@@ -267,7 +267,7 @@ namespace Umbraco.Core.Persistence
                     .Skip(commandIndex * rowsPerCommand)
                     .Take(rowsPerCommand);
 
-                var cmd = db.CreateCommand(connection, "");
+                var cmd = db.CreateCommand(connection, CommandType.Text,  "");
                 var prefix = db.DatabaseType.GetParameterPrefix(cmd.Connection.ConnectionString);
                 var pocoValues = new List<string>();
                 var index = 0;

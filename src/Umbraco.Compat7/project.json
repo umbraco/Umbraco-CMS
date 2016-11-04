@@ -1,12 +1,12 @@
 ﻿{
-    "dependencies": {
-        "LightInject": "4.1.1"
-    },
-    "frameworks": {
-        "net461": { }
-    },
-    "runtimes": {
-        "win": { },
-        "win-anycpu": { }
-    }
+  "dependencies": {
+    "LightInject": "4.1.3"
+  },
+  "frameworks": {
+    "net461": {}
+  },
+  "runtimes": {
+    "win": {},
+    "win-anycpu": {}
+  }
 }

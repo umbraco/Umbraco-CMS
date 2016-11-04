@@ -76,12 +76,12 @@ namespace Umbraco.Core.Logging
         /// Starts a new MiniProfiler.
         /// </summary>
         /// <remarks>
-        /// <para>This is called when WebProfiler calls MiniProfiler.Start() so, 
+        /// <para>This is called when WebProfiler calls MiniProfiler.Start() so,
         /// - as a result of WebRuntime starting the WebProfiler, and
         /// - assuming profiling is enabled, on every BeginRequest that should be profiled,
         /// - except for the very first one which is the boot request.</para>
         /// </remarks>
-        public override MiniProfiler Start(string sessionName)
+        public override MiniProfiler Start(string sessionName = null)
         {
             var first = Interlocked.Exchange(ref _first, 1) == 0;
             if (first == false) return base.Start(sessionName);
@@ -89,6 +89,12 @@ namespace Umbraco.Core.Logging
             _startupProfiler = new MiniProfiler("http://localhost/umbraco-startup") { Name = "StartupProfiler" };
             SetProfilerActive(_startupProfiler);
             return _startupProfiler;
+        }
+
+        // obsolete but that's the one that's called ;-(
+        public override MiniProfiler Start(ProfileLevel level, string sessionName = null)
+        {
+            return Start(sessionName);
         }
 
         /// <summary>
