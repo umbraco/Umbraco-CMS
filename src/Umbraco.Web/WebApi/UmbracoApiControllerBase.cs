@@ -69,7 +69,7 @@ namespace Umbraco.Web.WebApi
         /// Gets or sets the runtime state.
         /// </summary>
         [Inject]
-        internal RuntimeState RuntimeState { get; set; }
+        internal IRuntimeState RuntimeState { get; set; }
 
         /// <summary>
         /// Gets the application url.
