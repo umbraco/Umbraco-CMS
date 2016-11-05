@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core.Configuration;
@@ -11,8 +10,6 @@ using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Services;
-using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -358,9 +355,45 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override IPublishedContent GetById(bool preview, Guid nodeId)
         {
-            // todo - implement in a more efficient way
-            const string xpath = "//* [@isDoc and @key=$guid]";
-            return GetSingleByXPath(preview, xpath, new [] { new XPathVariable("guid", nodeId.ToString()) });
+            // implement this, but in a more efficient way
+            //const string xpath = "//* [@isDoc and @key=$guid]";
+            //return GetSingleByXPath(preview, xpath, new[] { new XPathVariable("guid", nodeId.ToString()) });
+
+            var keyMatch = nodeId.ToString();
+
+            var nav = GetXml(preview).CreateNavigator();
+            if (nav.MoveToFirstChild() == false) return null; // from / to /root
+            if (nav.MoveToFirstChild() == false) return null; // from /root to /root/*
+
+            while (true)
+            {
+                var isDoc = false;
+                string key = null;
+
+                if (nav.HasAttributes)
+                {
+                    nav.MoveToFirstAttribute();
+                    do
+                    {
+                        if (nav.Name == "isDoc") isDoc = true;
+                        if (nav.Name == "key") key = nav.Value;
+                        if (isDoc && key != null) break;
+                    } while (nav.MoveToNextAttribute());
+                    nav.MoveToParent();
+                }
+
+                if (isDoc == false || key != keyMatch)
+                {
+                    if (isDoc && nav.MoveToFirstChild())
+                        continue;
+                    while (nav.MoveToNext(XPathNodeType.Element) == false)
+                        if (nav.MoveToParent() == false || nav.NodeType == XPathNodeType.Root) return null;
+                    continue;
+                }
+
+                var elt = nav.UnderlyingObject as XmlNode;
+                return ConvertToDocument(elt, preview);
+            }
         }
 
         public override bool HasById(bool preview, int contentId)

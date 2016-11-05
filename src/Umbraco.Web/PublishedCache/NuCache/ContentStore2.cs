@@ -180,7 +180,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _localDb = null;
             });
         }
-        
+
         #endregion
 
         #region Content types
@@ -295,7 +295,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // unknown = bad
             if (_contentTypesById.TryGetValue(kit.ContentTypeId, out link) == false || link.Value == null)
                 return false;
-            
+
             // not checking ByAlias, assuming we don't have internal errors
 
             // register
@@ -560,7 +560,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // already in the dict
                 if (link.Gen != _liveGen)
                 {
-                    // for an older gen - if value is different then insert a new 
+                    // for an older gen - if value is different then insert a new
                     // link for the new gen, with the new value
                     if (link.Value != value)
                         dict.TryUpdate(key, new LinkedNode<TValue>(value, _liveGen, link), link);
@@ -619,7 +619,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         break;
                     link = link.Next;
                 }
-                if (link != null && link.Value != null)
+                if (link?.Value != null)
                     yield return Get(kvp.Key, gen);
             }
         }
@@ -636,6 +636,27 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 link = link.Next;
             }
             return null;
+        }
+
+        public IEnumerable<ContentNode> GetAll(long gen)
+        {
+            // enumerating on .Values locks the concurrent dictionary,
+            // so better get a shallow clone in an array and release
+            var links = _contentNodes.Values.ToArray();
+            foreach (var l in links)
+            {
+                var link = l;
+                while (link != null)
+                {
+                    if (link.Gen <= gen)
+                    {
+                        if (link.Value != null)
+                            yield return link.Value;
+                        break;
+                    }
+                    link = link.Next;
+                }
+            }
         }
 
         public bool IsEmpty(long gen)
@@ -737,7 +758,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (_collectTask != null)
                 return _collectTask;
-            
+
             // ReSharper disable InconsistentlySynchronizedField
             var task = _collectTask = Task.Run(() => Collect());
             _collectTask.ContinueWith(_ =>
@@ -795,7 +816,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
 #if DEBUG
                 //_logger.Debug<ContentStore2>("Collect id:" + kvp.Key + ", gen:" + link.Gen +
-                //    ", nxt:" + (link.Next == null ? "null" : "link") + 
+                //    ", nxt:" + (link.Next == null ? "null" : "link") +
                 //    ", val:" + (link.Value == null ? "null" : "value"));
 #endif
 
@@ -807,7 +828,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (link.Gen < liveGen && link.Value == null
                     && (link.Next == null || link.Gen <= _floorGen))
                 {
-                    // not live, null value, no next link = remove that one -- but only if 
+                    // not live, null value, no next link = remove that one -- but only if
                     // the dict has not been updated, have to do it via ICollection<> (thanks
                     // Mr Toub) -- and if the dict has been updated there is nothing to collect
                     var idict = dict as ICollection<KeyValuePair<TKey, LinkedNode<TValue>>>;
@@ -891,7 +912,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         internal TestHelper Test { get { return _unitTesting ?? (_unitTesting = new TestHelper(this)); } }
-        
+
         #endregion
 
         #region Classes
@@ -951,6 +972,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return _store.Get(id, _gen);
             }
 
+            public ContentNode Get(Guid id)
+            {
+                if (_gen < 0)
+                    throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
+                // fixme - optimize with an index - getAll/iterating is expensive
+                return _store.GetAll(_gen).FirstOrDefault(x => x.Uid == id);
+            }
+
             public IEnumerable<ContentNode> GetAtRoot()
             {
                 if (_gen < 0)
@@ -971,6 +1000,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
                 return _store.GetContentType(alias, _gen);
             }
+
+            // this code is here just so you don't try to implement it
+            // the only way we can iterate over "all" without locking the entire cache forever
+            // is by shallow cloning the cache, which is quite expensive, so we should probably not do it,
+            // and implement cache-level indexes
+            //public IEnumerable<ContentNode> GetAll()
+            //{
+            //    if (_gen < 0)
+            //        throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
+            //    return _store.GetAll(_gen);
+            //}
 
             public bool IsEmpty
             {

@@ -670,7 +670,7 @@ namespace Umbraco.Web
             int intId;
             if (ConvertIdObjectToInt(id, out intId))
                 return ContentQuery.Media(intId);
-            Guid guidId;
+            //Guid guidId;
             //if (ConvertIdObjectToGuid(id, out guidId))
             //    return ContentQuery.Media(guidId);
             return null;

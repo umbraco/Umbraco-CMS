@@ -21,9 +21,9 @@ namespace Umbraco.Web
         IEnumerable<IPublishedContent> ContentAtRoot();
 
         IPublishedContent Media(int id);
-        //IPublishedContent Media(Guid id);
+        IPublishedContent Media(Guid id);
         IEnumerable<IPublishedContent> Media(IEnumerable<int> ids);
-        //IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids);
+        IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids);
         IEnumerable<IPublishedContent> MediaAtRoot();
 
         /// <summary>

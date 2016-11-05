@@ -72,6 +72,8 @@ namespace Umbraco.Tests.PublishedContent
             base.MoreSetUp();
 	    }
 
+        private readonly Guid _node1173Guid = Guid.NewGuid();
+
 	    protected override string GetXmlContent(int templateId)
 		{
 			return @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -87,7 +89,7 @@ namespace Umbraco.Tests.PublishedContent
 		<umbracoUrlAlias><![CDATA[this/is/my/alias, anotheralias]]></umbracoUrlAlias>
 		<umbracoNaviHide>1</umbracoNaviHide>
 		<testRecursive><![CDATA[This is the recursive val]]></testRecursive>
-		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
+		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""" key=""" + _node1173Guid + @""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
 			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>
 			<testRecursive><![CDATA[]]></testRecursive>
@@ -121,6 +123,23 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsNotNull(doc);
 			return doc;
 		}
+
+	    [Test]
+	    public void GetNodeByIds()
+	    {
+            var ctx = GetUmbracoContext("/test");
+            var contentById = ctx.ContentCache.GetById(1173);
+            Assert.IsNotNull(contentById);
+            var contentByGuid = ctx.ContentCache.GetById(_node1173Guid);
+            Assert.IsNotNull(contentByGuid);
+            Assert.AreEqual(contentById.Id, contentByGuid.Id);
+            Assert.AreEqual(contentById.Key, contentByGuid.Key);
+
+            contentById = ctx.ContentCache.GetById(666);
+            Assert.IsNull(contentById);
+            contentByGuid = ctx.ContentCache.GetById(Guid.NewGuid());
+            Assert.IsNull(contentByGuid);
+        }
 
         [Test]
         public void Is_Last_From_Where_Filter_Dynamic_Linq()

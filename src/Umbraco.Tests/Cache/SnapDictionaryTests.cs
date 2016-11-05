@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Web.PublishedCache.NuCache;
 
@@ -448,7 +449,7 @@ namespace Umbraco.Tests.Cache
 
             Assert.AreEqual(3, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
-        
+
             Assert.AreEqual(3, d.SnapCount);
 
             s1.Dispose();
@@ -705,6 +706,39 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(3, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
             Assert.AreEqual("ein", s4.Get(1));
+        }
+
+        [Test]
+        public void GetAll()
+        {
+            var d = new SnapDictionary<int, string>();
+            d.Test.CollectAuto = false;
+
+            Assert.AreEqual(0, d.Test.GetValues(1).Length);
+
+            d.Set(1, "one");
+            d.Set(2, "two");
+            d.Set(3, "three");
+            d.Set(4, "four");
+
+            var s1 = d.CreateSnapshot();
+            var all = s1.GetAll().ToArray();
+            Assert.AreEqual(4, all.Length);
+            Assert.AreEqual("one", all[0]);
+            Assert.AreEqual("four", all[3]);
+
+            d.Set(1, "uno");
+            var s2 = d.CreateSnapshot();
+
+            all = s1.GetAll().ToArray();
+            Assert.AreEqual(4, all.Length);
+            Assert.AreEqual("one", all[0]);
+            Assert.AreEqual("four", all[3]);
+
+            all = s2.GetAll().ToArray();
+            Assert.AreEqual(4, all.Length);
+            Assert.AreEqual("uno", all[0]);
+            Assert.AreEqual("four", all[3]);
         }
     }
 }

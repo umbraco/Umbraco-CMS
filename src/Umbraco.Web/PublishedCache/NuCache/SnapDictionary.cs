@@ -252,16 +252,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // enumerating on .Values locks the concurrent dictionary,
             // so better get a shallow clone in an array and release
             var links = _items.Values.ToArray();
-            return links.Select(link =>
+            foreach (var l in links)
             {
+                var link = l;
                 while (link != null)
                 {
                     if (link.Gen <= gen)
-                        return link.Value; // may be null
+                    {
+                        if (link.Value != null)
+                            yield return link.Value;
+                        break;
+                    }
                     link = link.Next;
                 }
-                return null;
-            }).Where(x => x != null);
+            }
         }
 
         public bool IsEmpty(long gen)

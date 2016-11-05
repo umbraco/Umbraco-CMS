@@ -15,7 +15,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
+    internal class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
     {
         private readonly ContentStore2.Snapshot _snapshot;
         private readonly ICacheProvider _facadeCache;
@@ -209,11 +209,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 : n.Published;
         }
 
-        public override IPublishedContent GetById(bool preview, Guid nodeId)
+        public override IPublishedContent GetById(bool preview, Guid contentId)
         {
-            // fixme - implement in a more efficient way
-            const string xpath = "//* [@isDoc and @key=$guid]";
-            return GetSingleByXPath(preview, xpath, new[] { new XPathVariable("guid", nodeId.ToString()) });
+            var n = _snapshot.Get(contentId);
+            if (n == null) return null;
+
+            // both .Draft and .Published cannot be null at the same time
+            return preview
+                ? n.Draft ?? GetPublishedContentAsPreviewing(n.Published)
+                : n.Published;
         }
 
         public override bool HasById(bool preview, int contentId)

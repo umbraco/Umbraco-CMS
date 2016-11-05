@@ -110,7 +110,21 @@ namespace Umbraco.Web
                 : _query.Media(id);
         }
 
+        public IPublishedContent Media(Guid id)
+        {
+            return _query == null
+                ? ItemById(id, _mediaCache)
+                : _query.Media(id);
+        }
+
         public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
+        {
+            return _query == null
+                ? ItemsByIds(_mediaCache, ids)
+                : _query.Media(ids);
+        }
+
+        public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids)
         {
             return _query == null
                 ? ItemsByIds(_mediaCache, ids)

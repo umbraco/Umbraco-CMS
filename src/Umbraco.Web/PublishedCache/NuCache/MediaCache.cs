@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Core.Xml.XPath;
@@ -12,7 +10,7 @@ using Umbraco.Web.PublishedCache.NuCache.Navigable;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
+    internal class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
     {
         private readonly ContentStore2.Snapshot _snapshot;
         private readonly ICacheProvider _facadeCache;
@@ -40,9 +38,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override IPublishedContent GetById(bool preview, Guid contentId)
         {
-            // fixme - test + implement in a more efficient way
-            const string xpath = "//* [@isDoc and @key=$guid]";
-            return GetSingleByXPath(preview, xpath, new[] { new XPathVariable("guid", contentId.ToString()) });
+            var n = _snapshot.Get(contentId);
+            return n?.Published;
         }
 
         public override bool HasById(bool preview, int contentId)
