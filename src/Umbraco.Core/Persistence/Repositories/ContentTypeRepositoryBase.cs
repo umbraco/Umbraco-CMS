@@ -257,42 +257,41 @@ AND umbracoNode.id <> @id",
             Database.Update(nodeDto);
 
             // we NEED this: updating, so the .PrimaryKey already exists, but the entity does
-            // not carry it and therefore the dto does not have it yet - must get it from db
-            //Look up ContentType entry to get PrimaryKey for updating the DTO
-            var dtoPk = Database.First<ContentTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            // not carry it and therefore the dto does not have it yet - must get it from db,
+            // look up ContentType entry to get PrimaryKey for updating the DTO
+            var dtoPk = Database.First<ContentTypeDto>("WHERE nodeId = @Id", new { entity.Id });
             dto.PrimaryKey = dtoPk.PrimaryKey;
             Database.Update(dto);
 
             // handle (delete then recreate) compositions
-            Database.Delete<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { Id = entity.Id });
+            Database.Delete<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { entity.Id });
             foreach (var composition in entity.ContentTypeComposition)
                 Database.Insert(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
 
-            //Removing a ContentType from a composition (U4-1690)
-            //1. Find content based on the current ContentType: entity.Id
-            //2. Find all PropertyTypes on the ContentType that was removed - tracked id (key)
-            //3. Remove properties based on property types from the removed content type where the content ids correspond to those found in step one
+            // removing a ContentType from a composition (U4-1690)
+            // 1. Find content based on the current ContentType: entity.Id
+            // 2. Find all PropertyTypes on the ContentType that was removed - tracked id (key)
+            // 3. Remove properties based on property types from the removed content type where the content ids correspond to those found in step one
             var compositionBase = entity as ContentTypeCompositionBase;
             if (compositionBase != null && compositionBase.RemovedContentTypeKeyTracker != null &&
                 compositionBase.RemovedContentTypeKeyTracker.Any())
             {
-                //Find Content based on the current ContentType
+                // find Content based on the current ContentType
                 var sql = Sql()
                     .SelectAll()
                     .From<ContentDto>()
-                    .InnerJoin<NodeDto>()
-                    .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                     .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
                     .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
-
                 var contentDtos = Database.Fetch<ContentDto>(sql);
-                //Loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
+
+                // loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
                 foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
                 {
-                    //Find PropertyTypes for the removed ContentType
+                    // find PropertyTypes for the removed ContentType
                     var propertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = key });
-                    //Loop through the Content that is based on the current ContentType in order to remove the Properties that are
-                    //based on the PropertyTypes that belong to the removed ContentType.
+                    // loop through the Content that is based on the current ContentType in order to remove the Properties that are
+                    // based on the PropertyTypes that belong to the removed ContentType.
                     foreach (var contentDto in contentDtos)
                     {
                         foreach (var propertyType in propertyTypes)
@@ -302,28 +301,27 @@ AND umbracoNode.id <> @id",
                             var propertySql = Sql()
                                 .Select("cmsPropertyData.id")
                                 .From<PropertyDataDto>()
-                                .InnerJoin<PropertyTypeDto>()
-                                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                                 .Where<PropertyDataDto>(x => x.NodeId == nodeId)
                                 .Where<PropertyTypeDto>(x => x.Id == propertyTypeId);
 
-                            //Finally delete the properties that match our criteria for removing a ContentType from the composition
+                            // finally delete the properties that match our criteria for removing a ContentType from the composition
                             Database.Delete<PropertyDataDto>(new Sql("WHERE id IN (" + propertySql.SQL + ")", propertySql.Arguments));
                         }
                     }
                 }
             }
 
-            //Delete the allowed content type entries before adding the updated collection
+            // delete the allowed content type entries before re-inserting the collectino of allowed content types
             Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { entity.Id });
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
-                                    {
-                                        Id = entity.Id,
-                                        AllowedId = allowedContentType.Id.Value,
-                                        SortOrder = allowedContentType.SortOrder
-                                    });
+                {
+                    Id = entity.Id,
+                    AllowedId = allowedContentType.Id.Value,
+                    SortOrder = allowedContentType.SortOrder
+                });
             }
 
             // fixme below, manage the property type
