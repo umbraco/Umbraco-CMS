@@ -13,9 +13,9 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class PackagingServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class PackagingServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void PackagingService_Can_Export_Macro()

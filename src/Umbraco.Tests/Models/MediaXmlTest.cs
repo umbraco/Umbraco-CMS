@@ -15,8 +15,8 @@ using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Models
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class MediaXmlTest : TestWithDatabaseBase
     {
         [Test]

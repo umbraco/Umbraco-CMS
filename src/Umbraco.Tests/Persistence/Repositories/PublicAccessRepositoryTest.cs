@@ -16,8 +16,8 @@ using Content = Umbraco.Core.Models.Content;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PublicAccessRepositoryTest : TestWithDatabaseBase
     {
         [Test]

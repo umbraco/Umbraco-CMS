@@ -8,8 +8,8 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class SchemaValidationTest : TestWithDatabaseBase
     {
         [Test]

@@ -14,10 +14,9 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    [TestSetup.FacadeService(EnableRepositoryEvents = true)]
-    public class MediaServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]
+    public class MediaServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void Can_Move_Media()

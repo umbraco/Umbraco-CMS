@@ -6,9 +6,9 @@ using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
-	public class ContentFinderByNiceUrlAndTemplateTests : BaseWebTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class ContentFinderByNiceUrlAndTemplateTests : BaseWebTest
     {
         Template CreateTemplate(string alias)
         {

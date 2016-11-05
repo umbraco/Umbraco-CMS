@@ -17,9 +17,8 @@ using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Models.Mapping
 {
-    [RequiresAutoMapperMappings]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
+    [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class ContentWebModelMappingTests : TestWithDatabaseBase
     {
         protected override void MoreSetUp()

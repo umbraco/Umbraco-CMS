@@ -9,8 +9,8 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NoDatabasePerFixture)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public abstract class UrlRoutingTestBase : BaseWebTest
     {
         /// <summary>

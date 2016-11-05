@@ -9,8 +9,8 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Models
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class ContentXmlTest : TestWithDatabaseBase
     {
         [Test]

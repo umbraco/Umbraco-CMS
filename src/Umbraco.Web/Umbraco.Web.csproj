@@ -172,7 +172,7 @@
     <Compile Include="HybridEventMessagesAccessor.cs" />
     <Compile Include="HybridUmbracoDatabaseAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
-    <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />
+    <Compile Include="DI\WebModelMappersCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="IPublishedContentQuery.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />

@@ -25,7 +25,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
-using Umbraco.Web.DependencyInjection;
+using Umbraco.Web.DI;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;

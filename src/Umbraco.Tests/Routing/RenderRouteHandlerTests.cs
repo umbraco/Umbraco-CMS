@@ -21,9 +21,9 @@ using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
-	public class RenderRouteHandlerTests : BaseWebTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class RenderRouteHandlerTests : BaseWebTest
     {
 		public override void SetUp()
 		{

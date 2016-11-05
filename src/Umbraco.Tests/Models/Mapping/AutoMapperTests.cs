@@ -14,8 +14,8 @@ using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.Models.Mapping
 {
-    [RequiresAutoMapperMappings]
     [TestFixture]
+    [UmbracoTest(AutoMapper = true)]
     public class AutoMapperTests : TestWithApplicationBase
     {
         protected override void Compose()

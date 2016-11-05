@@ -70,6 +70,15 @@ namespace Umbraco.Core
             container.RegisterInstance(logger);
             // now it is ok to use Current.Logger
 
+            ConfigureUnhandledException(logger);
+
+            // get runtime & boot
+            _runtime = GetRuntime();
+            _runtime.Boot(container);
+        }
+
+        protected virtual void ConfigureUnhandledException(ILogger logger)
+        {
             // take care of unhandled exceptions - there is nothing we can do to
             // prevent the entire w3wp process to go down but at least we can try
             // and log the exception
@@ -83,10 +92,6 @@ namespace Umbraco.Core
                 msg += ".";
                 logger.Error<UmbracoApplicationBase>(msg, exception);
             };
-
-            // get runtime & boot
-            _runtime = GetRuntime();
-            _runtime.Boot(container);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain
@@ -137,6 +142,8 @@ namespace Umbraco.Core
                 _runtime.DisposeIfDisposable();
                 _runtime = null;
             }
+
+            Current.Reset(); // dispose the container and everything
 
             if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted) return;
 

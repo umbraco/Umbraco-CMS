@@ -14,8 +14,8 @@ namespace Umbraco.Tests.Persistence
 {
     // fixme.npoco - is this still appropriate?
     //
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class NPocoExtensionsTest : TestWithDatabaseBase
     {
         [Test]

@@ -17,8 +17,8 @@ using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, NUnit.Framework.Ignore]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentServicePerformanceTest : TestWithDatabaseBase
     {
         public override void SetUp()

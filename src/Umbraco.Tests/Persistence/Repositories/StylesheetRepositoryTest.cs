@@ -14,8 +14,8 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class StylesheetRepositoryTest : TestWithDatabaseBase
     {
         private IFileSystem _fileSystem;

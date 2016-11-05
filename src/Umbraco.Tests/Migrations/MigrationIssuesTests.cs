@@ -17,7 +17,7 @@ using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 namespace Umbraco.Tests.Migrations
 {
     [TestFixture]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class MigrationIssuesTests : TestWithDatabaseBase
     {
         [Test]

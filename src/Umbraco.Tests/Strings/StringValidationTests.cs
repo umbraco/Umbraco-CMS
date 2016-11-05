@@ -5,7 +5,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StringValidationTests : BaseTestBase
+    public class StringValidationTests : UmbracoTestBase
     {
         [Test]
         public void Validate_Email_Address()

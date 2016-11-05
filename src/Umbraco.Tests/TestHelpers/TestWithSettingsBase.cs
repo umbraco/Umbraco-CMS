@@ -10,7 +10,7 @@ namespace Umbraco.Tests.TestHelpers
     /// <para>Ensures that SettingsForTests is property resetted before and after each test executes.</para>
     /// <para>Sets a test Umbraco context accessor.</para>
     /// </remarks>
-    public abstract class TestWithSettingsBase : BaseTestBase
+    public abstract class TestWithSettingsBase : UmbracoTestBase
     {
         public override void SetUp()
         {

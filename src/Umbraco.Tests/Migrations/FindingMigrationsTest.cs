@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Data;
 using System.Linq;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Profiling;
-using Umbraco.Core.Services;
 using Umbraco.Tests.Migrations.Stubs;
 using Umbraco.Tests.TestHelpers;
 
@@ -21,7 +15,6 @@ namespace Umbraco.Tests.Migrations
     [TestFixture]
     public class FindingMigrationsTest : TestWithDatabaseBase
     {
-
         [Test]
         public void Can_Find_Migrations_With_Target_Version_Six()
         {
@@ -54,7 +47,6 @@ namespace Umbraco.Tests.Migrations
             }
 
             Assert.That(list.Count, Is.EqualTo(3));
-
             
             foreach (var migration1 in list)
             {

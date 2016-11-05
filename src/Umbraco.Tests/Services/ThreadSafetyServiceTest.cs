@@ -23,9 +23,9 @@ using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
 	[TestFixture, RequiresSTA]
-	public class ThreadSafetyServiceTest : TestWithDatabaseBase
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class ThreadSafetyServiceTest : TestWithDatabaseBase
 	{
 		//private IDatabaseUnitOfWorkProvider _uowProvider;
 		//private PerThreadSqlCeDatabaseFactory _dbFactory;

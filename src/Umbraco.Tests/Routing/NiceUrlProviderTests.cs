@@ -10,9 +10,9 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
-	public class NiceUrlProviderTests : BaseWebTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class NiceUrlProviderTests : BaseWebTest
     {
         protected override void MoreSetUp()
         {

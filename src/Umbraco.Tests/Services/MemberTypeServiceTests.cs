@@ -11,10 +11,9 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    [TestSetup.FacadeService(EnableRepositoryEvents = true)]
-    public class MemberTypeServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]
+    public class MemberTypeServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void Member_Cannot_Edit_Property()

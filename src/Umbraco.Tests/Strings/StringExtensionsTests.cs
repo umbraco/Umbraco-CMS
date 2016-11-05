@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.DI;
@@ -11,15 +10,14 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StringExtensionsTests : BaseTestBase
+    public class StringExtensionsTests : UmbracoTestBase
     {
 	    public override void SetUp()
 	    {
             base.SetUp();
 
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-            container.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
+            // fixme - in "compose"?
+            Container.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
 	    }
 
         [Test]

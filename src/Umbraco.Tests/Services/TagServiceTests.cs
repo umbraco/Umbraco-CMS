@@ -12,9 +12,9 @@ namespace Umbraco.Tests.Services
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    public class TagServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class TagServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void TagList_Contains_NodeCount()

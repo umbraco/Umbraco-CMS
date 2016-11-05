@@ -15,9 +15,9 @@ using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace Umbraco.Tests.Integration
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    public class GetCultureTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class GetCultureTests : TestWithSomeContentBase
     {
         protected override void MoreSetUp()
         {

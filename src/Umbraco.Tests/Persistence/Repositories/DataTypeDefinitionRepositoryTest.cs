@@ -1,49 +1,59 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.DI;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class DataTypeDefinitionRepositoryTest : TestWithDatabaseBase
     {
-        protected override CacheHelper CreateCacheHelper()
+        //protected override CacheHelper CreateCacheHelper()
+        //{
+        //    // hackish, but it works
+        //    var testName = TestContext.CurrentContext.Test.Name;
+        //    if (testName == "Can_Get_Pre_Value_As_String_With_Cache"
+        //        || testName == "Can_Get_Pre_Value_Collection_With_Cache")
+        //    {
+        //        return new CacheHelper(
+        //            new ObjectCacheRuntimeCacheProvider(),
+        //            new StaticCacheProvider(),
+        //            new StaticCacheProvider(),
+        //            new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider())); // default would be NullCacheProvider
+        //    }
+
+        //    return base.CreateCacheHelper();
+        //}
+
+        protected override void ComposeCacheHelper()
         {
             // hackish, but it works
             var testName = TestContext.CurrentContext.Test.Name;
-            if (testName == "Can_Get_Pre_Value_As_String_With_Cache"
-                || testName == "Can_Get_Pre_Value_Collection_With_Cache")
+            if (testName == "Can_Get_Pre_Value_As_String_With_Cache" || testName == "Can_Get_Pre_Value_Collection_With_Cache")
             {
-                return new CacheHelper(
+                var cacheHelper = new CacheHelper(
                     new ObjectCacheRuntimeCacheProvider(),
                     new StaticCacheProvider(),
                     new StaticCacheProvider(),
                     new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider())); // default would be NullCacheProvider
-            }
 
-            return base.CreateCacheHelper();
+                Container.RegisterSingleton(f => cacheHelper);
+                Container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
+            }
+            else
+            {
+                base.ComposeCacheHelper();
+            }
         }
 
         private IDataTypeDefinitionRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)

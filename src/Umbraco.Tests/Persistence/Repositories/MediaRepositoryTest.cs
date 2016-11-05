@@ -17,8 +17,8 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class MediaRepositoryTest : TestWithDatabaseBase
     {
         public override void SetUp()

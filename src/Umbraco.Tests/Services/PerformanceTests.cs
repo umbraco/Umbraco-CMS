@@ -28,8 +28,8 @@ namespace Umbraco.Tests.Services
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     [NUnit.Framework.Ignore("These should not be run by the server, only directly as they are only benchmark tests")]
     public class PerformanceTests : TestWithDatabaseBase
     {

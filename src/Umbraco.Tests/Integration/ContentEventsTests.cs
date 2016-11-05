@@ -19,9 +19,9 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Integration
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    public class ContentEventsTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class ContentEventsTests : TestWithSomeContentBase
     {
         #region Setup
 

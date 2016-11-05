@@ -13,8 +13,8 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class DomainRepositoryTest : TestWithDatabaseBase
     {
         private DomainRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out ContentRepository contentRepository, out LanguageRepository languageRepository)

@@ -27,10 +27,9 @@ namespace Umbraco.Tests.Services
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    [TestSetup.FacadeService(EnableRepositoryEvents = true)]
-    public class ContentServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]
+    public class ContentServiceTests : TestWithSomeContentBase
     {
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.

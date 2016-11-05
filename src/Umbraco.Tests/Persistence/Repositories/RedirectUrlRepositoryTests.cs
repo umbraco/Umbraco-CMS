@@ -10,8 +10,8 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class RedirectUrlRepositoryTests : TestWithDatabaseBase
     {
         public override void SetUp()

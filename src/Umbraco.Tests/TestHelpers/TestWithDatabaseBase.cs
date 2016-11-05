@@ -96,7 +96,7 @@ namespace Umbraco.Tests.TestHelpers
 
             Container.RegisterSingleton(f =>
             {
-                if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture)
+                if (Options.Database == UmbracoTestOptions.Database.None)
                     return TestObjects.GetDatabaseFactoryMock();
 
                 var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
@@ -118,10 +118,10 @@ namespace Umbraco.Tests.TestHelpers
             _isFirstInFixture = false;
             _isFirstInSession = false;
 
-            using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("teardown"))
+            using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("teardown")) // fixme move that one up
             {
-                if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
-                    RemoveDatabaseFile(Core.DI.Current.HasContainer ? Core.DI.Current.DatabaseContext.Database : null);
+                if (Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest)
+                    RemoveDatabaseFile(Core.DI.Current.HasContainer ? Core.DI.Current.Container.TryGetInstance<DatabaseContext>()?.Database : null);
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
@@ -221,15 +221,6 @@ namespace Umbraco.Tests.TestHelpers
         //    return _appContext;
         //}
 
-        protected DatabaseBehavior DatabaseTestBehavior
-        {
-            get
-            {
-                var att = GetType().GetCustomAttribute<DatabaseTestBehaviorAttribute>(false);
-                return att?.Behavior ?? DatabaseBehavior.NoDatabasePerFixture;
-            }
-        }
-
         protected virtual ISqlSyntaxProvider GetSyntaxProvider()
         {
             return new SqlCeSyntaxProvider();
@@ -259,7 +250,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void CreateSqlCeDatabase()
         {
-            if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture)
+            if (Options.Database == UmbracoTestOptions.Database.None)
                 return;
 
             var path = TestHelper.CurrentAssemblyDirectory;
@@ -281,9 +272,9 @@ namespace Umbraco.Tests.TestHelpers
             //if this is the first test in the session, always ensure a new db file is created
             if (_isFirstInSession 
                 || File.Exists(_databasePath) == false 
-                || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest 
-                || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest 
-                || (_isFirstInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
+                || Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest 
+                || Options.Database == UmbracoTestOptions.Database.NewEmptyPerTest 
+                || (_isFirstInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture))
             {
                 using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Remove database file"))
                 {
@@ -299,7 +290,7 @@ namespace Umbraco.Tests.TestHelpers
                 //Create the Sql CE database
                 using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Create database file"))
                 {
-                    if (DatabaseTestBehavior != DatabaseBehavior.EmptyDbFilePerTest && _databaseBytes != null)
+                    if (Options.Database != UmbracoTestOptions.Database.NewEmptyPerTest && _databaseBytes != null)
                     {
                         File.WriteAllBytes(_databasePath, _databaseBytes);
                     }
@@ -327,10 +318,7 @@ namespace Umbraco.Tests.TestHelpers
             // ensure we have a FacadeService
             if (_facadeService == null)
             {
-                var behavior = GetType().GetCustomAttribute<TestSetup.FacadeServiceAttribute>(false);
                 var cache = new NullCacheProvider();
-
-                var enableRepositoryEvents = behavior != null && behavior.EnableRepositoryEvents;
 
                 ContentTypesCache = new PublishedContentTypeCache(
                         Core.DI.Current.Services.ContentTypeService,
@@ -343,7 +331,7 @@ namespace Umbraco.Tests.TestHelpers
                 var service = new FacadeService(
                     Core.DI.Current.Services,
                     UowProvider,
-                    cache, facadeAccessor, Core.DI.Current.Logger, ContentTypesCache, null, true, enableRepositoryEvents);
+                    cache, facadeAccessor, Core.DI.Current.Logger, ContentTypesCache, null, true, Options.FacadeServiceRepositoryEvents);
 
                 // initialize PublishedCacheService content with an Xml source
                 service.XmlStore.GetXmlDocument = () =>
@@ -364,7 +352,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void InitializeDatabase()
         {
-            if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest)
+            if (Options.Database == UmbracoTestOptions.Database.None || Options.Database == UmbracoTestOptions.Database.NewEmptyPerTest)
                 return;
 
             //create the schema and load default data if:
@@ -374,8 +362,8 @@ namespace Umbraco.Tests.TestHelpers
 
             if (_databaseBytes == null &&
                 (_isFirstInSession
-                || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
-                || (_isFirstInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
+                || Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest
+                || (_isFirstInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture)))
             {
                 var database = Core.DI.Current.DatabaseContext.Database;
                 var schemaHelper = new DatabaseSchemaHelper(database, Logger);

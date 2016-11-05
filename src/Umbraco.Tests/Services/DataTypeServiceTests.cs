@@ -12,9 +12,9 @@ namespace Umbraco.Tests.Services
     /// <summary>
     /// Tests covering the DataTypeService
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    public class DataTypeServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class DataTypeServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void DataTypeService_Can_Persist_New_DataTypeDefinition()

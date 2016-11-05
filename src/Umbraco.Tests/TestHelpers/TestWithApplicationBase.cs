@@ -1,19 +1,13 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using AutoMapper;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Core.DI;
@@ -22,7 +16,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
-using Umbraco.Web.DependencyInjection;
 using Umbraco.Web.Services;
 using UmbracoExamine;
 
@@ -38,21 +31,16 @@ namespace Umbraco.Tests.TestHelpers
     /// <para>Does *not* create a database.</para>
     /// </remarks>
     [TestFixture]
+    [UmbracoTest(AutoMapper = true, ResetPluginManager = false)]
     public abstract class TestWithApplicationBase : TestWithSettingsBase
     {
-        private static PluginManager _pluginManager;
+        protected ILogger Logger => Container.GetInstance<ILogger>();
 
-        // tests shouldn't use IoC, but for all these tests inheriting from this class are integration tests
-        // and the number of these will hopefully start getting greatly reduced now that most things are mockable.
-        protected IServiceContainer Container { get; private set; }
+        protected IProfiler Profiler => Container.GetInstance<IProfiler>();
 
-        protected ILogger Logger { get; private set; }
+        protected ProfilingLogger ProfilingLogger => Container.GetInstance<ProfilingLogger>();
 
-        protected IProfiler Profiler { get; private set; }
-
-        protected ProfilingLogger ProfilingLogger { get; private set; }
-
-        protected CacheHelper CacheHelper { get; private set; }
+        protected CacheHelper CacheHelper => Container.GetInstance<CacheHelper>();
 
         protected virtual ISqlSyntaxProvider SqlSyntax => new SqlCeSyntaxProvider();
 
@@ -67,28 +55,17 @@ namespace Umbraco.Tests.TestHelpers
         /// </remarks>
         protected virtual bool PluginManagerResetRequired => false;
 
-        [TestFixtureSetUp]
-        public void InitializeFixture()
-        {
-            Logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
-            Profiler = new LogProfiler(Logger);
-            ProfilingLogger = new ProfilingLogger(Logger, Profiler);
-        }
-
         public override void SetUp()
         {
             base.SetUp();
 
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-            Container = container;
-
             TestHelper.InitializeContentDirectories();
-            CacheHelper = CreateCacheHelper();
-            InitializeLegacyMappingsForCoreEditors();
-            SetupPluginManager();
-            Compose();
-            InitializeAutoMapper();
+
+            // initialize legacy mapings for core editors
+            // create the legacy prop-eds mapping
+            if (LegacyPropertyEditorIdToAliasConverter.Count() == 0)
+                LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
+
             MoreSetUp();
         }
 
@@ -98,28 +75,13 @@ namespace Umbraco.Tests.TestHelpers
 
             TestHelper.CleanContentDirectories();
             TestHelper.CleanUmbracoSettingsConfig();
-
-            ResetPluginManager();
-            Container.Dispose();
         }
 
-        protected virtual void Compose()
+        protected override void Compose()
         {
+            base.Compose();
+
             var settings = SettingsForTests.GetDefault();
-
-            // basic things
-            Container.RegisterSingleton(factory => Logger);
-            Container.RegisterSingleton(factory => Profiler);
-            Container.RegisterSingleton(factory => ProfilingLogger);
-
-            Container.Register(factory => CacheHelper);
-            Container.Register(factory => CacheHelper.RuntimeCache);
-
-            // register mappers
-            Container.RegisterFrom<CoreModelMappersCompositionRoot>();
-            Container.RegisterFrom<WebModelMappersCompositionRoot>();
-
-            Container.RegisterInstance(_pluginManager);
 
             // default Datalayer/Repositories/SQL/Database/etc...
             Container.RegisterFrom<RepositoryCompositionRoot>();
@@ -172,59 +134,12 @@ namespace Umbraco.Tests.TestHelpers
             // composition root is doing weird things, fix
             Container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
             Container.RegisterSingleton<ISectionService, SectionService>();
-        }
 
-        private static void InitializeLegacyMappingsForCoreEditors()
-        {
-            // create the legacy prop-eds mapping
-            if (LegacyPropertyEditorIdToAliasConverter.Count() == 0)
-                LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
-        }
+            Container.RegisterSingleton(f => new PropertyEditorCollection(Enumerable.Empty<PropertyEditor>()));
+    }
 
-        // initialize automapper if required - takes time so don't do it unless required
-        private void InitializeAutoMapper()
-        {
-            if (GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) == null) return;
-
-            Mapper.Initialize(configuration =>
-            {
-                var mappers = Container.GetAllInstances<ModelMapperConfiguration>();
-                foreach (var mapper in mappers)
-                    mapper.ConfigureMappings(configuration);
-            });
-        }
-
-        protected virtual void ResetPluginManager()
-        {
-            if (PluginManagerResetRequired)
-                _pluginManager = null;
-        }
-
-        protected virtual CacheHelper CreateCacheHelper()
-        {
-            return CacheHelper.CreateDisabledCacheHelper();
-        }
-        
-        protected virtual void SetupPluginManager()
-        {
-            if (_pluginManager == null || PluginManagerResetRequired)
-            {
-                _pluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
-                {
-                    AssembliesToScan = new[]
-                    {
-                        Assembly.Load("Umbraco.Core"),
-                        Assembly.Load("umbraco"),
-                        Assembly.Load("Umbraco.Tests"),
-                        Assembly.Load("cms"),
-                        Assembly.Load("controls"),
-                    }
-                };
-            }
-        }
-
-        // fixme - rename & refactor
-        protected virtual void MoreSetUp()
+    // fixme - rename & refactor
+    protected virtual void MoreSetUp()
         { }
     }
 }

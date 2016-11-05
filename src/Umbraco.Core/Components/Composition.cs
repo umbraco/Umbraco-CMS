@@ -17,7 +17,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="container">A container.</param>
         /// <param name="level">The runtime level.</param>
-        public Composition(ServiceContainer container, RuntimeLevel level)
+        public Composition(IServiceContainer container, RuntimeLevel level)
         {
             Container = container;
             RuntimeLevel = level;
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Components
         /// Gets the container.
         /// </summary>
         /// <remarks>Use with care!</remarks>
-        public ServiceContainer Container { get; }
+        public IServiceContainer Container { get; }
 
         /// <summary>
         /// Gets the runtime level.

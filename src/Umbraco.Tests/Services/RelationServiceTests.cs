@@ -6,9 +6,9 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture, RequiresSTA]
-    public class RelationServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class RelationServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void Can_Create_RelationType_Without_Name()

@@ -10,8 +10,8 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class UnitOfWorkTests : TestWithDatabaseBase
     {
         [Test]

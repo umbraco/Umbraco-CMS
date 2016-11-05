@@ -8,9 +8,9 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    public class PublicAccessServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class PublicAccessServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void Can_Add_New_Entry()

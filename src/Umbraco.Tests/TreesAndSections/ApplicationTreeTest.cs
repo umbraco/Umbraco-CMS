@@ -15,8 +15,8 @@ namespace Umbraco.Tests.TreesAndSections
     ///This is a test class for ApplicationTreeTest and is intended
     ///to contain all ApplicationTreeTest Unit Tests
     ///</summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture, RequiresSTA]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ApplicationTreeTest : TestWithDatabaseBase
     {
         public override void SetUp()

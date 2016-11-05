@@ -9,8 +9,8 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class RoutesCacheTests : BaseWebTest
     {
         [Test]

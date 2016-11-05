@@ -28,6 +28,7 @@ namespace Umbraco.Tests.Models.Mapping
         private readonly Mock<IDataTypeService> _dataTypeService = new Mock<IDataTypeService>();
         private readonly Mock<IEntityService> _entityService = new Mock<IEntityService>();
         private readonly Mock<IFileService> _fileService = new Mock<IFileService>();
+        private Mock<PropertyEditorCollection> _editorsMock;
 
         public override void SetUp()
         {
@@ -54,15 +55,11 @@ namespace Umbraco.Tests.Models.Mapping
             //    nullCacheHelper,
             //    new ProfilingLogger(logger, Mock.Of<IProfiler>()));
 
-            // create a fake property editor collection to return fake property editors
-            var editors = new PropertyEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>()), };
-            var editorsMock = new Mock<PropertyEditorCollection>(new object[] { editors });
-            editorsMock.Setup(x => x[It.IsAny<string>()]).Returns(editors[0]);
-
+            // fixme - are we initializing mappers that... have already been?
             Mapper.Initialize(configuration =>
             {
                 //initialize our content type mapper
-                var mapper = new ContentTypeModelMapper(editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>());
+                var mapper = new ContentTypeModelMapper(_editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>());
                 mapper.ConfigureMappings(configuration);
                 var entityMapper = new EntityModelMapper();
                 entityMapper.ConfigureMappings(configuration);
@@ -72,6 +69,12 @@ namespace Umbraco.Tests.Models.Mapping
         protected override void Compose()
         {
             base.Compose();
+
+            // create and register a fake property editor collection to return fake property editors
+            var editors = new PropertyEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>()), };
+            _editorsMock = new Mock<PropertyEditorCollection>(new object[] { editors });
+            _editorsMock.Setup(x => x[It.IsAny<string>()]).Returns(editors[0]);
+            Container.RegisterSingleton(f => _editorsMock.Object);
 
             Container.RegisterSingleton(_ => _contentTypeService.Object);
             Container.RegisterSingleton(_ => _contentService.Object);

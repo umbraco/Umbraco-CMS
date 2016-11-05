@@ -16,18 +16,13 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class DefaultShortStringHelperTests : BaseTestBase
+    public class DefaultShortStringHelperTests : UmbracoTestBase
     {
         private DefaultShortStringHelper _helper;
 
         public override void SetUp()
         {
             base.SetUp();
-
-            // NOTE: it is not possible to configure the helper once it has been assigned
-            // to the resolver and resolution has frozen. but, obviously, it is possible
-            // to configure filters and then to alter these filters after resolution has
-            // frozen. beware, nothing is thread-safe in-there!
 
             // NOTE pre-filters runs _before_ Recode takes place
             // so there still may be utf8 chars even though you want ascii
@@ -74,9 +69,8 @@ namespace Umbraco.Tests.Strings
                     BreakTermsOnUpper = true
                 }));
 
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-            container.Register<IShortStringHelper>(_ => _helper);
+            // fixme - move to a "compose" thing?
+            Container.RegisterSingleton<IShortStringHelper>(f => _helper);
         }
 
         private static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -317,7 +311,7 @@ namespace Umbraco.Tests.Strings
                     Separator = '*'
                 }));
             Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
-            
+
             // FIXME but for a filename we want to keep them!
             // FIXME and what about a url?
         }
@@ -551,7 +545,7 @@ namespace Umbraco.Tests.Strings
         {
             var output = _helper.SplitPascalCasing(input, ' ');
             Assert.AreEqual(expected, output);
-			
+
             output = _helper.SplitPascalCasing(input, '*');
             expected = expected.Replace(' ', '*');
             Assert.AreEqual(expected, output);

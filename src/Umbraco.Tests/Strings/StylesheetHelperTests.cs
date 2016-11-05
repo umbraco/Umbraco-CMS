@@ -8,7 +8,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StylesheetHelperTests : BaseTestBase
+    public class StylesheetHelperTests : UmbracoTestBase
     {
         [Test]
         public void Replace_Rule()

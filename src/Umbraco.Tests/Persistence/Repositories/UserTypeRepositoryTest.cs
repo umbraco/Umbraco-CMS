@@ -15,8 +15,8 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class UserTypeRepositoryTest : TestWithDatabaseBase
     {
         private UserTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)

@@ -11,9 +11,9 @@ using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Services.Importing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    public class PackageImportTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class PackageImportTests : TestWithSomeContentBase
     {
         [Test]
         public void PackagingService_Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()

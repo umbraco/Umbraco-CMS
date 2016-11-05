@@ -12,7 +12,7 @@ namespace Umbraco.Core.Components
 
     internal class BootLoader
     {
-        private readonly ServiceContainer _container;
+        private readonly IServiceContainer _container;
         private readonly ProfilingLogger _proflog;
         private IUmbracoComponent[] _components;
         private bool _booted;
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Components
         /// Initializes a new instance of the <see cref="BootLoader"/> class.
         /// </summary>
         /// <param name="container">The application container.</param>
-        public BootLoader(ServiceContainer container)
+        public BootLoader(IServiceContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             _container = container;

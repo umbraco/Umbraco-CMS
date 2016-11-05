@@ -1269,7 +1269,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         public void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
             if (_xml == null) return; // not initialized yet!
-            
+
             // see ContentTypeServiceBase
             // in all cases we just want to clear the content type cache
             // the type will be reloaded if/when needed
@@ -2062,6 +2062,7 @@ WHERE cmsContentXml.nodeId IN (
         {
             // every published content item should have a corresponding row in cmsContentXml
             // every content item should have a corresponding row in cmsPreviewXml
+            // and that row should have the key="..." attribute
 
             var contentObjectType = Guid.Parse(Constants.ObjectTypes.Document);
             var db = unitOfWork.Database;
@@ -2071,7 +2072,7 @@ FROM umbracoNode
 JOIN cmsDocument ON (umbracoNode.id=cmsDocument.nodeId and cmsDocument.published=1)
 LEFT JOIN cmsContentXml ON (umbracoNode.id=cmsContentXml.nodeId)
 WHERE umbracoNode.nodeObjectType=@objType
-AND cmsContentXml.nodeId IS NULL
+AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'
 ", new { objType = contentObjectType });
 
             if (count > 0) return false;
@@ -2080,7 +2081,7 @@ AND cmsContentXml.nodeId IS NULL
 FROM umbracoNode
 LEFT JOIN cmsPreviewXml ON (umbracoNode.id=cmsPreviewXml.nodeId)
 WHERE umbracoNode.nodeObjectType=@objType
-AND cmsPreviewXml.nodeId IS NULL
+AND cmsPreviewXml.nodeId IS NULL OR cmsPreviewXml.xml NOT LIKE '% key=""'
 ", new { objType = contentObjectType });
 
             return count == 0;
@@ -2102,6 +2103,7 @@ AND cmsPreviewXml.nodeId IS NULL
         public bool VerifyMediaXmlLocked(IDatabaseUnitOfWork unitOfWork, IMediaRepository repository)
         {
             // every non-trashed media item should have a corresponding row in cmsContentXml
+            // and that row should have the key="..." attribute
 
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
             var db = unitOfWork.Database;
@@ -2111,7 +2113,7 @@ FROM umbracoNode
 JOIN cmsDocument ON (umbracoNode.id=cmsDocument.nodeId and cmsDocument.published=1)
 LEFT JOIN cmsContentXml ON (umbracoNode.id=cmsContentXml.nodeId)
 WHERE umbracoNode.nodeObjectType=@objType
-AND cmsContentXml.nodeId IS NULL
+AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'
 ", new { objType = mediaObjectType });
 
             return count == 0;

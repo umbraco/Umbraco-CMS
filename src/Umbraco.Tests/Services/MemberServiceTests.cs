@@ -19,10 +19,9 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    [TestSetup.FacadeService(EnableRepositoryEvents = true)]
-    public class MemberServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]
+    public class MemberServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void Can_Create_Member()

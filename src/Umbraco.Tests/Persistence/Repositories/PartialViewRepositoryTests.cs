@@ -9,7 +9,9 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -23,6 +25,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.SetUp();
 
             _fileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/");
+        }
+
+        protected override void Compose()
+        {
+            base.Compose();
+
+            Container.RegisterSingleton(f => new PropertyEditorCollection(Enumerable.Empty<PropertyEditor>()));
         }
 
         [Test]

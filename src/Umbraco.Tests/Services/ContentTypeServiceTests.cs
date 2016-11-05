@@ -13,11 +13,9 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    [TestSetup.FacadeService(EnableRepositoryEvents = true)]
-    public class ContentTypeServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]
+    public class ContentTypeServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void Deleting_PropertyType_Removes_The_Property_From_Content()

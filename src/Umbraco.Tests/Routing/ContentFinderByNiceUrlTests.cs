@@ -4,9 +4,9 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
 	[TestFixture]
-	public class ContentFinderByNiceUrlTests : BaseWebTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class ContentFinderByNiceUrlTests : BaseWebTest
     {
 		[TestCase("/", 1046)]
 		[TestCase("/default.aspx", 1046)] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !

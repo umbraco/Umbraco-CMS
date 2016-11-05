@@ -16,8 +16,8 @@ using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
 	[TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PublishMediaCacheTests : BaseWebTest
 	{
         protected override void MoreSetUp()

@@ -23,9 +23,8 @@ using Current = Umbraco.Web.Current;
 namespace Umbraco.Tests
 {
     [TestFixture]
-    public class MockTests : BaseTestBase
+    public class MockTests : UmbracoTestBase
     {
-        [SetUp]
         public override void SetUp()
         {
             base.SetUp();
@@ -66,14 +65,11 @@ namespace Umbraco.Tests
         {
             var umbracoContext = TestObjects.GetUmbracoContextMock();
 
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
             // unless we can inject them in MembershipHelper, we need need this
-            container.Register(_ => Mock.Of<IMemberService>());
-            container.Register(_ => Mock.Of<IMemberTypeService>());
-            container.Register(_ => CacheHelper.CreateDisabledCacheHelper());
-            container.Register<ServiceContext>();
+            Container.Register(_ => Mock.Of<IMemberService>());
+            Container.Register(_ => Mock.Of<IMemberTypeService>());
+            Container.Register(_ => CacheHelper.CreateDisabledCacheHelper());
+            Container.Register<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(umbracoContext,

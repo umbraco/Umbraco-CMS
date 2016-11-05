@@ -12,9 +12,9 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    public class MacroServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class MacroServiceTests : TestWithSomeContentBase
     {
         public override void CreateTestData()
         {

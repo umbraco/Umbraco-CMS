@@ -16,8 +16,8 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class RelationTypeRepositoryTest : TestWithDatabaseBase
     {
         public override void SetUp()

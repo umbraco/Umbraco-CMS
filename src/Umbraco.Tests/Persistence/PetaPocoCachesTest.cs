@@ -15,9 +15,9 @@ namespace Umbraco.Tests.Persistence
 {
     // fixme.npoco - what shall we do with those tests?
     //
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, Ignore]
-    public class PetaPocoCachesTest : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class PetaPocoCachesTest : TestWithSomeContentBase
     {
 
 #if DEBUG

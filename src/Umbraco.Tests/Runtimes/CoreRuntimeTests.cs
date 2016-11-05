@@ -17,19 +17,16 @@ using UmbracoExamine;
 namespace Umbraco.Tests.Runtimes
 {
     [TestFixture]
-    public class CoreRuntimeTests : TestWithSettingsBase
+    public class CoreRuntimeTests
     {
-        public override void SetUp()
+        [SetUp]
+        public void SetUp()
         {
-            base.SetUp();
-
             TestComponent.Reset();
         }
 
-        public override void TearDown()
+        public void TearDown()
         {
-            base.TearDown();
-
             TestComponent.Reset();
         }
 
@@ -71,6 +68,10 @@ namespace Umbraco.Tests.Runtimes
                 //return Mock.Of<ILogger>();
                 return new DebugDiagnosticsLogger();
             }
+
+            // don't register anything against AppDomain
+            protected override void ConfigureUnhandledException(ILogger logger)
+            { }
         }
 
         // test runtime

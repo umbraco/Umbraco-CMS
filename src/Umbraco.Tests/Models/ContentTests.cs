@@ -26,27 +26,22 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentTests : TestWithSettingsBase
     {
-        private ServiceContainer _container;
-
         public override void SetUp()
         {
             base.SetUp();
 
             var config = SettingsForTests.GetDefault();
             SettingsForTests.ConfigureSettings(config);
-
-            _container = new ServiceContainer();
-            _container.ConfigureUmbracoCore();
-            _container.Register(_ => Mock.Of<ILogger>());
-            _container.Register<FileSystems>();
-            _container.Register(_ => Mock.Of<IDataTypeService>());
-            _container.Register(_ => Mock.Of<IContentSection>());
         }
 
-        public override void TearDown()
+        protected override void Compose()
         {
-            base.TearDown();
-            _container.Dispose();
+            base.Compose();
+
+            Container.Register(_ => Mock.Of<ILogger>());
+            Container.Register<FileSystems>();
+            Container.Register(_ => Mock.Of<IDataTypeService>());
+            Container.Register(_ => Mock.Of<IContentSection>());
         }
 
         [Test]

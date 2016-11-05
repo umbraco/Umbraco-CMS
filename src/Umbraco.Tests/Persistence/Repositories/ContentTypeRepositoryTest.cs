@@ -23,9 +23,8 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [RequiresAutoMapperMappings]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentTypeRepositoryTest : TestWithDatabaseBase
     {
         public override void SetUp()

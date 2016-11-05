@@ -9,8 +9,8 @@ using Umbraco.Web;
 
 namespace Umbraco.Tests.PublishedContent
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class PublishedContentExtensionTests : PublishedContentTestBase
 	{
 		private UmbracoContext ctx;

@@ -14,9 +14,9 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
-	public class PublishContentCacheTests : BaseWebTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class PublishContentCacheTests : BaseWebTest
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;

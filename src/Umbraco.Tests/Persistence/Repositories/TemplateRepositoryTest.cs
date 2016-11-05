@@ -21,8 +21,8 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class TemplateRepositoryTest : TestWithDatabaseBase
     {
         private IFileSystem _masterPageFileSystem;

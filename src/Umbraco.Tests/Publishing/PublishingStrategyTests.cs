@@ -10,8 +10,8 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Publishing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PublishingStrategyTests : TestWithDatabaseBase
     {
         public override void SetUp()

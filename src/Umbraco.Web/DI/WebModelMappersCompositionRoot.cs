@@ -1,7 +1,7 @@
 using LightInject;
 using Umbraco.Web.Models.Mapping;
 
-namespace Umbraco.Web.DependencyInjection
+namespace Umbraco.Web.DI
 {
     public sealed class WebModelMappersCompositionRoot : ICompositionRoot
     {

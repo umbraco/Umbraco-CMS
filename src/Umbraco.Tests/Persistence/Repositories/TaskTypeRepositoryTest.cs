@@ -8,8 +8,8 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class TaskTypeRepositoryTest : TestWithDatabaseBase
     {
         [Test]

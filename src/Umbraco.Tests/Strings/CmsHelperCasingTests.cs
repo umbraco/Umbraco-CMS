@@ -6,7 +6,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class CmsHelperCasingTests : BaseTestBase
+    public class CmsHelperCasingTests : UmbracoTestBase
     {
         [SetUp]
         public void Setup()

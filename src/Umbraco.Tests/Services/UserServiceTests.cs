@@ -14,9 +14,9 @@ namespace Umbraco.Tests.Services
     /// <summary>
     /// Tests covering the UserService
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    public class UserServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class UserServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void UserService_Get_User_Permissions_For_Unassigned_Permission_Nodes()

@@ -9,9 +9,9 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
-    public class FileServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class FileServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void Create_Template_Then_Assign_Child()

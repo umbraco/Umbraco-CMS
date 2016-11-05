@@ -5,29 +5,28 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
-using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Components
 {
     [TestFixture]
-    public class ComponentTests : BaseTestBase
+    public class ComponentTests
     {
         private static readonly List<Type> Composed = new List<Type>();
         private static readonly List<string> Initialized = new List<string>();
 
+        private static IServiceContainer MockContainer(Action<Mock<IServiceContainer>> setup = null)
+        {
+            var mock = new Mock<IServiceContainer>();
+            mock.Setup(x => x.GetInstance<ProfilingLogger>()).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            setup?.Invoke(mock);
+            return mock.Object;
+        }
+
         [Test]
         public void Boot()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
-            var logger = Mock.Of<ILogger>();
-            var profiler = new LogProfiler(logger);
-            container.RegisterInstance(logger);
-            container.RegisterInstance(profiler);
-            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+            var container = MockContainer();
 
             var thing = new BootLoader(container);
             Composed.Clear();
@@ -42,14 +41,7 @@ namespace Umbraco.Tests.Components
         [Test]
         public void BrokenDependency()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
-            var logger = Mock.Of<ILogger>();
-            var profiler = new LogProfiler(logger);
-            container.RegisterInstance(logger);
-            container.RegisterInstance(profiler);
-            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+            var container = MockContainer();
 
             var thing = new BootLoader(container);
             Composed.Clear();
@@ -67,16 +59,10 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Initialize()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
-            container.Register<ISomeResource, SomeResource>();
-
-            var logger = Mock.Of<ILogger>();
-            var profiler = new LogProfiler(logger);
-            container.RegisterInstance(logger);
-            container.RegisterInstance(profiler);
-            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+            var container = MockContainer(m =>
+            {
+                m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof (ISomeResource)))).Returns(() => new SomeResource());
+            });
 
             var thing = new BootLoader(container);
             Composed.Clear();
@@ -91,14 +77,7 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Requires1()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
-            var logger = Mock.Of<ILogger>();
-            var profiler = new LogProfiler(logger);
-            container.RegisterInstance(logger);
-            container.RegisterInstance(profiler);
-            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+            var container = MockContainer();
 
             var thing = new BootLoader(container);
             Composed.Clear();
@@ -111,14 +90,7 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Requires2()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
-            var logger = Mock.Of<ILogger>();
-            var profiler = new LogProfiler(logger);
-            container.RegisterInstance(logger);
-            container.RegisterInstance(profiler);
-            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+            var container = MockContainer();
 
             var thing = new BootLoader(container);
             Composed.Clear();
@@ -132,14 +104,7 @@ namespace Umbraco.Tests.Components
         [Test]
         public void WeakDependencies()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
-            var logger = Mock.Of<ILogger>();
-            var profiler = new LogProfiler(logger);
-            container.RegisterInstance(logger);
-            container.RegisterInstance(profiler);
-            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+            var container = MockContainer();
 
             var thing = new BootLoader(container);
             Composed.Clear();
@@ -165,14 +130,7 @@ namespace Umbraco.Tests.Components
         [Test]
         public void DisableMissing()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
-            var logger = Mock.Of<ILogger>();
-            var profiler = new LogProfiler(logger);
-            container.RegisterInstance(logger);
-            container.RegisterInstance(profiler);
-            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+            var container = MockContainer();
 
             var thing = new BootLoader(container);
             Composed.Clear();

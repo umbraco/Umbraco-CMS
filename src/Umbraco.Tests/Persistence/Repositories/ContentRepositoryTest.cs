@@ -25,8 +25,8 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentRepositoryTest : TestWithDatabaseBase
     {
         public override void SetUp()

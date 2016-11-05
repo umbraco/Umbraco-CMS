@@ -11,9 +11,9 @@ namespace Umbraco.Tests.Services
     /// <summary>
     /// Tests covering the EntityService
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture, RequiresSTA]
-    public class EntityServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class EntityServiceTests : TestWithSomeContentBase
     {
         [Test]
         public void EntityService_Can_Find_All_Content_By_UmbracoObjectTypes()
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Services
             Assert.That(
                 entities.Any(
                     x =>
-                    x.AdditionalData.Any(y => y.Value is UmbracoEntity.EntityProperty 
+                    x.AdditionalData.Any(y => y.Value is UmbracoEntity.EntityProperty
                         && ((UmbracoEntity.EntityProperty)y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
         }
 
@@ -174,7 +174,7 @@ namespace Umbraco.Tests.Services
 
                 //Create and Save folder-Media -> 1050
                 var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
-                var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);                
+                var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
                 ServiceContext.MediaService.Save(folder, 0);
                 folderId = folder.Id;
 
@@ -192,9 +192,7 @@ namespace Umbraco.Tests.Services
                 ServiceContext.MediaService.Save(subfolder, 0);
                 var subfolder2 = MockedMedia.CreateMediaFolder(folderMediaType, subfolder.Id);
                 ServiceContext.MediaService.Save(subfolder2, 0);
-                
             }
-            
         }
     }
 }
