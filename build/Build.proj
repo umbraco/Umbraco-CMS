@@ -268,7 +268,7 @@
 	<!-- Build the Umbraco.Compat7 project (is not a dependency) -->
     <MSBuild Projects="..\src\Umbraco.Compat7\Umbraco.Compat7.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);Verbosity=minimal" Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="14.0" UnloadProjectsOnCompletion="False" />
 	<!-- Build the Umbraco.Tests project (is not a dependency) -->
-    <MSBuild Projects="..\src\Umbraco.Tests\Umbraco.Tests.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);Verbosity=minimal" Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="14.0" UnloadProjectsOnCompletion="False" />
+    <MSBuild Projects="..\src\Umbraco.Tests\Umbraco.Tests.csproj" Properties="WarningLevel=0;Configuration=Debug;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);Verbosity=minimal" Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="14.0" UnloadProjectsOnCompletion="False" />
 
     <!-- DONE -->
     <Message Text="Finished compiling projects" Importance="high" />
