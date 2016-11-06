@@ -23,6 +23,7 @@ function mediaHelper(umbRequestHelper) {
          * @param {object} options.imageOnly Optional, if true then will only return a path if the media item is an image
          */
         getMediaPropertyValue: function (options) {
+
             if (!options || !options.mediaModel) {
                 throw "The options objet does not contain the required parameters: mediaModel";
             }
@@ -58,8 +59,8 @@ function mediaHelper(umbRequestHelper) {
 
             var mediaVal;
 
-            //our default images might store one or many images (as csv)
-            var split = imageProp.value.split(',');
+            //our default images might store one or many images (as csv)            
+            var split = (imageProp.value && imageProp.value.src) ? imageProp.value.src.split(',') : '';
             var self = this;
             mediaVal = _.map(split, function (item) {
                 return { file: item, isImage: self.detectIfImageByExtension(item) };
