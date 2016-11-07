@@ -64,7 +64,8 @@
     <script type="text/javascript">
     document.angularReady = function (app) {
 
-        @Html.AngularExternalLoginInfoValuesScript((IEnumerable<string>)ViewBag.ExternalSignInError)
+        @Html.AngularValueExternalLoginInfoScript((IEnumerable<string>)ViewBag.ExternalSignInError)
+        @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
 
     }
     </script>

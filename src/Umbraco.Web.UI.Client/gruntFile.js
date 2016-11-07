@@ -380,8 +380,12 @@ module.exports = function (grunt) {
             options: {
                 dest: 'docs/api',
                 startPage: '/api',
-                title: "Umbraco 7",
+                title: "Umbraco Backoffice UI API Documentation",
                 html5Mode: false,
+                styles: [
+                    'docs/umb-docs.css'
+                ],
+                image: "https://our.umbraco.org/assets/images/logo.svg"
             },
             api: {
                 src: ['src/common/**/*.js', 'docs/src/api/**/*.ngdoc'],
@@ -390,7 +394,7 @@ module.exports = function (grunt) {
             tutorials: {
                 src: [],
                 title: ''
-            }
+            }            
         },
 
         eslint:{
@@ -459,6 +463,10 @@ module.exports = function (grunt) {
                     expand: true,
                     ignorePackages: ['bootstrap'],
                     packageSpecific: {
+                        'moment': {
+                            keepExpandedHierarchy: false,
+                            files: ['min/moment-with-locales.js']
+                        },
                         'typeahead.js': {
                             keepExpandedHierarchy: false,
                             files: ['dist/typeahead.bundle.min.js']

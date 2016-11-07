@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using System.Globalization;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (sourceString != null)
             {
                 decimal d;
-                return (decimal.TryParse(sourceString, out d)) ? d : 0M;
+                return (decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,  out d)) ? d : 0M;
             }
 
             // in the database an a decimal is an a decimal 

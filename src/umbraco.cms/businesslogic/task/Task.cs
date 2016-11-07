@@ -131,7 +131,7 @@ namespace umbraco.cms.businesslogic.task
             set
             {
                 _user = value;
-                TaskEntity.OwnerUserId = _user.Id;
+                TaskEntity.AssigneeUserId = _user.Id;
             }
         }
 

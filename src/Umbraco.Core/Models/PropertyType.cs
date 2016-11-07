@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
@@ -423,6 +424,19 @@ namespace Umbraco.Core.Models
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Checks the underlying property editor prevalues to see if the one that allows changing of the database field
+        /// to which data is saved (dataInt, dataVarchar etc.) is included.  If so that means the field could be changed when the data
+        /// type is saved.
+        /// </summary>
+        /// <returns></returns>
+        internal bool CanHaveDataValueTypeChanged()
+        {
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(_propertyEditorAlias);
+            return propertyEditor.PreValueEditor.Fields
+                .SingleOrDefault(x => x.Key == Constants.PropertyEditors.PreValueKeys.DataValueType) != null;
         }
 
         /// <summary>

@@ -60,6 +60,7 @@
     <key alias="atViewingFor">For</key>
   </area>
   <area alias="buttons">
+    <key alias="clearSelection">Ryd valg</key>
     <key alias="select">Vælg</key>
     <key alias="selectCurrentFolder">Vælg nuværende mappe</key>
     <key alias="somethingElse">Gør noget andet</key>
@@ -165,6 +166,10 @@
   <area alias="media">
     <key alias="clickToUpload">Klik for at uploade</key>
     <key alias="dropFilesHere">Slip filerne her...</key>
+    <key alias="urls">Link til medie</key>
+    <key alias="orClickHereToUpload">eller klik her for at vælge filer</key>
+    <key alias="onlyAllowedFiles">Tilladte filtyper er kun</key>
+    <key alias="maxFileSize">Maks filstørrelse er</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -187,6 +192,12 @@
     <key alias="visit">Besøg</key>
     <key alias="welcome">Velkommen</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Bliv</key>
+    <key alias="discardChanges">Kassér ændringer</key>
+    <key alias="unsavedChanges">Du har ikke-gemte ændringer</key>
+    <key alias="unsavedChangesWarning">Er du sikker på du vil navigere væk fra denne side? - du har ikke-gemte ændringer</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Navn på lokalt link</key>
     <key alias="assignDomain">Rediger domæner</key>
@@ -197,7 +208,7 @@
     <key alias="confirmlogout">Er du sikker på at du vil forlade Umbraco?</key>
     <key alias="confirmSure">Er du sikker?</key>
     <key alias="cut">Klip</key>
-    <key alias="editdictionary">Rediger ordbogs nøgle</key>
+    <key alias="editdictionary">Rediger ordbogsnøgle</key>
     <key alias="editlanguage">Rediger sprog</key>
     <key alias="insertAnchor">Indsæt lokalt link</key>
     <key alias="insertCharacter">Indsæt tegn</key>
@@ -421,8 +432,8 @@
     <key alias="listView">Listevisning</key>
     <key alias="saving">Gemmer...</key>
     <key alias="current">nuværende</key>
-    <key alias="move">Flyt</key>
     <key alias="embed">Indlejring</key>
+    <key alias="selected">valgt</key>
   </area>
 
   <area alias="colors">
@@ -985,7 +996,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberRoles">Roller</key>
     <key alias="memberTypes">Medlemstype</key>
     <key alias="documentTypes">Dokumenttyper</key>
-    <key alias="relationTypes">Dokumenttyper</key>
+    <key alias="relationTypes">Relationstyper</key>
 
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>

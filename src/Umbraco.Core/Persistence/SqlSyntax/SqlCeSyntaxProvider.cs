@@ -208,7 +208,6 @@ ORDER BY TABLE_NAME, INDEX_NAME");
         
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
-
         
     }
 }

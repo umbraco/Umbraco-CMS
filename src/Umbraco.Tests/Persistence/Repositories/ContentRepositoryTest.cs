@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
@@ -20,6 +21,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -72,7 +74,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create 100 non published
                 for (var i = 0; i < 100; i++)
-                {                    
+                {
                     var c1 = MockedContent.CreateSimpleContent(contentType1);
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
@@ -176,7 +178,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 for (var i = 0; i < 30; i++)
                 {
                     //These will be non-published so shouldn't show up
-                    var c1 = MockedContent.CreateSimpleContent(contentType1);                 
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
@@ -265,16 +267,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
-                Content textpage = MockedContent.CreateSimpleContent(contentType);
+                IContent textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
                 contentTypeRepository.AddOrUpdate(contentType);
                 repository.AddOrUpdate(textpage);
                 unitOfWork.Commit();
-
+                
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(textpage.HasIdentity, Is.True);
+
                 
             }
         }
@@ -299,14 +302,18 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
-                
+
                 contentTypeRepository.AddOrUpdate(contentType);
                 repository.AddOrUpdate(textpage);
                 unitOfWork.Commit();
 
+                var fetched = repository.Get(textpage.Id);
+
                 // Assert
                 Assert.That(textpage.Template, Is.Not.Null);
                 Assert.That(textpage.Template, Is.EqualTo(contentType.DefaultTemplate));
+
+                TestHelper.AssertAllPropertyValuesAreEquals(textpage, fetched, "yyyy-MM-dd HH:mm:ss");
             }
         }
 
@@ -520,7 +527,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
-            {                
+            {
                 var result = repository.GetAll().ToArray();
                 foreach (var content in result)
                 {
@@ -544,6 +551,41 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_GetPagedResultsByQuery_Sorting_On_Custom_Property()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Name.Contains("Text"));
+                long totalRecords;
+                
+                try
+                {                    
+                    DatabaseContext.Database.EnableSqlTrace = true;
+                    DatabaseContext.Database.EnableSqlCount();
+
+                    var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "title", Direction.Ascending, false);
+
+                    Assert.AreEqual(3, totalRecords);
+                    Assert.AreEqual(2, result.Count());
+
+                    result = repository.GetPagedResultsByQuery(query, 1, 2, out totalRecords, "title", Direction.Ascending, false);
+                    
+                    Assert.AreEqual(1, result.Count());
+                }
+                finally
+                {                
+                    DatabaseContext.Database.EnableSqlTrace = false;
+                    DatabaseContext.Database.DisableSqlCount();
+                }                
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetPagedResultsByQuery_ForFirstPage_On_ContentRepository()
         {
             // Arrange
@@ -555,12 +597,23 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending);
 
-                // Assert
-                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
-                Assert.That(result.Count(), Is.EqualTo(1));
-                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+                try
+                {
+                    DatabaseContext.Database.EnableSqlTrace = true;
+                    DatabaseContext.Database.EnableSqlCount();
+                    var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true);
+
+                    // Assert
+                    Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                    Assert.That(result.Count(), Is.EqualTo(1));
+                    Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+                }
+                finally
+                {
+                    DatabaseContext.Database.EnableSqlTrace = false;
+                    DatabaseContext.Database.DisableSqlCount();
+                }
             }
         }
 
@@ -576,7 +629,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending);
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending, true);
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -597,7 +650,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "Name", Direction.Ascending);
+                var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "Name", Direction.Ascending, true);
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -618,7 +671,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Descending);
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Descending, true);
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -639,7 +692,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page 2");
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, "Page 2");
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(1));
@@ -660,7 +713,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page");
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, "Page");
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(2));
