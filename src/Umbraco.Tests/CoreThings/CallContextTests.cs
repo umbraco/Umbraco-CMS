@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.CoreThings
 {
     [TestFixture]
     public class CallContextTests
@@ -35,11 +35,11 @@ namespace Umbraco.Tests
             SafeCallContext.Clear();
         }
 
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //    SafeCallContext.Clear();
-        //}
+        [TearDown]
+        public void TearDown()
+        {
+            SafeCallContext.Clear();
+        }
 
         [Test]
         public void Test1()

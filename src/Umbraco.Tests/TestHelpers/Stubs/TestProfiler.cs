@@ -3,7 +3,7 @@ using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
 using Umbraco.Core.Logging;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Tests.TestHelpers.Stubs
 {
     public class TestProfiler : IProfiler
     {

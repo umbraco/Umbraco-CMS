@@ -1,12 +1,11 @@
 ﻿using System;
-using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.DI;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.CoreThings
 {
     [TestFixture]
     public class TryConvertToTests : UmbracoTestBase

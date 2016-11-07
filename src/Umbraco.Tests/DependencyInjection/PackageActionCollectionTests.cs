@@ -7,7 +7,7 @@ using Umbraco.Core.DI;
 using Umbraco.Core.Plugins;
 using Umbraco.Core._Legacy.PackageActions;
 
-namespace Umbraco.Tests.DependencyInjection
+namespace Umbraco.Tests.DI
 {
     [TestFixture]
     public class PackageActionCollectionTests : ResolverBaseTest

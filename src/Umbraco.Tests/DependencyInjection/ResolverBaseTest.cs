@@ -7,7 +7,7 @@ using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Plugins;
 
-namespace Umbraco.Tests.DependencyInjection
+namespace Umbraco.Tests.DI
 {
     public abstract class ResolverBaseTest // fixme rename, do something!
     {

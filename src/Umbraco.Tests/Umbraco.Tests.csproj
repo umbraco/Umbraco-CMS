@@ -227,38 +227,36 @@
   <ItemGroup>
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
-    <Compile Include="CallContextTests.cs" />
+    <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
-    <Compile Include="DependencyInjection\TempTests.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
-    <Compile Include="NUnitTests.cs" />
+    <Compile Include="Testing\NUnitTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Persistence\Migrations\PostMigrationTests.cs" />
     <Compile Include="Persistence\NPocoExpressionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Scheduling\DeployTest.cs" />
-    <Compile Include="TestHelpers\Settable.cs" />
     <Compile Include="TestHelpers\UmbracoTestAttribute.cs" />
     <Compile Include="TestHelpers\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\UmbracoTestOptions.cs" />
-    <Compile Include="TryConvertToTests.cs" />
-    <Compile Include="TestHelpers\TestFacadeAccessor.cs" />
-    <Compile Include="TestHelpers\TestIndexCollectionAccessor.cs" />
+    <Compile Include="CoreThings\TryConvertToTests.cs" />
+    <Compile Include="TestHelpers\Stubs\TestFacadeAccessor.cs" />
+    <Compile Include="TestHelpers\Stubs\TestIndexCollectionAccessor.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
-    <Compile Include="TestHelpers\TestUmbracoDatabaseAccessor.cs" />
-    <Compile Include="TestHelpers\TestUmbracoContextAccessor.cs" />
+    <Compile Include="TestHelpers\Stubs\TestUmbracoDatabaseAccessor.cs" />
+    <Compile Include="TestHelpers\Stubs\TestUmbracoContextAccessor.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
     <Compile Include="Web\AngularIntegration\ServerVariablesParserTests.cs" />
-    <Compile Include="AttemptTests.cs" />
+    <Compile Include="CoreThings\AttemptTests.cs" />
     <Compile Include="Cache\CacheRefresherTests.cs" />
     <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMappingTests.cs" />
@@ -268,7 +266,7 @@
     <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
     <Compile Include="Collections\DeepCloneableListTests.cs" />
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
-    <Compile Include="DelegateExtensionsTests.cs" />
+    <Compile Include="CoreThings\DelegateExtensionsTests.cs" />
     <Compile Include="Logging\AsyncRollingFileAppenderTest.cs" />
     <Compile Include="Logging\DebugAppender.cs" />
     <Compile Include="Logging\ParallelForwarderTest.cs" />
@@ -298,7 +296,7 @@
     <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
     <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
-    <Compile Include="MockTests.cs" />
+    <Compile Include="Testing\MockTests.cs" />
     <Compile Include="Models\MacroTests.cs" />
     <Compile Include="Models\Mapping\AutoMapperTests.cs" />
     <Compile Include="Models\Collections\Item.cs" />
@@ -394,7 +392,7 @@
     <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
-    <Compile Include="ApplicationUrlHelperTests.cs" />
+    <Compile Include="Misc\ApplicationUrlHelperTests.cs" />
     <Compile Include="Services\FileServiceTests.cs" />
     <Compile Include="Services\LocalizedTextServiceTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />
@@ -452,10 +450,10 @@
     <Compile Include="PublishedContent\PublishedContentTestElements.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
-    <Compile Include="HashCodeCombinerTests.cs" />
+    <Compile Include="Misc\HashCodeCombinerTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
-    <Compile Include="LibraryTests.cs" />
+    <Compile Include="Misc\LibraryTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
@@ -494,7 +492,7 @@
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
-    <Compile Include="TestHelpers\TestProfiler.cs" />
+    <Compile Include="TestHelpers\Stubs\TestProfiler.cs" />
     <Compile Include="TreesAndSections\ResourceFiles.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -502,7 +500,7 @@
     </Compile>
     <Compile Include="TreesAndSections\SectionTests.cs" />
     <Compile Include="TreesAndSections\ApplicationTreeTest.cs" />
-    <Compile Include="ObjectExtensionsTests.cs" />
+    <Compile Include="CoreThings\ObjectExtensionsTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="DependencyInjection\LazyCollectionBuilderTests.cs" />
     <Compile Include="DependencyInjection\CollectionBuildersTests.cs" />
@@ -530,7 +528,6 @@
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
     <Compile Include="TestHelpers\TestWithApplicationBase.cs" />
-    <Compile Include="TestHelpers\DatabaseBehavior.cs" />
     <Compile Include="TestHelpers\SettingsForTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
@@ -564,14 +561,14 @@
     <Compile Include="UI\LegacyDialogTests.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataMediaService.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
-    <Compile Include="UriExtensionsTests.cs" />
-    <Compile Include="UriUtilityTests.cs" />
+    <Compile Include="CoreThings\UriExtensionsTests.cs" />
+    <Compile Include="Misc\UriUtilityTests.cs" />
     <Compile Include="DependencyInjection\PackageActionCollectionTests.cs" />
     <Compile Include="Plugins\PluginManagerExtensions.cs" />
     <Compile Include="Plugins\PluginManagerTests.cs" />
-    <Compile Include="TestHelpers\Stubs\FakeLastChanceFinder.cs" />
+    <Compile Include="TestHelpers\Stubs\TestLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
-    <Compile Include="EnumerableExtensionsTests.cs" />
+    <Compile Include="CoreThings\EnumerableExtensionsTests.cs" />
     <Compile Include="IO\AbstractFileSystemTests.cs" />
     <Compile Include="IO\FileSystemProviderManagerTests.cs" />
     <Compile Include="IO\PhysicalFileSystemTests.cs" />
@@ -580,10 +577,10 @@
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="Plugins\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
-    <Compile Include="VersionExtensionTests.cs" />
+    <Compile Include="CoreThings\VersionExtensionTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
-    <Compile Include="XmlExtensionsTests.cs" />
-    <Compile Include="XmlHelperTests.cs" />
+    <Compile Include="CoreThings\XmlExtensionsTests.cs" />
+    <Compile Include="Misc\XmlHelperTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

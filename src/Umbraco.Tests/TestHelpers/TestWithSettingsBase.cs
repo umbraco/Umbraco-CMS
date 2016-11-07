@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.TestHelpers

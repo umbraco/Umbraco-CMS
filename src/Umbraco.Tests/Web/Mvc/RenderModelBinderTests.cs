@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Current = Umbraco.Web.Current;

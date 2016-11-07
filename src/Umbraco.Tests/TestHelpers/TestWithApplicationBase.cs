@@ -16,6 +16,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Services;
 using UmbracoExamine;
 

@@ -22,6 +22,7 @@ using umbraco.uicontrols;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Plugins;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;

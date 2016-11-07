@@ -1,8 +1,8 @@
 ﻿using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Tests.TestHelpers.Stubs
 {
-    class TestFacadeAccessor : IFacadeAccessor
+    public class TestFacadeAccessor : IFacadeAccessor
     {
         public IFacade Facade { get; set; }
     }

@@ -554,6 +554,7 @@
     <Compile Include="Services\OperationStatusType.cs" />
     <Compile Include="Services\ServiceWithResultExtensions.cs" />
     <Compile Include="Services\TaskService.cs" />
+    <Compile Include="Settable.cs" />
     <Compile Include="Strategies\ManifestWatcherComponent.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
     <Compile Include="Models\IPartialView.cs" />

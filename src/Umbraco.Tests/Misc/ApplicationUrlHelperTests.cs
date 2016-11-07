@@ -6,11 +6,11 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
-using Umbraco.Core.DI;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.Misc
 {
     [TestFixture]
     public class ApplicationUrlHelperTests

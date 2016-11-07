@@ -4,7 +4,7 @@ using Umbraco.Web;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
 
-namespace Umbraco.Tests.DependencyInjection
+namespace Umbraco.Tests.DI
 {
     [TestFixture]
     public class ActionCollectionTests : ResolverBaseTest

@@ -5,7 +5,7 @@ using LightInject;
 using NUnit.Framework;
 using Umbraco.Core.DI;
 
-namespace Umbraco.Tests.DependencyInjection
+namespace Umbraco.Tests.DI
 {
     [TestFixture]
     public class CollectionBuildersTests

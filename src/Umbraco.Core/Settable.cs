@@ -1,9 +1,7 @@
 ﻿using System;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Core
 {
-    // fixme - belongs to Core?
-
     /// <summary>
     /// Represents a value that can be assigned a value.
     /// </summary>

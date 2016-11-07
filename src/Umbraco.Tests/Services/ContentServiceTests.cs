@@ -19,6 +19,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.DI;
 using Umbraco.Core.Events;
+using Umbraco.Tests.TestHelpers.Stubs;
 
 namespace Umbraco.Tests.Services
 {

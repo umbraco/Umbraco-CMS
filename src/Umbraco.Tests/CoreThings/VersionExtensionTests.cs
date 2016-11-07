@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.CoreThings
 {
     [TestFixture]
     public class VersionExtensionTests

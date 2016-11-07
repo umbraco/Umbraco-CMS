@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TestHelpers

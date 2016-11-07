@@ -3,16 +3,15 @@ using Lucene.Net.Index;
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.CoreThings
 {
     [TestFixture]
     public class DelegateExtensionsTests
     {
-
         [Test]
         public void Only_Executes_Specific_Count()
         {
-            var maxTries = 5;
+            const int maxTries = 5;
             var totalTries = 0;
             DelegateExtensions.RetryUntilSuccessOrMaxAttempts((currentTry) =>
             {
@@ -26,21 +25,14 @@ namespace Umbraco.Tests
         [Test]
         public void Quits_On_Success_Count()
         {
-            var maxTries = 5;
             var totalTries = 0;
             DelegateExtensions.RetryUntilSuccessOrMaxAttempts((currentTry) =>
             {
                 totalTries = currentTry;
-                if (totalTries == 2)
-                {
-                    return Attempt<string>.Succeed();
-                }                
-                return Attempt<string>.Fail();
+                return totalTries == 2 ? Attempt<string>.Succeed() : Attempt<string>.Fail();
             }, 5, TimeSpan.FromMilliseconds(10));
 
             Assert.AreEqual(2, totalTries);
         }
-
-
     }
 }

@@ -31,6 +31,7 @@ using File = System.IO.File;
 using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers.Stubs;
 
 namespace Umbraco.Tests.TestHelpers
 {

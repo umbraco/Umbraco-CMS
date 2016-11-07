@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
-using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Plugins;
@@ -59,7 +58,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 	        return null;
 		}
 
-		public System.Web.SessionState.SessionStateBehavior GetControllerSessionBehavior(RequestContext requestContext, string controllerName)
+		public SessionStateBehavior GetControllerSessionBehavior(RequestContext requestContext, string controllerName)
 		{
 			return SessionStateBehavior.Disabled;
 		}

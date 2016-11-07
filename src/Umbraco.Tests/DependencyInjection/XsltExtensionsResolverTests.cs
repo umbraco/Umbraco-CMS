@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core.Macros;
 using Umbraco.Web;
 
-namespace Umbraco.Tests.DependencyInjection
+namespace Umbraco.Tests.DI
 {
     [TestFixture]
     public class XsltExtensionsResolverTests : ResolverBaseTest

@@ -66,7 +66,7 @@ namespace Umbraco.Tests.TestHelpers
             return new FacadeRouter(
                 TestObjects.GetUmbracoSettings().WebRouting,
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
-                new FakeLastChanceFinder(),
+                new TestLastChanceFinder(),
                 container?.TryGetInstance<ServiceContext>() ?? new ServiceContext(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
         }
