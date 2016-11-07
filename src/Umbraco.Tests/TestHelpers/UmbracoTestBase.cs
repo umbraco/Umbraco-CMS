@@ -11,7 +11,9 @@ using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Plugins;
+using Umbraco.Web;
 using Umbraco.Web.DI;
+using Current = Umbraco.Core.DI.Current;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -191,6 +193,9 @@ namespace Umbraco.Tests.TestHelpers
 
             Container?.Dispose();
             Container = null;
+
+            // reset all other static things that should not be static ;(
+            UriUtility.ResetAppDomainAppVirtualPath();
         }
 
         #endregion

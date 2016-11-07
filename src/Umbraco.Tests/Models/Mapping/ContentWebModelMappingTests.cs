@@ -21,11 +21,14 @@ namespace Umbraco.Tests.Models.Mapping
     [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class ContentWebModelMappingTests : TestWithDatabaseBase
     {
-        protected override void MoreSetUp()
+        protected override void Compose()
         {
-            Container.RegisterSingleton<ICultureDictionaryFactory>(_ => Mock.Of<ICultureDictionaryFactory>());
+            base.Compose();
 
-            base.MoreSetUp();
+            //Container.RegisterSingleton(f => new PropertyEditorCollection(new[] { new TestPropertyEditor(f.GetInstance<ILogger>()) }));
+            //Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
+            //    .Add(f => f.GetInstance<PluginManager>().ResolvePropertyEditors());
+            Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
         }
 
         [PropertyEditor("Test.Test", "Test", "~/Test.html")]
@@ -35,17 +38,8 @@ namespace Umbraco.Tests.Models.Mapping
             /// The constructor will setup the property editor based on the attribute if one is found
             /// </summary>
             public TestPropertyEditor(ILogger logger) : base(logger)
-            {
-            }
+            { }
         }
-
-        //protected override void FreezeResolution()
-        //{
-        //    PropertyEditorResolver.Current = new PropertyEditorResolver(
-        //        () => PluginManager.Current.ResolvePropertyEditors());
-
-        //    base.FreezeResolution();
-        //}
 
         [Test]
         public void To_Media_Item_Simple()

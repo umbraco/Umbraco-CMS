@@ -28,11 +28,11 @@ namespace Umbraco.Tests.UmbracoExamine
         /// <summary>
         /// sets up resolvers before resolution is frozen
         /// </summary>
-        protected override void MoreSetUp()
+        protected override void Compose()
         {
-            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));
+            base.Compose();
 
-            base.MoreSetUp();
+            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));
         }
     }
 }

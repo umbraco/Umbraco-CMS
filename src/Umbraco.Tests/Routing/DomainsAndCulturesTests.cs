@@ -1,24 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
 using Umbraco.Web.Routing;
-using umbraco.cms.businesslogic.web;
-using System.Configuration;
 
 namespace Umbraco.Tests.Routing
 {
     [TestFixture]
     internal class DomainsAndCulturesTests : UrlRoutingTestBase
     {
-        protected override void MoreSetUp()
+        protected override void Compose()
         {
-            base.MoreSetUp();
+            base.Compose();
+
             Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
@@ -123,7 +117,7 @@ namespace Umbraco.Tests.Routing
         protected override string GetXmlContent(int templateId)
         {
             return @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
 ]>

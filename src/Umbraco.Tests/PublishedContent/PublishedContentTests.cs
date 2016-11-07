@@ -64,12 +64,11 @@ namespace Umbraco.Tests.PublishedContent
             Core.DI.Current.Reset();
         }
 
-	    protected override void MoreSetUp()
+	    protected override void Compose()
 	    {
-            var types = Current.PluginManager.ResolveTypes<PublishedContentModel>();
-            Container.RegisterSingleton<IPublishedContentModelFactory>(_ => new PublishedContentModelFactory(types));
+	        base.Compose();
 
-            base.MoreSetUp();
+            Container.RegisterSingleton<IPublishedContentModelFactory>(f => new PublishedContentModelFactory(f.GetInstance<PluginManager>().ResolveTypes<PublishedContentModel>()));
 	    }
 
         private readonly Guid _node1173Guid = Guid.NewGuid();

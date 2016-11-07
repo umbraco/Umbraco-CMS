@@ -20,12 +20,12 @@ namespace Umbraco.Tests.Cache.PublishedCache
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PublishMediaCacheTests : BaseWebTest
 	{
-        protected override void MoreSetUp()
+        protected override void Compose()
         {
+            base.Compose();
+
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
-
-            base.MoreSetUp();
         }
 
         //NOTE: This is "Without_Examine" too

@@ -56,8 +56,10 @@ namespace Umbraco.Tests.Routing
 	        }
 	    }
 
-        protected override void MoreSetUp()
+        protected override void Compose()
         {
+            base.Compose();
+
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
@@ -68,8 +70,6 @@ namespace Umbraco.Tests.Routing
             Container.RegisterInstance(umbracoApiControllerTypes);
 
             Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));
-
-            base.MoreSetUp();
         }
 
 		public override void TearDown()

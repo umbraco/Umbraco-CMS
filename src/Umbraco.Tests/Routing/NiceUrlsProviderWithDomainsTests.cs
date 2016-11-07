@@ -20,11 +20,6 @@ namespace Umbraco.Tests.Routing
             base.Compose();
 
             Container.RegisterSingleton(_ => Mock.Of<IDomainService>());
-        }
-
-        protected override void MoreSetUp()
-        {
-            base.MoreSetUp();
             Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
@@ -83,7 +78,7 @@ namespace Umbraco.Tests.Routing
         protected override string GetXmlContent(int templateId)
         {
             return @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
 ]>

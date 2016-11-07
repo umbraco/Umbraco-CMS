@@ -40,13 +40,13 @@ namespace Umbraco.Tests.CoreThings
         [Test]
         public void Flatten_List_2()
         {
-            var hierarchy = new TestItem
+            var hierarchy = new TestItem("1")
             {
                     Children = new List<TestItem>
                     {
-                            new TestItem(),
-                            new TestItem(),
-                            new TestItem()
+                            new TestItem("1.1"),
+                            new TestItem("1.2"),
+                            new TestItem("1.3")
                         }
                 };
 
@@ -64,58 +64,58 @@ namespace Umbraco.Tests.CoreThings
         [Test]
         public void Flatten_List()
         {
-            var hierarchy = new TestItem
+            var hierarchy = new TestItem("1")
             {
                 Children = new List<TestItem>
                 {
-	                new TestItem
+	                new TestItem("1.1")
 	                {
 	                    Children = new List<TestItem>
 	                    {
-	                        new TestItem
+	                        new TestItem("1.1.1")
 	                        {
 	                            Children = new List<TestItem>
 	                            {
-	                                new TestItem
+	                                new TestItem("1.1.1.1")
 	                                {
 	                                    Children = new List<TestItem>
 	                                    {
-	                                        new TestItem(),
-                                            new TestItem()
-	                                    }
-	                                    }
-	                                }
-	                            }
-	                        }
-	                    },
-	                    new TestItem
-	                    {
-	                        Children = new List<TestItem>
-	                        {
-	                            new TestItem
-	                            {
-	                                Children = new List<TestItem>
-	                                {
-	                                    new TestItem
-	                                    {
-	                                        Children = new List<TestItem>()
-	                                    }
-	                                }
-	                            },
-	                            new TestItem
-	                            {
-	                                Children = new List<TestItem>
-	                                {
-	                                    new TestItem
-	                                    {
-	                                        Children = new List<TestItem>()
+	                                        new TestItem("1.1.1.1.1"),
+                                            new TestItem("1.1.1.1.2")
 	                                    }
 	                                }
 	                            }
 	                        }
 	                    }
+	                },
+	                new TestItem("1.2")
+	                {
+	                    Children = new List<TestItem>
+	                    {
+	                        new TestItem("1.2.1")
+	                        {
+	                            Children = new List<TestItem>
+	                            {
+	                                new TestItem("1.2.1.1")
+	                                {
+	                                    Children = new List<TestItem>()
+	                                }
+	                            }
+	                        },
+	                        new TestItem("1.2.2")
+	                        {
+	                            Children = new List<TestItem>
+	                            {
+	                                new TestItem("1.2.2.1")
+	                                {
+	                                    Children = new List<TestItem>()
+	                                }
+	                            }
+	                        }
+	                    }
 	                }
-                };
+	            }
+            };
 
 #pragma warning disable CS0618 // Type or member is obsolete
             var flattened = hierarchy.Children.FlattenList(x => x.Children);
@@ -125,15 +125,19 @@ namespace Umbraco.Tests.CoreThings
             Assert.AreEqual(10, flattened.Count());
             Assert.AreEqual(10, selectRecursive.Count());
 
-            Assert.IsTrue(flattened.SequenceEqual(selectRecursive));
+            // both methods return the same elements, but not in the same order
+            Assert.IsFalse(flattened.SequenceEqual(selectRecursive));
+            foreach (var x in flattened) Assert.IsTrue(selectRecursive.Contains(x));
         }
 
         private class TestItem
         {
-            public TestItem()
+            public TestItem(string name)
             {
                 Children = Enumerable.Empty<TestItem>();
+                Name = name;
             }
+            public string Name { get; }
             public IEnumerable<TestItem> Children { get; set; }
         }
 

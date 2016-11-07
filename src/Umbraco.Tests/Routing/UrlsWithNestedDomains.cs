@@ -22,13 +22,14 @@ namespace Umbraco.Tests.Routing
 	    {
             base.Compose();
             Container.RegisterSingleton(_ => Mock.Of<IDomainService>());
+            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         [Test]
 		public void DoNotPolluteCache()
 		{
             SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains            
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
 
             var settings = SettingsForTests.GenerateMockSettings();
             var request = Mock.Get(settings.RequestHandler);
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.Routing
 			SetDomains1();
 
 		    const string url = "http://domain1.com/1001-1/1001-1-1";
-			
+
 			// get the nice url for 100111
 		    var umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings, urlProviders: new [] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
 			Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, true));
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Routing
             // route a rogue url
             var facadeRouter = CreateFacadeRouter();
             var frequest = facadeRouter.CreateRequest(umbracoContext);
-            
+
 			facadeRouter.FindDomain(frequest);
 			Assert.IsTrue(frequest.HasDomain);
 
@@ -71,12 +72,6 @@ namespace Umbraco.Tests.Routing
 			//Assert.AreEqual("http://domain1.com/1001-1/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, true)); // bad
 		}
 
-        protected override void MoreSetUp()
-        {
-            base.MoreSetUp();
-            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
-        }
-
         void SetDomains1()
 		{
             SetupDomainServiceMock(new[]
@@ -90,7 +85,7 @@ namespace Umbraco.Tests.Routing
 		protected override string GetXmlContent(int templateId)
 		{
 			return @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
 ]>

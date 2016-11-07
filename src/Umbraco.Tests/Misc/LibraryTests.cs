@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Misc
         public override void SetUp()
         {
             base.SetUp();
-            
+
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
             // when they are requested, but we must declare those that we
@@ -32,14 +32,14 @@ namespace Umbraco.Tests.Misc
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("content", 0, "?"), 
+                    new PublishedPropertyType("content", 0, "?"),
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
             Debug.Print("INIT LIB {0}",
                 ContentTypesCache.Get(PublishedItemType.Content, "anything")
                     .PropertyTypes.Count());
-            
+
             var umbracoContext = GetUmbracoContext("/test");
             Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
 		}
@@ -47,12 +47,12 @@ namespace Umbraco.Tests.Misc
 	    /// <summary>
 	    /// sets up resolvers before resolution is frozen
 	    /// </summary>
-	    protected override void MoreSetUp()
+	    protected override void Compose()
 	    {
+	        base.Compose();
+
             // required so we can access property.Value
 	        Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
-
-	        base.MoreSetUp();
 	    }
 
 	    [Test]
@@ -122,8 +122,8 @@ namespace Umbraco.Tests.Misc
 			{
 				val = library.GetItem(1173, s);
 				legacyVal = LegacyGetItem(1173, s);
-				Assert.AreEqual(legacyVal, val);				
-			}			
+				Assert.AreEqual(legacyVal, val);
+			}
 		}
 
 		[Test]

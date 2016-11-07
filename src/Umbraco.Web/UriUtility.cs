@@ -13,7 +13,7 @@ namespace Umbraco.Web
 
         static UriUtility()
         {
-			SetAppDomainAppVirtualPath(HttpRuntime.AppDomainAppVirtualPath);
+			ResetAppDomainAppVirtualPath();
         }
 
 		// internal for unit testing only
@@ -25,19 +25,18 @@ namespace Umbraco.Web
 				_appPathPrefix = String.Empty;
 		}
 
-		// will be "/" or "/foo"
-        public static string AppPath
+        internal static void ResetAppDomainAppVirtualPath()
         {
-            get { return _appPath; }
+            SetAppDomainAppVirtualPath(HttpRuntime.AppDomainAppVirtualPath);
         }
 
-		// will be "" or "/foo"
-        public static string AppPathPrefix
-        {
-            get { return _appPathPrefix; }
-        }
+        // will be "/" or "/foo"
+        public static string AppPath => _appPath;
 
-		// adds the virtual directory if any
+        // will be "" or "/foo"
+        public static string AppPathPrefix => _appPathPrefix;
+
+        // adds the virtual directory if any
 		// see also VirtualPathUtility.ToAbsolute
 		public static string ToAbsolute(string url)
         {
@@ -234,7 +233,7 @@ namespace Umbraco.Web
     	internal static Uri ToFullUrl(string absolutePath, HttpContextBase httpContext)
 		{
     		if (httpContext == null) throw new ArgumentNullException("httpContext");
-    		if (String.IsNullOrEmpty(absolutePath))
+    		if (string.IsNullOrEmpty(absolutePath))
 				throw new ArgumentNullException("absolutePath");
 			
 			if (!absolutePath.StartsWith("/"))

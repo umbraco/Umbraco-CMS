@@ -35,7 +35,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // this is so the model factory looks into the test assembly
             _pluginManager = Current.PluginManager;
-            Core.DI.Current.PluginManager = new PluginManager(new NullCacheProvider(), ProfilingLogger, false)
+            Current.PluginManager = new PluginManager(new NullCacheProvider(), ProfilingLogger, false)
                 {
                     AssembliesToScan = _pluginManager.AssembliesToScan
                         .Union(new[] { typeof (PublishedContentMoreTests).Assembly})
@@ -44,14 +44,10 @@ namespace Umbraco.Tests.PublishedContent
             InitializeUmbracoContext();
         }
 
-        protected override void MoreSetUp()
+        protected override void Compose()
         {
             Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
-
-            var types = Current.PluginManager.ResolveTypes<PublishedContentModel>();
-            Container.RegisterSingleton<IPublishedContentModelFactory>(_ => new PublishedContentModelFactory(types));
-
-            base.MoreSetUp();
+            Container.RegisterSingleton<IPublishedContentModelFactory>(f => new PublishedContentModelFactory(f.GetInstance<PluginManager>().ResolveTypes<PublishedContentModel>()));
         }
 
         private void InitializeUmbracoContext()

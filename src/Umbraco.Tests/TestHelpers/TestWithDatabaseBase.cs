@@ -311,8 +311,10 @@ namespace Umbraco.Tests.TestHelpers
         /// <summary>
         /// sets up resolvers before resolution is frozen
         /// </summary>
-        protected override void MoreSetUp()
+        protected override void Initialize() // fixme - should NOT be here!
         {
+            base.Initialize();
+
             // fixme - what about if (PropertyValueConvertersResolver.HasCurrent == false) ??
             Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
@@ -344,8 +346,6 @@ namespace Umbraco.Tests.TestHelpers
 
                 _facadeService = service;
             }
-
-            base.MoreSetUp();
         }
 
         /// <summary>

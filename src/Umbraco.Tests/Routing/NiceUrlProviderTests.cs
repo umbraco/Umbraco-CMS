@@ -4,7 +4,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 
@@ -14,9 +13,9 @@ namespace Umbraco.Tests.Routing
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class NiceUrlProviderTests : BaseWebTest
     {
-        protected override void MoreSetUp()
+        protected override void Compose()
         {
-            base.MoreSetUp();
+            base.Compose();
             Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
@@ -32,7 +31,7 @@ namespace Umbraco.Tests.Routing
         }
 
 		/// <summary>
-		/// This checks that when we retrieve a NiceUrl for multiple items that there are no issues with cache overlap 
+		/// This checks that when we retrieve a NiceUrl for multiple items that there are no issues with cache overlap
 		/// and that they are all cached correctly.
         /// </summary>
 		[Test]
@@ -148,7 +147,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, umbracoSettings: _umbracoSettings, urlProviders: new[] { new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger) });
 
 			Assert.AreEqual("/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
-            
+
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
 			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
 
@@ -171,14 +170,14 @@ namespace Umbraco.Tests.Routing
 
 			Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
 
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);            
-            
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
+
             Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
 
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
             umbracoContext.UrlProvider.Mode = UrlProviderMode.Absolute;
-			
+
             Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
 		}
 	}

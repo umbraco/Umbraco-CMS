@@ -16,12 +16,12 @@ namespace Umbraco.Tests.PublishedContent
         public override void SetUp()
         {
             base.SetUp();
-            
+
             // need to specify a custom callback for unit tests
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias), 
+                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
@@ -30,16 +30,16 @@ namespace Umbraco.Tests.PublishedContent
             Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
         }
 
-        protected override void MoreSetUp()
+        protected override void Compose()
         {
+            base.Compose();
+
             // fixme - what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
             // can we risk double - registering and then, what happens?
             Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<DatePickerValueConverter>()
                 .Append<TinyMceValueConverter>()
                 .Append<YesNoValueConverter>();
-
-            base.MoreSetUp();
         }
     }
 }

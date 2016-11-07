@@ -66,8 +66,6 @@ namespace Umbraco.Tests.TestHelpers
             // create the legacy prop-eds mapping
             if (LegacyPropertyEditorIdToAliasConverter.Count() == 0)
                 LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
-
-            MoreSetUp();
         }
 
         public override void TearDown()
@@ -129,7 +127,7 @@ namespace Umbraco.Tests.TestHelpers
 
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
             Container.Register(factory
-               => TestObjects.GetDatabaseUnitOfWorkProvider(factory.GetInstance<ILogger>(), factory.TryGetInstance<IDatabaseFactory>(), factory.TryGetInstance<RepositoryFactory>()));
+                => TestObjects.GetDatabaseUnitOfWorkProvider(factory.GetInstance<ILogger>(), factory.TryGetInstance<IDatabaseFactory>(), factory.TryGetInstance<RepositoryFactory>()));
 
             Container.RegisterFrom<ServicesCompositionRoot>();
             // composition root is doing weird things, fix
@@ -137,10 +135,6 @@ namespace Umbraco.Tests.TestHelpers
             Container.RegisterSingleton<ISectionService, SectionService>();
 
             Container.RegisterSingleton(f => new PropertyEditorCollection(Enumerable.Empty<PropertyEditor>()));
-    }
-
-    // fixme - rename & refactor
-    protected virtual void MoreSetUp()
-        { }
+        }
     }
 }
