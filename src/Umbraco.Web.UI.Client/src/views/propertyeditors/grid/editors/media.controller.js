@@ -1,16 +1,16 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
-    function ($scope, $rootScope, $timeout) {
+    function ($scope, $rootScope, $timeout, mediaResource, mediaHelper) {
 
         $scope.setImage = function(){
             $scope.mediaPickerOverlay = {};
             $scope.mediaPickerOverlay.view = "mediapicker";
-            $scope.mediaPickerOverlay.cropSize = $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined;
+            $scope.mediaPickerOverlay.cropSize =  $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined;
             $scope.mediaPickerOverlay.showDetails = true;
             $scope.mediaPickerOverlay.disableFolderSelect = true;
             $scope.mediaPickerOverlay.onlyImages = true;
             $scope.mediaPickerOverlay.show = true;
-
+            
             $scope.mediaPickerOverlay.submit = function(model) {
                 var selectedImage = model.selectedImages[0];
 
@@ -33,29 +33,34 @@ angular.module("umbraco")
             };
         };
 
-        $scope.setUrl = function(){
+        $scope.setUrl = function () {
 
-            if($scope.control.value.image){
-                var url = $scope.control.value.image;
+            if ($scope.control.value.image) {
+   
+                mediaResource.getById($scope.control.value.id).then(function (media) {
+                    var url = $scope.control.value.image = mediaHelper.resolveFile(media, false);
 
-                if($scope.control.editor.config && $scope.control.editor.config.size){
-                    url += "?width=" + $scope.control.editor.config.size.width;
-                    url += "&height=" + $scope.control.editor.config.size.height;
-                    url += "&animationprocessmode=first";
+                    if(url!=null){
+                        if ($scope.control.editor.config && $scope.control.editor.config.size) {
+                            url += "?width=" + $scope.control.editor.config.size.width;
+                            url += "&height=" + $scope.control.editor.config.size.height;
+                            url += "&animationprocessmode=first";
 
-                    if($scope.control.value.focalPoint){
-                        url += "&center=" + $scope.control.value.focalPoint.top +"," + $scope.control.value.focalPoint.left;
-                        url += "&mode=crop";
+                            if ($scope.control.value.focalPoint) {
+                                url += "&center=" + $scope.control.value.focalPoint.top + "," + $scope.control.value.focalPoint.left;
+                                url += "&mode=crop";
+                            }
+                        }
+
+                        // set default size if no crop present (moved from the view)
+                        if (url.indexOf('?') == -1) {
+                            url += "?width=960&upscale=false&animationprocessmode=false"
+                        }
                     }
-                }
 
-                // set default size if no crop present (moved from the view)
-                if (url.indexOf('?') == -1)
-                {
-                    url += "?width=800&upscale=false&animationprocessmode=false"
-                }
-                $scope.url = url;
-            }
+                    $scope.url = url;
+                })
+            };
         };
 
         $timeout(function(){
