@@ -9,11 +9,11 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi
 {
-  /// <summary>
+    /// <summary>
     /// The base class for API controllers that expose Umbraco services - THESE ARE NOT AUTO ROUTED
     /// </summary>
     public abstract class UmbracoApiControllerBase : ApiController, IUmbracoController
-  {
+    {
         protected UmbracoApiControllerBase()
             : this(UmbracoContext.Current)
         {
