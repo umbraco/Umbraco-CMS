@@ -27,6 +27,9 @@
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
+    <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+    <key alias="chooseWhereToMove">Choose where to move</key>
+    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
@@ -290,6 +293,7 @@
     <key alias="createFolder">Create folder...</key>
 
     <key alias="relateToOriginalLabel">Relate to original</key>
+    <key alias="includeDescendants">Include descendants</key>
     <key alias="theFriendliestCommunity">The friendliest community</key>
 
     <key alias="linkToPage">Link to page</key>
