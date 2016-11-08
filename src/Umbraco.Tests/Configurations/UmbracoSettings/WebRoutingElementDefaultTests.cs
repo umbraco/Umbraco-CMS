@@ -24,9 +24,9 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public void DisableNotPermittedAlternativeTemplates()
+        public void ValidateAlternativeTemplates()
         {
-            Assert.IsTrue(SettingsSection.WebRouting.DisableNotPermittedAlternativeTemplates == false);
+            Assert.IsTrue(SettingsSection.WebRouting.ValidateAlternativeTemplates == false);
         }
 
         [Test]

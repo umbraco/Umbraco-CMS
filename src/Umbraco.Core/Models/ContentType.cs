@@ -105,8 +105,8 @@ namespace Umbraco.Core.Models
         /// <returns>True if AllowedTemplates contains the templateId else False</returns>
         public bool IsAllowedTemplate(int templateId)
         {
-            var allowedTemplates = AllowedContentTypes ?? new ContentTypeSort[0];
-            return allowedTemplates.Any(t => t.Id.Value == templateId);
+            var allowedTemplates = AllowedTemplates ?? new ITemplate[0];
+            return allowedTemplates.Any(t => t.Id == templateId);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Models
         /// <returns>True if AllowedTemplates contains the templateAlias else False</returns>
         public bool IsAllowedTemplate(string templateAlias)
         {
-            var allowedTemplates = AllowedContentTypes ?? new ContentTypeSort[0];
+            var allowedTemplates = AllowedTemplates ?? new ITemplate[0];
             return allowedTemplates.Any(t => t.Alias.Equals(templateAlias, StringComparison.InvariantCultureIgnoreCase));
         }
 

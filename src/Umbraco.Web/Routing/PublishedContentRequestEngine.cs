@@ -607,9 +607,8 @@ namespace Umbraco.Web.Routing
 			// only if the published content is the initial once, else the alternate template
 			// does not apply
             // + optionnally, apply the alternate template on internal redirects
-            var useAltTemplate = _webRoutingSection.DisableAlternativeTemplates == false 
-                && (_pcr.IsInitialPublishedContent
-                || (_webRoutingSection.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent));
+            var useAltTemplate = _pcr.IsInitialPublishedContent
+                || (_webRoutingSection.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
             string altTemplate = useAltTemplate
                 ? _routingContext.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
 				: null;
@@ -648,33 +647,18 @@ namespace Umbraco.Web.Routing
 					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
 				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => altTemplate);
 
-				var template = ApplicationContext.Current.Services.FileService.GetTemplate(altTemplate);
-                if (template != null)
+                if (_pcr.PublishedContent.IsTemplateAllowed(altTemplate))
                 {
-                    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableNotPermittedAlternativeTemplates)
-                    {
-                        var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(_pcr.PublishedContent.DocumentTypeId);
-                        if (publishedContentContentType == null)
-                        {
-                            ProfilingLogger.Logger.Warn<PublishedContentRequestEngine>("{0}Content type ({1}) of published content({2}) can't be fetched  ={1} alias=\"{2}\"", () => tracePrefix, () => _pcr.PublishedContent.Id, () => _pcr.PublishedContent.DocumentTypeId);
-                        }
-                        else
-                        {
-                            var isAllowedTemplate = publishedContentContentType.IsAllowedTemplate(template.Id);
-                            if(isAllowedTemplate == false)
-                            {
-                                //If it is not allowed then default to as if no altTemplate had been supplied
-                                ProfilingLogger.Logger.Warn<PublishedContentRequestEngine>("{0}Content type '{1}' requested altTemplate of '{2}' but this is not an allowed template", () => tracePrefix, () => _pcr.PublishedContent.DocumentTypeAlias, () => altTemplate);
-                                template = GetTemplateModel(_pcr.PublishedContent.TemplateId);
-                            }
-                        }
-                    }
-                    _pcr.TemplateModel = template;
-                    ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+                    var template = ApplicationContext.Current.Services.FileService.GetTemplate(altTemplate);
+                    if (template != null)
+                        _pcr.TemplateModel = template;
+                    else
+                        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}The template with alias=\"{1}\" does not exist, ignoring.", () => tracePrefix, () => altTemplate);
                 }
                 else
                 {
-                    ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}The template with alias=\"{1}\" does not exist, ignoring.", () => tracePrefix, () => altTemplate);
+                    LogHelper.Warn<PublishedContentRequestEngine>("{0}Configuration settings prevent template \"{1}\" from showing for node \"{2}\"", () => tracePrefix, () => altTemplate, () => _pcr.PublishedContent.Id);
+                    _pcr.TemplateModel = GetTemplateModel(_pcr.PublishedContent.TemplateId);
                 }
 			}
 

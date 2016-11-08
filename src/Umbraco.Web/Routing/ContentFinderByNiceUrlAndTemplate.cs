@@ -44,36 +44,15 @@ namespace Umbraco.Web.Routing
                     var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
                     node = FindContent(docRequest, route);
 
-                    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false && node != null)
+                    if (node.IsTemplateAllowed(template.Id))
                     {
-                        if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableNotPermittedAlternativeTemplates == true)
-                        {
-                            var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(node.DocumentTypeId);
-                            if (publishedContentContentType == null)
-                            {
-                                LogHelper.Warn<PublishedContentRequestEngine>("Content type ({1}) of published content({2}) can't be fetched  ={1} alias=\"{2}\"", () => tracePrefix, () => node.Id, () => node.DocumentTypeId);
-                            }
-                            else
-                            {
-                                var isAllowedTemplate = publishedContentContentType.IsAllowedTemplate(template.Id);
-                                if (isAllowedTemplate == false)
-                                {
-                                    //If it is not allowed then default to as if no altTemplate had been supplied
-                                    LogHelper.Warn<PublishedContentRequestEngine>("{0}Content type '{1}' requested altTemplate of '{2}' but this is not an allowed template", () => tracePrefix, () => node.DocumentTypeAlias, () => template.Alias);
-
-                                    docRequest.PublishedContent = null;
-                                    node = null;
-                                }
-                                else
-                                {
-                                    docRequest.TemplateModel = template;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            docRequest.TemplateModel = template;
-                        }
+                        docRequest.TemplateModel = template;
+                    }
+                    else
+                    {
+                        LogHelper.Warn<ContentFinderByNiceUrlAndTemplate>("Configuration settings prevent template \"{0}\" from showing for node \"{1}\"", () => templateAlias, () => node.Id);
+                        docRequest.PublishedContent = null;
+                        node = null;
                     }
                 }
                 else

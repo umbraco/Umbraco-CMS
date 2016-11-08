@@ -8,7 +8,7 @@
 
         bool DisableAlternativeTemplates { get; }
 
-        bool DisableNotPermittedAlternativeTemplates { get; }
+        bool ValidateAlternativeTemplates { get; }
         
         bool DisableFindContentByIdPath { get; }
 		

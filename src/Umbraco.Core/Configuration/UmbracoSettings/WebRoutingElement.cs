@@ -23,11 +23,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (bool) base["disableAlternativeTemplates"]; }
         }
 
-        [ConfigurationProperty("disableNotPermittedAlternativeTemplates", DefaultValue = "false")]
-        public bool DisableNotPermittedAlternativeTemplates
+        [ConfigurationProperty("validateAlternativeTemplates", DefaultValue = "false")]
+        public bool ValidateAlternativeTemplates
         {
-            get { return (bool)base["disableNotPermittedAlternativeTemplates"]; }
+            get { return (bool)base["validateAlternativeTemplates"]; }
         }
+
         [ConfigurationProperty("disableFindContentByIdPath", DefaultValue = "false")]
         public bool DisableFindContentByIdPath
         {

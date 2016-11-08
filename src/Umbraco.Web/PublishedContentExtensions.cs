@@ -12,6 +12,7 @@ using Umbraco.Web.Models;
 using Umbraco.Core;
 using Umbraco.Web.Routing;
 using ContentType = umbraco.cms.businesslogic.ContentType;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web
 {
@@ -113,6 +114,44 @@ namespace Umbraco.Web
             var template = ApplicationContext.Current.Services.FileService.GetTemplate(content.TemplateId);
 			return template == null ? string.Empty : template.Alias;
 		}
+
+        public static bool IsTemplateAllowed(this IPublishedContent content, int templateId)
+        {
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == true)
+                return content.TemplateId == templateId;
+
+            if (content.TemplateId != templateId && UmbracoConfig.For.UmbracoSettings().WebRouting.ValidateAlternativeTemplates == true)
+            {
+                var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(content.ContentType.Id);
+                if (publishedContentContentType == null)
+                    throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+                return publishedContentContentType.IsAllowedTemplate(templateId);
+            }
+
+            return true;
+        }
+        public static bool IsTemplateAllowed(this IPublishedContent content, string templateAlias)
+        {
+            var contentTemplateAlias = content.GetTemplateAlias();
+            //I assume it is enough to compare aliases, as you can not have different templates with the same alias
+            var matchingAlias = contentTemplateAlias.Equals(templateAlias, StringComparison.InvariantCultureIgnoreCase);
+
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == true)
+                return matchingAlias;
+
+            if (matchingAlias == false && UmbracoConfig.For.UmbracoSettings().WebRouting.ValidateAlternativeTemplates == true)
+            {
+                var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(content.ContentType.Id);
+                if (publishedContentContentType == null)
+                    throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+                //This doesn't appear to be working because new templates aren't in AllowedTemplates
+                return publishedContentContentType.IsAllowedTemplate(templateAlias);
+            }
+
+            return true;
+        }
 
         #endregion
 
