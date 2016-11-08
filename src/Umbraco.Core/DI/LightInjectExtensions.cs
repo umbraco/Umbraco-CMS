@@ -277,6 +277,12 @@ namespace Umbraco.Core.DI
 
         public static TBuilder RegisterCollectionBuilder<TBuilder>(this IServiceContainer container)
         {
+            // make sure it's not already registered
+            // we just don't want to support re-registering collection builders
+            var registration = container.GetAvailableService<TBuilder>();
+            if (registration != null)
+                throw new InvalidOperationException("Collection builders should be registered only once.");
+
             // register the builder - per container
             var builderLifetime = new PerContainerLifetime();
             container.Register<TBuilder>(builderLifetime);

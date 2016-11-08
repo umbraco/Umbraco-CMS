@@ -13,6 +13,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.DI;
+using Umbraco.Core.Plugins;
 using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Models.Mapping
@@ -25,9 +26,6 @@ namespace Umbraco.Tests.Models.Mapping
         {
             base.Compose();
 
-            //Container.RegisterSingleton(f => new PropertyEditorCollection(new[] { new TestPropertyEditor(f.GetInstance<ILogger>()) }));
-            //Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
-            //    .Add(f => f.GetInstance<PluginManager>().ResolvePropertyEditors());
             Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
         }
 

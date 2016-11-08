@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -13,6 +14,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.DI;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
@@ -134,7 +136,14 @@ namespace Umbraco.Tests.TestHelpers
             Container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
             Container.RegisterSingleton<ISectionService, SectionService>();
 
-            Container.RegisterSingleton(f => new PropertyEditorCollection(Enumerable.Empty<PropertyEditor>()));
+            // somehow property editor ends up wanting this
+            Container.RegisterSingleton(f => new ManifestBuilder(
+                f.GetInstance<IRuntimeCacheProvider>(),
+                new ManifestParser(f.GetInstance<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), f.GetInstance<IRuntimeCacheProvider>())
+            ));
+
+            // note - don't register collections, use builders
+            Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>();
         }
     }
 }

@@ -40,7 +40,6 @@ namespace Umbraco.Tests.Services
             base.Compose();
 
             // fixme - do it differently
-            Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>();
             Container.Register(factory => factory.GetInstance<ServiceContext>().TextService);
         }
 

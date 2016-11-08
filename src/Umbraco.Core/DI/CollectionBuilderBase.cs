@@ -60,6 +60,11 @@ namespace Umbraco.Core.DI
             var expr = Expression.Lambda<Func<IEnumerable<TItem>, TCollection>>(exprNew, exprArg);
             _collectionCtor = expr.Compile();
 
+            // we just don't want to support re-registering collections here
+            var registration = Container.GetAvailableService<TCollection>();
+            if (registration != null)
+                throw new InvalidOperationException("Collection builders cannot be registered once the collection itself has been registered.");
+
             // register the collection
             Container.Register(_ => CreateCollection(), CollectionLifetime);
         }

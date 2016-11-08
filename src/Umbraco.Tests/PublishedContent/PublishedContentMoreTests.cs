@@ -46,7 +46,7 @@ namespace Umbraco.Tests.PublishedContent
 
         protected override void Compose()
         {
-            Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+            base.Compose();
             Container.RegisterSingleton<IPublishedContentModelFactory>(f => new PublishedContentModelFactory(f.GetInstance<PluginManager>().ResolveTypes<PublishedContentModel>()));
         }
 

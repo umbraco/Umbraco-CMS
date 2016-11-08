@@ -24,7 +24,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
         {
             base.Compose();
 
-            Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
+            Container.GetInstance<UrlSegmentProviderCollectionBuilder>()
+                .Clear()
                 .Append<DefaultUrlSegmentProvider>();
         }
 
