@@ -28,6 +28,9 @@
     <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
     <key alias="restore" version="7.3.0">Restore</key>
+    <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+    <key alias="chooseWhereToMove">Choose where to move</key>
+    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -144,7 +147,7 @@
     <key alias="memberrole">Role</key>
     <key alias="membertype">Member Type</key>
     <key alias="noDate">No date chosen</key>
-    <key alias="nodeName">Page Title</key>
+    <key alias="nodeName">Link title</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
@@ -288,6 +291,7 @@
     <key alias="createFolder">Create folder...</key>
 
     <key alias="relateToOriginalLabel">Relate to original</key>
+    <key alias="includeDescendants">Include descendants</key>
     <key alias="theFriendliestCommunity">The friendliest community</key>
 
     <key alias="linkToPage">Link to page</key>
@@ -1341,7 +1345,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
 
 	  <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
-	  <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely when there's any errors in macros. Rectifying this will set the value to '%1%'.</key>
+	  <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.</key>
 	  <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
 
 	  <!-- The following keys get these tokens passed in:
@@ -1359,8 +1363,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
 
 	  <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid %2%</key>
-	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid %2%</key>
+	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
+	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
 
 	  <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
 	  <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
