@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Misc
     <id>3</id>
     <name>child2</name>
   </children>
-</json>", result.Current.OuterXml);
+</json>".CrLf(), result.Current.OuterXml.CrLf());
 	    }
 
         [Test]
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Misc
     <id>3</id>
     <name>child2</name>
   </arrayitem>
-</json>", result.Current.OuterXml);
+</json>".CrLf(), result.Current.OuterXml.CrLf());
         }
 
         [Test]
