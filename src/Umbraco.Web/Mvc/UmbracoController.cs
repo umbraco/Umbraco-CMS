@@ -12,7 +12,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// A base controller class containing all of the Umbraco objects as properties that a developer requires
     /// </summary>
-    public abstract class UmbracoController : Controller
+    public abstract class UmbracoController : Controller, IUmbracoController
     {
         protected UmbracoController(UmbracoContext umbracoContext)
         {

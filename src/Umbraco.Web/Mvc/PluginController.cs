@@ -12,7 +12,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// A base class for all plugin controllers to inherit from
     /// </summary>
-    public abstract class PluginController : Controller
+    public abstract class PluginController : Controller, IUmbracoController
     {
         /// <summary>
         /// stores the metadata about plugin controllers
