@@ -233,26 +233,7 @@ namespace Umbraco.Web.Models.Mapping
             };
 
 
-            TabsAndPropertiesResolver.MapGenericProperties(member, display, localizedText, genericProperties, properties => {
-                if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
-                    && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
-                {
-                    var docTypeLink = string.Format("#/member/memberTypes/edit/{0}", member.ContentTypeId);
-
-                    //Replace the doc type property
-                    var docTypeProp = properties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    docTypeProp.Value = new List<object>
-                        {
-                            new
-                            {
-                                linkText = member.ContentType.Name,
-                                url = docTypeLink,
-                                target = "_self", icon = "icon-item-arrangement"
-                            }
-                        };
-                    docTypeProp.View = "urllist";
-                }
-            });
+            TabsAndPropertiesResolver.MapGenericProperties(member, display, localizedText, genericProperties);
 
             //check if there's an approval field
             var provider = membersProvider as global::umbraco.providers.members.UmbracoMembershipProvider;
