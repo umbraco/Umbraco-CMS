@@ -5,14 +5,14 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using Examine.LuceneEngine.SearchCriteria;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
-using Umbraco.Core;
 using Umbraco.Web.Routing;
 using ContentType = umbraco.cms.businesslogic.ContentType;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web
 {

@@ -77,16 +77,16 @@ namespace Umbraco.Web.Templates
             {
                 contentRequest.Culture = _umbracoContext.PublishedContentRequest.Culture;    
             }
-
-            //set the doc that was found by id
-            contentRequest.PublishedContent = doc;
-            //set the template, either based on the AltTemplate found or the standard template of the doc
-            contentRequest.TemplateModel = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false
+			
+			//set the doc that was found by id
+			contentRequest.PublishedContent = doc;
+			//set the template, either based on the AltTemplate found or the standard template of the doc
+			contentRequest.TemplateModel = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false
                 ? _umbracoContext.Application.Services.FileService.GetTemplate(doc.TemplateId)
                 : _umbracoContext.Application.Services.FileService.GetTemplate(AltTemplate.Value);
 
-            //if there is not template then exit
-            if (!contentRequest.HasTemplate)
+			//if there is not template then exit
+			if (!contentRequest.HasTemplate)
 			{
 				if (!AltTemplate.HasValue)
 				{
