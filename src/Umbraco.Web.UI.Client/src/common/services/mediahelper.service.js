@@ -58,9 +58,19 @@ function mediaHelper(umbRequestHelper) {
             }
 
             var mediaVal;
+            
+            // our default images might store one or many images (as csv) inside either
+            // imageProp.value or imageProp.value.src so check both.
+            var split = "";
+            if (imageProp.value) {
+                if ("string" === typeof(imageProp.value.src)) {
+                    split = imageProp.value.src.split(',');
+                } else if ("string" === typeof(imageProp.value)) {
+                    split = imageProp.value.split(',');
+                }
+            }
 
-            //our default images might store one or many images (as csv)            
-            var split = (imageProp.value && imageProp.value.src) ? imageProp.value.src.split(',') : '';
+
             var self = this;
             mediaVal = _.map(split, function (item) {
                 return { file: item, isImage: self.detectIfImageByExtension(item) };
