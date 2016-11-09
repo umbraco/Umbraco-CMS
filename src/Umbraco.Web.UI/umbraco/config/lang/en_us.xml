@@ -115,6 +115,7 @@
     <key alias="newTemplate">New Template</key>
     <key alias="newType">New Type</key>
     <key alias="none">none</key>
+    <key alias="rebuildIndexes">Please make sure to rebuild your Examine indexes using the 'Examine Management' dashboard in the Developer section, to ensure this change is applied everywhere.</key>
     <key alias="selectedContent">Content</key>
     <key alias="selectNewDocType">Select New Document Type</key>
     <key alias="successMessage">The document type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>

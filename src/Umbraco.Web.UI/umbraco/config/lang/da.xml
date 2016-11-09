@@ -109,9 +109,10 @@
     <key alias="newTemplate">Ny skabelon</key>
     <key alias="newType">Ny type</key>
     <key alias="none">ingen</key>
+    <key alias="rebuildIndexes">Du bør genopbygge dine Examine indekser via 'Examine Management' dashboarded i udvikler sektionen for at sikre at denne ændring registreres i hele dit website.</key>
     <key alias="selectedContent">Indhold</key>
     <key alias="selectNewDocType">Vælg ny dokumenttype</key>
-    <key alias="successMessage">Dokumenttypen på detvalgte indhold blev skiftet til [new type], og følgende egenskaber blev overført:</key>
+    <key alias="successMessage">Dokumenttypen på det valgte indhold blev skiftet til [new type], og følgende egenskaber blev overført:</key>
     <key alias="to">til</key>
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Overførsel af egenskaber kunne ikke fuldføres, da en eller flere egenskaber er indstillet til at blive overført mere end én gang.</key>
     <key alias="validDocTypesNote">Kun andre dokumenttyper, der er gyldige på denne placering, vises.</key>

@@ -265,10 +265,13 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 {
                     ContentPublishedMessage.Text = global::umbraco.ui.Text("changeDocType", "contentRepublished");
                     ContentPublishedMessage.Visible = true;
+                    RebuildIndexesMessage.Text = global::umbraco.ui.Text("changeDocType", "rebuildIndexes");
+                    RebuildIndexesMessage.Visible = true;
                 }
                 else
                 {
                     ContentPublishedMessage.Visible = false;
+                    RebuildIndexesMessage.Visible = false;
                 }
                 SuccessPlaceholder.Visible = true;
                 SaveAndCancelPlaceholder.Visible = false;
