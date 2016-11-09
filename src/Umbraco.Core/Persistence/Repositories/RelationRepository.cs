@@ -51,8 +51,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity;
         }
 
-        //TODO: Fix N+1 !
-
         protected override IEnumerable<IRelation> PerformGetAll(params int[] ids)
         {
             if (ids.Any())

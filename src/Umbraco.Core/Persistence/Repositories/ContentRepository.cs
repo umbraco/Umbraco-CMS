@@ -254,6 +254,14 @@ namespace Umbraco.Core.Persistence.Repositories
             } while (processed < total);
         }
 
+        public override IEnumerable<IContent> GetAllVersions(int id)
+        {
+            var sql = GetBaseQuery(false)
+                .Where(GetBaseWhereClause(), new { Id = id })
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+            return GetAllBySql(sql);
+        }
+
         public override IContent GetByVersion(Guid versionId)
         {
             var sql = GetBaseQuery(false);
@@ -662,28 +670,64 @@ namespace Umbraco.Core.Persistence.Repositories
                                 .OrderBy<NodeDto>(x => x.Level, SqlSyntax)
                                 .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
-
-            foreach (var dto in dtos)
-            {
-                //Check in the cache first. If it exists there AND it is published
-                // then we can use that entity. Otherwise if it is not published (which can be the case
-                // because we only store the 'latest' entries in the cache which might not be the published
-                // version)
-                var fromCache = RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
-                //var fromCache = TryGetFromCache(dto.NodeId);
-                if (fromCache != null && fromCache.Published)
-                {
-                    yield return fromCache;
-                }
-                else
-                {
-                    yield return CreateContentFromDto(dto, dto.VersionId, sql);
-                }
-            }
+            return GetAllBySql(sql);
         }
 
+        private IEnumerable<IContent> GetAllBySql(Sql sql)
+        {
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
+            var content = new IContent[dtos.Count];
+            var defs = new List<DocumentDefinition>();
+
+            for (var i = 0; i < dtos.Count; i++)
+            {
+                var dto = dtos[i];
+
+                // if the cache contains the published version, use it
+                var cached = RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
+                if (cached != null && cached.Published)
+                {
+                    content[i] = cached;
+                    continue;
+                }
+
+                // else, need to fetch the version from the database
+                var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+                var factory = new ContentFactory(contentType, NodeObjectTypeId, dto.NodeId);
+                var c = factory.BuildEntity(dto);
+                if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                    c.Template = _templateRepository.Get(dto.TemplateId.Value);
+                content[i] = c;
+
+                defs.Add(new DocumentDefinition(
+                    dto.NodeId,
+                    dto.VersionId,
+                    dto.ContentVersionDto.VersionDate,
+                    dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                    contentType
+                ));
+            }
+
+            // going to load all properties for all docs from database,
+            // but at least in one queries thus avoiding N+1
+            var propertyData = GetPropertyCollection(sql, defs);
+
+            var dtoIndex = 0;
+            var defIndex = 0;
+            while (true)
+            {
+                if (defIndex == defs.Count) return content;
+                while (dtoIndex < dtos.Count && dtos[dtoIndex].NodeId != defs[defIndex].Id) dtoIndex++;
+                var cc = content[dtoIndex];
+                cc.Properties = propertyData[cc.Id];
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                ((Entity)cc).ResetDirtyProperties(false);
+
+                defIndex++;
+            }
+        }
 
         /// <summary>
         /// This builds the Xml document used for the XML cache
