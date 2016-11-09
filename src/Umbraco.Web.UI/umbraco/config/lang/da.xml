@@ -277,18 +277,11 @@
     <key alias="treepicker">Vælg</key>
     <key alias="viewCacheItem">Se cache element</key>
     <key alias="createFolder">Opret mappe...</key>
-
     <key alias="relateToOriginalLabel">Relatér til original</key>
     <key alias="includeDescendants">Inkludér undersider</key>
-
     <key alias="linkToPage">Link til side</key>
-
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
-    <key alias="openInFullBody">Åbner det linket dokument i fuld visning af vinduet</key>
-    <key alias="openInParentFrame">Åbner det linket dokument i "parent frame"</key>
-
     <key alias="linkToMedia">Link til medie</key>
-
     <key alias="selectMedia">Vælg medie</key>
     <key alias="selectIcon">Vælg ikon</key>
     <key alias="selectItem">Vælg item</key>
@@ -297,14 +290,10 @@
     <key alias="selectContent">Vælg indhold</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
-
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
-
     <key alias="linkYour">Link dit</key>
     <key alias="unLinkYour">Fjern link fra dit</key>
-
     <key alias="account">konto</key>
-
     <key alias="selectEditor">Vælg editor</key>
   </area>
   <area alias="dictionaryItem">

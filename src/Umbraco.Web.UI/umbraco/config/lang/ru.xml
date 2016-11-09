@@ -340,18 +340,11 @@
     <key alias="treepicker">Выберите элемент</key>
     <key alias="viewCacheItem">Просмотр элемента кэша</key>
     <key alias="createFolder">Создать папку...</key>
-
     <key alias="relateToOriginalLabel">Связать с оригиналом</key>
     <key alias="theFriendliestCommunity">Самое дружелюбное сообщество</key>
-
     <key alias="linkToPage">Ссылка на страницу</key>
-
     <key alias="openInNewWindow">Открывает документ по ссылке в новом окне или вкладке браузера</key>
-    <key alias="openInFullBody">Открывает документ по ссылке в полноэкранном режиме</key>
-    <key alias="openInParentFrame">Открывает документ по ссылке в родительском фрейме</key>
-
     <key alias="linkToMedia">Ссылка на медиа-файл</key>
-
     <key alias="selectMedia">Выбрать медиа</key>
     <key alias="selectIcon">Выбрать значок</key>
     <key alias="selectItem">Выбрать элемент</key>
@@ -360,19 +353,14 @@
     <key alias="selectContent">Выбрать содержимое</key>
     <key alias="selectMember">Выбрать участника</key>
     <key alias="selectMemberGroup">Выбрать группу участников</key>
-
     <key alias="noMacroParams">Это макрос без параметров</key>
-
     <key alias="externalLoginProviders">Провайдеры аутентификации</key>
     <key alias="exceptionDetail">Подробное сообщение об ошибке</key>
     <key alias="stacktrace">Трассировка стека</key>
     <key alias="innerException">Внутренняя ошибка</key>
-
     <key alias="linkYour">Связать</key>
     <key alias="unLinkYour">Разорвать связь</key>
-
     <key alias="account">учетную запись</key>
-
     <key alias="selectEditor">Выбрать редактор</key>
   </area>
   <area alias="dictionaryItem">
