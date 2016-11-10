@@ -531,7 +531,7 @@ namespace Umbraco.Web.Editors
                 {
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
-                    if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.Image)
+                    if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
                         if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
                         {
