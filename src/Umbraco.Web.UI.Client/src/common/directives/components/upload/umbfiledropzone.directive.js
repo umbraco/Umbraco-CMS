@@ -104,9 +104,10 @@ angular.module("umbraco.directives")
 						scope.queue = [];
 					}	
 
-					// One allowed mediaType, pick this one 
+					// One allowed mediaType
 					if(scope.acceptedMediatypes && scope.acceptedMediatypes.length === 1){
-						scope.contentTypeAlias = scope.acceptedMediatypes[0].alias;
+						// set alias to auto to let the server best decide which media type to use
+						scope.contentTypeAlias = "umbracoAuto";
 						_processQueueItem();
 					}
 					
