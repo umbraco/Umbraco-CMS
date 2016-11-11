@@ -43,15 +43,17 @@ namespace Umbraco.Web.Trees
             get
             {
 
-                //if title is defined, return that
-                if(string.IsNullOrEmpty(_attribute.Title) == false)
-                    return _attribute.Title;
+               
 
 
                 //try to look up a tree header matching the tree alias
                 var localizedLabel = Services.TextService.Localize("treeHeaders/" + _attribute.Alias);
-                if (string.IsNullOrEmpty(localizedLabel) == false)
+                if (!string.IsNullOrEmpty(localizedLabel))
                     return localizedLabel;
+
+                //if title is defined, return that
+                if (!string.IsNullOrEmpty(_attribute.Title))
+                    return _attribute.Title;
 
                 //is returned to signal that a label was not found
                 return "[" + _attribute.Alias + "]";
