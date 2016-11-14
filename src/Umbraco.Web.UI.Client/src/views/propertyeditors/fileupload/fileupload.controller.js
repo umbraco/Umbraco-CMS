@@ -71,7 +71,10 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
                         "GetBigThumbnail",
                         [{ originalImagePath: file.file }]);
 
+            var extension = file.file.substring(file.file.lastIndexOf(".") + 1, file.file.length);
+
             file.thumbnail = thumbnailUrl;
+            file.extension = extension.toLowerCase();
         });
 
         $scope.clearFiles = false;

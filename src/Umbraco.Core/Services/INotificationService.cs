@@ -30,6 +30,20 @@ namespace Umbraco.Core.Services
                                Func<IUser, string[], string> createBody);
 
         /// <summary>
+        /// Sends the notifications for the specified user regarding the specified nodes and action.
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <param name="operatingUser"></param>
+        /// <param name="action"></param>
+        /// <param name="actionName"></param>
+        /// <param name="http"></param>
+        /// <param name="createSubject"></param>
+        /// <param name="createBody"></param>
+        void SendNotifications(IUser operatingUser, IEnumerable<IUmbracoEntity> entities, string action, string actionName, HttpContextBase http,
+                               Func<IUser, string[], string> createSubject,
+                               Func<IUser, string[], string> createBody);
+
+        /// <summary>
         /// Gets the notifications for the user
         /// </summary>
         /// <param name="user"></param>

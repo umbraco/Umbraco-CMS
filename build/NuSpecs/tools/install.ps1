@@ -97,7 +97,12 @@ if ($project) {
 		$umbracoUIXMLSource = Join-Path $installPath "UmbracoFiles\Umbraco\Config\Create\UI.xml"
 		$umbracoUIXMLDestination = Join-Path $projectPath "Umbraco\Config\Create\UI.xml"
 		Copy-Item $umbracoUIXMLSource $umbracoUIXMLDestination -Force
-	} 
+	} else {
+		$upgradeViewSource = Join-Path $umbracoFolderSource "Views\install\*"
+		$upgradeView = Join-Path $umbracoFolder "Views\install\"
+		Write-Host "Copying2 ${upgradeViewSource} to ${upgradeView}"
+		Copy-Item $upgradeViewSource $upgradeView -Force
+	}
 	
 	$installFolder = Join-Path $projectPath "Install"
 	if(Test-Path $installFolder) {

@@ -7,14 +7,17 @@ using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UmbracoExamine;
 using umbraco.MacroEngines;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Tests.PublishedContent
 {
     public class LegacyExamineBackedMediaTests : ExamineBaseTest
     {
-        public override void TestSetup()
+        public override void Initialize()
         {
-            base.TestSetup();
+            base.Initialize();
 
             var settings = SettingsForTests.GenerateMockSettings();
             var contentMock = Mock.Get(settings.Content);
@@ -22,13 +25,8 @@ namespace Umbraco.Tests.PublishedContent
             contentMock.Setup(x => x.UmbracoLibraryCacheDuration).Returns(1800);
             SettingsForTests.ConfigureSettings(settings);
         }
-
-        public override void TestTearDown()
-        {
-            SettingsForTests.Reset();
-            base.TestTearDown();
-        }
-
+        
+   
         [Test]
         public void Ensure_Children_Are_Sorted()
         {
@@ -47,7 +45,9 @@ namespace Umbraco.Tests.PublishedContent
                 var children = backedMedia.ChildrenAsList.Value;
 
                 var currSort = 0;
-                for (var i = 0; i < children.Count(); i++)
+                Assert.Greater(children.Count, 0);
+
+                for (var i = 0; i < children.Count; i++)
                 {
                     Assert.GreaterOrEqual(children[i].SortOrder, currSort);
                     currSort = children[i].SortOrder;

@@ -503,6 +503,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         protected abstract string FormatIdentity(ColumnDefinition column);
 
+        public abstract Sql SelectTop(Sql sql, int top);
+
         public virtual string DeleteDefaultConstraint
         {
             get

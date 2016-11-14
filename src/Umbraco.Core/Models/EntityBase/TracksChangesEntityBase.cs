@@ -18,7 +18,9 @@ namespace Umbraco.Core.Models.EntityBase
         //TODO: This needs to go on to ICanBeDirty http://issues.umbraco.org/issue/U4-5662
         public virtual IEnumerable<string> GetDirtyProperties()
         {
-            return _propertyChangedInfo.Where(x => x.Value).Select(x => x.Key);
+            return _propertyChangedInfo == null
+                ? Enumerable.Empty<string>()
+                : _propertyChangedInfo.Where(x => x.Value).Select(x => x.Key);
         }
 
         private bool _changeTrackingEnabled = true;
@@ -26,12 +28,12 @@ namespace Umbraco.Core.Models.EntityBase
         /// <summary>
         /// Tracks the properties that have changed
         /// </summary>
-        private IDictionary<string, bool> _propertyChangedInfo = new Dictionary<string, bool>();
+        private IDictionary<string, bool> _propertyChangedInfo;
 
         /// <summary>
         /// Tracks the properties that we're changed before the last commit (or last call to ResetDirtyProperties)
         /// </summary>
-        private IDictionary<string, bool> _lastPropertyChangedInfo = null;
+        private IDictionary<string, bool> _lastPropertyChangedInfo;
 
         /// <summary>
         /// Property changed event
@@ -47,12 +49,13 @@ namespace Umbraco.Core.Models.EntityBase
             //return if we're not tracking changes
             if (_changeTrackingEnabled == false) return;
 
+            if (_propertyChangedInfo == null)
+                _propertyChangedInfo = new Dictionary<string, bool>();
+
             _propertyChangedInfo[propertyInfo.Name] = true;
 
             if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyInfo.Name));
-            }
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyInfo.Name));
         }
 
         /// <summary>
@@ -62,7 +65,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <returns>True if Property is dirty, otherwise False</returns>
         public virtual bool IsPropertyDirty(string propertyName)
         {
-            return _propertyChangedInfo.Any(x => x.Key == propertyName);
+            return _propertyChangedInfo != null && _propertyChangedInfo.Any(x => x.Key == propertyName);
         }
 
         /// <summary>
@@ -71,7 +74,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <returns>True if entity is dirty, otherwise False</returns>
         public virtual bool IsDirty()
         {
-            return _propertyChangedInfo.Any();
+            return _propertyChangedInfo != null && _propertyChangedInfo.Any();
         }
 
         /// <summary>
@@ -90,7 +93,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <returns>True if Property was changed, otherwise False. Returns false if the entity had not been previously changed.</returns>
         public virtual bool WasPropertyDirty(string propertyName)
         {
-            return WasDirty() && _lastPropertyChangedInfo.Any(x => x.Key == propertyName);
+            return _lastPropertyChangedInfo != null && _lastPropertyChangedInfo.Any(x => x.Key == propertyName);
         }
 
         /// <summary>
@@ -100,7 +103,7 @@ namespace Umbraco.Core.Models.EntityBase
         {
             //NOTE: We cannot .Clear() because when we memberwise clone this will be the SAME
             // instance as the one on the clone, so we need to create a new instance.
-            _lastPropertyChangedInfo = new Dictionary<string, bool>();
+            _lastPropertyChangedInfo = null;
         }
 
         /// <summary>
@@ -130,26 +133,29 @@ namespace Umbraco.Core.Models.EntityBase
             if (rememberPreviouslyChangedProperties)
             {
                 //copy the changed properties to the last changed properties
-                _lastPropertyChangedInfo = _propertyChangedInfo.ToDictionary(v => v.Key, v => v.Value);
+                if (_propertyChangedInfo != null)
+                {
+                    _lastPropertyChangedInfo = _propertyChangedInfo.ToDictionary(v => v.Key, v => v.Value);
+                }
             }
 
             //NOTE: We cannot .Clear() because when we memberwise clone this will be the SAME
             // instance as the one on the clone, so we need to create a new instance.
-            _propertyChangedInfo = new Dictionary<string, bool>();
+            _propertyChangedInfo = null;
         }
 
-        protected void ResetChangeTrackingCollections()
+        public void ResetChangeTrackingCollections()
         {
-            _propertyChangedInfo = new Dictionary<string, bool>();
-            _lastPropertyChangedInfo = new Dictionary<string, bool>();
+            _propertyChangedInfo = null;
+            _lastPropertyChangedInfo = null;
         }
 
-        protected void DisableChangeTracking()
+        public void DisableChangeTracking()
         {
             _changeTrackingEnabled = false;
         }
 
-        protected void EnableChangeTracking()
+        public void EnableChangeTracking()
         {
             _changeTrackingEnabled = true;
         }
@@ -158,60 +164,61 @@ namespace Umbraco.Core.Models.EntityBase
         /// Used by inheritors to set the value of properties, this will detect if the property value actually changed and if it did
         /// it will ensure that the property has a dirty flag set.
         /// </summary>
-        /// <param name="setValue"></param>
-        /// <param name="value"></param>
+        /// <param name="newVal"></param>
+        /// <param name="origVal"></param>
         /// <param name="propertySelector"></param>
         /// <returns>returns true if the value changed</returns>
         /// <remarks>
-        /// This is required because we don't want a property to show up as "dirty" if the value is the same. For example, when we 
-        /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set 
+        /// This is required because we don't want a property to show up as "dirty" if the value is the same. For example, when we
+        /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set
         /// to the same value, so it's really not dirty.
         /// </remarks>
-        internal bool SetPropertyValueAndDetectChanges<T>(Func<T, T> setValue, T value, PropertyInfo propertySelector)
+        internal void SetPropertyValueAndDetectChanges<T>(T newVal, ref T origVal, PropertyInfo propertySelector)
         {
             if ((typeof(T) == typeof(string) == false) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(typeof(T)))
             {
                 throw new InvalidOperationException("This method does not support IEnumerable instances. For IEnumerable instances a manual custom equality check will be required");
             }
 
-            return SetPropertyValueAndDetectChanges(setValue, value, propertySelector,
-                new DelegateEqualityComparer<T>(
-                    //Standard Equals comparison
-                    (arg1, arg2) => Equals(arg1, arg2),
-                    arg => arg.GetHashCode()));
-
+            SetPropertyValueAndDetectChanges(newVal, ref origVal, propertySelector, EqualityComparer<T>.Default);
         }
 
         /// <summary>
         /// Used by inheritors to set the value of properties, this will detect if the property value actually changed and if it did
         /// it will ensure that the property has a dirty flag set.
         /// </summary>
-        /// <param name="setValue"></param>
-        /// <param name="value"></param>
+        /// <param name="newVal"></param>
+        /// <param name="origVal"></param>
         /// <param name="propertySelector"></param>
         /// <param name="comparer">The equality comparer to use</param>
         /// <returns>returns true if the value changed</returns>
         /// <remarks>
-        /// This is required because we don't want a property to show up as "dirty" if the value is the same. For example, when we 
-        /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set 
+        /// This is required because we don't want a property to show up as "dirty" if the value is the same. For example, when we
+        /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set
         /// to the same value, so it's really not dirty.
         /// </remarks>
-        internal bool SetPropertyValueAndDetectChanges<T>(Func<T, T> setValue, T value, PropertyInfo propertySelector, IEqualityComparer<T> comparer)
+        internal void SetPropertyValueAndDetectChanges<T>(T newVal, ref T origVal, PropertyInfo propertySelector, IEqualityComparer<T> comparer)
         {
-            var initVal = value;
-            var newVal = setValue(value);
-
-            //don't track changes, just set the value (above)
-            if (_changeTrackingEnabled == false) return false;
-
-            if (comparer.Equals(initVal, newVal) == false)
+            //don't track changes, just set the value
+            if (_changeTrackingEnabled == false)
             {
-                OnPropertyChanged(propertySelector);
-                return true;
+                //set the original value
+                origVal = newVal;
             }
-            return false;
+            else
+            {
+                //check changed
+                var changed = comparer.Equals(origVal, newVal) == false;
+
+                //set the original value
+                origVal = newVal;
+
+                //raise the event if it was changed
+                if (changed)
+                {
+                    OnPropertyChanged(propertySelector);
+                }
+            }
         }
-
-
     }
 }

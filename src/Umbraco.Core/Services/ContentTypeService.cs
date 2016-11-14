@@ -791,22 +791,27 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-
-                //TODO: This needs to change, if we are deleting a content type, we should just delete the data,
-                // this method will recursively go lookup every content item, check if any of it's descendants are
-                // of a different type, move them to the recycle bin, then permanently delete the content items.
-                // The main problem with this is that for every content item being deleted, events are raised...
-                // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
-
-                _contentService.DeleteContentOfType(contentType.Id);
-
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                 {
+                    //TODO: This needs to change, if we are deleting a content type, we should just delete the data,
+                    // this method will recursively go lookup every content item, check if any of it's descendants are
+                    // of a different type, move them to the recycle bin, then permanently delete the content items.
+                    // The main problem with this is that for every content item being deleted, events are raised...
+                    // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
+                    
+                    var deletedContentTypes = new List<IContentType>() {contentType};
+                    deletedContentTypes.AddRange(contentType.Descendants().OfType<IContentType>());
+
+                    foreach (var deletedContentType in deletedContentTypes)
+                    {
+                        _contentService.DeleteContentOfType(deletedContentType.Id);
+                    }
+                    
                     repository.Delete(contentType);
                     uow.Commit();
 
-                    DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(contentType, false), this);
+                    DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(deletedContentTypes.DistinctBy(x => x.Id), false), this);
                 }
 
                 Audit(AuditType.Delete, string.Format("Delete ContentType performed by user"), userId, contentType.Id);
@@ -830,14 +835,22 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-                foreach (var contentType in asArray)
-                {
-                    _contentService.DeleteContentOfType(contentType.Id);
-                }
-
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                 {
+                    var deletedContentTypes = new List<IContentType>();
+                    deletedContentTypes.AddRange(asArray);
+
+                    foreach (var contentType in asArray)
+                    {
+                        deletedContentTypes.AddRange(contentType.Descendants().OfType<IContentType>());
+                    }
+
+                    foreach (var deletedContentType in deletedContentTypes)
+                    {
+                        _contentService.DeleteContentOfType(deletedContentType.Id);
+                    }
+
                     foreach (var contentType in asArray)
                     {
                         repository.Delete(contentType);
@@ -845,7 +858,7 @@ namespace Umbraco.Core.Services
 
                     uow.Commit();
 
-                    DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(asArray, false), this);
+                    DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(deletedContentTypes.DistinctBy(x => x.Id), false), this);
                 }
 
                 Audit(AuditType.Delete, string.Format("Delete ContentTypes performed by user"), userId, -1);
@@ -1238,11 +1251,13 @@ namespace Umbraco.Core.Services
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
                 {
+                    var deletedMediaTypes = new List<IMediaType>() {mediaType};
+                    deletedMediaTypes.AddRange(mediaType.Descendants().OfType<IMediaType>());
 
                     repository.Delete(mediaType);
                     uow.Commit();
 
-                    DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(mediaType, false), this);
+                    DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(deletedMediaTypes.DistinctBy(x => x.Id), false), this);
                 }
 
                 Audit(AuditType.Delete, string.Format("Delete MediaType performed by user"), userId, mediaType.Id);
@@ -1271,13 +1286,17 @@ namespace Umbraco.Core.Services
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
                 {
+                    var deletedMediaTypes = new List<IMediaType>();
+                    deletedMediaTypes.AddRange(asArray);
+
                     foreach (var mediaType in asArray)
                     {
+                        deletedMediaTypes.AddRange(mediaType.Descendants().OfType<IMediaType>());
                         repository.Delete(mediaType);
                     }
                     uow.Commit();
 
-                    DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(asArray, false), this);
+                    DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(deletedMediaTypes.DistinctBy(x => x.Id), false), this);
                 }
 
                 Audit(AuditType.Delete, string.Format("Delete MediaTypes performed by user"), userId, -1);

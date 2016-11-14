@@ -149,8 +149,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         private void CreateCmsContentTypeData()
         {
             _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 532, NodeId = 1031, Alias = Constants.Conventions.MediaTypes.Folder, Icon = "icon-folder", Thumbnail = "icon-folder", IsContainer = false, AllowAtRoot = true });
-            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = Constants.Conventions.MediaTypes.Image, Icon = "icon-picture", Thumbnail = "icon-picture" });
-            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = Constants.Conventions.MediaTypes.File, Icon = "icon-document", Thumbnail = "icon-document" });
+            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = Constants.Conventions.MediaTypes.Image, Icon = "icon-picture", Thumbnail = "icon-picture", AllowAtRoot = true });
+            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = Constants.Conventions.MediaTypes.File, Icon = "icon-document", Thumbnail = "icon-document", AllowAtRoot = true });
             _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 531, NodeId = 1044, Alias = Constants.Conventions.MemberTypes.DefaultAlias, Icon = "icon-user", Thumbnail = "icon-user" });
         }
 
@@ -266,9 +266,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             //defaults for the member list
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -1, Alias = "pageSize", SortOrder = 1, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "10" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -2, Alias = "orderBy", SortOrder = 2, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "Name" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -2, Alias = "orderBy", SortOrder = 2, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "username" });
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -3, Alias = "orderDirection", SortOrder = 3, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "asc" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -4, Alias = "includeProperties", SortOrder = 4, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "[{\"alias\":\"email\",\"isSystem\":1},{\"alias\":\"username\",\"isSystem\":1},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1}]" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -4, Alias = "includeProperties", SortOrder = 4, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "[{\"alias\":\"username\",\"isSystem\":1},{\"alias\":\"email\",\"isSystem\":1},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1}]" });
 
             //layouts for the list view
             var cardLayout = "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": 1, \"selected\": true}";
@@ -276,10 +276,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             //defaults for the media list
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -5, Alias = "pageSize", SortOrder = 1, DataTypeNodeId = Constants.System.DefaultMediaListViewDataTypeId, Value = "100" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -6, Alias = "orderBy", SortOrder = 2, DataTypeNodeId = Constants.System.DefaultMediaListViewDataTypeId, Value = "VersionDate" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -6, Alias = "orderBy", SortOrder = 2, DataTypeNodeId = Constants.System.DefaultMediaListViewDataTypeId, Value = "updateDate" });
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -7, Alias = "orderDirection", SortOrder = 3, DataTypeNodeId = Constants.System.DefaultMediaListViewDataTypeId, Value = "desc" });
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -8, Alias = "layouts", SortOrder = 4, DataTypeNodeId = Constants.System.DefaultMediaListViewDataTypeId, Value = "[" + cardLayout + "," + listLayout + "]" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -9, Alias = "includeProperties", SortOrder = 5, DataTypeNodeId = Constants.System.DefaultMediaListViewDataTypeId, Value = "[{\"alias\":\"sortOrder\",\"isSystem\":1, \"header\": \"Sort order\"},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1},{\"alias\":\"owner\",\"header\":\"Updated by\",\"isSystem\":1}]" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -9, Alias = "includeProperties", SortOrder = 5, DataTypeNodeId = Constants.System.DefaultMediaListViewDataTypeId, Value = "[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1},{\"alias\":\"owner\",\"header\":\"Updated by\",\"isSystem\":1}]" });
         }
 
         private void CreateUmbracoRelationTypeData()

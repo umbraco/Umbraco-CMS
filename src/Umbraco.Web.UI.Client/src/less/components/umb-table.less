@@ -3,12 +3,33 @@
     display: flex;
     flex-direction: column;
 
+    position: relative;
+
     border: 1px solid @grayLight;
 
     flex-wrap: nowrap;
     justify-content: space-between;
 
     min-width: 640px;
+}
+
+.umb-table.umb-table-inactive {
+
+    &:before {
+        content: "";
+        background: rgba(255, 255, 255, 0.75);
+
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        z-index: 10;
+
+        outline: 1px solid rgba(255, 255, 255, 0.75);
+    }
+
 }
 
 .umb-table a {
@@ -90,6 +111,14 @@ input.umb-table__input {
 
     &:hover {
         background-color: fade(@grayLighter, 90%);
+    }
+}
+
+.umb-table-body .umb-table-row.-solid {
+    cursor: default;
+
+    &:hover {
+        background-color: white;
     }
 }
 
@@ -183,6 +212,8 @@ input.umb-table__input {
     user-select: none;
 }
 
+
+
 .umb-table-row.-selected,
 .umb-table-row.-selected:hover {
     background-color: fade(@blueDark, 4%);
@@ -212,7 +243,7 @@ input.umb-table__input {
     text-overflow: ellipsis;
 }
 
-.umb-table-cell:first-of-type {
+.umb-table-cell:first-of-type:not(.not-fixed) {
     flex: 0 0 25px;
 
     margin: 0 0 0 15px;

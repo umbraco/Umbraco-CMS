@@ -11,19 +11,27 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IUserType BuildEntity(UserTypeDto dto)
         {
-            var userType = new UserType
-                {
-                    Alias = dto.Alias,
-                    Id = dto.Id,
-                    Name = dto.Name,
-                    Permissions = dto.DefaultPermissions.IsNullOrWhiteSpace()
-                                      ? Enumerable.Empty<string>()
-                                      : dto.DefaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture))
-                };
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            userType.ResetDirtyProperties(false);
-            return userType;
+            var userType = new UserType();
+
+            try
+            {
+                userType.DisableChangeTracking();
+
+                userType.Alias = dto.Alias;
+                userType.Id = dto.Id;
+                userType.Name = dto.Name;
+                userType.Permissions = dto.DefaultPermissions.IsNullOrWhiteSpace()
+                    ? Enumerable.Empty<string>()
+                    : dto.DefaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture));
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                userType.ResetDirtyProperties(false);
+                return userType;
+            }
+            finally
+            {
+                userType.EnableChangeTracking();
+            }
         }
 
         public UserTypeDto BuildDto(IUserType entity)

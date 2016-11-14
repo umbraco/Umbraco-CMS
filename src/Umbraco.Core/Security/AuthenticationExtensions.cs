@@ -113,8 +113,8 @@ namespace Umbraco.Core.Security
 
             //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
             var claimsIdentity = http.User.Identity as ClaimsIdentity;
-            if (claimsIdentity != null && claimsIdentity.IsAuthenticated)
-            {                
+            if (claimsIdentity != null && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
+            {                 
                 try
                 {
                     return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
@@ -307,11 +307,9 @@ namespace Umbraco.Core.Security
             }
             catch (Exception)
             {
-                //TODO: Do we need to do more here?? need to make sure that the forms cookie is gone, but is that
-                // taken care of in our custom middleware somehow?
                 ctx.Authentication.SignOut(
-                    Core.Constants.Security.BackOfficeAuthenticationType,
-                    Core.Constants.Security.BackOfficeExternalAuthenticationType);
+                    Constants.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeExternalAuthenticationType);
                 return null;
             }
         }

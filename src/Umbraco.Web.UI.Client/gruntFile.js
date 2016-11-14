@@ -484,11 +484,16 @@ module.exports = function (grunt) {
                             files: ['css/font-awesome.min.css', 'fonts/*']
                         },
                         "jquery": {
-                            files: ['jquery.min.js', 'jquery.min.map']
+                            keepExpandedHierarchy: false,
+                            files: ['dist/jquery.min.js', 'dist/jquery.min.map']
                         },
                         'jquery-ui': {
                             keepExpandedHierarchy: false,
                             files: ['jquery-ui.min.js']
+                        },
+                        'jquery-migrate': {
+                            keepExpandedHierarchy: false,
+                            files: ['jquery-migrate.min.js']
                         },
                         'tinymce': {
                             files: ['plugins/**', 'themes/**', 'tinymce.min.js']

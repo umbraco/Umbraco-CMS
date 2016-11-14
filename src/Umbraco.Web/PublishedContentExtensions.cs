@@ -1747,6 +1747,17 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Gets the children of the content, of any of the specified types.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="alias">One or more content type alias.</param>
+        /// <returns>The children of the content, of any of the specified types.</returns>
+        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, params string[] alias)
+        {
+            return content.Children(x => alias.InvariantContains(x.DocumentTypeAlias));
+        }
+
+        /// <summary>
         /// Gets the children of the content, of a given content type.
         /// </summary>
         /// <typeparam name="T">The content type.</typeparam>
@@ -1850,6 +1861,21 @@ namespace Umbraco.Web
 				);
 			return dt;
 		}
+
+        #endregion
+
+        #region Axes: custom
+
+        // todo: in v8, rename this 'Root'
+        /// <summary>
+        /// Gets the 'site' content for this content.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <returns>The 'site' content ie AncestorOrSelf(1).</returns>
+        public static IPublishedContent Site(this IPublishedContent content)
+        {
+            return content.AncestorOrSelf(1);
+        }
 
         #endregion
 

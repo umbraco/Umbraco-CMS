@@ -52,9 +52,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
-            var dto = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -365,6 +365,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 foreach (var property in ((Member)entity).Properties)
                 {
+                    if (keyDictionary.ContainsKey(property.PropertyTypeId) == false) continue;
+
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
@@ -387,36 +389,26 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
                 if (contentTypeIds == null)
                 {
-                    var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
                     var subQuery = new Sql()
-                        .Select("DISTINCT cmsContentXml.nodeId")
-                        .From<ContentXmlDto>()
-                        .InnerJoin<NodeDto>()
-                        .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                        .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
+                        .Select("id")
+                        .From<NodeDto>(SqlSyntax)
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
                     var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
                 }
                 else
                 {
-                    foreach (var id in contentTypeIds)
-                    {
-                        var id1 = id;
-                        var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-                        var subQuery = new Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<NodeDto>()
-                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .InnerJoin<ContentDto>()
-                            .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType)
-                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+                    var subQuery = new Sql()
+                        .Select("umbracoNode.id as nodeId")
+                        .From<ContentDto>(SqlSyntax)
+                        .InnerJoin<NodeDto>(SqlSyntax)
+                        .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                        .WhereIn<ContentDto>(dto => dto.ContentTypeId, contentTypeIds, SqlSyntax)
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
-                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        Database.Execute(deleteSql);
-                    }
+                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    Database.Execute(deleteSql);                    
                 }
 
                 //now insert the data, again if something fails here, the whole transaction is reversed
@@ -622,9 +614,32 @@ namespace Umbraco.Core.Persistence.Repositories
             Func<Tuple<string, object[]>> filterCallback = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                sbWhere.Append("AND ((umbracoNode. " + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ") " +
-                                "OR (cmsMember.LoginName LIKE @0" + args.Count + "))");
-                args.Add("%" + filter + "%");
+                //This will build up the where clause - even though the same 'filter' is being
+                //applied to both columns, the parameters values passed to PetaPoco need to be 
+                //duplicated, otherwise it gets confused :/ 
+                var columnFilters = new List<Tuple<string, string>>
+                {
+                    new Tuple<string, string>("umbracoNode", "text"),
+                    new Tuple<string, string>("cmsMember", "LoginName")
+                };
+                sbWhere.Append("AND (");
+                for (int i = 0; i < columnFilters.Count; i++)
+                {
+                    sbWhere
+                        .Append("(")
+                        .Append(SqlSyntax.GetQuotedTableName(columnFilters[i].Item1))
+                        .Append(".")
+                        .Append(SqlSyntax.GetQuotedColumnName(columnFilters[i].Item2))
+                        .Append(" LIKE @")
+                        .Append(args.Count)
+                        .Append(") ");
+                    args.Add(string.Format("%{0}%", filter));
+                    if (i < (columnFilters.Count - 1))
+                    {
+                        sbWhere.Append("OR ");
+                    }
+                }
+                sbWhere.Append(")");
                 filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
             }
 
