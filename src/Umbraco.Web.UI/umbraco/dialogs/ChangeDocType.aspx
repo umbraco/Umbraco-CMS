@@ -97,9 +97,7 @@
             <asp:Literal ID="PropertiesMappedMessage" runat="server" />
             <asp:Literal ID="ContentPublishedMessage" runat="server" />
             <br /><br />
-            <asp:Literal ID="RebuildIndexesMessage" runat="server" />
-            <br /><br />
-            <a href="#" class="btn btn-success" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("defaultdialogs", "closeThisWindow") %></a>  
+            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("defaultdialogs", "closeThisWindow") %></a>  
         </p>
     </asp:PlaceHolder>
 

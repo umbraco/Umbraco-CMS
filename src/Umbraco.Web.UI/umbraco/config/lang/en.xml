@@ -100,7 +100,6 @@
     <key alias="styleShow">Show styles</key>
     <key alias="tableInsert">Insert table</key>
     <key alias="generateModels">Generate models</key>
-    <key alias="saveAndGenerateModels">Save and generate models</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -115,7 +114,6 @@
     <key alias="newTemplate">New Template</key>
     <key alias="newType">New Type</key>
     <key alias="none">none</key>
-    <key alias="rebuildIndexes">Please make sure to rebuild your Examine indexes using the 'Examine Management' dashboard in the Developer section, to ensure this change is applied everywhere.</key>
     <key alias="selectedContent">Content</key>
     <key alias="selectNewDocType">Select New Document Type</key>
     <key alias="successMessage">The document type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
