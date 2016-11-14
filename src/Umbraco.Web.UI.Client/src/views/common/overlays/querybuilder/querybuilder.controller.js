@@ -55,17 +55,29 @@
         }
 
         function chooseSource(query) {
-            dialogService.contentPicker({
-                callback: function (data) {
+            vm.contentPickerOverlay = {
+                view: "contentpicker",
+                show: true,
+                submit: function(model) {
 
-                    if (data.id > 0) {
-                        query.source = { id: data.id, name: data.name };
+                    var selectedNodeId = model.selection[0].id;
+                    var selectedNodeName = model.selection[0].name;
+
+                    if (selectedNodeId > 0) {
+                        query.source = { id: selectedNodeId, name: selectedNodeName };
                     } else {
                         query.source.name = "My website";
                         delete query.source.id;
                     }
+
+                    vm.contentPickerOverlay.show = false;
+                    vm.contentPickerOverlay = null;
+                },
+                close: function(oldModel) {
+                    vm.contentPickerOverlay.show = false;
+                    vm.contentPickerOverlay = null;
                 }
-            });
+            };
         }
 
         function getPropertyOperators(property) {
@@ -114,7 +126,7 @@
         }, true);
 
         onInit();
-        
+
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.QueryBuilderController", QueryBuilderOverlayController);
