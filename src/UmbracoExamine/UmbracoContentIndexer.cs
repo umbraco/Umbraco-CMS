@@ -419,8 +419,8 @@ namespace UmbracoExamine
                     
                     XElement[] mediaXElements;
                     
-                    var nodeTypes = _contentTypeService.GetAllContentTypes().ToArray();
-                    var icons = nodeTypes.ToDictionary(x => x.Id, y => y.Icon);
+                    var mediaTypes = _contentTypeService.GetAllMediaTypes().ToArray();
+                    var icons = mediaTypes.ToDictionary(x => x.Id, y => y.Icon);
 
                     do
                     {
@@ -443,7 +443,7 @@ namespace UmbracoExamine
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
                         if (IndexerData.IncludeNodeTypes.Any())
                         {
-                            var includeNodeTypeIds = nodeTypes.Where(x => IndexerData.IncludeNodeTypes.Contains(x.Alias)).Select(x => x.Id);
+                            var includeNodeTypeIds = mediaTypes.Where(x => IndexerData.IncludeNodeTypes.Contains(x.Alias)).Select(x => x.Id);
                             mediaXElements = mediaXElements.Where(elm => includeNodeTypeIds.Contains(elm.AttributeValue<int>("nodeType"))).ToArray();
                         }
 
