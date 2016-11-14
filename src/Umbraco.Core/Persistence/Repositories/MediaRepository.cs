@@ -4,21 +4,17 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Dynamics;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -137,6 +133,74 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of VersionableRepositoryBase<IContent>
 
+        public override IEnumerable<IMedia> GetAllVersions(int id)
+        {
+            var sql = GetBaseQuery(false)
+                .Where(GetBaseWhereClause(), new { Id = id })
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+            return ProcessQuery(sql, true);
+        }
+
+        private IEnumerable<IMedia> ProcessQuery(Sql sql, bool withCache = false)
+        {
+            // fetch returns a list so it's ok to iterate it in this method
+            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
+            var content = new IMedia[dtos.Count];
+            var defs = new List<DocumentDefinition>();
+
+            for (var i = 0; i < dtos.Count; i++)
+            {
+                var dto = dtos[i];
+
+                // if the cache contains the item, use it
+                if (withCache)
+                {
+                    var cached = RuntimeCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
+                    if (cached != null)
+                    {
+                        content[i] = cached;
+                        continue;
+                    }
+                }
+
+                // else, need to fetch from the database
+                // content type repository is full-cache so OK to get each one independently
+                var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+                var factory = new MediaFactory(contentType, NodeObjectTypeId, dto.NodeId);
+                content[i] = factory.BuildEntity(dto);
+
+                // need properties
+                defs.Add(new DocumentDefinition(
+                    dto.NodeId,
+                    dto.VersionId,
+                    dto.VersionDate,
+                    dto.ContentDto.NodeDto.CreateDate,
+                    contentType
+                ));
+            }
+
+            // load all properties for all documents from database in 1 query
+            var propertyData = GetPropertyCollection(sql, defs);
+
+            // assign
+            var dtoIndex = 0;
+            foreach (var def in defs)
+            {
+                // move to corresponding item (which has to exist)
+                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
+
+                // complete the item
+                var cc = content[dtoIndex];
+                cc.Properties = propertyData[cc.Id];
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                ((Entity) cc).ResetDirtyProperties(false);
+            }
+
+            return content;
+        }
+
         public override IMedia GetByVersion(Guid versionId)
         {
             var sql = GetBaseQuery(false);
@@ -175,7 +239,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     var subQuery = new Sql()
                         .Select("id")
                         .From<NodeDto>(SqlSyntax)
-                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);                    
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
                     var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
@@ -191,7 +255,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
                     var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                    Database.Execute(deleteSql);                    
+                    Database.Execute(deleteSql);
                 }
 
                 //now insert the data, again if something fails here, the whole transaction is reversed
@@ -460,65 +524,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<ContentVersionDto, Models.Media>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsContentVersion", "contentId"),
-                ProcessQuery, orderBy, orderDirection, orderBySystemField,
+                sql => ProcessQuery(sql), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
-        }
-
-        private IEnumerable<IMedia> ProcessQuery(Sql sql)
-        {
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
-
-            var ids = dtos.Select(x => x.ContentDto.ContentTypeId).ToArray();
-
-            //content types
-            var contentTypes = ids.Length == 0 ? Enumerable.Empty<IMediaType>() : _mediaTypeRepository.GetAll(ids).ToArray();
-
-            var dtosWithContentTypes = dtos
-                //This select into and null check are required because we don't have a foreign damn key on the contentType column
-                // http://issues.umbraco.org/issue/U4-5503
-                .Select(x => new { dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentDto.ContentTypeId) })
-                .Where(x => x.contentType != null)
-                .ToArray();
-
-            //Go get the property data for each document
-            var docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
-                d.dto.NodeId,
-                d.dto.VersionId,
-                d.dto.VersionDate,
-                d.dto.ContentDto.NodeDto.CreateDate,
-                d.contentType))
-                .ToArray();
-
-            var propertyData = GetPropertyCollection(sql, docDefs);
-
-            return dtosWithContentTypes.Select(d => CreateMediaFromDto(
-                d.dto,
-                contentTypes.First(ct => ct.Id == d.dto.ContentDto.ContentTypeId),
-                propertyData[d.dto.NodeId]));
-        }
-
-        /// <summary>
-        /// Private method to create a media object from a ContentDto
-        /// </summary>
-        /// <param name="d"></param>
-        /// <param name="contentType"></param>
-        /// <param name="propCollection"></param>
-        /// <returns></returns>
-        private IMedia CreateMediaFromDto(ContentVersionDto dto,
-            IMediaType contentType,
-            PropertyCollection propCollection)
-        {
-            var factory = new MediaFactory(contentType, NodeObjectTypeId, dto.NodeId);
-            var media = factory.BuildEntity(dto);
-
-            media.Properties = propCollection;
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)media).ResetDirtyProperties(false);
-            return media;
         }
 
         /// <summary>
