@@ -406,6 +406,7 @@
     <Compile Include="Media\Exif\ExifTag.cs" />
     <Compile Include="Media\Exif\ExifTagFactory.cs" />
     <Compile Include="Models\Rdbms\AccessRuleDto.cs" />
+    <Compile Include="Models\Rdbms\LockDto.cs" />
     <Compile Include="Models\Rdbms\RedirectUrlDto.cs" />
     <Compile Include="Models\Rdbms\DocumentPublishedReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\ExternalLoginDto.cs" />
@@ -415,6 +416,7 @@
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
+    <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
     <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
     <Compile Include="Persistence\Factories\MigrationEntryFactory.cs" />
@@ -428,6 +430,8 @@
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveFive\AddLockObjects.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveFive\AddLockTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\EnsureServersLockObject.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\AddRedirectUrlTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\RemoveStylesheetDataAndTablesAgain.cs" />
