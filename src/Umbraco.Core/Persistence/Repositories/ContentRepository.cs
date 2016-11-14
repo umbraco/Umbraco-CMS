@@ -209,6 +209,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 baseId = xmlItems.Last().NodeId;
             }
+        }
 
         public override IEnumerable<IContent> GetAllVersions(int id)
         {
