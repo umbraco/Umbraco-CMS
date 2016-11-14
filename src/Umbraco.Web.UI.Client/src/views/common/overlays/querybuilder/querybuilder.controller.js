@@ -1,101 +1,122 @@
-angular.module("umbraco").controller('Umbraco.Overlays.QueryBuilderController',
-		function($scope, $http, dialogService){
-			
-            $http.get("backoffice/UmbracoApi/TemplateQuery/GetAllowedProperties").then(function(response) {
-                $scope.properties = response.data;
+(function () {
+    "use strict";
+
+    function QueryBuilderOverlayController($scope, $http, dialogService) {
+
+        var vm = this;
+
+        vm.properties = [];
+        vm.contentTypes = [];
+        vm.conditions = [];
+
+        vm.query = {
+            contentType: {
+                name: "Everything"
+            },
+            source: {
+                name: "My website"
+            },
+            filters: [
+                {
+                    property: undefined,
+                    operator: undefined
+                }
+            ],
+            sort: {
+                property: {
+                    alias: "",
+                    name: "",
+                },
+                direction: "ascending"
+            }
+        };
+
+        vm.chooseSource = chooseSource;
+        vm.getPropertyOperators = getPropertyOperators;
+        vm.addFilter = addFilter;
+        vm.trashFilter = trashFilter;
+        vm.changeSortOrder = changeSortOrder;
+        vm.setSortProperty = setSortProperty;
+
+        function onInit() {
+
+            $http.get("backoffice/UmbracoApi/TemplateQuery/GetAllowedProperties").then(function (response) {
+                vm.properties = response.data;
             });
 
             $http.get("backoffice/UmbracoApi/TemplateQuery/GetContentTypes").then(function (response) {
-                $scope.contentTypes = response.data;
+                vm.contentTypes = response.data;
             });
 
             $http.get("backoffice/UmbracoApi/TemplateQuery/GetFilterConditions").then(function (response) {
-                $scope.conditions = response.data;
+                vm.conditions = response.data;
             });
 
+        }
 
-			$scope.query = {
-				contentType: {
-					name: "Everything"
-				},
-				source:{
-					name: "My website"
-				}, 
-				filters:[
-					{
-						property:undefined,
-						operator: undefined
-					}
-				],
-				sort:{
-					property:{
-						alias: "",
-						name: "",
-					},
-					direction: "ascending"
-				}
-			};
+        function chooseSource(query) {
+            dialogService.contentPicker({
+                callback: function (data) {
 
+                    if (data.id > 0) {
+                        query.source = { id: data.id, name: data.name };
+                    } else {
+                        query.source.name = "My website";
+                        delete query.source.id;
+                    }
+                }
+            });
+        }
 
+        function getPropertyOperators(property) {
+            var conditions = _.filter(vm.conditions, function (condition) {
+                var index = condition.appliesTo.indexOf(property.type);
+                return index >= 0;
+            });
+            return conditions;
+        }
 
-			$scope.chooseSource = function(query){
-				dialogService.contentPicker({
-				    callback: function (data) {
+        function addFilter(query) {
+            query.filters.push({});
+        }
 
-				        if (data.id > 0) {
-				            query.source = { id: data.id, name: data.name };
-				        } else {
-				            query.source.name = "My website";
-				            delete query.source.id;
-				        }
-					}
-				});
-			};
+        function trashFilter(query) {
+            query.filters.splice(query, 1);
+        }
 
-		    var throttledFunc = _.throttle(function() {
+        function changeSortOrder(query) {
+            if (query.sort.direction === "ascending") {
+                query.sort.direction = "descending";
+            } else {
+                query.sort.direction = "ascending";
+            }
+        }
 
-		        $http.post("backoffice/UmbracoApi/TemplateQuery/PostTemplateQuery", $scope.query).then(function (response) {
-		            $scope.model.result = response.data;
-		        });
+        function setSortProperty(query, property) {
+            query.sort.property = property;
+            if (property.type === "datetime") {
+                query.sort.direction = "descending";
+            } else {
+                query.sort.direction = "ascending";
+            }
+        }
 
-		    }, 200);
+        var throttledFunc = _.throttle(function () {
 
-		    $scope.$watch("query", function(value) {
-		        throttledFunc();
-		    }, true);
+            $http.post("backoffice/UmbracoApi/TemplateQuery/PostTemplateQuery", vm.query).then(function (response) {
+                $scope.model.result = response.data;
+            });
 
-			$scope.getPropertyOperators = function (property) {
+        }, 200);
 
-			    var conditions = _.filter($scope.conditions, function(condition) {
-			        var index = condition.appliesTo.indexOf(property.type);
-			        return index >= 0;
-			    });
-			    return conditions;
-			};
+        $scope.$watch("vm.query", function (value) {
+            throttledFunc();
+        }, true);
 
-			
-			$scope.addFilter = function(query){				
-			    query.filters.push({});
-			};
+        onInit();
+        
+    }
 
-			$scope.trashFilter = function (query) {
-			    query.filters.splice(query,1);
-			};
+    angular.module("umbraco").controller("Umbraco.Overlays.QueryBuilderController", QueryBuilderOverlayController);
 
-			$scope.changeSortOrder = function(query){
-				if(query.sort.direction === "ascending"){
-					query.sort.direction = "descending";
-				}else{
-					query.sort.direction = "ascending";
-				}
-			};
-
-			$scope.setSortProperty = function(query, property){
-				query.sort.property = property;
-				if(property.type === "datetime"){
-					query.sort.direction = "descending";
-				}else{
-					query.sort.direction = "ascending";
-				}
-			};
-		});
+})();
