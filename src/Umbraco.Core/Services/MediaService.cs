@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
