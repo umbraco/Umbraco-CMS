@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveFiv
 
         public override void Up()
         {
-            Execute.Sql("UPDATE cmsContentType SET allowAtRoot = 1 WHERE nodeId = 1031 OR nodeId = 1032 OR nodeId = 1033");
+            Execute.Sql("UPDATE cmsContentType SET allowAtRoot = 1 WHERE nodeId = 1032 OR nodeId = 1033");
         }
 
         public override void Down()
