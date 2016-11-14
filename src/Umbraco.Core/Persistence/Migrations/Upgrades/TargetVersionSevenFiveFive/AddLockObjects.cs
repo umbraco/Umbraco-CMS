@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveFiv
                 // be safe: delete old umbracoNode lock objects if any
                 db.Execute("DELETE FROM umbracoNode WHERE id=@id;", new { id });
                 // then create umbracoLock object
-                db.Execute("INSERT umbracoLock (id, name, value) VALUES (@id, '@name', 1);", new { id, name });
+                db.Execute("INSERT umbracoLock (id, name, value) VALUES (@id, @name, 1);", new { id, name });
                 return string.Empty;
             });
         }
