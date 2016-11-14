@@ -446,11 +446,10 @@ namespace UmbracoExamine
                             var includeNodeTypeIds = mediaTypes.Where(x => IndexerData.IncludeNodeTypes.Contains(x.Alias)).Select(x => x.Id);
                             mediaXElements = mediaXElements.Where(elm => includeNodeTypeIds.Contains(elm.AttributeValue<int>("nodeType"))).ToArray();
                         }
-
-                        // ReSharper disable once ForCanBeConvertedToForeach
-                        for (var i = 0; i < mediaXElements.Length; i++)
+                        
+                        foreach (var element in mediaXElements)
                         {
-                            mediaXElements[i].Add(new XAttribute("icon", icons[mediaXElements[i].AttributeValue<int>("nodeType")]));
+                            element.Add(new XAttribute("icon", icons[element.AttributeValue<int>("nodeType")]));
                         }
 
                         AddNodesToIndex(mediaXElements, type);
