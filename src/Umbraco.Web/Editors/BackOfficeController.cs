@@ -363,6 +363,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                     controller => controller.GetAllHealthChecks())
+                            },
+                            {
+                                "templateQueryApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
+                                    controller => controller.PostTemplateQuery(null))
                             }
                         }
                     },

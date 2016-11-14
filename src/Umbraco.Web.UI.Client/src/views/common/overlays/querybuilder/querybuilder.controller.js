@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function QueryBuilderOverlayController($scope, $http, dialogService) {
+    function QueryBuilderOverlayController($scope, templateQueryResource) {
 
         var vm = this;
 
@@ -40,17 +40,20 @@
 
         function onInit() {
 
-            $http.get("backoffice/UmbracoApi/TemplateQuery/GetAllowedProperties").then(function (response) {
-                vm.properties = response.data;
-            });
+            templateQueryResource.getAllowedProperties()
+                .then(function (properties) {
+                    vm.properties = properties;
+                });
 
-            $http.get("backoffice/UmbracoApi/TemplateQuery/GetContentTypes").then(function (response) {
-                vm.contentTypes = response.data;
-            });
+            templateQueryResource.getContentTypes()
+                .then(function (contentTypes) {
+                    vm.contentTypes = contentTypes;
+                });
 
-            $http.get("backoffice/UmbracoApi/TemplateQuery/GetFilterConditions").then(function (response) {
-                vm.conditions = response.data;
-            });
+            templateQueryResource.getFilterConditions()
+                .then(function (conditions) {
+                    vm.conditions = conditions;
+                });
 
         }
 
@@ -115,9 +118,10 @@
 
         var throttledFunc = _.throttle(function () {
 
-            $http.post("backoffice/UmbracoApi/TemplateQuery/PostTemplateQuery", vm.query).then(function (response) {
-                $scope.model.result = response.data;
-            });
+            templateQueryResource.postTemplateQuery(vm.query)
+                .then(function (response) {
+                    $scope.model.result = response;
+                });
 
         }, 200);
 
