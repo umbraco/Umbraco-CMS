@@ -16,7 +16,7 @@
         vm.openMacroPicker = openMacroPicker;
         vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
-
+        vm.openPartialOverlay = openPartialOverlay;
 
         function openMacroPicker() {
 
