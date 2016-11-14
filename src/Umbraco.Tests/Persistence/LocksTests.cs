@@ -254,7 +254,9 @@ namespace Umbraco.Tests.Persistence
                     var info = database.Query<dynamic>("SELECT * FROM sys.lock_information;");
                     Console.WriteLine("LOCKS:");
                     foreach (var row in info)
-                        Console.WriteLine($"> {row.request_spid} {row.resource_type} {row.resource_description} {row.request_mode} {row.resource_table} {row.resource_table_id} {row.request_status}");
+                        Console.WriteLine(string.Format("> {0} {1} {2} {3} {4} {5} {6}", row.request_spid,
+                            row.resource_type, row.resource_description, row.request_mode, row.resource_table,
+                            row.resource_table_id, row.request_status));
                     Thread.Sleep(6000);
                 }
                 catch (Exception e)
@@ -277,7 +279,9 @@ namespace Umbraco.Tests.Persistence
                     var info = database.Query<dynamic>("SELECT * FROM sys.lock_information;");
                     Console.WriteLine("LOCKS:");
                     foreach (var row in info)
-                        Console.WriteLine($"> {row.request_spid} {row.resource_type} {row.resource_description} {row.request_mode} {row.resource_table} {row.resource_table_id} {row.request_status}");
+                        Console.WriteLine(string.Format("> {0} {1} {2} {3} {4} {5} {6}", row.request_spid,
+                            row.resource_type, row.resource_description, row.request_mode, row.resource_table,
+                            row.resource_table_id, row.request_status));
                     Thread.Sleep(1000);
                 }
                 catch (Exception e)
