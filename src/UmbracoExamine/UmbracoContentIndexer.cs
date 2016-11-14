@@ -1,20 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Security;
-using System.Text;
-using System.Web;
 using System.Xml.Linq;
 using Examine;
-using Examine.Config;
-using Examine.Providers;
 using Lucene.Net.Documents;
-using Lucene.Net.Index;
 using Umbraco.Core;
-using umbraco.cms.businesslogic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
@@ -22,12 +14,9 @@ using UmbracoExamine.DataServices;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
 using UmbracoExamine.Config;
-using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
-using umbraco.BasePages;
 using Umbraco.Core.Persistence.Querying;
 using IContentService = Umbraco.Core.Services.IContentService;
-using UmbracoExamine.LocalStorage;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 
 
@@ -42,6 +31,7 @@ namespace UmbracoExamine
         private readonly IMediaService _mediaService;
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
+        private readonly IContentTypeService _contentTypeService;
 
         #region Constructors
 
@@ -55,6 +45,7 @@ namespace UmbracoExamine
             _mediaService = ApplicationContext.Current.Services.MediaService;
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
             _userService = ApplicationContext.Current.Services.UserService;
+            _contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
         }
 
         /// <summary>
@@ -73,6 +64,7 @@ namespace UmbracoExamine
             _mediaService = ApplicationContext.Current.Services.MediaService;
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
             _userService = ApplicationContext.Current.Services.UserService;
+            _contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
         }
 
         /// <summary>
@@ -91,6 +83,7 @@ namespace UmbracoExamine
             _mediaService = ApplicationContext.Current.Services.MediaService;
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
             _userService = ApplicationContext.Current.Services.UserService;
+            _contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
         }
 
         /// <summary>
@@ -105,6 +98,7 @@ namespace UmbracoExamine
         /// <param name="userService"></param>
         /// <param name="analyzer"></param>
         /// <param name="async"></param>
+        [Obsolete("Use the overload that specifies the Umbraco services")]
         public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, 
             IContentService contentService, 
             IMediaService mediaService,
@@ -117,13 +111,43 @@ namespace UmbracoExamine
             _mediaService = mediaService;
             _dataTypeService = dataTypeService;
             _userService = userService;
+            _contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+        }
+
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="indexerData"></param>
+        /// <param name="luceneDirectory"></param>
+        /// <param name="dataService"></param>
+        /// <param name="contentService"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        /// <param name="contentTypeService"></param>
+        /// <param name="analyzer"></param>
+        /// <param name="async"></param>
+        public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService,
+            IContentService contentService,
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
+            IUserService userService,
+            IContentTypeService contentTypeService,
+            Analyzer analyzer, bool async)
+            : base(indexerData, luceneDirectory, dataService, analyzer, async)
+        {
+            _contentService = contentService;
+            _mediaService = mediaService;
+            _dataTypeService = dataTypeService;
+            _userService = userService;
+            _contentTypeService = contentTypeService;
         }
 
         #endregion
 
         #region Constants & Fields
 
-        
+
 
         /// <summary>
         /// Used to store the path of a content object
@@ -206,13 +230,8 @@ namespace UmbracoExamine
                 SupportProtectedContent = supportProtected;
             else
                 SupportProtectedContent = false;
-
-
+            
             base.Initialize(name, config);
-
-            
-
-            
         }
 
         #endregion
@@ -285,10 +304,7 @@ namespace UmbracoExamine
         #endregion
 
         #region Public methods
-
         
-
-
         /// <summary>
         /// Overridden for logging
         /// </summary>
@@ -308,7 +324,6 @@ namespace UmbracoExamine
             {
                 DataService.LogService.AddErrorLog(-1, string.Format("ReIndexNode cannot proceed, the format of the XElement is invalid, the xml has no 'id' attribute. {0}", node));
             }
-
         }
 
         /// <summary>
@@ -355,8 +370,6 @@ namespace UmbracoExamine
             switch (type)
             {
                 case IndexTypes.Content:
-
-
                     var contentParentId = -1;
                     if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
                     {
@@ -391,66 +404,59 @@ namespace UmbracoExamine
                         {
                             content = descendants.ToArray();
                         }
-
                         AddNodesToIndex(GetSerializedContent(content), type);
                         pageIndex++;
-
-
                     } while (content.Length == pageSize);
 
                     break;
                 case IndexTypes.Media:
-
                     var mediaParentId = -1;
+
                     if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
                     {
                         mediaParentId = IndexerData.ParentNodeId.Value;
                     }
-                    IMedia[] media;
                     
+                    XElement[] mediaXElements;
+                    
+                    var mediaTypes = _contentTypeService.GetAllMediaTypes().ToArray();
+                    var icons = mediaTypes.ToDictionary(x => x.Id, y => y.Icon);
+
                     do
                     {
                         long total;
-                        var descendants = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out total);
+                        if (mediaParentId == -1)
+                        {
+                            mediaXElements = _mediaService.GetPagedXmlEntries("-1", pageIndex, pageSize, out total).ToArray();
+                        }
+                        else
+                        {
+                            //Get the parent
+                            var parent = _mediaService.GetById(mediaParentId);
+                            if (parent == null)
+                                mediaXElements = new XElement[0];
+                            else
+                                mediaXElements = _mediaService.GetPagedXmlEntries(parent.Path, pageIndex, pageSize, out total).ToArray();
+                        }
 
                         //if specific types are declared we need to post filter them
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
                         if (IndexerData.IncludeNodeTypes.Any())
                         {
-                            media = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
-                        }
-                        else
-                        {
-                            media = descendants.ToArray();
+                            var includeNodeTypeIds = mediaTypes.Where(x => IndexerData.IncludeNodeTypes.Contains(x.Alias)).Select(x => x.Id);
+                            mediaXElements = mediaXElements.Where(elm => includeNodeTypeIds.Contains(elm.AttributeValue<int>("nodeType"))).ToArray();
                         }
                         
-                        AddNodesToIndex(GetSerializedMedia(media), type);
+                        foreach (var element in mediaXElements)
+                        {
+                            element.Add(new XAttribute("icon", icons[element.AttributeValue<int>("nodeType")]));
+                        }
+
+                        AddNodesToIndex(mediaXElements, type);
                         pageIndex++;
-                    } while (media.Length == pageSize);
+                    } while (mediaXElements.Length == pageSize);
 
                     break;
-            }
-        }
-
-        private IEnumerable<XElement> GetSerializedMedia(IEnumerable<IMedia> media)
-        {
-            var serializer = new EntityXmlSerializer();
-            foreach (var m in media)
-            {
-                var xml = serializer.Serialize(
-                    _mediaService,
-                    _dataTypeService,
-                    _userService,
-                    m);
-
-                //add a custom 'icon' attribute
-                if (m.ContentType.Icon.IsNullOrWhiteSpace() == false)
-                {
-                    xml.Add(new XAttribute("icon", m.ContentType.Icon));    
-                }
-                
-
-                yield return xml;
             }
         }
 
@@ -510,7 +516,6 @@ namespace UmbracoExamine
 
         protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
         {
-
             //strip html of all users fields if we detect it has HTML in it. 
             //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
             //the value of the field 'as-is'.
@@ -546,7 +551,6 @@ namespace UmbracoExamine
             var icon = (string)e.Node.Attribute("icon");
             if (!e.Fields.ContainsKey(IconFieldName))
                 e.Fields.Add(IconFieldName, icon);  
-            
         }
 
         /// <summary>
@@ -584,7 +588,6 @@ namespace UmbracoExamine
             }
 
             return fields;
-
         }
 
         /// <summary>
@@ -605,7 +608,6 @@ namespace UmbracoExamine
             {
                 return base.GetIndexerData(indexSet);
             }
-
         }
 
         /// <summary>
@@ -635,7 +637,6 @@ namespace UmbracoExamine
             {
                 return false;
             }
-
             return base.ValidateDocument(node);
         }
 

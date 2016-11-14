@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Tests.PublishedContent
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     public class LegacyExamineBackedMediaTests : ExamineBaseTest
     {
         public override void Initialize()

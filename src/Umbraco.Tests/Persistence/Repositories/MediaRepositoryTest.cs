@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Moq;
@@ -59,9 +60,42 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Commit();
 
-                //delete all xml                 
+                //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10);
+
+                Assert.AreEqual(103, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
+        }
+
+        [Test]
+        public void Rebuild_Some_Xml_Structures()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+
+                var mediaType = mediaTypeRepository.Get(1032);
+
+                IMedia img50 = null;
+                for (var i = 0; i < 100; i++)
+                {
+                    var image = MockedMedia.CreateMediaImage(mediaType, -1);
+                    repository.AddOrUpdate(image);
+                    if (i == 50) img50 = image;
+                }
+                unitOfWork.Commit();
+
+                // assume this works (see other test)
+                repository.RebuildXmlStructures(media => new XElement("test"), 10);
+
+                //delete some xml
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml WHERE nodeId < " + img50.Id);
+                Assert.AreEqual(50, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
                 repository.RebuildXmlStructures(media => new XElement("test"), 10);
 
@@ -99,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Commit();
 
-                //delete all xml                 
+                //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
