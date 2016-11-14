@@ -159,11 +159,11 @@ namespace Umbraco.Tests.UmbracoExamine
             if (contentTypeService == null)
             {
                 var contentTypeServiceMock = new Mock<IContentTypeService>();
-                contentTypeServiceMock.Setup(x => x.GetAllContentTypes())
-                    .Returns(new List<IContentType>()
+                contentTypeServiceMock.Setup(x => x.GetAllMediaTypes())
+                    .Returns(new List<IMediaType>()
                     {
-                        new ContentType(-1) {Alias = "Folder", Name = "Folder", Id = 1031, Icon = "icon-folder"},
-                        new ContentType(-1) {Alias = "Image", Name = "Image", Id = 1032, Icon = "icon-picture"}
+                        new MediaType(-1) {Alias = "Folder", Name = "Folder", Id = 1031, Icon = "icon-folder"},
+                        new MediaType(-1) {Alias = "Image", Name = "Image", Id = 1032, Icon = "icon-picture"}
                     });
                 contentTypeService = contentTypeServiceMock.Object;
             }
