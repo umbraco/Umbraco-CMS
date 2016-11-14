@@ -15,7 +15,7 @@
 					
 					<ul class="dropdown-menu">
 						<li ng-repeat="contentType in vm.contentTypes">
-							<a href ng-click="vm.query.contentType = contentType">{{contentType.name}}</a>
+							<a href ng-click="vm.setContentType(contentType)">{{contentType.name}}</a>
 						</li>
 					</ul>
 
@@ -44,7 +44,7 @@
 
 					<ul class="dropdown-menu">
 						<li ng-repeat="property in vm.properties">
-							<a href ng-click="filter.property = property">
+							<a href ng-click="vm.setFilterProperty(filter, property)">
 		                    	{{property.name}}
 							</a>
 						</li>
@@ -59,14 +59,14 @@
 					</a>
 					<ul class="dropdown-menu">
 						<li ng-repeat="term in vm.getPropertyOperators(filter.property)">
-							<a href ng-click="filter.term = term">
+							<a href ng-click="vm.setFilterTerm(filter, term)">
 								{{term.name}}
 							</a>
 						</li>
 					</ul>
 				</div>
 
-				<input type="text" ng-if="filter.term" style="width:90px;" ng-model="filter.constraintValue" />
+				<input type="text" ng-if="filter.term" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
 
 				<a href ng-click="vm.addFilter(vm.query)">
 					<i class="icon-add"></i>

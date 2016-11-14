@@ -37,6 +37,10 @@
         vm.trashFilter = trashFilter;
         vm.changeSortOrder = changeSortOrder;
         vm.setSortProperty = setSortProperty;
+        vm.setContentType = setContentType;
+        vm.setFilterProperty = setFilterProperty;
+        vm.setFilterTerm = setFilterTerm;
+        vm.changeConstraintValue = changeConstraintValue;
 
         function onInit() {
 
@@ -54,6 +58,8 @@
                 .then(function (conditions) {
                     vm.conditions = conditions;
                 });
+            
+            throttledFunc();
 
         }
 
@@ -61,6 +67,7 @@
             vm.contentPickerOverlay = {
                 view: "contentpicker",
                 show: true,
+                submitButtonLabel: "Insert",
                 submit: function(model) {
 
                     var selectedNodeId = model.selection[0].id;
@@ -72,6 +79,8 @@
                         query.source.name = "My website";
                         delete query.source.id;
                     }
+
+                    throttledFunc();
 
                     vm.contentPickerOverlay.show = false;
                     vm.contentPickerOverlay = null;
@@ -105,6 +114,7 @@
             } else {
                 query.sort.direction = "ascending";
             }
+            throttledFunc();
         }
 
         function setSortProperty(query, property) {
@@ -114,20 +124,37 @@
             } else {
                 query.sort.direction = "ascending";
             }
+            throttledFunc();
+        }
+
+        function setContentType(contentType) {
+            vm.query.contentType = contentType;
+            throttledFunc();
+        }
+
+        function setFilterProperty(filter, property) {
+            filter.property = property;
+            throttledFunc();
+        }
+
+        function setFilterTerm(filter, term) {
+            filter.term = term;
+            throttledFunc();
+        }
+
+        function changeConstraintValue() {
+            throttledFunc();
         }
 
         var throttledFunc = _.throttle(function () {
-
+            
             templateQueryResource.postTemplateQuery(vm.query)
                 .then(function (response) {
                     $scope.model.result = response;
                 });
 
         }, 200);
-
-        $scope.$watch("vm.query", function (value) {
-            throttledFunc();
-        }, true);
+        
 
         onInit();
 
