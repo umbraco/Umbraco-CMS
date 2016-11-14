@@ -475,6 +475,7 @@
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeOne\UpdateUserLanguagesToIsoCode.cs" />
     <Compile Include="Persistence\PocoDataDataReader.cs" />
+    <Compile Include="Persistence\Querying\QueryExtensions.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
@@ -1016,10 +1017,10 @@
     <Compile Include="Persistence\PetaPocoConnectionExtensions.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
-    <Compile Include="Persistence\Querying\BaseExpressionHelper.cs" />
-    <Compile Include="Persistence\Querying\PocoToSqlExpressionHelper.cs" />
+    <Compile Include="Persistence\Querying\ExpressionVisitorBase.cs" />
+    <Compile Include="Persistence\Querying\PocoToSqlExpressionVisitor.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
-    <Compile Include="Persistence\Querying\ModelToSqlExpressionHelper.cs" />
+    <Compile Include="Persistence\Querying\ModelToSqlExpressionVisitor.cs" />
     <Compile Include="Persistence\Querying\Query.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />

@@ -8,7 +8,17 @@ namespace Umbraco.Core.Persistence.Mappers
 {
     public abstract class BaseMapper
     {
-        
+        private readonly ISqlSyntaxProvider _sqlSyntax;
+
+        protected BaseMapper() : this(SqlSyntaxContext.SqlSyntaxProvider)
+        {            
+        }
+
+        protected BaseMapper(ISqlSyntaxProvider sqlSyntax)
+        {
+            _sqlSyntax = sqlSyntax;
+        }
+
         internal abstract ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache { get; }
 
         internal abstract void BuildMap();
@@ -58,8 +68,8 @@ namespace Umbraco.Core.Persistence.Mappers
             string columnName = columnAttribute.Name;
 
             string columnMap = string.Format("{0}.{1}",
-                                             SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName),
-                                             SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+                                             _sqlSyntax.GetQuotedTableName(tableName),
+                                             _sqlSyntax.GetQuotedColumnName(columnName));
             return columnMap;
         }
     }

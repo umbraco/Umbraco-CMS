@@ -62,6 +62,12 @@ namespace Umbraco.Core.Services
 
         }
 
+        #region Static Queries
+
+        private readonly IQuery<IUmbracoEntity> _rootEntityQuery = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == -1);
+
+        #endregion
+
         /// <summary>
         /// Returns the integer id for a given GUID
         /// </summary>
@@ -389,8 +395,7 @@ namespace Umbraco.Core.Services
             var objectTypeId = umbracoObjectType.GetGuid();
             using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == -1);
-                var entities = repository.GetByQuery(query, objectTypeId);
+                var entities = repository.GetByQuery(_rootEntityQuery, objectTypeId);
 
                 return entities;
             }

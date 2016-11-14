@@ -104,6 +104,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+        #region Static Queries
+
+        private readonly IQuery<IContent> _publishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
+
+        #endregion
+
         #region Overrides of PetaPocoRepositoryBase<IContent>
 
 
@@ -205,7 +211,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     try
                     {
-                        // InsertOrUpdate tries to update first, which is good since it is what
                         // should happen in most cases, then it tries to insert, and it should work
                         // unless the node has been deleted, and we just report the exception
                         Database.InsertOrUpdate(xmlItem);
