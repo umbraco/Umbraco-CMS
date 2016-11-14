@@ -130,9 +130,9 @@
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "templateQueryApiBaseUrl",
-                        "PostTemplateQuery",
-                        query)),
-                'Failed to retrieve result');
+                        "PostTemplateQuery"),
+                        query),
+                'Failed to retrieve query');
         }
 
         var resource = {
