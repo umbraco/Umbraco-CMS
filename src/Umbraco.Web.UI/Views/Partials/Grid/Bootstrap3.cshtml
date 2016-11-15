@@ -67,10 +67,7 @@
             foreach (JProperty property in cfg.Properties())
             {
                 var propertyValue = TemplateUtilities.CleanForXss(property.Value.ToString());
-                if (string.IsNullOrWhiteSpace(propertyValue) == false)
-                {
-                    attrs.Add(property.Name + "=\"" + propertyValue +"\"");
-                }
+                attrs.Add(property.Name + "=\"" + propertyValue + "\"");
             }
 
         JObject style = contentItem.styles;

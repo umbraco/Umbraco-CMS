@@ -16,6 +16,6 @@
 else
 {
     <text>
-        <div style="@Model.editor.config.style">@TemplateUtilities.CleanForXss(Model.value.ToString())</div>
+        <div style="@Model.editor.config.style">@Model.value</div>
     </text>
 }
