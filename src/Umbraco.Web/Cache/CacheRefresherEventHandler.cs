@@ -125,9 +125,12 @@ namespace Umbraco.Web.Cache
 
             //public access events
             PublicAccessService.Saved += PublicAccessService_Saved;
-            PublicAccessService.Deleted += PublicAccessService_Deleted; ;
+            PublicAccessService.Deleted += PublicAccessService_Deleted;
+
+            RelationService.SavedRelationType += RelationType_Saved;
+            RelationService.DeletedRelationType += RelationType_Deleted;
         }
-        
+
         #region Publishing
 
         void PublishingStrategy_UnPublished(IPublishingStrategy sender, PublishEventArgs<IContent> e)
@@ -661,7 +664,25 @@ namespace Umbraco.Web.Cache
             {
                 DistributedCache.Instance.RemoveMemberGroupCache(m.Id);
             }
-        } 
+        }
+        #endregion
+
+        #region Relation type event handlers
+
+        private static void RelationType_Saved(IRelationService sender, SaveEventArgs<IRelationType> args)
+        {
+            var dc = DistributedCache.Instance;
+            foreach (var e in args.SavedEntities)
+                dc.RefreshRelationTypeCache(e.Id);
+        }
+
+        private static void RelationType_Deleted(IRelationService sender, DeleteEventArgs<IRelationType> args)
+        {
+            var dc = DistributedCache.Instance;
+            foreach (var e in args.DeletedEntities)
+                dc.RemoveRelationTypeCache(e.Id);
+        }
+
         #endregion
     }
 }
