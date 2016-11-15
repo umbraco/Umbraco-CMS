@@ -23,6 +23,7 @@
             vm.macroPickerOverlay = {
                 view: "macropicker",
                 show: true,
+                title: "Insert macro",
                 dialogData: {},
                 submit: function(model) {
 
@@ -77,6 +78,7 @@
                 treeAlias: "dictionary",
                 entityType: "dictionary",
                 multiPicker: false,
+                title: "Insert dictionary item",
                 show: true,
                 select: function(node){
 
@@ -106,7 +108,7 @@
                 entityType: "partialView",
                 multiPicker: false,
                 show: true,
-                title: "Insert Partial view",
+                title: "Insert partial view",
 
                 select: function(node){
                     
