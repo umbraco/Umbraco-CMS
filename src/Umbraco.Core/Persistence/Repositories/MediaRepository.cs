@@ -163,88 +163,49 @@ namespace Umbraco.Core.Persistence.Repositories
             return media;
         }
 
-        public void RebuildXmlStructures(Func<IMedia, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public void RebuildXmlStructures(Func<IMedia, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null)
         {
+            // the previous way of doing this was to run it all in one big transaction,
+            // and to bulk-insert groups of xml rows - which works, until the transaction
+            // times out - and besides, because v7 transactions are ReadCommited, it does
+            // not bring much safety - so this reverts to updating each record individually,
+            // and it may be slower in the end, but should be more resilient.
 
-            //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
-            using (var tr = Database.GetTransaction())
+            var baseId = 0;
+            var contentTypeIdsA = contentTypeIds == null ? new int[0] : contentTypeIds.ToArray();
+            while (true)
             {
-                //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
-                if (contentTypeIds == null)
-                {
-                    var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-                    var subQuery = new Sql()
-                        .Select("DISTINCT cmsContentXml.nodeId")
-                        .From<ContentXmlDto>()
-                        .InnerJoin<NodeDto>()
-                        .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                        .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
+                // get the next group of nodes
+                var query = GetBaseQuery(false);
+                if (contentTypeIdsA.Length > 0)
+                    query = query
+                        .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+                query = query
+                    .Where<NodeDto>(x => x.NodeId > baseId)
+                    .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
+                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
+                    .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
+                    .ToList();
 
-                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                    Database.Execute(deleteSql);
-                }
-                else
+                // no more nodes, break
+                if (xmlItems.Count == 0) break;
+
+                foreach (var xmlItem in xmlItems)
                 {
-                    foreach (var id in contentTypeIds)
+                    try
                     {
-                        var id1 = id;
-                        var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-                        var subQuery = new Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<NodeDto>()
-                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .InnerJoin<ContentDto>()
-                            .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType)
-                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
-
-                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        Database.Execute(deleteSql);
+                        // InsertOrUpdate tries to update first, which is good since it is what
+                        // should happen in most cases, then it tries to insert, and it should work
+                        // unless the node has been deleted, and we just report the exception
+                        Database.InsertOrUpdate(xmlItem);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error<MediaRepository>("Could not rebuild XML for nodeId=" + xmlItem.NodeId, e);
                     }
                 }
-
-                //now insert the data, again if something fails here, the whole transaction is reversed
-                if (contentTypeIds == null)
-                {
-                    var query = Query<IMedia>.Builder;
-                    RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                }
-                else
-                {
-                    foreach (var contentTypeId in contentTypeIds)
-                    {
-                        //copy local
-                        var id = contentTypeId;
-                        var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == id && x.Trashed == false);
-                        RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                    }
-                }
-
-                tr.Complete();
+                baseId = xmlItems.Last().NodeId;
             }
-        }
-
-        private void RebuildXmlStructuresProcessQuery(Func<IMedia, XElement> serializer, IQuery<IMedia> query, Transaction tr, int pageSize)
-        {
-            var pageIndex = 0;
-            var total = long.MinValue;
-            var processed = 0;
-            do
-            {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
-
-                var xmlItems = (from descendant in descendants
-                                let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
-
-                //bulk insert it into the database
-                Database.BulkInsertRecords(xmlItems, tr);
-
-                processed += xmlItems.Length;
-
-                pageIndex++;
-            } while (processed < total);
         }
 
         public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
@@ -473,6 +434,30 @@ namespace Umbraco.Core.Persistence.Repositories
                 ProcessQuery, orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
+        }
+
+        /// <summary>
+        /// Gets paged media descendants as XML by path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of media items</returns>
+        public IEnumerable<XElement> GetPagedXmlEntriesByPath(string path, long pageIndex, int pageSize, out long totalRecords)
+        {
+            Sql query;
+            if (path == "-1")
+            {
+                query = new Sql().Select("nodeId, xml").From("cmsContentXml").Where("nodeId IN (SELECT id FROM umbracoNode WHERE nodeObjectType = @0)", Guid.Parse(Constants.ObjectTypes.Media)).OrderBy("nodeId");
+            }
+            else
+            {
+                query = new Sql().Select("nodeId, xml").From("cmsContentXml").Where("nodeId IN (SELECT id FROM umbracoNode WHERE path LIKE @0)", path.EnsureEndsWith(",%")).OrderBy("nodeId");
+            }
+            var pagedResult = Database.Page<ContentXmlDto>(pageIndex+1, pageSize, query);
+            totalRecords = pagedResult.TotalItems;
+            return pagedResult.Items.Select(dto => XElement.Parse(dto.Xml));
         }
 
         private IEnumerable<IMedia> ProcessQuery(Sql sql)

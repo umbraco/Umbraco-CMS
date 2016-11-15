@@ -320,13 +320,14 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </remarks>
         public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy)
         {
+            if (orderBy == null)
+                throw new ArgumentNullException("orderBy");
+
             // get the referenced column name and find the corresp mapped column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             var mapper = MappingResolver.Current.ResolveMapperByType(typeof(IUser));
             var mappedField = mapper.Map(expressionMember.Name);
 
-            if (orderBy == null)
-                throw new ArgumentNullException("orderBy");
             if (mappedField.IsNullOrWhiteSpace())
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
 

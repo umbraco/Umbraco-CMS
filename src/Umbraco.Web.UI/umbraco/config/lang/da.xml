@@ -30,6 +30,9 @@
     <key alias="refreshNode">Genindlæs elementer</key>
     <key alias="republish">Genudgiv hele sitet</key>
     <key alias="restore" version="7.3.0">Gendan</key>
+    <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
+     <key alias="chooseWhereToMove">Hvor vil du flytte</key>
+    <key alias="toInTheTreeStructureBelow">hen til i træstrukturen?</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -202,12 +205,12 @@
   </area>
   <area alias="bulk">
     <key alias="done">Færdig</key>
-    
+
     <key alias="deletedItem">Slettede %0% element</key>
     <key alias="deletedItems">Slettede %0% elementer</key>
     <key alias="deletedItemOfItem">Slettede %0% ud af %1% element</key>
     <key alias="deletedItemOfItems">Slettede %0% ud af %1% elementer</key>
-    
+
     <key alias="publishedItem">Udgav %0% element</key>
     <key alias="publishedItems">Udgav %0% elementer</key>
     <key alias="publishedItemOfItem">Udgav %0% ud af %1% element</key>
@@ -274,17 +277,11 @@
     <key alias="treepicker">Vælg</key>
     <key alias="viewCacheItem">Se cache element</key>
     <key alias="createFolder">Opret mappe...</key>
-
     <key alias="relateToOriginalLabel">Relatér til original</key>
-
+    <key alias="includeDescendants">Inkludér undersider</key>
     <key alias="linkToPage">Link til side</key>
-
-    <key alias="openInNewWindow">Åbner det linket dokument i et nyt vindue eller fane</key>
-    <key alias="openInFullBody">Åbner det linket dokument i fuld visning af vinduet</key>
-    <key alias="openInParentFrame">Åbner det linket dokument i "parent frame"</key>
-
+    <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
-
     <key alias="selectMedia">Vælg medie</key>
     <key alias="selectIcon">Vælg ikon</key>
     <key alias="selectItem">Vælg item</key>
@@ -293,19 +290,25 @@
     <key alias="selectContent">Vælg indhold</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
-    
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
-
     <key alias="linkYour">Link dit</key>
-    <key alias="unLinkYour">Fjern link fra dit</key>    
-    
+    <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
-    
     <key alias="selectEditor">Vælg editor</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder. Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
+    <key alias="description">
+      <![CDATA[
+      Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder.<br />Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
+      ]]>
+    </key>
     <key alias="displayName">Kulturnavn</key>
+    <key alias="changeKey">Rediger navnet på ordbogselementet.</key>
+    <key alias="changeKeyError">
+      <![CDATA[
+      Navnet '%0%' eksisterer allerede.
+   ]]>
+    </key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -319,17 +322,17 @@
     <key alias="enterTags">Indtast nøgleord (tryk på Enter efter hvert nøgleord)...</key>
   </area>
   <area alias="editcontenttype">
-	<key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
+    <key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
     <key alias="allowAtRootDesc" version="7.2">Kun dokumenttyper med denne indstilling aktiveret oprettes i rodniveau under Inhold og Mediearkiv</key>
     <key alias="allowedchildnodetypes">Tilladte typer</key>
-	<key alias="contenttypecompositions">Sammensætning af dokumenttyper</key>
+    <key alias="contenttypecompositions">Sammensætning af dokumenttyper</key>
     <key alias="create">Opret</key>
     <key alias="deletetab">Slet fane</key>
     <key alias="description">Beskrivelse</key>
     <key alias="newtab">Ny fane</key>
     <key alias="tab">Fane</key>
     <key alias="thumbnail">Thumbnail</key>
-	<key alias="hasListView">Aktiver listevisning</key>
+    <key alias="hasListView">Aktiver listevisning</key>
     <key alias="hasListViewDesc" version="7.2">Viser undersider i en søgbar liste, undersider vises ikke i indholdstræet</key>
     <key alias="currentListView" version="7.2">Nuværende listevisning</key>
     <key alias="currentListViewDesc" version="7.2">Den aktive listevisningsdatatype</key>
@@ -364,7 +367,7 @@
   </area>
   <area alias="errors">
     <key alias="receivedErrorFromServer">Der skete en fejl på severen</key>
-	  <key alias="dissallowedMediaType">Denne filttype er blevet deaktiveret af administratoren</key>
+    <key alias="dissallowedMediaType">Denne filttype er blevet deaktiveret af administratoren</key>
     <key alias="codemirroriewarning">OBS! Selvom CodeMirror er slået til i konfigurationen, så er den deaktiveret i Internet Explorer fordi den ikke er stabil nok.</key>
     <key alias="contentTypeAliasAndNameNotNull">Du skal udfylde både Alias &amp; Navn på den nye egenskabstype!</key>
     <key alias="filePermissionsError">Der mangler læse/skrive rettigheder til bestemte filer og mapper</key>
@@ -380,7 +383,7 @@
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
     <key alias="xsltErrorHeader">Fejl i XSLT kode</key>
     <key alias="xsltErrorText">Din XSLT er ikke opdateret, da det indeholdt en fejl</key>
-	<key alias="missingPropertyEditorErrorMessage">Der er et problem med den datatype, der bruges til denn egenskab. Kontroller konfigurationen og prøv igen.</key>
+    <key alias="missingPropertyEditorErrorMessage">Der er et problem med den datatype, der bruges til denn egenskab. Kontroller konfigurationen og prøv igen.</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -466,7 +469,8 @@
     <key alias="showPageOnSend">Hvilken side skal vises efter at formularen er sendt</key>
     <key alias="size">Størrelse</key>
     <key alias="sort">Sortér</key>
-    <key alias="submit">Indsend</key> <!-- TODO: Translate this -->
+    <key alias="submit">Indsend</key>
+    <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Skriv for at søge...</key>
     <key alias="up">Op</key>
@@ -505,22 +509,22 @@
   </area>
 
   <area alias="shortcuts">
-      <key alias="addTab">Tilføj fane</key>
-      <key alias="addProperty">Tilføj egenskab</key>
-      <key alias="addEditor">Tilføj editor</key>
-      <key alias="addTemplate">Tilføj skabelon</key>
-      <key alias="addChildNode">Tilføj child node</key>
-      <key alias="addChild">Tilføj child</key>
+    <key alias="addTab">Tilføj fane</key>
+    <key alias="addProperty">Tilføj egenskab</key>
+    <key alias="addEditor">Tilføj editor</key>
+    <key alias="addTemplate">Tilføj skabelon</key>
+    <key alias="addChildNode">Tilføj child node</key>
+    <key alias="addChild">Tilføj child</key>
 
-      <key alias="editDataType">Rediger datatype</key>
+    <key alias="editDataType">Rediger datatype</key>
 
-      <key alias="navigateSections">Naviger sektioner</key>
+    <key alias="navigateSections">Naviger sektioner</key>
 
-      <key alias="shortcut">Genveje</key>
-      <key alias="showShortcuts">Vis genveje</key>
+    <key alias="shortcut">Genveje</key>
+    <key alias="showShortcuts">Vis genveje</key>
 
-      <key alias="toggleListView">Brug listevisning</key>
-      <key alias="toggleAllowAsRoot">Tillad på rodniveau</key>
+    <key alias="toggleListView">Brug listevisning</key>
+    <key alias="toggleAllowAsRoot">Tillad på rodniveau</key>
   </area>
 
   <area alias="graphicheadline">
@@ -538,13 +542,17 @@
     <key alias="databaseErrorWebConfig">Kunne ikke gemme web.config filen. Du bedes venligst manuelt ændre database forbindelses strengen.</key>
     <key alias="databaseFound">Din database er blevet fundet og identificeret som</key>
     <key alias="databaseHeader">Database konfiguration</key>
-    <key alias="databaseInstall"><![CDATA[
+    <key alias="databaseInstall">
+      <![CDATA[
       Klik på <strong>installér</strong> knappen for at installere Umbraco %0% databasen
-    ]]></key>
+    ]]>
+    </key>
     <key alias="databaseInstall"><![CDATA[Tryk på <strong>installér</strong> knappen for at installere Umbraco %0% databasen]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>
-<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mere information om at redigere web.config her.</a></p>]]></key>
+    <key alias="databaseNotFound">
+      <![CDATA[<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>
+<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mere information om at redigere web.config her.</a></p>]]>
+    </key>
     <key alias="databaseText"><![CDATA[For at afslutte dette skridt er du nødt til at have nogle informationer om din database parat ("database forbindelsesstrengen").<br/>Kontakt venligst din ISP hvis det er nødvendigt. Hvis du installerer på en lokal maskine eller server kan du muligvis få informationerne fra din systemadministrator.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Tryk på <strong>Opgradér</strong> knappen for at opgradere din database til Umbraco %0%</p><p>Bare rolig - intet indhold vil blive slettet og alt vil stadig fungere bagefter!</p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din database er blevet opgraderet til den endelige version %0%.<br/>Tryk på <strong>Næste</strong> for at fortsætte.]]></key>
@@ -590,8 +598,10 @@
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Yderligere hjælpe og informationer</h3> Få hjælp fra vores prisvindende fællesskab, gennemse dokumentationen eller se nogle gratis videoer om hvordan du opsætter et simpelt site, hvordan du bruger pakker og en 'quick guide' til Umbraco terminologier]]></key>
     <key alias="theEndHeader">Umbraco %0% er installeret og klar til brug</key>
     <key alias="theEndInstallFailed"><![CDATA[For at afslutte installationen er du nødt til manuelt at rette <strong>/web.config filen</strong> og opdatére 'AppSetting' feltet <strong>UmbracoConfigurationStatus</strong> i bunden til <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>komme igang med det samme</strong> ved at klikke på "Start Umbraco" knappen nedenfor.<br/>Hvis du er <strong>ny med Umbraco</strong>, kan du finde masser af ressourcer på vores 'getting started' sider.
-]]></key>
+    <key alias="theEndInstallSuccess">
+      <![CDATA[Du kan <strong>komme igang med det samme</strong> ved at klikke på "Start Umbraco" knappen nedenfor.<br/>Hvis du er <strong>ny med Umbraco</strong>, kan du finde masser af ressourcer på vores 'getting started' sider.
+]]>
+    </key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Start Umbraco</h3>For at administrere dit website skal du blot åbne Umbraco administrationen og begynde at tilføje indhold, opdatere skabelonerne og stylesheets'ene eller tilføje ny funktionalitet.]]></key>
     <key alias="Unavailable">Forbindelse til databasen fejlede.</key>
     <key alias="Version3">Umbraco Version 3</key>
@@ -666,12 +676,15 @@ Gå til http://%4%/#/content/content/edit/%5% for at redigere.
 Ha' en dejlig dag!
 
 Mange hilsner fra Umbraco robotten
-		]]></key>
-    <key alias="mailBodyHtml"><![CDATA[<p>Hej %0%</p>
+		]]>
+    </key>
+    <key alias="mailBodyHtml">
+      <![CDATA[<p>Hej %0%</p>
     <p>Dette er en automatisk mail for at informere dig om at opgaven <strong>'%1%'</strong>
     er blevet udførtpå siden <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> af brugeren <strong>'%3%'</strong> </p>
     <div style="margin: 8px 0; padding: 8px; display: block;"> <br />
-    <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Opdateringssammendrag:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISÉR&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SLET&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p>Hav en fortsat god dag!<br /><br /> De bedste hilsner fra umbraco robotten </p>]]></key>
+    <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Opdateringssammendrag:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISÉR&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SLET&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p>Hav en fortsat god dag!<br /><br /> De bedste hilsner fra umbraco robotten </p>]]>
+    </key>
     <key alias="mailSubject">[%0%] Notificering om %1% udført på %2%</key>
     <key alias="notifications">Notificeringer</key>
   </area>
@@ -692,8 +705,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageUninstalledHeader">Pakken blev fjernet</key>
     <key alias="packageUninstalledText">Pakken er på succefuld vis blevet fjernet</key>
     <key alias="packageUninstallHeader">Afinstallér pakke</key>
-    <key alias="packageUninstallText"><![CDATA[Du kan fjerne markeringen på elementer du ikke ønsker at fjerne, på dette tidspunkt, nedenfor. Når du klikker 'bekræft' vil alle afkrydsede elemenet blive fjernet <br/>
-<span style="color: Red; font-weight: bold;">Bemærk:</span> at dokumenter og medier som afhænger af denne pakke vil muligvis holde op med at virke, så vær forsigtig. Hvis i tvivl, kontakt personen som har udviklet pakken.]]></key>
+    <key alias="packageUninstallText">
+      <![CDATA[Du kan fjerne markeringen på elementer du ikke ønsker at fjerne, på dette tidspunkt, nedenfor. Når du klikker 'bekræft' vil alle afkrydsede elemenet blive fjernet <br/>
+<span style="color: Red; font-weight: bold;">Bemærk:</span> at dokumenter og medier som afhænger af denne pakke vil muligvis holde op med at virke, så vær forsigtig. Hvis i tvivl, kontakt personen som har udviklet pakken.]]>
+    </key>
     <key alias="packageUpgradeDownload">Download opdatering fra opbevaringsbasen</key>
     <key alias="packageUpgradeHeader">Opdatér pakke</key>
     <key alias="packageUpgradeInstructions">Opdateringsinstrukser</key>
@@ -726,6 +741,19 @@ Mange hilsner fra Umbraco robotten
     <key alias="paSimpleHelp">Hvis du blot ønsker at opsætte simpel beskyttelse ved hjælp af et enkelt login og kodeord</key>
   </area>
   <area alias="publish">
+    <key alias="contentPublishedFailedAwaitingRelease">Udgivelsen kunne ikke udgives da publiceringsdato er sat</key>
+    <key alias="contentPublishedFailedExpired">
+      <![CDATA[
+      %0% Udgivelsen kunne ikke blive publiceret da publiceringsdatoen er overskredet
+     ]]>
+    </key>
+    <key alias="contentPublishedFailedInvalid">
+      <![CDATA[
+    %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
+    ]]>
+    </key>
+    <key alias="editContentPublishedFailedByParent">Udgivelsen fejlede fordi en overordnet side ikke er publiceret</key>
+
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
     <key alias="inProgress">Publicerer - vent venligst...</key>
@@ -799,58 +827,58 @@ Mange hilsner fra Umbraco robotten
 
   <area alias="contentTypeEditor">
 
-      <key alias="compositions">Kompositioner</key>
-      <key alias="noTabs">Du har ikke tilføjet nogle faner</key>
-      <key alias="addNewTab">Tilføj ny fane</key>
-      <key alias="addAnotherTab">Tilføj endnu en fane</key>
-      <key alias="inheritedFrom">Nedarvet fra</key>
-      <key alias="addProperty">Tilføj property</key>
-      <key alias="requiredLabel">Påkrævet label</key>
+    <key alias="compositions">Kompositioner</key>
+    <key alias="noTabs">Du har ikke tilføjet nogle faner</key>
+    <key alias="addNewTab">Tilføj ny fane</key>
+    <key alias="addAnotherTab">Tilføj endnu en fane</key>
+    <key alias="inheritedFrom">Nedarvet fra</key>
+    <key alias="addProperty">Tilføj property</key>
+    <key alias="requiredLabel">Påkrævet label</key>
 
-      <key alias="enableListViewHeading">Aktiver listevisning</key>
-      <key alias="enableListViewDescription">Konfigurer indholdet til at blive vist i en sorterbar og søgbar liste, dens børn vil ikke blive vist i træet</key>
+    <key alias="enableListViewHeading">Aktiver listevisning</key>
+    <key alias="enableListViewDescription">Konfigurer indholdet til at blive vist i en sorterbar og søgbar liste, dens børn vil ikke blive vist i træet</key>
 
-      <key alias="allowedTemplatesHeading">Tilladte skabeloner</key>
-      <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner der er tilladt at bruge på dette indhold</key>
+    <key alias="allowedTemplatesHeading">Tilladte skabeloner</key>
+    <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner der er tilladt at bruge på dette indhold</key>
 
-      <key alias="allowAsRootHeading">Tillad på rodniveau</key>
-      <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret oprettes i rodniveau under inhold og mediearkiv</key>
-      <key alias="allowAsRootCheckbox">Ja – indhold af denne type er tilladt i roden</key>
+    <key alias="allowAsRootHeading">Tillad på rodniveau</key>
+    <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret oprettes i rodniveau under inhold og mediearkiv</key>
+    <key alias="allowAsRootCheckbox">Ja – indhold af denne type er tilladt i roden</key>
 
-      <key alias="childNodesHeading">Tilladte typer</key>
-      <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne</key>
+    <key alias="childNodesHeading">Tilladte typer</key>
+    <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne</key>
 
-      <key alias="chooseChildNode">Vælg child node</key>
+    <key alias="chooseChildNode">Vælg child node</key>
 
-      <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.</key>
-      <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
-      <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
+    <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.</key>
+    <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
+    <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
 
-      <key alias="availableEditors">Tilgængelige editors</key>
-      <key alias="reuse">Genbrug</key>
-      <key alias="editorSettings">Editor indstillinger</key>
+    <key alias="availableEditors">Tilgængelige editors</key>
+    <key alias="reuse">Genbrug</key>
+    <key alias="editorSettings">Editor indstillinger</key>
 
-      <key alias="configuration">Konfiguration</key>
+    <key alias="configuration">Konfiguration</key>
 
-      <key alias="yesDelete">Ja, slet</key>
+    <key alias="yesDelete">Ja, slet</key>
 
-      <key alias="movedUnderneath">blev flyttet til</key>
-      <key alias="folderToMove">Vælg hvor</key>
-      <key alias="structureBelow">skal flyttes til</key>
+    <key alias="movedUnderneath">blev flyttet til</key>
+    <key alias="folderToMove">Vælg hvor</key>
+    <key alias="structureBelow">skal flyttes til</key>
 
-      <key alias="allDocumentTypes">Alle dokumenttyper</key>
-      <key alias="allDocuments">Alle dokumenter</key>
-      <key alias="allMediaItems">Alle medier</key>
+    <key alias="allDocumentTypes">Alle dokumenttyper</key>
+    <key alias="allDocuments">Alle dokumenter</key>
+    <key alias="allMediaItems">Alle medier</key>
 
-      <key alias="usingThisDocument">som benytter denne dokumenttype vil blive slettet permanent. Bekræft at du også vil slette dem.</key>
-      <key alias="usingThisMedia">som benytter denne medietype vil blive slettet permanent. Bekræft at du også vil slette dem.</key>
-      <key alias="usingThisMember">som benytter denne medlemstype vil blive slettet permanent. Bekræft at du også vil slette dem.</key>
+    <key alias="usingThisDocument">som benytter denne dokumenttype vil blive slettet permanent. Bekræft at du også vil slette dem.</key>
+    <key alias="usingThisMedia">som benytter denne medietype vil blive slettet permanent. Bekræft at du også vil slette dem.</key>
+    <key alias="usingThisMember">som benytter denne medlemstype vil blive slettet permanent. Bekræft at du også vil slette dem.</key>
 
-      <key alias="andAllDocuments">og alle dokumenter, som benytter denne type</key>
-      <key alias="andAllMediaItems">og alle medier, som benytter denne type</key>
-      <key alias="andAllMembers">og alle medlemmer, som benytter denne type</key>
+    <key alias="andAllDocuments">og alle dokumenter, som benytter denne type</key>
+    <key alias="andAllMediaItems">og alle medier, som benytter denne type</key>
+    <key alias="andAllMembers">og alle medlemmer, som benytter denne type</key>
 
-      <key alias="thisEditorUpdateSettings">der bruger denne editor vil blive opdateret med de nye indstillinger</key>
+    <key alias="thisEditorUpdateSettings">der bruger denne editor vil blive opdateret med de nye indstillinger</key>
   </area>
 
   <area alias="rollback">
@@ -914,8 +942,6 @@ Mange hilsner fra Umbraco robotten
   <area alias="speechBubbles">
     <key alias="operationCancelledHeader">Annulleret</key>
     <key alias="operationCancelledText">Handlingen blev annulleret af et 3. part tilføjelsesprogram</key>
-    <key alias="contentPublishedFailedByEvent">Udgivelsen blev standset af et 3. parts modul</key>
-    <key alias="contentPublishedFailedAwaitingRelease">Udgivelsen kunne ikke udgives da publiceringsdato er sat</key>
     <key alias="contentTypeDublicatePropertyType">Property type eksisterer allerede</key>
     <key alias="contentTypePropertyTypeCreated">Egenskabstype oprettet</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Navn: %0% <br /> DataType: %1%]]></key>
@@ -929,7 +955,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="cssSavedText">Stylesheet gemt uden fejl</key>
     <key alias="dataTypeSaved">Datatype gemt</key>
     <key alias="dictionaryItemSaved">Ordbogsnøgle gemt</key>
-    <key alias="editContentPublishedFailedByParent">Udgivelsen fejlede fordi en overordnet side ikke er publiceret</key>
     <key alias="editContentPublishedHeader">Indhold publiceret</key>
     <key alias="editContentPublishedText">og nu synligt for besøgende</key>
     <key alias="editContentSavedHeader">Indhold gemt</key>
@@ -1131,11 +1156,28 @@ Mange hilsner fra Umbraco robotten
     <key alias="sessionExpires">Session udløber</key>
   </area>
   <area alias="validation">
-      <key alias="validation">Validation</key>
-      <key alias="validateAsEmail">Valider som email</key>
-      <key alias="validateAsNumber">Valider som tal</key>
-      <key alias="validateAsUrl">Valider som Url</key>
-      <key alias="enterCustomValidation">...eller indtast din egen validering</key>
-      <key alias="fieldIsMandatory">Feltet er påkrævet</key>
+    <key alias="validation">Validation</key>
+    <key alias="validateAsEmail">Valider som email</key>
+    <key alias="validateAsNumber">Valider som tal</key>
+    <key alias="validateAsUrl">Valider som Url</key>
+    <key alias="enterCustomValidation">...eller indtast din egen validering</key>
+    <key alias="fieldIsMandatory">Feltet er påkrævet</key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">Slå URL tracker fra</key>
+    <key alias="enableUrlTracker">Slå URL tracker til</key>
+    <key alias="originalUrl">Original URL</key>
+    <key alias="redirectedTo">Viderestillet til</key>
+    <key alias="noRedirects">Der er ikke lavet nogen viderestillinger</key>
+    <key alias="noRedirectsDescription">Når en udgivet side bliver omdøbt eller flyttet, vil en viderestilling automatisk blive lavet til den nye side.</key>
+    <key alias="removeButton">Fjern</key>
+    <key alias="confirmRemove">Er du sikker på at du vil fjerne viderestillingen fra '%0%' til '%1%'?</key>
+    <key alias="redirectRemoved">Viderestillings URL fjernet.</key>
+    <key alias="redirectRemoveError">Fejl under fjernelse af viderestillings URL.</key>
+    <key alias="confirmDisable">Er du sikker på at du vil slå URL trackeren fra?</key>
+    <key alias="disabledConfirm">URL tracker er nu slået fra.</key>
+    <key alias="disableError">Der opstod en fejl under forsøget på at slå URL trackeren fra, der findes mere information i logfilen.</key>
+    <key alias="enabledConfirm">URL tracker er nu slået fra.</key>
+    <key alias="enableError">Der opstod en fejl under forsøget på at slå URL trackeren til, der findes mere information i logfilen.</key>
   </area>
 </language>

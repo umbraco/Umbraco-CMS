@@ -14,7 +14,40 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
         });
     };
 }
+
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
+
+
+function startUpDynamicContentController(dashboardResource, assetsService) {
+    var vm = this;
+    vm.loading = true;
+    vm.showDefault = false;
+    
+    //proxy remote css through the local server
+    assetsService.loadCss( dashboardResource.getRemoteDashboardCssUrl("content") );
+    dashboardResource.getRemoteDashboardContent("content").then(
+        function (data) {
+
+            vm.loading = false;
+
+            //test if we have received valid data
+            //we capture it like this, so we avoid UI errors - which automatically triggers ui based on http response code
+            if (data && data.sections) {
+                vm.dashboard = data;
+            } else{
+                vm.showDefault = true;
+            }
+
+        },
+
+        function (exception) {
+            console.error(exception);
+            vm.loading = false;
+            vm.showDefault = true;
+        });
+}
+
+angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
 
 
 function FormsController($scope, $route, $cookieStore, packageResource, localizationService) {
@@ -192,27 +225,43 @@ function startupLatestEditsController($scope) {
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupLatestEditsController", startupLatestEditsController);
 
-function MediaFolderBrowserDashboardController($rootScope, $scope, contentTypeResource) {
+function MediaFolderBrowserDashboardController($rootScope, $scope, $location, contentTypeResource, userService) {
 
-    //get the system media listview
-    contentTypeResource.getPropertyTypeScaffold(-96)
-        .then(function(dt) {
+    var currentUser = {};
 
-            $scope.fakeProperty = {
-                alias: "contents",
-                config: dt.config,
-                description: "",
-                editor: dt.editor,
-                hideLabel: true,
-                id: 1,
-                label: "Contents:",
-                validation: {
-                    mandatory: false,
-                    pattern: null
-                },
-                value: "",
-                view: dt.view
-            };
+    userService.getCurrentUser().then(function (user) {
+
+        currentUser = user;
+
+        // check if the user start node is the dashboard
+        if(currentUser.startMediaId === -1) {
+
+            //get the system media listview
+            contentTypeResource.getPropertyTypeScaffold(-96)
+                .then(function(dt) {
+
+                    $scope.fakeProperty = {
+                        alias: "contents",
+                        config: dt.config,
+                        description: "",
+                        editor: dt.editor,
+                        hideLabel: true,
+                        id: 1,
+                        label: "Contents:",
+                        validation: {
+                            mandatory: false,
+                            pattern: null
+                        },
+                        value: "",
+                        view: dt.view
+                    };
+
+            });
+
+        } else {
+            // redirect to start node
+            $location.path("/media/media/edit/" + currentUser.startMediaId);
+        }
 
     });
 

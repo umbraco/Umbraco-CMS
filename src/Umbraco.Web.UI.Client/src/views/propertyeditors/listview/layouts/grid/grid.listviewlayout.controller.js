@@ -9,7 +9,7 @@
 (function() {
    "use strict";
 
-   function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper) {
+   function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper) {
 
       var vm = this;
 
@@ -21,6 +21,7 @@
       vm.mediaDetailsTooltip = {};
       vm.itemsWithoutFolders = [];
       vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
+      vm.acceptedMediatypes = [];
 
       vm.dragEnter = dragEnter;
       vm.dragLeave = dragLeave;
@@ -35,6 +36,13 @@
 
       function activate() {
           vm.itemsWithoutFolders = filterOutFolders($scope.items);
+
+          if($scope.entityType === 'media') {
+            mediaTypeHelper.getAllowedImagetypes(vm.nodeId).then(function (types) {
+                vm.acceptedMediatypes = types;
+            });
+          }
+
       }
 
       function filterOutFolders(items) {
