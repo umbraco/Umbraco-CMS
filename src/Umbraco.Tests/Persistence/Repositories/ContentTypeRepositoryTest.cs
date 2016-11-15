@@ -539,7 +539,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
-                var child1 = MockedContentTypes.CreateSimpleContentType("aabc", "aabc", contentType, randomizeAliases: true);
+                var child1 = MockedContentTypes.CreateSimpleContentType("abc", "abc", contentType, randomizeAliases: true);
                 repository.AddOrUpdate(child1);
                 var child3 = MockedContentTypes.CreateSimpleContentType("zyx", "zyx", contentType, randomizeAliases: true);
                 repository.AddOrUpdate(child3);
@@ -553,7 +553,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentTypes.Count(), Is.EqualTo(3));
                 Assert.AreEqual("a123", contentTypes.ElementAt(0).Name);
-                Assert.AreEqual("aabc", contentTypes.ElementAt(1).Name);
+                Assert.AreEqual("abc", contentTypes.ElementAt(1).Name);
                 Assert.AreEqual("zyx", contentTypes.ElementAt(2).Name);
             }
 

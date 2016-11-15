@@ -3,11 +3,13 @@ using System.Linq;
 using Examine;
 using Lucene.Net.Store;
 using NUnit.Framework;
+using Umbraco.Tests.TestHelpers;
 using UmbracoExamine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
-	[TestFixture]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [TestFixture]
 	public class EventsTest : ExamineBaseTest
 	{
 		[Test]

@@ -32,6 +32,7 @@ using System.Security.Permissions;
 
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+[assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
 [assembly: InternalsVisibleTo("Umbraco.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
