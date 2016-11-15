@@ -2,7 +2,6 @@
 
 :: UMBRACO BUILD FILE
 
-ECHO.
 
 :: ensure we have UmbracoVersion.txt
 IF NOT EXIST UmbracoVersion.txt (
@@ -19,7 +18,7 @@ FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED COMMENT SE
 REM process args
 
 SET INTEGRATION=0
-SET nuGetFolder=%CD%\..\src\packages\
+SET nuGetFolder=%CD%\..\src\packages
 SET SKIPNUGET=0
 
 :processArgs
@@ -82,9 +81,9 @@ REM run
 SET VERSION=%RELEASE%
 IF [%COMMENT%] EQU [] (SET VERSION=%RELEASE%) ELSE (SET VERSION=%RELEASE%-%COMMENT%)
 
-ECHO.
+ECHO ################################################################
 ECHO Building Umbraco %VERSION%
-ECHO.
+ECHO ################################################################
 
 SET MSBUILDPATH=C:\Program Files (x86)\MSBuild\14.0\Bin
 SET MSBUILD="%MSBUILDPATH%\MsBuild.exe"
@@ -100,10 +99,10 @@ RD ..\src\Umbraco.Web.UI.Client\bower_components /Q /S
 ECHO.
 ECHO Removing existing built files to make sure everything is clean as a whistle
 RMDIR /Q /S _BuildOutput
-DEL /F /Q UmbracoCms.*.zip
-DEL /F /Q UmbracoExamine.*.zip
-DEL /F /Q UmbracoCms.*.nupkg
-DEL /F /Q webpihash.txt
+DEL /F /Q UmbracoCms.*.zip 2>NUL
+DEL /F /Q UmbracoExamine.*.zip 2>NUL
+DEL /F /Q UmbracoCms.*.nupkg 2>NUL
+DEL /F /Q webpihash.txt 2>NUL
 
 ECHO.
 ECHO Making sure Git is in the path so that the build can succeed
@@ -116,16 +115,16 @@ SET PATH="C:\Program Files (x86)\Git\cmd";"C:\Program Files\Git\cmd";%PATH%
 
 ECHO.
 ECHO Making sure we have a web.config
-IF NOT EXIST %CD%\..\src\Umbraco.Web.UI\web.config COPY %CD%\..\src\Umbraco.Web.UI\web.Template.config %CD%\..\src\Umbraco.Web.UI\web.config
+IF NOT EXIST "%CD%\..\src\Umbraco.Web.UI\web.config" COPY "%CD%\..\src\Umbraco.Web.UI\web.Template.config" "%CD%\..\src\Umbraco.Web.UI\web.config"
 
 ECHO.
 ECHO Reporting NuGet version
-%CD%\..\src\.nuget\NuGet.exe help | findstr "^NuGet Version:"
+"%CD%\..\src\.nuget\NuGet.exe" help | findstr "^NuGet Version:"
 
 ECHO.
 ECHO Restoring NuGet packages
 ECHO Into %nuGetFolder%
-%CD%\..\src\.nuget\NuGet.exe restore %CD%\..\src\umbraco.sln -Verbosity Quiet -NonInteractive -PackagesDirectory %nuGetFolder%
+"%CD%\..\src\.nuget\NuGet.exe" restore "%CD%\..\src\umbraco.sln" -Verbosity Quiet -NonInteractive -PackagesDirectory "%nuGetFolder%"
 IF ERRORLEVEL 1 GOTO :error
 
 ECHO.
@@ -135,7 +134,7 @@ ECHO This takes a few minutes and logging is set to report warnings
 ECHO and errors only so it might seems like nothing is happening for a while. 
 ECHO You can check the msbuild.log file for progress.
 ECHO.
-%MSBUILD% "Build.proj" /p:BUILD_RELEASE=%RELEASE% /p:BUILD_COMMENT=%COMMENT% /p:NugetPackagesDirectory=%nuGetFolder% /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /fileLogger
+%MSBUILD% "Build.proj" /p:BUILD_RELEASE=%RELEASE% /p:BUILD_COMMENT=%COMMENT% /p:NugetPackagesDirectory="%nuGetFolder%" /consoleloggerparameters:Summary;ErrorsOnly /fileLogger
 IF ERRORLEVEL 1 GOTO error
 
 ECHO.
