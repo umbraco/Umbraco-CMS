@@ -180,6 +180,7 @@
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
+    <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\PetaPocoCachesTest.cs" />

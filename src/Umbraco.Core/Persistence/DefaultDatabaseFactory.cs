@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence
         //[ThreadStatic]
         //private static volatile UmbracoDatabase _nonHttpInstance;
 
-	    private const string ItemKey = "Umbraco.Core.Persistence.DefaultDatabaseFactory";
+        private const string ItemKey = "Umbraco.Core.Persistence.DefaultDatabaseFactory";
 
         private static UmbracoDatabase NonContextValue
         {
@@ -75,16 +75,16 @@ namespace Umbraco.Core.Persistence
 
 		public UmbracoDatabase CreateDatabase()
 		{
-			// no http context, create the call context object
+            // no http context, create the call context object
             // NOTHING is going to track the object and it is the responsibility of the caller to release it!
             // using the ReleaseDatabase method.
-			if (HttpContext.Current == null)
-			{
+            if (HttpContext.Current == null)
+            {
                 LogHelper.Debug<DefaultDatabaseFactory>("Get NON http [T" + Environment.CurrentManagedThreadId + "]");
-			    var value = NonContextValue;
-			    if (value != null) return value;
-				lock (Locker)
-				{
+                var value = NonContextValue;
+                if (value != null) return value;
+                lock (Locker)
+                {
                     value = NonContextValue;
                     if (value != null) return value;
 
@@ -93,9 +93,9 @@ namespace Umbraco.Core.Persistence
                                             ? new UmbracoDatabase(ConnectionString, ProviderName, _logger)
                                             : new UmbracoDatabase(_connectionStringName, _logger);
 
-				    return value;
-				}
-			}
+                    return value;
+                }
+            }
 
             // we have an http context, so only create one per request.
             // UmbracoDatabase is marked IDisposeOnRequestEnd and therefore will be disposed when
@@ -103,38 +103,40 @@ namespace Umbraco.Core.Persistence
             // connections at the end of each request. no need to call ReleaseDatabase.
             LogHelper.Debug<DefaultDatabaseFactory>("Get http [T" + Environment.CurrentManagedThreadId + "]");
             if (HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)) == false)
-			{
+            {
                 LogHelper.Debug<DefaultDatabaseFactory>("Create http [T" + Environment.CurrentManagedThreadId + "]");
-                HttpContext.Current.Items.Add(typeof (DefaultDatabaseFactory),
-			                                  string.IsNullOrEmpty(ConnectionString) == false && string.IsNullOrEmpty(ProviderName) == false
+                HttpContext.Current.Items.Add(typeof(DefaultDatabaseFactory),
+                                              string.IsNullOrEmpty(ConnectionString) == false && string.IsNullOrEmpty(ProviderName) == false
                                                   ? new UmbracoDatabase(ConnectionString, ProviderName, _logger)
                                                   : new UmbracoDatabase(_connectionStringName, _logger));
-			}
-			return (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
-		}
+            }
+            return (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
+        }
 
         // releases the "context" database
-	    public void ReleaseDatabase()
-	    {
-	        if (HttpContext.Current == null)
-	        {
-	            var value = NonContextValue;
-	            if (value != null) value.Dispose();
-	            NonContextValue = null;
-	        }
-	        else
-	        {
-	            var db = (UmbracoDatabase) HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
-	            if (db != null) db.Dispose();
+        public void ReleaseDatabase()
+        {
+            if (HttpContext.Current == null)
+            {
+                var value = NonContextValue;
+                if (value != null) value.Dispose();
+                NonContextValue = null;
+            }
+            else
+            {
+                var db = (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
+                if (db != null) db.Dispose();
                 HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
-	        }
-	    }
+            }
+        }
 
-		protected override void DisposeResources()
+        protected override void DisposeResources()
 		{
             ReleaseDatabase();
 		}
 
+        // during tests, the thread static var can leak between tests
+        // this method provides a way to force-reset the variable
 	    internal void ResetForTests()
 	    {
             var value = NonContextValue;
@@ -148,46 +150,46 @@ namespace Umbraco.Core.Persistence
         // the logical call context...
 
         static DefaultDatabaseFactory()
-	    {
-	        SafeCallContext.Register(DetachDatabase, AttachDatabase);
-	    }
+        {
+            SafeCallContext.Register(DetachDatabase, AttachDatabase);
+        }
 
         // detaches the current database
         // ie returns the database and remove it from whatever is "context"
-	    private static UmbracoDatabase DetachDatabase()
-	    {
-	        if (HttpContext.Current == null)
-	        {
-	            var db = NonContextValue;
-	            NonContextValue = null;
-	            return db;
-	        }
-	        else
-	        {
-	            var db = (UmbracoDatabase) HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
+        private static UmbracoDatabase DetachDatabase()
+        {
+            if (HttpContext.Current == null)
+            {
+                var db = NonContextValue;
+                NonContextValue = null;
+                return db;
+            }
+            else
+            {
+                var db = (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
                 HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
-	            return db;
-	        }
+                return db;
+            }
         }
 
         // attach a current database
         // ie assign it to whatever is "context"
         // throws if there already is a database
-	    private static void AttachDatabase(object o)
-	    {
-	        var database = o as UmbracoDatabase;
+        private static void AttachDatabase(object o)
+        {
+            var database = o as UmbracoDatabase;
             if (o != null && database == null) throw new ArgumentException("Not an UmbracoDatabase.", "o");
 
-	        if (HttpContext.Current == null)
-	        {
+            if (HttpContext.Current == null)
+            {
                 if (NonContextValue != null) throw new InvalidOperationException();
-	            if (database != null) NonContextValue = database;
+                if (database != null) NonContextValue = database;
             }
-	        else
-	        {
+            else
+            {
                 if (HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] != null) throw new InvalidOperationException();
                 if (database != null) HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] = database;
-	        }
+            }
         }
 
         #endregion

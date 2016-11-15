@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence
 				{
 					DatabaseContext = _dbContext,
 					IsReady = true
-				};			
+				};
 		}
 
 		[TearDown]
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Persistence
 
             var appCtx = new ApplicationContext(
                 _dbContext,
-                new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()), 
+                new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
