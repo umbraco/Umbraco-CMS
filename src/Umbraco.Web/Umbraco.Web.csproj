@@ -382,7 +382,7 @@
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="Profiling\StartupWebProfilerProvider.cs" />
+    <Compile Include="Profiling\WebProfilerProvider.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePreValueEditor.cs" />
