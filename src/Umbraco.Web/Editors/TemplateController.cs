@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -47,11 +45,9 @@ namespace Umbraco.Web.Editors
         public TemplateDisplay GetById(int id)
         {
             var template = Services.FileService.GetTemplate(id);
-           
             if (template == null)
-            {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+
             return Mapper.Map<ITemplate, TemplateDisplay>(template);
         }
 
@@ -66,9 +62,7 @@ namespace Umbraco.Web.Editors
         {
             var template = Services.FileService.GetTemplate(id);
             if (template == null)
-            {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
 
             Services.FileService.DeleteTemplate(template.Alias);
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -77,16 +71,11 @@ namespace Umbraco.Web.Editors
         public TemplateDisplay GetEmpty()
         {
             var dt = new Template("", "");
-            var scaffold = Mapper.Map<ITemplate, TemplateDisplay>((ITemplate)dt);
+            var content = ViewHelper.GetDefaultFileContent();
+
+            var scaffold = Mapper.Map<ITemplate, TemplateDisplay>(dt);
             scaffold.Path = "-1";
-            scaffold.Content = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
-@{
-    Layout = null;
-}
-
-@* The fun starts here *@
-
-";
+            scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
             return scaffold;
         }
 
@@ -97,24 +86,32 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public TemplateDisplay PostSave(TemplateDisplay display)
         {
-            if(display.Id > 0)
+            if (display.Id > 0)
             {
+                // update
                 var template = Services.FileService.GetTemplate(display.Id);
+                if (template == null)
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+
                 Mapper.Map(display, template);
                 Services.FileService.SaveTemplate(template);
-                return display;
             }
             else
             {
                 //create
                 ITemplate master = null;
                 if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
+                {
                     master = Services.FileService.GetTemplate(display.MasterTemplateAlias);
+                    if (master == null)
+                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
 
                 var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Content, master);
                 Mapper.Map(template, display);
-                return display;
             }
+
+            return display;
         }
     }
 }

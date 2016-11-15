@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -23,7 +18,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.CreateDate, exp => exp.Ignore())
                 .ForMember(x => x.UpdateDate, exp => exp.Ignore())
                 .ForMember(x => x.VirtualPath, exp => exp.Ignore())
-                .ForMember(x => x.Path, exp => exp.Ignore());
+                .ForMember(x => x.Path, exp => exp.Ignore())
+                .ForMember(x => x.MasterTemplateId, exp => exp.Ignore()) // ok, assigned when creating the template
+                .ForMember(x => x.IsMasterTemplate, exp => exp.Ignore())
+                .ForMember(x => x.HasIdentity, exp => exp.Ignore());
         }
     }
 }
