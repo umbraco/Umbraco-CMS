@@ -82,11 +82,9 @@
                 mode: "razor",
                 theme: "chrome",
                 showPrintMargin: false,
-
                 advanced: {
-                    fontSize: '16px'
+                    fontSize: '14px'
                 },
-
                 onLoad: function(_editor) {
                     vm.editor = _editor;
                     
