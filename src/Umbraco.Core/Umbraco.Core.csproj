@@ -146,6 +146,7 @@
     <Compile Include="Attempt{T}.cs" />
     <Compile Include="Auditing\Audit.cs" />
     <Compile Include="Auditing\AuditTypes.cs" />
+    <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
@@ -356,7 +357,11 @@
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
+    <Compile Include="ICompletable.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="IO\ShadowFileSystem.cs" />
+    <Compile Include="IO\ShadowFileSystemsScope.cs" />
+    <Compile Include="IO\ShadowWrapper.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
     <Compile Include="Logging\ImageProcessorLogger.cs" />
     <Compile Include="Logging\IQueue.cs" />
@@ -368,6 +373,8 @@
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
+    <Compile Include="Media\ImageExtensions.cs" />
+    <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
     <Compile Include="Models\ContentTypeAvailableCompositionsResult.cs" />
@@ -384,6 +391,7 @@
     <Compile Include="Models\IPublishedContentWithKey.cs" />
     <Compile Include="Models\IRedirectUrl.cs" />
     <Compile Include="Models\IServerRegistration.cs" />
+    <Compile Include="Models\IXsltFile.cs" />
     <Compile Include="Models\Mapping\MappingExpressionExtensions.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
     <Compile Include="Models\PartialViewType.cs" />
@@ -413,6 +421,8 @@
     <Compile Include="Models\Rdbms\MigrationDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployChecksumDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployDependencyDto.cs" />
+    <Compile Include="Models\XsltFile.cs" />
+    <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
@@ -495,11 +505,13 @@
     <Compile Include="Persistence\Repositories\Interfaces\IRedirectUrlRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IServerRegistrationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDeleteMediaFilesRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IXsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepository.cs" />
+    <Compile Include="Persistence\Repositories\XsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
@@ -527,7 +539,6 @@
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
-    <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\AppDomainTokenConverter.cs" />
@@ -580,8 +591,6 @@
     <Compile Include="Manifest\ParameterEditorConverter.cs" />
     <Compile Include="Manifest\PreValueFieldConverter.cs" />
     <Compile Include="Manifest\PropertyEditorConverter.cs" />
-    <Compile Include="Media\ImageHelper.cs" />
-    <Compile Include="Media\MediaSubfolderCounter.cs" />
     <Compile Include="ModelMapperHelper.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
@@ -14,6 +15,9 @@ namespace Umbraco.Core.Services
         void DeletePartialViewMacroFolder(string folderPath);
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
+        IEnumerable<IPartialView> GetPartialViewMacros(params string[] names);
+        IXsltFile GetXsltFile(string path);
+        IEnumerable<IXsltFile> GetXsltFiles(params string[] names);
         Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = 0);
         Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = 0);
         bool DeletePartialView(string path, int userId = 0);
@@ -235,5 +239,89 @@ namespace Umbraco.Core.Services
         /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
         /// </remarks>
         RenderingEngine DetermineTemplateRenderingEngine(ITemplate template);
+
+        /// <summary>
+        /// Gets the content of a template as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the template.</param>
+        /// <returns>The content of the template.</returns>
+        Stream GetTemplateFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a template.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the template.</param>
+        /// <param name="content">The content of the template.</param>
+        void SetTemplateFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the content of a stylesheet as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the stylesheet.</param>
+        /// <returns>The content of the stylesheet.</returns>
+        Stream GetStylesheetFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a stylesheet.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the stylesheet.</param>
+        /// <param name="content">The content of the stylesheet.</param>
+        void SetStylesheetFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the content of a script file as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the script.</param>
+        /// <returns>The content of the script file.</returns>
+        Stream GetScriptFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a script file.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the script.</param>
+        /// <param name="content">The content of the script file.</param>
+        void SetScriptFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the content of a XSLT file as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the XSLT file.</param>
+        /// <returns>The content of the XSLT file.</returns>
+        Stream GetXsltFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a XSLT file.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the XSLT file.</param>
+        /// <param name="content">The content of the XSLT file.</param>
+        void SetXsltFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the content of a macro partial view as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macro partial view.</param>
+        /// <returns>The content of the macro partial view.</returns>
+        Stream GetPartialViewMacroFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a macro partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macro partial view.</param>
+        /// <param name="content">The content of the macro partial view.</param>
+        void SetPartialViewMacroFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the content of a partial view as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the partial view.</param>
+        /// <returns>The content of the partial view.</returns>
+        Stream GetPartialViewFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the partial view.</param>
+        /// <param name="content">The content of the partial view.</param>
+        void SetPartialViewFileContent(string filepath, Stream content);
     }
 }

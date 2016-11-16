@@ -285,12 +285,8 @@ namespace Umbraco.Core.Packaging
                     PrivateBinPathProbe = AppDomain.CurrentDomain.SetupInformation.PrivateBinPathProbe
                 };
 
-            //create new domain with full trust
-            return AppDomain.CreateDomain(
-                appName,
-                AppDomain.CurrentDomain.Evidence,
-                domainSetup,
-                new PermissionSet(PermissionState.Unrestricted));
+            // create new domain with full trust
+            return AppDomain.CreateDomain(appName, AppDomain.CurrentDomain.Evidence, domainSetup, new PermissionSet(PermissionState.Unrestricted));
         }
     }
 }

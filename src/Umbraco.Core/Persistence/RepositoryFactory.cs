@@ -197,7 +197,7 @@ namespace Umbraco.Core.Persistence
         {
             return new RelationRepository(
                 uow,
-                _noCache, //never cache
+                _noCache,
                 _logger, _sqlSyntax,
                 CreateRelationTypeRepository(uow));
         }
@@ -206,13 +206,13 @@ namespace Umbraco.Core.Persistence
         {
             return new RelationTypeRepository(
                 uow,
-                _noCache, //never cache
+                _cacheHelper,
                 _logger, _sqlSyntax);
         }
 
         public virtual IScriptRepository CreateScriptRepository(IUnitOfWork uow)
         {
-            return new ScriptRepository(uow, new PhysicalFileSystem(SystemDirectories.Scripts), _settings.Content);
+            return new ScriptRepository(uow, FileSystemProviderManager.Current.ScriptsFileSystem, _settings.Content);
         }
 
         internal virtual IPartialViewRepository CreatePartialViewRepository(IUnitOfWork uow)
@@ -227,7 +227,7 @@ namespace Umbraco.Core.Persistence
 
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow, IDatabaseUnitOfWork db)
         {
-            return new StylesheetRepository(uow, new PhysicalFileSystem(SystemDirectories.Css));
+            return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
         }
 
         public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
@@ -235,9 +235,14 @@ namespace Umbraco.Core.Persistence
             return new TemplateRepository(uow, 
                 _cacheHelper,
                 _logger, _sqlSyntax,
-                new PhysicalFileSystem(SystemDirectories.Masterpages),
-                new PhysicalFileSystem(SystemDirectories.MvcViews),
+                FileSystemProviderManager.Current.MasterPagesFileSystem,
+                FileSystemProviderManager.Current.MvcViewsFileSystem,
                 _settings.Templates);
+        }
+
+        public virtual IXsltFileRepository CreateXsltFileRepository(IUnitOfWork uow)
+        {
+            return new XsltFileRepository(uow, FileSystemProviderManager.Current.XsltFileSystem);
         }
 
         public virtual IMigrationEntryRepository CreateMigrationEntryRepository(IDatabaseUnitOfWork uow)
@@ -341,6 +346,11 @@ namespace Umbraco.Core.Persistence
                 _cacheHelper,
                 _logger,
                 _sqlSyntax);
+        }
+
+        internal IStylesheetRepository CreateStylesheetRepository(IDatabaseUnitOfWork uow)
+        {
+            return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
         }
     }
 }

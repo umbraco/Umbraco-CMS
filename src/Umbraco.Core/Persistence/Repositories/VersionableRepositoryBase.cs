@@ -22,6 +22,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -656,7 +657,7 @@ WHERE EXISTS(
 
             var allsuccess = true;
 
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.MediaFileSystem;
             Parallel.ForEach(files, file =>
             {
                 try

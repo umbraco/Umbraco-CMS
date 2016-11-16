@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence
 	    /// <param name="logger"></param>
 	    public DefaultDatabaseFactory(string connectionStringName, ILogger logger)
 		{
-	        if (logger == null) throw new ArgumentNullException("logger");
+            if (logger == null) throw new ArgumentNullException("logger");
 	        Mandate.ParameterNotNullOrEmpty(connectionStringName, "connectionStringName");
 
             //if (NonContextValue != null) throw new Exception("NonContextValue is not null.");
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence
 	    /// <param name="logger"></param>
 	    public DefaultDatabaseFactory(string connectionString, string providerName, ILogger logger)
 		{
-	        if (logger == null) throw new ArgumentNullException("logger");
+            if (logger == null) throw new ArgumentNullException("logger");
 	        Mandate.ParameterNotNullOrEmpty(connectionString, "connectionString");
 			Mandate.ParameterNotNullOrEmpty(providerName, "providerName");
 

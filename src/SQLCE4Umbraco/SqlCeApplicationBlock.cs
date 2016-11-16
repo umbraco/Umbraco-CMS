@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data.SqlServerCe;
 using System.Data;
 using System.Diagnostics;
@@ -26,28 +24,59 @@ namespace SqlCE4Umbraco
             params SqlCeParameter[] commandParameters
             )
         {
-            object retVal;
-
             try
             {
-                using (SqlCeConnection conn = SqlCeContextGuardian.Open(connectionString))
+                using (var conn = SqlCeContextGuardian.Open(connectionString))
                 {
-                    using (SqlCeCommand cmd = new SqlCeCommand(commandText, conn))
-                    {
-                        AttachParameters(cmd, commandParameters);
-                        Debug.WriteLine("---------------------------------SCALAR-------------------------------------");
-                        Debug.WriteLine(commandText);
-                        Debug.WriteLine("----------------------------------------------------------------------------");
-                        retVal = cmd.ExecuteScalar();
-                    }
+                    return ExecuteScalarTry(conn, null, commandText, commandParameters);
                 }
-
-                return retVal;
             }
             catch (Exception ee)
             {
-                throw new SqlCeProviderException("Error running Scalar: \nSQL Statement:\n" + commandText + "\n\nException:\n" + ee.ToString());
+                throw new SqlCeProviderException("Error running Scalar: \nSQL Statement:\n" + commandText + "\n\nException:\n" + ee);
             }
+        }
+
+        public static object ExecuteScalar(
+            SqlCeConnection conn, SqlCeTransaction trx,
+            CommandType commandType,
+            string commandText,
+            params SqlCeParameter[] commandParameters)
+        {
+            try
+            {
+                return ExecuteScalarTry(conn, trx, commandText, commandParameters);
+            }
+            catch (Exception ee)
+            {
+                throw new SqlCeProviderException("Error running Scalar: \nSQL Statement:\n" + commandText + "\n\nException:\n" + ee);
+            }
+        }
+
+        public static object ExecuteScalar(
+            SqlCeConnection conn,
+            CommandType commandType,
+            string commandText,
+            params SqlCeParameter[] commandParameters)
+        {
+            return ExecuteScalar(conn, null, commandType, commandText, commandParameters);
+        }
+
+        private static object ExecuteScalarTry(
+            SqlCeConnection conn, SqlCeTransaction trx,
+            string commandText,
+            params SqlCeParameter[] commandParameters)
+        {
+            object retVal;
+            using (var cmd = trx == null ? new SqlCeCommand(commandText, conn) : new SqlCeCommand(commandText, conn, trx))
+            {
+                AttachParameters(cmd, commandParameters);
+                Debug.WriteLine("---------------------------------SCALAR-------------------------------------");
+                Debug.WriteLine(commandText);
+                Debug.WriteLine("----------------------------------------------------------------------------");
+                retVal = cmd.ExecuteScalar();
+            }
+            return retVal;
         }
 
         /// <summary>
@@ -66,54 +95,83 @@ namespace SqlCE4Umbraco
         {
             try
             {
-                int rowsAffected;
-                using (SqlCeConnection conn = SqlCeContextGuardian.Open(connectionString))
+                using (var conn = SqlCeContextGuardian.Open(connectionString))
                 {
-                    // this is for multiple queries in the installer
-                    if (commandText.Trim().StartsWith("!!!"))
-                    {
-                        commandText = commandText.Trim().Trim('!');
-                        string[] commands = commandText.Split('|');
-                        string currentCmd = String.Empty;
-
-                        foreach (string cmd in commands)
-                        {
-                            try
-                            {
-                                currentCmd = cmd;
-                                if (!String.IsNullOrWhiteSpace(cmd))
-                                {
-                                    SqlCeCommand c = new SqlCeCommand(cmd, conn);
-                                    c.ExecuteNonQuery();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Debug.WriteLine("*******************************************************************");
-                                Debug.WriteLine(currentCmd);
-                                Debug.WriteLine(e);
-                                Debug.WriteLine("*******************************************************************");
-                            }
-                        }
-                        return 1;
-                    }
-                    else
-                    {
-                        Debug.WriteLine("----------------------------------------------------------------------------");
-                        Debug.WriteLine(commandText);
-                        Debug.WriteLine("----------------------------------------------------------------------------");
-                        SqlCeCommand cmd = new SqlCeCommand(commandText, conn);
-                        AttachParameters(cmd, commandParameters);
-                        rowsAffected = cmd.ExecuteNonQuery();
-                    }
+                    return ExecuteNonQueryTry(conn, null, commandText, commandParameters);
                 }
-
-                return rowsAffected;
             }
             catch (Exception ee)
             {
                 throw new SqlCeProviderException("Error running NonQuery: \nSQL Statement:\n" + commandText + "\n\nException:\n" + ee.ToString());
             }
+        }
+
+        public static int ExecuteNonQuery(
+            SqlCeConnection conn,
+            CommandType commandType,
+            string commandText,
+            params SqlCeParameter[] commandParameters
+        )
+        {
+            return ExecuteNonQuery(conn, null, commandType, commandText, commandParameters);
+        }
+
+        public static int ExecuteNonQuery(
+            SqlCeConnection conn, SqlCeTransaction trx,
+            CommandType commandType,
+            string commandText,
+            params SqlCeParameter[] commandParameters
+            )
+        {
+            try
+            {
+                return ExecuteNonQueryTry(conn, trx, commandText, commandParameters);
+            }
+            catch (Exception ee)
+            {
+                throw new SqlCeProviderException("Error running NonQuery: \nSQL Statement:\n" + commandText + "\n\nException:\n" + ee.ToString());
+            }
+        }
+
+        private static int ExecuteNonQueryTry(
+            SqlCeConnection conn, SqlCeTransaction trx,
+            string commandText,
+            params SqlCeParameter[] commandParameters)
+        {
+            // this is for multiple queries in the installer
+            if (commandText.Trim().StartsWith("!!!"))
+            {
+                commandText = commandText.Trim().Trim('!');
+                var commands = commandText.Split('|');
+                var currentCmd = string.Empty;
+
+                foreach (var command in commands)
+                {
+                    try
+                    {
+                        currentCmd = command;
+                        if (string.IsNullOrWhiteSpace(command)) continue;
+                        var c = trx == null ? new SqlCeCommand(command, conn) : new SqlCeCommand(command, conn, trx);
+                        c.ExecuteNonQuery();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine("*******************************************************************");
+                        Debug.WriteLine(currentCmd);
+                        Debug.WriteLine(e);
+                        Debug.WriteLine("*******************************************************************");
+                    }
+                }
+                return 1;
+            }
+
+            Debug.WriteLine("----------------------------------------------------------------------------");
+            Debug.WriteLine(commandText);
+            Debug.WriteLine("----------------------------------------------------------------------------");
+            var cmd = new SqlCeCommand(commandText, conn);
+            AttachParameters(cmd, commandParameters);
+            var rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected;
         }
 
         /// <summary>
@@ -133,25 +191,8 @@ namespace SqlCE4Umbraco
         {
             try
             {
-                Debug.WriteLine("---------------------------------READER-------------------------------------");
-                Debug.WriteLine(commandText);
-                Debug.WriteLine("----------------------------------------------------------------------------");
-                SqlCeDataReader reader;
-                SqlCeConnection conn = SqlCeContextGuardian.Open(connectionString);
-
-                try
-                {
-                    SqlCeCommand cmd = new SqlCeCommand(commandText, conn);
-                    AttachParameters(cmd, commandParameters);
-                    reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-                }
-                catch
-                {
-                    conn.Close();
-                    throw;
-                }
-
-                return reader;
+                var conn = SqlCeContextGuardian.Open(connectionString);
+                return ExecuteReaderTry(conn, null, commandText, commandParameters);
             }
             catch (Exception ee)
             {
@@ -159,30 +200,71 @@ namespace SqlCE4Umbraco
             }
         }
 
-        public static bool VerifyConnection(string connectionString)
+        public static SqlCeDataReader ExecuteReader(
+            SqlCeConnection conn,
+            CommandType commandType,
+            string commandText,
+            params SqlCeParameter[] commandParameters
+        )
         {
-            bool isConnected = false;
-            using (SqlCeConnection conn = SqlCeContextGuardian.Open(connectionString))
-            {
-                isConnected = conn.State == ConnectionState.Open;
-            }
-
-            return isConnected;
+            return ExecuteReader(conn, commandType, commandText, commandParameters);
         }
 
-        private static void AttachParameters(SqlCeCommand command, SqlCeParameter[] commandParameters)
+        public static SqlCeDataReader ExecuteReader(
+            SqlCeConnection conn, SqlCeTransaction trx,
+            CommandType commandType,
+            string commandText,
+            params SqlCeParameter[] commandParameters
+            )
         {
-            foreach (SqlCeParameter parameter in commandParameters)
+            try
+            {
+                return ExecuteReaderTry(conn, trx, commandText, commandParameters);
+            }
+            catch (Exception ee)
+            {
+                throw new SqlCeProviderException("Error running Reader: \nSQL Statement:\n" + commandText + "\n\nException:\n" + ee.ToString());
+            }
+        }
+
+        private static SqlCeDataReader ExecuteReaderTry(
+            SqlCeConnection conn, SqlCeTransaction trx,
+            string commandText,
+            params SqlCeParameter[] commandParameters)
+        {
+            Debug.WriteLine("---------------------------------READER-------------------------------------");
+            Debug.WriteLine(commandText);
+            Debug.WriteLine("----------------------------------------------------------------------------");
+
+            try
+            {
+                var cmd = trx == null ? new SqlCeCommand(commandText, conn) : new SqlCeCommand(commandText, conn, trx);
+                AttachParameters(cmd, commandParameters);
+                return cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            }
+            catch
+            {
+                conn.Close();
+                throw;
+            }
+        }
+
+        public static bool VerifyConnection(string connectionString)
+        {
+            using (var conn = SqlCeContextGuardian.Open(connectionString))
+            {
+                return conn.State == ConnectionState.Open;
+            }
+        }
+
+        private static void AttachParameters(SqlCeCommand command, IEnumerable<SqlCeParameter> commandParameters)
+        {
+            foreach (var parameter in commandParameters)
             {
                 if ((parameter.Direction == ParameterDirection.InputOutput) && (parameter.Value == null))
-                {
                     parameter.Value = DBNull.Value;
-                }
                 command.Parameters.Add(parameter);
             }
         }
-
-
-
     }
 }

@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -10,21 +9,25 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture]
     public abstract class BaseUmbracoConfigurationTest
     {
-       
-
         [SetUp]
         public virtual void Initialize()
         {
-            SettingsForTests.Reset();
-            
+            Reset();
         }
 
         [TearDown]
         public virtual void TearDown()
         {
-            //reset settings
-            SettingsForTests.Reset();            
-            
+            Reset();
+        }
+
+        private static void Reset()
+        {
+            // reset settings
+            SettingsForTests.Reset();
+
+            // clear the logical call context
+            SafeCallContext.Clear();
         }
     }
 }

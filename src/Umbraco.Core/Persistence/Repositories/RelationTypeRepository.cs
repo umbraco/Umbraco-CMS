@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -18,50 +19,42 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class RelationTypeRepository : PetaPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
-
         public RelationTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
+        { }
+
+        // assuming we don't have tons of relation types, use a FullDataSet policy, ie
+        // cache the entire GetAll result once in a single collection - which can expire
+        private FullDataSetRepositoryCachePolicyFactory<IRelationType, int> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<IRelationType, int> CachePolicyFactory
         {
+            get
+            {
+                return _cachePolicyFactory 
+                    ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IRelationType, int>(
+                        RuntimeCache, GetEntityId, () => PerformGetAll(), expires: true));
+            }
         }
 
         #region Overrides of RepositoryBase<int,RelationType>
 
         protected override IRelationType PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var dto = Database.Fetch<RelationTypeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
-            if (dto == null)
-                return null;
-
-            var factory = new RelationTypeFactory();
-            var entity = factory.BuildEntity(dto);
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
-
-            return entity;
+            // use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
         protected override IEnumerable<IRelationType> PerformGetAll(params int[] ids)
         {
+            var sql = GetBaseQuery(false);
+
+            // should not happen due to the cache policy
             if (ids.Any())
-            {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
-            }
-            else
-            {
-                var dtos = Database.Fetch<RelationTypeDto>("WHERE id > 0");
-                foreach (var dto in dtos)
-                {
-                    yield return Get(dto.Id);
-                }
-            }
+                throw new NotImplementedException();
+
+            var dtos = Database.Fetch<RelationTypeDto>(sql);
+            var factory = new RelationTypeFactory();
+            return dtos.Select(x => DtoToEntity(x, factory));
         }
 
         protected override IEnumerable<IRelationType> PerformGetByQuery(IQuery<IRelationType> query)
@@ -71,11 +64,19 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<RelationTypeDto>(sql);
+            var factory = new RelationTypeFactory();
+            return dtos.Select(x => DtoToEntity(x, factory));
+        }
 
-            foreach (var dto in dtos)
-            {
-                yield return Get(dto.Id);
-            }
+        private static IRelationType DtoToEntity(RelationTypeDto dto, RelationTypeFactory factory)
+        {
+            var entity = factory.BuildEntity(dto);
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((TracksChangesEntityBase) entity).ResetDirtyProperties(false);
+
+            return entity;
         }
 
         #endregion
