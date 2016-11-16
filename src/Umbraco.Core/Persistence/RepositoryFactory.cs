@@ -217,12 +217,12 @@ namespace Umbraco.Core.Persistence
 
         internal virtual IPartialViewRepository CreatePartialViewRepository(IUnitOfWork uow)
         {
-            return new PartialViewRepository(uow);
+            return new PartialViewRepository(uow, FileSystemProviderManager.Current.PartialViewsFileSystem);
         }
 
         internal virtual IPartialViewRepository CreatePartialViewMacroRepository(IUnitOfWork uow)
         {
-            return new PartialViewMacroRepository(uow);
+            return new PartialViewMacroRepository(uow, FileSystemProviderManager.Current.MacroPartialsFileSystem);
         }
 
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow, IDatabaseUnitOfWork db)

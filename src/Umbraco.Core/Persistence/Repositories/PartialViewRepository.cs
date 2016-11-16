@@ -10,14 +10,9 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
     {
-        public PartialViewRepository(IUnitOfWork work)
-			: this(work, FileSystemProviderManager.Current.PartialViewsFileSystem)
-        {
-        }
-
-        public PartialViewRepository(IUnitOfWork work, IFileSystem fileSystem) : base(work, fileSystem)
-        {
-        }
+        public PartialViewRepository(IUnitOfWork work, IFileSystem fileSystem) 
+            : base(work, fileSystem)
+        { }
 
         protected virtual PartialViewType ViewType { get { return PartialViewType.PartialView; } }
 
