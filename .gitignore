@@ -141,5 +141,3 @@ build/docs.zip
 build/ui-docs.zip
 build/csharp-docs.zip
 build/msbuild.log
-/src/Umbraco.Web.UI/js/jquery.min.js
-/src/Umbraco.Web.UI/js/bootstrap.min.js
