@@ -27,7 +27,6 @@
                     <umb-editor-sub-header-content-left>
 
                         <div class="btn-group umb-button-group dropdown">
-
                             <umb-button
                                 type="button"
                                 button-style="link"
@@ -46,7 +45,6 @@
                                 <li><a href="" ng-click="vm.openMacroOverlay()">Macro</a></li>
                                 <li><a href="" ng-click="vm.openPartialOverlay()">Partial view</a></li>
                             </ul>
-
                         </div>
 
                         <umb-button
@@ -61,12 +59,22 @@
                         <umb-button
                             type="button"
                             button-style="link"
-                            label="Organise"
-                            icon="icon-layout"
-                            action="vm.openOrganizeOverlay()">
+                            label="Sections"
+                            icon="icon-indent"
+                            action="vm.openSectionsOverlay()">
                         </umb-button>
 
                     </umb-editor-sub-header-content-left>
+
+                    <umb-editor-sub-header-content-right>
+
+                        <a class="btn btn-link" ng-click="vm.openMasterTemplateOverlay()">
+                            <i class="icon icon-layout" style="margin-right:5px;"></i>
+                            <span class="bold">Master template:</span>
+                            {{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}
+                        </a>
+
+                    </umb-editor-sub-header-content-right>
 
                 </umb-editor-sub-header>
 
@@ -135,9 +143,9 @@
     </umb-overlay>
 
     <umb-overlay
-       ng-if="vm.organizeOverlay.show"
-       model="vm.organizeOverlay"
-       view="vm.organizeOverlay.view"
+       ng-if="vm.sectionsOverlay.show"
+       model="vm.sectionsOverlay"
+       view="vm.sectionsOverlay.view"
        position="right">
    </umb-overlay>
 
@@ -145,6 +153,13 @@
        ng-if="vm.partialItemOverlay.show"
        model="vm.partialItemOverlay"
        view="vm.partialItemOverlay.view"
+       position="right">
+   </umb-overlay>
+   
+   <umb-overlay
+       ng-if="vm.masterTemplateOverlay.show"
+       model="vm.masterTemplateOverlay"
+       view="vm.masterTemplateOverlay.view"
        position="right">
    </umb-overlay>
 

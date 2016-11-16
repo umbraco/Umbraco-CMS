@@ -6,17 +6,12 @@
         var vm = this;
         vm.page = {};
         vm.page.loading = true;
+        vm.templates = [];
 
         //menu
         vm.page.menu = {};
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
-
-        vm.insert = function (str) {
-            vm.editor.moveCursorToPosition(vm.currentPosition);
-            vm.editor.insert(str);
-            vm.editor.focus();
-        };
 
 
         vm.save = function () {
@@ -42,14 +37,16 @@
             });
         };
 
-        function persistCurrentLocation() {
-            vm.currentPosition = vm.editor.getCursorPosition();
-        }
-
         vm.init = function () {
 
             //we need to load this somewhere, for now its here.
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+
+            //load templates - used in the master template picker
+            templateResource.getAll()
+                .then(function(templates) {
+                    vm.templates = templates;
+                });
 
             if($routeParams.create){
 
@@ -99,42 +96,16 @@
             }
         };
 
-
-        vm.setLayout = function(path){
-
-            var templateCode = vm.editor.getValue();
-            var newValue = path;
-            var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?)(\"[^\"]*?\"|null)(;[\\s\\S]*?})", "gi");
-
-            if (newValue !== undefined && newValue !== "") {
-                if (layoutDefRegex.test(templateCode)) {
-                    // Declaration exists, so just update it
-                    templateCode = templateCode.replace(layoutDefRegex, "$1\"" + newValue + "\"$3");
-                } else {
-                    // Declaration doesn't exist, so prepend to start of doc
-                    //TODO: Maybe insert at the cursor position, rather than just at the top of the doc?
-                    templateCode = "@{\n\tLayout = \"" + newValue + "\";\n}\n" + templateCode;
-                }
-            } else {
-                if (layoutDefRegex.test(templateCode)) {
-                    // Declaration exists, so just update it
-                    templateCode = templateCode.replace(layoutDefRegex, "$1null$3");
-                }
-            }
-
-            vm.editor.setValue(templateCode);
-            vm.editor.clearSelection();
-            vm.editor.navigateFileStart();
-        };
-
-
         vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
         vm.openQueryBuilderOverlay = openQueryBuilderOverlay;
         vm.openMacroOverlay = openMacroOverlay;
         vm.openInsertOverlay = openInsertOverlay;
-        vm.openOrganizeOverlay = openOrganizeOverlay;
+        vm.openSectionsOverlay = openSectionsOverlay;
         vm.openPartialOverlay = openPartialOverlay;
+        vm.openMasterTemplateOverlay = openMasterTemplateOverlay;
+        vm.selectMasterTemplate = selectMasterTemplate;
+        vm.getMasterTemplateName = getMasterTemplateName;
 
         function openInsertOverlay() {
 
@@ -148,23 +119,23 @@
                         case "macro":
 
                             var macroObject = macroService.collectValueData(model.insert.selectedMacro, model.insert.macroParams, "Mvc");
-                            vm.insert(macroObject.syntax);
+                            insert(macroObject.syntax);
                             break;
 
                         case "dictionary":
                             //crappy hack due to dictionary items not in umbracoNode table
                         	var code = "@Umbraco.GetDictionaryValue(\"" + model.insert.node.name + "\")";
-                        	vm.insert(code);
+                        	insert(code);
                             break;
 
                         case "partial":
                             //crappy hack due to dictionary items not in umbracoNode table
                             var code = "@Html.Partial(\"" + model.insert.node.name + "\")";
-                            vm.insert(code);
+                            insert(code);
                             break;
                             
                         case "umbracoField":
-                          vm.insert(model.insert.umbracoField);
+                            insert(model.insert.umbracoField);
                             break;
                     }
 
@@ -188,13 +159,14 @@
                 dialogData: {},
                 show: true,
                 title: "Insert macro",
-
                 submit: function (model) {
 
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
-                    vm.insert(macroObject.syntax);
+                    insert(macroObject.syntax);
+
                     vm.macroPickerOverlay.show = false;
                     vm.macroPickerOverlay = null;
+
                 }
             };
         }
@@ -210,7 +182,7 @@
                 show: true,
 
                 submit: function (model) {
-                  vm.insert(model.umbracoField);
+                  insert(model.umbracoField);
                   vm.pageFieldOverlay.show = false;
                   vm.pageFieldOverlay = null;
                 },
@@ -236,7 +208,7 @@
                 select: function(node){
                 	//crappy hack due to dictionary items not in umbracoNode table
                 	var code = "@Umbraco.GetDictionaryValue(\"" + node.name + "\")";
-                	vm.insert(code);
+                	insert(code);
 
                 	vm.dictionaryItemOverlay.show = false;
                     vm.dictionaryItemOverlay = null;
@@ -266,7 +238,7 @@
                 select: function(node){
                     //crappy hack due to dictionary items not in umbracoNode table
                     var code = "@Html.Partial(\"" + node.name + "\")";
-                    vm.insert(code);
+                    insert(code);
 
                     vm.partialItemOverlay.show = false;
                     vm.partialItemOverlay = null;
@@ -302,7 +274,7 @@
                                 "\t}\n" +
                             "</ul>\n\n";
 
-                    vm.insert(code);
+                    insert(code);
                     
                     vm.queryBuilderOverlay.show = false;
                     vm.queryBuilderOverlay = null;
@@ -316,49 +288,136 @@
         }
 
 
-        function openOrganizeOverlay() {
-            vm.organizeOverlay = {
+        function openSectionsOverlay() {
 
-                view: "organize",
+            vm.sectionsOverlay = {
+                view: "templatesections",
                 show: true,
-                template: vm.template,
-                title: "Organise template",
+                isMasterTemplate: true,
+                submit: function(model) {
 
-                submit: function (model) {
-                    if (model.masterPage && model.masterPage.alias) {
-                        vm.template.masterPageAlias = model.masterPage.alias;
-                        vm.setLayout(model.masterPage.alias + ".cshtml");
-                    } else {
-                        vm.template.masterPageAlias = null;
-                        vm.setLayout(null);
+                    if (model.insertType === 'renderBody') {
+                        insert("@RenderBody()");
                     }
 
-                    if (model.addRenderBody) {
-                        vm.insert("@RenderBody()");
+                    if (model.insertType === 'renderSection') {
+                        insert("@RenderSection(\"" + model.renderSectionName + "\", " + model.mandatoryRenderSection + ")");
                     }
 
-                    if (model.addRenderSection) {
-                        vm.insert("@RenderSection(\"" +
-                            model.renderSectionName +
-                            "\", " +
-                            model.mandatoryRenderSection +
-                            ")");
+                    if (model.insertType === 'addSection') {
+                        insert("@section " + model.sectionName + "\r\n{\r\n\r\n}\r\n");
                     }
 
-                    if (model.addSection) {
-                        vm.insert("@section " + model.sectionName + "\r\n{\r\n\r\n}\r\n");
-                    }
+                    vm.sectionsOverlay.show = false;
+                    vm.sectionsOverlay = null;
 
-                    vm.organizeOverlay.show = false;
-                    vm.organizeOverlay = null;
                 },
+                close: function(model) {
 
-                close: function (model) {
-                    vm.organizeOverlay.show = false;
-                    vm.organizeOverlay = null;
+                    vm.sectionsOverlay.show = false;
+                    vm.sectionsOverlay = null;
+
                 }
-
             }
+        }
+
+        function openMasterTemplateOverlay() {
+
+            vm.masterTemplateOverlay = {
+                view: "itempicker",
+                title: "Choose master template",
+                availableItems: vm.templates,
+                show: true,
+                submit: function(model) {
+
+                    var template = model.selectedItem;
+
+                    if (template && template.alias) {
+                        vm.template.masterTemplateAlias = template.alias;
+                        setLayout(template.alias + ".cshtml");
+                    } else {
+                        vm.template.masterTemplateAlias = null;
+                        setLayout(null);
+                    }
+
+                    vm.masterTemplateOverlay.show = false;
+                    vm.masterTemplateOverlay = null;
+                },
+                close: function(oldModel) {
+                    vm.masterTemplateOverlay.show = false;
+                    vm.masterTemplateOverlay = null;
+                }
+            };
+
+        }
+
+        function selectMasterTemplate(template) {
+
+            if (template && template.alias) {
+                vm.template.masterTemplateAlias = template.alias;
+                setLayout(template.alias + ".cshtml");
+            } else {
+                vm.template.masterTemplateAlias = null;
+                setLayout(null);
+            }
+            
+        }
+
+        function getMasterTemplateName(masterTemplateAlias, templates) {
+
+            if(masterTemplateAlias) {
+
+                var templateName = "";
+
+                angular.forEach(templates, function(template){
+                    if(template.alias === masterTemplateAlias) {
+                        templateName = template.name;
+                    }
+                });
+
+                return templateName;
+
+            } else {
+                return "No template";
+            }
+            
+        }
+
+        function setLayout(templatePath){
+            
+            var templateCode = vm.editor.getValue();
+            var newValue = templatePath;
+            var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?)(\"[^\"]*?\"|null)(;[\\s\\S]*?})", "gi");
+
+            if (newValue !== undefined && newValue !== "") {
+                if (layoutDefRegex.test(templateCode)) {
+                    // Declaration exists, so just update it
+                    templateCode = templateCode.replace(layoutDefRegex, "$1\"" + newValue + "\"$3");
+                } else {
+                    // Declaration doesn't exist, so prepend to start of doc
+                    //TODO: Maybe insert at the cursor position, rather than just at the top of the doc?
+                    templateCode = "@{\n\tLayout = \"" + newValue + "\";\n}\n" + templateCode;
+                }
+            } else {
+                if (layoutDefRegex.test(templateCode)) {
+                    // Declaration exists, so just update it
+                    templateCode = templateCode.replace(layoutDefRegex, "$1null$3");
+                }
+            }
+
+            vm.editor.setValue(templateCode);
+            vm.editor.clearSelection();
+            vm.editor.navigateFileStart();
+        }
+
+        function insert(str) {
+            vm.editor.moveCursorToPosition(vm.currentPosition);
+            vm.editor.insert(str);
+            vm.editor.focus();
+        }
+
+        function persistCurrentLocation() {
+            vm.currentPosition = vm.editor.getCursorPosition();
         }
 
         vm.init();
