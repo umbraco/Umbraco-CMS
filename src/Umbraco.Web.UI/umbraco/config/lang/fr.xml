@@ -145,7 +145,7 @@
     <key alias="memberrole">Rôle</key>
     <key alias="membertype">Type de membre</key>
     <key alias="noDate">Aucune date choisie</key>
-    <key alias="nodeName">Titre de la page</key>
+    <key alias="nodeName">Titre du lien</key>
     <key alias="otherElements">Propriétés</key>
     <key alias="parentNotPublished">Ce document est publié mais n'est pas visible car son parent '%0%' n'est pas publié</key>
     <key alias="parentNotPublishedAnomaly">Oups : ce document est publié mais n'est pas présent dans le cache (erreur interne Umbraco)</key>
@@ -166,7 +166,7 @@
     <key alias="updateDate">Dernière édition</key>
     <key alias="updateDateDesc" version="7.0">Date/heure à laquelle ce document a été édité</key>
     <key alias="uploadClear">Supprimer le(s) fichier(s)</key>
-    <key alias="urls">Lien vers un document</key>
+    <key alias="urls">Lien</key>
     <key alias="memberof">Membre du/des groupe(s)</key>
     <key alias="notmemberof">Pas membre du/des groupe(s)</key>
     <key alias="childItems" version="7.0">Eléments enfants</key>

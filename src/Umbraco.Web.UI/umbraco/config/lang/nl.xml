@@ -140,7 +140,7 @@
     <key alias="memberrole">Rol</key>
     <key alias="membertype">Ledentype</key>
     <key alias="noDate">Geen datum gekozen</key>
-    <key alias="nodeName">Pagina Titel</key>
+    <key alias="nodeName">Link Titel</key>
     <key alias="otherElements">Eigenschappen</key>
     <key alias="parentNotPublished">Dit document is gepubliceerd maar niet zichtbaar omdat de bovenliggende node '%0%' niet gepubliceerd is</key>
     <key alias="parentNotPublishedAnomaly">Oeps: dit document is gepubliceerd, maar het is niet in de cache (interne serverfout)</key>
@@ -159,7 +159,7 @@
     <key alias="updateDate">Laatst gewijzigd</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Bestand(en) verwijderen</key>
-    <key alias="urls">Link naar het document</key>
+    <key alias="urls">Link</key>
     <key alias="memberof">Lid van groep(en)</key>
     <key alias="notmemberof">Geen lid van groep(en)</key>
     

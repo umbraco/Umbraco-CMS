@@ -96,7 +96,7 @@
     <key alias="memberrole">Ruolo</key>
     <key alias="membertype">Tipologia Membro</key>
     <key alias="noDate"><![CDATA[La data non è stata selezionata]]></key>
-    <key alias="nodeName">Titolo della Pagina</key>
+    <key alias="nodeName">Titolo del Link</key>
     <key alias="otherElements"><![CDATA[Proprietà]]></key>
     <key alias="parentNotPublished"><![CDATA[Questo documento è pubblicato ma non è visibile perchè il padre '%0%' non è pubblicato]]></key>
     <key alias="publish">Pubblicato</key>
@@ -111,7 +111,7 @@
     <key alias="unPublish">Non pubblicare</key>
     <key alias="updateDate">Ultima modifica</key>
     <key alias="uploadClear">Rimuovi il file</key>
-    <key alias="urls">Link al documento</key>
+    <key alias="urls">Link</key>
   </area>
   <area alias="create">
     <key alias="chooseNode"><![CDATA[Dove vuoi creare il nuovo %0%]]></key>

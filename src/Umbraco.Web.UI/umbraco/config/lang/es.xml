@@ -140,7 +140,7 @@
     <key alias="memberrole">Rol</key>
     <key alias="membertype">Tipo de miembro</key>
     <key alias="noDate">Sin fecha</key>
-    <key alias="nodeName">Título de la página</key>
+    <key alias="nodeName">Título del vínculo</key>
     <key alias="otherElements">Propiedades</key>
     <key alias="parentNotPublished">Este documento ha sido publicado pero no es visible porque el padre '%0%' no esta publicado</key>
     <key alias="parentNotPublishedAnomaly">Upss: este documento está publicado pero no está en la caché (error interno)</key>
@@ -158,7 +158,7 @@
     <key alias="updateDate">Última actualización</key>
     <key alias="updateDateDesc" version="7.0">Fecha/hora este documento fue modificado</key>
     <key alias="uploadClear">Eliminar archivo</key>
-    <key alias="urls">Vínculo al documento</key>
+    <key alias="urls">Vínculo</key>
     <key alias="memberof">Miembro de grupo(s)</key>
     <key alias="notmemberof">No es miembreo de grupo(s)</key>
     <key alias="childItems" version="7.0">Nodos hijo</key>

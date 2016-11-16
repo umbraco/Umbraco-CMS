@@ -137,7 +137,7 @@
     <key alias="memberrole">Mitgliederrolle</key>
     <key alias="membertype">Mitglieder-Typ</key>
     <key alias="noDate">Kein Datum gewählt</key>
-    <key alias="nodeName">Name des Dokument</key>
+    <key alias="nodeName">Name des Link</key>
     <key alias="otherElements">Eigenschaften</key>
     <key alias="parentNotPublished">Dieses Dokument ist veröffentlicht aber nicht sichtbar, da das übergeordnete Dokument '%0%' nicht publiziert ist</key>
     <key alias="parentNotPublishedAnomaly">Ups! Dieses Dokument ist veröffentlicht aber nicht im internen Cache aufzufinden: Systemfehler.</key>
@@ -156,7 +156,7 @@
     <key alias="updateDate">Zuletzt bearbeitet am</key>
     <key alias="updateDateDesc" version="7.0">Letzter Änderungszeitpunkt des Dokuments</key>
     <key alias="uploadClear">Datei entfernen</key>
-    <key alias="urls">Link zum Dokument</key>
+    <key alias="urls">Link</key>
     <key alias="memberof">Mitglied der Gruppe(n)</key>
     <key alias="notmemberof">Kein Mitglied der Gruppe(n)</key>
     <key alias="childItems" version="7.0">Untergeordnete Elemente</key>
