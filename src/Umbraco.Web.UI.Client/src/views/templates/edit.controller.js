@@ -200,7 +200,6 @@
                 multiPicker: false,
                 show: true,
                 title: "Insert dictionary item",
-
                 select: function(node){
                 	//crappy hack due to dictionary items not in umbracoNode table
                 	var code = "@Umbraco.GetDictionaryValue(\"" + node.name + "\")";
@@ -209,11 +208,6 @@
                 	vm.dictionaryItemOverlay.show = false;
                     vm.dictionaryItemOverlay = null;
                 },
-
-                submit: function (model) {
-                    console.log(model);
-                },
-
                 close: function (model) {
                     vm.dictionaryItemOverlay.show = false;
                     vm.dictionaryItemOverlay = null;
@@ -230,7 +224,6 @@
                 multiPicker: false,
                 show: true,
                 title: "Insert Partial view",
-
                 select: function(node){
                     //crappy hack due to dictionary items not in umbracoNode table
                     var code = "@Html.Partial(\"" + node.name + "\")";
@@ -239,13 +232,6 @@
                     vm.partialItemOverlay.show = false;
                     vm.partialItemOverlay = null;
                 },
-
-                submit: function (model) {
-                    console.log(model);
-                    vm.partialItemOverlay.show = false;
-                    vm.partialItemOverlay = null;
-                },
-
                 close: function (model) {
                     vm.partialItemOverlay.show = false;
                     vm.partialItemOverlay = null;
@@ -288,8 +274,9 @@
 
             vm.sectionsOverlay = {
                 view: "templatesections",
-                show: true,
                 isMasterTemplate: true,
+                submitButtonLabel: "Insert",
+                show: true,
                 submit: function(model) {
 
                     if (model.insertType === 'renderBody') {
@@ -374,7 +361,7 @@
                 return templateName;
 
             } else {
-                return "No template";
+                return "No master";
             }
             
         }

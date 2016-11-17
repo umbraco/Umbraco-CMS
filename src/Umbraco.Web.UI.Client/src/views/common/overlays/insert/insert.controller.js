@@ -22,9 +22,9 @@
 
             vm.macroPickerOverlay = {
                 view: "macropicker",
-                show: true,
                 title: "Insert macro",
                 dialogData: {},
+                show: true,
                 submit: function(model) {
 
                     $scope.model.insert = {
