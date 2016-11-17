@@ -174,19 +174,15 @@
 
         function openPageFieldOverlay() {
             vm.pageFieldOverlay = {
-                title: "Insert page field",
-                description: "Insert data in template",
                 submitButtonLabel: "Insert",
                 closeButtonlabel: "Cancel",
                 view: "insertfield",
                 show: true,
-
                 submit: function (model) {
-                  insert(model.umbracoField);
-                  vm.pageFieldOverlay.show = false;
-                  vm.pageFieldOverlay = null;
+                    insert(model.umbracoField);
+                    vm.pageFieldOverlay.show = false;
+                    vm.pageFieldOverlay = null;
                 },
-
                 close: function (model) {
                     vm.pageFieldOverlay.show = false;
                     vm.pageFieldOverlay = null;
