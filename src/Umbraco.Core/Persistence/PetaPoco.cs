@@ -181,7 +181,7 @@ namespace Umbraco.Core.Persistence
 			CommonConstruct();
 		}
 
-		internal enum DBType
+		public enum DBType
 		{
 			SqlServer,
 			SqlServerCE,
@@ -190,7 +190,9 @@ namespace Umbraco.Core.Persistence
 			Oracle,
             SQLite
 		}
-		DBType _dbType = DBType.SqlServer;
+		private DBType _dbType = DBType.SqlServer;
+
+        public DBType DatabaseType { get { return _dbType; } }
 
 		// Common initialization
 		private void CommonConstruct()
@@ -224,13 +226,18 @@ namespace Umbraco.Core.Persistence
 		// Automatically close one open shared connection
 		public void Dispose()
 		{
-			// Automatically close one open connection reference
-			//  (Works with KeepConnectionAlive and manually opening a shared connection)
-			CloseSharedConnection();
+		    Dispose(true);
 		}
 
-		// Set to true to keep the first opened connection alive until this object is disposed
-		public bool KeepConnectionAlive { get; set; }
+	    protected virtual void Dispose(bool disposing)
+	    {
+            // Automatically close one open connection reference
+            //  (Works with KeepConnectionAlive and manually opening a shared connection)
+            CloseSharedConnection();
+        }
+
+        // Set to true to keep the first opened connection alive until this object is disposed
+        public bool KeepConnectionAlive { get; set; }
 
 		// Open a connection (can be nested)
 		public void OpenSharedConnection()
