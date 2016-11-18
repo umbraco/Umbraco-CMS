@@ -247,6 +247,7 @@ namespace Umbraco.Core.Persistence
 
         protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
             LogHelper.Debug<UmbracoDatabase>("Dispose (" + InstanceSid + ").");
             if (DatabaseFactory != null) DatabaseFactory.OnDispose(this);
         }
