@@ -75,69 +75,168 @@ namespace Umbraco.Core.Persistence
 
 		public UmbracoDatabase CreateDatabase()
 		{
-            // no http context, create the call context object
-            // NOTHING is going to track the object and it is the responsibility of the caller to release it!
-            // using the ReleaseDatabase method.
+            UmbracoDatabase database;
+
+            // gets or creates a database, using either the call context (if no http context) or
+            // the current request context (http context) to store it. once done using the database,
+            // it should be disposed - which will remove it from whatever context it is currently
+            // stored in. this is automatic with http context because UmbracoDatabase implements
+            // IDisposeOnRequestEnd, but NOT with call context.
+
             if (HttpContext.Current == null)
             {
-                LogHelper.Debug<DefaultDatabaseFactory>("Get NON http [T" + Environment.CurrentManagedThreadId + "]");
-                var value = NonContextValue;
-                if (value != null) return value;
-                lock (Locker)
+                database = NonContextValue;
+                if (database == null)
                 {
-                    value = NonContextValue;
-                    if (value != null) return value;
-
-                    LogHelper.Debug<DefaultDatabaseFactory>("Create NON http [T" + Environment.CurrentManagedThreadId + "]");
-                    NonContextValue = value = string.IsNullOrEmpty(ConnectionString) == false && string.IsNullOrEmpty(ProviderName) == false
-                                            ? new UmbracoDatabase(ConnectionString, ProviderName, _logger)
-                                            : new UmbracoDatabase(_connectionStringName, _logger);
-
-                    return value;
+                    lock (Locker)
+                    {
+                        database = NonContextValue;
+                        if (database == null)
+                        {
+                            database = CreateDatabaseInstance(ContextOwner.CallContext);
+                            NonContextValue = database;
+                        }
+#if DEBUG_DATABASES
+                        else
+                        {
+                            Log("Get lcc", database);
+                        }
+#endif
+                    }
                 }
+#if DEBUG_DATABASES
+                else
+                {
+                    Log("Get lcc", database);
+                }
+#endif
+                return database;
             }
 
-            // we have an http context, so only create one per request.
-            // UmbracoDatabase is marked IDisposeOnRequestEnd and therefore will be disposed when
-            // UmbracoModule attempts to dispose the relevant HttpContext items. so we DO dispose
-            // connections at the end of each request. no need to call ReleaseDatabase.
-            LogHelper.Debug<DefaultDatabaseFactory>("Get http [T" + Environment.CurrentManagedThreadId + "]");
-            if (HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)) == false)
-            {
-                LogHelper.Debug<DefaultDatabaseFactory>("Create http [T" + Environment.CurrentManagedThreadId + "]");
-                HttpContext.Current.Items.Add(typeof(DefaultDatabaseFactory),
-                                              string.IsNullOrEmpty(ConnectionString) == false && string.IsNullOrEmpty(ProviderName) == false
-                                                  ? new UmbracoDatabase(ConnectionString, ProviderName, _logger)
-                                                  : new UmbracoDatabase(_connectionStringName, _logger));
+		    if (HttpContext.Current.Items.Contains(typeof (DefaultDatabaseFactory)) == false)
+		    {
+		        database = CreateDatabaseInstance(ContextOwner.HttpContext);
+                HttpContext.Current.Items.Add(typeof (DefaultDatabaseFactory), database);
+		    }
+		    else
+		    {
+		        database = (UmbracoDatabase) HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
+#if DEBUG_DATABASES
+                Log("Get ctx", database);
+#endif
             }
-            return (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
+
+            return database;
+		}
+
+        // called by UmbracoDatabase when disposed, so that the factory can de-list it from context
+	    internal void OnDispose(UmbracoDatabase disposing)
+	    {
+	        var value = disposing;
+	        switch (disposing.ContextOwner)
+	        {
+                case ContextOwner.CallContext:
+                    value = NonContextValue;
+                    break;
+                case ContextOwner.HttpContext:
+                    value = (UmbracoDatabase) HttpContext.Current.Items[typeof (DefaultDatabaseFactory)];
+                    break;
+	        }
+
+            if (value != null && value.InstanceId != disposing.InstanceId) throw new Exception("panic: wrong db.");
+
+            switch (disposing.ContextOwner)
+            {
+                case ContextOwner.CallContext:
+                    NonContextValue = null;
+                    break;
+                case ContextOwner.HttpContext:
+                    HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
+                    break;
+            }
+
+            disposing.ContextOwner = ContextOwner.None;
+
+#if DEBUG_DATABASES
+            _databases.Remove(value);
+#endif
         }
 
-        // releases the "context" database
-        public void ReleaseDatabase()
+#if DEBUG_DATABASES
+        // helps identifying when non-httpContext databases are created by logging the stack trace
+        private void LogCallContextStack()
         {
-            if (HttpContext.Current == null)
-            {
-                var value = NonContextValue;
-                if (value != null) value.Dispose();
-                NonContextValue = null;
-            }
+            var trace = Environment.StackTrace;
+            if (trace.IndexOf("ScheduledPublishing") > 0)
+                LogHelper.Debug<DefaultDatabaseFactory>("CallContext: Scheduled Publishing");
+            else if (trace.IndexOf("TouchServerTask") > 0)
+                LogHelper.Debug<DefaultDatabaseFactory>("CallContext: Server Registration");
+            else if (trace.IndexOf("LogScrubber") > 0)
+                LogHelper.Debug<DefaultDatabaseFactory>("CallContext: Log Scrubber");
             else
-            {
-                var db = (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
-                if (db != null) db.Dispose();
-                HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
-            }
+                LogHelper.Debug<DefaultDatabaseFactory>("CallContext: " + Environment.StackTrace);
         }
+
+        private readonly List<UmbracoDatabase> _databases = new List<UmbracoDatabase>();
+
+        // helps identifying database leaks by keeping track of all instances
+        public List<UmbracoDatabase> Databases { get { return _databases; } }
+
+        private static void Log(string message, UmbracoDatabase database)
+        {
+            LogHelper.Debug<DefaultDatabaseFactory>(message + " (" + (database == null ? "" : database.InstanceSid) + ").");
+        }
+#endif
+
+        internal enum ContextOwner
+        {
+            None,
+            HttpContext,
+            CallContext
+        }
+
+        internal UmbracoDatabase CreateDatabaseInstance(ContextOwner contextOwner)
+	    {
+            var database = string.IsNullOrEmpty(ConnectionString) == false && string.IsNullOrEmpty(ProviderName) == false
+                    ? new UmbracoDatabase(ConnectionString, ProviderName, _logger)
+                    : new UmbracoDatabase(_connectionStringName, _logger);
+	        database.ContextOwner = contextOwner;
+	        database.DatabaseFactory = this;
+            //database.EnableSqlTrace = true;
+#if DEBUG_DATABASES
+            Log("Create " + contextOwner, database);
+            if (contextOwner == ContextOwner.CallContext)
+                LogCallContextStack();
+            _databases.Add(database);
+#endif
+            return database;
+	    }
 
         protected override void DisposeResources()
 		{
-            ReleaseDatabase();
-		}
+            UmbracoDatabase database;
+
+            if (HttpContext.Current == null)
+            {
+                database = NonContextValue;
+#if DEBUG_DATABASES
+                Log("Release lcc", database);
+#endif
+            }
+            else
+            {
+                database = (UmbracoDatabase) HttpContext.Current.Items[typeof (DefaultDatabaseFactory)];
+#if DEBUG_DATABASES
+                Log("Release ctx", database);
+#endif
+            }
+
+            if (database != null) database.Dispose(); // removes it from call context
+        }
 
         // during tests, the thread static var can leak between tests
         // this method provides a way to force-reset the variable
-	    internal void ResetForTests()
+        internal void ResetForTests()
 	    {
             var value = NonContextValue;
             if (value != null) value.Dispose();
@@ -156,26 +255,29 @@ namespace Umbraco.Core.Persistence
 
         // detaches the current database
         // ie returns the database and remove it from whatever is "context"
-        private static UmbracoDatabase DetachDatabase()
+        internal static UmbracoDatabase DetachDatabase()
         {
+            UmbracoDatabase database;
+
             if (HttpContext.Current == null)
             {
-                var db = NonContextValue;
+                database = NonContextValue;
                 NonContextValue = null;
-                return db;
             }
             else
             {
-                var db = (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
-                HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
-                return db;
+                database = (UmbracoDatabase) HttpContext.Current.Items[typeof (DefaultDatabaseFactory)];
+                HttpContext.Current.Items.Remove(typeof (DefaultDatabaseFactory));
             }
+
+            if (database != null) database.ContextOwner = ContextOwner.None;
+            return database;
         }
 
         // attach a current database
         // ie assign it to whatever is "context"
         // throws if there already is a database
-        private static void AttachDatabase(object o)
+        internal static void AttachDatabase(object o)
         {
             var database = o as UmbracoDatabase;
             if (o != null && database == null) throw new ArgumentException("Not an UmbracoDatabase.", "o");
@@ -183,12 +285,18 @@ namespace Umbraco.Core.Persistence
             if (HttpContext.Current == null)
             {
                 if (NonContextValue != null) throw new InvalidOperationException();
-                if (database != null) NonContextValue = database;
+                if (database == null) return;
+
+                NonContextValue = database;
+                database.ContextOwner = ContextOwner.CallContext;
             }
             else
             {
-                if (HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] != null) throw new InvalidOperationException();
-                if (database != null) HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] = database;
+                if (HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] != null) throw new InvalidOperationException();
+                if (database == null) return;
+
+                HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] = database;
+                database.ContextOwner = ContextOwner.HttpContext;
             }
         }
 

@@ -1,7 +1,9 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Text;
+using MySql.Data.MySqlClient;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -21,6 +23,12 @@ namespace Umbraco.Core.Persistence
         private readonly ILogger _logger;
         private readonly Guid _instanceId = Guid.NewGuid();
         private bool _enableCount;
+#if DEBUG_DATABASES
+        private int _spid = -1;
+#endif
+
+        internal DefaultDatabaseFactory.ContextOwner ContextOwner = DefaultDatabaseFactory.ContextOwner.None;
+        internal DefaultDatabaseFactory DatabaseFactory = null;
 
         /// <summary>
         /// Used for testing
@@ -28,6 +36,18 @@ namespace Umbraco.Core.Persistence
         internal Guid InstanceId
         {
             get { return _instanceId; }
+        }
+
+        public string InstanceSid
+        {
+            get
+            {
+#if DEBUG_DATABASES
+                return _instanceId.ToString("N").Substring(0, 8) + ":" + _spid;
+#else
+                return _instanceId.ToString("N").Substring(0, 8);
+#endif
+            }
         }
 
         /// <summary>
@@ -113,13 +133,44 @@ namespace Umbraco.Core.Persistence
         {
             // propagate timeout if none yet
 
+#if DEBUG_DATABASES
+            if (DatabaseType == DBType.MySql)
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT CONNECTION_ID()";
+                    _spid = Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+            else if (DatabaseType == DBType.SqlServer)
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT @@SPID";
+                    _spid = Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+            else
+            {
+                // includes SqlCE
+                _spid = 0;
+            }
+#endif
+
             // wrap the connection with a profiling connection that tracks timings
             return new StackExchange.Profiling.Data.ProfiledDbConnection(connection as DbConnection, MiniProfiler.Current);
         }
 
+#if DEBUG_DATABASES
+        public override void OnConnectionClosing(IDbConnection conn)
+        {
+            _spid = -1;
+        }
+#endif
+
         public override void OnException(Exception x)
         {
-            _logger.Error<UmbracoDatabase>("Database exception occurred", x);
+            _logger.Error<UmbracoDatabase>("Exception (" + InstanceSid + ").", x);
             base.OnException(x);
         }
 
@@ -132,14 +183,18 @@ namespace Umbraco.Core.Persistence
             if (EnableSqlTrace)
             {
                 var sb = new StringBuilder();
+#if DEBUG_DATABASES
+                sb.Append(InstanceSid);
+                sb.Append(": ");
+#endif
                 sb.Append(cmd.CommandText);
                 foreach (DbParameter p in cmd.Parameters)
                 {
                     sb.Append(" - ");
                     sb.Append(p.Value);
                 }
-                
-                _logger.Debug<UmbracoDatabase>(sb.ToString());
+
+                _logger.Debug<UmbracoDatabase>(sb.ToString().Replace("{", "{{").Replace("}", "}}"));
             }
 
             base.OnExecutingCommand(cmd);
@@ -185,9 +240,15 @@ namespace Umbraco.Core.Persistence
                     }
                 }
             }
-           
+
             //use the defaults
             base.BuildSqlDbSpecificPagingQuery(databaseType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            LogHelper.Debug<UmbracoDatabase>("Dispose (" + InstanceSid + ").");
+            if (DatabaseFactory != null) DatabaseFactory.OnDispose(this);
         }
     }
 }
