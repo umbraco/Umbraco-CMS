@@ -16,7 +16,7 @@ namespace Umbraco.Web.Scheduling
         private readonly ApplicationContext _appContext;
         private readonly IUmbracoSettingsSection _settings;
 
-        public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
+        public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             ApplicationContext appContext, IUmbracoSettingsSection settings)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
@@ -77,6 +77,8 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
+            // running on a background task, requires a safe database (see UsingSafeDatabase doc)
+            using (ApplicationContext.Current.DatabaseContext.UsingSafeDatabase)
             using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));
