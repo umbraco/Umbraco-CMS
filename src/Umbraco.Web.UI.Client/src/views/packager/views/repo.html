@@ -340,6 +340,16 @@
                                 <p>{{vm.installState.status}}</p>
                             </div>
 
+                            <div class="umb-info-local-item text-info"
+                                 ng-show="vm.installCompleted">
+
+                                <button type="button"
+                                        class="btn btn-success flex-inline mt3"
+                                        ng-click="vm.reloadPage()">
+                                    Finish
+                                </button>
+                            </div>
+
                         </div>
                     </form>
 

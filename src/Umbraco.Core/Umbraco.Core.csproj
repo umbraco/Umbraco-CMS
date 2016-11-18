@@ -454,6 +454,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddUniqueIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\RemoveParentIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Mappers\TaskTypeMapper.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemovePropertyDataIdIndex.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeTwo\EnsureMigrationsTableIdentityIsCorrect.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\EnsureContentTypeUniqueIdsAreConsistent.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddExternalLoginsTable.cs" />
@@ -1348,6 +1349,7 @@
     <Compile Include="Sync\ApplicationUrlHelper.cs" />
     <Compile Include="Sync\RefreshMethodType.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />
+    <Compile Include="Sync\SingleServerRegistrar.cs" />
     <Compile Include="ThreadExtensions.cs" />
     <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
