@@ -197,6 +197,25 @@ angular.module("umbraco")
             $scope.onFilesQueue = function() {
                 $scope.activeDrag = false;
             };
+    
+            $scope.openDetailsDialog = function() {
+
+                $scope.mediaPickerDetailsOverlay = {};
+                $scope.mediaPickerDetailsOverlay.show = true;
+
+                $scope.mediaPickerDetailsOverlay.submit = function(model) {
+                    $scope.model.selectedImages.push($scope.target);
+                    $scope.model.submit($scope.model);
+
+                    $scope.mediaPickerDetailsOverlay.show = false;
+                    $scope.mediaPickerDetailsOverlay = null;
+                };
+
+                $scope.mediaPickerDetailsOverlay.close = function(oldModel) {
+                    $scope.mediaPickerDetailsOverlay.show = false;
+                    $scope.mediaPickerDetailsOverlay = null;
+                };
+            };
 
             //default root item
             if (!$scope.target) {
@@ -219,24 +238,16 @@ angular.module("umbraco")
                 } else {
                     $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
                 }
+            } else {
+                //Opens correct folder if target is set
+                entityResource.getById($scope.target.id, "media").then(function (node) {
+                    var nodePath = node.path.split(",");
+                    $scope.gotoFolder({ id: nodePath[nodePath.length - 2], name: "Media", icon: "icon-folder" });
+                });
+                
+                //Opens details for media i target is set
+                $scope.openDetailsDialog();
             }
 
-            $scope.openDetailsDialog = function() {
-
-                $scope.mediaPickerDetailsOverlay = {};
-                $scope.mediaPickerDetailsOverlay.show = true;
-
-                $scope.mediaPickerDetailsOverlay.submit = function(model) {
-                    $scope.model.selectedImages.push($scope.target);
-                    $scope.model.submit($scope.model);
-
-                    $scope.mediaPickerDetailsOverlay.show = false;
-                    $scope.mediaPickerDetailsOverlay = null;
-                };
-
-                $scope.mediaPickerDetailsOverlay.close = function(oldModel) {
-                    $scope.mediaPickerDetailsOverlay.show = false;
-                    $scope.mediaPickerDetailsOverlay = null;
-                };
-            };
+            
         });
