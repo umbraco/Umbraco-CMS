@@ -524,7 +524,7 @@ namespace Umbraco.Web.Editors
             //get the files
             foreach (var file in result.FileData)
             {
-                var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"', ' ' });
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
                 var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
                 if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext) == false)
