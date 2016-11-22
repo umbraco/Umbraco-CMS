@@ -9,30 +9,29 @@
                 ui-sortable
                 ng-model="model.value.templates">
 
-                <li ng-repeat="template in model.value.templates">
+                <li ng-repeat="template in model.value.templates" class="clearfix">
 
                     <div ng-click="configureTemplate(template)"
-                        class="preview-rows layout" style="margin-top: 5px; margin-bottom: 20px; float:left">
+                         class="preview-rows layout" style="margin-top: 5px; margin-bottom: 20px; float:left">
 
                         <div class="preview-row">
                             <div class="preview-col"
-                                ng-class="{last:$last}"
-                                ng-repeat="section in template.sections | filter:zeroWidthFilter"
-                                ng-style="{width: percentage(section.grid) + '%', height: '60px'}">
+                                 ng-class="{last:$last}"
+                                 ng-repeat="section in template.sections | filter:zeroWidthFilter"
+                                 ng-style="{width: percentage(section.grid) + '%', height: '60px', 'max-width': '100%'}">
                                 <div class="preview-cell"></div>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        {{template.name}} <br/>
+                        {{template.name}} <br />
                         <i class="icon-delete red"></i>
                         <a class="btn btn-small btn-link"
                            href
                            ng-click="deleteTemplate($index)"><localize key="general_delete" /></a>
                     </div>
 
-                    <br style="clear: both" />
                 </li>
             </ul>
 
@@ -55,7 +54,7 @@
                     ui-sortable
                     ng-model="model.value.layouts">
 
-                    <li ng-repeat="layout in model.value.layouts">
+                    <li ng-repeat="layout in model.value.layouts" class="clearfix">
 
                         <div ng-click="configureLayout(layout)"
                             class="preview-rows columns" style="margin-top: 5px; margin-bottom: 25px; float:left">
@@ -64,7 +63,7 @@
                                 <div class="preview-col"
                                     ng-class="{last:$last}"
                                     ng-repeat="area in layout.areas | filter:zeroWidthFilter"
-                                    ng-style="{width: percentage(area.grid) + '%'}">
+                                    ng-style="{width: percentage(area.grid) + '%', 'max-width': '100%'}">
 
                                     <div class="preview-cell"></div>
                                 </div>
@@ -79,12 +78,11 @@
                             </a>
                         </div>
 
-                        <br style="clear: both" />
                     </li>
                 </ul>
 
                 <button class="btn btn-small" prevent-default ng-click="configureLayout()">
-                        <i class="icon-add"></i> <localize key="grid_addRowConfiguration" />
+                    <i class="icon-add"></i> <localize key="grid_addRowConfiguration" />
                 </button>
 
             </div>
@@ -98,7 +96,7 @@
         <umb-control-group
             label="@grid_columns"
             description="@grid_columnsDetails">
-                <input type="text" class="" ng-model="model.value.columns" />
+                <input type="number" min="1" ng-model="model.value.columns" />
         </umb-control-group>
 
         <umb-control-group
@@ -107,7 +105,7 @@
 
             <ul class="unstyled list-icons umb-contentpicker"
                 ui-sortable
-                ng-model="model.config">
+                ng-model="model.value.config">
 
                 <li ng-repeat="configValue in model.value.config">
                     <i class="icon icon-navigation handle"></i>
@@ -133,8 +131,11 @@
 
 
 
-        <umb-control-group label="@grid_styles"  description="@grid_stylesDetails">
-            <ul class="unstyled list-icons  umb-contentpicker"
+        <umb-control-group
+            label="@grid_styles"
+            description="@grid_stylesDetails">
+
+            <ul class="unstyled list-icons umb-contentpicker"
                 ui-sortable
                 ng-model="model.value.styles">
 
