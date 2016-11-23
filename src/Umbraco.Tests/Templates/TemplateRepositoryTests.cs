@@ -15,6 +15,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -40,7 +41,7 @@ namespace Umbraco.Tests.Templates
             var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
             unitOfWorkMock.Setup(x => x.Database).Returns(db);
 
-            _templateRepository = new TemplateRepository(unitOfWorkMock.Object, _cacheMock.Object, logger, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object, Mock.Of<IMapperCollection>());
+            _templateRepository = new TemplateRepository(unitOfWorkMock.Object, _cacheMock.Object, logger, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object, Mock.Of<IQueryFactory>());
 
         }
 

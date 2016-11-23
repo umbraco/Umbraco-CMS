@@ -26,10 +26,10 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
-            memberTypeRepository = new MemberTypeRepository(unitOfWork, DisabledCache, Logger, Mappers);
-            memberGroupRepository = new MemberGroupRepository(unitOfWork, DisabledCache, Logger, Mappers);
-            var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, Mappers);
-            var repository = new MemberRepository(unitOfWork, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<IContentSection>(), Mappers);
+            memberTypeRepository = new MemberTypeRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
+            memberGroupRepository = new MemberGroupRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
+            var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
+            var repository = new MemberRepository(unitOfWork, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<IContentSection>(), QueryFactory);
             return repository;
         }
 
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var member = CreateTestMember(key: key);
 
                 // Act
-                var query = new Query<IMember>(SqlSyntax, Mappers).Where(x => x.Key == key);
+                var query = QueryFactory.Create<IMember>().Where(x => x.Key == key);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -248,7 +248,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Correct_Subquery()
         {
-            var query = new Query<IMember>(SqlSyntax, Mappers).Where(x =>
+            var query = QueryFactory.Create<IMember>().Where(x =>
                         ((Member) x).LongStringPropertyValue.Contains("1095") &&
                         ((Member) x).PropertyTypeAlias == "headshot");
 

@@ -186,7 +186,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IRedirectUrlRepository CreateRepository(IDatabaseUnitOfWork uow)
         {
-            return new RedirectUrlRepository(uow, CacheHelper, Logger, Mappers);
+            return new RedirectUrlRepository(uow, CacheHelper, Logger, QueryFactory);
         }
 
         private IContent _textpage, _subpage, _otherpage, _trashed;

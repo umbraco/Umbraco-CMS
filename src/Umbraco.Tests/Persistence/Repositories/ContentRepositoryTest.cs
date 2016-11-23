@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             TemplateRepository tr;
             var ctRepository = CreateRepository(unitOfWork, out contentTypeRepository, out tr);
-            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, Mappers);
+            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, QueryFactory);
             return ctRepository;
         }
 
@@ -52,20 +52,20 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository)
         {
-            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, Mappers);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository, Mappers);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), Mappers);
+            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), QueryFactory);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository, QueryFactory);
+            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), QueryFactory);
             return repository;
         }
 
         /// <summary>
         /// This test ensures that when property values using special database fields are saved, the actual data in the
         /// object being stored is also transformed in the same way as the data being stored in the database is.
-        /// Before you would see that ex: a decimal value being saved as 100 or "100", would be that exact value in the 
+        /// Before you would see that ex: a decimal value being saved as 100 or "100", would be that exact value in the
         /// object, but the value saved to the database was actually 100.000000.
-        /// When querying the database for the value again - the value would then differ from what is in the object. 
-        /// This caused inconsistencies between saving+publishing and simply saving and then publishing, due to the former 
+        /// When querying the database for the value again - the value would then differ from what is in the object.
+        /// This caused inconsistencies between saving+publishing and simply saving and then publishing, due to the former
         /// sending the non-transformed data directly on to publishing.
         /// </summary>
         [Test]
@@ -99,10 +99,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage", propertyTypeCollection);
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Complete();
-                
+
                 // Int and decimal values are passed in as strings as they would be from the backoffice UI
                 var textpage = MockedContent.CreateSimpleContentWithSpecialDatabaseTypes(contentType, "test@umbraco.org", -1, "100", "150", dateValue);
-                
+
                 // Act
                 repository.AddOrUpdate(textpage);
                 unitOfWork.Complete();
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(textpage.HasIdentity, Is.True);
-                
+
                 var persistedTextpage = repository.Get(textpage.Id);
                 Assert.That(persistedTextpage.Name, Is.EqualTo(textpage.Name));
                 Assert.AreEqual(100m, persistedTextpage.GetValue(decimalPropertyAlias));
@@ -176,7 +176,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(textpage.HasIdentity, Is.True);
-
             }
         }
 
@@ -608,10 +607,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
                 var query = repository.Query.Where(x => x.Level == 2);
-                
+
                 long totalRecords;
 
-                var filterQuery = new Query<IContent>(SqlSyntax, Mappers).Where(x => x.Name.Contains("Page 2"));
+                var filterQuery = QueryFactory.Create<IContent>().Where(x => x.Name.Contains("Page 2"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert
@@ -635,7 +634,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 long totalRecords;
 
-                var filterQuery = new Query<IContent>(SqlSyntax, Mappers).Where(x => x.Name.Contains("text"));
+                var filterQuery = QueryFactory.Create<IContent>().Where(x => x.Name.Contains("text"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert

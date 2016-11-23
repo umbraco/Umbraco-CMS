@@ -281,7 +281,7 @@ Umbraco.Application.Actions = function() {
         actionRePublish: function() {
             /// <summary></summary>
 
-            UmbClientMgr.openModalWindow('dialogs/republish.aspx?rnd=' + this._utils.generateRandom(), 'Republishing entire site', true, 450, 210);
+            UmbClientMgr.openModalWindow('dialogs/republish.aspx?rnd=' + this._utils.generateRandom(), uiKeys['actions_republish'], true, 450, 210);
         },
 
         actionAssignDomain: function() {

@@ -4,12 +4,12 @@ using System.Globalization;
 using System.Linq;
 using System.Xml;
 using NPoco;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
-
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -32,8 +32,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private PermissionRepository<IContent> _permissionRepository;
 
-        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection, IMapperCollection mappers)
-            : base(work, cacheHelper, logger, contentSection, mappers)
+        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection, IQueryFactory queryFactory)
+            : base(work, cacheHelper, logger, contentSection, queryFactory)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException(nameof(contentTypeRepository));
             if (templateRepository == null) throw new ArgumentNullException(nameof(templateRepository));
@@ -42,6 +42,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
             _cacheHelper = cacheHelper;
+
+            _publishedQuery =  queryFactory.Create<IContent>().Where(x => x.Published);
 
             EnsureUniqueNaming = true;
         }
@@ -106,6 +108,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return MapQueryDtos(Database.Fetch<DocumentDto>(sql));
         }
+
+        #endregion
+
+        #region Static Queries
+
+        private readonly IQuery<IContent> _publishedQuery;
 
         #endregion
 
@@ -587,18 +595,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 .OrderBy<NodeDto>(x => x.Level)
                                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto>(sql);
-
-            foreach (var dto in dtos)
-            {
-                // check cache first, if it exists and is published, use it
-                // it may exist and not be published as the cache has 'latest version used'
-                var fromCache = RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
-                yield return fromCache != null && fromCache.Published
-                    ? fromCache
-                    : CreateContentFromDto(dto, dto.VersionId);
-            }
+            return MapQueryDtos(Database.Fetch<DocumentDto>(sql), true);
         }
 
         public int CountPublished(string contentTypeAlias = null)
@@ -700,7 +697,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
-                MapQueryDtos,
+                x => MapQueryDtos(x),
                 orderBy, orderDirection, orderBySystemField, "cmsDocument",
                 filterSql);
         }
@@ -762,80 +759,76 @@ WHERE (@path LIKE {5})",
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IContent> MapQueryDtos(List<DocumentDto> dtos)
+        private IEnumerable<IContent> MapQueryDtos(List<DocumentDto> dtos, bool withCache = false)
         {
             //nothing found
-            if (dtos.Any() == false) return Enumerable.Empty<IContent>();
+            var content = new IContent[dtos.Count];
+            var defs = new List<DocumentDefinition>();
+            var templateIds = new List<int>();
 
-            //content types
-            //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
-            var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
-                .ToArray();
-
-
-            var ids = dtos
-                .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
-                .Select(x => x.TemplateId.Value).ToArray();
-
-            //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
-            var templates = ids.Length == 0 ? Enumerable.Empty<ITemplate>() : _templateRepository.GetAll(ids).ToArray();
-
-            var dtosWithContentTypes = dtos
-                //This select into and null check are required because we don't have a foreign damn key on the contentType column
-                // http://issues.umbraco.org/issue/U4-5503
-                .Select(x => new { dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentVersionDto.ContentDto.ContentTypeId) })
-                .Where(x => x.contentType != null)
-                .ToArray();
-
-            //Go get the property data for each document
-            var docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
-                d.dto.NodeId,
-                d.dto.VersionId,
-                d.dto.ContentVersionDto.VersionDate,
-                d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                d.contentType));
-
-            var propertyData = GetPropertyCollection(docDefs.ToArray());
-
-            return dtosWithContentTypes.Select(d => CreateContentFromDto(
-                d.dto,
-                contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
-                templates.FirstOrDefault(tem => tem.Id == (d.dto.TemplateId ?? -1)),
-                propertyData[d.dto.NodeId]));
-        }
-
-        /// <summary>
-        /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <param name="contentType"></param>
-        /// <param name="template"></param>
-        /// <param name="propCollection"></param>
-        /// <returns></returns>
-        private IContent CreateContentFromDto(DocumentDto dto,
-            IContentType contentType,
-            ITemplate template,
-            PropertyCollection propCollection)
-        {
-            var factory = new ContentFactory(contentType, NodeObjectTypeId, dto.NodeId);
-            var content = factory.BuildEntity(dto);
-
-            //Check if template id is set on DocumentDto, and get ITemplate if it is.
-            if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+            for (var i = 0; i < dtos.Count; i++)
             {
-                content.Template = template ?? _templateRepository.Get(dto.TemplateId.Value);
-            }
-            else
-            {
-                //ensure there isn't one set.
-                content.Template = null;
+                var dto = dtos[i];
+
+                // if the cache contains the published version, use it
+                if (withCache)
+                {
+                    var cached = RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
+                    if (cached != null && cached.Published)
+                    {
+                        content[i] = cached;
+                        continue;
+                    }
+                }
+
+                // else, need to fetch from the database
+                // content type repository is full-cache so OK to get each one independently
+                var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+                var factory = new ContentFactory(contentType, NodeObjectTypeId, dto.NodeId);
+                content[i] = factory.BuildEntity(dto);
+
+                // need template
+                if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                    templateIds.Add(dto.TemplateId.Value);
+
+                // need properties
+                defs.Add(new DocumentDefinition(
+                    dto.NodeId,
+                    dto.VersionId,
+                    dto.ContentVersionDto.VersionDate,
+                    dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                    contentType
+                ));
             }
 
-            content.Properties = propCollection;
+            // load all required templates in 1 query
+            var templates = _templateRepository.GetAll(templateIds.ToArray())
+                .ToDictionary(x => x.Id, x => x);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)content).ResetDirtyProperties(false);
+            // load all properties for all documents from database in 1 query
+            var propertyData = GetPropertyCollection(defs.ToArray());
+
+            // assign
+            var dtoIndex = 0;
+            foreach (var def in defs)
+            {
+                // move to corresponding item (which has to exist)
+                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
+
+                // complete the item
+                var cc = content[dtoIndex];
+                var dto = dtos[dtoIndex];
+                ITemplate template = null;
+                if (dto.TemplateId.HasValue)
+                    templates.TryGetValue(dto.TemplateId.Value, out template); // else null
+                cc.Template = template;
+                cc.Properties = propertyData[cc.Id];
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                ((Entity) cc).ResetDirtyProperties(false);
+            }
+
             return content;
         }
 

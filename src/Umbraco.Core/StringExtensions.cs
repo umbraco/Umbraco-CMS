@@ -181,7 +181,7 @@ namespace Umbraco.Core
         /// <param name="input"></param>
         /// <param name="ignoreFromClean"></param>
         /// <returns></returns>
-        internal static string CleanForXss(this string input, params char[] ignoreFromClean)
+        public static string CleanForXss(this string input, params char[] ignoreFromClean)
         {
             //remove any html
             input = input.StripHtml();

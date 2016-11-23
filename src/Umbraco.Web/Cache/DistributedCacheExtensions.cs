@@ -353,5 +353,19 @@ namespace Umbraco.Web.Cache
         }
 
         #endregion
+
+        #region Relation type cache
+
+        public static void RefreshRelationTypeCache(this DistributedCache dc, int id)
+        {
+            dc.Refresh(RelationTypeCacheRefresher.UniqueId, id);
+        }
+
+        public static void RemoveRelationTypeCache(this DistributedCache dc, int id)
+        {
+            dc.Remove(RelationTypeCacheRefresher.UniqueId, id);
+        }
+
+        #endregion
     }
 }

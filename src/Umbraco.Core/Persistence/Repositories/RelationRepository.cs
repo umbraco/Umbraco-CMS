@@ -11,9 +11,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -25,8 +23,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IRelationTypeRepository relationTypeRepository, IMapperCollection mappers)
-            : base(work, cache, logger, mappers)
+        public RelationRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IRelationTypeRepository relationTypeRepository, IQueryFactory queryFactory)
+            : base(work, cache, logger, queryFactory)
         {
             _relationTypeRepository = relationTypeRepository;
         }
@@ -47,34 +45,17 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new Exception(string.Format("RelationType with Id: {0} doesn't exist", dto.RelationType));
 
             var factory = new RelationFactory(relationType);
-            var entity = factory.BuildEntity(dto);
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
-
-            return entity;
+            return DtoToEntity(dto, factory);
         }
-
-        //TODO: Fix N+1 !
 
         protected override IEnumerable<IRelation> PerformGetAll(params int[] ids)
         {
-            if (ids.Any())
-            {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
-            }
-            else
-            {
-                var dtos = Database.Fetch<RelationDto>("WHERE id > 0");
-                foreach (var dto in dtos)
-                {
-                    yield return Get(dto.Id);
-                }
-            }
+            var sql = GetBaseQuery(false);
+            if (ids.Length > 0)
+                sql.WhereIn<RelationDto>(x => x.Id, ids);
+            sql.OrderBy<RelationDto>(x => x.RelationType);
+            var dtos = Database.Fetch<RelationDto>(sql);
+            return DtosToEntities(dtos);
         }
 
         protected override IEnumerable<IRelation> PerformGetByQuery(IQuery<IRelation> query)
@@ -82,13 +63,36 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IRelation>(sqlClause, query);
             var sql = translator.Translate();
-
+            sql.OrderBy<RelationDto>(x => x.RelationType);
             var dtos = Database.Fetch<RelationDto>(sql);
+            return DtosToEntities(dtos);
+        }
 
-            foreach (var dto in dtos)
+        private IEnumerable<IRelation> DtosToEntities(IEnumerable<RelationDto> dtos)
+        {
+            // in most cases, the relation type will be the same for all of them,
+            // plus we've ordered the relations by type, so try to allocate as few
+            // factories as possible - bearing in mind that relation types are cached
+            RelationFactory factory = null;
+            var relationTypeId = -1;
+
+            return dtos.Select(x =>
             {
-                yield return Get(dto.Id);
-            }
+                if (relationTypeId != x.RelationType)
+                    factory = new RelationFactory(_relationTypeRepository.Get(relationTypeId = x.RelationType));
+                return DtoToEntity(x, factory);
+            });
+        }
+
+        private static IRelation DtoToEntity(RelationDto dto, RelationFactory factory)
+        {
+            var entity = factory.BuildEntity(dto);
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
+
+            return entity;
         }
 
         #endregion

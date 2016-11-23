@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Moq;
@@ -30,9 +31,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MediaRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
         {
-            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper, Logger, Mappers);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, Mappers);
-            var repository = new MediaRepository(unitOfWork, CacheHelper, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mappers);
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
+            var repository = new MediaRepository(unitOfWork, CacheHelper, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), QueryFactory);
             return repository;
         }
 
@@ -231,7 +232,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Level == 2);
+                var query = QueryFactory.Create<IMedia>().Where(x => x.Level == 2);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -250,7 +251,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Level == 2);
+                var query = QueryFactory.Create<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true);
 
@@ -272,7 +273,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Level == 2);
+                var query = QueryFactory.Create<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "SortOrder", Direction.Ascending, true);
 
@@ -294,7 +295,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Level == 2);
+                var query = QueryFactory.Create<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "SortOrder", Direction.Ascending, true);
 
@@ -316,7 +317,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Level == 2);
+                var query = QueryFactory.Create<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Descending, true);
 
@@ -338,7 +339,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Level == 2);
+                var query = QueryFactory.Create<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true);
 
@@ -360,10 +361,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Level == 2);
+                var query = QueryFactory.Create<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
 
-                var filter = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Name.Contains("File"));
+                var filter = QueryFactory.Create<IMedia>().Where(x => x.Name.Contains("File"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true,
                     filter);
 
@@ -385,10 +386,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Level == 2);
+                var query = QueryFactory.Create<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
 
-                var filter = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Name.Contains("Test"));
+                var filter = QueryFactory.Create<IMedia>().Where(x => x.Name.Contains("Test"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true,
                     filter);
 
@@ -473,7 +474,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 int level = 2;
-                var query = new Query<IMedia>(SqlSyntax, Mappers).Where(x => x.Level == level);
+                var query = QueryFactory.Create<IMedia>().Where(x => x.Level == level);
                 var result = repository.Count(query);
 
                 // Assert

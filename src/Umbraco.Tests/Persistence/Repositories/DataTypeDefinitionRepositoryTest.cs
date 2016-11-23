@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers, Constants.ObjectTypes.DataTypeContainerGuid);
+            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, QueryFactory, Constants.ObjectTypes.DataTypeContainerGuid);
         }
 
         [TestCase("UmbracoPreVal87-21,3,48", 3, true)]
@@ -309,7 +309,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var query = new Query<IDataTypeDefinition>(SqlSyntax, Mappers).Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
+                var query = QueryFactory.Create<IDataTypeDefinition>().Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -329,7 +329,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var query = new Query<IDataTypeDefinition>(SqlSyntax, Mappers).Where(x => x.Name.StartsWith("D"));
+                var query = QueryFactory.Create<IDataTypeDefinition>().Where(x => x.Name.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert

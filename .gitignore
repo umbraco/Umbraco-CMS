@@ -144,5 +144,5 @@ build/docs.zip
 build/ui-docs.zip
 build/csharp-docs.zip
 build/msbuild.log
-
+.vs/
 src/packages/

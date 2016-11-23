@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
@@ -93,6 +94,7 @@ namespace Umbraco.Tests.TestHelpers
             CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
+            IQueryFactory queryFactory,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IServiceFactory container = null)
         {
@@ -148,7 +150,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var userService = GetLazyService<IUserService>(container, () => new UserService(provider, logger, eventMessagesFactory));
             var dataTypeService = GetLazyService<IDataTypeService>(container, () => new DataTypeService(provider, logger, eventMessagesFactory));
-            var contentService = GetLazyService<IContentService>(container, () => new ContentService(provider, logger, eventMessagesFactory, mediaFileSystem));
+            var contentService = GetLazyService<IContentService>(container, () => new ContentService(provider, logger, eventMessagesFactory, queryFactory, mediaFileSystem));
             var notificationService = GetLazyService<INotificationService>(container, () => new NotificationService(provider, userService.Value, contentService.Value, logger));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(container, () => new ServerRegistrationService(provider, logger, eventMessagesFactory));
             var memberGroupService = GetLazyService<IMemberGroupService>(container, () => new MemberGroupService(provider, logger, eventMessagesFactory));
@@ -163,6 +165,7 @@ namespace Umbraco.Tests.TestHelpers
             var entityService = GetLazyService<IEntityService>(container, () => new EntityService(
                     provider, logger, eventMessagesFactory,
                     contentService.Value, contentTypeService.Value, mediaService.Value, mediaTypeService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
+                    queryFactory,
                     //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
 
@@ -216,8 +219,8 @@ namespace Umbraco.Tests.TestHelpers
             if (databaseFactory == null)
             {
                 var accessor = new TestUmbracoDatabaseAccessor();
-                var mappers = Mock.Of<IMapperCollection>();
-                databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, mappers);
+                var queryFactory = Mock.Of<IQueryFactory>();
+                databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, queryFactory);
             }
             repositoryFactory = repositoryFactory  ??  new RepositoryFactory(Mock.Of<IServiceContainer>());
             return new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);

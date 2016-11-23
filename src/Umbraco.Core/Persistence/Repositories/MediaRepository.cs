@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -11,12 +10,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -29,8 +25,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
 
-        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, IMapperCollection mappers)
-            : base(work, cache, logger, contentSection, mappers)
+        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, IQueryFactory queryFactory)
+            : base(work, cache, logger, contentSection, queryFactory)
         {
             if (mediaTypeRepository == null) throw new ArgumentNullException(nameof(mediaTypeRepository));
             if (tagRepository == null) throw new ArgumentNullException(nameof(tagRepository));
@@ -76,7 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
             }
 
-            return ProcessQuery(sql);
+            return MapQueryDtos(Database.Fetch<ContentVersionDto>(sql));
         }
 
         protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
@@ -86,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            return ProcessQuery(sql);
+            return MapQueryDtos(Database.Fetch<ContentVersionDto>(sql));
         }
 
         #endregion
@@ -143,6 +139,15 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Overrides of VersionableRepositoryBase<IContent>
+
+        public override IEnumerable<IMedia> GetAllVersions(int id)
+        {
+            var sql = GetBaseQuery(false)
+                .Where(GetBaseWhereClause(), new { Id = id })
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            return MapQueryDtos(Database.Fetch<ContentVersionDto>(sql), true);
+        }
 
         public override IMedia GetByVersion(Guid versionId)
         {
@@ -421,46 +426,66 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
-                MapQueryDtos, orderBy, orderDirection, orderBySystemField, "cmsContentVersion",
+                x => MapQueryDtos(x), orderBy, orderDirection, orderBySystemField, "cmsContentVersion",
                 filterSql);
         }
 
-        private IEnumerable<IMedia> ProcessQuery(Sql sql)
+        private IEnumerable<IMedia> MapQueryDtos(List<ContentVersionDto> dtos, bool withCache = false)
         {
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<ContentVersionDto>(sql);
-            return MapQueryDtos(dtos);
-        }
+            var content = new IMedia[dtos.Count];
+            var defs = new List<DocumentDefinition>();
 
-        private IEnumerable<IMedia> MapQueryDtos(List<ContentVersionDto> dtos)
-        {
-            var ids = dtos.Select(x => x.ContentDto.ContentTypeId).ToArray();
+            for (var i = 0; i < dtos.Count; i++)
+            {
+                var dto = dtos[i];
 
-            //content types
-            var contentTypes = ids.Length == 0 ? Enumerable.Empty<IMediaType>() : _mediaTypeRepository.GetAll(ids).ToArray();
+                // if the cache contains the item, use it
+                if (withCache)
+                {
+                    var cached = RuntimeCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
+                    if (cached != null)
+                    {
+                        content[i] = cached;
+                        continue;
+                    }
+                }
 
-            var dtosWithContentTypes = dtos
-                //This select into and null check are required because we don't have a foreign damn key on the contentType column
-                // http://issues.umbraco.org/issue/U4-5503
-                .Select(x => new { dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentDto.ContentTypeId) })
-                .Where(x => x.contentType != null)
-                .ToArray();
+                // else, need to fetch from the database
+                // content type repository is full-cache so OK to get each one independently
+                var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+                var factory = new MediaFactory(contentType, NodeObjectTypeId, dto.NodeId);
+                content[i] = factory.BuildEntity(dto);
 
-            //Go get the property data for each document
-            var docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
-                d.dto.NodeId,
-                d.dto.VersionId,
-                d.dto.VersionDate,
-                d.dto.ContentDto.NodeDto.CreateDate,
-                d.contentType))
-                .ToArray();
+                // need properties
+                defs.Add(new DocumentDefinition(
+                    dto.NodeId,
+                    dto.VersionId,
+                    dto.VersionDate,
+                    dto.ContentDto.NodeDto.CreateDate,
+                    contentType
+                ));
+            }
 
-            var propertyData = GetPropertyCollection(docDefs);
+            // load all properties for all documents from database in 1 query
+            var propertyData = GetPropertyCollection(defs.ToArray());
 
-            return dtosWithContentTypes.Select(d => CreateMediaFromDto(
-                d.dto,
-                contentTypes.First(ct => ct.Id == d.dto.ContentDto.ContentTypeId),
-                propertyData[d.dto.NodeId]));
+            // assign
+            var dtoIndex = 0;
+            foreach (var def in defs)
+            {
+                // move to corresponding item (which has to exist)
+                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
+
+                // complete the item
+                var cc = content[dtoIndex];
+                cc.Properties = propertyData[cc.Id];
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                ((Entity)cc).ResetDirtyProperties(false);
+            }
+
+            return content;
         }
 
         /// <summary>

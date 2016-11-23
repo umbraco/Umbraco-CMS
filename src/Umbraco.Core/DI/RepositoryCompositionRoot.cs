@@ -4,6 +4,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Plugins;
@@ -25,6 +26,9 @@ namespace Umbraco.Core.DI
             // register IUnitOfWork providers
             container.RegisterSingleton<IUnitOfWorkProvider, FileUnitOfWorkProvider>();
             container.RegisterSingleton<IDatabaseUnitOfWorkProvider, NPocoUnitOfWorkProvider>();
+
+            // register query factory
+            container.RegisterSingleton<IQueryFactory, QueryFactory>();
 
             // register repository factory
             container.RegisterSingleton<RepositoryFactory>();

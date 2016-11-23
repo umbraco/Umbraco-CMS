@@ -12,7 +12,6 @@ namespace Umbraco.Core.Models.Rdbms
     {
         [Column("id")]
         [PrimaryKeyColumn]
-        [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyData")]
         public int Id { get; set; }
 
         [Column("contentNodeId")]

@@ -4,11 +4,13 @@ using Examine;
 using Examine.Session;
 using Lucene.Net.Store;
 using NUnit.Framework;
+using Umbraco.Tests.TestHelpers;
 using UmbracoExamine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class EventsTest : ExamineBaseTest
     {
         [Test]
@@ -21,7 +23,7 @@ namespace Umbraco.Tests.UmbracoExamine
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 var searcher = indexer.GetSearcher();
-                
+
                 var isIgnored = false;
 
                 EventHandler<IndexingNodeDataEventArgs> ignoringNode = (s, e) =>

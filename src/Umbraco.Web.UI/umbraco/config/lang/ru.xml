@@ -340,18 +340,11 @@
     <key alias="treepicker">Выберите элемент</key>
     <key alias="viewCacheItem">Просмотр элемента кэша</key>
     <key alias="createFolder">Создать папку...</key>
-
     <key alias="relateToOriginalLabel">Связать с оригиналом</key>
     <key alias="theFriendliestCommunity">Самое дружелюбное сообщество</key>
-
     <key alias="linkToPage">Ссылка на страницу</key>
-
     <key alias="openInNewWindow">Открывает документ по ссылке в новом окне или вкладке браузера</key>
-    <key alias="openInFullBody">Открывает документ по ссылке в полноэкранном режиме</key>
-    <key alias="openInParentFrame">Открывает документ по ссылке в родительском фрейме</key>
-
     <key alias="linkToMedia">Ссылка на медиа-файл</key>
-
     <key alias="selectMedia">Выбрать медиа</key>
     <key alias="selectIcon">Выбрать значок</key>
     <key alias="selectItem">Выбрать элемент</key>
@@ -360,19 +353,14 @@
     <key alias="selectContent">Выбрать содержимое</key>
     <key alias="selectMember">Выбрать участника</key>
     <key alias="selectMemberGroup">Выбрать группу участников</key>
-
     <key alias="noMacroParams">Это макрос без параметров</key>
-
     <key alias="externalLoginProviders">Провайдеры аутентификации</key>
     <key alias="exceptionDetail">Подробное сообщение об ошибке</key>
     <key alias="stacktrace">Трассировка стека</key>
     <key alias="innerException">Внутренняя ошибка</key>
-
     <key alias="linkYour">Связать</key>
     <key alias="unLinkYour">Разорвать связь</key>
-
     <key alias="account">учетную запись</key>
-
     <key alias="selectEditor">Выбрать редактор</key>
   </area>
   <area alias="dictionaryItem">
@@ -380,6 +368,12 @@
 		Ниже Вы можете указать различные переводы данной статьи словаря '<em>%0%</em>'<br/>Добавить другие языки можно, воспользовавшись пунктом 'Языки' в меню слева
 		]]></key>
     <key alias="displayName">Название языка (культуры)</key>
+    <key alias="changeKey">Редактировать элемент (ключ) словаря</key>
+    <key alias="changeKeyError">
+      <![CDATA[
+      Ключ '%0%' уже существует в словаре.
+   ]]>
+    </key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Допустим как корневой</key>
@@ -655,7 +649,7 @@
     <key alias="xmlDataIntegrityCheckMedia">Медиа - всего в XML: %0%, всего: %1%Б с ошибками: %2%</key>
     <key alias="xmlDataIntegrityCheckContent">Содержимое - всего в XML: %0%, всего опубликовано: %1%, с ошибками: %2%</key>
 
-    <key alias="httpsCheckValidCertificate">Сертификат Вашего сайта отмечен как проверенный.</key>
+    <key alias="httpsCheckValidCertificate">Сертификат Вашего веб-сайта отмечен как проверенный.</key>
     <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
     <key alias="httpsCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Сейчас Вы %0% просматриваете сайт, используя протокол HTTPS.</key>

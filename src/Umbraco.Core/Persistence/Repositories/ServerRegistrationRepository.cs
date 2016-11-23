@@ -5,10 +5,8 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -18,8 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<IServerRegistration, int> _cachePolicy;
 
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMapperCollection mappers)
-            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappers)
+        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IQueryFactory queryFactory)
+            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, queryFactory)
         { }
 
         protected override IRepositoryCachePolicy<IServerRegistration, int> CachePolicy => _cachePolicy

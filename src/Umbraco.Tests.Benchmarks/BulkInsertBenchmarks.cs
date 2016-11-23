@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations.Initial;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 using ILogger = Umbraco.Core.Logging.ILogger;
@@ -47,25 +48,27 @@ namespace Umbraco.Tests.Benchmarks
         {
             IDatabaseFactory f = null;
             var l = new Lazy<IDatabaseFactory>(() => f);
+            var p = new SqlServerSyntaxProvider(l);
             f = new DefaultDatabaseFactory(
                 "server=.\\SQLExpress;database=YOURDB;user id=YOURUSER;password=YOURPASS",
                 Constants.DatabaseProviders.SqlServer,
-                new [] { new SqlServerSyntaxProvider(l) },
+                new [] { p },
                 logger,
                 new ThreadStaticUmbracoDatabaseAccessor(), 
-                new MapperCollection(Enumerable.Empty<BaseMapper>()));
+                new QueryFactory(p, new MapperCollection(Enumerable.Empty<BaseMapper>())));
             return f.GetDatabase();
         }
 
         private UmbracoDatabase GetSqlCeDatabase(string cstr, ILogger logger)
         {
+            var p = new SqlCeSyntaxProvider();
             var f = new DefaultDatabaseFactory(
                 cstr,
                 Constants.DatabaseProviders.SqlCe,
-                new[] { new SqlCeSyntaxProvider() },
+                new[] { p },
                 logger,
                 new ThreadStaticUmbracoDatabaseAccessor(),
-                new MapperCollection(Enumerable.Empty<BaseMapper>()));
+                new QueryFactory(p, new MapperCollection(Enumerable.Empty<BaseMapper>())));
             return f.GetDatabase();
         }
 

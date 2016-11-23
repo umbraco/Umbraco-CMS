@@ -11,7 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -30,8 +30,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection, IMapperCollection mappers)
-            : base(work, cache, logger, contentSection, mappers)
+        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection, IQueryFactory queryFactory)
+            : base(work, cache, logger, contentSection, queryFactory)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException(nameof(memberTypeRepository));
             if (tagRepository == null) throw new ArgumentNullException(nameof(tagRepository));
@@ -564,7 +564,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // better to create the query text only once!
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-                MapQueryDtos, orderBy, orderDirection, orderBySystemField, "cmsMember",
+                x => MapQueryDtos(x), orderBy, orderDirection, orderBySystemField, "cmsMember",
                 filterSql);
         }
 
@@ -598,56 +598,62 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IMember> MapQueryDtos(List<MemberDto> dtos)
+        private IEnumerable<IMember> MapQueryDtos(List<MemberDto> dtos, bool withCache = false)
         {
-            var ids = dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray();
+            var content = new IMember[dtos.Count];
+            var defs = new List<DocumentDefinition>();
 
-            //content types
-            var contentTypes = ids.Length == 0 ? Enumerable.Empty<IMemberType>() : _memberTypeRepository.GetAll(ids).ToArray();
+            for (var i = 0; i < dtos.Count; i++)
+            {
+                var dto = dtos[i];
 
-            var dtosWithContentTypes = dtos
-                //This select into and null check are required because we don't have a foreign damn key on the contentType column
-                // http://issues.umbraco.org/issue/U4-5503
-                .Select(x => new { dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentVersionDto.ContentDto.ContentTypeId) })
-                .Where(x => x.contentType != null)
-                .ToArray();
+                // if the cache contains the item, use it
+                if (withCache)
+                {
+                    var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
+                    if (cached != null)
+                    {
+                        content[i] = cached;
+                        continue;
+                    }
+                }
 
-            //Go get the property data for each document
-            IEnumerable<DocumentDefinition> docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
-                d.dto.NodeId,
-                d.dto.ContentVersionDto.VersionId,
-                d.dto.ContentVersionDto.VersionDate,
-                d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                d.contentType));
+                // else, need to fetch from the database
+                // content type repository is full-cache so OK to get each one independently
+                var contentType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+                var factory = new MemberFactory(contentType, NodeObjectTypeId, dto.NodeId);
+                content[i] = factory.BuildEntity(dto);
 
-            var propertyData = GetPropertyCollection(docDefs.ToArray());
+                // need properties
+                defs.Add(new DocumentDefinition(
+                    dto.NodeId,
+                    dto.ContentVersionDto.VersionId,
+                    dto.ContentVersionDto.VersionDate,
+                    dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                    contentType
+                ));
+            }
 
-            return dtosWithContentTypes.Select(d => CreateMemberFromDto(
-                        d.dto,
-                        contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
-                        propertyData[d.dto.NodeId]));
-        }
+            // load all properties for all documents from database in 1 query
+            var propertyData = GetPropertyCollection(defs.ToArray());
 
-        /// <summary>
-        /// Private method to create a member object from a MemberDto
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <param name="contentType"></param>
-        /// <param name="propCollection"></param>
-        /// <returns></returns>
-        private IMember CreateMemberFromDto(MemberDto dto,
-            IMemberType contentType,
-            PropertyCollection propCollection)
-        {
-            var factory = new MemberFactory(contentType, NodeObjectTypeId, dto.ContentVersionDto.NodeId);
-            var member = factory.BuildEntity(dto);
+            // assign
+            var dtoIndex = 0;
+            foreach (var def in defs)
+            {
+                // move to corresponding item (which has to exist)
+                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
 
-            member.Properties = propCollection;
+                // complete the item
+                var cc = content[dtoIndex];
+                cc.Properties = propertyData[cc.Id];
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)member).ResetDirtyProperties(false);
-            return member;
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                ((Entity)cc).ResetDirtyProperties(false);
+            }
+
+            return content;
         }
 
         /// <summary>

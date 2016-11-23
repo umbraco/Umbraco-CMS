@@ -235,6 +235,7 @@
     <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Testing\NUnitTests.cs" />
+    <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Persistence\Migrations\PostMigrationTests.cs" />
     <Compile Include="Persistence\NPocoExpressionsTests.cs" />

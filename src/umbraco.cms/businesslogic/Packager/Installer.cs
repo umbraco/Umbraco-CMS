@@ -380,7 +380,7 @@ namespace umbraco.cms.businesslogic.packager
                     if (languageItemsElement != null)
                     {
                         var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
-                        insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString()));
+                        insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString(CultureInfo.InvariantCulture)));
                     }
 
                     #endregion
@@ -390,24 +390,17 @@ namespace umbraco.cms.businesslogic.packager
                     if (dictionaryItemsElement != null)
                     {
                         var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
-                        insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString()));
+                        insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString(CultureInfo.InvariantCulture)));
                     }
                     #endregion
 
                     #region Macros
-                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("//macro"))
+                    var macroItemsElement = rootElement.Descendants("Macros").FirstOrDefault();
+                    if (macroItemsElement != null)
                     {
-                        //TODO: Fix this, this should not use the legacy API
-                        Macro m = Macro.Import(n);
-
-                        if (m != null)
-                        {
-                            insPack.Data.Macros.Add(m.Id.ToString(CultureInfo.InvariantCulture));
-                            //saveNeeded = true;
-                        }
+                        var insertedMacros = packagingService.ImportMacros(macroItemsElement);
+                        insPack.Data.Macros.AddRange(insertedMacros.Select(m => m.Id.ToString(CultureInfo.InvariantCulture)));
                     }
-
-                    //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
                     #endregion
 
                     #region Templates
@@ -445,7 +438,7 @@ namespace umbraco.cms.businesslogic.packager
                     {
                         StyleSheet s = StyleSheet.Import(n, currentUser);
 
-                        insPack.Data.Stylesheets.Add(s.Id.ToString());
+                        insPack.Data.Stylesheets.Add(s.Id.ToString(CultureInfo.InvariantCulture));
                         //saveNeeded = true;
                     }
 

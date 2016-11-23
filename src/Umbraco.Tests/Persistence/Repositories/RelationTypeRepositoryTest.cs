@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private RelationTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
+            return new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), QueryFactory);
         }
 
 
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var query = new Query<IRelationType>(SqlSyntax, Mappers).Where(x => x.Alias.StartsWith("relate"));
+                var query = QueryFactory.Create<IRelationType>().Where(x => x.Alias.StartsWith("relate"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var childObjType = new Guid(Constants.ObjectTypes.DocumentType);
-                var query = new Query<IRelationType>(SqlSyntax, Mappers).Where(x => x.ChildObjectType == childObjType);
+                var query = QueryFactory.Create<IRelationType>().Where(x => x.ChildObjectType == childObjType);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -236,7 +236,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
+                var repository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), QueryFactory);
 
                 repository.AddOrUpdate(relateContent);//Id 2
                 repository.AddOrUpdate(relateContentType);//Id 3

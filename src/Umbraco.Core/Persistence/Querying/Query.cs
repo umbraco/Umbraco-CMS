@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -34,7 +32,8 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (predicate != null)
             {
-                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax, _mappers);
+                //TODO: This should have an SqlSyntax object passed in, this ctor is relying on a singleton
+                var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlSyntax, _mappers);
                 string whereExpression = expressionHelper.Visit(predicate);
 
                 _wheres.Add(new Tuple<string, object[]>(whereExpression, expressionHelper.GetSqlParameters()));
@@ -46,7 +45,7 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (fieldSelector != null)
             {
-                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax, _mappers);
+                var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlSyntax, _mappers);
                 string whereExpression = expressionHelper.Visit(fieldSelector);
 
                 _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { @values = values } }));
@@ -62,6 +61,5 @@ namespace Umbraco.Core.Persistence.Querying
         {
             return _wheres;
         }
-
     }
 }

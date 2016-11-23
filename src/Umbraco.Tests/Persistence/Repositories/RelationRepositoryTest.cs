@@ -30,8 +30,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private RelationRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out RelationTypeRepository relationTypeRepository)
         {
-            relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
-            var repository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), relationTypeRepository, Mappers);
+            relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), QueryFactory);
+            var repository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), relationTypeRepository, QueryFactory);
             return repository;
         }
 
@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out repositoryType);
 
                 // Act
-                var query = new Query<IRelation>(SqlSyntax, Mappers).Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
+                var query = QueryFactory.Create<IRelation>().Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
                 int count = repository.Count(query);
 
                 // Assert
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out repositoryType);
 
                 // Act
-                var query = new Query<IRelation>(SqlSyntax, Mappers).Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
+                var query = QueryFactory.Create<IRelation>().Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
                 var relations = repository.GetByQuery(query);
 
                 // Assert
@@ -266,8 +266,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
-                var relationRepository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), relationTypeRepository, Mappers);
+                var relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), QueryFactory);
+                var relationRepository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), relationTypeRepository, QueryFactory);
 
                 relationTypeRepository.AddOrUpdate(relateContent);
                 relationTypeRepository.AddOrUpdate(relateContentType);

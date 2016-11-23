@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, Mappers);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
 
                 var created = DateTime.Now;
                 var task = new Task(new TaskType("asdfasdf"))
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, Mappers);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
 
                 var created = DateTime.Now;
                 repo.AddOrUpdate(new Task(new TaskType("asdfasdf"))
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, Mappers);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
 
                 var task = new Task(new TaskType("asdfasdf"))
                 {
@@ -117,7 +117,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, Mappers);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
 
                 var task = new Task(new TaskType("asdfasdf"))
                 {
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, Mappers);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
 
                 var found = repo.GetAll().ToArray();
                 Assert.AreEqual(20, found.Count());
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, Mappers);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
 
                 var found = repo.GetTasks(includeClosed: true).ToArray();
                 Assert.AreEqual(15, found.Count());
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, Mappers);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
 
                 var found = repo.GetTasks(itemId:-20).ToArray();
                 Assert.AreEqual(10, found.Count());
@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, Mappers);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
 
                 var found = repo.GetTasks(includeClosed: false);
                 Assert.AreEqual(10, found.Count());
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, Mappers);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
 
                 for (int i = 0; i < count; i++)
                 {

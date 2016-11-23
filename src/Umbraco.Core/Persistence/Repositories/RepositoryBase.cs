@@ -71,6 +71,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         public abstract IQueryFactory QueryFactory { get; }
 
+        #region Static Queries
+
+        private IQuery<TEntity> _hasIdQuery;
+
+        #endregion
+
         protected virtual TId GetEntityId(TEntity entity)
         {
             return (TId)(object)entity.Id;
@@ -91,9 +97,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var options = new RepositoryCachePolicyOptions(() =>
                 {
+                        //create it once if it is needed (no need for locking here)
+                        if (_hasIdQuery == null)
+                        {
+                            _hasIdQuery = Query.Where(x => x.Id != 0);
+                        }
+
                     //Get count of all entities of current type (TEntity) to ensure cached result is correct
-                    var query = Query.Where(x => x.Id != 0);
-                    return PerformCount(query);
+                        return PerformCount(_hasIdQuery);
                 });
 
                 _cachePolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, options);

@@ -31,6 +31,7 @@ using File = System.IO.File;
 using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Stubs;
 
@@ -100,8 +101,8 @@ namespace Umbraco.Tests.TestHelpers
                 var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
                 var logger = f.GetInstance<ILogger>();
                 var umbracoDatabaseAccessor = f.GetInstance<IUmbracoDatabaseAccessor>();
-                var mappers = f.GetInstance<IMapperCollection>();
-                var factory = new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, logger, umbracoDatabaseAccessor, mappers);
+                var queryFactory = f.GetInstance<IQueryFactory>();
+                var factory = new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, logger, umbracoDatabaseAccessor, queryFactory);
                 factory.ResetForTests();
                 return factory;
             });

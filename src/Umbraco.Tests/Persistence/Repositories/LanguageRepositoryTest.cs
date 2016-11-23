@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private LanguageRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);            
+            return new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), QueryFactory);            
         }
 
      
@@ -175,7 +175,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var query = new Query<ILanguage>(SqlSyntax, Mappers).Where(x => x.IsoCode == "da-DK");
+                var query = QueryFactory.Create<ILanguage>().Where(x => x.IsoCode == "da-DK");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var query = new Query<ILanguage>(SqlSyntax, Mappers).Where(x => x.IsoCode.StartsWith("D"));
+                var query = QueryFactory.Create<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert

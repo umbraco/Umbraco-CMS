@@ -20,17 +20,18 @@ namespace Umbraco.Core.Services
     {
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
-        
 
         public EntityService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
-           IContentService contentService, IContentTypeService contentTypeService, 
+           IContentService contentService, IContentTypeService contentTypeService,
            IMediaService mediaService, IMediaTypeService mediaTypeService,
            IDataTypeService dataTypeService,
            IMemberService memberService, IMemberTypeService memberTypeService,
+           IQueryFactory queryFactory,
            IRuntimeCacheProvider runtimeCache)
             : base(provider, logger, eventMessagesFactory)
         {
             _runtimeCache = runtimeCache;
+            _rootEntityQuery = queryFactory.Create<IUmbracoEntity>().Where(x => x.ParentId == -1);
 
             _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
             {
@@ -60,11 +61,17 @@ namespace Umbraco.Core.Services
                 //            ParentId = found.ParentId
                 //        };
                 //    }
-                    
+
                 //})}
             };
 
         }
+
+        #region Static Queries
+
+        private readonly IQuery<IUmbracoEntity> _rootEntityQuery;
+
+        #endregion
 
         /// <summary>
         /// Returns the integer id for a given GUID
@@ -108,7 +115,7 @@ namespace Umbraco.Core.Services
                     }
                     uow.Complete();
                     return id;
-                }                
+                }
             });
             return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<int>.Fail();
         }
@@ -435,8 +442,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                var query = repository.Query.Where(x => x.ParentId == -1);
-                var entities = repository.GetByQuery(query, objectTypeId);
+                var entities = repository.GetByQuery(_rootEntityQuery, objectTypeId);
                 uow.Complete();
                 return entities;
             }

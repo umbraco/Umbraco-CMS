@@ -287,41 +287,29 @@
     <key alias="thumbnailimageclickfororiginal">Cliquez sur l'image pour la voir en taille réelle</key>
     <key alias="treepicker">Sélectionner un élément</key>
     <key alias="viewCacheItem">Voir l'élément de cache</key>
-	<key alias="createFolder">Créer un répertoire...</key>
-
-	<key alias="relateToOriginalLabel">Lier à l'original</key>
-	<key alias="theFriendliestCommunity">La communauté la plus amicale</key>
-
-	<key alias="linkToPage">Lier à la page</key>
-
-	<key alias="openInNewWindow">Ouvre le document lié dans une nouvelle fenêtre ou un nouvel onglet</key>
-	<key alias="openInFullBody">Ouvre le document lié dans l'entièreté de la fenêtre</key>
-	<key alias="openInParentFrame">Ouvre le document lié dans le conteneur parent</key>
-
-	<key alias="linkToMedia">Lier à un media</key>
-
-	<key alias="selectMedia">Sélectionner le media</key>
-	<key alias="selectIcon">Sélectionner l'icône</key>
-	<key alias="selectItem">Sélectionner l'élément</key>
-	<key alias="selectLink">Sélectionner le lien</key>
-	<key alias="selectMacro">Sélectionner la macro</key>
-	<key alias="selectContent">Sélectionner le contenu</key>
-	<key alias="selectMember">Sélectionner le membre</key>
-	<key alias="selectMemberGroup">Sélectionner le groupe de membres</key>
-
-	<key alias="noMacroParams">Il n'y a pas de paramètres pour cette macro</key>
-
-	<key alias="externalLoginProviders">Fournisseurs externes d'identification</key>
-	<key alias="exceptionDetail">Détails de l'exception</key>
-	<key alias="stacktrace">Trace d'exécution</key>
-	<key alias="innerException">Exception interne</key>
-
-	<key alias="linkYour">Liez votre</key>
-	<key alias="unLinkYour">Enlevez votre</key>
-
-	<key alias="account">compte</key>
-
-	<key alias="selectEditor">Sélectionner un éditeur</key>
+    <key alias="createFolder">Créer un répertoire...</key>
+    <key alias="relateToOriginalLabel">Lier à l'original</key>
+    <key alias="theFriendliestCommunity">La communauté la plus amicale</key>
+    <key alias="linkToPage">Lier à la page</key>
+    <key alias="openInNewWindow">Ouvre le document lié dans une nouvelle fenêtre ou un nouvel onglet</key>
+    <key alias="linkToMedia">Lier à un media</key>
+    <key alias="selectMedia">Sélectionner le media</key>
+    <key alias="selectIcon">Sélectionner l'icône</key>
+    <key alias="selectItem">Sélectionner l'élément</key>
+    <key alias="selectLink">Sélectionner le lien</key>
+    <key alias="selectMacro">Sélectionner la macro</key>
+    <key alias="selectContent">Sélectionner le contenu</key>
+    <key alias="selectMember">Sélectionner le membre</key>
+    <key alias="selectMemberGroup">Sélectionner le groupe de membres</key>
+    <key alias="noMacroParams">Il n'y a pas de paramètres pour cette macro</key>
+    <key alias="externalLoginProviders">Fournisseurs externes d'identification</key>
+    <key alias="exceptionDetail">Détails de l'exception</key>
+    <key alias="stacktrace">Trace d'exécution</key>
+    <key alias="innerException">Exception interne</key>
+    <key alias="linkYour">Liez votre</key>
+    <key alias="unLinkYour">Enlevez votre</key>
+    <key alias="account">compte</key>
+    <key alias="selectEditor">Sélectionner un éditeur</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[

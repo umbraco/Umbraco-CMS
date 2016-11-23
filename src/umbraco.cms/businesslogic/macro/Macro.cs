@@ -1,11 +1,8 @@
 using System;
-using System.Data;
-using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Runtime.CompilerServices;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -177,22 +174,25 @@ namespace umbraco.cms.businesslogic.macro
 	        }
 	    }
 
-		/// <summary>
-		/// Macro initializer
-		/// </summary>
-		public Macro()
+        /// <summary>
+        /// Macro initializer
+        /// </summary>
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
+        public Macro()
 		{
 		}
 
-		/// <summary>
-		/// Macro initializer
-		/// </summary>
-		/// <param name="Id">The id of the macro</param>
-		public Macro(int Id)
+        /// <summary>
+        /// Macro initializer
+        /// </summary>
+        /// <param name="Id">The id of the macro</param>
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
+        public Macro(int Id)
 		{
             Setup(Id);
 		}
 
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
         internal Macro(IMacro macro)
         {
             MacroEntity = macro;
@@ -202,15 +202,17 @@ namespace umbraco.cms.businesslogic.macro
         /// Initializes a new instance of the <see cref="Macro"/> class.
         /// </summary>
         /// <param name="alias">The alias.</param>
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
         public Macro(string alias)
         {
             Setup(alias);
         }
 
-	    /// <summary>
-	    /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-	    /// </summary>
-	    public virtual void Save()
+        /// <summary>
+        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// </summary>
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
+        public virtual void Save()
 	    {
             Current.Services.MacroService.Save(MacroEntity);
         }
@@ -223,8 +225,7 @@ namespace umbraco.cms.businesslogic.macro
             Current.Services.MacroService.Delete(MacroEntity);
         }
 
-        //TODO: Fix this, this should wrap a new API!
-
+        [Obsolete("This is no longer used, use the IMacroService and related models instead")]
         public static Macro Import(XmlNode n)
         {
             var alias = XmlHelper.GetNodeValue(n.SelectSingleNode("alias"));

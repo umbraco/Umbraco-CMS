@@ -4,6 +4,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -12,8 +13,8 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IUmbracoEntity
         where TRepository :  class, IRepository
     {
-        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentSection contentSection, IMapperCollection mappers)
-            : base(work, cache, logger, contentSection, mappers)
+        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentSection contentSection, IQueryFactory queryFactory)
+            : base(work, cache, logger, contentSection, queryFactory)
         {
         }
 

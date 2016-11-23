@@ -28,11 +28,19 @@ namespace Umbraco.Core.Services
             IDatabaseUnitOfWorkProvider provider,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
+            IQueryFactory queryFactory,
             MediaFileSystem mediaFileSystem)
             : base(provider, logger, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
+            _notTrashedQuery = queryFactory.Create<IContent>().Where(x => x.Trashed == false);
         }
+
+        #endregion
+
+        #region Static Queries
+
+        private readonly IQuery<IContent> _notTrashedQuery;
 
         #endregion
 
@@ -826,8 +834,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.Query.Where(x => x.Trashed == false);
-                var content = repository.GetByPublishedVersion(query);
+                var content = repository.GetByPublishedVersion(_notTrashedQuery);
                 uow.Complete();
                 return content;
             }

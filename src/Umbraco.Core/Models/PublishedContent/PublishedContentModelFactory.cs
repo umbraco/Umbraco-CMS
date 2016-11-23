@@ -81,5 +81,10 @@ namespace Umbraco.Core.Models.PublishedContent
                 ? constructor(content)
                 : content;
         }
+
+        public T CreateModel<T>(IPublishedFragment content)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

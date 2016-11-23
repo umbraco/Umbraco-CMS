@@ -42,38 +42,18 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDisplay
             config.CreateMap<IContent, ContentItemDisplay>()
-                .ForMember(
-                    dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
-                .ForMember(
-                    dto => dto.Updater,
-                    expression => expression.ResolveUsing(new CreatorResolver(_userService)))
-                .ForMember(
-                    dto => dto.Icon,
-                    expression => expression.MapFrom(content => content.ContentType.Icon))
-                .ForMember(
-                    dto => dto.ContentTypeAlias,
-                    expression => expression.MapFrom(content => content.ContentType.Alias))
-                .ForMember(
-                    dto => dto.ContentTypeName,
-                    expression => expression.MapFrom(content => content.ContentType.Name))
-                .ForMember(
-                    dto => dto.IsContainer,
-                    expression => expression.MapFrom(content => content.ContentType.IsContainer))
-                .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())                
-                .ForMember(
-                    dto => dto.Trashed,
-                    expression => expression.MapFrom(content => content.Trashed))
-                .ForMember(
-                    dto => dto.PublishDate,
-                    expression => expression.MapFrom(content => GetPublishedDate(_contentService, content)))
-                .ForMember(
-                    dto => dto.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
-                .ForMember(
-                    dto => dto.HasPublishedVersion,
-                    expression => expression.MapFrom(content => content.HasPublishedVersion))
-                .ForMember(
-                    dto => dto.Urls,
+                .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
+                .ForMember(display => display.Updater, expression => expression.ResolveUsing(new CreatorResolver(_userService)))
+                .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(display => display.ContentTypeName, expression => expression.MapFrom(content => content.ContentType.Name))
+                .ForMember(display => display.IsContainer, expression => expression.MapFrom(content => content.ContentType.IsContainer))
+                .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
+                .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
+                .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(_contentService, content)))
+                .ForMember(display => display.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
+                .ForMember(display => display.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(display => display.Urls,
                     expression => expression.MapFrom(content =>
                         UmbracoContext.Current == null
                             ? new[] {"Cannot generate urls without a current Umbraco Context"}
@@ -87,46 +67,26 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(_textService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => _userService))))
-                .AfterMap((media, display) => AfterMap(media, display, _dataTypeService, _textService,
-                    _contentTypeService, _contentService));
+                .AfterMap((content, display) => AfterMap(content, display, _dataTypeService, _textService, _contentTypeService, _contentService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
-                .ForMember(
-                    dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
-                .ForMember(
-                    dto => dto.Updater,
-                    expression => expression.ResolveUsing(new CreatorResolver(_userService)))
-                .ForMember(
-                    dto => dto.Icon,
-                    expression => expression.MapFrom(content => content.ContentType.Icon))
-                .ForMember(
-                    dto => dto.Trashed,
-                    expression => expression.MapFrom(content => content.Trashed))
-                .ForMember(
-                    dto => dto.HasPublishedVersion,
-                    expression => expression.MapFrom(content => content.HasPublishedVersion))
-                .ForMember(
-                    dto => dto.ContentTypeAlias,
-                    expression => expression.MapFrom(content => content.ContentType.Alias))
-                .ForMember(display => display.Alias, expression => expression.Ignore());
+                .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
+                .ForMember(dto => dto.Updater, expression => expression.ResolveUsing(new CreatorResolver(_userService)))
+                .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(dto => dto.Trashed, expression => expression.MapFrom(content => content.Trashed))
+                .ForMember(dto => dto.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(dto => dto.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(dto => dto.Alias, expression => expression.Ignore());
 
             //FROM IContent TO ContentItemDto<IContent>
             config.CreateMap<IContent, ContentItemDto<IContent>>()
-                .ForMember(
-                    dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
-                .ForMember(
-                    dto => dto.HasPublishedVersion,
-                    expression => expression.MapFrom(content => content.HasPublishedVersion))
-                .ForMember(display => display.Updater, expression => expression.Ignore())
-                .ForMember(display => display.Icon, expression => expression.Ignore())
-                .ForMember(display => display.Alias, expression => expression.Ignore());
-
-
+                .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
+                .ForMember(dto => dto.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(dto => dto.Updater, expression => expression.Ignore())
+                .ForMember(dto => dto.Icon, expression => expression.Ignore())
+                .ForMember(dto => dto.Alias, expression => expression.Ignore());
         }
-
 
         /// <summary>
         /// Maps the generic tab with custom properties for content
@@ -137,7 +97,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="localizedText"></param>
         /// <param name="contentTypeService"></param>
         /// <param name="contentService"></param>
-        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, 
+        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService,
             ILocalizedTextService localizedText, IContentTypeService contentTypeService, IContentService contentService)
         {
             //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
@@ -165,7 +125,6 @@ namespace Umbraco.Web.Models.Mapping
                     display.IsChildOfListView = ancesctorListView != null;
                 }
             }
-            
 
             //map the tree node url
             if (HttpContext.Current != null)
@@ -174,9 +133,9 @@ namespace Umbraco.Web.Models.Mapping
                 var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
                 display.TreeNodeUrl = url;
             }
-            
+
             //fill in the template config to be passed to the template drop down.
-            var templateItemConfig = new Dictionary<string, string> { { "", "Choose..." } };
+            var templateItemConfig = new Dictionary<string, string> {{"", "Choose..."}};
             foreach (var t in content.ContentType.AllowedTemplates
                 .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false))
             {
@@ -187,7 +146,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
             }
-            
+
             var properties = new List<ContentPropertyDisplay>
             {
                 new ContentPropertyDisplay
@@ -197,7 +156,7 @@ namespace Umbraco.Web.Models.Mapping
                     Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
                     View = Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View
                 },
-                 new ContentPropertyDisplay
+                new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/releaseDate"),
@@ -209,7 +168,7 @@ namespace Umbraco.Web.Models.Mapping
                         {"offsetTime", "1"}
                     }
                     //TODO: Fix up hard coded datepicker
-                } ,
+                },
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
@@ -260,21 +219,21 @@ namespace Umbraco.Web.Models.Mapping
                         var docTypeLink = string.Format("#/settings/documenttypes/edit/{0}", currentDocumentTypeId);
 
                         //Replace the doc type property
-                        var docTypeProp = genericProperties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                        docTypeProp.Value = new List<object>
+                        var docTypeProperty = genericProperties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        docTypeProperty.Value = new List<object>
                         {
                             new
                             {
                                 linkText = currentDocumentTypeName,
                                 url = docTypeLink,
-                                target = "_self", icon = "icon-item-arrangement"
+                                target = "_self",
+                                icon = "icon-item-arrangement"
                             }
                         };
                         //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                        docTypeProp.View = "urllist";
+                        docTypeProperty.View = "urllist";
                     }
                 });
-
         }
 
         /// <summary>
@@ -319,13 +278,13 @@ namespace Umbraco.Web.Models.Mapping
                 var svc = _userService.Value;
 
                 var permissions = svc.GetPermissions(
-                    //TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
-                    // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
-                    // refrence exception :(
-                    UmbracoContext.Current.Security.CurrentUser,
-                    // Here we need to do a special check since this could be new content, in which case we need to get the permissions
-                    // from the parent, not the existing one otherwise permissions would be coming from the root since Id is 0.
-                    source.HasIdentity ? source.Id : source.ParentId)
+                        //TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
+                        // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
+                        // refrence exception :(
+                        UmbracoContext.Current.Security.CurrentUser,
+                        // Here we need to do a special check since this could be new content, in which case we need to get the permissions
+                        // from the parent, not the existing one otherwise permissions would be coming from the root since Id is 0.
+                        source.HasIdentity ? source.Id : source.ParentId)
                     .FirstOrDefault();
 
                 return permissions == null
@@ -333,6 +292,5 @@ namespace Umbraco.Web.Models.Mapping
                     : permissions.AssignedPermissions.Where(x => x.Length == 1).Select(x => x.ToUpperInvariant()[0]);
             }
         }
-
     }
 }

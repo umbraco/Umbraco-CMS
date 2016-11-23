@@ -21,8 +21,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<IMemberType, int> _cachePolicy;
 
-        public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers)
-            : base(work, cache, logger, mappers)
+        public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
+            : base(work, cache, logger, queryFactory)
         { }
 
         protected override IRepositoryCachePolicy<IMemberType, int> CachePolicy

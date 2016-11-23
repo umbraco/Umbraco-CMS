@@ -28,28 +28,31 @@ namespace UmbracoExamine
     /// </summary>
     public class UmbracoContentIndexer : BaseUmbracoIndexer
     {
-        protected IContentService ContentService { get; private set; }
-        protected IMediaService MediaService { get; private set; }
-        protected IUserService UserService { get; private set; }
+        protected IContentService ContentService { get; }
+        protected IMediaService MediaService { get; }
+        protected IUserService UserService { get; }
+
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private readonly IQueryFactory _queryFactory;
         private int? _parentId;
 
         #region Constructors
 
-        /// <summary>
-        /// Default constructor
-        /// </summary>
+        // default - bad, should inject instead
+        // usage: none
         public UmbracoContentIndexer()
-            : base()
         {
             ContentService = Current.Services.ContentService;
             MediaService = Current.Services.MediaService;
             UserService = Current.Services.UserService;
+
             _urlSegmentProviders = Current.UrlSegmentProviders;
             _queryFactory = Current.DatabaseContext.QueryFactory;
+
+            InitializeQueries();
         }
 
+        // usage: IndexInitializer (tests)
         public UmbracoContentIndexer(
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
@@ -66,12 +69,12 @@ namespace UmbracoExamine
             IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
             : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, facetConfiguration, indexValueTypes)
         {
-            if (contentService == null) throw new ArgumentNullException("contentService");
-            if (mediaService == null) throw new ArgumentNullException("mediaService");
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
-            if (validator == null) throw new ArgumentNullException("validator");
-            if (options == null) throw new ArgumentNullException("options");
+            if (contentService == null) throw new ArgumentNullException(nameof(contentService));
+            if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
+            if (userService == null) throw new ArgumentNullException(nameof(userService));
+            if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
+            if (validator == null) throw new ArgumentNullException(nameof(validator));
+            if (options == null) throw new ArgumentNullException(nameof(options));
             if (queryFactory == null) throw new ArgumentNullException(nameof(queryFactory));
 
             SupportProtectedContent = options.SupportProtectedContent;
@@ -87,8 +90,15 @@ namespace UmbracoExamine
             UserService = userService;
             _urlSegmentProviders = urlSegmentProviders;
             _queryFactory = queryFactory;
+
+            InitializeQueries();
         }
 
+        private void InitializeQueries()
+        {
+            if (_publishedQuery == null)
+                _publishedQuery = _queryFactory.Create<IContent>().Where(x => x.Published);
+        }
 
         #endregion
 
@@ -131,7 +141,7 @@ namespace UmbracoExamine
                 SupportProtectedContent = supportProtected;
             else
                 SupportProtectedContent = false;
-
+            
             base.Initialize(name, config);
         }
 
@@ -168,10 +178,7 @@ namespace UmbracoExamine
 
         #endregion
 
-
         #region Public methods
-
-
 
         /// <summary>
         /// Deletes a node from the index.
@@ -209,6 +216,11 @@ namespace UmbracoExamine
 
         #region Protected
 
+        /// <summary>
+        /// This is a static query, it's parameters don't change so store statically
+        /// </summary>
+        private static IQuery<IContent> _publishedQuery;
+
         protected override void PerformIndexAll(string type)
         {
             const int pageSize = 10000;
@@ -217,7 +229,6 @@ namespace UmbracoExamine
             switch (type)
             {
                 case IndexTypes.Content:
-
                     var contentParentId = -1;
                     if (ParentId.HasValue && ParentId.Value > 0)
                     {
@@ -237,9 +248,7 @@ namespace UmbracoExamine
                         else
                         {
                             //add the published filter
-                            var qry = _queryFactory.Create<IContent>().Where(x => x.Published == true);
-
-                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, qry);
+                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, _publishedQuery);
                         }
 
                         //if specific types are declared we need to post filter them
@@ -256,19 +265,21 @@ namespace UmbracoExamine
                         IndexItems(GetValueSets(content));
 
                         pageIndex++;
-
-
                     } while (content.Length == pageSize);
-
 
                     break;
                 case IndexTypes.Media:
-
                     var mediaParentId = -1;
+
                     if (ParentId.HasValue && ParentId.Value > 0)
                     {
                         mediaParentId = ParentId.Value;
                     }
+
+                    // merge note: 7.5 changes this to use mediaService.GetPagedXmlEntries but we cannot merge the
+                    // change here as mediaService does not provide access to Xml in v8 - and actually Examine should
+                    // not assume that Umbraco provides Xml at all.
+
                     IMedia[] media;
 
                     do
@@ -321,10 +332,10 @@ namespace UmbracoExamine
                     {"writerName", new object[] {c.GetWriterProfile(UserService).Name}},
                     {"writerID", new object[] {c.WriterId}},
                     {"version", new object[] {c.Version}},
-                    {"template", new object[] {c.Template == null ? 0 : c.Template.Id}}
+                    {"template", new object[] {c.Template?.Id ?? 0}}
                 };
 
-                foreach (var property in c.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                foreach (var property in c.Properties.Where(p => p?.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
                 {
                     values.Add(property.Alias, new[] {property.Value});
                 }
@@ -358,7 +369,7 @@ namespace UmbracoExamine
                     {"creatorName", new object[] {m.GetCreatorProfile(UserService).Name}}
                 };
 
-                foreach (var property in m.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                foreach (var property in m.Properties.Where(p => p?.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
                 {
                     values.Add(property.Alias, new[] { property.Value });
                 }

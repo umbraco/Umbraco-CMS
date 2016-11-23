@@ -31,10 +31,9 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class ContentTypeRepositoryBase<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-        protected ContentTypeRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers)
-            : base(work, cache, logger, mappers)
-        {
-        }
+        protected ContentTypeRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
+            : base(work, cache, logger, queryFactory)
+        { }
 
         public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
         {

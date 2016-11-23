@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using System.IO;
 using Umbraco.Core.Models;

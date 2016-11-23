@@ -28,6 +28,9 @@
     <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
     <key alias="restore" version="7.3.0">Restore</key>
+    <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+    <key alias="chooseWhereToMove">Choose where to move</key>
+    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -287,18 +290,12 @@
     <key alias="treepicker">Pick item</key>
     <key alias="viewCacheItem">View Cache Item</key>
     <key alias="createFolder">Create folder...</key>
-
     <key alias="relateToOriginalLabel">Relate to original</key>
+    <key alias="includeDescendants">Include descendants</key>
     <key alias="theFriendliestCommunity">The friendliest community</key>
-
     <key alias="linkToPage">Link to page</key>
-
     <key alias="openInNewWindow">Opens the linked document in a new window or tab</key>
-    <key alias="openInFullBody">Opens the linked document in the full body of the window</key>
-    <key alias="openInParentFrame">Opens the linked document in the parent frame</key>
-
     <key alias="linkToMedia">Link to media</key>
-
     <key alias="selectMedia">Select media</key>
     <key alias="selectIcon">Select icon</key>
     <key alias="selectItem">Select item</key>
@@ -308,19 +305,14 @@
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
     <key alias="noIconsFound">No icons were found</key>
-
     <key alias="noMacroParams">There are no parameters for this macro</key>
-
     <key alias="externalLoginProviders">External login providers</key>
     <key alias="exceptionDetail">Exception Details</key>
     <key alias="stacktrace">Stacktrace</key>
     <key alias="innerException">Inner Exception</key>
-
     <key alias="linkYour">Link your</key>
     <key alias="unLinkYour">Un-Link your</key>
-
     <key alias="account">account</key>
-
     <key alias="selectEditor">Select editor</key>
   </area>
   <area alias="dictionaryItem">
@@ -826,6 +818,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="installStateInstalling">Installing...</key>
     <key alias="installStateRestarting">Restarting, please wait...</key>
     <key alias="installStateComplete">All done, your browser will now refresh, please wait...</key>
+    <key alias="installStateCompleted">Please click finish to complete installation and reload page.</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>
@@ -1345,7 +1338,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
 
 	  <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
-	  <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely when there's any errors in macros. Rectifying this will set the value to '%1%'.</key>
+	  <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.</key>
 	  <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
 
 	  <!-- The following keys get these tokens passed in:

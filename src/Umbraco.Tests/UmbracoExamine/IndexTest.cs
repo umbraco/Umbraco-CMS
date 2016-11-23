@@ -1,31 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Examine;
-using Examine.LuceneEngine;
-using Examine.LuceneEngine.Config;
+﻿using System.Linq;
 using Examine.LuceneEngine.Providers;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
 using Examine.Session;
-using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers;
 using UmbracoExamine;
-using Version = Lucene.Net.Util.Version;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
 
-	/// <summary>
-	/// Tests the standard indexing capabilities
-	/// </summary>
-	[TestFixture, RequiresSTA]
+    /// <summary>
+    /// Tests the standard indexing capabilities
+    /// </summary>
+    [TestFixture, RequiresSTA]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class IndexTest : ExamineBaseTest
 	{
 
@@ -42,7 +32,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 //create the whole thing
                 indexer.RebuildIndex();
 	            session.WaitForChanges();
-                
+
 	            var result = searcher.Find(searcher.CreateCriteria().All().Compile());
 
                 Assert.AreEqual(29, result.TotalItemCount);
@@ -130,7 +120,6 @@ namespace Umbraco.Tests.UmbracoExamine
                 results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
                 Assert.AreEqual(1, results.Count());
             }
-
 		}
 
 		[Test]
@@ -139,7 +128,7 @@ namespace Umbraco.Tests.UmbracoExamine
             using (var luceneDir = new RAMDirectory())
             using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 //make parent id 2222
-                options: new UmbracoContentIndexerOptions(false, false, 2222)))           
+                options: new UmbracoContentIndexerOptions(false, false, 2222)))
             using (var session = new ThreadScopedIndexSession(indexer1.SearcherContext))
             {
                 var searcher = indexer1.GetSearcher();
@@ -158,7 +147,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 indexer1.ReIndexNode(node, IndexTypes.Media);
 
                 session.WaitForChanges();
-                
+
                 //it will exist because it exists under 2222
                 var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
                 Assert.AreEqual(1, results.Count());
@@ -195,7 +184,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 //create the whole thing
                 indexer.RebuildIndex();
                 session.WaitForChanges();
-                
+
                 var result = searcher.Find(searcher.CreateCriteria().Field(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content).Compile());
                 Assert.AreEqual(21, result.TotalItemCount);
 

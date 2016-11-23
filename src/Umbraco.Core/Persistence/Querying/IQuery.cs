@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 
 namespace Umbraco.Core.Persistence.Querying
 {
-
     /// <summary>
     /// Represents a query for building Linq translatable SQL queries
     /// </summary>

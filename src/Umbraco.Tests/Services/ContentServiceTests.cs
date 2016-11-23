@@ -1464,7 +1464,7 @@ namespace Umbraco.Tests.Services
                 TestObjects.GetDefaultSqlSyntaxProviders(Logger),
                 Logger,
                 new TestUmbracoDatabaseAccessor(),
-                Mappers);
+                QueryFactory);
             var repositoryFactory = MockRepositoryFactory();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
@@ -1740,10 +1740,10 @@ namespace Umbraco.Tests.Services
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers);
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, Mappers);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, Mappers);
-            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), Mappers);
+            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), QueryFactory);
+            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, QueryFactory);
+            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), QueryFactory);
             return repository;
         }
 
@@ -1755,19 +1755,19 @@ namespace Umbraco.Tests.Services
             mock
                 .Setup(x => x.CreateRepository<ITemplateRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
                 .Returns((IDatabaseUnitOfWork uow, string name) =>
-                    new TemplateRepository(uow, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers));
+                    new TemplateRepository(uow, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), QueryFactory));
             mock
                 .Setup(x => x.CreateRepository<ITagRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
                 .Returns((IDatabaseUnitOfWork uow, string name) =>
-                    new TagRepository(uow, DisabledCache, Logger, Mappers));
+                    new TagRepository(uow, DisabledCache, Logger, QueryFactory));
             mock
                 .Setup(x => x.CreateRepository<IContentTypeRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
                 .Returns((IDatabaseUnitOfWork uow, string name) =>
-                    new ContentTypeRepository(uow, DisabledCache, Logger, factory.CreateRepository<ITemplateRepository>(uow), Mappers));
+                    new ContentTypeRepository(uow, DisabledCache, Logger, factory.CreateRepository<ITemplateRepository>(uow), QueryFactory));
             mock
                 .Setup(x => x.CreateRepository<IContentRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
                 .Returns((IDatabaseUnitOfWork uow, string name) =>
-                    new ContentRepository(uow, DisabledCache, Logger, factory.CreateRepository<IContentTypeRepository>(uow), factory.CreateRepository<ITemplateRepository>(uow), factory.CreateRepository<ITagRepository>(uow), Mock.Of<IContentSection>(), Mappers));
+                    new ContentRepository(uow, DisabledCache, Logger, factory.CreateRepository<IContentTypeRepository>(uow), factory.CreateRepository<ITemplateRepository>(uow), factory.CreateRepository<ITagRepository>(uow), Mock.Of<IContentSection>(), QueryFactory));
 
             return factory = mock.Object;
         }

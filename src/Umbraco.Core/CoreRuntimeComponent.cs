@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using AutoMapper;
 using LightInject;
@@ -71,11 +72,16 @@ namespace Umbraco.Core
 
             // register a server registrar, by default it's the db registrar unless the dev
             // has the legacy dist calls enabled - fixme - should obsolete the legacy thing
-            composition.Container.RegisterSingleton(factory => UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled
-                ? (IServerRegistrar)new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings())
-                : (IServerRegistrar)new DatabaseServerRegistrar(
-                    new Lazy<IServerRegistrationService>(factory.GetInstance<IServerRegistrationService>),
-                    new DatabaseServerRegistrarOptions()));
+            composition.Container.RegisterSingleton<IServerRegistrar>(f =>
+            {
+                if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
+                    return new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings());
+                if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))
+                    return new SingleServerRegistrar(f.GetInstance<IRuntimeState>());
+                return new DatabaseServerRegistrar(
+                    new Lazy<IServerRegistrationService>(f.GetInstance<IServerRegistrationService>),
+                    new DatabaseServerRegistrarOptions());
+            });
 
             // by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden by either the legacy thing or the db thing in the corresponding

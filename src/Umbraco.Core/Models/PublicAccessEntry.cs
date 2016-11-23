@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models
             NoAccessNodeId = noAccessNode.Id;
             _protectedNodeId = protectedNode.Id;
 
-            _ruleCollection = new ObservableCollection<PublicAccessRule>(ruleCollection);            
+            _ruleCollection = new ObservableCollection<PublicAccessRule>(ruleCollection);
             _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
         }
 
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Models
         internal IEnumerable<Guid> RemovedRules
         {
             get { return _removedRules; }
-        } 
+        }
 
         public IEnumerable<PublicAccessRule> Rules
         {
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Models
             get { return _noAccessNodeId; }
             set { SetPropertyValueAndDetectChanges(value, ref _noAccessNodeId, Ps.Value.NoAccessNodeIdSelector); }
         }
-       
+
         [DataMember]
         public int ProtectedNodeId
         {

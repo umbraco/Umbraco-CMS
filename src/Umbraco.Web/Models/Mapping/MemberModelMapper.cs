@@ -40,10 +40,10 @@ namespace Umbraco.Web.Models.Mapping
             //FROM MembershipUser TO MediaItemDisplay - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, MemberDisplay>()
                 .ConvertUsing(user =>
-                    {
-                        var member = Mapper.Map<MembershipUser, IMember>(user);
-                        return Mapper.Map<IMember, MemberDisplay>(member);
-                    });
+                {
+                    var member = Mapper.Map<MembershipUser, IMember>(user);
+                    return Mapper.Map<IMember, MemberDisplay>(member);
+                });
 
             //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, IMember>()
@@ -73,23 +73,13 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMember TO MediaItemDisplay
             config.CreateMap<IMember, MemberDisplay>()
-                .ForMember(
-                    dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(_userService)))
-                .ForMember(
-                    dto => dto.Icon,
-                    expression => expression.MapFrom(content => content.ContentType.Icon))
-                .ForMember(
-                    dto => dto.ContentTypeAlias,
-                    expression => expression.MapFrom(content => content.ContentType.Alias))
-                .ForMember(
-                    dto => dto.ContentTypeName,
-                    expression => expression.MapFrom(content => content.ContentType.Name))
+                .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>(_userService)))
+                .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(display => display.ContentTypeName, expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
-                .ForMember(display => display.Tabs,
-                    expression => expression.ResolveUsing(new MemberTabsAndPropertiesResolver(_textService)))
-                .ForMember(display => display.MemberProviderFieldMapping,
-                    expression => expression.ResolveUsing(new MemberProviderFieldMappingResolver()))
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new MemberTabsAndPropertiesResolver(_textService)))
+                .ForMember(display => display.MemberProviderFieldMapping, expression => expression.ResolveUsing(new MemberProviderFieldMappingResolver()))
                 .ForMember(display => display.MembershipScenario,
                     expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => _memberTypeService))))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
@@ -101,31 +91,21 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
-                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore())
+                .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
                 .AfterMap((member, display) => MapGenericCustomProperties(_memberService, member, display, _textService));
 
             //FROM IMember TO MemberBasic
             config.CreateMap<IMember, MemberBasic>()
-                .ForMember(
-                    dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(_userService)))
-                .ForMember(
-                    dto => dto.Icon,
-                    expression => expression.MapFrom(content => content.ContentType.Icon))
-                .ForMember(
-                    dto => dto.ContentTypeAlias,
-                    expression => expression.MapFrom(content => content.ContentType.Alias))
-                .ForMember(
-                    dto => dto.Email,
-                    expression => expression.MapFrom(content => content.Email))
-                .ForMember(
-                    dto => dto.Username,
-                    expression => expression.MapFrom(content => content.Username))
-                .ForMember(display => display.Trashed, expression => expression.Ignore())
-                .ForMember(x => x.Published, expression => expression.Ignore())
-                .ForMember(x => x.Updater, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore());
+                .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>(_userService)))
+                .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(dto => dto.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(dto => dto.Email, expression => expression.MapFrom(content => content.Email))
+                .ForMember(dto => dto.Username, expression => expression.MapFrom(content => content.Username))
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
+                .ForMember(dto => dto.Published, expression => expression.Ignore())
+                .ForMember(dto => dto.Updater, expression => expression.Ignore())
+                .ForMember(dto => dto.Alias, expression => expression.Ignore())
+                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
@@ -134,41 +114,31 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
                 .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
-                .ForMember(
-                    dto => dto.Owner,
-                    expression => expression.UseValue(new UserBasic {Name = "Admin", UserId = 0}))
-                .ForMember(
-                    dto => dto.Icon,
-                    expression => expression.UseValue("icon-user"))
+                .ForMember(member => member.Owner, expression => expression.UseValue(new UserBasic {Name = "Admin", UserId = 0}))
+                .ForMember(member => member.Icon, expression => expression.UseValue("icon-user"))
                 .ForMember(member => member.Name, expression => expression.MapFrom(user => user.UserName))
-                .ForMember(
-                    dto => dto.Email,
-                    expression => expression.MapFrom(content => content.Email))
-                .ForMember(
-                    dto => dto.Username,
-                    expression => expression.MapFrom(content => content.UserName))
+                .ForMember(member => member.Email, expression => expression.MapFrom(content => content.Email))
+                .ForMember(member => member.Username, expression => expression.MapFrom(content => content.UserName))
                 .ForMember(member => member.Properties, expression => expression.Ignore())
                 .ForMember(member => member.ParentId, expression => expression.Ignore())
                 .ForMember(member => member.Path, expression => expression.Ignore())
                 .ForMember(member => member.SortOrder, expression => expression.Ignore())
                 .ForMember(member => member.AdditionalData, expression => expression.Ignore())
-                .ForMember(x => x.Published, expression => expression.Ignore())
-                .ForMember(x => x.Updater, expression => expression.Ignore())
-                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(x => x.ContentTypeAlias, expression => expression.Ignore())
+                .ForMember(member => member.Published, expression => expression.Ignore())
+                .ForMember(member => member.Updater, expression => expression.Ignore())
+                .ForMember(member => member.Trashed, expression => expression.Ignore())
+                .ForMember(member => member.Alias, expression => expression.Ignore())
+                .ForMember(member => member.ContentTypeAlias, expression => expression.Ignore())
                 .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
             config.CreateMap<IMember, ContentItemDto<IMember>>()
-                .ForMember(
-                    dto => dto.Owner,
-                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(_userService)))
-                .ForMember(x => x.Published, expression => expression.Ignore())
-                .ForMember(x => x.Updater, expression => expression.Ignore())
-                .ForMember(x => x.Icon, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore())
+                .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>(_userService)))
+                .ForMember(dto => dto.Published, expression => expression.Ignore())
+                .ForMember(dto => dto.Updater, expression => expression.Ignore())
+                .ForMember(dto => dto.Icon, expression => expression.Ignore())
+                .ForMember(dto => dto.Alias, expression => expression.Ignore())
+                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
                 .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(new MemberDtoPropertiesValueResolver()));
 
@@ -253,8 +223,28 @@ namespace Umbraco.Web.Models.Mapping
                 }
             };
 
+            TabsAndPropertiesResolver.MapGenericProperties(member, display, localizedText, genericProperties, properties =>
+            {
+                if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
+                    && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+                {
+                    var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", member.ContentTypeId);
 
-            TabsAndPropertiesResolver.MapGenericProperties(member, display, localizedText, genericProperties);
+                    //Replace the doctype property
+                    var docTypeProperty = properties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    docTypeProperty.Value = new List<object>
+                    {
+                        new
+                        {
+                            linkText = member.ContentType.Name,
+                            url = memberTypeLink,
+                            target = "_self",
+                            icon = "icon-item-arrangement"
+                        }
+                    };
+                    docTypeProperty.View = "urllist";
+                }
+            });
 
             //check if there's an approval field
             var provider = membersProvider as IUmbracoMemberTypeMembershipProvider;
@@ -267,7 +257,6 @@ namespace Umbraco.Web.Models.Mapping
                     prop.Value = 1;
                 }
             }
-
         }
 
         /// <summary>
@@ -276,6 +265,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="memberService"></param>
         /// <param name="member"></param>
         /// <param name="display"></param>
+        /// <param name="localizedText"></param>
         /// <returns></returns>
         /// <remarks>
         /// If the membership provider installed is the umbraco membership provider, then we will allow changing the username, however if
@@ -285,11 +275,11 @@ namespace Umbraco.Web.Models.Mapping
         internal static ContentPropertyDisplay GetLoginProperty(IMemberService memberService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
         {
             var prop = new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("login"),
-                    Value = display.Username
-                };
+            {
+                Alias = string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                Label = localizedText.Localize("login"),
+                Value = display.Username
+            };
 
             var scenario = memberService.GetMembershipScenario();
 
@@ -342,8 +332,8 @@ namespace Umbraco.Web.Models.Mapping
                 var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
 
                 return source.Properties
-                             .Where(x => exclude.Contains(x.Alias) == false)
-                             .Select(Mapper.Map<Property, ContentPropertyDto>);
+                    .Where(x => exclude.Contains(x.Alias) == false)
+                    .Select(Mapper.Map<Property, ContentPropertyDto>);
             }
         }
 
@@ -396,7 +386,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider) provider;
 
                     //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
                     // if we just had all of the membeship provider fields on the member table :(
@@ -410,8 +400,6 @@ namespace Umbraco.Web.Models.Mapping
 
                     return result;
                 }
-
-
             }
         }
 
@@ -434,8 +422,8 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 var memberType = _memberTypeService.Value.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 return memberType != null
-                           ? MembershipScenario.CustomProviderWithUmbracoLink
-                           : MembershipScenario.StandaloneCustomProvider;
+                    ? MembershipScenario.CustomProviderWithUmbracoLink
+                    : MembershipScenario.StandaloneCustomProvider;
             }
         }
 
@@ -459,7 +447,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider) provider;
 
                     return new Dictionary<string, string>
                     {
@@ -468,10 +456,7 @@ namespace Umbraco.Web.Models.Mapping
                         {Constants.Conventions.Member.Comments, umbracoProvider.CommentPropertyTypeAlias}
                     };
                 }
-
-
             }
         }
-
     }
 }

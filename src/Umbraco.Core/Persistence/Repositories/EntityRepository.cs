@@ -6,9 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -21,12 +19,12 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </remarks>
     internal class EntityRepository : DisposableObject, IEntityRepository
     {
-        private readonly QueryFactory _queryFactory;
+        private readonly IQueryFactory _queryFactory;
 
-        public EntityRepository(IDatabaseUnitOfWork work, IMapperCollection mappers)
+        public EntityRepository(IDatabaseUnitOfWork work, IQueryFactory queryFactory)
         {
             UnitOfWork = work;
-            _queryFactory = new QueryFactory(work.Database.SqlSyntax, mappers);
+            _queryFactory = queryFactory;
         }
 
         /// <summary>

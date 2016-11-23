@@ -23,8 +23,8 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
         {
-            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
-            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository, Mappers);
+            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), QueryFactory);
+            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository, QueryFactory);
             return repository;
         }
 
@@ -166,8 +166,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Flush();
                 var id = user.Id;
 
-                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers);
-                var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, Mappers);
+                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, QueryFactory);
+                var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, QueryFactory);
 
                 repository2.Delete(user);
                 unitOfWork.Flush();
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUser>(SqlSyntax, Mappers).Where(x => x.Username == "TestUser1");
+                var query = QueryFactory.Create<IUser>().Where(x => x.Username == "TestUser1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -329,7 +329,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUser>(SqlSyntax, Mappers).Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                var query = QueryFactory.Create<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
                 var result = repository.Count(query);
 
                 // Assert
@@ -484,8 +484,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers);
-                var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, Mappers);
+                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, QueryFactory);
+                var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, QueryFactory);
 
                 // Act
                 var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
@@ -535,7 +535,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers);
+                var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, QueryFactory);
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
                 unitOfWork.Complete();
