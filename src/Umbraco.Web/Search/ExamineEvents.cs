@@ -122,10 +122,13 @@ namespace Umbraco.Web.Search
                     foreach (var alias in contentTypesChanged)
                     {
                         var ctType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(alias);
-                        var contentItems = ApplicationContext.Current.Services.ContentService.GetContentOfContentType(ctType.Id);
-                        foreach (var contentItem in contentItems)
+                        if (ctType != null)
                         {
-                            ReIndexForContent(contentItem, contentItem.HasPublishedVersion && contentItem.Trashed == false);
+                            var contentItems = ApplicationContext.Current.Services.ContentService.GetContentOfContentType(ctType.Id);
+                            foreach (var contentItem in contentItems)
+                            {
+                                ReIndexForContent(contentItem, contentItem.HasPublishedVersion && contentItem.Trashed == false);
+                            }
                         }                        
                     }                    
                 }
@@ -134,10 +137,13 @@ namespace Umbraco.Web.Search
                     foreach (var alias in mediaTypesChanged)
                     {
                         var ctType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(alias);
-                        var mediaItems = ApplicationContext.Current.Services.MediaService.GetMediaOfMediaType(ctType.Id);
-                        foreach (var mediaItem in mediaItems)
+                        if (ctType != null)
                         {
-                            ReIndexForMedia(mediaItem, mediaItem.Trashed == false);
+                            var mediaItems = ApplicationContext.Current.Services.MediaService.GetMediaOfMediaType(ctType.Id);
+                            foreach (var mediaItem in mediaItems)
+                            {
+                                ReIndexForMedia(mediaItem, mediaItem.Trashed == false);
+                            }
                         }
                     }
                 }
@@ -146,10 +152,13 @@ namespace Umbraco.Web.Search
                     foreach (var alias in memberTypesChanged)
                     {
                         var ctType = ApplicationContext.Current.Services.MemberTypeService.Get(alias);
-                        var memberItems = ApplicationContext.Current.Services.MemberService.GetMembersByMemberType(ctType.Id);
-                        foreach (var memberItem in memberItems)
+                        if (ctType != null)
                         {
-                            ReIndexForMember(memberItem);
+                            var memberItems = ApplicationContext.Current.Services.MemberService.GetMembersByMemberType(ctType.Id);
+                            foreach (var memberItem in memberItems)
+                            {
+                                ReIndexForMember(memberItem);
+                            }
                         }
                     }
                 }

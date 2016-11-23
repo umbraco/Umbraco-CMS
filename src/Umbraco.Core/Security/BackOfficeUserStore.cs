@@ -644,6 +644,13 @@ namespace Umbraco.Core.Security
             {
                 anythingChanged = true;
                 user.IsLockedOut = identityUser.IsLockedOut;
+
+                if (user.IsLockedOut)
+                {
+                    //need to set the last lockout date
+                    user.LastLockoutDate = DateTime.Now;
+                }
+
             }
             if (user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
             {
