@@ -13,7 +13,6 @@ namespace UmbracoExamine.DataServices
 {
     public class UmbracoContentService : IContentService
     {
-
         private readonly ApplicationContext _applicationContext;
 
 		public UmbracoContentService()
@@ -58,7 +57,7 @@ namespace UmbracoExamine.DataServices
         [Obsolete("This should no longer be used, latest content will be indexed by using the IContentService directly")]
 		public XDocument GetLatestContentByXPath(string xpath)
         {
-            using (_applicationContext.DatabaseContext.UsingSafeDatabase)
+            using (_applicationContext.DatabaseContext.UseSafeDatabase()) // reuse current db if any else use & dispose one
             {
                 var xmlContent = XDocument.Parse("<content></content>");
                 var rootContent = _applicationContext.Services.ContentService.GetRootContent();
@@ -80,7 +79,7 @@ namespace UmbracoExamine.DataServices
         /// <returns></returns>
         public bool IsProtected(int nodeId, string path)
         {
-            using (_applicationContext.DatabaseContext.UsingSafeDatabase)
+            using (_applicationContext.DatabaseContext.UseSafeDatabase()) // reuse current db if any else use & dispose one
             {
                 return _applicationContext.Services.PublicAccessService.IsProtected(path.EnsureEndsWith("," + nodeId));
             }
@@ -93,8 +92,8 @@ namespace UmbracoExamine.DataServices
 		
 		public IEnumerable<string> GetAllUserPropertyNames()
 	    {
-	        using (_applicationContext.DatabaseContext.UsingSafeDatabase)
-	        {
+	        using (_applicationContext.DatabaseContext.UseSafeDatabase()) // reuse current db if any else use & dispose one
+            {
 	            try
 	            {
 	                var result = _applicationContext.DatabaseContext.Database.Fetch<string>("select distinct alias from cmsPropertyType order by alias");

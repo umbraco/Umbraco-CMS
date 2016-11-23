@@ -94,13 +94,13 @@ namespace Umbraco.Core
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="Database"/> object for doing CRUD operations against custom tables that resides in the Umbraco database.
+        /// Gets an "ambient" database for doing CRUD operations against custom tables that resides in the Umbraco database.
         /// </summary>
         /// <remarks>
         /// <para>Should not be used for operation against standard Umbraco tables; as services should be used instead.</para>
         /// <para>Gets or creates an "ambient" database that is either stored in http context + available for the whole
-        /// request + auto-disposed at the end of the request, or in call context if there is no http context - in which
-        /// case it needs to be explicitely disposed so it is removed from call context.</para>
+        /// request + auto-disposed at the end of the request, or stored in call context if there is no http context - in which
+        /// case it *must* be explicitely disposed (which will remove it from call context).</para>
         /// </remarks>
         public virtual UmbracoDatabase Database
         {
@@ -108,24 +108,32 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Replaces the "ambient" database (if any) and installs a new <see cref="Database"/> object.
+        /// Replaces the "ambient" database (if any) and by a new temp database.
         /// </summary>
         /// <remarks>
-        /// <para>The returned IDisposable *must* be diposed in order to properly disposed the safe database and
+        /// <para>The returned IDisposable *must* be diposed in order to properly dispose the temp database and
         /// restore the original "ambient" database (if any).</para>
         /// <para>This is to be used in background tasks to ensure that they have an "ambient" database which
         /// will be properly removed from call context and does not interfere with anything else. In most case
         /// it is not replacing anything, just temporarily installing a database in context.</para>
         /// </remarks>
-        public virtual IDisposable UsingSafeDatabase
+        public virtual IDisposable UseSafeDatabase(bool force = false)
         {
-            get
+            var factory = _factory as DefaultDatabaseFactory;
+            if (factory == null) throw new NotSupportedException();
+            if (DefaultDatabaseFactory.HasAmbientDatabase)
             {
-                var factory = _factory as DefaultDatabaseFactory;
-                if (factory == null) throw new NotSupportedException();
-                var database = factory.CreateDatabaseInstance(DefaultDatabaseFactory.ContextOwner.None);
-                return new UsedDatabase(database, _logger);
+                // has ambient,
+                // if forcing, detach it and replace it with a new, temp, database
+                //  when the UsingDatabase is disposed, the temp database is disposed and the original one is re-instated
+                // else do nothing (and nothing will be disposed)
+                return force
+                    ? new UsingDatabase(DefaultDatabaseFactory.DetachAmbientDatabase(), factory.CreateDatabase())
+                    : new UsingDatabase(null, null);
             }
+
+            // create a new, temp, database (will be disposed with UsingDatabase)
+            return new UsingDatabase(null, factory.CreateDatabase());
         }
 
         /// <summary>
@@ -788,30 +796,26 @@ namespace Umbraco.Core
             return true;
         }
 
-        private class UsedDatabase : IDisposable
+        private class UsingDatabase : IDisposable
         {
-            private readonly UmbracoDatabase _database;
-            private readonly ILogger _logger;
+            private readonly UmbracoDatabase _orig;
+            private readonly UmbracoDatabase _temp;
 
-            public UsedDatabase(UmbracoDatabase database, ILogger logger)
+            public UsingDatabase(UmbracoDatabase orig, UmbracoDatabase temp)
             {
-                _logger = logger;
-
-                // replace with ours
-                _database = DefaultDatabaseFactory.DetachDatabase();
-                _logger.Debug<DatabaseContext>("Detached db " + (_database == null ? "x" : _database.InstanceSid) + ".");
-                DefaultDatabaseFactory.AttachDatabase(database);
-                _logger.Debug<DatabaseContext>("Attached db " + database.InstanceSid + ".");
+                _orig = orig;
+                _temp = temp;
             }
 
             public void Dispose()
             {
-                // restore the original DB
-                var db = DefaultDatabaseFactory.DetachDatabase();
-                _logger.Debug<DatabaseContext>("Detached db " + db.InstanceSid + ".");
-                db.Dispose();
-                DefaultDatabaseFactory.AttachDatabase(_database);
-                _logger.Debug<DatabaseContext>("Attached db " + (_database == null ? "x" : _database.InstanceSid) + ".");
+                if (_temp != null)
+                {
+                    _temp.Dispose();
+                    if (_orig != null)
+                        DefaultDatabaseFactory.AttachAmbientDatabase(_orig);
+                }
+                GC.SuppressFinalize(this);
             }
         }
     }

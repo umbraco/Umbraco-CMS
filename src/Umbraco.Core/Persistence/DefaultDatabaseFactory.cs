@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using System.Web;
 using Umbraco.Core.Logging;
@@ -250,12 +251,23 @@ namespace Umbraco.Core.Persistence
 
         static DefaultDatabaseFactory()
         {
-            SafeCallContext.Register(DetachDatabase, AttachDatabase);
+            SafeCallContext.Register(DetachAmbientDatabase, AttachAmbientDatabase);
         }
+
+        // gets a value indicating whether there is an ambient database
+	    internal static bool HasAmbientDatabase
+	    {
+	        get
+	        {
+	            return HttpContext.Current == null
+	                ? NonContextValue != null
+	                : HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] != null;
+	        }
+	    }
 
         // detaches the current database
         // ie returns the database and remove it from whatever is "context"
-        internal static UmbracoDatabase DetachDatabase()
+        internal static UmbracoDatabase DetachAmbientDatabase()
         {
             UmbracoDatabase database;
 
@@ -277,7 +289,7 @@ namespace Umbraco.Core.Persistence
         // attach a current database
         // ie assign it to whatever is "context"
         // throws if there already is a database
-        internal static void AttachDatabase(object o)
+        internal static void AttachAmbientDatabase(object o)
         {
             var database = o as UmbracoDatabase;
             if (o != null && database == null) throw new ArgumentException("Not an UmbracoDatabase.", "o");
