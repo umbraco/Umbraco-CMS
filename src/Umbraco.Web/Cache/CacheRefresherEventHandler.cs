@@ -9,8 +9,10 @@ using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using System.Linq;
+using System.Reflection;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Logging;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Publishing;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
@@ -21,6 +23,7 @@ namespace Umbraco.Web.Cache
     /// <summary>
     /// Class which listens to events on business level objects in order to invalidate the cache amongst servers when data changes
     /// </summary>
+    [WeightedPlugin(int.MinValue)]
     public class CacheRefresherEventHandler : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
@@ -104,14 +107,14 @@ namespace Umbraco.Web.Cache
 
             //Bind to media events
 
-            MediaService.Saved += MediaServiceSaved;            
+            MediaService.Saved += MediaServiceSaved;
             MediaService.Deleted += MediaServiceDeleted;
             MediaService.Moved += MediaServiceMoved;
             MediaService.Trashed += MediaServiceTrashed;
             MediaService.EmptiedRecycleBin += MediaServiceEmptiedRecycleBin;
 
             //Bind to content events - this is for unpublished content syncing across servers (primarily for examine)
-            
+
             ContentService.Saved += ContentServiceSaved;
             ContentService.Deleted += ContentServiceDeleted;
             ContentService.Copied += ContentServiceCopied;
@@ -231,7 +234,7 @@ namespace Umbraco.Web.Cache
                 DistributedCache.Instance.RemoveUnpublishedCachePermanently(e.Ids.ToArray());
             }
         }
-        
+
         /// <summary>
         /// Handles cache refreshing for when content is trashed
         /// </summary>
@@ -253,7 +256,7 @@ namespace Umbraco.Web.Cache
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <remarks>
-        /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the 
+        /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the
         /// case then we need to clear all user permissions cache.
         /// </remarks>
         static void ContentServiceCopied(IContentService sender, CopyEventArgs<IContent> e)
@@ -285,10 +288,10 @@ namespace Umbraco.Web.Cache
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <remarks>
-        /// When an entity is saved we need to notify other servers about the change in order for the Examine indexes to 
+        /// When an entity is saved we need to notify other servers about the change in order for the Examine indexes to
         /// stay up-to-date for unpublished content.
-        /// 
-        /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the 
+        ///
+        /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the
         /// case then we need to clear all user permissions cache.
         /// </remarks>
         static void ContentServiceSaved(IContentService sender, SaveEventArgs<IContent> e)
@@ -303,8 +306,8 @@ namespace Umbraco.Web.Cache
                     var permissionsChanged = ((Content)x).WasPropertyDirty("PermissionsChanged");
                     if (permissionsChanged)
                     {
-                        clearUserPermissions = true;                        
-                    }    
+                        clearUserPermissions = true;
+                    }
                 }
             });
 
@@ -337,7 +340,7 @@ namespace Umbraco.Web.Cache
         static void ApplicationTreeDeleted(ApplicationTree sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationTreeCache();
-        } 
+        }
         #endregion
 
         #region Application event handlers
@@ -349,7 +352,7 @@ namespace Umbraco.Web.Cache
         static void ApplicationDeleted(Section sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationCache();
-        } 
+        }
         #endregion
 
         #region UserType event handlers
@@ -362,9 +365,9 @@ namespace Umbraco.Web.Cache
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserTypeCache(x.Id));
         }
-        
+
         #endregion
-        
+
         #region Dictionary event handlers
 
         static void LocalizationServiceSavedDictionaryItem(ILocalizationService sender, SaveEventArgs<IDictionaryItem> e)
@@ -390,11 +393,11 @@ namespace Umbraco.Web.Cache
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDataTypeCache(x));
         }
 
-   
+
         #endregion
 
         #region Stylesheet and stylesheet property event handlers
-     
+
         static void FileServiceDeletedStylesheet(IFileService sender, DeleteEventArgs<Stylesheet> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveStylesheetCache(x));
@@ -441,7 +444,7 @@ namespace Umbraco.Web.Cache
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshLanguageCache(x));
         }
-      
+
         #endregion
 
         #region Content/media/member Type event handlers
@@ -505,9 +508,9 @@ namespace Umbraco.Web.Cache
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshMemberTypeCache(x));
         }
 
-        
+
         #endregion
-        
+
         #region User/permissions event handlers
 
         static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
@@ -540,7 +543,7 @@ namespace Umbraco.Web.Cache
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserCache(x.Id));
         }
-        
+
         private static void InvalidateCacheForPermissionsChange(UserPermission sender)
         {
             if (sender.User != null)
@@ -580,7 +583,7 @@ namespace Umbraco.Web.Cache
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshTemplateCache(x.Id));
         }
-      
+
         #endregion
 
         #region Macro event handlers
@@ -600,7 +603,7 @@ namespace Umbraco.Web.Cache
                 DistributedCache.Instance.RefreshMacroCache(entity);
             }
         }
-  
+
         #endregion
 
         #region Media event handlers
@@ -631,14 +634,14 @@ namespace Umbraco.Web.Cache
         static void MediaServiceSaved(IMediaService sender, SaveEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RefreshMediaCache(e.SavedEntities.ToArray());
-        } 
+        }
         #endregion
 
         #region Member event handlers
 
         static void MemberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> e)
         {
-            DistributedCache.Instance.RemoveMemberCache(e.DeletedEntities.ToArray());    
+            DistributedCache.Instance.RemoveMemberCache(e.DeletedEntities.ToArray());
         }
 
         static void MemberServiceSaved(IMemberService sender, SaveEventArgs<IMember> e)
