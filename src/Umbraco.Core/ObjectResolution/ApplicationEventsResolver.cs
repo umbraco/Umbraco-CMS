@@ -15,7 +15,6 @@ namespace Umbraco.Core.ObjectResolution
 	/// </remarks>
     public sealed class ApplicationEventsResolver : ManyObjectsResolverBase<ApplicationEventsResolver, IApplicationEventHandler>, IDisposable
 	{
-
 	    private readonly LegacyStartupHandlerResolver _legacyResolver;
 
 	    /// <summary>
@@ -23,7 +22,7 @@ namespace Umbraco.Core.ObjectResolution
 	    /// </summary>
 	    /// <param name="logger"></param>
 	    /// <param name="applicationEventHandlers"></param>
-	    /// <param name="serviceProvider"></param>		
+	    /// <param name="serviceProvider"></param>
 	    internal ApplicationEventsResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> applicationEventHandlers)
             : base(serviceProvider, logger, applicationEventHandlers)
 		{
@@ -34,7 +33,7 @@ namespace Umbraco.Core.ObjectResolution
 		}
 
         /// <summary>
-        /// Override in order to only return types of IApplicationEventHandler and above, 
+        /// Override in order to only return types of IApplicationEventHandler and above,
         /// do not include the legacy types of IApplicationStartupHandler
         /// </summary>
         protected override IEnumerable<Type> InstanceTypes
@@ -69,7 +68,7 @@ namespace Umbraco.Core.ObjectResolution
             var handler = CollectionResolved;
             if (handler != null) handler(this, e);
         }
-        
+
         /// <summary>
         /// Create instances of all of the legacy startup handlers
         /// </summary>
@@ -82,11 +81,11 @@ namespace Umbraco.Core.ObjectResolution
 		protected override bool SupportsClear
 		{
             get { return false; }
-		}		
+		}
 
 		protected override bool SupportsInsert
 		{
-			get { return false; }			
+			get { return false; }
 		}
 
 	    private class LegacyStartupHandlerResolver : ManyObjectsResolverBase<ApplicationEventsResolver, IApplicationStartupHandler>, IDisposable
@@ -171,9 +170,6 @@ namespace Umbraco.Core.ObjectResolution
 
             //Clear event handlers
 	        CollectionResolved = null;
-
 	    }
-
-	    
     }
 }

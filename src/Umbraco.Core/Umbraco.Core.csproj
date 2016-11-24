@@ -1204,7 +1204,7 @@
     <Compile Include="Models\Rdbms\UserDto.cs" />
     <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
-    <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
+    <Compile Include="ObjectResolution\WeightAttribute.cs" />
     <Compile Include="Persistence\PetaPoco.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />

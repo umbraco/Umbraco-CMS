@@ -8,7 +8,7 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-	[WeightedPlugin(2000)]
+	[Weight(2000)]
     public class FileExtensionIconThumbnailProvider : AbstractThumbnailProvider
     {
         protected override IEnumerable<string> SupportedExtensions

@@ -23,7 +23,7 @@ namespace Umbraco.Core.ObjectResolution
 		private readonly List<Type> _instanceTypes = new List<Type>();
 	    private IEnumerable<TResolved> _sortedValues;
 
-		private int _defaultPluginWeight = 10;
+		private int _defaultPluginWeight = 100;
 
 		#region Constructors
 
@@ -179,7 +179,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// </summary>
 		/// <returns>The sorted resolved object instances.</returns>
 		/// <remarks>
-		/// <para>The order is based upon the <c>WeightedPluginAttribute</c> and <c>DefaultPluginWeight</c>.</para>
+		/// <para>The order is based upon the <c>WeightAttribute</c> and <c>DefaultPluginWeight</c>.</para>
 		/// <para>Weights are sorted ascendingly (lowest weights come first).</para>
 		/// </remarks>
 		protected IEnumerable<TResolved> GetSortedValues()
@@ -196,7 +196,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Gets or sets the default type weight.
 		/// </summary>
-		/// <remarks>Determines the weight of types that do not have a <c>WeightedPluginAttribute</c> set on 
+		/// <remarks>Determines the weight of types that do not have a <c>WeightAttribute</c> set on 
 		/// them, when calling <c>GetSortedValues</c>.</remarks>
 		protected virtual int DefaultPluginWeight
 		{
@@ -212,7 +212,7 @@ namespace Umbraco.Core.ObjectResolution
 		protected virtual int GetObjectWeight(object o)
 		{
 			var type = o.GetType();
-			var attr = type.GetCustomAttribute<WeightedPluginAttribute>(true);
+			var attr = type.GetCustomAttribute<WeightAttribute>(true);
 			return attr == null ? DefaultPluginWeight : attr.Weight;
 		}
 
