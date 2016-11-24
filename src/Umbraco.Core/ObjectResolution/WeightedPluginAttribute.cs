@@ -6,7 +6,7 @@ namespace Umbraco.Core.ObjectResolution
 	/// Indicates the relative weight of a resolved object type.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	internal class WeightedPluginAttribute : Attribute
+	public class WeightedPluginAttribute : Attribute
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="WeightedPluginAttribute"/> class with a weight.

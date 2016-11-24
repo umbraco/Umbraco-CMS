@@ -13,7 +13,7 @@ namespace Umbraco.Core.ObjectResolution
 	/// <remarks>
 	/// This is disposable because after the app has started it should be disposed to release any memory being occupied by instances.
 	/// </remarks>
-    internal  sealed class ApplicationEventsResolver : ManyObjectsResolverBase<ApplicationEventsResolver, IApplicationEventHandler>, IDisposable
+    public sealed class ApplicationEventsResolver : ManyObjectsResolverBase<ApplicationEventsResolver, IApplicationEventHandler>, IDisposable
 	{
 
 	    private readonly LegacyStartupHandlerResolver _legacyResolver;
@@ -30,7 +30,7 @@ namespace Umbraco.Core.ObjectResolution
             //create the legacy resolver and only include the legacy types
 	        _legacyResolver = new LegacyStartupHandlerResolver(
                 serviceProvider, logger,
-	            applicationEventHandlers.Where(x => !TypeHelper.IsTypeAssignableFrom<IApplicationEventHandler>(x)));
+	            applicationEventHandlers.Where(x => TypeHelper.IsTypeAssignableFrom<IApplicationEventHandler>(x) == false));
 		}
 
         /// <summary>
@@ -42,14 +42,34 @@ namespace Umbraco.Core.ObjectResolution
             get { return base.InstanceTypes.Where(TypeHelper.IsTypeAssignableFrom<IApplicationEventHandler>); }
         }
 
-	    /// <summary>
-		/// Gets the <see cref="IApplicationEventHandler"/> implementations.
-		/// </summary>
-		public IEnumerable<IApplicationEventHandler> ApplicationEventHandlers
+	    private List<IApplicationEventHandler> _orderedAndFiltered;
+
+        /// <summary>
+        /// Gets the <see cref="IApplicationEventHandler"/> implementations.
+        /// </summary>
+        public IEnumerable<IApplicationEventHandler> ApplicationEventHandlers
 		{
-            get { return Values; }
+	        get
+	        {
+	            if (_orderedAndFiltered == null)
+	            {
+                    _orderedAndFiltered = GetSortedValues().ToList();
+
+                    //raise event so the collection can be modified
+                    OnCollectionResolved(new ApplicationEventsEventArgs(_orderedAndFiltered));
+                }
+	            return _orderedAndFiltered;
+	        }
 		}
 
+	    public event EventHandler<ApplicationEventsEventArgs> CollectionResolved;
+
+        private void OnCollectionResolved(ApplicationEventsEventArgs e)
+        {
+            var handler = CollectionResolved;
+            if (handler != null) handler(this, e);
+        }
+        
         /// <summary>
         /// Create instances of all of the legacy startup handlers
         /// </summary>
@@ -146,7 +166,14 @@ namespace Umbraco.Core.ObjectResolution
 	    {
             _legacyResolver.Dispose();
             ResetCollections();
+            _orderedAndFiltered.Clear();
+	        _orderedAndFiltered = null;
+
+            //Clear event handlers
+	        CollectionResolved = null;
+
 	    }
-        
-	}
+
+	    
+    }
 }
