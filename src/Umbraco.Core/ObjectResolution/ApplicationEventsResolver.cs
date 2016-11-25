@@ -52,6 +52,7 @@ namespace Umbraco.Core.ObjectResolution
 	        {
 	            if (_orderedAndFiltered == null)
 	            {
+	                _resolved = true;
                     _orderedAndFiltered = GetSortedValues().ToList();                    
                     OnCollectionResolved(_orderedAndFiltered);
                 }
@@ -59,23 +60,33 @@ namespace Umbraco.Core.ObjectResolution
 	        }
 		}
 
-        /// <summary>
-        /// A delegate that can be set in the pre-boot phase in order to filter or re-order the event handler collection
-        /// </summary>
-        /// <remarks>
-        /// This can be set on startup in the pre-boot process in either a custom boot manager or global.asax (UmbracoApplication)
-        /// </remarks>
-        public Action<IList<IApplicationEventHandler>> FilterCollection { get; set; }
+	    /// <summary>
+	    /// A delegate that can be set in the pre-boot phase in order to filter or re-order the event handler collection
+	    /// </summary>
+	    /// <remarks>
+	    /// This can be set on startup in the pre-boot process in either a custom boot manager or global.asax (UmbracoApplication)
+	    /// </remarks>
+	    public Action<IList<IApplicationEventHandler>> FilterCollection
+	    {
+	        get { return _filterCollection; }
+	        set
+	        {
+                if (_resolved)
+                    throw new InvalidOperationException("Cannot set the FilterCollection delegate once the ApplicationEventHandlers are resolved");
 
-        /// <summary>
-        /// Allow any filters to be applied to the event handler list
-        /// </summary>
-        /// <param name="handlers"></param>
-        /// <remarks>
-        /// This allows custom logic to execute in order to filter or re-order the event handlers prior to executing,
-        /// however this also ensures that any core handlers are executed first to ensure the stabiliy of Umbraco.
-        /// </remarks>
-        private void OnCollectionResolved(List<IApplicationEventHandler> handlers)
+                _filterCollection = value;
+	        }
+	    }
+
+	    /// <summary>
+	    /// Allow any filters to be applied to the event handler list
+	    /// </summary>
+	    /// <param name="handlers"></param>
+	    /// <remarks>
+	    /// This allows custom logic to execute in order to filter or re-order the event handlers prior to executing,
+	    /// however this also ensures that any core handlers are executed first to ensure the stabiliy of Umbraco.
+	    /// </remarks>
+	    private void OnCollectionResolved(List<IApplicationEventHandler> handlers)
         {
             if (FilterCollection == null) return;
 
@@ -142,8 +153,10 @@ namespace Umbraco.Core.ObjectResolution
 
 	    private bool _disposed;
 		private readonly ReaderWriterLockSlim _disposalLocker = new ReaderWriterLockSlim();
+	    private Action<IList<IApplicationEventHandler>> _filterCollection;
+	    private bool _resolved = false;
 
-		/// <summary>
+	    /// <summary>
 		/// Gets a value indicating whether this instance is disposed.
 		/// </summary>
 		/// <value>
