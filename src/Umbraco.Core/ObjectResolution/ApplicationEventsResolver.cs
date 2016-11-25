@@ -73,6 +73,8 @@ namespace Umbraco.Core.ObjectResolution
 	        {
                 if (_resolved)
                     throw new InvalidOperationException("Cannot set the FilterCollection delegate once the ApplicationEventHandlers are resolved");
+                if (_filterCollection != null)
+                    throw new InvalidOperationException("Cannot set the FilterCollection delegate once it's already been specified");
 
                 _filterCollection = value;
 	        }
