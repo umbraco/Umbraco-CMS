@@ -58,7 +58,15 @@ namespace Umbraco.Core.ObjectResolution
 	            return _orderedAndFiltered;
 	        }
 		}
-        
+
+        /// <summary>
+        /// A delegate that can be set in the pre-boot phase in order to filter or re-order the event handler collection
+        /// </summary>
+        /// <remarks>
+        /// This can be set on startup in the pre-boot process in either a custom boot manager or global.asax (UmbracoApplication)
+        /// </remarks>
+        public Action<IList<IApplicationEventHandler>> FilterCollection { get; set; }
+
         /// <summary>
         /// Allow any filters to be applied to the event handler list
         /// </summary>
@@ -69,10 +77,9 @@ namespace Umbraco.Core.ObjectResolution
         /// </remarks>
         private void OnCollectionResolved(List<IApplicationEventHandler> handlers)
         {
-            foreach (var filter in handlers.OfType<IApplicationEventsFilter>().ToArray())
-            {
-                filter.Filter(handlers);
-            }
+            if (FilterCollection == null) return;
+
+            FilterCollection(handlers);
 
             //find all of the core handlers and their weight, remove them from the main list
             var coreItems = new List<Tuple<IApplicationEventHandler, int>>();
