@@ -329,6 +329,17 @@ namespace umbraco
             if (c.Published)
                 return;
 
+            //if it's a brand new entity, then this shouldn't affect the sort order of the document
+            if (c.IsNewEntity())
+                return;
+
+            //if the sort order didn't change and the published state didn't change then we don't need to continue
+            if (c.WasPropertyDirty("SortOrder") == false
+                && c.WasPropertyDirty("Published") == false)
+            {
+                return;
+            }
+
             using (var safeXml = GetSafeXmlWriter(false))
             {
                 //TODO: This can be null: safeXml.Xml!!!!
