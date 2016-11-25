@@ -31,7 +31,11 @@ namespace umbraco.cms.businesslogic.macro
 	{
         //initialize empty model
 	    internal IMacro MacroEntity = new Umbraco.Core.Models.Macro();
-
+        
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }

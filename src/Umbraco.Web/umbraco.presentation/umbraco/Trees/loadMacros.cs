@@ -44,9 +44,13 @@ namespace umbraco
             rootNode.NodeID = "init";
         }
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
-            get { return umbraco.BusinessLogic.Application.SqlHelper; }
+            get { return Application.SqlHelper; }
         }
 
         /// <summary>
@@ -70,9 +74,9 @@ function openMacro(id) {
         /// <param name="tree"></param>
         public override void Render(ref XmlTree tree)
         {
-            using (IRecordsReader macros = SqlHelper.ExecuteReader("select id, macroName from cmsMacro order by macroName"))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader macros = sqlHelper.ExecuteReader("select id, macroName from cmsMacro order by macroName"))
             {
-                
                 while (macros.Read())
                 {
                     XmlTreeNode xNode = XmlTreeNode.Create(this);
