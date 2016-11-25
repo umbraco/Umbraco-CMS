@@ -7,7 +7,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core.ObjectResolution
 {
-	/// <summary>
+    /// <summary>
 	/// A resolver to return all IApplicationEvents objects
 	/// </summary>
 	/// <remarks>
@@ -52,21 +52,47 @@ namespace Umbraco.Core.ObjectResolution
 	        {
 	            if (_orderedAndFiltered == null)
 	            {
-                    _orderedAndFiltered = GetSortedValues().ToList();
-
-                    //raise event so the collection can be modified
-                    OnCollectionResolved(new ApplicationEventsEventArgs(_orderedAndFiltered));
+                    _orderedAndFiltered = GetSortedValues().ToList();                    
+                    OnCollectionResolved(_orderedAndFiltered);
                 }
 	            return _orderedAndFiltered;
 	        }
 		}
-
-	    public event EventHandler<ApplicationEventsEventArgs> CollectionResolved;
-
-        private void OnCollectionResolved(ApplicationEventsEventArgs e)
+        
+        /// <summary>
+        /// Allow any filters to be applied to the event handler list
+        /// </summary>
+        /// <param name="handlers"></param>
+        /// <remarks>
+        /// This allows custom logic to execute in order to filter or re-order the event handlers prior to executing,
+        /// however this also ensures that any core handlers are executed first to ensure the stabiliy of Umbraco.
+        /// </remarks>
+        private void OnCollectionResolved(List<IApplicationEventHandler> handlers)
         {
-            var handler = CollectionResolved;
-            if (handler != null) handler(this, e);
+            foreach (var filter in handlers.OfType<IApplicationEventsFilter>().ToArray())
+            {
+                filter.Filter(handlers);
+            }
+
+            //find all of the core handlers and their weight, remove them from the main list
+            var coreItems = new List<Tuple<IApplicationEventHandler, int>>();
+            foreach (var handler in handlers.ToArray())
+            {
+                //Yuck, but not sure what else we can do 
+                if (
+                    handler.GetType().Assembly.FullName.StartsWith("Umbraco.", StringComparison.OrdinalIgnoreCase)
+                    || handler.GetType().Assembly.FullName.StartsWith("Concorde."))
+                {
+                    coreItems.Add(new Tuple<IApplicationEventHandler, int>(handler, GetObjectWeight(handler)));
+                    handlers.Remove(handler);
+                }
+            }
+
+            //re-add the core handlers to the beginning of the list ordered by their weight
+            foreach (var coreHandler in coreItems.OrderBy(x => x.Item2))
+            {
+                handlers.Insert(0, coreHandler.Item1);
+            }            
         }
 
         /// <summary>
@@ -166,10 +192,7 @@ namespace Umbraco.Core.ObjectResolution
             _legacyResolver.Dispose();
             ResetCollections();
             _orderedAndFiltered.Clear();
-	        _orderedAndFiltered = null;
-
-            //Clear event handlers
-	        CollectionResolved = null;
+	        _orderedAndFiltered = null;            
 	    }
     }
 }
