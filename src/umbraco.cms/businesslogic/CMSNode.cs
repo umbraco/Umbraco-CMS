@@ -1103,23 +1103,24 @@ order by level,sortOrder";
 
         protected virtual XmlNode GetPreviewXml(XmlDocument xd, Guid version)
         {
+            var xmlDoc = new XmlDocument();
 
-            XmlDocument xmlDoc = new XmlDocument();
-            using (XmlReader xmlRdr = SqlHelper.ExecuteXmlReader(
-                                                       "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@versionId", version)))
-            {
-                xmlDoc.Load(xmlRdr);
-            }
+            var xmlStr = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
+                new { nodeId = Id, versionId = version });
 
+            if (xmlStr.IsNullOrWhiteSpace()) return null;
+
+            xmlDoc.LoadXml(xmlStr);
+            
             return xd.ImportNode(xmlDoc.FirstChild, true);
         }
 
         protected internal virtual bool PreviewExists(Guid versionId)
         {
-            return (SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
-                        SqlHelper.CreateParameter("@nodeId", Id), SqlHelper.CreateParameter("@versionId", versionId)) != 0);
+            return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
+                        new {nodeId = Id, versionId = versionId}) != 0;
 
         }
 
@@ -1133,11 +1134,10 @@ order by level,sortOrder";
         {
             string sql = PreviewExists(versionId) ? "UPDATE cmsPreviewXml SET xml = @xml, timestamp = @timestamp WHERE nodeId=@nodeId AND versionId = @versionId"
                                 : "INSERT INTO cmsPreviewXml(nodeId, versionId, timestamp, xml) VALUES (@nodeId, @versionId, @timestamp, @xml)";
-            SqlHelper.ExecuteNonQuery(sql,
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@versionId", versionId),
-                                      SqlHelper.CreateParameter("@timestamp", DateTime.Now),
-                                      SqlHelper.CreateParameter("@xml", x.OuterXml));
+
+            ApplicationContext.Current.DatabaseContext.Database.Execute(
+                sql, new {nodeId = Id, versionId = versionId, timestamp = DateTime.Now, xml = x.OuterXml});
+            
         }
 
         protected void PopulateCMSNodeFromReader(IRecordsReader dr)
