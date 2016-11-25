@@ -88,9 +88,10 @@ namespace Umbraco.Core.ObjectResolution
 	    /// </remarks>
 	    private void OnCollectionResolved(List<IApplicationEventHandler> handlers)
         {
-            if (FilterCollection == null) return;
-
-            FilterCollection(handlers);
+            if (FilterCollection != null)
+            {
+                FilterCollection(handlers);
+            }
 
             //find all of the core handlers and their weight, remove them from the main list
             var coreItems = new List<Tuple<IApplicationEventHandler, int>>();
