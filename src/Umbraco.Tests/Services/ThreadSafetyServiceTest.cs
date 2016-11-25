@@ -271,8 +271,7 @@ namespace Umbraco.Tests.Services
 			public UmbracoDatabase GetDatabase()
 			{
 			    var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-                return _databases.GetOrAdd(
-                    Thread.CurrentThread.ManagedThreadId,
+                return _databases.GetOrAdd(Thread.CurrentThread.ManagedThreadId,
                     i => new UmbracoDatabase(settings.ConnectionString, SqlSyntax, DatabaseType, _dbProviderFactory, _logger));
 			}
 

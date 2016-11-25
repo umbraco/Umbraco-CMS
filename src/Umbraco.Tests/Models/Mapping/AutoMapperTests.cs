@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AutoMapper;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.DI;
 
 namespace Umbraco.Tests.Models.Mapping
 {

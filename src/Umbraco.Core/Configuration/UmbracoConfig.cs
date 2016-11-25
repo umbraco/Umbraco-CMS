@@ -31,15 +31,26 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         private UmbracoConfig()
         {
+            // note: need to use SafeCallContext here because ConfigurationManager.GetSection ends up getting AppDomain.Evidence
+            // which will want to serialize the call context including anything that is in there - what a mess!
+
             if (_umbracoSettings == null)
             {
-                var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;                
+                IUmbracoSettingsSection umbracoSettings;
+                using (new SafeCallContext())
+                {
+                    umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;
+                }
                 SetUmbracoSettings(umbracoSettings);
             }
 
             if (_dashboardSection == null)
             {
-                var dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;                
+                IDashboardSection dashboardConfig;
+                using (new SafeCallContext())
+                {
+                    dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;
+                }
                 SetDashboardSettings(dashboardConfig);
             }
         }

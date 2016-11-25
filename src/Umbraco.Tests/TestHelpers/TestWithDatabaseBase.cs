@@ -78,8 +78,6 @@ namespace Umbraco.Tests.TestHelpers
 
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
-
-            CreateAndInitializeDatabase();
         }
 
         protected override void Compose()
@@ -245,6 +243,8 @@ namespace Umbraco.Tests.TestHelpers
         protected override void Initialize() // fixme - should NOT be here!
         {
             base.Initialize();
+
+            CreateAndInitializeDatabase();
 
             // ensure we have a FacadeService
             if (_facadeService == null)

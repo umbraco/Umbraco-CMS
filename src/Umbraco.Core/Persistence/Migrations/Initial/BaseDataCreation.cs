@@ -39,11 +39,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 CreateUmbracoLockData();
             }
 
-            if (tableName.Equals("umbracoLock"))
-            {
-                CreateUmbracoLockData();
-            }
-
             if (tableName.Equals("cmsContentType"))
             {
                 CreateCmsContentTypeData();

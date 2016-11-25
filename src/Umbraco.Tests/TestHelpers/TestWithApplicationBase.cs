@@ -117,9 +117,11 @@ namespace Umbraco.Tests.TestHelpers
 
             Container.RegisterSingleton<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
             Container.RegisterSingleton<IUmbracoDatabaseAccessor, TestUmbracoDatabaseAccessor>();
+            var sqlSyntaxProviders = TestObjects.GetDefaultSqlSyntaxProviders(Logger);
+            Container.RegisterSingleton<ISqlSyntaxProvider>(_ => sqlSyntaxProviders.OfType<SqlCeSyntaxProvider>().First());
             Container.RegisterSingleton<IDatabaseFactory>(f => new DefaultDatabaseFactory(
                 Core.Configuration.GlobalSettings.UmbracoConnectionName,
-                TestObjects.GetDefaultSqlSyntaxProviders(Logger),
+                sqlSyntaxProviders,
                 Logger, f.GetInstance<IUmbracoDatabaseAccessor>(),
                 Mock.Of<IQueryFactory>()));
             Container.RegisterSingleton(f => new DatabaseContext(
