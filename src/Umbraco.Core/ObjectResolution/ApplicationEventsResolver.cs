@@ -11,7 +11,13 @@ namespace Umbraco.Core.ObjectResolution
 	/// A resolver to return all IApplicationEvents objects
 	/// </summary>
 	/// <remarks>
-	/// This is disposable because after the app has started it should be disposed to release any memory being occupied by instances.
+	/// <para>This is disposable because after the app has started it should be disposed to release any memory being occupied by instances.</para>
+	/// <para>Ordering handlers: handlers are ordered by (ascending) weight. By default, handlers from the Umbraco.* or Concorde.*
+	/// assemblies have a -100 weight whereas any other handler has a weight of +100. A custom weight can be assigned to a handler
+	/// by marking the class with the WeightAttribute. For example, the CacheRefresherEventHandler is marked with [Weight(int.MinValue)]
+	/// because its events need to run before anything else. Positive weights are considered "user-space" while negative weights are
+	/// "core". Finally, users can register a filter to process the list (after it has been ordered) and re-order it, or remove handlers.</para>
+	/// <para>BEWARE! handlers order is an important thing, and removing handlers or reordering handlers can have unexpected consequences.</para>
 	/// </remarks>
     public sealed class ApplicationEventsResolver : ManyObjectsResolverBase<ApplicationEventsResolver, IApplicationEventHandler>, IDisposable
 	{
@@ -25,9 +31,9 @@ namespace Umbraco.Core.ObjectResolution
 	    /// <param name="serviceProvider"></param>
 	    internal ApplicationEventsResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> applicationEventHandlers)
             : base(serviceProvider, logger, applicationEventHandlers)
-		{
+	    {
             //create the legacy resolver and only include the legacy types
-	        _legacyResolver = new LegacyStartupHandlerResolver(
+            _legacyResolver = new LegacyStartupHandlerResolver(
                 serviceProvider, logger,
 	            applicationEventHandlers.Where(x => TypeHelper.IsTypeAssignableFrom<IApplicationEventHandler>(x) == false));
 		}
@@ -52,26 +58,29 @@ namespace Umbraco.Core.ObjectResolution
 	        {
 	            if (_orderedAndFiltered == null)
 	            {
-	                _resolved = true;
-                    _orderedAndFiltered = GetSortedValues().ToList();                    
-                    OnCollectionResolved(_orderedAndFiltered);
+                    _orderedAndFiltered = GetSortedValues().ToList();
+                    if (FilterCollection != null)
+                        FilterCollection(_orderedAndFiltered);
                 }
 	            return _orderedAndFiltered;
 	        }
 		}
 
-	    /// <summary>
-	    /// A delegate that can be set in the pre-boot phase in order to filter or re-order the event handler collection
-	    /// </summary>
-	    /// <remarks>
-	    /// This can be set on startup in the pre-boot process in either a custom boot manager or global.asax (UmbracoApplication)
-	    /// </remarks>
-	    public Action<IList<IApplicationEventHandler>> FilterCollection
+        /// <summary>
+        /// Gets or sets a delegate to filter the event handler list (EXPERT!).
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be set on startup in the pre-boot process in either a custom boot manager or global.asax (UmbracoApplication).</para>
+        /// <para>Allows custom logic to execute in order to filter and/or re-order the event handlers prior to executing.</para>
+        /// <para>To be used by custom boot sequences where the boot loader needs to remove some handlers, or raise their priority.</para>
+        /// <para>Filtering the event handler collection can have ugly consequences. Use with care.</para>
+        /// </remarks>
+        public Action<IList<IApplicationEventHandler>> FilterCollection
 	    {
 	        get { return _filterCollection; }
 	        set
 	        {
-                if (_resolved)
+                if (_orderedAndFiltered != null)
                     throw new InvalidOperationException("Cannot set the FilterCollection delegate once the ApplicationEventHandlers are resolved");
                 if (_filterCollection != null)
                     throw new InvalidOperationException("Cannot set the FilterCollection delegate once it's already been specified");
@@ -80,40 +89,16 @@ namespace Umbraco.Core.ObjectResolution
 	        }
 	    }
 
-	    /// <summary>
-	    /// Allow any filters to be applied to the event handler list
-	    /// </summary>
-	    /// <param name="handlers"></param>
-	    /// <remarks>
-	    /// This allows custom logic to execute in order to filter or re-order the event handlers prior to executing,
-	    /// however this also ensures that any core handlers are executed first to ensure the stabiliy of Umbraco.
-	    /// </remarks>
-	    private void OnCollectionResolved(List<IApplicationEventHandler> handlers)
-        {
-            if (FilterCollection != null)
-            {
-                FilterCollection(handlers);
-            }
+	    protected override int GetObjectWeight(object o)
+	    {
+            var type = o.GetType();
+            var attr = type.GetCustomAttribute<WeightAttribute>(true);
+            if (attr != null) return attr.Weight;
+            var name = type.Assembly.FullName;
 
-            //find all of the core handlers and their weight, remove them from the main list
-            var coreItems = new List<Tuple<IApplicationEventHandler, int>>();
-            foreach (var handler in handlers.ToArray())
-            {
-                //Yuck, but not sure what else we can do 
-                if (
-                    handler.GetType().Assembly.FullName.StartsWith("Umbraco.", StringComparison.OrdinalIgnoreCase)
-                    || handler.GetType().Assembly.FullName.StartsWith("Concorde."))
-                {
-                    coreItems.Add(new Tuple<IApplicationEventHandler, int>(handler, GetObjectWeight(handler)));
-                    handlers.Remove(handler);
-                }
-            }
-
-            //re-add the core handlers to the beginning of the list ordered by their weight
-            foreach (var coreHandler in coreItems.OrderBy(x => x.Item2))
-            {
-                handlers.Insert(0, coreHandler.Item1);
-            }            
+            // we should really attribute all our Core handlers, so this is temp
+            var core = name.InvariantStartsWith("Umbraco.") || name.InvariantStartsWith("Concorde.");
+            return core ? -DefaultPluginWeight : DefaultPluginWeight;
         }
 
         /// <summary>
@@ -157,7 +142,6 @@ namespace Umbraco.Core.ObjectResolution
 	    private bool _disposed;
 		private readonly ReaderWriterLockSlim _disposalLocker = new ReaderWriterLockSlim();
 	    private Action<IList<IApplicationEventHandler>> _filterCollection;
-	    private bool _resolved = false;
 
 	    /// <summary>
 		/// Gets a value indicating whether this instance is disposed.
@@ -215,7 +199,7 @@ namespace Umbraco.Core.ObjectResolution
             _legacyResolver.Dispose();
             ResetCollections();
             _orderedAndFiltered.Clear();
-	        _orderedAndFiltered = null;            
+	        _orderedAndFiltered = null;
 	    }
     }
 }
