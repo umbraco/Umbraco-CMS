@@ -150,9 +150,15 @@ namespace Umbraco.Core.Persistence
             {
                 case ContextOwner.CallContext:
                     NonContextValue = null;
+#if DEBUG_DATABASES
+                    Log("Clr lcc", disposing);
+#endif
                     break;
                 case ContextOwner.HttpContext:
                     HttpContext.Current.Items.Remove(typeof(DefaultDatabaseFactory));
+#if DEBUG_DATABASES
+                    Log("Clr ctx", disposing);
+#endif
                     break;
             }
 
