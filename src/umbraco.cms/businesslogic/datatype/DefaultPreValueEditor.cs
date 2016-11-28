@@ -30,7 +30,10 @@ namespace umbraco.cms.businesslogic.datatype
 
         private Dictionary<string, DataEditorSettingType> dtSettings = new Dictionary<string, DataEditorSettingType>();
 
-
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         public static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -116,8 +119,8 @@ namespace umbraco.cms.businesslogic.datatype
                     else
                         throw new ArgumentException("Datatype is not initialized");
 
-                    _prevalue =
-                        SqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where DataTypeNodeId = " + defId);
+                    using (var sqlHelper = Application.SqlHelper)
+                        _prevalue = sqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where DataTypeNodeId = " + defId);
                 }
                 return _prevalue;
             }
@@ -133,13 +136,17 @@ namespace umbraco.cms.businesslogic.datatype
 
                 _prevalue = value;
                 ensurePrevalue();
-                IParameter[] SqlParams = new IParameter[]
+                using (var sqlHelper = Application.SqlHelper)
+                {
+                    IParameter[] SqlParams = new IParameter[]
                     {
-                        SqlHelper.CreateParameter("@value", _textbox.Text),
-                        SqlHelper.CreateParameter("@dtdefid", defId)
+                        sqlHelper.CreateParameter("@value", _textbox.Text),
+                        sqlHelper.CreateParameter("@dtdefid", defId)
                     };
-                // update prevalue
-                SqlHelper.ExecuteNonQuery("update cmsDataTypePreValues set [value] = @value where datatypeNodeId = @dtdefid", SqlParams);
+
+                    // update prevalue
+                    sqlHelper.ExecuteNonQuery("update cmsDataTypePreValues set [value] = @value where datatypeNodeId = @dtdefid", SqlParams);
+                }
             }
         }
 
@@ -257,8 +264,9 @@ namespace umbraco.cms.businesslogic.datatype
         [Obsolete("Use the PreValues class for data access instead")]
         public static string GetPrevalueFromId(int Id)
         {
-            return SqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where id = @id",
-                                                   SqlHelper.CreateParameter("@id", Id));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where id = @id",
+                                                   sqlHelper.CreateParameter("@id", Id));
         }
 
 

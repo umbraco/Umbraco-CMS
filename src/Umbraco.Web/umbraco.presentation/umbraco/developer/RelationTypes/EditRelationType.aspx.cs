@@ -82,7 +82,8 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 				{
 					this._relations = new List<ReadOnlyRelation>();
 
-				    using (var reader = uQuery.SqlHelper.ExecuteReader(@"
+                    using (var sqlHelper = BusinessLogic.Application.SqlHelper)
+                    using (var reader = sqlHelper.ExecuteReader(@"
                         SELECT  A.id, 
                                 A.parentId,
 		                        B.[text] AS parentText,
@@ -114,7 +115,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 					}
 				}
 
-				return this._relations;
+			    return this._relations;
 			}
 		}
 

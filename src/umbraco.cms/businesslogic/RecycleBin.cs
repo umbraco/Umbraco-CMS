@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using umbraco.BusinessLogic;
 using Umbraco.Core;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.web;
@@ -106,7 +107,8 @@ namespace umbraco.cms.businesslogic
             string sql = String.Format(RecycleBin.m_ChildCountSQL,
                         (int) type);
 
-            return SqlHelper.ExecuteScalar<int>(sql, SqlHelper.CreateParameter("@nodeObjectType", objectType));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<int>(sql, sqlHelper.CreateParameter("@nodeObjectType", objectType));
         }
         #endregion
 
@@ -157,9 +159,10 @@ namespace umbraco.cms.businesslogic
             {
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
 
-                using (IRecordsReader dr = SqlHelper.ExecuteReader(m_ChildSQL,
-                            SqlHelper.CreateParameter("@parentId", this.Id),
-                            SqlHelper.CreateParameter("@type", _nodeObjectType)))
+                using (var sqlHelper = Application.SqlHelper)
+                using (IRecordsReader dr = sqlHelper.ExecuteReader(m_ChildSQL,
+                            sqlHelper.CreateParameter("@parentId", this.Id),
+                            sqlHelper.CreateParameter("@type", _nodeObjectType)))
                 {
                     while (dr.Read())
                     {
