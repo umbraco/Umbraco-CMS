@@ -1560,12 +1560,13 @@ namespace umbraco.cms.businesslogic.web
         private XmlNode importXml()
         {
             XmlDocument xmlDoc = new XmlDocument();
-            using (var sqlHelper = Application.SqlHelper)
-            {
-                using(var xmlRdr = sqlHelper.ExecuteXmlReader(string.Format(
-                                                            "select xml from cmsContentXml where nodeID = {0}", Id)))
-                    xmlDoc.Load(xmlRdr);
-            }
+
+            var xmlStr = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                "select xml from cmsContentXml where nodeID = @nodeId", new {nodeId = Id});
+
+            if (xmlStr.IsNullOrWhiteSpace()) return null;
+
+            xmlDoc.LoadXml(xmlStr);
 
             return xmlDoc.FirstChild;
         }
