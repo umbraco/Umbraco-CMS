@@ -165,10 +165,20 @@ namespace umbraco.presentation.tinymce3
             {
                 IRecordsReader macroRenderings;
                 if (Request["editor"] != "")
-                    macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
+                {
+                    const string query = "select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName";
+                    using (var sqlHelper = BusinessLogic.Application.SqlHelper)
+                    using (var renderings = sqlHelper.ExecuteReader(query))
+                        macroRenderings = renderings;
+                }
                 else
-                    macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
-
+                {
+                    const string query = "select macroAlias, macroName from cmsMacro order by macroName";
+                    using (var sqlHelper = BusinessLogic.Application.SqlHelper)
+                    using (var renderings = sqlHelper.ExecuteReader(query))
+                        macroRenderings = renderings;
+                }
+                
                 umb_macroAlias.DataSource = macroRenderings;
                 umb_macroAlias.DataValueField = "macroAlias";
                 umb_macroAlias.DataTextField = "macroName";

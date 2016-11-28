@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using umbraco.BusinessLogic;
 using Umbraco.Core.Logging;
 
 namespace umbraco.editorControls
@@ -27,16 +28,16 @@ namespace umbraco.editorControls
                 // Don't query if there's nothing to query for..
                 if (string.IsNullOrWhiteSpace(Value.ToString()) == false)
                 {
-                    var dr = SqlHelper.ExecuteReader(string.Format("Select [value] from cmsDataTypeprevalues where id in ({0})", SqlHelper.EscapeString(Value.ToString())));
-
-                    while (dr.Read())
+                    using (var sqlHelper = Application.SqlHelper)
+                    using (var dr = sqlHelper.ExecuteReader(string.Format("Select [value] from cmsDataTypeprevalues where id in ({0})", sqlHelper.EscapeString(Value.ToString()))))
                     {
-                        value += value.Length == 0
-                            ? dr.GetString("value")
-                            : string.Format(",{0}", dr.GetString("value"));
+                        while (dr.Read())
+                        {
+                            value += value.Length == 0
+                                ? dr.GetString("value")
+                                : string.Format(",{0}", dr.GetString("value"));
+                        }
                     }
-
-                    dr.Close();
                 }
             }
             catch (Exception ex)

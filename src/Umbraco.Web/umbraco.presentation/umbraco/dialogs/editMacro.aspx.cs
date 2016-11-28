@@ -125,17 +125,22 @@ namespace umbraco.dialogs
 				}
 				else
 				{
-					IRecordsReader macroRenderings;
-					if (Request.GetItemAsString("editor") != "")
-						macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
-					else
-						macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
+				    string query;
+				    if (Request.GetItemAsString("editor") != "")
+				        query = "select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName";
+				    else
+				        query = "select macroAlias, macroName from cmsMacro order by macroName";
 
-					umb_macroAlias.DataSource = macroRenderings;
-					umb_macroAlias.DataValueField = "macroAlias";
-					umb_macroAlias.DataTextField = "macroName";
-					umb_macroAlias.DataBind();
-					macroRenderings.Close();
+                    using (var sqlHelper = BusinessLogic.Application.SqlHelper)
+                    {
+                        using (IRecordsReader macroRenderings = sqlHelper.ExecuteReader(query))
+                        {
+                            umb_macroAlias.DataSource = macroRenderings;
+                            umb_macroAlias.DataValueField = "macroAlias";
+                            umb_macroAlias.DataTextField = "macroName";
+                            umb_macroAlias.DataBind();
+                        }
+                    }
 				}
 			}
 
