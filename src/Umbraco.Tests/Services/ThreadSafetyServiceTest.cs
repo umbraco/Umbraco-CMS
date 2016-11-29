@@ -6,6 +6,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -271,8 +272,9 @@ namespace Umbraco.Tests.Services
 			public UmbracoDatabase GetDatabase()
 			{
 			    var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                var sqlContext = new SqlContext(SqlSyntax, Mock.Of<IPocoDataFactory>(), DatabaseType);
                 return _databases.GetOrAdd(Thread.CurrentThread.ManagedThreadId,
-                    i => new UmbracoDatabase(settings.ConnectionString, SqlSyntax, DatabaseType, _dbProviderFactory, _logger));
+                    i => new UmbracoDatabase(settings.ConnectionString, sqlContext, _dbProviderFactory, _logger));
 			}
 
 			protected override void DisposeResources()

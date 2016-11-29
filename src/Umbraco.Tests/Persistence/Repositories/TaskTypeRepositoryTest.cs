@@ -19,8 +19,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var taskType = new TaskType("asdfasdf");
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
-                var taskTypeRepo = new TaskTypeRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var taskTypeRepo = new TaskTypeRepository(unitOfWork, CacheHelper, Logger);
 
                 var created = DateTime.Now;
                 var task = new Task(taskType)

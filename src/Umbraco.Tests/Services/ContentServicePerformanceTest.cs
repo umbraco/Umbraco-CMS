@@ -158,10 +158,10 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), QueryFactory);
-                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
-                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, QueryFactory);
-                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), QueryFactory);
+                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
+                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository);
+                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -190,10 +190,10 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), QueryFactory);
-                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
-                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, QueryFactory);
-                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), QueryFactory);
+                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
+                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository);
+                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -220,10 +220,10 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), QueryFactory);
-                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
-                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, QueryFactory);
-                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), QueryFactory);
+                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
+                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository);
+                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
 
                 // Act
                 var contents = repository.GetAll();
@@ -253,10 +253,10 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), QueryFactory);
-                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
-                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, QueryFactory);
-                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), QueryFactory);
+                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
+                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository);
+                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
 
                 // Act
                 var contents = repository.GetAll();

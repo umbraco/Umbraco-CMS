@@ -11,10 +11,10 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoUnitOfWork"/> class with a a repository factory.
         /// </summary>
-        /// <param name="factory">A repository factory.</param>
+        /// <param name="repositoryFactory">A repository factory.</param>
         /// <remarks>This should be used by the FileUnitOfWorkProvider exclusively.</remarks>
-        public FileUnitOfWork(RepositoryFactory factory)
-            : base(factory)
+        public FileUnitOfWork(RepositoryFactory repositoryFactory)
+            : base(repositoryFactory)
         { }
 
         /// <summary>
@@ -25,7 +25,7 @@
         /// <returns>The created repository for the unit of work.</returns>
 	    public override TRepository CreateRepository<TRepository>(string name = null)
         {
-            return Factory.CreateRepository<TRepository>(this, name);
+            return RepositoryFactory.CreateRepository<TRepository>(this, name);
         }
     }
 }

@@ -32,8 +32,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private PermissionRepository<IContent> _permissionRepository;
 
-        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection, IQueryFactory queryFactory)
-            : base(work, cacheHelper, logger, contentSection, queryFactory)
+        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection)
+            : base(work, cacheHelper, logger, contentSection)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException(nameof(contentTypeRepository));
             if (templateRepository == null) throw new ArgumentNullException(nameof(templateRepository));
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _tagRepository = tagRepository;
             _cacheHelper = cacheHelper;
 
-            _publishedQuery =  queryFactory.Create<IContent>().Where(x => x.Published);
+            _publishedQuery =  work.DatabaseContext.Query<IContent>().Where(x => x.Published);
 
             EnsureUniqueNaming = true;
         }

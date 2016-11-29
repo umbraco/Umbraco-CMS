@@ -223,7 +223,17 @@ namespace Umbraco.Core.Components
 
         private object GetParameter(Type componentType, Type parameterType)
         {
-            var param = _container.TryGetInstance(parameterType);
+            object param;
+
+            try
+            {
+                param = _container.TryGetInstance(parameterType);
+            }
+            catch (Exception e)
+            {
+                throw new BootFailedException($"Could not get parameter of type {parameterType.FullName} for component {componentType.FullName}.", e);
+            }
+
             if (param == null) throw new BootFailedException($"Could not get parameter of type {parameterType.FullName} for component {componentType.FullName}.");
             return param;
         }

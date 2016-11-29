@@ -20,18 +20,17 @@ namespace Umbraco.Core.Services
     {
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
+        private IQuery<IUmbracoEntity> _queryRootEntity;
 
         public EntityService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
            IContentService contentService, IContentTypeService contentTypeService,
            IMediaService mediaService, IMediaTypeService mediaTypeService,
            IDataTypeService dataTypeService,
            IMemberService memberService, IMemberTypeService memberTypeService,
-           IQueryFactory queryFactory,
            IRuntimeCacheProvider runtimeCache)
             : base(provider, logger, eventMessagesFactory)
         {
             _runtimeCache = runtimeCache;
-            _rootEntityQuery = queryFactory.Create<IUmbracoEntity>().Where(x => x.ParentId == -1);
 
             _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
             {
@@ -69,7 +68,9 @@ namespace Umbraco.Core.Services
 
         #region Static Queries
 
-        private readonly IQuery<IUmbracoEntity> _rootEntityQuery;
+        // lazy-constructed because when the ctor runs, the query factory may not be ready
+
+        private IQuery<IUmbracoEntity> QueryRootEntity => _queryRootEntity ?? (_queryRootEntity = UowProvider.DatabaseContext.Query<IUmbracoEntity>().Where(x => x.ParentId == -1));
 
         #endregion
 
@@ -98,7 +99,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DataType:
                         case UmbracoObjectTypes.DocumentTypeContainer:
                             id = uow.Database.ExecuteScalar<int?>(
-                                 uow.Database.Sql()
+                                 uow.DatabaseContext.Sql()
                                     .Select("id")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.UniqueId == key));
@@ -144,7 +145,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
                             guid = uow.Database.ExecuteScalar<Guid?>(
-                                 uow.Database.Sql()
+                                 uow.DatabaseContext.Sql()
                                     .Select("uniqueID")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.NodeId == id));
@@ -442,7 +443,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                var entities = repository.GetByQuery(_rootEntityQuery, objectTypeId);
+                var entities = repository.GetByQuery(QueryRootEntity, objectTypeId);
                 uow.Complete();
                 return entities;
             }
@@ -547,7 +548,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                var sql = uow.Database.Sql()
+                var sql = uow.DatabaseContext.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.NodeId == id);
@@ -568,7 +569,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                var sql = uow.Database.Sql()
+                var sql = uow.DatabaseContext.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.UniqueId == key);

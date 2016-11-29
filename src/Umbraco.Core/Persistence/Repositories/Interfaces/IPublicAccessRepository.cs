@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IPublicAccessRepository : IRepositoryQueryable<Guid, PublicAccessEntry>
+    public interface IPublicAccessRepository : IQueryRepository<Guid, PublicAccessEntry>
     {
     }
 }

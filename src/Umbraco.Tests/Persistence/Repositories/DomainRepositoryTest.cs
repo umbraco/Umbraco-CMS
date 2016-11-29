@@ -19,12 +19,12 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private DomainRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out ContentRepository contentRepository, out LanguageRepository languageRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), QueryFactory);
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, QueryFactory);
-            contentRepository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), QueryFactory);
-            languageRepository = new LanguageRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
-            var domainRepository = new DomainRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
+            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
+            contentRepository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            languageRepository = new LanguageRepository(unitOfWork, DisabledCache, Logger);
+            var domainRepository = new DomainRepository(unitOfWork, DisabledCache, Logger);
             return domainRepository;
         }
 

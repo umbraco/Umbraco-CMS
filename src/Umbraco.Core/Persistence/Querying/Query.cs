@@ -30,26 +30,21 @@ namespace Umbraco.Core.Persistence.Querying
         /// <returns>This instance so calls to this method are chainable</returns>
         public virtual IQuery<T> Where(Expression<Func<T, bool>> predicate)
         {
-            if (predicate != null)
-            {
-                //TODO: This should have an SqlSyntax object passed in, this ctor is relying on a singleton
-                var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlSyntax, _mappers);
-                string whereExpression = expressionHelper.Visit(predicate);
+            if (predicate == null) return this;
 
-                _wheres.Add(new Tuple<string, object[]>(whereExpression, expressionHelper.GetSqlParameters()));
-            }
+            var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlSyntax, _mappers);
+            var whereExpression = expressionHelper.Visit(predicate);
+            _wheres.Add(new Tuple<string, object[]>(whereExpression, expressionHelper.GetSqlParameters()));
             return this;
         }
 
         public virtual IQuery<T> WhereIn(Expression<Func<T, object>> fieldSelector, IEnumerable values)
         {
-            if (fieldSelector != null)
-            {
-                var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlSyntax, _mappers);
-                string whereExpression = expressionHelper.Visit(fieldSelector);
+            if (fieldSelector == null) return this;
 
-                _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { @values = values } }));
-            }
+            var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlSyntax, _mappers);
+            var whereExpression = expressionHelper.Visit(fieldSelector);
+            _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { values } }));
             return this;
         }
 

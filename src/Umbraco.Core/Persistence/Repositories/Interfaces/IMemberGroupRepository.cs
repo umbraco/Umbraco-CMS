@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IMemberGroupRepository : IRepositoryQueryable<int, IMemberGroup>
+    public interface IMemberGroupRepository : IQueryRepository<int, IMemberGroup>
     {
         /// <summary>
         /// Gets a member group by it's name

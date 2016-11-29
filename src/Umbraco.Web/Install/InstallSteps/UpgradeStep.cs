@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -14,6 +13,13 @@ namespace Umbraco.Web.Install.InstallSteps
         "Upgrade", "upgrade", 1, "Upgrading Umbraco to the latest and greatest version.")]
     internal class UpgradeStep : InstallSetupStep<object>
     {
+        private readonly DatabaseBuilder _databaseBuilder;
+
+        public UpgradeStep(DatabaseBuilder databaseBuilder)
+        {
+            _databaseBuilder = databaseBuilder;
+        }
+
         public override bool RequiresExecution(object model)
         {
             return true;
@@ -53,8 +59,8 @@ namespace Umbraco.Web.Install.InstallSteps
             var version = new SemVersion(0);
 
             //If we have a db context available, if we don't then we are not installed anyways
-            if (Current.DatabaseContext.IsDatabaseConfigured && Current.DatabaseContext.CanConnect)
-                version = Current.DatabaseContext.ValidateDatabaseSchema().DetermineInstalledVersionByMigrations(Current.Services.MigrationEntryService);
+            if (_databaseBuilder.IsDatabaseConfigured && _databaseBuilder.CanConnect)
+                version = _databaseBuilder.ValidateDatabaseSchema().DetermineInstalledVersionByMigrations(Current.Services.MigrationEntryService);
 
             if (version != new SemVersion(0))
                 return version;

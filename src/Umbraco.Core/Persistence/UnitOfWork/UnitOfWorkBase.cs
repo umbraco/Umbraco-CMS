@@ -9,12 +9,12 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     {
         private readonly Queue<Operation> _operations = new Queue<Operation>();
 
-        protected UnitOfWorkBase(RepositoryFactory factory)
+        protected UnitOfWorkBase(RepositoryFactory repositoryFactory)
         {
-            Factory = factory;
+            RepositoryFactory = repositoryFactory;
         }
 
-        protected RepositoryFactory Factory { get; }
+        protected RepositoryFactory RepositoryFactory { get; }
 
         public abstract TRepository CreateRepository<TRepository>(string name = null)
             where TRepository : IRepository;

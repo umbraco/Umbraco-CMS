@@ -8,9 +8,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -20,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class UserTypeRepository : NPocoRepositoryBase<int, IUserType>, IUserTypeRepository
     {
-        public UserTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-            : base(work, cache, logger, queryFactory)
+        public UserTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+            : base(work, cache, logger)
         {
         }
 

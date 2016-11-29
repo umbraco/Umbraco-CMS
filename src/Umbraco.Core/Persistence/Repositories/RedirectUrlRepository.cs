@@ -13,8 +13,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class RedirectUrlRepository : NPocoRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
     {
-        public RedirectUrlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory) 
-            : base(work, cache, logger, queryFactory)
+        public RedirectUrlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger) 
+            : base(work, cache, logger)
         { }
 
         protected override int PerformCount(IQuery<IRedirectUrl> query)

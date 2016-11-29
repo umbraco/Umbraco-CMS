@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<IDomain, int> _cachePolicy;
 
-        public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-            : base(work, cache, logger, queryFactory)
+        public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+            : base(work, cache, logger)
         {           
         }
 

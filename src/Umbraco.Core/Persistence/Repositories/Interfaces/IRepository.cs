@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
-	/// Defines the base implementation of a Repository
+	/// Defines the base implementation of a repository.
 	/// </summary>
-	/// <remarks>
-	/// Currently this interface is empty but it is useful for flagging a repository without having generic parameters, it also might
-	/// come in handy if we need to add anything to the base/non-generic repository interface.
-	/// </remarks>
 	public interface IRepository
-	{
-
-	}
+	{ }
 
     public interface IReadRepository<in TId, out TEntity> : IRepository
     {
@@ -39,12 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
         bool Exists(TId id);
     }
 
-    //TODO: This should be decoupled! Shouldn't inherit from the IReadRepository and should be named IWriteRepository
-
-    /// <summary>
-    /// Defines the implementation of a Repository
-    /// </summary>
-    public interface IRepository<in TId, TEntity> : IReadRepository<TId, TEntity>
+    public interface IWriteRepository<in TEntity> : IRepository
     {
         /// <summary>
         /// Adds or Updates an Entity
@@ -58,4 +46,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         void Delete(TEntity entity);
     }
+
+    public interface IRepository<in TId, TEntity> : IReadRepository<TId, TEntity>, IWriteRepository<TEntity>
+    { }
 }

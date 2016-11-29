@@ -16,8 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<IServerRegistration, int> _cachePolicy;
 
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IQueryFactory queryFactory)
-            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, queryFactory)
+        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger)
+            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger)
         { }
 
         protected override IRepositoryCachePolicy<IServerRegistration, int> CachePolicy => _cachePolicy

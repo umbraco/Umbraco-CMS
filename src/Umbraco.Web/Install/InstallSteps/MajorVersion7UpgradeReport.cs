@@ -4,9 +4,9 @@ using System.Linq;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Install.Models;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -14,24 +14,24 @@ namespace Umbraco.Web.Install.InstallSteps
         "MajorVersion7UpgradeReport", 1, "")]
     internal class MajorVersion7UpgradeReport : InstallSetupStep<object>
     {
-        private readonly DatabaseContext _databaseContext;
+        private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
 
-        public MajorVersion7UpgradeReport(DatabaseContext databaseContext, IRuntimeState runtime)
+        public MajorVersion7UpgradeReport(DatabaseBuilder databaseBuilder, IRuntimeState runtime)
         {
-            _databaseContext = databaseContext;
+            _databaseBuilder = databaseBuilder;
             _runtime = runtime;
         }
 
         public override InstallSetupResult Execute(object model)
         {
             //we cannot run this step if the db is not configured.
-            if (_databaseContext.IsDatabaseConfigured == false)
+            if (_databaseBuilder.IsDatabaseConfigured == false)
             {
                 return null;
             }
 
-            var result = _databaseContext.ValidateDatabaseSchema();
+            var result = _databaseBuilder.ValidateDatabaseSchema();
             var determinedVersion = result.DetermineInstalledVersion();
 
             return new InstallSetupResult("version7upgradereport", 
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Install.InstallSteps
             try
             {
                 //we cannot run this step if the db is not configured.
-                if (_databaseContext.IsDatabaseConfigured == false)
+                if (_databaseBuilder.IsDatabaseConfigured == false)
                 {
                     return false;
                 }
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
-            var result = _databaseContext.ValidateDatabaseSchema();
+            var result = _databaseBuilder.ValidateDatabaseSchema();
             var determinedVersion = result.DetermineInstalledVersion();
             if ((string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false || determinedVersion.Equals(new Version(0, 0, 0)) == false)
                 && UmbracoVersion.Current.Major > determinedVersion.Major)
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             var errorReport = new List<string>();
 
-            var sqlSyntax = _databaseContext.SqlSyntax;
+            var sqlSyntax = _databaseBuilder.DatabaseContext.SqlSyntax;
 
             var sql = new Sql();
             sql
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Install.InstallSteps
                     sqlSyntax.GetQuotedColumn("cmsDataType", "nodeId") + " = " +
                     sqlSyntax.GetQuotedColumn("umbracoNode", "id"));
 
-            var list = _databaseContext.Database.Fetch<dynamic>(sql);
+            var list = _databaseBuilder.DatabaseContext.Database.Fetch<dynamic>(sql);
             foreach (var item in list)
             {
                 Guid legacyId = item.controlId;
@@ -106,12 +106,12 @@ namespace Umbraco.Web.Install.InstallSteps
                     var editor = Current.PropertyEditors[alias];
                     if (editor == null)
                     {
-                        errorReport.Add(string.Format("Property Editor with ID '{0}' (assigned to Data Type '{1}') has a valid GUID -> Alias map but no property editor was found. It will be replaced with a Readonly/Label property editor.", item.controlId, item.text));
+                        errorReport.Add($"Property Editor with ID '{item.controlId}' (assigned to Data Type '{item.text}') has a valid GUID -> Alias map but no property editor was found. It will be replaced with a Readonly/Label property editor.");
                     }
                 }
                 else
                 {
-                    errorReport.Add(string.Format("Property Editor with ID '{0}' (assigned to Data Type '{1}') does not have a valid GUID -> Alias map. It will be replaced with a Readonly/Label property editor.", item.controlId, item.text));
+                    errorReport.Add($"Property Editor with ID '{item.controlId}' (assigned to Data Type '{item.text}') does not have a valid GUID -> Alias map. It will be replaced with a Readonly/Label property editor.");
                 }
             }
 

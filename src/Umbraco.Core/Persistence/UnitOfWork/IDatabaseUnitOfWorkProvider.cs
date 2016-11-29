@@ -6,6 +6,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     public interface IDatabaseUnitOfWorkProvider
 	{
         /// <summary>
+        /// Gets the database context.
+        /// </summary>
+        DatabaseContext DatabaseContext { get; }
+
+        /// <summary>
         /// Creates a unit of work.
         /// </summary>
         /// <returns>A new unit of work.</returns>

@@ -13,7 +13,8 @@
         /// itself it the factory has no model for that content type.</returns>
         IPublishedContent CreateModel(IPublishedContent content);
 
-        T CreateModel<T>(IPublishedFragment content);
+        // temp - dont break MB
+        //T CreateModel<T>(IPublishedFragment content);
 
         // fixme
         // and we'd need a

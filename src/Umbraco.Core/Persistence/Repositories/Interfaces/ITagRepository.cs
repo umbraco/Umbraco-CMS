@@ -4,7 +4,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface ITagRepository : IRepositoryQueryable<int, ITag>
+    public interface ITagRepository : IQueryRepository<int, ITag>
     {
 
         TaggedEntity GetTaggedEntityByKey(Guid key);

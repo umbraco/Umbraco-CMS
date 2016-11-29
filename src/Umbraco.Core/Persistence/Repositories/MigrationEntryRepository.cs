@@ -17,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class MigrationEntryRepository : NPocoRepositoryBase<int, IMigrationEntry>, IMigrationEntryRepository
     {
-        public MigrationEntryRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-            : base(work, cache, logger, queryFactory)
+        public MigrationEntryRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
+            : base(work, cache, logger)
         {
         }
 

@@ -16,8 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class TaskTypeRepository : NPocoRepositoryBase<int, TaskType>, ITaskTypeRepository
     {
-        public TaskTypeRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-            : base(work, cache, logger, queryFactory)
+        public TaskTypeRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
+            : base(work, cache, logger)
         {
         }
 

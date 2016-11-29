@@ -48,6 +48,8 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual ISqlSyntaxProvider SqlSyntax => new SqlCeSyntaxProvider();
 
+        protected IMapperCollection Mappers => Container.GetInstance<IMapperCollection>();
+
         protected IQueryFactory QueryFactory => Container.GetInstance<IQueryFactory>();
 
         /// <summary>
@@ -123,12 +125,8 @@ namespace Umbraco.Tests.TestHelpers
                 Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 sqlSyntaxProviders,
                 Logger, f.GetInstance<IUmbracoDatabaseAccessor>(),
-                Mock.Of<IQueryFactory>()));
-            Container.RegisterSingleton(f => new DatabaseContext(
-                f.GetInstance<IDatabaseFactory>(),
-                Logger,
-                Mock.Of<IRuntimeState>(),
-                Mock.Of<IMigrationEntryService>()));
+                Mock.Of<IMapperCollection>()));
+            Container.RegisterSingleton(f => new DatabaseContext(f.GetInstance<IDatabaseFactory>()));
 
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
             Container.Register(factory

@@ -16,8 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class ExternalLoginRepository : NPocoRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository
     {
-        public ExternalLoginRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-            : base(work, cache, logger, queryFactory)
+        public ExternalLoginRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+            : base(work, cache, logger)
         {
         }
 

@@ -22,8 +22,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<IDictionaryItem, int> _cachePolicy;
 
-        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-            : base(work, cache, logger, queryFactory)
+        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+            : base(work, cache, logger)
         { }
 
         protected override IRepositoryCachePolicy<IDictionaryItem, int> CachePolicy
@@ -240,13 +240,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionaryItem Get(Guid uniqueId)
         {
-            var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, QueryFactory);
+            var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, Cache, Logger);
             return uniqueIdRepo.Get(uniqueId);
         }
 
         public IDictionaryItem Get(string key)
         {
-            var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, QueryFactory);
+            var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, Cache, Logger);
             return keyRepo.Get(key);
         }
 
@@ -294,8 +294,8 @@ namespace Umbraco.Core.Persistence.Repositories
             private IRepositoryCachePolicy<IDictionaryItem, Guid> _cachePolicy;
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-                : base(work, cache, logger, queryFactory)
+            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+                : base(work, cache, logger)
             {
                 _dictionaryRepository = dictionaryRepository;
             }
@@ -355,8 +355,8 @@ namespace Umbraco.Core.Persistence.Repositories
             private IRepositoryCachePolicy<IDictionaryItem, string> _cachePolicy;
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-                : base(work, cache, logger, queryFactory)
+            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+                : base(work, cache, logger)
             {
                 _dictionaryRepository = dictionaryRepository;
             }

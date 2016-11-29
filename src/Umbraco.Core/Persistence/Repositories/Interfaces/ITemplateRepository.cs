@@ -6,7 +6,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface ITemplateRepository : IRepositoryQueryable<int, ITemplate>
+    public interface ITemplateRepository : IQueryRepository<int, ITemplate>
     {
         ITemplate Get(string alias);
 

@@ -22,5 +22,7 @@ namespace Umbraco.Core.Persistence
         bool CanConnect { get; }
         
         IQueryFactory QueryFactory { get; }
+
+        ISqlSyntaxProvider SqlSyntax { get; }
 	}
 }

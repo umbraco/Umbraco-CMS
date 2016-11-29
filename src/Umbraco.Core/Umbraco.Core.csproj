@@ -223,6 +223,7 @@
     <Compile Include="Constants-Icons.cs" />
     <Compile Include="CoreRuntime.cs" />
     <Compile Include="CoreRuntimeComponent.cs" />
+    <Compile Include="DatabaseBuilder.cs" />
     <Compile Include="DI\Current.cs" />
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
@@ -293,6 +294,7 @@
     <Compile Include="Models\PublishedContent\NoopPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PropertyResult.cs" />
     <Compile Include="Models\PublishedContent\PropertyResultType.cs" />
+    <Compile Include="Models\Rdbms\ContentNuDto.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseAccessor.cs" />
     <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
     <Compile Include="Persistence\Mappers\MapperCollection.cs" />
@@ -451,8 +453,8 @@
     <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\DataTypeContainerRepository.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\DocumentTypeContainerRepository.cs" />
+    <Compile Include="Persistence\Repositories\DataTypeContainerRepository.cs" />
+    <Compile Include="Persistence\Repositories\DocumentTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDataTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDocumentTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IEntityContainerRepository.cs" />
@@ -470,7 +472,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IXsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\MediaTypeContainerRepository.cs" />
+    <Compile Include="Persistence\Repositories\MediaTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepository.cs" />
@@ -1017,7 +1019,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IMemberTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\IRepositoryQueryable.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IQueryRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepositoryVersionable.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepository.cs" />

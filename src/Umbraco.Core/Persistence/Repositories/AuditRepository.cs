@@ -15,8 +15,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class AuditRepository : NPocoRepositoryBase<int, AuditItem>, IAuditRepository
     {
-        public AuditRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-            : base(work, cache, logger, queryFactory)
+        public AuditRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
+            : base(work, cache, logger)
         {
         }
 

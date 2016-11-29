@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Defines the <see cref="IRedirectUrl"/> repository.
     /// </summary>
-    public interface IRedirectUrlRepository : IRepositoryQueryable<Guid, IRedirectUrl>
+    public interface IRedirectUrlRepository : IQueryRepository<Guid, IRedirectUrl>
     {
         /// <summary>
         /// Gets a redirect url.

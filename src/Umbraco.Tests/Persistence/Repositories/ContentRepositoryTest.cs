@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             TemplateRepository tr;
             var ctRepository = CreateRepository(unitOfWork, out contentTypeRepository, out tr);
-            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, QueryFactory);
+            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository);
             return ctRepository;
         }
 
@@ -52,10 +52,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository)
         {
-            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), QueryFactory);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, QueryFactory);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository, QueryFactory);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), QueryFactory);
+            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 

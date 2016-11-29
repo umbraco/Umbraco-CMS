@@ -14,36 +14,30 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoUnitOfWork"/> class with a database and a repository factory.
         /// </summary>
+        /// <param name="databaseContext">The database context.</param>
         /// <param name="database">A database.</param>
-        /// <param name="factory">A repository factory.</param>
+        /// <param name="repositoryFactory">A repository factory.</param>
         /// <remarks>This should be used by the NPocoUnitOfWorkProvider exclusively.</remarks>
-        internal NPocoUnitOfWork(UmbracoDatabase database, RepositoryFactory factory)
-            : base(factory)
+        internal NPocoUnitOfWork(DatabaseContext databaseContext, UmbracoDatabase database, RepositoryFactory repositoryFactory)
+            : base(repositoryFactory)
         {
+            DatabaseContext = databaseContext;
             Database = database;
         }
 
-        /// <summary>
-        /// Gets the unit of work underlying database.
-        /// </summary>
-        public UmbracoDatabase Database { get; }
+        /// <inheritdoc />
+        public DatabaseContext DatabaseContext { get; }
 
-        /// <summary>
-        /// Creates a repository.
-        /// </summary>
-        /// <typeparam name="TRepository">The type of the repository.</typeparam>
-        /// <param name="name">The optional name of the repository.</param>
-        /// <returns>The created repository for the unit of work.</returns>
+        /// <inheritdoc />
+        public UmbracoDatabase Database { get; } // => DatabaseContext.Database; // fixme + change ctor
+
+        /// <inheritdoc />
         public override TRepository CreateRepository<TRepository>(string name = null)
         {
-            return Factory.CreateRepository<TRepository>(this, name);
+            return RepositoryFactory.CreateRepository<TRepository>(this, name);
         }
 
-        /// <summary>
-        /// Ensures that we have a transaction.
-        /// </summary>
-        /// <remarks>Isolation level is determined by the database, see UmbracoDatabase.DefaultIsolationLevel. Should be
-        /// at least IsolationLevel.RepeatablRead else the node locks will not work correctly.</remarks>
+        /// <inheritdoc />
         public override void Begin()
         {
             base.Begin();
@@ -52,6 +46,39 @@ namespace Umbraco.Core.Persistence.UnitOfWork
                 _transaction = Database.GetTransaction();
         }
 
+        /// <inheritdoc />
+        public void ReadLock(params int[] lockIds)
+        {
+            Begin(); // we need a transaction
+
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = Database.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
+        }
+
+        /// <inheritdoc />
+        public void WriteLock(params int[] lockIds)
+        {
+            Begin(); // we need a transaction
+
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = Database.Execute("UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+                if (i == 0) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
+        }
+
+        /// <inheritdoc />
         protected override void DisposeResources()
         {
             base.DisposeResources();
@@ -68,38 +95,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
                 _transaction.Dispose(); // abort the transaction
 
             _transaction = null;
-        }
-
-        public void ReadLock(params int[] lockIds)
-        {
-            Begin(); // we need a transaction
-
-            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
-                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
-            foreach (var lockId in lockIds)
-            {
-                var i = Database.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id",
-                    new { @id = lockId });
-                if (i == null) // ensure we are actually locking!
-                    throw new Exception($"LockObject with id={lockId} does not exist.");
-            }
-        }
-
-        public void WriteLock(params int[] lockIds)
-        {
-            Begin(); // we need a transaction
-
-            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
-                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
-            foreach (var lockId in lockIds)
-            {
-                var i = Database.Execute("UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id",
-                    new { @id = lockId });
-                if (i == 0) // ensure we are actually locking!
-                    throw new Exception($"LockObject with id={lockId} does not exist.");
-            }
         }
     }
 }

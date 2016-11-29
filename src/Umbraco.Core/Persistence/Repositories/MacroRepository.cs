@@ -17,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MacroRepository : NPocoRepositoryBase<int, IMacro>, IMacroRepository
     {
 
-        public MacroRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IQueryFactory queryFactory)
-            : base(work, cache, logger, queryFactory)
+        public MacroRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+            : base(work, cache, logger)
         {
         }
 
