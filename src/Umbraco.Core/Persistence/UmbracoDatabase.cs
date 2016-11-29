@@ -84,10 +84,10 @@ namespace Umbraco.Core.Persistence
 
         // INTERNAL FOR UNIT TESTS
         internal UmbracoDatabase(DbConnection connection,
-            ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, ILogger logger)
-            : base(connection, databaseType, DefaultIsolationLevel)
+            SqlContext sqlContext, ILogger logger)
+            : base(connection, sqlContext.DatabaseType, DefaultIsolationLevel)
         {
-            _sqlContext = new SqlContext(sqlSyntax, null, databaseType); // beware! no pocoDataFactory!
+            _sqlContext = sqlContext;
 
             _logger = logger;
 

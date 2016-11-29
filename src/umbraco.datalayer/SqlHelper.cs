@@ -389,8 +389,8 @@ namespace umbraco.DataLayer
             var databaseContextProperty = currentType.GetProperty("DatabaseContext", BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
             var databaseContext = databaseContextProperty.GetValue(null);
 
-            var factoryField = databaseContextType.GetField("_factory", BindingFlags.Instance | BindingFlags.NonPublic);
-            Factory = factoryField.GetValue(databaseContext);
+            var factoryProperty = databaseContextType.GetProperty("DatabaseFactory", BindingFlags.Instance | BindingFlags.NonPublic);
+            Factory = factoryProperty.GetValue(databaseContext);
 
             GetMethod = defaultDatabaseFactoryType.GetMethod("GetDatabase", BindingFlags.Instance | BindingFlags.Public);
 

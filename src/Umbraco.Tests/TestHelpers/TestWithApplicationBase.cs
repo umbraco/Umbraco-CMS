@@ -50,7 +50,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected IMapperCollection Mappers => Container.GetInstance<IMapperCollection>();
 
-        protected IQueryFactory QueryFactory => Container.GetInstance<IQueryFactory>();
+        protected IQueryFactory QueryFactory => Container.GetInstance<DatabaseContext>().QueryFactory;
 
         /// <summary>
         /// Gets a value indicating whether the plugin manager should be resetted before and after each test.
@@ -114,8 +114,36 @@ namespace Umbraco.Tests.TestHelpers
             Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
 
             // register application stuff (database factory & context, services...)
-            Container.RegisterCollectionBuilder<MapperCollectionBuilder>()
-                .Add(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
+            Container.RegisterCollectionBuilder<MapperCollectionBuilder>() // fixme - see CoreRuntime, should not duplicate core here
+                .Add<AccessMapper>()
+                .Add<AuditItemMapper>()
+                .Add<ContentMapper>()
+                .Add<ContentTypeMapper>()
+                .Add<DataTypeDefinitionMapper>()
+                .Add<DictionaryMapper>()
+                .Add<DictionaryTranslationMapper>()
+                .Add<DomainMapper>()
+                .Add<LanguageMapper>()
+                .Add<MacroMapper>()
+                .Add<MediaMapper>()
+                .Add<MediaTypeMapper>()
+                .Add<MemberGroupMapper>()
+                .Add<MemberMapper>()
+                .Add<MemberTypeMapper>()
+                .Add<MigrationEntryMapper>()
+                .Add<PropertyGroupMapper>()
+                .Add<PropertyMapper>()
+                .Add<PropertyTypeMapper>()
+                .Add<RelationMapper>()
+                .Add<RelationTypeMapper>()
+                .Add<ServerRegistrationMapper>()
+                .Add<TagMapper>()
+                .Add<TaskTypeMapper>()
+                .Add<TemplateMapper>()
+                .Add<UmbracoEntityMapper>()
+                .Add<UserMapper>()
+                .Add<ExternalLoginMapper>()
+                .Add<UserTypeMapper>();
 
             Container.RegisterSingleton<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
             Container.RegisterSingleton<IUmbracoDatabaseAccessor, TestUmbracoDatabaseAccessor>();

@@ -88,8 +88,14 @@ namespace Umbraco.Core.Persistence.Repositories
             get
             {
                 if (_cachePolicy != null) return _cachePolicy;
-                if (_hasIdQuery == null) _hasIdQuery = Query.Where(x => x.Id != 0);
-                var options = new RepositoryCachePolicyOptions(() => PerformCount(_hasIdQuery));
+                // fixme - no query for some TEntity?!
+                //if (_hasIdQuery == null) _hasIdQuery = Query.Where(x => x.Id != 0);
+                //var options = new RepositoryCachePolicyOptions(() => PerformCount(_hasIdQuery));
+                var options = new RepositoryCachePolicyOptions(() =>
+                {
+                    if (_hasIdQuery == null) _hasIdQuery = Query.Where(x => x.Id != 0);
+                    return PerformCount(_hasIdQuery);
+                });
                 return _cachePolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, options);
             }
             set

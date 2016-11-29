@@ -54,7 +54,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             var syntax = new SqlCeSyntaxProvider();
             var connection = GetDbConnection();
-            return new UmbracoDatabase(connection, syntax, DatabaseType.SQLCe, logger);
+            var sqlContext = new SqlContext(syntax, Mock.Of<IPocoDataFactory>(), DatabaseType.SQLCe);
+            return new UmbracoDatabase(connection, sqlContext, logger);
         }
 
         /// <summary>
@@ -68,7 +69,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             var syntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)); // do NOT try to get the server's version!
             var connection = GetDbConnection();
-            return new UmbracoDatabase(connection, syntax, DatabaseType.SqlServer2008, logger);
+            var sqlContext = new SqlContext(syntax, Mock.Of<IPocoDataFactory>(), DatabaseType.SqlServer2008);
+            return new UmbracoDatabase(connection, sqlContext, logger);
         }
 
         public static void RegisterServices(IServiceContainer container)

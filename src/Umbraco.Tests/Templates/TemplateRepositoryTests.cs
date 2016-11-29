@@ -1,12 +1,5 @@
 ﻿using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -14,10 +7,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 
@@ -29,7 +20,7 @@ namespace Umbraco.Tests.Templates
         private readonly Mock<CacheHelper> _cacheMock = new Mock<CacheHelper>();
         private readonly Mock<IFileSystem> _viewFileSystemMock = new Mock<IFileSystem>();
         private readonly Mock<IFileSystem> _masterpageFileSystemMock = new Mock<IFileSystem>();
-        private readonly Mock<ITemplatesSection> _templateConfigMock = new Mock<Core.Configuration.UmbracoSettings.ITemplatesSection>();
+        private readonly Mock<ITemplatesSection> _templateConfigMock = new Mock<ITemplatesSection>();
         private TemplateRepository _templateRepository;
 
         [SetUp]
@@ -38,8 +29,13 @@ namespace Umbraco.Tests.Templates
             var logger = Mock.Of<ILogger>();
 
             var unitOfWorkMock = new Mock<IDatabaseUnitOfWork>();
-            var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
-            unitOfWorkMock.Setup(x => x.Database).Returns(db);
+            var database = TestObjects.GetUmbracoSqlCeDatabase(logger);
+            unitOfWorkMock.Setup(x => x.Database).Returns(database);
+
+            var databaseFactoryMock = new Mock<IDatabaseFactory>();
+            databaseFactoryMock.Setup(x => x.QueryFactory).Returns(Mock.Of<IQueryFactory>());
+            var databaseContext = new DatabaseContext(databaseFactoryMock.Object);
+            unitOfWorkMock.Setup(x => x.DatabaseContext).Returns(databaseContext);
 
             _templateRepository = new TemplateRepository(unitOfWorkMock.Object, _cacheMock.Object, logger, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object);
 

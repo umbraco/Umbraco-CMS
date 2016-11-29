@@ -439,7 +439,7 @@ namespace Umbraco.Tests.IO
             Assert.IsTrue(fs.FileExists("sub/f5.txt"));
             scope.Dispose();
             Assert.IsTrue(fs.FileExists("sub/f5.txt"));
-            Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
+            TestHelper.TryAssert(() => Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id)));
         }
 
         [Test]

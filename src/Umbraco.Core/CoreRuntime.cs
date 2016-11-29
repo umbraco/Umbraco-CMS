@@ -259,6 +259,7 @@ namespace Umbraco.Core
                 .Add<PropertyMapper>()
                 .Add<PropertyTypeMapper>()
                 .Add<RelationMapper>()
+                .Add<RelationTypeMapper>()
                 .Add<ServerRegistrationMapper>()
                 .Add<TagMapper>()
                 .Add<TaskTypeMapper>()
