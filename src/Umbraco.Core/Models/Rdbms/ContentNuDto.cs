@@ -1,8 +1,7 @@
 ﻿using NPoco;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Web.PublishedCache.NuCache.DataSource
+namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("cmsContentNu")]
     [PrimaryKey("nodeId", AutoIncrement = false)]

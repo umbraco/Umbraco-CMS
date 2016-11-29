@@ -244,7 +244,6 @@
     <Compile Include="PublishedCache\NuCache\ContentStore2.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentData.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\ContentNuDto.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\Database.cs" />
     <Compile Include="PublishedCache\NuCache\DomainCache.cs" />

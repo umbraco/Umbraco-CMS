@@ -84,7 +84,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {46, typeof (UmbracoDeployChecksumDto)},
                                                                               {47, typeof (UmbracoDeployDependencyDto)},
                                                                               {48, typeof (RedirectUrlDto) },
-                                                                              {49, typeof (LockDto) }
+                                                                              {49, typeof (LockDto) },
+                                                                              {50, typeof (ContentNuDto) }
                                                                           };
         #endregion
 
