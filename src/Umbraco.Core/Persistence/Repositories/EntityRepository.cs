@@ -19,12 +19,9 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </remarks>
     internal class EntityRepository : DisposableObject, IEntityRepository
     {
-        private readonly IQueryFactory _queryFactory;
-
-        public EntityRepository(IDatabaseUnitOfWork work, IQueryFactory queryFactory)
+        public EntityRepository(IDatabaseUnitOfWork work)
         {
             UnitOfWork = work;
-            _queryFactory = queryFactory;
         }
 
         /// <summary>
@@ -34,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Query Methods
 
-        public IQuery<IUmbracoEntity> Query => _queryFactory.Create<IUmbracoEntity>();
+        public IQuery<IUmbracoEntity> Query => UnitOfWork.DatabaseContext.Query<IUmbracoEntity>();
 
         public Sql<SqlContext> Sql() { return UnitOfWork.Database.Sql();}
 

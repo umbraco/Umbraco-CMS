@@ -23,13 +23,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             _repositoryFactory = repositoryFactory;
         }
 
-        #region Implement IUnitOfWorkProvider
+        /// <inheritdoc />
+        public DatabaseContext DatabaseContext => Current.DatabaseContext; // fixme inject!
 
-        /// <summary>
-        /// Creates a unit of work around a database obtained from the database factory.
-        /// </summary>
-        /// <returns>A unit of work.</returns>
-        /// <remarks>The unit of work will execute on the database returned by the database factory.</remarks>
+        /// <inheritdoc />
         public IDatabaseUnitOfWork CreateUnitOfWork()
         {
             // get a database from the factory - might be the "ambient" database eg
@@ -39,7 +36,5 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             var databaseContext = Current.DatabaseContext; // fixme - inject!
             return new NPocoUnitOfWork(databaseContext, database, _repositoryFactory);
         }
-
-        #endregion
     }
 }

@@ -37,6 +37,10 @@ namespace Umbraco.Core
             composition.Container.RegisterFrom<ServicesCompositionRoot>();
             composition.Container.RegisterFrom<CoreModelMappersCompositionRoot>();
 
+            // register database builder
+            // *not* a singleton, don't want to keep it around
+            composition.Container.Register<DatabaseBuilder>();
+
             //TODO: Don't think we'll need this when the resolvers are all container resolvers
             composition.Container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
 
@@ -117,8 +121,7 @@ namespace Umbraco.Core
             composition.Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
         }
 
-        internal void Initialize(
-            IEnumerable<ModelMapperConfiguration> modelMapperConfigurations)
+        internal void Initialize(IEnumerable<ModelMapperConfiguration> modelMapperConfigurations)
         {
             //TODO: Remove these for v8!
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();

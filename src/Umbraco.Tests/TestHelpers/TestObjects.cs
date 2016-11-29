@@ -150,7 +150,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var userService = GetLazyService<IUserService>(container, () => new UserService(provider, logger, eventMessagesFactory));
             var dataTypeService = GetLazyService<IDataTypeService>(container, () => new DataTypeService(provider, logger, eventMessagesFactory));
-            var contentService = GetLazyService<IContentService>(container, () => new ContentService(provider, logger, eventMessagesFactory, queryFactory, mediaFileSystem));
+            var contentService = GetLazyService<IContentService>(container, () => new ContentService(provider, logger, eventMessagesFactory, mediaFileSystem));
             var notificationService = GetLazyService<INotificationService>(container, () => new NotificationService(provider, userService.Value, contentService.Value, logger));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(container, () => new ServerRegistrationService(provider, logger, eventMessagesFactory));
             var memberGroupService = GetLazyService<IMemberGroupService>(container, () => new MemberGroupService(provider, logger, eventMessagesFactory));
@@ -165,7 +165,6 @@ namespace Umbraco.Tests.TestHelpers
             var entityService = GetLazyService<IEntityService>(container, () => new EntityService(
                     provider, logger, eventMessagesFactory,
                     contentService.Value, contentTypeService.Value, mediaService.Value, mediaTypeService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
-                    queryFactory,
                     //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
 

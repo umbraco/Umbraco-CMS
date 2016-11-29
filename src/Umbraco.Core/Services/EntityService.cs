@@ -20,18 +20,17 @@ namespace Umbraco.Core.Services
     {
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
+        private IQuery<IUmbracoEntity> _queryRootEntity;
 
         public EntityService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
            IContentService contentService, IContentTypeService contentTypeService,
            IMediaService mediaService, IMediaTypeService mediaTypeService,
            IDataTypeService dataTypeService,
            IMemberService memberService, IMemberTypeService memberTypeService,
-           IQueryFactory queryFactory,
            IRuntimeCacheProvider runtimeCache)
             : base(provider, logger, eventMessagesFactory)
         {
             _runtimeCache = runtimeCache;
-            _rootEntityQuery = queryFactory.Create<IUmbracoEntity>().Where(x => x.ParentId == -1);
 
             _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
             {
@@ -69,7 +68,9 @@ namespace Umbraco.Core.Services
 
         #region Static Queries
 
-        private readonly IQuery<IUmbracoEntity> _rootEntityQuery;
+        // lazy-constructed because when the ctor runs, the query factory may not be ready
+
+        private IQuery<IUmbracoEntity> QueryRootEntity => _queryRootEntity ?? (_queryRootEntity = UowProvider.DatabaseContext.Query<IUmbracoEntity>().Where(x => x.ParentId == -1));
 
         #endregion
 
@@ -442,7 +443,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                var entities = repository.GetByQuery(_rootEntityQuery, objectTypeId);
+                var entities = repository.GetByQuery(QueryRootEntity, objectTypeId);
                 uow.Complete();
                 return entities;
             }

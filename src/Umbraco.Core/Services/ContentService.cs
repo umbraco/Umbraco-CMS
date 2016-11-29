@@ -21,6 +21,7 @@ namespace Umbraco.Core.Services
     public class ContentService : RepositoryService, IContentService, IContentServiceOperations
     {
         private readonly MediaFileSystem _mediaFileSystem;
+        private IQuery<IContent> _queryNotTrashed;
 
         #region Constructors
 
@@ -28,19 +29,19 @@ namespace Umbraco.Core.Services
             IDatabaseUnitOfWorkProvider provider,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
-            IQueryFactory queryFactory,
             MediaFileSystem mediaFileSystem)
             : base(provider, logger, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
-            _notTrashedQuery = queryFactory.Create<IContent>().Where(x => x.Trashed == false);
         }
 
         #endregion
 
-        #region Static Queries
+        #region Static queries
 
-        private readonly IQuery<IContent> _notTrashedQuery;
+        // lazy-constructed because when the ctor runs, the query factory may not be ready
+
+        private IQuery<IContent> QueryNotTrashed => _queryNotTrashed ?? (_queryNotTrashed = UowProvider.DatabaseContext.Query<IContent>().Where(x => x.Trashed == false));
 
         #endregion
 
@@ -834,7 +835,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var content = repository.GetByPublishedVersion(_notTrashedQuery);
+                var content = repository.GetByPublishedVersion(QueryNotTrashed);
                 uow.Complete();
                 return content;
             }
