@@ -38,10 +38,10 @@ namespace Umbraco.Tests.Persistence
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
-            var dbFactory = new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, _sqlSyntaxProviders, _logger, new TestUmbracoDatabaseAccessor(), Mock.Of<IQueryFactory>());
+            var dbFactory = new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, _sqlSyntaxProviders, _logger, new TestUmbracoDatabaseAccessor(), Mock.Of<IMapperCollection>());
             _runtime = Mock.Of<IRuntimeState>();
             _migrationEntryService = Mock.Of<IMigrationEntryService>();
-            _dbContext = new DatabaseContext(dbFactory, _logger, _runtime, _migrationEntryService);
+            _dbContext = new DatabaseContext(dbFactory);
 		}
 
 		[TearDown]
@@ -91,8 +91,8 @@ namespace Umbraco.Tests.Persistence
             }
 
             // re-create the database factory and database context with proper connection string
-            var dbFactory = new DefaultDatabaseFactory(connString, Constants.DbProviderNames.SqlCe, _sqlSyntaxProviders, _logger, new TestUmbracoDatabaseAccessor(), Mock.Of<IQueryFactory>());
-            _dbContext = new DatabaseContext(dbFactory, _logger, _runtime, _migrationEntryService);
+            var dbFactory = new DefaultDatabaseFactory(connString, Constants.DbProviderNames.SqlCe, _sqlSyntaxProviders, _logger, new TestUmbracoDatabaseAccessor(), Mock.Of<IMapperCollection>());
+            _dbContext = new DatabaseContext(dbFactory);
 
             // create application context
             //var appCtx = new ApplicationContext(
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Persistence
         [TestCase("tcp:MyServer.database.windows.net,1433", "MyDatabase", "MyUser@MyServer", "MyPassword")]
         public void Build_Azure_Connection_String_Regular(string server, string databaseName, string userName, string password)
         {
-            var connectionString = DatabaseContext.GetAzureConnectionString(server, databaseName, userName, password);
+            var connectionString = DatabaseBuilder.GetAzureConnectionString(server, databaseName, userName, password);
             Assert.AreEqual(connectionString, "Server=tcp:MyServer.database.windows.net,1433;Database=MyDatabase;User ID=MyUser@MyServer;Password=MyPassword");
         }
 
@@ -136,7 +136,7 @@ namespace Umbraco.Tests.Persistence
         [TestCase("tcp:kzeej5z8ty.ssmsawacluster4.windowsazure.mscds.com", "MyDatabase", "MyUser@kzeej5z8ty", "MyPassword")]
         public void Build_Azure_Connection_String_CustomServer(string server, string databaseName, string userName, string password)
         {
-            var connectionString = DatabaseContext.GetAzureConnectionString(server, databaseName, userName, password);
+            var connectionString = DatabaseBuilder.GetAzureConnectionString(server, databaseName, userName, password);
             Assert.AreEqual(connectionString, "Server=tcp:kzeej5z8ty.ssmsawacluster4.windowsazure.mscds.com,1433;Database=MyDatabase;User ID=MyUser@kzeej5z8ty;Password=MyPassword");
         }
     }

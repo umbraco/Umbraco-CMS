@@ -205,45 +205,6 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        /// <summary>
-        /// Gets the database connection string
-        /// </summary>
-        /// <value>The database connection string.</value>
-        [Obsolete("Use System.Configuration.ConfigurationManager.ConnectionStrings[\"umbracoDbDSN\"] instead")]
-        public static string DbDsn
-        {
-            get
-            {
-                var settings = ConfigurationManager.ConnectionStrings[UmbracoConnectionName];
-                var connectionString = string.Empty;
-
-                if (settings != null)
-                {
-                    connectionString = settings.ConnectionString;
-
-                    // The SqlCe connectionString is formatted slightly differently, so we need to update it
-                    if (settings.ProviderName.Contains("SqlServerCe"))
-                        connectionString = string.Format("datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;{0}", connectionString);
-                }
-
-                return connectionString;
-            }
-            set
-            {
-                if (DbDsn != value)
-                {
-                    if (value.ToLower().Contains("SQLCE4Umbraco.SqlCEHelper".ToLower()))
-                    {
-                        Current.DatabaseContext.ConfigureEmbeddedDatabaseConnection();
-                    }
-                    else
-                    {
-                        Current.DatabaseContext.ConfigureDatabaseConnection(value);
-                    }
-                }
-            }
-        }
-
         //TODO: Move these to constants!
         public const string UmbracoConnectionName = "umbracoDbDSN";
         public const string UmbracoMigrationName = "Umbraco";

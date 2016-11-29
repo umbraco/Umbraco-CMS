@@ -30,6 +30,7 @@ namespace Umbraco.Core.Persistence
     {
         private readonly IUmbracoDatabaseAccessor _umbracoDatabaseAccessor;
         private readonly ISqlSyntaxProvider[] _sqlSyntaxProviders;
+        private readonly IMapperCollection _mappers;
         private readonly ILogger _logger;
 
         private DatabaseFactory _databaseFactory;
@@ -39,6 +40,8 @@ namespace Umbraco.Core.Persistence
         private DbProviderFactory _dbProviderFactory;
         private DatabaseType _databaseType;
         private ISqlSyntaxProvider _sqlSyntax;
+        private IQueryFactory _queryFactory;
+        private SqlContext _sqlContext;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
@@ -49,13 +52,13 @@ namespace Umbraco.Core.Persistence
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="umbracoDatabaseAccessor"></param>
-        /// <param name="queryFactory"></param>
+        /// <param name="mappers"></param>
         /// <remarks>Used by LightInject.</remarks>
-        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IQueryFactory queryFactory)
-            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, umbracoDatabaseAccessor, queryFactory)
+        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMapperCollection mappers)
+            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, umbracoDatabaseAccessor, mappers)
         {
             if (Configured == false)
-                DatabaseContext.GiveLegacyAChance(this, logger);
+                DatabaseBuilder.GiveLegacyAChance(this, logger);
         }
 
         /// <summary>
@@ -65,17 +68,17 @@ namespace Umbraco.Core.Persistence
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger</param>
         /// <param name="umbracoDatabaseAccessor"></param>
-        /// <param name="queryFactory"></param>
+        /// <param name="mappers"></param>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IQueryFactory queryFactory)
+        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMapperCollection mappers)
         {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (umbracoDatabaseAccessor == null) throw new ArgumentNullException(nameof(umbracoDatabaseAccessor));
             if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentNullOrEmptyException(nameof(connectionStringName));
-            if (queryFactory == null) throw new ArgumentNullException(nameof(queryFactory));
+            if (mappers == null) throw new ArgumentNullException(nameof(mappers));
 
-            QueryFactory = queryFactory;
+            _mappers = mappers;
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
             _umbracoDatabaseAccessor = umbracoDatabaseAccessor;
@@ -105,16 +108,16 @@ namespace Umbraco.Core.Persistence
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="umbracoDatabaseAccessor"></param>
-        /// <param name="queryFactory"></param>
+        /// <param name="mappers"></param>
         /// <remarks>Used in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IQueryFactory queryFactory)
+        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMapperCollection mappers)
         {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (umbracoDatabaseAccessor == null) throw new ArgumentNullException(nameof(umbracoDatabaseAccessor));
-            if (queryFactory == null) throw new ArgumentNullException(nameof(queryFactory));
+            if (mappers == null) throw new ArgumentNullException(nameof(mappers));
 
-            QueryFactory = queryFactory;
+            _mappers = mappers;
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
             _umbracoDatabaseAccessor = umbracoDatabaseAccessor;
@@ -154,7 +157,16 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Gets the database query factory.
         /// </summary>
-        public IQueryFactory QueryFactory { get; }
+        public IQueryFactory QueryFactory {
+            get
+            {
+                EnsureConfigured();
+                return _queryFactory;
+            }
+        }
+
+        // fixme
+        public SqlContext SqlContext => _sqlContext;
 
         // will be configured by the database context
         public void Configure(string connectionString, string providerName)
@@ -199,6 +211,12 @@ namespace Umbraco.Core.Persistence
 
                 if (_databaseFactory == null) throw new NullReferenceException("The call to DatabaseFactory.Config yielded a null DatabaseFactory instance.");
 
+                // these are created here because it is the DefaultDatabaseFactory that determines
+                // the sql syntax, poco data factory, and database type - so it "owns" the context
+                // and the query factory
+                _sqlContext = new SqlContext(_sqlSyntax, _pocoDataFactory, _databaseType);
+                _queryFactory = new QueryFactory(_sqlSyntax, _mappers);
+
                 _logger.Debug<DefaultDatabaseFactory>("Configured.");
                 Configured = true;
             }
@@ -232,7 +250,7 @@ namespace Umbraco.Core.Persistence
         // method used by NPoco's DatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
         {
-            return new UmbracoDatabase(_connectionString, _sqlSyntax, _databaseType, _dbProviderFactory, _logger, _connectionRetryPolicy, _commandRetryPolicy);
+            return new UmbracoDatabase(_connectionString, _sqlContext, _dbProviderFactory, _logger, _connectionRetryPolicy, _commandRetryPolicy);
         }
 
         /// <summary>
@@ -246,7 +264,7 @@ namespace Umbraco.Core.Persistence
             // check if it's in scope
             var db = _umbracoDatabaseAccessor.UmbracoDatabase;
             if (db != null) return db;
-            db = (UmbracoDatabase)_databaseFactory.GetDatabase();
+            db = (UmbracoDatabase) _databaseFactory.GetDatabase();
             _umbracoDatabaseAccessor.UmbracoDatabase = db;
             return db;
         }

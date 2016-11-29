@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IDataTypeDefinitionRepository : IRepositoryQueryable<int, IDataTypeDefinition>
+    public interface IDataTypeDefinitionRepository : IQueryRepository<int, IDataTypeDefinition>
     {
         
         PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId);

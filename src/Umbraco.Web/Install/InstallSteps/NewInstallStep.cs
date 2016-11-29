@@ -26,13 +26,13 @@ namespace Umbraco.Web.Install.InstallSteps
     {
         private readonly HttpContextBase _http;
         private readonly IUserService _userService;
-        private readonly DatabaseContext _databaseContext;
+        private readonly DatabaseBuilder _databaseBuilder;
 
-        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseContext databaseContext)
+        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder)
         {
             _http = http;
             _userService = userService;
-            _databaseContext = databaseContext;
+            _databaseBuilder = databaseBuilder;
         }
 
         private MembershipProvider CurrentProvider
@@ -127,11 +127,11 @@ namespace Umbraco.Web.Install.InstallSteps
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.
             if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
 
-            if (_databaseContext.IsConnectionStringConfigured(databaseSettings)
-                && _databaseContext.IsDatabaseConfigured)
+            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings)
+                && _databaseBuilder.IsDatabaseConfigured)
             {
                 //check if we have the default user configured already
-                var result = _databaseContext.Database.ExecuteScalar<int>(
+                var result = _databaseBuilder.DatabaseContext.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
                 if (result == 1)
                 {

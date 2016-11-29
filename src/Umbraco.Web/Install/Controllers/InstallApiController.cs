@@ -15,19 +15,19 @@ namespace Umbraco.Web.Install.Controllers
     [HttpInstallAuthorize]
     public class InstallApiController : ApiController
     {
-        private readonly DatabaseContext _databaseContext;
+        private readonly DatabaseBuilder _databaseBuilder;
         private readonly ProfilingLogger _proflog;
         private readonly ILogger _logger;
         private InstallHelper _helper;
 
-        public InstallApiController(UmbracoContext umbracoContext, DatabaseContext databaseContext, ILogger logger, ProfilingLogger proflog)
+        public InstallApiController(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, ILogger logger, ProfilingLogger proflog)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            if (databaseContext == null) throw new ArgumentNullException(nameof(databaseContext));
+            if (databaseBuilder == null) throw new ArgumentNullException(nameof(databaseBuilder));
             if (proflog == null) throw new ArgumentNullException(nameof(proflog));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             UmbracoContext = umbracoContext;
-            _databaseContext = databaseContext;
+            _databaseBuilder = databaseBuilder;
             _logger = logger;
             _proflog = proflog;
         }
@@ -37,12 +37,11 @@ namespace Umbraco.Web.Install.Controllers
         /// </summary>
         public UmbracoContext UmbracoContext { get; }
 
-        internal InstallHelper InstallHelper => _helper ?? (_helper = new InstallHelper(UmbracoContext, _databaseContext, _logger));
+        internal InstallHelper InstallHelper => _helper ?? (_helper = new InstallHelper(UmbracoContext, _databaseBuilder, _logger));
 
         public bool PostValidateDatabaseConnection(DatabaseModel model)
         {
-            var dbHelper = new DatabaseHelper();
-            var canConnect = dbHelper.CheckConnection(model);
+            var canConnect = _databaseBuilder.CheckConnection(model.DatabaseType.ToString(), model.ConnectionString, model.Server, model.DatabaseName, model.Login, model.Password, model.IntegratedAuth);
             return canConnect;
         }
 
@@ -70,7 +69,7 @@ namespace Umbraco.Web.Install.Controllers
 
         public IEnumerable<Package> GetPackages()
         {
-            var installHelper = new InstallHelper(UmbracoContext, _databaseContext, _logger);
+            var installHelper = new InstallHelper(UmbracoContext, _databaseBuilder, _logger);
             var starterKits = installHelper.GetStarterKits();
             return starterKits;
         }

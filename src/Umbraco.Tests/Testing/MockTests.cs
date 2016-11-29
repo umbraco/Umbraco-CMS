@@ -39,12 +39,9 @@ namespace Umbraco.Tests.Testing
         public void Can_Mock_Database_Context()
         {
             var databaseFactory = TestObjects.GetDatabaseFactoryMock();
-            var logger = Mock.Of<ILogger>();
-            var runtimeState = Mock.Of<IRuntimeState>();
-            var migrationEntryService = Mock.Of<IMigrationEntryService>();
 
             // ReSharper disable once UnusedVariable
-            var databaseContext = new DatabaseContext(databaseFactory, logger, runtimeState, migrationEntryService);
+            var databaseContext = new DatabaseContext(databaseFactory);
             Assert.Pass();
         }
 

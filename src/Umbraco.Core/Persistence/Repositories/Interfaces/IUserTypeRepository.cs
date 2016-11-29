@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IUserTypeRepository : IRepositoryQueryable<int, IUserType>
+    public interface IUserTypeRepository : IQueryRepository<int, IUserType>
     {
          
     }

@@ -219,8 +219,8 @@ namespace Umbraco.Tests.TestHelpers
             if (databaseFactory == null)
             {
                 var accessor = new TestUmbracoDatabaseAccessor();
-                var queryFactory = Mock.Of<IQueryFactory>();
-                databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, queryFactory);
+                var mappers = Mock.Of<IMapperCollection>();
+                databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, mappers);
             }
             repositoryFactory = repositoryFactory  ??  new RepositoryFactory(Mock.Of<IServiceContainer>());
             return new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);

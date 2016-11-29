@@ -26,6 +26,7 @@ namespace Umbraco.Core.Persistence
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
 
         private readonly ILogger _logger;
+        private readonly SqlContext _sqlContext;
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
         private bool _enableCount;
@@ -35,7 +36,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         internal Guid InstanceId { get; } = Guid.NewGuid();
 
-        public ISqlSyntaxProvider SqlSyntax { get; }
+        public ISqlSyntaxProvider SqlSyntax => _sqlContext.SqlSyntax;
 
         /// <summary>
         /// Generally used for testing, will output all SQL statements executed to the logger
@@ -68,38 +69,40 @@ namespace Umbraco.Core.Persistence
         // creates one instance per request
         // also used by DatabaseContext for creating DBs and upgrading
         public UmbracoDatabase(string connectionString,
-            ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, DbProviderFactory provider,
-            ILogger logger,
+            SqlContext sqlContext, DbProviderFactory provider, ILogger logger,
             RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
-            : base(connectionString, databaseType, provider, DefaultIsolationLevel)
+            : base(connectionString, sqlContext.DatabaseType, provider, DefaultIsolationLevel)
         {
-            SqlSyntax = sqlSyntax;
+            _sqlContext = sqlContext;
+
             _logger = logger;
             _connectionRetryPolicy = connectionRetryPolicy;
             _commandRetryPolicy = commandRetryPolicy;
+
             EnableSqlTrace = false;
         }
 
         // INTERNAL FOR UNIT TESTS
         internal UmbracoDatabase(DbConnection connection,
-            ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType,
-            ILogger logger)
+            ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, ILogger logger)
             : base(connection, databaseType, DefaultIsolationLevel)
         {
-            SqlSyntax = sqlSyntax;
+            _sqlContext = new SqlContext(sqlSyntax, null, databaseType); // beware! no pocoDataFactory!
+
             _logger = logger;
+
             EnableSqlTrace = false;
         }
 
         // fixme: these two could be an extension method of IUmbracoDatabaseConfig
         public Sql<SqlContext> Sql()
         {
-            return NPoco.Sql.BuilderFor(new SqlContext(this));
+            return NPoco.Sql.BuilderFor(_sqlContext);
         }
 
         public Sql<SqlContext> Sql(string sql, params object[] args)
         {
-            return NPoco.Sql.BuilderFor(new SqlContext(this)).Append(sql, args);
+            return Sql().Append(sql, args);
         }
 
         //protected override void OnConnectionClosing(DbConnection conn)
@@ -159,5 +162,7 @@ namespace Umbraco.Core.Persistence
             }
             base.OnExecutedCommand(cmd);
         }
+
+        // fixme - see v7.6 - what about disposing & managing context and call context?
     }
 }

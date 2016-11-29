@@ -26,10 +26,10 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
-            memberTypeRepository = new MemberTypeRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
-            memberGroupRepository = new MemberGroupRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
-            var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, QueryFactory);
-            var repository = new MemberRepository(unitOfWork, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<IContentSection>(), QueryFactory);
+            memberTypeRepository = new MemberTypeRepository(unitOfWork, DisabledCache, Logger);
+            memberGroupRepository = new MemberGroupRepository(unitOfWork, DisabledCache, Logger);
+            var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
+            var repository = new MemberRepository(unitOfWork, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<IContentSection>());
             return repository;
         }
 

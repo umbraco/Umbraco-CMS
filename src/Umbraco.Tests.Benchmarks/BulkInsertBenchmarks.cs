@@ -55,20 +55,19 @@ namespace Umbraco.Tests.Benchmarks
                 new [] { p },
                 logger,
                 new ThreadStaticUmbracoDatabaseAccessor(), 
-                new QueryFactory(p, new MapperCollection(Enumerable.Empty<BaseMapper>())));
+                new MapperCollection(Enumerable.Empty<BaseMapper>()));
             return f.GetDatabase();
         }
 
         private UmbracoDatabase GetSqlCeDatabase(string cstr, ILogger logger)
         {
-            var p = new SqlCeSyntaxProvider();
             var f = new DefaultDatabaseFactory(
                 cstr,
                 Constants.DatabaseProviders.SqlCe,
-                new[] { p },
+                new[] { new SqlCeSyntaxProvider() },
                 logger,
                 new ThreadStaticUmbracoDatabaseAccessor(),
-                new QueryFactory(p, new MapperCollection(Enumerable.Empty<BaseMapper>())));
+                new MapperCollection(Enumerable.Empty<BaseMapper>()));
             return f.GetDatabase();
         }
 

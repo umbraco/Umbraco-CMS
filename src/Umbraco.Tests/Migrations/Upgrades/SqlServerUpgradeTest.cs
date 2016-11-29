@@ -23,10 +23,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            var databaseType = DatabaseType.SqlServer2008;
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null));
             var dbProviderFactory = DbProviderFactories.GetFactory("System.Data.SqlClient");
-            return new UmbracoDatabase(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco", sqlSyntax, databaseType, dbProviderFactory, Mock.Of<ILogger>());
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)), Mock.Of<IPocoDataFactory>(), DatabaseType.SqlServer2008);
+            return new UmbracoDatabase(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco", sqlContext, dbProviderFactory, Mock.Of<ILogger>());
         }
 
         public override string GetDatabaseSpecificSqlScript()

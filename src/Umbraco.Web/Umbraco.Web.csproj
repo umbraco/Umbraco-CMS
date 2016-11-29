@@ -497,7 +497,6 @@
     <Compile Include="Models\ImageCropDataSet.cs" />
     <Compile Include="Models\ImageCropFocalPoint.cs" />
     <Compile Include="Models\ImageCropMode.cs" />
-    <Compile Include="Install\DatabaseHelper.cs" />
     <Compile Include="Install\InstallException.cs" />
     <Compile Include="Install\InstallStatusTracker.cs" />
     <Compile Include="Install\InstallSteps\DatabaseConfigureStep.cs" />

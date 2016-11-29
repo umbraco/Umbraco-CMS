@@ -28,8 +28,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private PermissionRepository<IContent> _permissionRepository;
 
-        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IQueryFactory queryFactory)
-            : base(work, cacheHelper, logger, queryFactory)
+        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository)
+            : base(work, cacheHelper, logger)
         {
             _userTypeRepository = userTypeRepository;
             _cacheHelper = cacheHelper;

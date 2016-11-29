@@ -17,18 +17,16 @@ namespace Umbraco.Web.Install
 {
     internal class InstallHelper
     {
-        private readonly UmbracoContext _umbracoContext;
-        private readonly DatabaseContext _databaseContext;
+        private readonly DatabaseBuilder _databaseBuilder;
         private readonly HttpContextBase _httpContext;
         private readonly ILogger _logger;
         private InstallationType? _installationType;
 
-        internal InstallHelper(UmbracoContext umbracoContext, DatabaseContext databaseContext, ILogger logger)
+        internal InstallHelper(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, ILogger logger)
         {
-            _umbracoContext = umbracoContext;
             _httpContext = umbracoContext.HttpContext;
             _logger = logger;
-            _databaseContext = databaseContext;
+            _databaseBuilder = databaseBuilder;
         }
 
         /// <summary>
@@ -40,17 +38,17 @@ namespace Umbraco.Web.Install
         /// </remarks>
         public IEnumerable<InstallSetupStep> GetAllSteps()
         {
-            // fixme - should NOT use current everywhere here - inject!
             return new List<InstallSetupStep>
             {
-                new NewInstallStep(_httpContext, Current.Services.UserService, Current.DatabaseContext),
-                new UpgradeStep(),
+                // fixme - should NOT use current everywhere here - inject!
+                new NewInstallStep(_httpContext, Current.Services.UserService, _databaseBuilder),
+                new UpgradeStep(_databaseBuilder),
                 new FilePermissionsStep(),
-                new MajorVersion7UpgradeReport(Current.DatabaseContext, Current.RuntimeState),
+                new MajorVersion7UpgradeReport(_databaseBuilder, Current.RuntimeState),
                 new Version73FileCleanup(_httpContext, _logger),
-                new DatabaseConfigureStep(Current.DatabaseContext),
-                new DatabaseInstallStep(Current.DatabaseContext, Current.RuntimeState, Current.Logger),
-                new DatabaseUpgradeStep(Current.DatabaseContext, Current.Services.MigrationEntryService, Current.RuntimeState, Current.MigrationCollectionBuilder, Current.Logger),
+                new DatabaseConfigureStep(_databaseBuilder),
+                new DatabaseInstallStep(_databaseBuilder, Current.RuntimeState, Current.Logger),
+                new DatabaseUpgradeStep(_databaseBuilder, Current.Services.MigrationEntryService, Current.RuntimeState, Current.MigrationCollectionBuilder, Current.Logger),
                 new StarterKitDownloadStep(Current.Services.ContentService, this),
                 new StarterKitInstallStep(_httpContext),
                 new StarterKitCleanupStep(),
@@ -173,7 +171,7 @@ namespace Umbraco.Web.Install
             {
                 var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
                 if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
-                    && _databaseContext.IsConnectionStringConfigured(databaseSettings) == false)
+                    && _databaseBuilder.IsConnectionStringConfigured(databaseSettings) == false)
                 {
                     //no version or conn string configured, must be a brand new install
                     return true;
@@ -181,20 +179,20 @@ namespace Umbraco.Web.Install
 
                 //now we have to check if this is really a new install, the db might be configured and might contain data
 
-                if (_databaseContext.IsConnectionStringConfigured(databaseSettings) == false
-                    || _databaseContext.IsDatabaseConfigured == false)
+                if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) == false
+                    || _databaseBuilder.IsDatabaseConfigured == false)
                 {
                     return true;
                 }
 
                 //check if we have the default user configured already
-                var result = _databaseContext.Database.ExecuteScalar<int>(
+                var result = _databaseBuilder.DatabaseContext.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
                 if (result == 1)
                 {
                     //the user has not been configured
                     //this is always true on UaaS, need to check if there's multiple users too
-                    var usersResult = _databaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
+                    var usersResult = _databaseBuilder.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
                     return usersResult == 1;
                 }
 

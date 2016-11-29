@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IContentTypeRepositoryBase<TItem> : IRepositoryQueryable<int, TItem>, IReadRepository<Guid, TItem>
+    public interface IContentTypeRepositoryBase<TItem> : IQueryRepository<int, TItem>, IReadRepository<Guid, TItem>
         where TItem : IContentTypeComposition
     {
         TItem Get(string alias);

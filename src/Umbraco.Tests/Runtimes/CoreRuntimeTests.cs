@@ -163,9 +163,7 @@ namespace Umbraco.Tests.Runtimes
                 base.Compose(composition);
 
                 composition.Container.Register(factory => SettingsForTests.GetDefault());
-                composition.Container.Register(factory => new DatabaseContext(
-                    factory.GetInstance<IDatabaseFactory>(),
-                    factory.GetInstance<ILogger>(), factory.GetInstance<IRuntimeState>(), Mock.Of<IMigrationEntryService>()), new PerContainerLifetime());
+                composition.Container.Register(factory => new DatabaseContext(factory.GetInstance<IDatabaseFactory>()), new PerContainerLifetime());
                 composition.Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
 
                 Composed = true;

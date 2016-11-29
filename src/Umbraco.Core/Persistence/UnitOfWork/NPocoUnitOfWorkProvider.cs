@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.DI;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
@@ -28,19 +23,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             _repositoryFactory = repositoryFactory;
         }
 
-        // this should NOT be here, all tests should supply the appropriate providers,
-        // however the above ctor is used in hundreds of tests at the moment, so...
-        // will refactor later
-        private static IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger)
-        {
-            return new ISqlSyntaxProvider[]
-            {
-                new MySqlSyntaxProvider(logger),
-                new SqlCeSyntaxProvider(),
-                new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null))
-            };
-        }
-
         #region Implement IUnitOfWorkProvider
 
         /// <summary>
@@ -51,10 +33,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         public IDatabaseUnitOfWork CreateUnitOfWork()
         {
             // get a database from the factory - might be the "ambient" database eg
-            // the one that's enlisted with the HttpContext - so it's not always a
+            // the one that's enlisted with the HttpContext - so it's *not* necessary a
             // "new" database.
             var database = _databaseFactory.GetDatabase();
-            return new NPocoUnitOfWork(database, _repositoryFactory);
+            var databaseContext = Current.DatabaseContext; // fixme - inject!
+            return new NPocoUnitOfWork(databaseContext, database, _repositoryFactory);
         }
 
         #endregion

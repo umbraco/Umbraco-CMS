@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
-using LightInject;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPoco;
@@ -40,7 +39,7 @@ namespace Umbraco.Core.Sync
         private bool _syncing;
         private bool _released;
 
-        protected DatabaseServerMessengerOptions Options { get; private set; }
+        protected DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
             IRuntimeState runtime, DatabaseContext dbContext, ILogger logger, ProfilingLogger proflog,

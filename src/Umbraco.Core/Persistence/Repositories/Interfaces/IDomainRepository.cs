@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IDomainRepository : IRepositoryQueryable<int, IDomain>
+    public interface IDomainRepository : IQueryRepository<int, IDomain>
     {
         IDomain GetByName(string domainName);
         bool Exists(string domainName);

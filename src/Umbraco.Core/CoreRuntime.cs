@@ -15,6 +15,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
@@ -180,26 +181,29 @@ namespace Umbraco.Core
         /// <inheritdoc/>
         public virtual void Compose(ServiceContainer container)
         {
+            // compose the very essential things that are needed to bootstrap, before anything else,
+            // and only these things - the rest should be composed in runtime components
+
+            // register basic things
             container.RegisterSingleton<IProfiler, LogProfiler>();
             container.RegisterSingleton<ProfilingLogger>();
             container.RegisterSingleton<IRuntimeState, RuntimeState>();
 
+            // register caches
+            // need the deep clone runtime cache profiver to ensure entities are cached properly, ie
+            // are cloned in and cloned out - no request-based cache here since no web-based context,
+            // will be overriden later or
             container.RegisterSingleton(_ => new CacheHelper(
-                // we need to have the dep clone runtime cache provider to ensure
-                // all entities are cached properly (cloned in and cloned out)
                 new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
-                // we have no request based cache when not running in web-based context
                 new NullCacheProvider(),
-                new IsolatedRuntimeCache(type =>
-                    // we need to have the dep clone runtime cache provider to ensure
-                    // all entities are cached properly (cloned in and cloned out)
-                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
-            container.RegisterSingleton(factory => factory.GetInstance<CacheHelper>().RuntimeCache);
+                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
+            container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
 
-            container.RegisterSingleton(factory => new PluginManager(factory.GetInstance<IRuntimeCacheProvider>(), factory.GetInstance<ProfilingLogger>()));
+            // register the plugin manager
+            container.RegisterSingleton(f => new PluginManager(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<ProfilingLogger>()));
 
-            // register syntax providers
+            // register syntax providers - required by database factory
             container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
             container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>("SqlCeSyntaxProvider");
             container.Register<ISqlSyntaxProvider, SqlServerSyntaxProvider>("SqlServerSyntaxProvider");
@@ -210,14 +214,21 @@ namespace Umbraco.Core
             var mapperCollectionBuilder = container.RegisterCollectionBuilder<MapperCollectionBuilder>();
             ComposeMapperCollection(mapperCollectionBuilder);
 
-            // register database factory
+            // register database factory - required to check for migrations
             // will be initialized with syntax providers and a logger, and will try to configure
             // from the default connection string name, if possible, else will remain non-configured
             // until the database context configures it properly (eg when installing)
             container.RegisterSingleton<IDatabaseFactory, DefaultDatabaseFactory>();
 
-            // register a database accessor - will be replaced
-            // by HybridUmbracoDatabaseAccessor in the web runtime
+            // register database context
+            container.RegisterSingleton<DatabaseContext>();
+
+            // register query factory - fixme kill
+            container.RegisterSingleton(f => f.GetInstance<IDatabaseFactory>().QueryFactory);
+
+            // register a database accessor - required by database factory
+            // will be replaced by HybridUmbracoDatabaseAccessor in the web runtime
+            // fixme - we should NOT be using thread static at all + will NOT get replaced = wtf?
             container.RegisterSingleton<IUmbracoDatabaseAccessor, ThreadStaticUmbracoDatabaseAccessor>();
 
             // register MainDom

@@ -4,7 +4,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IMigrationEntryRepository : IRepositoryQueryable<int, IMigrationEntry>
+    public interface IMigrationEntryRepository : IQueryRepository<int, IMigrationEntry>
     {
         IMigrationEntry FindEntry(string migrationName, SemVersion version);
     }

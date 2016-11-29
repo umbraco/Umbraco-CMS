@@ -98,7 +98,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DataType:
                         case UmbracoObjectTypes.DocumentTypeContainer:
                             id = uow.Database.ExecuteScalar<int?>(
-                                 uow.Database.Sql()
+                                 uow.DatabaseContext.Sql()
                                     .Select("id")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.UniqueId == key));
@@ -144,7 +144,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
                             guid = uow.Database.ExecuteScalar<Guid?>(
-                                 uow.Database.Sql()
+                                 uow.DatabaseContext.Sql()
                                     .Select("uniqueID")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.NodeId == id));
@@ -547,7 +547,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                var sql = uow.Database.Sql()
+                var sql = uow.DatabaseContext.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.NodeId == id);
@@ -568,7 +568,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                var sql = uow.Database.Sql()
+                var sql = uow.DatabaseContext.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.UniqueId == key);

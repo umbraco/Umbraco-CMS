@@ -99,9 +99,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public UmbracoDatabase GetConfiguredDatabase()
         {
-            var databaseType = DatabaseType.SQLCe;
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;", new SqlCeSyntaxProvider(), databaseType, dbProviderFactory, Mock.Of<ILogger>());
+            var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), Mock.Of<IPocoDataFactory>(), DatabaseType.SQLCe);
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;", sqlContext, dbProviderFactory, Mock.Of<ILogger>());
         }
 
         public string GetDatabaseSpecificSqlScript()

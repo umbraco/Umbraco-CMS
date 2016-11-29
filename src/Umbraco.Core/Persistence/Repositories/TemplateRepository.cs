@@ -37,8 +37,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly MasterPageHelper _masterPageHelper;
         private IRepositoryCachePolicy<ITemplate, int> _cachePolicy;
 
-        public TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig, IQueryFactory queryFactory)
-            : base(work, cache, logger, queryFactory)
+        public TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
+            : base(work, cache, logger)
         {
             _masterpagesFileSystem = masterpageFileSystem;
             _viewsFileSystem = viewFileSystem;

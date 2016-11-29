@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal interface IMacroRepository : IRepositoryQueryable<int, IMacro>
+    internal interface IMacroRepository : IQueryRepository<int, IMacro>
     {
 
         //IEnumerable<IMacro> GetAll(params string[] aliases);

@@ -11,11 +11,11 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
-        private readonly DatabaseContext _databaseContext;
+        private readonly DatabaseBuilder _databaseBuilder;
 
-        public DatabaseConfigureStep(DatabaseContext databaseContext)
+        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder)
         {
-            _databaseContext = databaseContext;
+            _databaseBuilder = databaseBuilder;
         }
 
         public override InstallSetupResult Execute(DatabaseModel database)
@@ -26,9 +26,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 database = new DatabaseModel();
             }
 
-            var dbHelper = new DatabaseHelper();
-
-            if (dbHelper.CheckConnection(database) == false)
+            if (_databaseBuilder.CheckConnection(database.DatabaseType.ToString(), database.ConnectionString, database.Server, database.DatabaseName, database.Login, database.Password, database.IntegratedAuth) == false)
             {
                 throw new InstallException("Could not connect to the database");
             }
@@ -40,32 +38,28 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             if (database.ConnectionString.IsNullOrWhiteSpace() == false)
             {
-                _databaseContext.ConfigureDatabaseConnection(database.ConnectionString);
+                _databaseBuilder.ConfigureDatabaseConnection(database.ConnectionString);
             }
             else if (database.DatabaseType == DatabaseType.SqlCe)
             {
-                _databaseContext.ConfigureEmbeddedDatabaseConnection();
+                _databaseBuilder.ConfigureEmbeddedDatabaseConnection();
             }
             else if (database.IntegratedAuth)
             {
-                _databaseContext.ConfigureIntegratedSecurityDatabaseConnection(
-                    database.Server, database.DatabaseName);
+                _databaseBuilder.ConfigureIntegratedSecurityDatabaseConnection(database.Server, database.DatabaseName);
             }
             else
             {
                 var password = database.Password.Replace("&", "&amp;").Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;").Replace("'", "''");
                 password = string.Format("'{0}'", password);
 
-                _databaseContext.ConfigureDatabaseConnection(
+                _databaseBuilder.ConfigureDatabaseConnection(
                     database.Server, database.DatabaseName, database.Login, password,
                     database.DatabaseType.ToString());
             }
         }
 
-        public override string View
-        {
-            get { return ShouldDisplayView() ? base.View : ""; }
-        }
+        public override string View => ShouldDisplayView() ? base.View : "";
 
         public override bool RequiresExecution(DatabaseModel model)
         {
@@ -77,12 +71,12 @@ namespace Umbraco.Web.Install.InstallSteps
             //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
             var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
 
-            if (_databaseContext.IsConnectionStringConfigured(databaseSettings))
+            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings))
             {
                 try
                 {
                     //Since a connection string was present we verify the db can connect and query
-                    var result = _databaseContext.ValidateDatabaseSchema();
+                    var result = _databaseBuilder.ValidateDatabaseSchema();
                     result.DetermineInstalledVersion();
                     return false;
                 }

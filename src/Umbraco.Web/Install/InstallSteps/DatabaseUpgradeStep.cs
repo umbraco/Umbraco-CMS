@@ -15,15 +15,15 @@ namespace Umbraco.Web.Install.InstallSteps
         "DatabaseUpgrade", 12, "")]
     internal class DatabaseUpgradeStep : InstallSetupStep<object>
     {
-        private readonly DatabaseContext _databaseContext;
+        private readonly DatabaseBuilder _databaseBuilder;
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly MigrationCollectionBuilder _migrationCollectionBuilder;
 
-        public DatabaseUpgradeStep(DatabaseContext databaseContext, IMigrationEntryService migrationEntryService, IRuntimeState runtime, MigrationCollectionBuilder migrationCollectionBuilder, ILogger logger)
+        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IMigrationEntryService migrationEntryService, IRuntimeState runtime, MigrationCollectionBuilder migrationCollectionBuilder, ILogger logger)
         {
-            _databaseContext = databaseContext;
+            _databaseBuilder = databaseBuilder;
             _migrationEntryService = migrationEntryService;
             _runtime = runtime;
             _migrationCollectionBuilder = migrationCollectionBuilder;
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var result = _databaseContext.UpgradeSchemaAndData(_migrationEntryService, _migrationCollectionBuilder);
+                var result = _databaseBuilder.UpgradeSchemaAndData(_migrationEntryService, _migrationCollectionBuilder);
 
                 if (result.Success == false)
                 {
@@ -68,10 +68,10 @@ namespace Umbraco.Web.Install.InstallSteps
             
             var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
 
-            if (_databaseContext.IsConnectionStringConfigured(databaseSettings))
+            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings))
             {
                 //Since a connection string was present we verify whether this is an upgrade or an empty db
-                var result = _databaseContext.ValidateDatabaseSchema();
+                var result = _databaseBuilder.ValidateDatabaseSchema();
 
                 var determinedVersion = result.DetermineInstalledVersion();
                 if (determinedVersion.Equals(new Version(0, 0, 0)))

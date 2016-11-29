@@ -24,10 +24,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            var databaseType = DatabaseType.MySQL;
-            var sqlSyntax = new MySqlSyntaxProvider(Mock.Of<ILogger>());
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.MySql);
-            return new UmbracoDatabase("Server = 169.254.120.3; Database = upgradetest; Uid = umbraco; Pwd = umbraco", sqlSyntax, databaseType, dbProviderFactory, Mock.Of<ILogger>());
+            var sqlContext = new SqlContext(new MySqlSyntaxProvider(Mock.Of<ILogger>()), Mock.Of<IPocoDataFactory>(), DatabaseType.MySQL);
+            return new UmbracoDatabase("Server = 169.254.120.3; Database = upgradetest; Uid = umbraco; Pwd = umbraco", sqlContext, dbProviderFactory, Mock.Of<ILogger>());
         }
 
         public override string GetDatabaseSpecificSqlScript()
