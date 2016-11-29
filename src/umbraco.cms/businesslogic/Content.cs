@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
+using umbraco.BusinessLogic;
 using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
@@ -129,23 +130,27 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                if (_contentType == null)
+                using (var sqlHelper = LegacySqlHelper.SqlHelper)
                 {
-                    object o = SqlHelper.ExecuteScalar<object>(
-                        "Select ContentType from cmsContent where nodeId=@nodeid",
-                            SqlHelper.CreateParameter("@nodeid", this.Id));
-                    if (o == null)
-                        return null;
-                    int contentTypeId;
-                    if (int.TryParse(o.ToString(), out contentTypeId) == false)
-                        return null;
-                    try
+                    if (_contentType == null)
                     {
-                        _contentType = new ContentType(contentTypeId);
-                    }
-                    catch
-                    {
-                        return null;
+                        object o = sqlHelper.ExecuteScalar<object>(
+                            "Select ContentType from cmsContent where nodeId=@nodeid",
+                            sqlHelper.CreateParameter("@nodeid", this.Id));
+                        if (o == null)
+                            return null;
+                        int contentTypeId;
+                        if (int.TryParse(o.ToString(), out contentTypeId) == false)
+                            return null;
+
+                        try
+                        {
+                            _contentType = new ContentType(contentTypeId);
+                        }
+                        catch
+                        {
+                            return null;
+                        }
                     }
                 }
                 return _contentType;
@@ -218,7 +223,8 @@ namespace umbraco.cms.businesslogic
                     string sql = "Select versionId from cmsContentVersion where contentID = " + this.Id +
                                  " order by id desc ";
 
-                    using (IRecordsReader dr = SqlHelper.ExecuteReader(sql))
+                    using (var sqlHelper = LegacySqlHelper.SqlHelper)
+                    using (IRecordsReader dr = sqlHelper.ExecuteReader(sql))
                     {
                         if (!dr.Read())
                             _version = Guid.Empty;
@@ -245,6 +251,7 @@ namespace umbraco.cms.businesslogic
         }
 
         /// <summary>
+            
         /// Deletes the current Content object, must be overridden in the child class.
         /// </summary>
         public override void delete()
@@ -256,10 +263,12 @@ namespace umbraco.cms.businesslogic
             OnDeletedContent(new ContentDeleteEventArgs(Current.DatabaseContext.Database, Id));
 
             // Delete version history
-            SqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);
+            using (var sqlHelper = LegacySqlHelper.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);
 
             // Delete Contentspecific data ()
-            SqlHelper.ExecuteNonQuery("Delete from cmsContent where NodeId = " + this.Id);
+            using (var sqlHelper = LegacySqlHelper.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Delete from cmsContent where NodeId = " + this.Id);
 
             // Delete Nodeinformation!!
             base.delete();
@@ -278,7 +287,7 @@ namespace umbraco.cms.businesslogic
         {
             //we know that there is one ctor arg and it is a GUID since we are only calling the base
             // ctor with this overload for one purpose.
-            var version = (Guid) ctorArgs[0];
+            var version = (Guid)ctorArgs[0];
             _version = version;
 
             base.PreSetupNode(ctorArgs);
@@ -303,6 +312,8 @@ namespace umbraco.cms.businesslogic
             _contentTypeIcon = InitContentTypeIcon;
         }
 
+        
+             
         #endregion
 
         #region Private Methods
@@ -314,7 +325,8 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         protected void deleteAllProperties()
         {
-            SqlHelper.ExecuteNonQuery("Delete from cmsPropertyData where contentNodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
+            using (var sqlHelper = LegacySqlHelper.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Delete from cmsPropertyData where contentNodeId = @nodeId", sqlHelper.CreateParameter("@nodeId", this.Id));
         }
 
         #endregion
@@ -341,7 +353,6 @@ namespace umbraco.cms.businesslogic
         {
             DeletedContent?.Invoke(this, args);
         }
-
         #endregion
     }
 }

@@ -79,6 +79,7 @@ namespace Umbraco.Web.Scheduling
                         {
                             Content = new StringContent(string.Empty)
                         };
+
                         //pass custom the authorization header
                         request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_userService);
 
@@ -96,6 +97,7 @@ namespace Umbraco.Web.Scheduling
 
         public override bool IsAsync => true;
 
+    
         public override bool RunsOnShutdown => false;
     }
 }

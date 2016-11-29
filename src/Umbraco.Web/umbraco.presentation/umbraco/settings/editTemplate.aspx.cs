@@ -195,7 +195,6 @@ namespace umbraco.cms.presentation.settings
 
 		private void LoadMacros()
 		{
-		    ;
 		    var macroRenderings =
 		        Services.MacroService.GetAll()
 		            .Select(x => new TempMacroClass()
@@ -220,10 +219,10 @@ namespace umbraco.cms.presentation.settings
 		{
 			if (
 				DatabaseContext.Database.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) ==
-				1)
-				return "1";
-			else
-				return "0";
+				    1)
+				    return "1";
+			    else
+				    return "0";
 		}
 
 		/// <summary>

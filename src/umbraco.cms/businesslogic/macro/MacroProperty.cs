@@ -23,6 +23,10 @@ namespace umbraco.cms.businesslogic.macro
     [Obsolete("This is no longer used, use the IMacroService and related models instead")]
     public class MacroProperty
     {
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return LegacySqlHelper.SqlHelper; }
@@ -104,7 +108,8 @@ namespace umbraco.cms.businesslogic.macro
 
         private void Setup()
         {
-            using (var dr = SqlHelper.ExecuteReader("select macro, editorAlias, macroPropertySortOrder, macroPropertyAlias, macroPropertyName from cmsMacroProperty where id = @id", SqlHelper.CreateParameter("@id", Id)))
+            using (var sqlHelper = LegacySqlHelper.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader("select macro, editorAlias, macroPropertySortOrder, macroPropertyAlias, macroPropertyName from cmsMacroProperty where id = @id", sqlHelper.CreateParameter("@id", Id)))
             {
                 if (dr.Read())
                 {
@@ -126,7 +131,8 @@ namespace umbraco.cms.businesslogic.macro
         /// </summary>
         public void Delete()
         {
-            SqlHelper.ExecuteNonQuery("delete from cmsMacroProperty where id = @id", SqlHelper.CreateParameter("@id", this.Id));
+            using (var sqlHelper = LegacySqlHelper.SqlHelper)
+                sqlHelper.ExecuteNonQuery("delete from cmsMacroProperty where id = @id", sqlHelper.CreateParameter("@id", this.Id));
         }
 
         public void Save()
@@ -135,19 +141,19 @@ namespace umbraco.cms.businesslogic.macro
             {
                 MacroProperty mp = MakeNew(Macro, Alias, Name, ParameterEditorAlias);
                 Id = mp.Id;
-
             }
             else
             {
-                SqlHelper.ExecuteNonQuery("UPDATE cmsMacroProperty set macro = @macro, " +
+                using (var sqlHelper = LegacySqlHelper.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("UPDATE cmsMacroProperty set macro = @macro, " +
                                           "macropropertyAlias = @alias, macroPropertyName = @name, " +
                                           "editorAlias = @editorAlias, macroPropertySortOrder = @so WHERE id = @id",
-                                          SqlHelper.CreateParameter("@id", Id),
-                                          SqlHelper.CreateParameter("@macro", Macro.Id),
-                                          SqlHelper.CreateParameter("@alias", Alias),
-                                          SqlHelper.CreateParameter("@name", Name),
-                                          SqlHelper.CreateParameter("@editorAlias", ParameterEditorAlias),
-                                          SqlHelper.CreateParameter("@so", SortOrder));
+                                          sqlHelper.CreateParameter("@id", Id),
+                                          sqlHelper.CreateParameter("@macro", Macro.Id),
+                                          sqlHelper.CreateParameter("@alias", Alias),
+                                          sqlHelper.CreateParameter("@name", Name),
+                                          sqlHelper.CreateParameter("@editorAlias", ParameterEditorAlias),
+                                          sqlHelper.CreateParameter("@so", SortOrder));
             }
         }
 
@@ -177,7 +183,8 @@ namespace umbraco.cms.businesslogic.macro
         public static MacroProperty[] GetProperties(int macroId)
         {
             var props = new List<MacroProperty>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacroProperty where macro = @macroId order by macroPropertySortOrder, id ASC", SqlHelper.CreateParameter("@macroId", macroId)))
+            using (var sqlHelper = LegacySqlHelper.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader("select id from cmsMacroProperty where macro = @macroId order by macroPropertySortOrder, id ASC", sqlHelper.CreateParameter("@macroId", macroId)))
             {                
                 while (dr.Read())
                 {
@@ -198,7 +205,6 @@ namespace umbraco.cms.businesslogic.macro
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static MacroProperty MakeNew(Macro macro, string alias, string name, string editorAlias)
         {
-
             //try to get the new mapped parameter editor
             var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
             if (mapped.IsNullOrWhiteSpace() == false)
@@ -208,13 +214,17 @@ namespace umbraco.cms.businesslogic.macro
 
             int macroPropertyId = 0;
             // The method is synchronized
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsMacroProperty (macro, macropropertyAlias, macroPropertyName, editorAlias) VALUES (@macro, @alias, @name, @editorAlias)",
-                SqlHelper.CreateParameter("@macro", macro.Id),
-                SqlHelper.CreateParameter("@alias", alias),
-                SqlHelper.CreateParameter("@name", name),
-                SqlHelper.CreateParameter("@editorAlias", editorAlias));
-            macroPropertyId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsMacroProperty");
-            return new MacroProperty(macroPropertyId);
+            using (var sqlHelper = LegacySqlHelper.SqlHelper)
+            {
+                sqlHelper.ExecuteNonQuery(
+                    "INSERT INTO cmsMacroProperty (macro, macropropertyAlias, macroPropertyName, editorAlias) VALUES (@macro, @alias, @name, @editorAlias)",
+                    sqlHelper.CreateParameter("@macro", macro.Id),
+                    sqlHelper.CreateParameter("@alias", alias),
+                    sqlHelper.CreateParameter("@name", name),
+                    sqlHelper.CreateParameter("@editorAlias", editorAlias));
+                macroPropertyId = sqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsMacroProperty");
+                return new MacroProperty(macroPropertyId);
+            }
         }
 
         #endregion

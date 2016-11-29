@@ -501,12 +501,14 @@ namespace umbraco.cms.businesslogic.web
 
             string pathExp = childrenOnly ? Path + ",%" : Path;
 
-            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp));
-            while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), !dr.GetBoolean("published")));
-            dr.Close();
+            using (var sqlHelper = LegacySqlHelper.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp)))
+            {
+                while (dr.Read())
+                    nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), !dr.GetBoolean("published")));
 
-            return nodes;
+                return nodes;
+            }
         }
 
         #endregion

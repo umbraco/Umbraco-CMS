@@ -548,27 +548,27 @@ namespace Umbraco.Web
 		            Logger.Debug<UmbracoModule>($"End Request. ({DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds}ms)");
 		        }
 
-		        OnEndRequest(new EventArgs());
+                    OnEndRequest(new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));
 
-		        DisposeHttpContextItems(httpContext);
+					DisposeHttpContextItems(httpContext);
 		    };
 		}
 
 		public void Dispose()
 		{ }
 
-		#endregion
+        #endregion
 
         #region Events
 
-        internal static event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
+        public static event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
 
         private void OnRouteAttempt(RoutableAttemptEventArgs args)
         {
             RouteAttempt?.Invoke(this, args);
         }
 
-        internal static event EventHandler<EventArgs> EndRequest;
+        public static event EventHandler<EventArgs> EndRequest;
 
         private void OnEndRequest(EventArgs args)
         {

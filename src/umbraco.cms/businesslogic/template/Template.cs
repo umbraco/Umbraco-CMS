@@ -314,7 +314,8 @@ namespace umbraco.cms.businesslogic.template
 
 
             //remove refs from documents
-            SqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
+                using (var sqlHelper = LegacySqlHelper.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
 
 
             Current.Services.FileService.DeleteTemplate(TemplateEntity.Alias);

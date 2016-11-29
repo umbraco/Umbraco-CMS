@@ -20,7 +20,7 @@ Note that you can always [download a nightly build](http://nightly.umbraco.org/?
 
 [![ScreenShot](http://umbraco.com/images/whatisumbraco.png)](https://umbraco.tv/videos/umbraco-v7/content-editor/basics/introduction/cms-explanation/)
 
-## Umbraco - The Friendly CMS ## 
+## Umbraco - The Friendly CMS ##
 
 For the first time on the Microsoft platform, there is a free user and developer friendly CMS that makes it quick and easy to create websites - or a breeze to build complex web applications. Umbraco has award-winning integration capabilities and supports ASP.NET MVC or Web Forms, including User and Custom Controls, out of the box. 
 
@@ -30,7 +30,7 @@ Used by more than 350,000 active websites including Carlsberg, Segway, Amazon an
 
 To view more examples, please visit [https://umbraco.com/why-umbraco/#caseStudies](https://umbraco.com/why-umbraco/#caseStudies)
 
-## Why Open Source? ## 
+## Why Open Source? ##
 As an Open Source platform, Umbraco is more than just a CMS. We are transparent with our roadmap for future versions, our incremental sprint planning notes are publicly accessible and community contributions and packages are available for all to use.
 
 ## Downloading ##

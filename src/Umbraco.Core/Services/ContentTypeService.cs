@@ -49,6 +49,8 @@ namespace Umbraco.Core.Services
                 var aliases = repo.GetAllPropertyTypeAliases();
                 uow.Complete();
                 return aliases;
+                    
+                    
             }
         }
 

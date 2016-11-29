@@ -197,7 +197,8 @@ namespace umbraco.DataLayer.Utility.Installer
                 {
                     if(v.ExpectedRows > -1)
                     {
-                        using (var reader = SqlHelper.ExecuteReader(v.Sql))
+                        using (var sqlHelper = SqlHelper)
+                        using (var reader = sqlHelper.ExecuteReader(v.Sql))
                         {
                             var rowCount = 0;
                             while (reader.Read())
@@ -209,7 +210,8 @@ namespace umbraco.DataLayer.Utility.Installer
                     }
                     else
                     {
-                        SqlHelper.ExecuteNonQuery(v.Sql);
+                        using (var sqlHelper = SqlHelper)
+                            sqlHelper.ExecuteNonQuery(v.Sql);
                     }
 
                     //if (!String.IsNullOrEmpty(v.Table) && !String.IsNullOrEmpty(v.Field) && !String.IsNullOrEmpty(v.Value))
@@ -251,7 +253,8 @@ namespace umbraco.DataLayer.Utility.Installer
             {
                 string rawStatement = statement.Trim();
                 if (rawStatement.Length > 0)
-                    SqlHelper.ExecuteNonQuery(rawStatement);
+                    using (var sqlHelper = SqlHelper)
+                        sqlHelper.ExecuteNonQuery(rawStatement);
             }
         }
 
