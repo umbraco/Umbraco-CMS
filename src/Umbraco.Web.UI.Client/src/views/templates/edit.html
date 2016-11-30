@@ -22,20 +22,26 @@
 
             <umb-editor-container>
 
-                <umb-editor-sub-header>
+                <div class="flex" style="margin-bottom: 30px;">
 
-                    <umb-editor-sub-header-content-left>
+                    <div class="flex">
+                        <a class="btn btn-link" ng-click="vm.openMasterTemplateOverlay()">
+                            <i class="icon icon-layout" style="margin-right:5px;"></i>
+                            <span class="bold">Master template:</span> {{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}
+                        </a>
+                    </div>
 
-                        <div class="btn-group umb-button-group dropdown">
-                            <umb-button
+                    <div class="flex" style="margin-left: auto;">
+                        <div class="btn-group umb-button-group dropdown" style="margin-right: 10px;">
+                            
+                            <button
                                 type="button"
-                                button-style="link"
-                                label="Insert"
-                                icon="icon-add"
-                                action="vm.openInsertOverlay()">
-                            </umb-button>
+                                class="umb-era-button umb-button--s"
+                                ng-click="vm.openInsertOverlay()">
+                                <i class="icon icon-add"></i> Insert
+                            </button>
 
-                            <a class="btn btn-link dropdown-toggle umb-button-group__toggle" style="margin-left: -13px;" data-toggle="dropdown">
+                            <a class="umb-era-button umb-button--s dropdown-toggle umb-button-group__toggle" data-toggle="dropdown">
                                 <span class="caret"></span>
                             </a>
 
@@ -45,38 +51,27 @@
                                 <li><a href="" ng-click="vm.openDictionaryItemOverlay()">Dictionary</a></li>
                                 <li><a href="" ng-click="vm.openMacroOverlay()">Macro</a></li>
                             </ul>
+
                         </div>
 
-                        <umb-button
+                        <button
                             type="button"
-                            button-style="link"
-                            label="Query Builder"
-                            icon="icon-wand"
-                            action="vm.openQueryBuilderOverlay()">
-                        </umb-button>
+                            style="margin-right: 10px;"
+                            class="umb-era-button umb-button--s"
+                            ng-click="vm.openQueryBuilderOverlay()">
+                            <i class="icon icon-wand"></i> Query builder
+                        </button>
 
-
-                        <umb-button
+                        <button
                             type="button"
-                            button-style="link"
-                            label="Sections"
-                            icon="icon-indent"
-                            action="vm.openSectionsOverlay()">
-                        </umb-button>
+                            class="umb-era-button umb-button--s"
+                            ng-click="vm.openSectionsOverlay()">
+                            <i class="icon icon-indent"></i> Sections
+                        </button>
 
-                    </umb-editor-sub-header-content-left>
+                    </div>
 
-                    <umb-editor-sub-header-content-right>
-
-                        <a class="btn btn-link" ng-click="vm.openMasterTemplateOverlay()">
-                            <i class="icon icon-layout" style="margin-right:5px;"></i>
-                            <span class="bold">Master template:</span>
-                            {{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}
-                        </a>
-
-                    </umb-editor-sub-header-content-right>
-
-                </umb-editor-sub-header>
+                </div>
 
                 <div
                     auto-scale="85"
