@@ -166,7 +166,7 @@ namespace Umbraco.Web.Editors
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
                     //add the default text filter
-                    queryFilter = DatabaseContext.QueryFactory.Create<IMedia>()
+                    queryFilter = DatabaseContext.Query<IMedia>()
                         .Where(x => x.Name.Contains(filter));
                 }
 

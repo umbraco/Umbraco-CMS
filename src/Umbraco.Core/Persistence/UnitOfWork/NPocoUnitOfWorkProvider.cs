@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.DI;
+﻿using System;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
@@ -7,34 +7,29 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     /// </summary>
     public class NPocoUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
     {
-        private readonly IDatabaseFactory _databaseFactory;
         private readonly RepositoryFactory _repositoryFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoUnitOfWorkProvider"/> class with a database factory and a repository factory.
         /// </summary>
-        /// <param name="databaseFactory">A database factory.</param>
+        /// <param name="databaseContext">A database context.</param>
         /// <param name="repositoryFactory">A repository factory.</param>
-        public NPocoUnitOfWorkProvider(IDatabaseFactory databaseFactory, RepositoryFactory repositoryFactory)
+        public NPocoUnitOfWorkProvider(DatabaseContext databaseContext, RepositoryFactory repositoryFactory)
         {
-            Mandate.ParameterNotNull(databaseFactory, nameof(databaseFactory));
-            Mandate.ParameterNotNull(repositoryFactory, nameof(repositoryFactory));
-            _databaseFactory = databaseFactory;
+            if (databaseContext == null) throw new ArgumentNullException(nameof(databaseContext));
+            if (repositoryFactory == null) throw new ArgumentNullException(nameof(repositoryFactory));
+
+            DatabaseContext = databaseContext;
             _repositoryFactory = repositoryFactory;
         }
 
         /// <inheritdoc />
-        public DatabaseContext DatabaseContext => Current.DatabaseContext; // fixme inject!
+        public DatabaseContext DatabaseContext { get; }
 
         /// <inheritdoc />
         public IDatabaseUnitOfWork CreateUnitOfWork()
         {
-            // get a database from the factory - might be the "ambient" database eg
-            // the one that's enlisted with the HttpContext - so it's *not* necessary a
-            // "new" database.
-            var database = _databaseFactory.GetDatabase();
-            var databaseContext = Current.DatabaseContext; // fixme - inject!
-            return new NPocoUnitOfWork(databaseContext, database, _repositoryFactory);
+            return new NPocoUnitOfWork(DatabaseContext, _repositoryFactory);
         }
     }
 }

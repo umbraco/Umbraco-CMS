@@ -2,6 +2,7 @@ using System;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -24,5 +25,7 @@ namespace Umbraco.Core.Services
             EventMessagesFactory = eventMessagesFactory;
             UowProvider = provider;
         }
+
+        protected IQuery<T> Query<T>() => UowProvider.DatabaseContext.Query<T>();
     }
 }

@@ -165,8 +165,7 @@ namespace Umbraco.Core.Persistence
             }
         }
 
-        // fixme
-        public SqlContext SqlContext => _sqlContext;
+        public Sql<SqlContext> Sql() => NPoco.Sql.BuilderFor(_sqlContext);
 
         // will be configured by the database context
         public void Configure(string connectionString, string providerName)

@@ -131,7 +131,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 && _databaseBuilder.IsDatabaseConfigured)
             {
                 //check if we have the default user configured already
-                var result = _databaseBuilder.DatabaseContext.Database.ExecuteScalar<int>(
+                var result = _databaseBuilder.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
                 if (result == 1)
                 {

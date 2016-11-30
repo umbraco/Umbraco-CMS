@@ -1,4 +1,5 @@
 using System;
+using NPoco;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -24,5 +25,7 @@ namespace Umbraco.Core.Persistence
         IQueryFactory QueryFactory { get; }
 
         ISqlSyntaxProvider SqlSyntax { get; }
+
+	    Sql<SqlContext> Sql();
 	}
 }

@@ -469,7 +469,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
                 var filterQuery = filter.IsNullOrWhiteSpace()
                     ? null
-                    : repository.QueryFactory.Create<IMedia>().Where(x => x.Name.Contains(filter));
+                    : Query<IMedia>().Where(x => x.Name.Contains(filter));
                 return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
             }
         }
@@ -525,7 +525,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var filterQuery = filter.IsNullOrWhiteSpace()
                     ? null
-                    : repository.QueryFactory.Create<IMedia>().Where(x => x.Name.Contains(filter));
+                    : Query<IMedia>().Where(x => x.Name.Contains(filter));
                 return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
             }
         }

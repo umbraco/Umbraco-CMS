@@ -22,21 +22,24 @@ namespace Umbraco.Core
     /// </summary>
     public class DatabaseBuilder
     {
+        private readonly IDatabaseFactory _databaseFactory;
         private readonly IRuntimeState _runtime;
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly ILogger _logger;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
-        public DatabaseBuilder(DatabaseContext databaseContext, IRuntimeState runtime, IMigrationEntryService migrationEntryService, ILogger logger)
+        public DatabaseBuilder(IDatabaseFactory databaseFactory, IRuntimeState runtime, IMigrationEntryService migrationEntryService, ILogger logger)
         {
-            DatabaseContext = databaseContext;
+            _databaseFactory = databaseFactory;
             _runtime = runtime;
             _migrationEntryService = migrationEntryService;
             _logger = logger;
         }
 
-        public DatabaseContext DatabaseContext { get; }
+        public UmbracoDatabase Database => _databaseFactory.GetDatabase();
+
+        public ISqlSyntaxProvider SqlSyntax => _databaseFactory.SqlSyntax;
 
         #region Status
 
@@ -45,12 +48,12 @@ namespace Umbraco.Core
         /// mean that it is possible to connect, nor that Umbraco is installed, nor
         /// up-to-date.
         /// </summary>
-        public bool IsDatabaseConfigured => DatabaseContext.IsDatabaseConfigured;
+        public bool IsDatabaseConfigured => _databaseFactory.Configured;
 
         /// <summary>
         /// Gets a value indicating whether it is possible to connect to the database.
         /// </summary>
-        public bool CanConnect => DatabaseContext.CanConnect;
+        public bool CanConnect => _databaseFactory.CanConnect;
 
         // that method was originally created by Per in DatabaseHelper- tests the db connection for install
         // fixed by Shannon to not-ignore the provider
@@ -97,7 +100,7 @@ namespace Umbraco.Core
         /// </summary>
         public void ConfigureEmbeddedDatabaseConnection()
         {
-            ConfigureEmbeddedDatabaseConnection(DatabaseContext.DatabaseFactory, _logger);
+            ConfigureEmbeddedDatabaseConnection(_databaseFactory, _logger);
         }
 
         private static void ConfigureEmbeddedDatabaseConnection(IDatabaseFactory factory, ILogger logger)
@@ -130,7 +133,7 @@ namespace Umbraco.Core
                 : Constants.DbProviderNames.SqlServer;
 
             SaveConnectionString(connectionString, providerName, _logger);
-            DatabaseContext.DatabaseFactory.Configure(connectionString, providerName);
+            _databaseFactory.Configure(connectionString, providerName);
         }
 
         /// <summary>
@@ -147,7 +150,7 @@ namespace Umbraco.Core
             var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out providerName);
 
             SaveConnectionString(connectionString, providerName, _logger);
-            DatabaseContext.DatabaseFactory.Configure(connectionString, providerName);
+            _databaseFactory.Configure(connectionString, providerName);
         }
 
         /// <summary>
@@ -185,7 +188,7 @@ namespace Umbraco.Core
         {
             var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
             SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer, _logger);
-            DatabaseContext.DatabaseFactory.Configure(connectionString, Constants.DbProviderNames.SqlServer);
+            _databaseFactory.Configure(connectionString, Constants.DbProviderNames.SqlServer);
         }
 
         /// <summary>
@@ -374,13 +377,13 @@ namespace Umbraco.Core
 
         internal DatabaseSchemaResult ValidateDatabaseSchema()
         {
-            if (DatabaseContext.DatabaseFactory.Configured == false)
-                return new DatabaseSchemaResult(DatabaseContext.SqlSyntax);
+            if (_databaseFactory.Configured == false)
+                return new DatabaseSchemaResult(_databaseFactory.SqlSyntax);
 
             if (_databaseSchemaValidationResult != null)
                 return _databaseSchemaValidationResult;
 
-            var database = DatabaseContext.DatabaseFactory.GetDatabase();
+            var database = _databaseFactory.GetDatabase();
             var dbSchema = new DatabaseSchemaCreation(database, _logger);
             _databaseSchemaValidationResult = dbSchema.ValidateSchema();
             return _databaseSchemaValidationResult;
@@ -398,7 +401,7 @@ namespace Umbraco.Core
 
                 _logger.Info<DatabaseContext>("Database configuration status: Started");
 
-                var database = DatabaseContext.DatabaseFactory.GetDatabase();
+                var database = _databaseFactory.GetDatabase();
 
                 // If MySQL, we're going to ensure that database calls are maintaining proper casing as to remove the necessity for checks
                 // for case insensitive queries. In an ideal situation (which is what we're striving for), all calls would be case sensitive.
@@ -468,7 +471,7 @@ namespace Umbraco.Core
 
                 _logger.Info<DatabaseContext>("Database upgrade started");
 
-                var database = DatabaseContext.DatabaseFactory.GetDatabase();
+                var database = _databaseFactory.GetDatabase();
                 //var supportsCaseInsensitiveQueries = SqlSyntax.SupportsCaseInsensitiveQueries(database);
 
                 var message = GetResultMessageForMySql();
@@ -534,7 +537,7 @@ namespace Umbraco.Core
 
         private string GetResultMessageForMySql()
         {
-            if (DatabaseContext.SqlSyntax.GetType() == typeof(MySqlSyntaxProvider))
+            if (_databaseFactory.GetType() == typeof(MySqlSyntaxProvider))
             {
                 return "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
                        "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
@@ -576,7 +579,7 @@ namespace Umbraco.Core
 
         private Attempt<Result> CheckReadyForInstall()
         {
-            if (DatabaseContext.DatabaseFactory.Configured == false)
+            if (_databaseFactory.Configured == false)
             {
                 return Attempt.Fail(new Result
                 {

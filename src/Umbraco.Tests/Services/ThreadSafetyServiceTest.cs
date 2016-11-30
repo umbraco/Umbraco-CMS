@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Services
 		public override void SetUp()
 		{
 			base.SetUp();
-            
+
    //         //we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that
    //         //a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
    //         //threading environment, or a single apartment threading environment will not work for this test because
@@ -256,6 +256,11 @@ namespace Umbraco.Tests.Services
 		    }
 
 		    public ISqlSyntaxProvider SqlSyntax { get; } = new SqlCeSyntaxProvider();
+
+		    public Sql<SqlContext> Sql()
+		    {
+		        throw new NotImplementedException();
+		    }
 
 		    public IQueryFactory QueryFactory => _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappers));
 

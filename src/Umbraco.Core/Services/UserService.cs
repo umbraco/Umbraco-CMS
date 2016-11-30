@@ -640,7 +640,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
-                var query = repository.QueryFactory.Create<IUserType>().Where(x => x.Alias == alias);
+                var query = repository.Query.Where(x => x.Alias == alias);
                 var type = repository.GetByQuery(query).SingleOrDefault();
                 uow.Complete();
                 return type;
@@ -673,7 +673,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
-                var query = repository.QueryFactory.Create<IUserType>().Where(x => x.Name == name);
+                var query = repository.Query.Where(x => x.Name == name);
                 var type = repository.GetByQuery(query).SingleOrDefault();
                 uow.Complete();
                 return type;

@@ -9,86 +9,76 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Represents the Umbraco database.
+    /// Represents the Umbraco database context.
     /// </summary>
-    /// <remarks>One per AppDomain. Ensures that the database is available.</remarks>
+    /// <remarks>
+    /// <para>The database context creates Sql statements and IQuery expressions.</para>
+    /// <para>The database context provides the SqlSyntax and the DatabaseType.</para>
+    /// <para>The database context provides access to the "ambient" database.</para>
+    /// <para>The database context provides basic status infos (whether the db is configured and can connect).</para>
+    /// </remarks>
     public class DatabaseContext
     {
+        private readonly IDatabaseFactory _databaseFactory;
+        private bool _canConnectOnce;
+
+        // fixme
+        // do we need to expose the query factory here?
+        // all in all, would prob. mean replacing ALL repository.Query by something more meaningful? YES!
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseContext"/> class.
         /// </summary>
         /// <param name="databaseFactory">A database factory.</param>
         /// <remarks>The database factory will try to configure itself but may fail eg if the default
         /// Umbraco connection string is not available because we are installing. In which case this
-        /// database context must sort things out and configure the database factory before it can be
+        /// database builder must sort things out and configure the database factory before it can be
         /// used.</remarks>
         public DatabaseContext(IDatabaseFactory databaseFactory)
         {
             if (databaseFactory == null) throw new ArgumentNullException(nameof(databaseFactory));
 
-            DatabaseFactory = databaseFactory;
+            _databaseFactory = databaseFactory;
         }
 
-        // FIXME
-        // this is basically exposing a subset of the database factory...
-        // so why? why not "just" merge with database factory?
-        // which can create & manage ambient database,
-        //           create Sql<SqlContext> expressions
-        //           create IQuery<T> expressions
-        // ?
-
-        internal IDatabaseFactory DatabaseFactory { get; }
-
         /// <summary>
-        /// Gets the QueryFactory
+        /// Gets the query factory.
         /// </summary>
-        public IQueryFactory QueryFactory => DatabaseFactory.QueryFactory; // fixme obsolete?
+        /// <remarks>In most cases... this is useless, better use Query{T}.</remarks>
+        public IQueryFactory QueryFactory => _databaseFactory.QueryFactory;
 
         /// <summary>
         /// Gets the database sql syntax.
         /// </summary>
-        public ISqlSyntaxProvider SqlSyntax => DatabaseFactory.SqlSyntax;
-
-        // fixme
-        // created by the database factory?
-        // add PocoDataFactory
-        // add DatabaseType
-        // add Sql() and Query<T>()
-        // so it can finally replace SqlContext entirely?
-        // need an IDatabaseContext interface?
-
-        public Sql<SqlContext> Sql()
-        {
-            var factory = (DefaultDatabaseFactory) DatabaseFactory; // fixme
-            return NPoco.Sql.BuilderFor(factory.SqlContext);
-        }
-
-        public Sql<SqlContext> Sql(string sql, params object[] args)
-        {
-            return Sql().Append(sql, args);
-        }
-
-        public IQuery<T> Query<T>()
-        {
-            return DatabaseFactory.QueryFactory.Create<T>();
-        }
+        public ISqlSyntaxProvider SqlSyntax => _databaseFactory.SqlSyntax;
 
         /// <summary>
-        /// Gets the <see cref="Database"/> object for doing CRUD operations
-        /// against custom tables that resides in the Umbraco database.
+        /// Creates a Sql statement.
         /// </summary>
-        /// <remarks>
-        /// This should not be used for CRUD operations or queries against the
-        /// standard Umbraco tables! Use the Public services for that.
-        /// </remarks>
-        public UmbracoDatabase Database => DatabaseFactory.GetDatabase();
+        public Sql<SqlContext> Sql() => _databaseFactory.Sql();
 
         /// <summary>
-        /// Gets a value indicating whether the database is configured. It does not necessarily
-        /// mean that it is possible to connect, nor that Umbraco is installed, nor
-        /// up-to-date.
+        /// Creates a Sql statement.
         /// </summary>
-        public bool IsDatabaseConfigured => DatabaseFactory.Configured;
+        public Sql<SqlContext> Sql(string sql, params object[] args) => Sql().Append(sql, args);
+
+        /// <summary>
+        /// Creates a Query expression.
+        /// </summary>
+        public IQuery<T> Query<T>() => _databaseFactory.QueryFactory.Create<T>();
+
+        /// <summary>
+        /// Gets an "ambient" database for doing CRUD operations against custom tables that resides in the Umbraco database.
+        /// </summary>
+        /// <remarks>Should not be used for operation against standard Umbraco tables; as services should be used instead.</remarks>
+        public UmbracoDatabase Database => _databaseFactory.GetDatabase();
+
+        /// <summary>
+        /// Gets a value indicating whether the database is configured.
+        /// </summary>
+        /// <remarks>It does not necessarily mean that it is possible to
+        /// connect, nor that Umbraco is installed, nor up-to-date.</remarks>
+        public bool IsDatabaseConfigured => _databaseFactory.Configured;
 
         /// <summary>
         /// Gets a value indicating whether it is possible to connect to the database.
@@ -97,9 +87,18 @@ namespace Umbraco.Core
         {
             get
             {
-                if (DatabaseFactory.Configured == false) return false;
-                var canConnect = DatabaseFactory.CanConnect;
-                Current.Logger.Info<DatabaseContext>("CanConnect = " + canConnect);
+                var canConnect = _databaseFactory.Configured  && _databaseFactory.CanConnect;
+
+                if (_canConnectOnce)
+                {
+                    Current.Logger.Debug<DatabaseContext>("CanConnect: " + canConnect);
+                }
+                else
+                {
+                    Current.Logger.Info<DatabaseContext>("CanConnect: " + canConnect);
+                    _canConnectOnce = canConnect; // keep logging Info until we can connect
+                }
+
                 return canConnect;
             }
         }

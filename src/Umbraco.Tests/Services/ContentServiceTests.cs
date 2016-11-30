@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -1466,7 +1467,7 @@ namespace Umbraco.Tests.Services
                 new TestUmbracoDatabaseAccessor(),
                 Mappers);
             var repositoryFactory = MockRepositoryFactory();
-            var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
+            var provider = new NPocoUnitOfWorkProvider(new DatabaseContext(databaseFactory), repositoryFactory);
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 

@@ -1050,7 +1050,7 @@ namespace Umbraco.Core.Services
                         throw new InvalidOperationException("The role " + roleName + " is currently assigned to members");
                 }
 
-                var query = repository.QueryFactory.Create<IMemberGroup>().Where(g => g.Name == roleName);
+                var query = repository.Query.Where(g => g.Name == roleName);
                 var found = repository.GetByQuery(query).ToArray();
 
                 foreach (var memberGroup in found)

@@ -5,6 +5,7 @@ using System.Linq;
 using LightInject;
 using Moq;
 using NPoco;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -224,7 +225,7 @@ namespace Umbraco.Tests.TestHelpers
                 databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, mappers);
             }
             repositoryFactory = repositoryFactory  ??  new RepositoryFactory(Mock.Of<IServiceContainer>());
-            return new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
+            return new NPocoUnitOfWorkProvider(new DatabaseContext(databaseFactory), repositoryFactory);
         }
     }
 }

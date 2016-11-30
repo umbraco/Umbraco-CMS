@@ -124,7 +124,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 typeof (IMemberGroup).FullName + "." + name,
                 () =>
                 {
-                    var qry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(name));
+                    var qry = Query.Where(group => group.Name.Equals(name));
                     var result = GetByQuery(qry);
                     return result.FirstOrDefault();
                 },
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IMemberGroup CreateIfNotExists(string roleName)
         {
-            var qry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(roleName));
+            var qry = Query.Where(group => group.Name.Equals(roleName));
             var result = GetByQuery(qry);
 
             if (result.Any()) return null;

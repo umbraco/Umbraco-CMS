@@ -81,7 +81,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             var errorReport = new List<string>();
 
-            var sqlSyntax = _databaseBuilder.DatabaseContext.SqlSyntax;
+            var sqlSyntax = _databaseBuilder.SqlSyntax;
 
             var sql = new Sql();
             sql
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Install.InstallSteps
                     sqlSyntax.GetQuotedColumn("cmsDataType", "nodeId") + " = " +
                     sqlSyntax.GetQuotedColumn("umbracoNode", "id"));
 
-            var list = _databaseBuilder.DatabaseContext.Database.Fetch<dynamic>(sql);
+            var list = _databaseBuilder.Database.Fetch<dynamic>(sql);
             foreach (var item in list)
             {
                 Guid legacyId = item.controlId;

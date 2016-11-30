@@ -15,21 +15,19 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// Initializes a new instance of the <see cref="NPocoUnitOfWork"/> class with a database and a repository factory.
         /// </summary>
         /// <param name="databaseContext">The database context.</param>
-        /// <param name="database">A database.</param>
         /// <param name="repositoryFactory">A repository factory.</param>
         /// <remarks>This should be used by the NPocoUnitOfWorkProvider exclusively.</remarks>
-        internal NPocoUnitOfWork(DatabaseContext databaseContext, UmbracoDatabase database, RepositoryFactory repositoryFactory)
+        internal NPocoUnitOfWork(DatabaseContext databaseContext, RepositoryFactory repositoryFactory)
             : base(repositoryFactory)
         {
             DatabaseContext = databaseContext;
-            Database = database;
         }
 
         /// <inheritdoc />
         public DatabaseContext DatabaseContext { get; }
 
         /// <inheritdoc />
-        public UmbracoDatabase Database { get; } // => DatabaseContext.Database; // fixme + change ctor
+        public UmbracoDatabase Database => DatabaseContext.Database;
 
         /// <inheritdoc />
         public override TRepository CreateRepository<TRepository>(string name = null)

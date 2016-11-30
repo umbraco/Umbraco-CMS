@@ -186,13 +186,13 @@ namespace Umbraco.Web.Install
                 }
 
                 //check if we have the default user configured already
-                var result = _databaseBuilder.DatabaseContext.Database.ExecuteScalar<int>(
+                var result = _databaseBuilder.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
                 if (result == 1)
                 {
                     //the user has not been configured
                     //this is always true on UaaS, need to check if there's multiple users too
-                    var usersResult = _databaseBuilder.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
+                    var usersResult = _databaseBuilder.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
                     return usersResult == 1;
                 }
 
