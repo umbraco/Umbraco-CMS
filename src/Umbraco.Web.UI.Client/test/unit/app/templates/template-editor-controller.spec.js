@@ -42,8 +42,14 @@
                 q = $q;
 
                 ace = {
-                    on: function(){}
-                }
+                    on: function(){},
+                    navigateFileEnd: function() {},
+                    getCursorPosition: function() {},
+                    getValue: function() {},
+                    setValue: function() {},
+                    clearSelection: function() {},
+                    navigateFileStart: function() {}
+                };
 
                 controller = createController();
                 scope.$digest();
@@ -65,7 +71,8 @@
                     $scope: scope,
                     $routeParams: {},
                     templateResource: {
-                        getById: resolvedPromise({})
+                        getById: resolvedPromise({}),
+                        getAll: resolvedPromise({})
                     },
                     assetsService: {
                         loadCss: function() {}
@@ -85,44 +92,42 @@
                 });
             }
 
-            it("has ace editor",
-                function () {
-                    expect(controller.editor).toBe(ace);
-                });
+            it("has ace editor", function () {
+                expect(controller.editor).toBe(ace);
+            });
 
-            it("sets masterpage on template",
-                function () {
-                    controller.setLayout = function() {};
+            it("sets masterpage on template", function () {
+                controller.setLayout = function() {};
 
-                    controller.openOrganizeOverlay();
-                    controller.organizeOverlay.submit({
-                        masterPage: {
-                            alias: "NewMasterPage"
-                        }
-                    });
-                    expect(controller.template.masterPageAlias).toBe("NewMasterPage");
-                });
-
-            it("changes layout value when masterpage is selected",
-                function() {
-                    var newTemplate;
-                    ace.clearSelection = nada;
-                    ace.navigateFileStart = nada;
-                    ace.getValue = function () {
-                        return "@{ Layout = null; }";
+                controller.openMasterTemplateOverlay();
+                controller.masterTemplateOverlay.submit({
+                    selectedItem: {
+                        alias: "NewMasterPage"
                     }
-                    ace.setValue = function (value) {
-                        newTemplate = value;
-                    }
-
-                    controller.openOrganizeOverlay();
-                    controller.organizeOverlay.submit({
-                        masterPage: {
-                            alias: "NewMasterPage"
-                        }
-                    });
-                    expect(newTemplate).toBe("@{ Layout = \"NewMasterPage.cshtml\"; }");
                 });
+                expect(controller.template.masterTemplateAlias).toBe("NewMasterPage");
+            });
+
+            it("changes layout value when masterpage is selected", function() {
+                var newTemplate;
+                ace.clearSelection = nada;
+                ace.navigateFileStart = nada;
+                ace.getValue = function () {
+                    return "@{ Layout = null; }";
+                }
+                ace.setValue = function (value) {
+                    newTemplate = value;
+                }
+
+                controller.openMasterTemplateOverlay();
+                controller.masterTemplateOverlay.submit({
+                    selectedItem: {
+                        alias: "NewMasterPage"
+                    }
+                });
+                expect(newTemplate).toBe("@{ Layout = \"NewMasterPage.cshtml\"; }");
+            });
+            
         });
 
 }());
