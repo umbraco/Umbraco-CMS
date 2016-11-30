@@ -111,7 +111,7 @@
   <Target Name="BeforeBuild">
   </Target>
   -->
-  <Target Name="AfterBuild" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(DefineConstants), '^(.*;)*COMPAT7(;.*)*$'))">
+  <Target Name="AfterBuild" Condition="'$(BuildingInsideVisualStudio)' == 'true' AND $([System.Text.RegularExpressions.Regex]::IsMatch($(DefineConstants), '^(.*;)*COMPAT7(;.*)*$'))">
     <Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\Umbraco.Compat7.dll" DestinationFolder="$(ProjectDir)..\Umbraco.Web.UI\bin" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
 </Project>
