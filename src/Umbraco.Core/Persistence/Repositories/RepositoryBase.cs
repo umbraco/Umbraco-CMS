@@ -88,11 +88,11 @@ namespace Umbraco.Core.Persistence.Repositories
             get
             {
                 if (_cachePolicy != null) return _cachePolicy;
-                // fixme - no query for some TEntity?!
-                //if (_hasIdQuery == null) _hasIdQuery = Query.Where(x => x.Id != 0);
-                //var options = new RepositoryCachePolicyOptions(() => PerformCount(_hasIdQuery));
+
                 var options = new RepositoryCachePolicyOptions(() =>
                 {
+                    // have to initialize query here, because some TEntity cannot create a query,
+                    // but for those TEntity we don't perform counts? all this is a bit weird
                     if (_hasIdQuery == null) _hasIdQuery = Query.Where(x => x.Id != 0);
                     return PerformCount(_hasIdQuery);
                 });
