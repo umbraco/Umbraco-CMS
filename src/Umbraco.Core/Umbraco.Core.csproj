@@ -313,6 +313,7 @@
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
+    <Compile Include="Deploy\DeploySupportAttribute.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
