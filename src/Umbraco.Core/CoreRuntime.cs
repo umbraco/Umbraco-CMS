@@ -209,7 +209,7 @@ namespace Umbraco.Core
             container.Register<ISqlSyntaxProvider, SqlServerSyntaxProvider>("SqlServerSyntaxProvider");
 
             // register persistence mappers - required by database factory so needs to be done here
-            // means the only place the collection can be modified is in a runtime - afterwards it 
+            // means the only place the collection can be modified is in a runtime - afterwards it
             // has been frozen and it is too late
             var mapperCollectionBuilder = container.RegisterCollectionBuilder<MapperCollectionBuilder>();
             ComposeMapperCollection(mapperCollectionBuilder);
@@ -237,37 +237,7 @@ namespace Umbraco.Core
 
         protected virtual void ComposeMapperCollection(MapperCollectionBuilder builder)
         {
-            // ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>()
-            builder
-                .Add<AccessMapper>()
-                .Add<AuditItemMapper>()
-                .Add<ContentMapper>()
-                .Add<ContentTypeMapper>()
-                .Add<DataTypeDefinitionMapper>()
-                .Add<DictionaryMapper>()
-                .Add<DictionaryTranslationMapper>()
-                .Add<DomainMapper>()
-                .Add<LanguageMapper>()
-                .Add<MacroMapper>()
-                .Add<MediaMapper>()
-                .Add<MediaTypeMapper>()
-                .Add<MemberGroupMapper>()
-                .Add<MemberMapper>()
-                .Add<MemberTypeMapper>()
-                .Add<MigrationEntryMapper>()
-                .Add<PropertyGroupMapper>()
-                .Add<PropertyMapper>()
-                .Add<PropertyTypeMapper>()
-                .Add<RelationMapper>()
-                .Add<RelationTypeMapper>()
-                .Add<ServerRegistrationMapper>()
-                .Add<TagMapper>()
-                .Add<TaskTypeMapper>()
-                .Add<TemplateMapper>()
-                .Add<UmbracoEntityMapper>()
-                .Add<UserMapper>()
-                .Add<ExternalLoginMapper>()
-                .Add<UserTypeMapper>();
+            builder.AddCore();
         }
 
         private void SetRuntimeStateLevel(RuntimeState runtimeState, IDatabaseFactory databaseFactory, ILogger logger)

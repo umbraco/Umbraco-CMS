@@ -114,36 +114,8 @@ namespace Umbraco.Tests.TestHelpers
             Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
 
             // register application stuff (database factory & context, services...)
-            Container.RegisterCollectionBuilder<MapperCollectionBuilder>() // fixme - see CoreRuntime, should not duplicate core here
-                .Add<AccessMapper>()
-                .Add<AuditItemMapper>()
-                .Add<ContentMapper>()
-                .Add<ContentTypeMapper>()
-                .Add<DataTypeDefinitionMapper>()
-                .Add<DictionaryMapper>()
-                .Add<DictionaryTranslationMapper>()
-                .Add<DomainMapper>()
-                .Add<LanguageMapper>()
-                .Add<MacroMapper>()
-                .Add<MediaMapper>()
-                .Add<MediaTypeMapper>()
-                .Add<MemberGroupMapper>()
-                .Add<MemberMapper>()
-                .Add<MemberTypeMapper>()
-                .Add<MigrationEntryMapper>()
-                .Add<PropertyGroupMapper>()
-                .Add<PropertyMapper>()
-                .Add<PropertyTypeMapper>()
-                .Add<RelationMapper>()
-                .Add<RelationTypeMapper>()
-                .Add<ServerRegistrationMapper>()
-                .Add<TagMapper>()
-                .Add<TaskTypeMapper>()
-                .Add<TemplateMapper>()
-                .Add<UmbracoEntityMapper>()
-                .Add<UserMapper>()
-                .Add<ExternalLoginMapper>()
-                .Add<UserTypeMapper>();
+            Container.RegisterCollectionBuilder<MapperCollectionBuilder>()
+                .AddCore();
 
             Container.RegisterSingleton<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
             Container.RegisterSingleton<IUmbracoDatabaseAccessor, TestUmbracoDatabaseAccessor>();
