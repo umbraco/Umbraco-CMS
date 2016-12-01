@@ -217,15 +217,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             get { return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema; }
         }
 
-        private int NavigateElementRoute(XmlElement elt, string[] urlParts)
+        private static int NavigateElementRoute(XmlElement elt, string[] urlParts)
         {
             var found = true;
             var i = 0;
             while (found && i < urlParts.Length)
             {
                 found = false;
-                foreach (XmlElement child in elt.ChildNodes)
+                foreach (XmlNode childNode in elt.ChildNodes)
                 {
+                    var child = childNode as XmlElement;
+                    if (child == null) continue; // be safe
+
                     var noNode = UseLegacySchema
                         ? child.Name != "node"
                         : child.GetAttributeNode("isDoc") == null;
