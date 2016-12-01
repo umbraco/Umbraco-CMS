@@ -62,15 +62,14 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IRuntimeCacheProvider RuntimeCache => Cache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
 
         /// <summary>
-        /// Used to create a new query instance
+        /// Creates a new query.
         /// </summary>
-        /// <returns></returns>
-        public abstract IQuery<TEntity> Query { get; }
+        public virtual IQuery<TEntity> QueryT => Query<TEntity>();
 
         /// <summary>
-        /// Returns a query factory instance
+        /// Creates a new query.
         /// </summary>
-        public abstract IQueryFactory QueryFactory { get; }
+        public abstract IQuery<T> Query<T>();
 
         #region Static Queries
 
@@ -93,7 +92,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     // have to initialize query here, because some TEntity cannot create a query,
                     // but for those TEntity we don't perform counts? all this is a bit weird
-                    if (_hasIdQuery == null) _hasIdQuery = Query.Where(x => x.Id != 0);
+                    if (_hasIdQuery == null) _hasIdQuery = QueryT.Where(x => x.Id != 0);
                     return PerformCount(_hasIdQuery);
                 });
                 return _cachePolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, options);

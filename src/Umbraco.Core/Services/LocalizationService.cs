@@ -165,7 +165,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDictionaryRepository>();
-                var query = repository.Query.Where(x => x.ParentId == parentId);
+                var query = repository.QueryT.Where(x => x.ParentId == parentId);
                 var items = repository.GetByQuery(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 items.ForEach(EnsureDictionaryItemLanguageCallback);
@@ -201,7 +201,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDictionaryRepository>();
-                var query = repository.Query.Where(x => x.ParentId == null);
+                var query = repository.QueryT.Where(x => x.ParentId == null);
                 var items = repository.GetByQuery(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 items.ForEach(EnsureDictionaryItemLanguageCallback);

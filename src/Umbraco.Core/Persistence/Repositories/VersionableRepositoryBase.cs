@@ -430,7 +430,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // start with base query, and apply the supplied IQuery
             var sqlBase = GetBaseQuery(false);
-            if (query == null) query = Query;
+            if (query == null) query = QueryT;
             var translator = new SqlTranslator<TEntity>(sqlBase, query);
             var sqlNodeIds = translator.Translate();
 

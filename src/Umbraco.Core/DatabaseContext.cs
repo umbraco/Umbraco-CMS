@@ -22,10 +22,6 @@ namespace Umbraco.Core
         private readonly IDatabaseFactory _databaseFactory;
         private bool _canConnectOnce;
 
-        // fixme
-        // do we need to expose the query factory here?
-        // all in all, would prob. mean replacing ALL repository.Query by something more meaningful? YES!
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseContext"/> class.
         /// </summary>
@@ -41,10 +37,12 @@ namespace Umbraco.Core
             _databaseFactory = databaseFactory;
         }
 
+        // in most cases, this should not be used, keeping it here for compatibility (temp)
+        // todo: get rid of it
         /// <summary>
         /// Gets the query factory.
         /// </summary>
-        /// <remarks>In most cases... this is useless, better use Query{T}.</remarks>
+        /// <remarks>In most cases this should not be used, better use Query{T}.</remarks>
         public IQueryFactory QueryFactory => _databaseFactory.QueryFactory;
 
         /// <summary>

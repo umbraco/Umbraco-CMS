@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -9,14 +8,14 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IQueryRepository<in TId, TEntity> : IRepository<TId, TEntity>
     {
         /// <summary>
-        /// Returns a query instance
+        /// Creates a new query.
         /// </summary>
-        IQuery<TEntity> Query { get; }
+        IQuery<TEntity> QueryT { get; }
 
         /// <summary>
-        /// Returns a query factory instance
+        /// Creates a new query.
         /// </summary>
-        IQueryFactory QueryFactory { get; }
+        IQuery<T> Query<T>();
 
         /// <summary>
         /// Gets all entities of the specified type and query

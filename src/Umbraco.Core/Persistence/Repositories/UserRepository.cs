@@ -332,8 +332,9 @@ namespace Umbraco.Core.Persistence.Repositories
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
             // get the referenced column name and find the corresp mapped column name
+            var queryFactory = UnitOfWork.DatabaseContext.QueryFactory;
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
-            var mapper = QueryFactory.Mappers[typeof(IUser)];
+            var mapper = queryFactory.Mappers[typeof(IUser)];
             var mappedField = mapper.Map(SqlSyntax, expressionMember.Name);
 
             if (mappedField.IsNullOrWhiteSpace())

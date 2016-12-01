@@ -252,7 +252,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         {
-            var query = Query.Where(x => x.ParentId == null);
+            var query = QueryT.Where(x => x.ParentId == null);
             return GetByQuery(query);
         }
 
@@ -271,7 +271,7 @@ namespace Umbraco.Core.Persistence.Repositories
                             .Where<DictionaryDto>(x => x.Parent != null)
                             .Where($"{SqlSyntax.GetQuotedColumnName("parent")} IN (@parentIds)", new { parentIds = @group });
 
-                        var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query);
+                        var translator = new SqlTranslator<IDictionaryItem>(sqlClause, QueryT);
                         var sql = translator.Translate();
                         sql.OrderBy<DictionaryDto>(x => x.UniqueId);
 

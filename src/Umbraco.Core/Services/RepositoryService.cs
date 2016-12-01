@@ -1,7 +1,6 @@
 using System;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -14,8 +13,8 @@ namespace Umbraco.Core.Services
     {
         protected ILogger Logger { get; private set; }
         protected IEventMessagesFactory EventMessagesFactory { get; private set; }
-        protected IDatabaseUnitOfWorkProvider UowProvider { get; private set; }
-        
+        protected IDatabaseUnitOfWorkProvider UowProvider { get; }
+
         protected RepositoryService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));

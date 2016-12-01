@@ -786,7 +786,7 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IContentTypeRepository>();
-                var query = repository.Query.Where(x => x.Alias == contentTypeAlias);
+                var query = repository.QueryT.Where(x => x.Alias == contentTypeAlias);
                 var types = repository.GetByQuery(query).ToArray();
 
                 if (types.Any() == false)

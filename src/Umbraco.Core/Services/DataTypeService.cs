@@ -196,7 +196,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                var def = repository.GetByQuery(repository.Query.Where(x => x.Name == name)).FirstOrDefault();
+                var def = repository.GetByQuery(repository.QueryT.Where(x => x.Name == name)).FirstOrDefault();
                 uow.Complete();
                 return def;
             }
@@ -228,7 +228,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                var query = repository.Query.Where(x => x.Key == id);
+                var query = repository.QueryT.Where(x => x.Key == id);
                 var definition = repository.GetByQuery(query).FirstOrDefault();
                 uow.Complete();
                 return definition;
@@ -245,7 +245,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                var query = repository.Query.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
+                var query = repository.QueryT.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
                 var definitions = repository.GetByQuery(query);
                 uow.Complete();
                 return definitions;

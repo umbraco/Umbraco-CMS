@@ -26,9 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="logger">A logger.</param>
         protected NPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
-        {
-            QueryFactory = work.DatabaseContext.QueryFactory;
-        }
+        { }
 
         /// <summary>
 		/// Gets the repository's unit of work.
@@ -46,15 +44,9 @@ namespace Umbraco.Core.Persistence.Repositories
         public ISqlSyntaxProvider SqlSyntax => UnitOfWork.DatabaseContext.SqlSyntax;
 
         /// <summary>
-        /// Gets the repository's query factory.
-        /// </summary>
-        public override IQueryFactory QueryFactory { get; }
-
-        /// <summary>
         /// Creates a new query.
         /// </summary>
-        /// <returns>A new query.</returns>
-        public override IQuery<TEntity> Query => QueryFactory.Create<TEntity>();
+        public override IQuery<T> Query<T>() => UnitOfWork.DatabaseContext.Query<T>();
 
         /// <summary>
         /// Creates a new Sql statement.

@@ -190,7 +190,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </remarks>
         protected override void PersistDeletedItem(IContentType entity)
         {
-            var query = Query.Where(x => x.ParentId == entity.Id);
+            var query = QueryT.Where(x => x.ParentId == entity.Id);
             var children = GetByQuery(query);
             foreach (var child in children)
             {

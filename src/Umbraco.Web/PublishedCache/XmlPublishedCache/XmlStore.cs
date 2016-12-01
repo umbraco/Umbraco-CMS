@@ -1812,7 +1812,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = repository.Query.Where(x => x.Published);
+            var query = _uowProvider.DatabaseContext.Query<IContent>().Where(x => x.Published);
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1884,7 +1884,7 @@ WHERE cmsPreviewXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = repository.Query;
+            var query = _uowProvider.DatabaseContext.Query<IContent>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1960,7 +1960,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = repository.Query;
+            var query = _uowProvider.DatabaseContext.Query<IMedia>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -2030,7 +2030,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = repository.Query;
+            var query = _uowProvider.DatabaseContext.Query<IMember>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 

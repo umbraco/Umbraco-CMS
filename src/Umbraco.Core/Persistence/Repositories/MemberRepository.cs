@@ -440,12 +440,12 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             //get the group id
-            var grpQry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(roleName));
+            var grpQry = Query<IMemberGroup>().Where(group => group.Name.Equals(roleName));
             var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
             if (memberGroup == null) return Enumerable.Empty<IMember>();
 
             // get the members by username
-            var query = Query;
+            var query = QueryT;
             switch (matchType)
             {
                 case StringPropertyMatchType.Exact:
@@ -495,7 +495,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<IMember> GetByMemberGroup(string groupName)
         {
-            var grpQry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(groupName));
+            var grpQry = Query<IMemberGroup>().Where(group => group.Name.Equals(groupName));
             var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
             if (memberGroup == null) return Enumerable.Empty<IMember>();
 

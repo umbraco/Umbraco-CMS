@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public override void Delete(IDataTypeDefinition entity)
         {
             //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-            var query = QueryFactory.Create<PropertyType>().Where(x => x.DataTypeDefinitionId == entity.Id);
+            var query = Query<PropertyType>().Where(x => x.DataTypeDefinitionId == entity.Id);
 
             //TODO: Don't we need to be concerned about media and member types here too ?
             var contentTypes = _contentTypeRepository.GetByQuery(query);
@@ -376,7 +376,7 @@ AND umbracoNode.id <> @id",
 
             //update all descendants from the original path, update in order of level
             var descendants = this.GetByQuery(
-                Query.Where(type => type.Path.StartsWith(origPath + ",")));
+                QueryT.Where(type => type.Path.StartsWith(origPath + ",")));
 
             var lastParent = toMove;
             foreach (var descendant in descendants.OrderBy(x => x.Level))
