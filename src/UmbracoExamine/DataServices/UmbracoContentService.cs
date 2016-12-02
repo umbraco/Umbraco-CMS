@@ -57,7 +57,7 @@ namespace UmbracoExamine.DataServices
         [Obsolete("This should no longer be used, latest content will be indexed by using the IContentService directly")]
 		public XDocument GetLatestContentByXPath(string xpath)
         {
-            using (_applicationContext.DatabaseContext.UseSafeDatabase()) // reuse current db if any else use & dispose one
+            using (_applicationContext.DatabaseContext.UseSafeDatabase())
             {
                 var xmlContent = XDocument.Parse("<content></content>");
                 var rootContent = _applicationContext.Services.ContentService.GetRootContent();
@@ -79,7 +79,7 @@ namespace UmbracoExamine.DataServices
         /// <returns></returns>
         public bool IsProtected(int nodeId, string path)
         {
-            using (_applicationContext.DatabaseContext.UseSafeDatabase()) // reuse current db if any else use & dispose one
+            using (_applicationContext.DatabaseContext.UseSafeDatabase())
             {
                 return _applicationContext.Services.PublicAccessService.IsProtected(path.EnsureEndsWith("," + nodeId));
             }
@@ -92,7 +92,7 @@ namespace UmbracoExamine.DataServices
 		
 		public IEnumerable<string> GetAllUserPropertyNames()
 	    {
-	        using (_applicationContext.DatabaseContext.UseSafeDatabase()) // reuse current db if any else use & dispose one
+	        using (_applicationContext.DatabaseContext.UseSafeDatabase())
             {
 	            try
 	            {

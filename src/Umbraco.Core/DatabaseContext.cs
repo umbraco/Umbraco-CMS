@@ -121,12 +121,9 @@ namespace Umbraco.Core
         {
             var factory = _factory as DefaultDatabaseFactory;
             if (factory == null) throw new NotSupportedException();
+
             if (DefaultDatabaseFactory.HasAmbientDatabase)
             {
-                // has ambient,
-                // if forcing, detach it and replace it with a new, temp, database
-                //  when the UsingDatabase is disposed, the temp database is disposed and the original one is re-instated
-                // else do nothing (and nothing will be disposed)
                 return force
                     ? new UsingDatabase(DefaultDatabaseFactory.DetachAmbientDatabase(), factory.CreateDatabase())
                     : new UsingDatabase(null, null);
