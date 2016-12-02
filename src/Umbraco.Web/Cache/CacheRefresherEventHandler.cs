@@ -23,7 +23,7 @@ namespace Umbraco.Web.Cache
     /// <summary>
     /// Class which listens to events on business level objects in order to invalidate the cache amongst servers when data changes
     /// </summary>
-    [WeightedPlugin(int.MinValue)]
+    [Weight(int.MinValue)]
     public class CacheRefresherEventHandler : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
