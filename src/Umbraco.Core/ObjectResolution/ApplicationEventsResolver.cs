@@ -53,20 +53,28 @@ namespace Umbraco.Core.ObjectResolution
 	            if (_orderedAndFiltered == null)
 	            {
 	                _resolved = true;
-                    _orderedAndFiltered = GetSortedValues().ToList();                    
-                    OnCollectionResolved(_orderedAndFiltered);
+                    _orderedAndFiltered = GetSortedValues().ToList();
+
+                    //call the callback if one is applied
+                    if (FilterCollection != null)
+                    {
+                        FilterCollection(_orderedAndFiltered);
+                    }
                 }
 	            return _orderedAndFiltered;
 	        }
 		}
-
-	    /// <summary>
-	    /// A delegate that can be set in the pre-boot phase in order to filter or re-order the event handler collection
-	    /// </summary>
-	    /// <remarks>
-	    /// This can be set on startup in the pre-boot process in either a custom boot manager or global.asax (UmbracoApplication)
-	    /// </remarks>
-	    public Action<IList<IApplicationEventHandler>> FilterCollection
+        
+        /// <summary>
+        /// EXPERT: Allow a delegate to be set to filters the event handler list
+        /// </summary>
+        /// <remarks>
+        /// This allows custom logic to execute in order to filter or re-order the event handlers prior to executing.
+        /// Primarily this is used for custom boot sequences where the custom boot loader may need to remove certain startup
+        /// handlers from executing. 
+        /// This can be set on startup in the pre-boot process in either a custom boot manager or global.asax (UmbracoApplication)
+        /// </remarks>
+        public Action<IList<IApplicationEventHandler>> FilterCollection
 	    {
 	        get { return _filterCollection; }
 	        set
@@ -80,41 +88,29 @@ namespace Umbraco.Core.ObjectResolution
 	        }
 	    }
 
-	    /// <summary>
-	    /// Allow any filters to be applied to the event handler list
-	    /// </summary>
-	    /// <param name="handlers"></param>
-	    /// <remarks>
-	    /// This allows custom logic to execute in order to filter or re-order the event handlers prior to executing,
-	    /// however this also ensures that any core handlers are executed first to ensure the stabiliy of Umbraco.
-	    /// </remarks>
-	    private void OnCollectionResolved(List<IApplicationEventHandler> handlers)
-        {
-            if (FilterCollection != null)
-            {
-                FilterCollection(handlers);
-            }
+        /// <summary>
+        /// This will get the object weight for the plugin
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// For event handlers, all Core event handlers that are not attributed will result in a -100 value
+        /// </remarks>
+	    protected override int GetObjectWeight(object o)
+	    {
+            var type = o.GetType();
+            var attr = type.GetCustomAttribute<WeightAttribute>(true);
 
-            //find all of the core handlers and their weight, remove them from the main list
-            var coreItems = new List<Tuple<IApplicationEventHandler, int>>();
-            foreach (var handler in handlers.ToArray())
-            {
-                //Yuck, but not sure what else we can do 
-                if (
-                    handler.GetType().Assembly.FullName.StartsWith("Umbraco.", StringComparison.OrdinalIgnoreCase)
-                    || handler.GetType().Assembly.FullName.StartsWith("Concorde."))
-                {
-                    coreItems.Add(new Tuple<IApplicationEventHandler, int>(handler, GetObjectWeight(handler)));
-                    handlers.Remove(handler);
-                }
-            }
+	        if (attr == null &&
+	            (o.GetType().Assembly.FullName.StartsWith("Umbraco.", StringComparison.OrdinalIgnoreCase)
+	             || o.GetType().Assembly.FullName.StartsWith("Concorde.")))
+	        {
+	            return -100;
+	        }
 
-            //re-add the core handlers to the beginning of the list ordered by their weight
-            foreach (var coreHandler in coreItems.OrderBy(x => x.Item2))
-            {
-                handlers.Insert(0, coreHandler.Item1);
-            }            
+	        return attr == null ? DefaultPluginWeight : attr.Weight;
         }
+        
 
         /// <summary>
         /// Create instances of all of the legacy startup handlers
