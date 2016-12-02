@@ -429,6 +429,7 @@
     <Compile Include="Persistence\BulkDataReader.cs" />
     <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
+    <Compile Include="Persistence\DatabaseDebugHelper.cs" />
     <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
     <Compile Include="Persistence\Factories\MigrationEntryFactory.cs" />
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />

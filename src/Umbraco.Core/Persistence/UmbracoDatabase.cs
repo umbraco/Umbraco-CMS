@@ -1,12 +1,14 @@
 using System;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Text;
-using MySql.Data.MySqlClient;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
+
+#if DEBUG_DATABASES
+using System.Threading;
+#endif
 
 namespace Umbraco.Core.Persistence
 {
@@ -54,6 +56,12 @@ namespace Umbraco.Core.Persistence
         /// Generally used for testing, will output all SQL statements executed to the logger
         /// </summary>
         internal bool EnableSqlTrace { get; set; }
+
+#if DEBUG_DATABASES
+        private const bool EnableSqlTraceDefault = true;
+#else
+        private const bool EnableSqlTraceDefault = false;
+#endif
 
         /// <summary>
         /// Used for testing
@@ -105,28 +113,28 @@ namespace Umbraco.Core.Persistence
             : base(connection)
         {
             _logger = logger;
-            EnableSqlTrace = false;
+            EnableSqlTrace = EnableSqlTraceDefault;
         }
 
         public UmbracoDatabase(string connectionString, string providerName, ILogger logger)
             : base(connectionString, providerName)
         {
             _logger = logger;
-            EnableSqlTrace = false;
+            EnableSqlTrace = EnableSqlTraceDefault;
         }
 
         public UmbracoDatabase(string connectionString, DbProviderFactory provider, ILogger logger)
             : base(connectionString, provider)
         {
             _logger = logger;
-            EnableSqlTrace = false;
+            EnableSqlTrace = EnableSqlTraceDefault;
         }
 
         public UmbracoDatabase(string connectionStringName, ILogger logger)
             : base(connectionStringName)
         {
             _logger = logger;
-            EnableSqlTrace = false;
+            EnableSqlTrace = EnableSqlTraceDefault;
         }
 
         public override IDbConnection OnConnectionOpened(IDbConnection connection)
@@ -197,6 +205,12 @@ namespace Umbraco.Core.Persistence
                 _logger.Debug<UmbracoDatabase>(sb.ToString().Replace("{", "{{").Replace("}", "}}"));
             }
 
+#if DEBUG_DATABASES
+            DatabaseDebugHelper.SetCommand(cmd, InstanceSid + " [T" + Thread.CurrentThread.ManagedThreadId + "]");
+            var refsobj = DatabaseDebugHelper.GetReferencedObjects(cmd.Connection);
+            if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
+#endif
+
             base.OnExecutingCommand(cmd);
         }
 
@@ -248,7 +262,9 @@ namespace Umbraco.Core.Persistence
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+#if DEBUG_DATABASES
             LogHelper.Debug<UmbracoDatabase>("Dispose (" + InstanceSid + ").");
+#endif
             if (DatabaseFactory != null) DatabaseFactory.OnDispose(this);
         }
     }
