@@ -269,10 +269,12 @@ namespace UmbracoExamine
         {
             if (CanInitialize())
             {
+                // remove the db from lcc
                 using (new SafeCallContext())
+                //using (ApplicationContext.Current.DatabaseContext.UseSafeDatabase())
                 {
                     base.RebuildIndex();
-                }
+                } // will try to re-instate the original DB *but* if a DB has been created in the meantime what shall we do?
             }
         }
 

@@ -300,9 +300,12 @@ namespace Umbraco.Core.Persistence
             var database = o as UmbracoDatabase;
             if (o != null && database == null) throw new ArgumentException("Not an UmbracoDatabase.", "o");
 
+            var ambient = DetachAmbientDatabase();
+            if (ambient != null) ambient.Dispose();
+
             if (HttpContext.Current == null)
             {
-                if (NonContextValue != null) throw new InvalidOperationException();
+                //if (NonContextValue != null) throw new InvalidOperationException();
                 if (database == null) return;
 
                 NonContextValue = database;
@@ -310,7 +313,7 @@ namespace Umbraco.Core.Persistence
             }
             else
             {
-                if (HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] != null) throw new InvalidOperationException();
+                //if (HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] != null) throw new InvalidOperationException();
                 if (database == null) return;
 
                 HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] = database;
