@@ -284,6 +284,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
         public IEnumerable<IUserGroup> GetGroupsForUser(int userId)
         {
+            var tables = SqlSyntax.GetTablesInSchema(ApplicationContext.Current.DatabaseContext.Database).ToArray();
+            if (tables.InvariantContains("umbracoUserGroup") == false)
+                return new List<IUserGroup>();
+
             var sql = new Sql();
             sql.Select("*")
                 .From<UserGroupDto>()

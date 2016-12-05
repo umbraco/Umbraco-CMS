@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -16,11 +17,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
         public override void Up()
         {
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
+            var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
             AddNewTables(tables);
             MigrateUserPermissions();
             MigrateUserTypesToGroups();
-            DeleteOldTables(tables);
+            DeleteOldTables(tables, constraints);
         }
 
         private void AddNewTables(string[] tables)
@@ -162,7 +164,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 				)");
         }
 
-        private void DeleteOldTables(string[] tables)
+        private void DeleteOldTables(string[] tables, Tuple<string, string, string>[] constraints)
         {
             if (tables.InvariantContains("umbracoUser2App"))
             {
@@ -176,6 +178,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 
             if (tables.InvariantContains("umbracoUserType") && tables.InvariantContains("umbracoUser"))
             {
+                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_umbracoUser_umbracoUserType_id")))
+                { 
+                    Delete.ForeignKey("FK_umbracoUser_umbracoUserType_id").OnTable("umbracoUser");
+                }
+
                 Delete.Column("userType").FromTable("umbracoUser");
                 Delete.Table("umbracoUserType");
             }

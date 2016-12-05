@@ -39,7 +39,6 @@ namespace umbraco.cms.presentation.user
         protected TextBox lname = new TextBox();
         protected PlaceHolder passw = new PlaceHolder();
         protected TextBox email = new TextBox();
-        protected DropDownList userType = new DropDownList();
         protected DropDownList userLanguage = new DropDownList();
         protected CheckBox NoConsole = new CheckBox();
         protected CheckBox Disabled = new CheckBox();
@@ -162,7 +161,6 @@ namespace umbraco.cms.presentation.user
             pp.addProperty(ui.Text("user", "loginname", UmbracoUser), lname);
             pp.addProperty(ui.Text("user", "password", UmbracoUser), passw);
             pp.addProperty(ui.Text("email", UmbracoUser), email);
-            pp.addProperty(ui.Text("user", "usertype", UmbracoUser), userType);
             pp.addProperty(ui.Text("user", "language", UmbracoUser), userLanguage);
 
             // Media  / content root nodes

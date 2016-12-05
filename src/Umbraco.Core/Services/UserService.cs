@@ -321,7 +321,7 @@ namespace Umbraco.Core.Services
         public string GetDefaultMemberType()
         {
             // User types now being removed, there is no default user type to return
-            throw new NotImplementedException();
+            return "None";
         }
 
         /// <summary>

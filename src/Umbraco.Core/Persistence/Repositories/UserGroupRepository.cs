@@ -194,6 +194,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
+                               "DELETE FROM umbracoUser2UserGroup WHERE userGroupId = @Id",
                                "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @Id",
                                "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @Id",
                                "DELETE FROM umbracoUserGroup WHERE id = @Id"
