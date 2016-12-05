@@ -206,6 +206,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public bool IsMultipleDataType(int dataTypeId)
         {
+            // ** This must be cached (U4-8862) **
             var dts = ApplicationContext.Current.Services.DataTypeService;
             var multiPickerPreValue =
                 dts.GetPreValuesCollectionByDataTypeId(dataTypeId)

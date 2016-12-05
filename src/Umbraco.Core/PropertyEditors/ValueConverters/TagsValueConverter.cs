@@ -8,7 +8,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    public class TagsValueConverter: PropertyValueConverterBase, IPropertyValueConverterMeta
+    public class TagsValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
@@ -66,6 +66,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// </returns>
         private static bool JsonStorageType(int dataTypeId)
         {
+            // ** This must be cached (U4-8862) **
             var dts = ApplicationContext.Current.Services.DataTypeService;
             var storageType =
                 dts.GetPreValuesCollectionByDataTypeId(dataTypeId)
