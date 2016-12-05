@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core.Sync;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
@@ -64,7 +65,7 @@ namespace Umbraco.Web
             return batch;
         }
 
-        void UmbracoModule_EndRequest(object sender, EventArgs e)
+        void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
         {
             FlushBatch();
         }

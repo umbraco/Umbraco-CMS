@@ -468,12 +468,14 @@ namespace umbraco
 
 
         #endregion
-
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
         }
-
         #region constructors
 
         public static string GetMasterPageName(int templateID)
@@ -497,11 +499,12 @@ namespace umbraco
             var t = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<template>(
                string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
                {
-                   using (var templateData = SqlHelper.ExecuteReader(@"select nodeId, alias, node.parentID as master, text, design
+                   using (var sqlHelper = Application.SqlHelper)
+                   using (var templateData = sqlHelper.ExecuteReader(@"select nodeId, alias, node.parentID as master, text, design
 from cmsTemplate
 inner join umbracoNode node on (node.id = cmsTemplate.nodeId)
 where nodeId = @templateID",
-                           SqlHelper.CreateParameter("@templateID", templateID)))
+                           sqlHelper.CreateParameter("@templateID", templateID)))
                     {
                        if (templateData.Read())
                        {
@@ -515,7 +518,7 @@ where nodeId = @templateID",
                            if (!templateData.IsNull("design"))
                                _templateDesign = templateData.GetString("design");
                        }
-                   }
+                    }
                    return this;
                });
 

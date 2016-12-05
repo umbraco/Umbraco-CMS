@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence
         /// Safely inserts a record, or updates if it exists, based on a unique constraint.
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="poco"></param>       
+        /// <param name="poco"></param>
         /// <returns>The action that executed, either an insert or an update. If an insert occurred and a PK value got generated, the poco object
         /// passed in will contain the updated value.</returns>
         /// <remarks>
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <param name="db"></param>
         /// <param name="poco"></param>
-        /// <param name="updateArgs"></param>      
+        /// <param name="updateArgs"></param>
         /// <param name="updateCommand">If the entity has a composite key they you need to specify the update command explicitly</param>
         /// <returns>The action that executed, either an insert or an update. If an insert occurred and a PK value got generated, the poco object
         /// passed in will contain the updated value.</returns>
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Persistence
                     if (rowCount > 0)
                         return RecordPersistenceType.Update;
 
-                    // failed: does not exist (due to race cond RC2), need to insert 
+                    // failed: does not exist (due to race cond RC2), need to insert
                     // loop
                 }
             }
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Persistence
 
             using (var tr = db.GetTransaction())
             {
-                db.BulkInsertRecords(collection, tr, SqlSyntaxContext.SqlSyntaxProvider, true);
+                db.BulkInsertRecords(collection, tr, SqlSyntaxContext.SqlSyntaxProvider, true, true); // use native, commit
             }
         }
 
@@ -202,7 +202,7 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="T"></typeparam>
         /// <param name="db"></param>
         /// <param name="collection"></param>
-        /// <param name="tr"></param>        
+        /// <param name="tr"></param>
         /// <param name="syntaxProvider"></param>
         /// <param name="useNativeSqlPlatformBulkInsert">
         /// If this is false this will try to just generate bulk insert statements instead of using the current SQL platform's bulk
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Persistence
 
             try
             {
-                int processed = 0;                
+                int processed = 0;
 
                 var usedNativeSqlPlatformInserts = useNativeSqlPlatformBulkInsert
                     && NativeSqlPlatformBulkInsertRecords(db, syntaxProvider, pd, collection, out processed);
@@ -243,7 +243,7 @@ namespace Umbraco.Core.Persistence
                     {
                         //SqlCe doesn't support bulk insert statements!
                         foreach (var poco in collection)
-                        {                         
+                        {
                             db.Insert(poco);
                         }
                     }
@@ -307,9 +307,9 @@ namespace Umbraco.Core.Persistence
         /// <param name="pd"></param>
         /// <returns>Sql commands with populated command parameters required to execute the sql statement</returns>
         /// <remarks>
-        /// The limits for number of parameters are 2100 (in sql server, I think there's many more allowed in mysql). So 
-        /// we need to detect that many params and split somehow. 
-        /// For some reason the 2100 limit is not actually allowed even though the exception from sql server mentions 2100 as a max, perhaps it is 2099 
+        /// The limits for number of parameters are 2100 (in sql server, I think there's many more allowed in mysql). So
+        /// we need to detect that many params and split somehow.
+        /// For some reason the 2100 limit is not actually allowed even though the exception from sql server mentions 2100 as a max, perhaps it is 2099
         /// that is max. I've reduced it to 2000 anyways.
         /// </remarks>
         internal static IDbCommand[] GenerateBulkInsertCommand<T>(
@@ -332,7 +332,7 @@ namespace Umbraco.Core.Persistence
             var paramsPerItem = pd.Columns.Count(i => IncludeColumn(pd, i));
 
             //Example calc:
-            // Given: we have 4168 items in the itemArray, each item contains 8 command parameters (values to be inserterted)                
+            // Given: we have 4168 items in the itemArray, each item contains 8 command parameters (values to be inserterted)
             // 2100 / 8 = 262.5
             // Math.Floor(2100 / 8) = 262 items per trans
             // 4168 / 262 = 15.908... = there will be 16 trans in total
@@ -409,15 +409,15 @@ namespace Umbraco.Core.Persistence
                 dbConnection = profiledConnection.InnerConnection;
             }
 
-            //check if it's SQL or SqlCe   
-            
+            //check if it's SQL or SqlCe
+
             var sqlConnection = dbConnection as SqlConnection;
             if (sqlConnection != null)
             {
                 processed = BulkInsertRecordsSqlServer(db, (SqlServerSyntaxProvider)syntaxProvider, pd, collection);
                 return true;
             }
-            
+
             var sqlCeConnection = dbConnection as SqlCeConnection;
             if (sqlCeConnection != null)
             {
@@ -442,7 +442,7 @@ namespace Umbraco.Core.Persistence
         internal static int BulkInsertRecordsSqlCe<T>(Database db,
             Database.PocoData pd,
             IEnumerable<T> collection)
-        {            
+        {
             var cols = pd.Columns.ToArray();
 
             using (var cmd = db.CreateCommand(db.Connection, string.Empty))
@@ -457,7 +457,7 @@ namespace Umbraco.Core.Persistence
                     // This seems to cause problems, I think this is primarily used for retrieval, not
                     // inserting. see: https://msdn.microsoft.com/en-us/library/system.data.sqlserverce.sqlcecommand.indexname%28v=vs.100%29.aspx?f=255&MSPPError=-2147217396
                     //sqlCeCommand.IndexName = pd.TableInfo.PrimaryKey;
-                    
+
                     var count = 0;
                     using (var rs = sqlCeCommand.ExecuteResultSet(ResultSetOptions.Updatable))
                     {
@@ -480,7 +480,7 @@ namespace Umbraco.Core.Persistence
                     }
                     return count;
                 }
-                   
+
             }
         }
 

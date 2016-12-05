@@ -37,13 +37,15 @@ namespace SqlCE4Umbraco
             ITable table = null;
 
             // get name in correct casing
-            name = SqlHelper.ExecuteScalar<string>("SELECT name FROM sys.tables WHERE name=@name",
-                                                          SqlHelper.CreateParameter("name", name));
+            using (var sqlHelper = SqlHelper)
+                name = sqlHelper.ExecuteScalar<string>("SELECT name FROM sys.tables WHERE name=@name",
+                                                          sqlHelper.CreateParameter("name", name));
             if (name != null)
             {
                 table = new DefaultTable(name);
 
-                using (IRecordsReader reader = SqlHelper.ExecuteReader(
+                using (var sqlHelper = SqlHelper)
+                using (IRecordsReader reader = sqlHelper.ExecuteReader(
                         @"SELECT c.name AS Name, st.name AS DataType, c.max_length, c.is_nullable, c.is_identity
                           FROM sys.tables AS t
                             JOIN sys.columns AS c ON t.object_id = c.object_id
@@ -51,7 +53,7 @@ namespace SqlCE4Umbraco
                             JOIN sys.types AS ty ON ty.user_type_id = c.user_type_id
                             JOIN sys.types st ON ty.system_type_id = st.user_type_id
                           WHERE t.name = @name
-                          ORDER BY c.column_id", SqlHelper.CreateParameter("name", name)))
+                          ORDER BY c.column_id", sqlHelper.CreateParameter("name", name)))
                 {
                     while (reader.Read())
                     {
@@ -112,7 +114,8 @@ namespace SqlCE4Umbraco
 
             // create query
             StringBuilder createTableQuery = new StringBuilder();
-            createTableQuery.AppendFormat("CREATE TABLE [{0}] (", SqlHelper.EscapeString(table.Name));
+            using (var sqlHelper = SqlHelper)
+                createTableQuery.AppendFormat("CREATE TABLE [{0}] (", sqlHelper.EscapeString(table.Name));
 
             // add fields
             while (hasNext)
@@ -136,7 +139,8 @@ namespace SqlCE4Umbraco
             // execute query
             try
             {
-                SqlHelper.ExecuteNonQuery(createTableQuery.ToString());
+                using (var sqlHelper = SqlHelper)
+                    sqlHelper.ExecuteNonQuery(createTableQuery.ToString());
             }
             catch (Exception executeException)
             {
@@ -154,13 +158,15 @@ namespace SqlCE4Umbraco
             Debug.Assert(table != null && field != null);
 
             StringBuilder addColumnQuery = new StringBuilder();
-            addColumnQuery.AppendFormat("ALTER TABLE [{0}] ADD [{1}] {2}",
-                                        SqlHelper.EscapeString(table.Name),
-                                        SqlHelper.EscapeString(field.Name),
-                                        SqlHelper.EscapeString(GetDatabaseType(field)));
+            using (var sqlHelper = SqlHelper)
+                addColumnQuery.AppendFormat("ALTER TABLE [{0}] ADD [{1}] {2}",
+                                        sqlHelper.EscapeString(table.Name),
+                                        sqlHelper.EscapeString(field.Name),
+                                        sqlHelper.EscapeString(GetDatabaseType(field)));
             try
             {
-                SqlHelper.ExecuteNonQuery(addColumnQuery.ToString());
+                using (var sqlHelper = SqlHelper)
+                    sqlHelper.ExecuteNonQuery(addColumnQuery.ToString());
             }
             catch (Exception executeException)
             {

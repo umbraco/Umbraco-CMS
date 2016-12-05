@@ -8,12 +8,7 @@ namespace Umbraco.Tests.Benchmarks
     {
         public static void Main(string[] args)
         {
-            if (args.Length == 0)
-            {
-                var summary = BenchmarkRunner.Run<BulkInsertBenchmarks>();
-                Console.ReadLine();
-            }
-            else if (args.Length == 1)
+            if (args.Length == 1)
             {
                 var type = Assembly.GetExecutingAssembly().GetType("Umbraco.Tests.Benchmarks." +args[0]);
                 if (type == null)

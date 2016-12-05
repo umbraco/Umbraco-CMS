@@ -431,6 +431,7 @@
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveFive\UpdateAllowedMediaTypesAtRoot.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\EnsureServersLockObject.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\AddRedirectUrlTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\RemoveStylesheetDataAndTablesAgain.cs" />
@@ -441,6 +442,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddUniqueIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\RemoveParentIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Mappers\TaskTypeMapper.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemovePropertyDataIdIndex.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeTwo\EnsureMigrationsTableIdentityIsCorrect.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\EnsureContentTypeUniqueIdsAreConsistent.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddExternalLoginsTable.cs" />
@@ -476,6 +478,7 @@
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeOne\UpdateUserLanguagesToIsoCode.cs" />
     <Compile Include="Persistence\PocoDataDataReader.cs" />
+    <Compile Include="Persistence\Querying\QueryExtensions.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
@@ -1030,10 +1033,10 @@
     <Compile Include="Persistence\PetaPocoConnectionExtensions.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
-    <Compile Include="Persistence\Querying\BaseExpressionHelper.cs" />
-    <Compile Include="Persistence\Querying\PocoToSqlExpressionHelper.cs" />
+    <Compile Include="Persistence\Querying\ExpressionVisitorBase.cs" />
+    <Compile Include="Persistence\Querying\PocoToSqlExpressionVisitor.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
-    <Compile Include="Persistence\Querying\ModelToSqlExpressionHelper.cs" />
+    <Compile Include="Persistence\Querying\ModelToSqlExpressionVisitor.cs" />
     <Compile Include="Persistence\Querying\Query.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />
@@ -1215,7 +1218,7 @@
     <Compile Include="Models\Rdbms\UserDto.cs" />
     <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
-    <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
+    <Compile Include="ObjectResolution\WeightAttribute.cs" />
     <Compile Include="Persistence\PetaPoco.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
@@ -1347,6 +1350,7 @@
     <Compile Include="Sync\ApplicationUrlHelper.cs" />
     <Compile Include="Sync\RefreshMethodType.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />
+    <Compile Include="Sync\SingleServerRegistrar.cs" />
     <Compile Include="ThreadExtensions.cs" />
     <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />

@@ -50,7 +50,7 @@ namespace umbraco
                 var profingLogger = new ProfilingLogger(
                     logger,
                     ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : new LogProfiler(logger));
- 
+
                 // prepare the persister task
                 // there's always be one task keeping a ref to the runner
                 // so it's safe to just create it as a local var here
@@ -71,7 +71,7 @@ namespace umbraco
                         // once released, the cache still works but does not write to file anymore,
                         // which is OK with database server messenger but will cause data loss with
                         // another messenger...
-                        
+
                         runner.Shutdown(false, true); // wait until flushed
                         _released = true;
                     });
@@ -145,13 +145,17 @@ namespace umbraco
         }
 
         //NOTE: We CANNOT use this for a double check lock because it is a property, not a field and to do double
-        // check locking in c# you MUST have a volatile field. Even thoug this wraps a volatile field it will still 
+        // check locking in c# you MUST have a volatile field. Even thoug this wraps a volatile field it will still
         // not work as expected for a double check lock because properties are treated differently in the clr.
         public virtual bool isInitializing
         {
             get { return _xmlContent == null; }
         }
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -323,11 +327,17 @@ namespace umbraco
             // this updates the published cache to take care of the situation
             // without ContentService having to ... what exactly?
 
-            // no need to do it if the content is published without unpublished changes,
-            // though, because in that case the XML will get re-generated with the
-            // correct sort order.
-            if (c.Published)
-                return;
+            // no need to do it if
+            // - the content is published without unpublished changes (XML will be re-gen anyways)
+            // - the content has no published version (not in XML)
+            // - the sort order has not changed
+            // note that
+            // - if it is a new entity is has not published version
+            // - if Published is dirty and false it's getting unpublished and has no published version
+            //
+            if (c.Published) return;
+            if (c.HasPublishedVersion == false) return;
+            if (c.WasPropertyDirty("SortOrder") == false) return;
 
             using (var safeXml = GetSafeXmlWriter(false))
             {
@@ -415,7 +425,7 @@ namespace umbraco
             {
                 XmlNode x;
 
-                // remove from xml db cache 
+                // remove from xml db cache
                 doc.XmlRemoveFromDB();
 
                 // clear xml cache
@@ -431,7 +441,7 @@ namespace umbraco
                 {
                     var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
                     prov.RemoveNode(doc.Id);
-                }                
+                }
             }
         }
 
@@ -482,7 +492,7 @@ namespace umbraco
             if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null && UmbracoContext.Current.HttpContext.Items.Contains(XmlContextContentItemKey))
                 UmbracoContext.Current.HttpContext.Items.Remove(XmlContextContentItemKey);
         }
-        
+
         /// <summary>
         /// Load content from database
         /// </summary>
@@ -513,7 +523,7 @@ namespace umbraco
         public void PersistXmlToFile()
         {
         }
-        
+
         internal DateTime GetCacheFileUpdateTime()
         {
             //TODO: Should there be a try/catch here in case the file is being written to while this is trying to be executed?
@@ -562,7 +572,7 @@ namespace umbraco
         private static bool UseLegacySchema
         {
             get { return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema; }
-        }        
+        }
 
         #endregion
 
@@ -766,9 +776,9 @@ namespace umbraco
                 _releaser.Dispose();
                 _releaser = null;
             }
-            
+
         }
-                
+
         private static string ChildNodesXPath
         {
             get
@@ -862,9 +872,9 @@ namespace umbraco
             // and in addition, writing async is never fully async because
             // althouth the writer is async, xml.WriteTo() will not async
 
-            // that one almost works but... "The elements are indented as long as the element 
+            // that one almost works but... "The elements are indented as long as the element
             // does not contain mixed content. Once the WriteString or WriteWhitespace method
-            // is called to write out a mixed element content, the XmlWriter stops indenting. 
+            // is called to write out a mixed element content, the XmlWriter stops indenting.
             // The indenting resumes once the mixed content element is closed." - says MSDN
             // about XmlWriterSettings.Indent
 
@@ -1069,7 +1079,7 @@ namespace umbraco
             //TODO: This could be faster, might as well just iterate all children and filter
             // instead of selecting matching children (i.e. iterating all) and then iterating the
             // filtered items to remove, this also allocates more memory to store the list of children.
-            // Below we also then do another filtering of child nodes, if we just iterate all children we 
+            // Below we also then do another filtering of child nodes, if we just iterate all children we
             // can perform both functions more efficiently
             var dataNodes = publishedNode.SelectNodes(DataNodesXPath);
             if (dataNodes == null) throw new Exception("oops");

@@ -739,6 +739,11 @@ namespace Umbraco.Core.Persistence
 	    /// <param name="take"></param>
 	    internal virtual void BuildSqlDbSpecificPagingQuery(DBType databaseType, long skip, long take, string sql, string sqlSelectRemoved, string sqlOrderBy, ref object[] args, out string sqlPage)
 	    {
+            // this is overriden in UmbracoDatabase, and if running SqlServer >=2012, the database type
+            // is switched from SqlServer to SqlServerCE in order to use the better paging syntax that
+            // SqlCE supports, and SqlServer >=2012 too.
+            // so the first case is actually for SqlServer <2012, and second case is CE *and* SqlServer >=2012
+
             if (databaseType == DBType.SqlServer || databaseType == DBType.Oracle)
             {
                 sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
@@ -746,8 +751,16 @@ namespace Umbraco.Core.Persistence
                 {
                     sqlSelectRemoved = "peta_inner.* FROM (SELECT " + sqlSelectRemoved + ") peta_inner";
                 }
-                sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn>@{2} AND peta_rn<=@{3}",
-                                        sqlOrderBy == null ? "ORDER BY (SELECT NULL)" : sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);
+
+                // split to ensure that peta_rn is the last field to be selected, else Page<int> would fail
+                // the resulting sql is not perfect, NPoco has a much nicer way to do it, but it would require
+                // importing large parts of NPoco
+                var pos = sqlSelectRemoved.IndexOf("FROM");
+                var sqlColumns = sqlSelectRemoved.Substring(0, pos);
+                var sqlFrom = sqlSelectRemoved.Substring(pos);
+
+                sqlPage = string.Format("SELECT * FROM (SELECT {0}, ROW_NUMBER() OVER ({1}) peta_rn {2}) peta_paged WHERE peta_rn>@{3} AND peta_rn<=@{4}",
+                                        sqlColumns, sqlOrderBy ?? "ORDER BY (SELECT NULL)", sqlFrom, args.Length, args.Length + 1);
                 args = args.Concat(new object[] { skip, skip + take }).ToArray();
             }
             else if (databaseType == DBType.SqlServerCE)
@@ -774,7 +787,7 @@ namespace Umbraco.Core.Persistence
 				throw new Exception("Unable to parse SQL statement for paged query");
 			if (_dbType == DBType.Oracle && sqlSelectRemoved.StartsWith("*"))
                 throw new Exception("Query must alias '*' when performing a paged query.\neg. select t.* from table t order by t.id");
-            
+
 		    BuildSqlDbSpecificPagingQuery(_dbType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
 		}
 
