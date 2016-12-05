@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -60,7 +61,9 @@ namespace Umbraco.Web.PropertyEditors
             public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
             {
                 var json = editorValue.Value as JArray;
-                return json == null ? null : json.Select(x => x.Value<string>());
+                return json == null 
+                    ? null 
+                    : json.Select(x => x.Value<string>()).Where(x => x.IsNullOrWhiteSpace() == false).Select(WebUtility.HtmlEncode);
             }
 
             /// <summary>

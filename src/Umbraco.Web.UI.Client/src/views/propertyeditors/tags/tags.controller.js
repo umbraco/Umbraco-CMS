@@ -41,7 +41,7 @@ angular.module("umbraco")
 
             //Helper method to add a tag on enter or on typeahead select
             function addTag(tagToAdd) {
-                tagToAdd = $sanitize(tagToAdd);
+                tagToAdd = String(tagToAdd).htmlEncode();
                 if (tagToAdd != null && tagToAdd.length > 0) {
                     if ($scope.model.value.indexOf(tagToAdd) < 0) {
                         $scope.model.value.push(tagToAdd);
