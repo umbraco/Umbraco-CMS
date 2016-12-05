@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
             // for some reason it was not, so it was created during migrations but not during
             // new installs, so for ppl that upgrade, make sure they have it
 
-            EnsureLockObject(Constants.System.ServersLock, "0AF5E610-A310-4B6F-925F-E928D5416AF7", "LOCK: Servers");
+            EnsureLockObject(Constants.Locks.Servers, "0AF5E610-A310-4B6F-925F-E928D5416AF7", "LOCK: Servers");
         }
 
         public override void Down()

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models;
+﻿using System.IO;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -7,5 +8,7 @@ namespace Umbraco.Core.Persistence.Repositories
         void AddFolder(string folderPath);
         void DeleteFolder(string folderPath);
         bool ValidatePartialView(IPartialView partialView);
+        Stream GetFileContentStream(string filepath);
+        void SetFileContent(string filepath, Stream content);
     }
 }

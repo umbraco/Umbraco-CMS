@@ -9,6 +9,7 @@ using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using System.Linq;
+using System.Reflection;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;

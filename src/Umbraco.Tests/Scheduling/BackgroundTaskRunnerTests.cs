@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Tests.Scheduling
@@ -16,7 +15,7 @@ namespace Umbraco.Tests.Scheduling
     [Timeout(30000)]
     public class BackgroundTaskRunnerTests
     {
-        ILogger _logger; 
+        private ILogger _logger; 
 
         [TestFixtureSetUp]
         public void InitializeFixture()
@@ -552,29 +551,29 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void DelayedTaskRuns()
+        public async void LatchedTaskRuns()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
-                var task = new MyDelayedTask(200, false);
+                var task = new MyLatchedTask(200, false);
                 runner.Add(task);
                 Assert.IsTrue(runner.IsRunning);
-                Thread.Sleep(5000);
+                Thread.Sleep(1000);
                 Assert.IsTrue(runner.IsRunning); // still waiting for the task to release
                 Assert.IsFalse(task.HasRun);
                 task.Release();
-                await runner.CurrentThreadingTask; //wait for current task to complete
+                await runner.CurrentThreadingTask; // wait for current task to complete
                 Assert.IsTrue(task.HasRun);
                 await runner.StoppedAwaitable; // wait for the entire runner operation to complete
             }
         }
 
         [Test]
-        public async void DelayedTaskStops()
+        public async void LatchedTaskStops()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
-                var task = new MyDelayedTask(200, true);
+                var task = new MyLatchedTask(200, true);
                 runner.Add(task);
                 Assert.IsTrue(runner.IsRunning);
                 Thread.Sleep(5000);
@@ -588,7 +587,7 @@ namespace Umbraco.Tests.Scheduling
 
         
         [Test]
-        public void DelayedRecurring()
+        public void LatchedRecurring()
         {
             var runCount = 0;
             var waitHandle = new ManualResetEvent(false);
@@ -662,7 +661,6 @@ namespace Umbraco.Tests.Scheduling
                 runner.Add(task);
                 Assert.IsTrue(runner.IsRunning);
                 await runner.StoppedAwaitable; // wait for the entire runner operation to complete
-
                 Assert.AreEqual(1, exceptions.Count); // traced and reported
             }
         }
@@ -681,6 +679,38 @@ namespace Umbraco.Tests.Scheduling
                 await runner.StoppedAwaitable; // wait for the entire runner operation to complete
 
                 Assert.AreEqual(1, exceptions.Count); // traced and reported
+            }
+        }
+
+        [Test]
+        public async void CancelAsyncTask()
+        {
+            using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
+            {
+                var task = new MyAsyncTask(4000);
+                runner.Add(task);
+                Assert.IsTrue(runner.IsRunning);
+                await Task.Delay(1000); // ensure the task *has* started else cannot cancel
+                runner.CancelCurrentBackgroundTask();
+
+                await runner.StoppedAwaitable; // wait for the entire runner operation to complete
+                Assert.AreEqual(default(DateTime), task.Ended);
+            }
+        }
+
+        [Test]
+        public async void CancelLatchedTask()
+        {
+            using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
+            {
+                var task = new MyLatchedTask(4000, false);
+                runner.Add(task);
+                Assert.IsTrue(runner.IsRunning);
+                await Task.Delay(1000); // ensure the task *has* started else cannot cancel
+                runner.CancelCurrentBackgroundTask();
+
+                await runner.StoppedAwaitable; // wait for the entire runner operation to complete
+                Assert.IsFalse(task.HasRun);
             }
         }
 
@@ -706,7 +736,7 @@ namespace Umbraco.Tests.Scheduling
 
             public async Task RunAsync(CancellationToken token)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000, token);
                 if (_running)
                     throw new Exception("Task has thrown.");
             }
@@ -750,28 +780,28 @@ namespace Umbraco.Tests.Scheduling
             public override bool RunsOnShutdown { get { return true; } }
         }
 
-        private class MyDelayedTask : ILatchedBackgroundTask
+        private class MyLatchedTask : ILatchedBackgroundTask
         {
             private readonly int _runMilliseconds;
-            private readonly ManualResetEventSlim _gate;
+            private readonly TaskCompletionSource<bool> _latch;
 
             public bool HasRun { get; private set; }
 
-            public MyDelayedTask(int runMilliseconds, bool runsOnShutdown)
+            public MyLatchedTask(int runMilliseconds, bool runsOnShutdown)
             {
                 _runMilliseconds = runMilliseconds;
-                _gate = new ManualResetEventSlim(false);
+                _latch = new TaskCompletionSource<bool>();
                 RunsOnShutdown = runsOnShutdown;
             }
 
-            public WaitHandle Latch
+            public Task Latch
             {
-                get { return _gate.WaitHandle; }
+                get { return _latch.Task; }
             }
 
             public bool IsLatched
             {
-                get { return _gate.IsSet == false; }
+                get { return _latch.Task.IsCompleted == false; }
             }
 
             public bool RunsOnShutdown { get; private set; }
@@ -784,7 +814,7 @@ namespace Umbraco.Tests.Scheduling
 
             public void Release()
             {
-                _gate.Set();
+                _latch.SetResult(true);
             }
 
             public Task RunAsync(CancellationToken token)
@@ -849,6 +879,86 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
+        private class MyAsyncTask : BaseTask
+        {
+            private readonly int _milliseconds;
+
+            public MyAsyncTask()
+                : this(500)
+            { }
+
+            public MyAsyncTask(int milliseconds)
+            {
+                _milliseconds = milliseconds;
+            }
+
+            public override void PerformRun()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override async Task RunAsync(CancellationToken token)
+            {
+                await Task.Delay(_milliseconds, token);
+                Ended = DateTime.Now;
+            }
+
+            public override bool IsAsync
+            {
+                get { return true; }
+            }
+        }
+
+        [Test]
+        public void SourceTaskTest()
+        {
+            var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, _logger);
+
+            var task = new SourceTask();
+            runner.Add(task);
+            Assert.IsTrue(runner.IsRunning);
+            Console.WriteLine("completing");
+            task.Complete(); // in Deploy this does not return ffs - no point until I cannot repro
+            Console.WriteLine("completed");
+            Console.WriteLine("done");
+        }
+
+        private class SourceTask : IBackgroundTask
+        {
+            private readonly SemaphoreSlim _timeout = new SemaphoreSlim(0, 1);
+            private readonly TaskCompletionSource<object> _source = new TaskCompletionSource<object>();
+
+            public void Complete()
+            {
+                _source.SetResult(null);
+            }
+
+            public void Dispose()
+            { }
+
+            public void Run()
+            {
+                throw new NotImplementedException();
+            }
+
+            private int i;
+
+            public async Task RunAsync(CancellationToken token)
+            {
+                Console.WriteLine("boom");
+                var timeout = _timeout.WaitAsync(token);
+                var task = WorkItemRunAsync();
+                var anyTask = await Task.WhenAny(task, timeout).ConfigureAwait(false);
+            }
+
+            private async Task WorkItemRunAsync()
+            {
+                await _source.Task.ConfigureAwait(false);
+            }
+
+            public bool IsAsync { get { return true; } }
+        }
+
         public abstract class BaseTask : IBackgroundTask
         {
             public bool WasCancelled { get; set; }
@@ -863,13 +973,13 @@ namespace Umbraco.Tests.Scheduling
                 Ended = DateTime.Now;
             }
 
-            public Task RunAsync(CancellationToken token)
+            public virtual Task RunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
                 //return Task.Delay(500); 
             }
 
-            public bool IsAsync
+            public virtual bool IsAsync
             {
                 get { return false; }
             }
