@@ -393,6 +393,7 @@
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyWrapped.cs" />
+    <Compile Include="Models\Range.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
@@ -511,6 +512,7 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MemberGroupPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RadioButtonListValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\SliderValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TagsValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\UserPickerValueConverter.cs" />
