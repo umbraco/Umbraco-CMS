@@ -63,7 +63,12 @@ namespace Umbraco.Web.PropertyEditors
                 var json = editorValue.Value as JArray;
                 return json == null 
                     ? null 
-                    : json.Select(x => x.Value<string>()).Where(x => x.IsNullOrWhiteSpace() == false).Select(WebUtility.HtmlEncode);
+                    : json.Select(x => x.Value<string>()).Where(x => x.IsNullOrWhiteSpace() == false)
+                        //First we will decode it as html because we know that if this is not a malicious post that the value is
+                        // already Html encoded by the tags JavaScript controller. Then we'll re-Html Encode it to ensure that in case this
+                        // is a malicious post (i.e. someone is submitting data manually by modifying the request).
+                        .Select(WebUtility.HtmlDecode)
+                        .Select(WebUtility.HtmlEncode);
             }
 
             /// <summary>
