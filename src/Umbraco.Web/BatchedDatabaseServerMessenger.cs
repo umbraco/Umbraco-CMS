@@ -60,7 +60,7 @@ namespace Umbraco.Web
             }
         }
 
-        private void UmbracoModule_EndRequest(object sender, EventArgs e)
+        private void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
         {
             // will clear the batch - will remain in HttpContext though - that's ok
             FlushBatch();
@@ -84,11 +84,16 @@ namespace Umbraco.Web
 
             var instructions = batch.SelectMany(x => x.Instructions).ToArray();
             batch.Clear();
-            if (instructions.Length == 0) return;
-            WriteInstructions(instructions);
+
+            //Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount
+            foreach (var instructionsBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+            {
+                WriteInstructions(instructionsBatch);
+            }
+            
         }
 
-        private void WriteInstructions(RefreshInstruction[] instructions)
+        private void WriteInstructions(IEnumerable<RefreshInstruction> instructions)
         {
             var dto = new CacheInstructionDto
             {
@@ -136,9 +141,18 @@ namespace Umbraco.Web
 
             // batch if we can, else write to DB immediately
             if (batch == null)
-                WriteInstructions(instructions.ToArray());
+            {
+                //only write the json blob with a maximum count of the MaxProcessingInstructionCount
+                foreach (var maxBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+                {
+                    WriteInstructions(maxBatch);
+                }
+            }
             else
+            {
                 batch.Add(new RefreshInstructionEnvelope(servers, refresher, instructions));
+            }
+                
         }        
     }
 }

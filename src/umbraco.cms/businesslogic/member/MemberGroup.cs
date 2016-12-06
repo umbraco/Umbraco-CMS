@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 using umbraco.DataLayer;
 using System.Collections;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 
@@ -136,9 +137,10 @@ namespace umbraco.cms.businesslogic.member
 
 	    public bool HasMember(int memberId)
 	    {
-	        return SqlHelper.ExecuteScalar<int>("select count(member) from cmsMember2MemberGroup where member = @member and memberGroup = @memberGroup",
-	            SqlHelper.CreateParameter("@member", memberId),
-	            SqlHelper.CreateParameter("@memberGroup", Id)) > 0;
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<int>("select count(member) from cmsMember2MemberGroup where member = @member and memberGroup = @memberGroup",
+	            sqlHelper.CreateParameter("@member", memberId),
+	            sqlHelper.CreateParameter("@memberGroup", Id)) > 0;
 	    }
 
 	    /// <summary>

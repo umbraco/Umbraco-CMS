@@ -4,14 +4,14 @@
 		<li style="width: 120px; height: 100px; overflow: hidden;" ng-repeat="image in images">
 
 			<!-- IMAGE -->
-			<img ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" />
+			<img ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" title="{{image.name}}" />
 
 			<!-- SVG -->
-			<img ng-if="image.metaData.umbracoExtension.Value === 'svg'" ng-src="{{image.metaData.umbracoFile.Value}}" alt="" />
+			<img ng-if="image.metaData.umbracoExtension.Value === 'svg'" ng-src="{{image.metaData.umbracoFile.Value}}" alt="" title="{{image.name}}" />
 			<img ng-if="image.extension === 'svg'" ng-src="{{image.file}}" alt="" />
 
 			<!-- FILE -->
-			<span class="icon-holder" ng-hide="image.thumbnail || image.metaData.umbracoExtension.Value === 'svg' || image.extension === 'svg'">
+			<span class="umb-icon-holder" ng-hide="image.thumbnail || image.metaData.umbracoExtension.Value === 'svg' || image.extension === 'svg'">
 				<i class="icon {{image.icon}} large"></i>
 				<small>{{image.name}}</small>
 			</span>

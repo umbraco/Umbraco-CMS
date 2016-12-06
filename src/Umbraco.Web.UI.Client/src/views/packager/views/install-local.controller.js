@@ -12,6 +12,7 @@
             status: "",
             progress:0
         };
+        vm.installCompleted = false;
         vm.zipFile = {
             uploadStatus: "idle",
             uploadProgress: 0,
@@ -33,6 +34,9 @@
                 fields: {},
                 file: file
             }).progress(function (evt) {
+
+                // set view state to uploading
+                vm.state = 'uploading';
 
                 // calculate progress in percentage
                 var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
@@ -134,10 +138,10 @@
                             localStorageService.set("packageInstallUri", "installed");
                         }
 
-                        //reload on next digest (after cookie)
-                        $timeout(function () {
-                            $window.location.reload(true);
-                        });
+                        vm.installState.status = localizationService.localize("packager_installStateCompleted");
+                        vm.installCompleted = true;
+                        
+                        
 
                     },
                     installError);
@@ -146,6 +150,13 @@
         function installError() {
             //This will return a rejection meaning that the promise change above will stop
             return $q.reject();
+        }
+
+        vm.reloadPage = function() {
+            //reload on next digest (after cookie)
+            $timeout(function () {
+                $window.location.reload(true);
+            });
         }
     }
 

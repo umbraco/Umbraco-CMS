@@ -40,6 +40,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region IRepositoryVersionable Implementation
 
+        /// <summary>
+        /// Gets a list of all versions for an <see cref="TEntity"/> ordered so latest is first
+        /// </summary>
+        /// <param name="id">Id of the <see cref="TEntity"/> to retrieve versions from</param>
+        /// <returns>An enumerable list of the same <see cref="TEntity"/> object with different versions</returns>
         public virtual IEnumerable<TEntity> GetAllVersions(int id)
         {
             var sql = new Sql();
@@ -58,6 +63,28 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 yield return GetByVersion(dto.VersionId);
             }
+        }
+
+        /// <summary>
+        /// Gets a list of all version Ids for the given content item ordered so latest is first
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        public virtual IEnumerable<Guid> GetVersionIds(int id, int maxRows)
+        {
+            var sql = new Sql();
+            sql.Select("cmsDocument.versionId")
+                .From<DocumentDto>(SqlSyntax)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<DocumentDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .Where<NodeDto>(x => x.NodeId == id)
+                .OrderByDescending<DocumentDto>(x => x.UpdateDate, SqlSyntax);
+
+            return Database.Fetch<Guid>(SqlSyntax.SelectTop(sql, maxRows));
         }
 
         public virtual void DeleteVersion(Guid versionId)
@@ -583,6 +610,8 @@ WHERE EXISTS(
                     return "cmsContentVersion.VersionDate";
                 case "NAME":
                     return "umbracoNode.text";
+                case "PUBLISHED":
+                    return "cmsDocument.published";
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";

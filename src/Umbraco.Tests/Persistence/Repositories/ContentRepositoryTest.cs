@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 for (int i = 0; i < allCreated.Count; i++)
                 {
                     allCreated[i].Name = "blah" + i;
-                    //IMPORTANT testing note here: We need to changed the published state here so that 
+                    //IMPORTANT testing note here: We need to changed the published state here so that
                     // it doesn't automatically think this is simply publishing again - this forces the latest
                     // version to be Saved and not published
                     allCreated[i].ChangePublishedState(PublishedState.Saved);
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Commit();
 
-                //delete all xml                 
+                //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
@@ -156,7 +156,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Commit();
 
-                //delete all xml                 
+                //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Commit();
 
-                //delete all xml                 
+                //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
@@ -234,10 +234,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         /// <summary>
         /// This test ensures that when property values using special database fields are saved, the actual data in the
         /// object being stored is also transformed in the same way as the data being stored in the database is.
-        /// Before you would see that ex: a decimal value being saved as 100 or "100", would be that exact value in the 
+        /// Before you would see that ex: a decimal value being saved as 100 or "100", would be that exact value in the
         /// object, but the value saved to the database was actually 100.000000.
-        /// When querying the database for the value again - the value would then differ from what is in the object. 
-        /// This caused inconsistencies between saving+publishing and simply saving and then publishing, due to the former 
+        /// When querying the database for the value again - the value would then differ from what is in the object.
+        /// This caused inconsistencies between saving+publishing and simply saving and then publishing, due to the former
         /// sending the non-transformed data directly on to publishing.
         /// </summary>
         [Test]
@@ -269,10 +269,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage", propertyTypeCollection);
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
-                
+
                 // Int and decimal values are passed in as strings as they would be from the backoffice UI
                 var textpage = MockedContent.CreateSimpleContentWithSpecialDatabaseTypes(contentType, "test@umbraco.org", -1, "100", "150", dateValue);
-                
+
                 // Act
                 repository.AddOrUpdate(textpage);
                 unitOfWork.Commit();
@@ -280,7 +280,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(textpage.HasIdentity, Is.True);
-                
+
                 var persistedTextpage = repository.Get(textpage.Id);
                 Assert.That(persistedTextpage.Name, Is.EqualTo(textpage.Name));
                 Assert.AreEqual(100m, persistedTextpage.GetValue(decimalPropertyAlias));
@@ -342,12 +342,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 contentTypeRepository.AddOrUpdate(contentType);
                 repository.AddOrUpdate(textpage);
                 unitOfWork.Commit();
-                
+
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(textpage.HasIdentity, Is.True);
 
-                
+
             }
         }
 
@@ -631,9 +631,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Name.Contains("Text"));
                 long totalRecords;
-                
+
                 try
-                {                    
+                {
                     DatabaseContext.Database.EnableSqlTrace = true;
                     DatabaseContext.Database.EnableSqlCount();
 
@@ -643,14 +643,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Assert.AreEqual(2, result.Count());
 
                     result = repository.GetPagedResultsByQuery(query, 1, 2, out totalRecords, "title", Direction.Ascending, false);
-                    
+
                     Assert.AreEqual(1, result.Count());
                 }
                 finally
-                {                
+                {
                     DatabaseContext.Database.EnableSqlTrace = false;
                     DatabaseContext.Database.DisableSqlCount();
-                }                
+                }
             }
         }
 
@@ -761,7 +761,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
                 var filterQuery = Query<IContent>.Builder.Where(x => x.Name.Contains("Page 2"));
-                
+
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 

@@ -16,7 +16,9 @@ using umbraco;
 using System.Linq;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
+using Umbraco.Core.Services;
 using GlobalSettings = umbraco.GlobalSettings;
+using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -25,6 +27,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         #region Routes cache
 
         private readonly RoutesCache _routesCache = new RoutesCache(!UnitTesting);
+
+        private DomainHelper _domainHelper;
+
+        private DomainHelper GetDomainHelper(IDomainService domainService)
+        {
+            return _domainHelper ?? (_domainHelper = new DomainHelper(domainService));
+        }
 
         // for INTERNAL, UNIT TESTS use ONLY
         internal RoutesCache RoutesCache { get { return _routesCache; } }
@@ -99,6 +108,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // - non-colliding, adds one complete "by route" lookup, only on the first time a url is computed (then it's cached anyways)
             // - colliding, adds one "by route" lookup, the first time the url is computed, then one dictionary looked each time it is computed again
             // assuming no collisions, the impact is one complete "by route" lookup the first time each url is computed
+            //
+            // U4-9121 - this lookup is too expensive when computing a large amount of urls on a front-end (eg menu)
+            // ... thinking about moving the lookup out of the path into its own async task, so we are not reporting errors
+            //     in the back-office anymore, but at least we are not polluting the cache
+            // instead, refactored DeterminedIdByRoute to stop using XPath, with a 16x improvement according to benchmarks
+            // will it be enough?
+
             var loopId = preview ? 0 : _routesCache.GetNodeId(route); // might be cached already in case of collision
             if (loopId == 0)
             {
@@ -130,62 +146,141 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
             var startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
-            IEnumerable<XPathVariable> vars;
-
-            var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode, out vars);
 
             //check if we can find the node in our xml cache
-            var content = GetSingleByXPath(umbracoContext, preview, xpath, vars == null ? null : vars.ToArray());
+            var id = NavigateRoute(umbracoContext, preview, startNodeId, path, hideTopLevelNode);
+            if (id > 0) return GetById(umbracoContext, preview, id);
 
             // if hideTopLevelNodePath is true then for url /foo we looked for /*/foo
             // but maybe that was the url of a non-default top-level node, so we also
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
-            if (content == null && hideTopLevelNode && path.Length > 1 && path.IndexOf('/', 1) < 0)
+            if (hideTopLevelNode && path.Length > 1 && path.IndexOf('/', 1) < 0)
             {
-                xpath = CreateXpathQuery(startNodeId, path, false, out vars);
-                content = GetSingleByXPath(umbracoContext, preview, xpath, vars == null ? null : vars.ToArray());
+                var id2 = NavigateRoute(umbracoContext, preview, startNodeId, path, false);
+                if (id2 > 0) return GetById(umbracoContext, preview, id2);
             }
 
-            return content;
+            return null;
+        }
+
+        private int NavigateRoute(UmbracoContext umbracoContext, bool preview, int startNodeId, string path, bool hideTopLevelNode)
+        {
+            var xml = GetXml(umbracoContext, preview);
+            XmlElement elt;
+
+            // empty path
+            if (path == string.Empty || path == "/")
+            {
+                if (startNodeId > 0)
+                {
+                    elt = xml.GetElementById(startNodeId.ToString(CultureInfo.InvariantCulture));
+                    return elt == null ? -1 : startNodeId;
+                }
+
+                elt = null;
+                var min = int.MaxValue;
+                foreach (var e in xml.DocumentElement.ChildNodes.OfType<XmlElement>())
+                {
+                    var sortOrder = int.Parse(e.GetAttribute("sortOrder"));
+                    if (sortOrder < min)
+                    {
+                        min = sortOrder;
+                        elt = e;
+                    }
+                }
+                return elt == null ? -1 : int.Parse(elt.GetAttribute("id"));
+            }
+
+            // non-empty path
+            elt = startNodeId <= 0
+                ? xml.DocumentElement
+                : xml.GetElementById(startNodeId.ToString(CultureInfo.InvariantCulture));
+            if (elt == null) return -1;
+
+            var urlParts = path.Split(SlashChar, StringSplitOptions.RemoveEmptyEntries);
+
+            if (hideTopLevelNode && startNodeId <= 0)
+            {
+                foreach (var e in elt.ChildNodes.OfType<XmlElement>())
+                {
+                    var id = NavigateElementRoute(e, urlParts);
+                    if (id > 0) return id;
+                }
+                return -1;
+            }
+
+            return NavigateElementRoute(elt, urlParts);
+        }
+
+        private static bool UseLegacySchema
+        {
+            get { return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema; }
+        }
+
+        private static int NavigateElementRoute(XmlElement elt, string[] urlParts)
+        {
+            var found = true;
+            var i = 0;
+            while (found && i < urlParts.Length)
+            {
+                found = false;
+                foreach (var child in elt.ChildNodes.OfType<XmlElement>())
+                {
+                    var noNode = UseLegacySchema
+                        ? child.Name != "node"
+                        : child.GetAttributeNode("isDoc") == null;
+                    if (noNode) continue;
+                    if (child.GetAttribute("urlName") != urlParts[i]) continue;
+
+                    found = true;
+                    elt = child;
+                    break;
+                }
+                i++;
+            }
+            return found ? int.Parse(elt.GetAttribute("id")) : -1;
         }
 
         string DetermineRouteById(UmbracoContext umbracoContext, bool preview, int contentId)
         {
-            var node = GetById(umbracoContext, preview, contentId);
-            if (node == null)
-                return null;
+            var elt = GetXml(umbracoContext, preview).GetElementById(contentId.ToString(CultureInfo.InvariantCulture));
+            if (elt == null) return null;
 
-            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
+            var domainHelper = GetDomainHelper(umbracoContext.Application.Services.DomainService);
 
             // walk up from that node until we hit a node with a domain,
             // or we reach the content root, collecting urls in the way
             var pathParts = new List<string>();
-            var n = node;
-            var hasDomains = domainHelper.NodeHasDomains(n.Id);
-            while (hasDomains == false && n != null) // n is null at root
+            var eltId = int.Parse(elt.GetAttribute("id"));
+            var eltParentId = int.Parse(((XmlElement) elt.ParentNode).GetAttribute("id"));
+            var e = elt;
+            var id = eltId;
+            var hasDomains = domainHelper.NodeHasDomains(id);
+            while (hasDomains == false && id != -1)
             {
                 // get the url
-                var urlName = n.UrlName;
+                var urlName = e.GetAttribute("urlName");
                 pathParts.Add(urlName);
 
                 // move to parent node
-                n = n.Parent;
-                hasDomains = n != null && domainHelper.NodeHasDomains(n.Id);
+                e = (XmlElement) e.ParentNode;
+                id = int.Parse(e.GetAttribute("id"));
+                hasDomains = id != -1 && domainHelper.NodeHasDomains(id);
             }
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
-            if (hasDomains == false && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
-                ApplyHideTopLevelNodeFromPath(umbracoContext, node, pathParts);
+            if (hasDomains == false && GlobalSettings.HideTopLevelNodeFromPath)
+                ApplyHideTopLevelNodeFromPath(umbracoContext, eltId, eltParentId, pathParts);
 
             // assemble the route
             pathParts.Reverse();
             var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
-            var route = (n == null ? "" : n.Id.ToString(CultureInfo.InvariantCulture)) + path;
+            var route = (id == -1 ? "" : id.ToString(CultureInfo.InvariantCulture)) + path;
 
             return route;
         }
 
-        static void ApplyHideTopLevelNodeFromPath(UmbracoContext umbracoContext, IPublishedContent node, IList<string> pathParts)
+        static void ApplyHideTopLevelNodeFromPath(UmbracoContext umbracoContext, int nodeId, int parentId, IList<string> pathParts)
         {
             // in theory if hideTopLevelNodeFromPath is true, then there should be only once
             // top-level node, or else domains should be assigned. but for backward compatibility
@@ -195,12 +290,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // "/foo" fails (looking for "/*/foo") we try also "/foo".
             // this does not make much sense anyway esp. if both "/foo/" and "/bar/foo" exist, but
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
-            if (node.Parent == null)
+            if (parentId == -1)
             {
                 var rootNode = umbracoContext.ContentCache.GetByRoute("/", true);
                 if (rootNode == null)
                     throw new Exception("Failed to get node at /.");
-                if (rootNode.Id == node.Id) // remove only if we're the default node
+                if (rootNode.Id == nodeId) // remove only if we're the default node
                     pathParts.RemoveAt(pathParts.Count - 1);
             }
             else
@@ -217,12 +312,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			public int Version { get; private set; }
 
-			public static string Root { get { return "/root"; } }
 			public string RootDocuments { get; private set; }
-			public string DescendantDocumentById { get; private set; }
-			public string ChildDocumentByUrlName { get; private set; }
-            public string ChildDocumentByUrlNameVar { get; private set; }
-            public string RootDocumentWithLowestSortOrder { get; private set; }
 
 			public XPathStringsDefinition(int version)
 			{
@@ -233,19 +323,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					// legacy XML schema
 					case 0:
 						RootDocuments = "/root/node";
-						DescendantDocumentById = "//node [@id={0}]";
-						ChildDocumentByUrlName = "/node [@urlName='{0}']";
-						ChildDocumentByUrlNameVar = "/node [@urlName=${0}]";
-						RootDocumentWithLowestSortOrder = "/root/node [not(@sortOrder > ../node/@sortOrder)][1]";
 						break;
 
 					// default XML schema as of 4.10
 					case 1:
 						RootDocuments = "/root/* [@isDoc]";
-						DescendantDocumentById = "//* [@isDoc and @id={0}]";
-						ChildDocumentByUrlName = "/* [@isDoc and @urlName='{0}']";
-						ChildDocumentByUrlNameVar = "/* [@isDoc and @urlName=${0}]";
-						RootDocumentWithLowestSortOrder = "/root/* [@isDoc and not(@sortOrder > ../* [@isDoc]/@sortOrder)][1]";
 						break;
 
 					default:
@@ -420,84 +502,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         #region XPathQuery
 
         static readonly char[] SlashChar = new[] { '/' };
-
-        protected string CreateXpathQuery(int startNodeId, string path, bool hideTopLevelNodeFromPath, out IEnumerable<XPathVariable> vars)
-        {
-            string xpath;
-            vars = null;
-
-            if (path == string.Empty || path == "/")
-            {
-                // if url is empty
-                if (startNodeId > 0)
-                {
-					// if in a domain then use the root node of the domain
-					xpath = string.Format(XPathStringsDefinition.Root + XPathStrings.DescendantDocumentById, startNodeId);
-                }
-                else
-                {
-                    // if not in a domain - what is the default page?
-                    // let's say it is the first one in the tree, if any -- order by sortOrder
-
-					// but!
-					// umbraco does not consistently guarantee that sortOrder starts with 0
-					// so the one that we want is the one with the smallest sortOrder
-					// read http://stackoverflow.com/questions/1128745/how-can-i-use-xpath-to-find-the-minimum-value-of-an-attribute-in-a-set-of-elemen
-
-					// so that one does not work, because min(@sortOrder) maybe 1
-					// xpath = "/root/*[@isDoc and @sortOrder='0']";
-
-					// and we can't use min() because that's XPath 2.0
-					// that one works
-					xpath = XPathStrings.RootDocumentWithLowestSortOrder;
-                }
-            }
-            else
-            {
-                // if url is not empty, then use it to try lookup a matching page
-                var urlParts = path.Split(SlashChar, StringSplitOptions.RemoveEmptyEntries);
-                var xpathBuilder = new StringBuilder();
-                int partsIndex = 0;
-                List<XPathVariable> varsList = null;
-
-                if (startNodeId == 0)
-                {
-					if (hideTopLevelNodeFromPath)
-						xpathBuilder.Append(XPathStrings.RootDocuments); // first node is not in the url
-					else
-						xpathBuilder.Append(XPathStringsDefinition.Root);
-                }
-                else
-                {
-					xpathBuilder.AppendFormat(XPathStringsDefinition.Root + XPathStrings.DescendantDocumentById, startNodeId);
-					// always "hide top level" when there's a domain
-                }
-
-                while (partsIndex < urlParts.Length)
-                {
-                    var part = urlParts[partsIndex++];
-                    if (part.Contains('\'') || part.Contains('"'))
-                    {
-                        // use vars, escaping gets ugly pretty quickly
-                        varsList = varsList ?? new List<XPathVariable>();
-                        var varName = string.Format("var{0}", partsIndex);
-                        varsList.Add(new XPathVariable(varName, part));
-                        xpathBuilder.AppendFormat(XPathStrings.ChildDocumentByUrlNameVar, varName);
-                    }
-                    else
-                    {
-                        xpathBuilder.AppendFormat(XPathStrings.ChildDocumentByUrlName, part);
-
-                    }
-                }
-
-                xpath = xpathBuilder.ToString();
-                if (varsList != null)
-                    vars = varsList.ToArray();
-            }
-
-            return xpath;
-        }
 
         #endregion
 

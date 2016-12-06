@@ -229,15 +229,16 @@ namespace umbraco.editorControls.PickerRelations
 
 			getRelationsSql += " AND comment = '" + instanceIdentifier + "'";
 
-			using (IRecordsReader relations = uQuery.SqlHelper.ExecuteReader(getRelationsSql))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader relations = sqlHelper.ExecuteReader(getRelationsSql))
 			{
 				//clear data
 				Relation relation;
-				while (relations.Read())
+			    while (relations.Read())
 				{
-					relation = new Relation(relations.GetInt("id"));
+				    relation = new Relation(relations.GetInt("id"));
 
-					// TODO: [HR] check to see if an instance identifier is used
+				    // TODO: [HR] check to see if an instance identifier is used
 					relation.Delete();
 				}
 			}

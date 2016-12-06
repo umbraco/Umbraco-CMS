@@ -299,6 +299,14 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetVersions(int id);
 
         /// <summary>
+        /// Gets a list of all version Ids for the given content item ordered so latest is first
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        IEnumerable<Guid> GetVersionIds(int id, int maxRows);
+
+        /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects, which reside at the first level / root
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>

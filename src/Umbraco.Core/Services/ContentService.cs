@@ -56,6 +56,12 @@ namespace Umbraco.Core.Services
             _userService = userService;
         }
 
+        #region Static Queries
+
+        private readonly IQuery<IContent> _notTrashedQuery = Query<IContent>.Builder.Where(x => x.Trashed == false);
+
+        #endregion
+
         public int CountPublished(string contentTypeAlias = null)
         {
             var uow = UowProvider.GetUnitOfWork();
@@ -342,11 +348,23 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IEnumerable<IContent> GetByIds(IEnumerable<int> ids)
         {
-            if (ids.Any() == false) return Enumerable.Empty<IContent>();
+            var idsArray = ids.ToArray();
+            if (idsArray.Length == 0) return Enumerable.Empty<IContent>();
 
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.GetAll(ids.ToArray());
+                //ensure that the result has the order based on the ids passed in
+                var result = repository.GetAll(idsArray);
+
+                var content = result.ToDictionary(x => x.Id, x => x);
+
+                var sortedResult = idsArray.Select(x =>
+                {
+                    IContent c;
+                    return content.TryGetValue(x, out c) ? c : null;
+                }).WhereNotNull();
+
+                return sortedResult;
             }
         }
 
@@ -432,6 +450,21 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
                 var versions = repository.GetAllVersions(id);
+                return versions;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all version Ids for the given content item ordered so latest is first
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        public IEnumerable<Guid> GetVersionIds(int id, int maxRows)
+        {
+            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
+            {
+                var versions = repository.GetVersionIds(id, maxRows);
                 return versions;
             }
         }
@@ -762,8 +795,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Trashed == false);
-                return repository.GetByPublishedVersion(query);
+                return repository.GetByPublishedVersion(_notTrashedQuery);
             }
         }
 

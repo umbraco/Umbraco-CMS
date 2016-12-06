@@ -174,7 +174,7 @@ namespace Umbraco.Core
         /// </summary>
         public void ConfigureEmbeddedDatabaseConnection()
         {
-            const string providerName = "System.Data.SqlServerCe.4.0";
+            const string providerName = Constants.DatabaseProviders.SqlCe;
 
             var connectionString = GetEmbeddedDatabaseConnectionString();
             SaveConnectionString(connectionString, providerName);

@@ -27,7 +27,7 @@
 			<div class="logo"></div>
 
 			<h1>Welcome to your Umbraco installation</h1>
-			<h3>You're seeing the wonderful page because your website doesn't contain any published content yet.</h3>
+			<h3>You're seeing this wonderful page because your website doesn't contain any published content yet.</h3>
 
 			<div class="cta">
 				<a href="<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>" class="button">Open Umbraco</a>
@@ -44,7 +44,7 @@
 
 				<div class="col">
 					<h2>Be a part of the community</h2>
-					<p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, we’re sure that you can get your answers from the community.</p>
+					<p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, weâ€™re sure that you can get your answers from the community.</p>
 					
 					<a href="http://our.umbraco.org?ref=ourFromInstaller" target="_blank">our.Umbraco &rarr;</a>
 				</div>

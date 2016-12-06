@@ -61,7 +61,7 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
-                .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
+                .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing(new AvailablePropertyEditorsResolver()))
                 .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
                     new PreValueDisplayResolver(lazyDataTypeService)))
                 .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(definition => definition.Key, expression => expression.Ignore())
                 .ForMember(definition => definition.Path, expression => expression.Ignore())
                 .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
-                .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>())
+                .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing(new DatabaseTypeResolver()))
                 .ForMember(x => x.ControlId, expression => expression.Ignore())
                 .ForMember(x => x.CreatorId, expression => expression.Ignore())
                 .ForMember(x => x.Level, expression => expression.Ignore())

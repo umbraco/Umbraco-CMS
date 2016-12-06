@@ -199,7 +199,7 @@
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.created">
                                 <div class="umb-package-details__information-item-label">Created:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.created}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.created | date:'yyyy-MM-dd HH:mm:ss'}}</div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.latestVersion">
@@ -338,6 +338,16 @@
 
                             <div class="umb-info-local-item text-info" ng-class="{'text-info' : vm.installState.type !== 'error'}">
                                 <p>{{vm.installState.status}}</p>
+                            </div>
+
+                            <div class="umb-info-local-item text-info"
+                                 ng-show="vm.installCompleted">
+
+                                <button type="button"
+                                        class="btn btn-success flex-inline mt3"
+                                        ng-click="vm.reloadPage()">
+                                    Finish
+                                </button>
                             </div>
 
                         </div>

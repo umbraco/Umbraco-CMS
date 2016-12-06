@@ -1,44 +1,95 @@
+<div class="umb-dashboard-grid" ng-controller="Umbraco.Dashboard.StartUpDynamicContentController as vm">
 
-<div style="max-width: 1200px">
-<h3><strong>Welcome to The Friendly CMS</strong></h3>
-<p style="font-size: 16px; line-height: 1.5; margin-bottom: 30px; max-width: 760px;">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible:</p>
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-<div class="row">
-    <div class="span4">
-        <a href="http://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=tv" target="_blank" class="nounderline">
-            <img src="views/dashboard/default/umbracotv.png" alt="Umbraco.TV - Hours of Umbraco Video Tutorials" style="margin: 10px 0 10px 0"/>
-        </a>
+    <div class="row clearfix" ng-if="vm.dashboard">
+        <!-- Sections -->
+        <div class="grid-section" ng-repeat="section in vm.dashboard.sections">
+            <div class="{{'span' + section.grid + ' column dash-section'}}">
 
+                <!-- rows -->
+                <div class="row clearfix dash-row" ng-repeat="row in section.rows">
+                    <div class="dash-inner-row">
 
-         <a href="http://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=header&utm_campaign=tv" target="_blank" class="btn-link -underline">
-             <h4> <strong>Umbraco.TV - Learn from the source!</strong> </h4>
-        </a>
+                        <!-- areas -->
+                        <div ng-repeat="area in row.areas"
+                             class="{{'span' + area.grid + ' column dash-area'}}">
+                            <div class="dash-inner-area">
 
-        <p style="line-height: 1.5;">
-            Umbraco.TV will help you go from zero to Umbraco
-            hero at a pace that suits you. Our easy to follow
-            online training videos will give you the fundamental
-            knowledge to start building awesome Umbraco websites.
-        </p>
+                                <!-- Controls -->
+                                <div ng-repeat="control in area.controls" class="dash-control dash-control-{{control.alias}}">
+                                    <div class="dash-inner-control">
+                                        <div ng-bind-html-unsafe="control.html"></div>
+                                    </div>
+                                </div>
+                                <!-- Controls end -->
+                            </div>
+                        </div>
+                        <!-- Area end -->
+                    </div>
+                </div>
+            </div>
+            <!-- Section end -->
+
+        </div>
     </div>
+    <!-- grid container end -->
 
-    <div class="span4 offset1">
 
-        <a href="http://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our" target="_blank" class="nounderline">
-            <img src="views/dashboard/default/ourumbraco.png" alt="Our Umbraco" style="margin: 10px 0 10px 0"/>
-        </a>
-
-        <a href="http://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=header&utm_campaign=our" target="_blank" class="btn-link -underline">
-            <h4><strong>Our Umbraco - The Friendliest Community</strong></h4>
-        </a>
-
-        <p style="line-height: 1.5;">
-            Our Umbraco - the official community site is your one
-            stop for everything Umbraco. Whether you need a
-            question answered or looking for cool plugins, the
-            worlds best community is just a click away.
+    <!-- Default content in case we cannot fetch content from the outside -->
+    <div style="max-width: 1200px" ng-if="vm.showDefault">
+        <h3><strong>Welcome to The Friendly CMS</strong></h3>
+        <p style="font-size: 16px; line-height: 1.5; margin-bottom: 30px; max-width: 760px;">
+            <span>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</span>
         </p>
-    </div>
-</div>
+        <h4>Find out more:</h4>
+        <ul>
+            <li>Find the answers to your Umbraco questions in <a href="https://our.umbraco.org/documentation/" target="_blank" class="btn-link-underline">our Documentation</a></li>
+            <li>Ask a question in the <a href="https://our.umbraco.org" target="_blank" class="btn-link-underline">Community Forum</a></li>
+            <li>Find <a href="https://our.umbraco.org/projects" target="_blank" class="btn-link-underline">an add-on package</a> to help you get going quickly</li>
+            <li>Watch <a href="https://umbraco.tv" class="btn-link-underline">our tutorial videos</a> (some are free, some require a subscription)</li>
+            <li>Find out about <a href="https://umbraco.com/products-and-support" target="_blank" class="btn-link-underline">our productivity boosting tools and commercial support</a></li>
+            <li>Find out about <a href="https://umbraco.com/products/training" target="_blank" class="btn-link-underline">real-life training and certification opportunities</a></li>
+        </ul>            
+
+        <div class="row">
+            <div class="span4">
+                <a href="https://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=tv" target="_blank" class="nounderline">
+                    <img src="views/dashboard/default/umbracotv.png" alt="Umbraco.TV - Hours of Umbraco Video Tutorials" style="margin: 10px 0 10px 0" />
+                </a>
+
+
+                <a href="https://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=header&utm_campaign=tv" target="_blank" class="btn-link -underline">
+                    <h4> <strong>Umbraco.TV - Learn from the source!</strong> </h4>
+                </a>
+
+                <p style="line-height: 1.5;">
+                    Umbraco.TV will help you go from zero to Umbraco
+                    hero at a pace that suits you. Our easy to follow
+                    online training videos will give you the fundamental
+                    knowledge to start building awesome Umbraco websites.
+                </p>
+            </div>
+
+            <div class="span4 offset1">
+
+                <a href="https://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our" target="_blank" class="nounderline">
+                    <img src="views/dashboard/default/ourumbraco.png" alt="Our Umbraco" style="margin: 10px 0 10px 0" />
+                </a>
+
+                <a href="https://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=header&utm_campaign=our" target="_blank" class="btn-link -underline">
+                    <h4><strong>Our Umbraco - The Friendliest Community</strong></h4>
+                </a>
+
+                <p style="line-height: 1.5;">
+                    Our Umbraco - the official community site is your one
+                    stop for everything Umbraco. Whether you need a
+                    question answered or looking for cool plugins, the
+                    worlds best community is just a click away.
+                </p>
+
+            </div>
+        </div>
+    </div> 
 
 </div>

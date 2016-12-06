@@ -28,6 +28,9 @@
     <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
     <key alias="restore" version="7.3.0">Restore</key>
+    <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+    <key alias="chooseWhereToMove">Choose where to move</key>
+    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -144,12 +147,12 @@
     <key alias="memberrole">Role</key>
     <key alias="membertype">Member Type</key>
     <key alias="noDate">No date chosen</key>
-    <key alias="nodeName">Page Title</key>
+    <key alias="nodeName">Link title</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
-    <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error - see log)</key>
-    <key alias="getUrlException">Oops: could not get the url (internal error - see log)</key>
-    <key alias="routeError">Oops: this document is published but its url would collide with content %0%</key>
+    <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
+    <key alias="getUrlException">Could not get the url</key>
+    <key alias="routeError">This document is published but its url would collide with content %0%</key>
     <key alias="publish">Publish</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="releaseDate">Publish at</key>
@@ -286,18 +289,12 @@
     <key alias="treepicker">Pick item</key>
     <key alias="viewCacheItem">View Cache Item</key>
     <key alias="createFolder">Create folder...</key>
-
     <key alias="relateToOriginalLabel">Relate to original</key>
+    <key alias="includeDescendants">Include descendants</key>
     <key alias="theFriendliestCommunity">The friendliest community</key>
-
     <key alias="linkToPage">Link to page</key>
-
     <key alias="openInNewWindow">Opens the linked document in a new window or tab</key>
-    <key alias="openInFullBody">Opens the linked document in the full body of the window</key>
-    <key alias="openInParentFrame">Opens the linked document in the parent frame</key>
-
     <key alias="linkToMedia">Link to media</key>
-
     <key alias="selectMedia">Select media</key>
     <key alias="selectIcon">Select icon</key>
     <key alias="selectItem">Select item</key>
@@ -307,19 +304,14 @@
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
     <key alias="noIconsFound">No icons were found</key>
-
     <key alias="noMacroParams">There are no parameters for this macro</key>
-
     <key alias="externalLoginProviders">External login providers</key>
     <key alias="exceptionDetail">Exception Details</key>
     <key alias="stacktrace">Stacktrace</key>
     <key alias="innerException">Inner Exception</key>
-
     <key alias="linkYour">Link your</key>
     <key alias="unLinkYour">Un-Link your</key>
-
     <key alias="account">account</key>
-
     <key alias="selectEditor">Select editor</key>
   </area>
   <area alias="dictionaryItem">
@@ -327,6 +319,12 @@
       Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left
    ]]></key>
     <key alias="displayName">Culture Name</key>
+    <key alias="changeKey">Edit the key of the dictionary item.</key>
+    <key alias="changeKeyError">
+      <![CDATA[
+      The key '%0%' already exists.
+   ]]>
+    </key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -819,7 +817,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="installStateInstalling">Installing...</key>
     <key alias="installStateRestarting">Restarting, please wait...</key>
     <key alias="installStateComplete">All done, your browser will now refresh, please wait...</key>
-
+    <key alias="installStateCompleted">Please click finish to complete installation and reload page.</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>
@@ -1335,7 +1333,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
 
 	  <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
-	  <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely when there's any errors in macros. Rectifying this will set the value to '%1%'.</key>
+	  <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.</key>
 	  <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
 
 	  <!-- The following keys get these tokens passed in:
@@ -1353,9 +1351,10 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
 
 	  <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid %2%</key>
-	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid %2%</key>
+	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
+	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
 
+	  <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
 	  <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
 	  <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
 	  <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>

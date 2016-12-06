@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Security;
 
@@ -503,6 +504,15 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
                 return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
+            }
+        }
+
+        internal IEnumerable<IUser> GetNextUsers(int id, int count)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = (UserRepository) RepositoryFactory.CreateUserRepository(uow))
+            {
+                return repository.GetNextUsers(id, count);
             }
         }
 

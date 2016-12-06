@@ -36,6 +36,22 @@ namespace umbraco.uicontrols
             set { m_title = value; }
         }
 
+        public void addProperty(string Caption, Control C, params BaseValidator[] validators)
+        {
+
+            PropertyPanel pp = new PropertyPanel();
+            pp.Controls.Add(C);
+
+            foreach (var validator in validators)
+            {
+                validator.Display = ValidatorDisplay.Dynamic;
+                pp.Controls.Add(validator);
+            }
+            pp.Text = Caption;
+
+            this.Controls.Add(pp);
+        }
+
         public void addProperty(string Caption, Control C)
         {
 
