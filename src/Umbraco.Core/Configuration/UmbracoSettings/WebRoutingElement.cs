@@ -44,5 +44,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (string)base["umbracoApplicationUrl"]; }
         }
+
+        [ConfigurationProperty("defaultSection", DefaultValue = "false")]
+        public string defaultSection
+        {
+            get { return (string)base["defaultSection"]; }
+        }
     }
 }

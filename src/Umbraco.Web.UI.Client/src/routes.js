@@ -101,7 +101,7 @@ app.config(function ($routeProvider) {
             templateUrl: function (rp) {
                 if (rp.section.toLowerCase() === "default" || rp.section.toLowerCase() === "umbraco" || rp.section === "")
                 {
-                    rp.section = "content";
+                    rp.section = Umbraco.Sys.ServerVariables.umbracoSettings.defaultSection || "content";
                 }
 
                 rp.url = "dashboard.aspx?app=" + rp.section;

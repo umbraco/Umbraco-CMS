@@ -15,6 +15,8 @@
         string UrlProviderMode { get; }
 
         string UmbracoApplicationUrl { get; }
+
+        string defaultSection { get;  }
     }
 
 }
