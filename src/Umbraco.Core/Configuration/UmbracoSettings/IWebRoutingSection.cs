@@ -16,7 +16,7 @@
 
         string UmbracoApplicationUrl { get; }
 
-        string defaultSection { get;  }
+        string DefaultSection { get;  }
     }
 
 }

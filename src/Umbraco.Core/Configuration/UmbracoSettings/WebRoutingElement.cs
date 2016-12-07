@@ -46,7 +46,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("defaultSection", DefaultValue = "false")]
-        public string defaultSection
+        public string DefaultSection
         {
             get { return (string)base["defaultSection"]; }
         }

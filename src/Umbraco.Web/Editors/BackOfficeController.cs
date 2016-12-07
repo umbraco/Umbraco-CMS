@@ -381,7 +381,7 @@ namespace Umbraco.Web.Editors
                                 GetMaxRequestLength()
                             },
                             {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
-                            {"defaultSection", UmbracoConfig.For.UmbracoSettings().WebRouting.defaultSection},
+                            {"defaultSection", UmbracoConfig.For.UmbracoSettings().WebRouting.DefaultSection},
                             {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                             {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
                         }
