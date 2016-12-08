@@ -3,7 +3,7 @@ namespace Umbraco.Core.Dynamics
 	/// <summary>
 	/// Currently just used for informational purposes as to where a PropertyResult object was created from.
 	/// </summary>
-	internal enum PropertyResultType
+	public enum PropertyResultType
 	{
 		/// <summary>
 		/// The property resolved was a normal document property
