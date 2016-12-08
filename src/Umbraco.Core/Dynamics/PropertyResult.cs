@@ -4,14 +4,14 @@ using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-	internal class PropertyResult : IPublishedProperty, IHtmlString
+	public class PropertyResult : IPublishedProperty, IHtmlString
 	{
         private readonly IPublishedProperty _source;
 	    private readonly string _alias;
 	    private readonly object _value;
         private readonly PropertyResultType _type;
 
-        internal PropertyResult(IPublishedProperty source, PropertyResultType type)
+        public PropertyResult(IPublishedProperty source, PropertyResultType type)
         {
     		if (source == null) throw new ArgumentNullException("source");
             
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Dynamics
 			_value = value;
         }
 
-        internal PropertyResultType PropertyType { get { return _type; } }
+        public PropertyResultType PropertyType { get { return _type; } }
 
         public string PropertyTypeAlias { get { return _source == null ? _alias : _source.PropertyTypeAlias; } }
         public object DataValue { get { return _source == null ? _value : _source.DataValue; } }
