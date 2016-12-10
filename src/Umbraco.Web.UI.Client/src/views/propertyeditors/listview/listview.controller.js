@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, dataTypeResource) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -264,10 +264,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          // Update all values for display
          if ($scope.listViewResultSet.items) {
 
-            // For content, track any values that are referended node Ids
+            // For content, track any values that are referenced node Ids, or referenced pre-value Ids (as later
+            // we want to be able to look-up the node names and/or pre-value labels to display instead of the Ids)
             var referencedNodeIds = [];
+            var referencedPreValues = [];
             _.each($scope.listViewResultSet.items, function (e) {
-                setPropertyValues(e, referencedNodeIds);
+                setPropertyValues(e, referencedNodeIds, referencedPreValues);
             });
              
             // If we've got some referenced nodeIds, update the numerical display of the node Id with the node names
@@ -277,6 +279,26 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                         updatePropertyValuesForReferencedNodes(e, referencedNodes);
                     });
                 });
+            }
+
+            // Similarly, if we have referenced pre-value Ids, update the numerical display of the Id with the pre-value label
+            if (referencedPreValues.length > 0) {
+                var dataTypeIdsHandled = [];
+                for (var i = 0; i < referencedPreValues.length; i++) {
+
+                    // Need to create immediately invoked function to avoid closure on the value of preValueDetail.editor
+                    (function (preValueDetail) {
+                        if (dataTypeIdsHandled.indexOf(preValueDetail.dataTypeDefinitionId) === -1) {
+                            dataTypeResource.getPreValues(preValueDetail.editor, preValueDetail.dataTypeDefinitionId).then(function (data) {
+                                _.each($scope.listViewResultSet.items, function (e) {
+                                    updatePropertyValuesForReferencedPreValues(e, data[0].value, preValueDetail.editor);
+                                });
+                            });
+
+                            dataTypeIdsHandled.push(preValueDetail.dataTypeDefinitionId);
+                        }
+                    })(referencedPreValues[i]);
+                }
             }
          }
 
@@ -548,7 +570,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
              });
    }
 
-   function getCustomPropertyValue(alias, properties, referencedNodeIds) {
+   function getCustomPropertyValue(alias, properties, referencedNodeIds, referencedPreValues) {
       var value = '';
       var index = getCustomPropertyIndex(alias, properties);
 
@@ -563,6 +585,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                  for (var j = 0; j < pickedNodeIds.length; j++) {
                      trackReferencedNodeIdsInIncludedProperties(referencedNodeIds, pickedNodeIds[j]);
                  }
+             } else if (editor === 'Umbraco.DropDown' || editor === 'Umbraco.RadioButtonList' || editor === 'Umbraco.DropDownMultiple' || editor === 'Umbraco.CheckBoxList') {
+                 trackReferencedPreValuesInIncludedProperties(referencedPreValues, properties[index]);
              }
          }
       }
@@ -590,8 +614,41 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        }
    }
 
+   function trackReferencedPreValuesInIncludedProperties(referencedPreValuesInIncludedProperties, property) {
+       if (property.editor === 'Umbraco.DropDown' || property.editor === 'Umbraco.RadioButtonList') {
+           trackReferencedPreValueInIncludedProperties(referencedPreValuesInIncludedProperties, property, parseInt(property.value));
+       } else if (property.editor === 'Umbraco.DropDownMultiple' || property.editor === 'Umbraco.CheckBoxList') {
+           for (var i = 0; i < property.value.length; i++) {
+               trackReferencedPreValueInIncludedProperties(referencedPreValuesInIncludedProperties, property, parseInt(property.value[i]));
+           }
+       }
+   }
+
+   function trackReferencedPreValueInIncludedProperties(referencedPreValuesInIncludedProperties, property, value) {
+       if (getTrackedPrevalueIndex(referencedPreValuesInIncludedProperties, value) === -1) {
+           referencedPreValuesInIncludedProperties.push({
+               dataTypeDefinitionId: property.dataTypeDefinitionId,
+               editor: property.editor,
+               id: value
+           });
+       }
+   }
+
+   function getTrackedPrevalueIndex(referencedPreValuesInIncludedProperties, id) {
+       var index = 0;
+       for (var i = 0; i < referencedPreValuesInIncludedProperties.length; i++) {
+           if (referencedPreValuesInIncludedProperties[i].id === id) {
+               return index;
+           }
+
+           index++;
+       }
+
+       return -1;
+   }
+
    /** This ensures that the correct value is set for each item in a row, we don't want to call a function during interpolation or ng-bind as performance is really bad that way */
-   function setPropertyValues(result, referencedNodeIds) {
+   function setPropertyValues(result, referencedNodeIds, referencedPreValues) {
 
       //set the edit url
       result.editPath = createEditUrlCallback(result);
@@ -610,7 +667,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
          // If we've got nothing yet, look at a user defined property
          if (typeof value === 'undefined') {
-            value = getCustomPropertyValue(alias, result.properties, referencedNodeIds);
+             value = getCustomPropertyValue(alias, result.properties, referencedNodeIds, referencedPreValues);
          }
 
          // If we have a date, format it
@@ -622,7 +679,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          result[alias] = value;
       });
    }
-
+    
    function updatePropertyValuesForReferencedNodes(result, referencedNodes) {
        _.each($scope.options.includeProperties, function (e) {
            var alias = e.alias;
@@ -659,6 +716,45 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
            if (referencedNodes[i].id === nodeId) {
                return referencedNodes[i].name;
            }
+       }
+
+       return '';
+   }
+
+   function updatePropertyValuesForReferencedPreValues(result, referencedPreValues, editor) {
+       _.each($scope.options.includeProperties, function (e) {
+           var alias = e.alias;
+           var propertyIndex = getCustomPropertyIndex(alias, result.properties);
+           if (propertyIndex > -1 && result.properties[propertyIndex].editor === editor) {
+               var currentValue = result[alias];
+               var preValueLabel;
+               if (editor === 'Umbraco.DropDown' || editor === 'Umbraco.RadioButtonList') {
+                   preValueLabel = getLabelForReferencedPreValue(parseInt(currentValue), referencedPreValues);
+                   if (preValueLabel !== '') {
+                       result[alias] = preValueLabel;
+                   }
+               } else if (editor === 'Umbraco.DropDownMultiple' || editor === 'Umbraco.CheckBoxList') {
+                   var preValueIds = currentValue;
+                   result[alias] = '';
+                   for (var j = 0; j < preValueIds.length; j++) {
+                       preValueLabel = getLabelForReferencedPreValue(parseInt(preValueIds[j]), referencedPreValues);
+                       if (preValueLabel !== '') {
+                           if (result[alias] !== '') {
+                               result[alias] += ', ';
+                           }
+
+                           result[alias] += preValueLabel;
+                       }
+                   }
+               }
+           }
+       });
+   }
+
+   function getLabelForReferencedPreValue(preValueId, referencedPreValues) {
+       var preValue = referencedPreValues[preValueId];
+       if (preValue) {
+           return preValue.value;
        }
 
        return '';

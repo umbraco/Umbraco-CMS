@@ -45,8 +45,9 @@ namespace Umbraco.Web.Models.Mapping
                     Value = editor.ValueEditor.ConvertDbToEditor(property, property.PropertyType, DataTypeService.Value),
                     Alias = property.Alias, 
                     PropertyEditor = editor,
-                    Editor = editor.Alias
-                };
+                    Editor = editor.Alias,
+                    DataTypeDefitionId = property.PropertyType.DataTypeDefinitionId
+            };
 
             return result;
         }

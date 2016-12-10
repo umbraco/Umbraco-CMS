@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
-    /// Represents a content property to be saved
+    /// Represents a content property to be saved or displayed
     /// </summary>
     [DataContract(Name = "property", Namespace = "")]
     public class ContentPropertyBasic
@@ -30,6 +30,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "editor", IsRequired = false)]
         public string Editor { get; set; }
 
+        [DataMember(Name = "dataTypeDefinitionId")]
+        public int DataTypeDefitionId { get; set; }
 
         /// <summary>
         /// Used internally during model mapping
