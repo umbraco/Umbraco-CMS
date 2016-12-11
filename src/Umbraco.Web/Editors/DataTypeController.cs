@@ -128,7 +128,13 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="editorAlias"></param>
         /// <param name="dataTypeId">The data type id for the pre-values, -1 if it is a new data type</param>
-        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members; 
+        /// due to the need to retrieve prevalue labels in the list view
+        /// </remarks>    
+        [UmbracoTreeAuthorize(
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Developer)]
         public IEnumerable<PreValueFieldDisplay> GetPreValues(string editorAlias, int dataTypeId = -1)
         {
             var propEd = PropertyEditorResolver.Current.GetByAlias(editorAlias);
