@@ -94,13 +94,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return ProcessQuery(sql);
         }
 
-        #endregion
-
-        #region Static Queries
-
-        private readonly IQuery<IContent> _publishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
-
-        #endregion
+        #endregion        
 
         #region Overrides of PetaPocoRepositoryBase<IContent>
 

@@ -64,7 +64,7 @@ namespace Umbraco.Core.Services
 
         #region Static Queries
 
-        private readonly IQuery<IUmbracoEntity> _rootEntityQuery = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == -1);
+        private IQuery<IUmbracoEntity> _rootEntityQuery;
 
         #endregion
 
@@ -392,6 +392,12 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetRootEntities(UmbracoObjectTypes umbracoObjectType)
         {
+            //create it once if it is needed (no need for locking here)
+            if (_rootEntityQuery == null)
+            {
+                _rootEntityQuery = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == -1);
+            }
+
             var objectTypeId = umbracoObjectType.GetGuid();
             using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
             {

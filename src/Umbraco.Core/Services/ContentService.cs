@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
 
         #region Static Queries
 
-        private readonly IQuery<IContent> _notTrashedQuery = Query<IContent>.Builder.Where(x => x.Trashed == false);
+        private IQuery<IContent> _notTrashedQuery;
 
         #endregion
 
@@ -793,6 +793,12 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         internal IEnumerable<IContent> GetAllPublished()
         {
+            //create it once if it is needed (no need for locking here)
+            if (_notTrashedQuery == null)
+            {
+                _notTrashedQuery = Query<IContent>.Builder.Where(x => x.Trashed == false);
+            }
+
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetByPublishedVersion(_notTrashedQuery);
