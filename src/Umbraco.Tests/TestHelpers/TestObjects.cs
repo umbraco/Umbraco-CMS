@@ -8,6 +8,7 @@ using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -221,7 +222,10 @@ namespace Umbraco.Tests.TestHelpers
             if (databaseFactory == null)
             {
                 var accessor = new TestUmbracoDatabaseAccessor();
-                var mappers = Mock.Of<IMapperCollection>();
+                //var mappersBuilder = new MapperCollectionBuilder(Current.Container); // fixme
+                //mappersBuilder.AddCore();
+                //var mappers = mappersBuilder.CreateCollection();
+                var mappers = Current.Container.GetInstance<IMapperCollection>();
                 databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, mappers);
             }
             repositoryFactory = repositoryFactory  ??  new RepositoryFactory(Mock.Of<IServiceContainer>());
