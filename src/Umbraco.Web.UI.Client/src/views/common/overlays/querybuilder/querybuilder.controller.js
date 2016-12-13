@@ -1,13 +1,25 @@
 (function () {
     "use strict";
 
-    function QueryBuilderOverlayController($scope, templateQueryResource) {
+    function QueryBuilderOverlayController($scope, $element, templateQueryResource, assetsService, angularHelper) {
 
         var vm = this;
 
         vm.properties = [];
         vm.contentTypes = [];
         vm.conditions = [];
+
+        vm.datePickerConfig = {
+            pickDate: true,
+            pickTime: false,
+            format: "YYYY-MM-DD",
+            icons: {
+                time: "icon-time",
+                date: "icon-calendar",
+                up: "icon-chevron-up",
+                down: "icon-chevron-down"
+            }
+        };
 
         vm.query = {
             contentType: {
@@ -41,6 +53,7 @@
         vm.setFilterProperty = setFilterProperty;
         vm.setFilterTerm = setFilterTerm;
         vm.changeConstraintValue = changeConstraintValue;
+        vm.datePickerChange = datePickerChange;
 
         function onInit() {
 
@@ -58,7 +71,7 @@
                 .then(function (conditions) {
                     vm.conditions = conditions;
                 });
-            
+                
             throttledFunc();
 
         }
@@ -134,12 +147,10 @@
 
         function setFilterProperty(filter, property) {
             filter.property = property;
-            throttledFunc();
         }
 
         function setFilterTerm(filter, term) {
             filter.term = term;
-            throttledFunc();
         }
 
         function changeConstraintValue() {
@@ -154,7 +165,13 @@
                 });
 
         }, 200);
-        
+
+        function datePickerChange(event) {
+            templateQueryResource.postTemplateQuery(vm.query)
+                .then(function (response) {
+                    $scope.model.result = response;
+                });
+        }
 
         onInit();
 

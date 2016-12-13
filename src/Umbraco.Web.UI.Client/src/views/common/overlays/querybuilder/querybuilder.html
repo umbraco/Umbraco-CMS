@@ -66,8 +66,17 @@
 					</ul>
 				</div>
 
-				<input type="text" ng-if="filter.term" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
-
+				<!-- Filter term types  (string, int, date) -->
+				<input type="text" ng-show="filter.term.appliesTo[0] === 'string'" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
+				<input type="number" ng-show="filter.term.appliesTo[0] === 'int'" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
+				<span ng-show="filter.term.appliesTo[0] === 'datetime'">
+					<umb-date-time-picker
+						options="vm.datePickerConfig"
+						ng-model="filter.constraintValue"
+						on-change="vm.datePickerChange()">
+					</umb-date-time-picker>
+				</span>
+				
 				<a href ng-click="vm.addFilter(vm.query)">
 					<i class="icon-add"></i>
 				</a>
