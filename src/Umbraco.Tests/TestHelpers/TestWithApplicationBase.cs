@@ -124,7 +124,7 @@ namespace Umbraco.Tests.TestHelpers
             Container.RegisterSingleton<IDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 sqlSyntaxProviders,
-                Logger, f.GetInstance<IUmbracoDatabaseAccessor>(),
+                Logger, f.GetInstance<IDatabaseScopeAccessor>(),
                 Mock.Of<IMapperCollection>()));
             Container.RegisterSingleton(f => new DatabaseContext(f.GetInstance<IDatabaseFactory>()));
 

@@ -221,7 +221,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (databaseFactory == null)
             {
-                var accessor = new TestUmbracoDatabaseAccessor();
+                var accessor = new TestDatabaseScopeAccessor();
                 //var mappersBuilder = new MapperCollectionBuilder(Current.Container); // fixme
                 //mappersBuilder.AddCore();
                 //var mappers = mappersBuilder.CreateCollection();

@@ -98,7 +98,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
                 var logger = f.GetInstance<ILogger>();
-                var umbracoDatabaseAccessor = f.GetInstance<IUmbracoDatabaseAccessor>();
+                var umbracoDatabaseAccessor = f.GetInstance<IDatabaseScopeAccessor>();
                 var mappers = f.GetInstance<IMapperCollection>();
                 var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, logger, umbracoDatabaseAccessor, mappers);
                 factory.ResetForTests();

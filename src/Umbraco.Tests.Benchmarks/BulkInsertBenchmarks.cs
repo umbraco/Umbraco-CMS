@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Benchmarks
                 Constants.DatabaseProviders.SqlServer,
                 new [] { p },
                 logger,
-                new ThreadStaticUmbracoDatabaseAccessor(), 
+                new ThreadStaticDatabaseScopeAccessor(), 
                 new MapperCollection(Enumerable.Empty<BaseMapper>()));
             return f.GetDatabase();
         }
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Benchmarks
                 Constants.DatabaseProviders.SqlCe,
                 new[] { new SqlCeSyntaxProvider() },
                 logger,
-                new ThreadStaticUmbracoDatabaseAccessor(),
+                new ThreadStaticDatabaseScopeAccessor(),
                 new MapperCollection(Enumerable.Empty<BaseMapper>()));
             return f.GetDatabase();
         }
