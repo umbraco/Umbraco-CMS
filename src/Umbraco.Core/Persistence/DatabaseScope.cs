@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Umbraco.Core.Persistence
 {
-    public class DatabaseScope : IDisposable
+    public class DatabaseScope : IDisposeOnRequestEnd // implies IDisposable
     {
         private readonly DatabaseScope _parent;
         private readonly IDatabaseScopeAccessor _accessor;

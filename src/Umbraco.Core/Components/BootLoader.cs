@@ -44,7 +44,11 @@ namespace Umbraco.Core.Components
 
             InstanciateComponents(orderedComponentTypes);
             ComposeComponents(level);
-            InitializeComponents();
+
+            using (_container.GetInstance<DatabaseContext>().CreateDatabaseScope())
+            {
+                InitializeComponents();
+            }
 
             // rejoice!
             _booted = true;

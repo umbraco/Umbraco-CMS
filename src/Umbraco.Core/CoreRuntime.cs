@@ -116,11 +116,12 @@ namespace Umbraco.Core
                 }
             }
 
+            //fixme
             // after Umbraco has started there is a scope in "context" and that context is
             // going to stay there and never get destroyed nor reused, so we have to ensure that
             // everything is cleared
-            var sa = container.GetInstance<IDatabaseScopeAccessor>();
-            sa.Scope?.Dispose();
+            //var sa = container.GetInstance<IDatabaseScopeAccessor>();
+            //sa.Scope?.Dispose();
         }
 
         private void AquireMainDom(IServiceFactory container)
@@ -341,13 +342,17 @@ namespace Umbraco.Core
 
         protected virtual bool EnsureMigration(IDatabaseFactory databaseFactory, SemVersion codeVersion)
         {
-            var database = databaseFactory.GetDatabase();
-            var codeVersionString = codeVersion.ToString();
-            var sql = database.Sql()
-                .Select<MigrationDto>()
-                .From<MigrationDto>()
-                .Where<MigrationDto>(x => x.Name.InvariantEquals(GlobalSettings.UmbracoMigrationName) && x.Version == codeVersionString);
-            return database.FirstOrDefault<MigrationDto>(sql) != null;
+            var uf = databaseFactory as UmbracoDatabaseFactory; // fixme
+            if (uf == null) throw new Exception("oops: db.");
+            using (var database = uf.CreateDatabase()) // no scope - just the database
+            {
+                var codeVersionString = codeVersion.ToString();
+                var sql = database.Sql()
+                    .Select<MigrationDto>()
+                    .From<MigrationDto>()
+                    .Where<MigrationDto>(x => x.Name.InvariantEquals(GlobalSettings.UmbracoMigrationName) && x.Version == codeVersionString);
+                return database.FirstOrDefault<MigrationDto>(sql) != null;
+            }
         }
 
         private static string LocalVersion

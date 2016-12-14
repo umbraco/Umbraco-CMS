@@ -54,9 +54,12 @@ namespace Umbraco.Web
         [Inject]
         internal FacadeRouter FacadeRouter { get; set; }
 
+        [Inject]
+        internal DatabaseContext DatabaseContext { get; set; }
+
         #endregion
 
-	    public UmbracoModule()
+        public UmbracoModule()
 	    {
             _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
         }
@@ -80,6 +83,9 @@ namespace Umbraco.Web
 			httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 
             // process
+
+            // create the database scope which will be disposed with http context
+		    var scope = DatabaseContext.CreateDatabaseScope();
 
             // create the LegacyRequestInitializer
             // and initialize legacy stuff

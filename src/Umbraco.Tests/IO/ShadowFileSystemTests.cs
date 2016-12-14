@@ -406,7 +406,7 @@ namespace Umbraco.Tests.IO
             Assert.AreEqual(1, Directory.GetDirectories(appdata + "/Shadow").Length);
             scope.Dispose();
             Assert.IsFalse(fs.FileExists("sub/f3.txt"));
-            Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
+            TestHelper.TryAssert(() => Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id)));
 
             // shadow with scope and complete does complete
             scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa, logger);
