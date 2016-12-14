@@ -390,7 +390,7 @@ namespace Umbraco.Tests.Web.Mvc
                 logger, settings,
                 "/dang", 0);
 
-            var facadeRouter = BaseWebTest.CreateFacadeRouter();
+            var facadeRouter = BaseWebTest.CreateFacadeRouter(TestObjects.GetUmbracoSettings().WebRouting);
             var frequest = facadeRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
 
             frequest.Culture = CultureInfo.InvariantCulture;

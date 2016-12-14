@@ -61,10 +61,15 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
-        internal static FacadeRouter CreateFacadeRouter(IServiceContainer container = null, ContentFinderCollection contentFinders = null)
+        internal FacadeRouter CreateFacadeRouter(IServiceContainer container = null, ContentFinderCollection contentFinders = null)
+        {
+            return CreateFacadeRouter(TestObjects.GetUmbracoSettings().WebRouting, container, contentFinders);
+        }
+
+        internal static FacadeRouter CreateFacadeRouter(IWebRoutingSection webRoutingSection, IServiceContainer container = null, ContentFinderCollection contentFinders = null)
         {
             return new FacadeRouter(
-                TestObjects.GetUmbracoSettings().WebRouting,
+                webRoutingSection,
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 container?.TryGetInstance<ServiceContext>() ?? new ServiceContext(),

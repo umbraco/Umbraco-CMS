@@ -14,7 +14,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -28,67 +27,17 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ThreadSafetyServiceTest : TestWithDatabaseBase
 	{
-		//private IDatabaseUnitOfWorkProvider _uowProvider;
-		//private PerThreadSqlCeDatabaseFactory _dbFactory;
-	    private IUmbracoDatabaseAccessor _accessor;
-	 //   private DatabaseContext _dbContext;
-	 //   private ServiceContext _services;
-
 		public override void SetUp()
 		{
 			base.SetUp();
-
-   //         //we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that
-   //         //a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
-   //         //threading environment, or a single apartment threading environment will not work for this test because
-   //         //it is multi-threaded.
-   //         _dbFactory = new PerThreadSqlCeDatabaseFactory(Logger, Mock.Of<IMapperCollection>());
-   //         var repositoryFactory = new RepositoryFactory(Container);
-   //         _uowProvider = new NPocoUnitOfWorkProvider(_dbFactory, repositoryFactory);
-
-   //         // overwrite the local object
-   //         _dbContext = new DatabaseContext(_dbFactory, Logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
-
-   //         //disable cache
-		 //   var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
-
-			////here we are going to override the ServiceContext because normally with our test cases we use a
-			////global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
-			////we need a new Database object for each thread.
-		 //   var evtMsgs = new TransientEventMessagesFactory();
-		 //   _services = TestObjects.GetServiceContext(
-   //             repositoryFactory,
-   //             _uowProvider,
-   //             new FileUnitOfWorkProvider(),
-   //             cacheHelper,
-   //             Logger,
-   //             evtMsgs,
-   //             Enumerable.Empty<IUrlSegmentProvider>());
-
 			CreateTestData();
 		}
 
         protected override void Compose()
         {
             base.Compose();
-
-            //replace some services
-            //Container.Register<IDatabaseFactory>(factory => _dbFactory);
-            //Container.Register<IDatabaseFactory>(f => _dbFactory = new PerThreadSqlCeDatabaseFactory(f.GetInstance<ILogger>(), f.GetInstance<IMapperCollection>()));
-            Container.RegisterSingleton(f => _accessor = new ThreadStaticUmbracoDatabaseAccessor()); // per-thread database
-
-            //Container.Register<DatabaseContext>(factory => _dbContext);
-            //Container.Register<ServiceContext>(factory => _services);
+            Container.RegisterSingleton<IDatabaseScopeAccessor>(f => new ThreadStaticDatabaseScopeAccessor()); // per-thread database scope
         }
-
-		public override void TearDown()
-		{
-			// dispose!
-           // _dbFactory?.Dispose();
-		    _accessor.UmbracoDatabase?.Dispose();
-
-            base.TearDown();
-		}
 
         private const int MaxThreadCount = 20;
 
@@ -106,34 +55,38 @@ namespace Umbraco.Tests.Services
 			{
 				var t = new Thread(() =>
 				{
-					try
-					{
-						//Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Create 1st content.");
-						var content1 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
+				    using (DatabaseContext.CreateDatabaseScope())
+				    {
+                        try
+                        {
+                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Create 1st content.");
+                            var content1 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
 
-						//Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 1st content.");
-						contentService.Save(content1);
-                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 1st content.");
+                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 1st content.");
+                            contentService.Save(content1);
+                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 1st content.");
 
-						Thread.Sleep(100); //quick pause for maximum overlap!
+                            Thread.Sleep(100); //quick pause for maximum overlap!
 
-                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Create 2nd content.");
-                        var content2 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
+                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Create 2nd content.");
+                            var content2 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
 
-                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 2nd content.");
-                        contentService.Save(content2);
-                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 2nd content.");
+                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 2nd content.");
+                            contentService.Save(content2);
+                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 2nd content.");
+                        }
+                        catch (Exception e)
+                        {
+                            //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Exception!");
+                            lock (exceptions) { exceptions.Add(e); }
+                        }
                     }
-                    catch (Exception e)
-					{
-                        //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Exception!");
-						lock (exceptions) { exceptions.Add(e); }
-					}
-				});
+                });
 				threads.Add(t);
 			}
 
             // start all threads
+            // dont need SafeCallContext since db is threadstatic
             Debug.WriteLine("Starting threads");
             threads.ForEach(x => x.Start());
 
@@ -173,35 +126,38 @@ namespace Umbraco.Tests.Services
 			{
 				var t = new Thread(() =>
 				{
-					try
-					{
-						//Debug.WriteLine("Created content on thread: " + Thread.CurrentThread.ManagedThreadId);
+				    using (DatabaseContext.CreateDatabaseScope())
+				    {
+                        try
+                        {
+                            //Debug.WriteLine("Created content on thread: " + Thread.CurrentThread.ManagedThreadId);
 
-						//create 2 content items
+                            //create 2 content items
 
-					    var folder1 = mediaService.CreateMedia("test" + Guid.NewGuid(), -1, Constants.Conventions.MediaTypes.Folder, 0);
-						//Debug.WriteLine("Saving folder1 on thread: " + Thread.CurrentThread.ManagedThreadId);
-						mediaService.Save(folder1, 0);
+                            var folder1 = mediaService.CreateMedia("test" + Guid.NewGuid(), -1, Constants.Conventions.MediaTypes.Folder, 0);
+                            //Debug.WriteLine("Saving folder1 on thread: " + Thread.CurrentThread.ManagedThreadId);
+                            mediaService.Save(folder1, 0);
 
-						Thread.Sleep(100); //quick pause for maximum overlap!
+                            Thread.Sleep(100); //quick pause for maximum overlap!
 
-                        var folder2 = mediaService.CreateMedia("test" + Guid.NewGuid(), -1, Constants.Conventions.MediaTypes.Folder, 0);
-						//Debug.WriteLine("Saving folder2 on thread: " + Thread.CurrentThread.ManagedThreadId);
-						mediaService.Save(folder2, 0);
-					}
-					catch (Exception e)
-					{
-                        lock (exceptions) { exceptions.Add(e); }
+                            var folder2 = mediaService.CreateMedia("test" + Guid.NewGuid(), -1, Constants.Conventions.MediaTypes.Folder, 0);
+                            //Debug.WriteLine("Saving folder2 on thread: " + Thread.CurrentThread.ManagedThreadId);
+                            mediaService.Save(folder2, 0);
+                        }
+                        catch (Exception e)
+                        {
+                            lock (exceptions) { exceptions.Add(e); }
+                        }
                     }
-				});
+                });
 				threads.Add(t);
 			}
 
-			//start all threads
-			threads.ForEach(x => x.Start());
+            //start all threads
+            threads.ForEach(x => x.Start());
 
-			//wait for all to complete
-			threads.ForEach(x => x.Join());
+            //wait for all to complete
+            threads.ForEach(x => x.Join());
 
 			//kill them all
             // uh? no!

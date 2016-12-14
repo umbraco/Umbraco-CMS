@@ -39,6 +39,8 @@ namespace Umbraco.Tests.Web.Mvc
             Current.Reset();
         }
 
+        private TestObjects TestObjects = new TestObjects(null);
+
         private MethodInfo GetRenderMvcControllerIndexMethodFromCurrentType(Type currType)
         {
             return currType.GetMethods().Single(x =>

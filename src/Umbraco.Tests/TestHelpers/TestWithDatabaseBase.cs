@@ -51,6 +51,7 @@ namespace Umbraco.Tests.TestHelpers
     {
         private CacheHelper _disabledCacheHelper;
         private IFacadeService _facadeService;
+        private IDisposable _databaseScope;
 
         // note: a fixture class is created once for all the tests in that fixture
         // these flags are used to ensure a new database file is used when appropriate
@@ -135,6 +136,8 @@ namespace Umbraco.Tests.TestHelpers
             {
                 timer?.Dispose();
             }
+
+            _databaseScope?.Dispose();
 
             base.TearDown();
         }
@@ -283,6 +286,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (Options.Database == UmbracoTestOptions.Database.None || Options.Database == UmbracoTestOptions.Database.NewEmptyPerTest)
                 return;
+
+            _databaseScope = Core.DI.Current.DatabaseContext.CreateDatabaseScope();
 
             //create the schema and load default data if:
             // - is the first test in the session

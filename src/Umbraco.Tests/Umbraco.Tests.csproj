@@ -234,6 +234,8 @@
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
+    <Compile Include="Persistence\DatabaseScopeTests.cs" />
+    <Compile Include="TestHelpers\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestDatabaseScopeAccessor.cs" />
     <Compile Include="Testing\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
@@ -252,7 +254,6 @@
     <Compile Include="TestHelpers\Stubs\TestIndexCollectionAccessor.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
-    <Compile Include="TestHelpers\Stubs\TestUmbracoDatabaseAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestUmbracoContextAccessor.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />

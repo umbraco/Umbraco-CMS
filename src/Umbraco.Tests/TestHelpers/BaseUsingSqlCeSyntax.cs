@@ -21,6 +21,8 @@ namespace Umbraco.Tests.TestHelpers
 
         protected SqlContext SqlContext { get; private set; }
 
+        internal TestObjects TestObjects = new TestObjects(null);
+
         protected Sql<SqlContext> Sql()
         {
             return NPoco.Sql.BuilderFor(SqlContext);

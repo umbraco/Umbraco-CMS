@@ -51,24 +51,57 @@ namespace Umbraco.Tests.Persistence
 		}
 
         [Test]
-        public void Can_Verify_Single_Database_Instance()
+        public void NoDatabaseWithoutScope()
         {
-			var db1 = _dbContext.Database;
-			var db2 = _dbContext.Database;
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                var db = _dbContext.Database;
+            });
+        }
+
+        [Test]
+        public void SingleDatabaseInstancePerScope()
+        {
+            UmbracoDatabase db1, db2;
+
+            using (_dbContext.CreateDatabaseScope())
+            {
+                db1 = _dbContext.Database;
+                db2 = _dbContext.Database;
+            }
 
             Assert.AreSame(db1, db2);
         }
 
         [Test]
-        public void Can_Assert_DatabaseType()
+        public void DifferentDatabaseInstancePerScope()
         {
-			var databaseType = _dbContext.Database.DatabaseType;
+            UmbracoDatabase db1, db2;
 
-            Assert.AreEqual(DatabaseType.SQLCe, databaseType);
+            using (_dbContext.CreateDatabaseScope())
+            {
+                db1 = _dbContext.Database;
+            }
+            using (_dbContext.CreateDatabaseScope())
+            {
+                db2 = _dbContext.Database;
+            }
+
+            Assert.AreNotSame(db1, db2);
         }
 
         [Test]
-        public void Can_Assert_Created_Database()
+        public void GetDatabaseType()
+        {
+            using (_dbContext.CreateDatabaseScope())
+            {
+                var databaseType = _dbContext.Database.DatabaseType;
+                Assert.AreEqual(DatabaseType.SQLCe, databaseType);
+            }
+        }
+
+        [Test]
+        public void CreateDatabase() // fixme - move to DatabaseBuilderTest!
         {
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
@@ -102,8 +135,12 @@ namespace Umbraco.Tests.Persistence
             //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             // create the umbraco database
-            var schemaHelper = new DatabaseSchemaHelper(_dbContext.Database, _logger);
-            schemaHelper.CreateDatabaseSchema(_runtime, _migrationEntryService, false);
+            DatabaseSchemaHelper schemaHelper;
+            using (_dbContext.CreateDatabaseScope())
+            {
+                schemaHelper = new DatabaseSchemaHelper(_dbContext.Database, _logger);
+                schemaHelper.CreateDatabaseSchema(_runtime, _migrationEntryService, false);
+            }
 
             var umbracoNodeTable = schemaHelper.TableExist("umbracoNode");
             var umbracoUserTable = schemaHelper.TableExist("umbracoUser");

@@ -296,7 +296,6 @@
     <Compile Include="Models\PublishedContent\PropertyResultType.cs" />
     <Compile Include="Models\Rdbms\ContentNuDto.cs" />
     <Compile Include="Persistence\DbCommandExtensions.cs" />
-    <Compile Include="Persistence\IUmbracoDatabaseAccessor.cs" />
     <Compile Include="Persistence\IDatabaseScopeAccessor.cs" />
     <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
     <Compile Include="Persistence\Mappers\MapperCollection.cs" />
@@ -306,8 +305,8 @@
     <Compile Include="Persistence\Migrations\MigrationCollectionBuilder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddContentNuTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\RefactorXmlColumns.cs" />
-    <Compile Include="Persistence\ThreadStaticUmbracoDatabaseAccessor.cs" />
     <Compile Include="Persistence\DatabaseScope.cs" />
+    <Compile Include="Persistence\ThreadStaticDatabaseScopeAccessor.cs" />
     <Compile Include="Plugins\HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ICompletable.cs" />

@@ -235,7 +235,7 @@ namespace Umbraco.Core
             // register a database accessor - required by database factory
             // will be replaced by HybridUmbracoDatabaseAccessor in the web runtime
             // fixme - we should NOT be using thread static at all + will NOT get replaced = wtf?
-            container.RegisterSingleton<IUmbracoDatabaseAccessor, ThreadStaticUmbracoDatabaseAccessor>();
+            container.RegisterSingleton<IDatabaseScopeAccessor, ThreadStaticDatabaseScopeAccessor>();
 
             // register MainDom
             container.RegisterSingleton<MainDom>();

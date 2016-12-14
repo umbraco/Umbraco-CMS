@@ -27,15 +27,22 @@ namespace Umbraco.Tests.TestHelpers
     /// <summary>
     /// Provides objects for tests.
     /// </summary>
-    internal static partial class TestObjects
+    internal partial class TestObjects
     {
+        private readonly IServiceContainer _container;
+
+        public TestObjects(IServiceContainer container)
+        {
+            _container = container;
+        }
+
         /// <summary>
         /// Gets the default ISqlSyntaxProvider objects.
         /// </summary>
         /// <param name="logger">A logger.</param>
         /// <param name="lazyFactory">A (lazy) database factory.</param>
         /// <returns>The default ISqlSyntaxProvider objects.</returns>
-        public static IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger, Lazy<IDatabaseFactory> lazyFactory = null)
+        public IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger, Lazy<IDatabaseFactory> lazyFactory = null)
         {
             return new ISqlSyntaxProvider[]
             {
@@ -52,7 +59,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>An UmbracoDatabase.</returns>
         /// <remarks>This is just a void database that has no actual database but pretends to have an open connection
         /// that can begin a transaction.</remarks>
-        public static UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger logger)
+        public UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger logger)
         {
             var syntax = new SqlCeSyntaxProvider();
             var connection = GetDbConnection();
@@ -67,7 +74,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>An UmbracoDatabase.</returns>
         /// <remarks>This is just a void database that has no actual database but pretends to have an open connection
         /// that can begin a transaction.</remarks>
-        public static UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
+        public UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
         {
             var syntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)); // do NOT try to get the server's version!
             var connection = GetDbConnection();
@@ -75,7 +82,7 @@ namespace Umbraco.Tests.TestHelpers
             return new UmbracoDatabase(connection, sqlContext, logger);
         }
 
-        public static void RegisterServices(IServiceContainer container)
+        public void RegisterServices(IServiceContainer container)
         { }
 
         /// <summary>
@@ -92,7 +99,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>A ServiceContext.</returns>
         /// <remarks>Should be used sparingly for integration tests only - for unit tests
         /// just mock the services to be passed to the ctor of the ServiceContext.</remarks>
-        public static ServiceContext GetServiceContext(RepositoryFactory repositoryFactory,
+        public ServiceContext GetServiceContext(RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
             IUnitOfWorkProvider fileUnitOfWorkProvider,
             CacheHelper cache,
@@ -211,17 +218,17 @@ namespace Umbraco.Tests.TestHelpers
                 redirectUrlService);
         }
 
-        private static Lazy<T> GetLazyService<T>(IServiceFactory container, Func<T> ctor)
+        private Lazy<T> GetLazyService<T>(IServiceFactory container, Func<T> ctor)
             where T : class
         {
             return new Lazy<T>(() => container?.TryGetInstance<T>() ?? ctor());
         }
 
-        public static IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger, IDatabaseFactory databaseFactory = null, RepositoryFactory repositoryFactory = null)
+        public IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger, IDatabaseFactory databaseFactory = null, RepositoryFactory repositoryFactory = null)
         {
             if (databaseFactory == null)
             {
-                var accessor = new TestDatabaseScopeAccessor();
+                var accessor = _container.TryGetInstance<IDatabaseScopeAccessor>() ?? new TestDatabaseScopeAccessor();
                 //var mappersBuilder = new MapperCollectionBuilder(Current.Container); // fixme
                 //mappersBuilder.AddCore();
                 //var mappers = mappersBuilder.CreateCollection();

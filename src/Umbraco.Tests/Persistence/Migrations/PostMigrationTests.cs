@@ -14,6 +14,8 @@ namespace Umbraco.Tests.Persistence.Migrations
     [TestFixture]
     public class PostMigrationTests
     {
+        private TestObjects TestObjects = new TestObjects(null);
+
         [Test]
         public void Executes_For_Any_Product_Name_When_Not_Specified()
         {

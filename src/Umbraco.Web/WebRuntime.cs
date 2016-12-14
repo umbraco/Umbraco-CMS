@@ -73,7 +73,7 @@ namespace Umbraco.Web
                     new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
 
             container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
-            container.RegisterSingleton<IUmbracoDatabaseAccessor, HybridUmbracoDatabaseAccessor>(); // replace CoreRuntime's accessor
+            container.RegisterSingleton<IDatabaseScopeAccessor, HybridDatabaseScopeAccessor>(); // replace CoreRuntime's accessor
         }
 
         #region Getters

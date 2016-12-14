@@ -20,7 +20,7 @@ namespace Umbraco.Tests.TestHelpers
     /// <summary>
     /// Provides objects for tests.
     /// </summary>
-    internal static partial class TestObjects
+    internal partial class TestObjects
     {
         /// <summary>
         /// Gets a mocked IDatabaseFactory.
@@ -29,7 +29,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="configured">A value indicating whether the factory is configured.</param>
         /// <param name="canConnect">A value indicating whether the factory can connect to the database.</param>
         /// <remarks>This is just a void factory that has no actual database.</remarks>
-        public static IDatabaseFactory GetDatabaseFactoryMock(bool configured = true, bool canConnect = true)
+        public IDatabaseFactory GetDatabaseFactoryMock(bool configured = true, bool canConnect = true)
         {
             var databaseFactoryMock = new Mock<IDatabaseFactory>();
             databaseFactoryMock.Setup(x => x.Configured).Returns(configured);
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.TestHelpers
 
             // can get a database - but don't try to use it!
             if (configured && canConnect)
-                databaseFactoryMock.Setup(x => x.GetDatabase()).Returns(TestObjects.GetUmbracoSqlCeDatabase(Mock.Of<ILogger>()));
+                databaseFactoryMock.Setup(x => x.GetDatabase()).Returns(GetUmbracoSqlCeDatabase(Mock.Of<ILogger>()));
 
             return databaseFactoryMock.Object;
         }
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.TestHelpers
         /// Gets a mocked service context built with mocked services.
         /// </summary>
         /// <returns>A ServiceContext.</returns>
-        public static ServiceContext GetServiceContextMock(IServiceFactory container = null)
+        public ServiceContext GetServiceContextMock(IServiceFactory container = null)
         {
             return new ServiceContext(
                 MockService<IContentService>(),
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.TestHelpers
                 MockService<IMacroService>());
         }
 
-        private static T MockService<T>(IServiceFactory container = null)
+        private T MockService<T>(IServiceFactory container = null)
             where T : class
         {
             return container?.TryGetInstance<T>() ?? new Mock<T>().Object;
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>A DbConnection.</returns>
         /// <remarks>This is because NPoco wants a DbConnection, NOT an IDbConnection,
         /// and DbConnection is hard to mock so we create our own class here.</remarks>
-        public static DbConnection GetDbConnection()
+        public DbConnection GetDbConnection()
         {
             return new MockDbConnection();
         }
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         /// <returns>An Umbraco context.</returns>
         /// <remarks>This should be the minimum Umbraco context.</remarks>
-        public static UmbracoContext GetUmbracoContextMock(IUmbracoContextAccessor accessor = null)
+        public UmbracoContext GetUmbracoContextMock(IUmbracoContextAccessor accessor = null)
         {
             var httpContext = Mock.Of<HttpContextBase>();
 
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.TestHelpers
             return UmbracoContext.EnsureContext(accessor, httpContext, facadeService, webSecurity, settings, urlProviders, true);
         }
 
-        public static IUmbracoSettingsSection GetUmbracoSettings()
+        public IUmbracoSettingsSection GetUmbracoSettings()
         {
             var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
             var webRoutingSectionMock = new Mock<IWebRoutingSection>();

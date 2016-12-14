@@ -3,7 +3,6 @@ using System.Data;
 using System.Data.SqlServerCe;
 using System.Linq;
 using System.Threading;
-using System.Web;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -31,16 +30,11 @@ namespace Umbraco.Tests.Persistence
             //Container.RegisterSingleton<IDatabaseFactory, ThreadSafetyServiceTest.PerThreadSqlCeDatabaseFactory>();
 
             // but it should work with...
-            Container.RegisterSingleton<IUmbracoDatabaseAccessor, HybridUmbracoDatabaseAccessor>();
+            Container.RegisterSingleton<IDatabaseScopeAccessor, HybridDatabaseScopeAccessor>();
             Container.RegisterSingleton<IHttpContextAccessor, NoHttpContextAccessor>();
             // + using SafeCallContext when starting threads
 
             // fixme - need to ensure that disposing of the DB properly removes it from context see 7.6
-        }
-
-        private class NoHttpContextAccessor : IHttpContextAccessor
-        {
-            public HttpContext HttpContext { get; set; } = null;
         }
 
         protected override void Initialize()
@@ -94,44 +88,10 @@ namespace Umbraco.Tests.Persistence
             for (var i = 0; i < threadCount; i++)
             {
                 var index = i; // capture
-                threads[i] = new Thread(() =>
-                {
-                    var database = DatabaseContext.Database;
-                    try
-                    {
-                        database.BeginTransaction(IsolationLevel.RepeatableRead);
-                    }
-                    catch (Exception e)
-                    {
-                        exceptions[index] = e;
-                        return;
-                    }
-                    try
-                    {
-                        Console.WriteLine($"[{index}] WAIT");
-                        database.AcquireLockNodeReadLock(Constants.Locks.Servers);
-                        Console.WriteLine($"[{index}] GRANT");
-                        lock (locker)
-                        {
-                            acquired++;
-                            if (acquired == threadCount) ev.Set();
-                        }
-                        ev.Wait();
-                    }
-                    catch (Exception e)
-                    {
-                        exceptions[index] = e;
-                    }
-                    finally
-                    {
-                        Console.WriteLine($"[{index}] FREE");
-                        database.CompleteTransaction();
-                        database.Dispose();
-                    }
-                });
+                threads[i] = new Thread(() => ConcurrentReadersTestThread(exceptions, index, locker, ref acquired, threadCount, ev));
             }
 
-            // need safe call context else the current one leaks into *both* threads
+            // safe call context ensures that current scope does not leak into starting threads
             using (new SafeCallContext())
             {
                 foreach (var thread in threads) thread.Start();
@@ -141,6 +101,46 @@ namespace Umbraco.Tests.Persistence
 
             for (var i = 0; i < threadCount; i++)
                 Assert.IsNull(exceptions[i]);
+        }
+
+        private void ConcurrentReadersTestThread(Exception[] exceptions, int index, object locker, ref int acquired, int threadCount, ManualResetEventSlim ev)
+        {
+            // in a thread, must create a scope
+            using (DatabaseContext.CreateDatabaseScope())
+            {
+                UmbracoDatabase database;
+                try
+                {
+                    database = DatabaseContext.Database;
+                    database.BeginTransaction(IsolationLevel.RepeatableRead);
+                }
+                catch (Exception e)
+                {
+                    exceptions[index] = e;
+                    return;
+                }
+                try
+                {
+                    Console.WriteLine($"[{index}] WAIT");
+                    database.AcquireLockNodeReadLock(Constants.Locks.Servers);
+                    Console.WriteLine($"[{index}] GRANT");
+                    lock (locker)
+                    {
+                        acquired++;
+                        if (acquired == threadCount) ev.Set();
+                    }
+                    ev.Wait();
+                }
+                catch (Exception e)
+                {
+                    exceptions[index] = e;
+                }
+                finally
+                {
+                    Console.WriteLine($"[{index}] FREE");
+                    database.CompleteTransaction();
+                }
+            }
         }
 
         [Test]
@@ -154,40 +154,10 @@ namespace Umbraco.Tests.Persistence
             for (var i = 0; i < threadCount; i++)
             {
                 var index = i;
-                threads[i] = new Thread(() =>
-                {
-                    var database = DatabaseContext.Database;
-                    try
-                    {
-                        database.BeginTransaction(IsolationLevel.RepeatableRead);
-                    }
-                    catch (Exception e)
-                    {
-                        exceptions[index] = e;
-                        return;
-                    }
-                    try
-                    {
-                        Console.WriteLine($"[{index}] WAIT");
-                        database.AcquireLockNodeWriteLock(Constants.Locks.Servers);
-                        Console.WriteLine($"[{index}] GRANT");
-                        lock (locker)
-                        {
-                            acquired++;
-                            if (acquired > 0) throw new Exception("oops");
-                        }
-                        Thread.Sleep(200); // keep the log for a little while
-                    }
-                    finally
-                    {
-                        Console.WriteLine($"[{index}] FREE");
-                        database.CompleteTransaction();
-                        database.Dispose();
-                    }
-                });
+                threads[i] = new Thread(() => ConcurrentWritersTestThread(exceptions, index, locker, ref acquired));
             }
 
-            // need safe call context else the current one leaks into *both* threads
+            // safe call context ensures that current scope does not leak into starting threads
             using (new SafeCallContext())
             {
                 foreach (var thread in threads) thread.Start();
@@ -197,6 +167,42 @@ namespace Umbraco.Tests.Persistence
 
             for (var i = 0; i < threadCount; i++)
                 Assert.IsNull(exceptions[i]);
+        }
+
+        private void ConcurrentWritersTestThread(Exception[] exceptions, int index, object locker, ref int acquired)
+        {
+            // in a thread, must create a scope
+            using (DatabaseContext.CreateDatabaseScope())
+            {
+                UmbracoDatabase database;
+                try
+                {
+                    database = DatabaseContext.Database;
+                    database.BeginTransaction(IsolationLevel.RepeatableRead);
+                }
+                catch (Exception e)
+                {
+                    exceptions[index] = e;
+                    return;
+                }
+                try
+                {
+                    Console.WriteLine($"[{index}] WAIT");
+                    database.AcquireLockNodeWriteLock(Constants.Locks.Servers);
+                    Console.WriteLine($"[{index}] GRANT");
+                    lock (locker)
+                    {
+                        acquired++;
+                        if (acquired > 0) throw new Exception("oops");
+                    }
+                    Thread.Sleep(200); // keep the log for a little while
+                }
+                finally
+                {
+                    Console.WriteLine($"[{index}] FREE");
+                    database.CompleteTransaction();
+                }
+            }
         }
 
         [Test]
@@ -212,7 +218,7 @@ namespace Umbraco.Tests.Persistence
             var thread1 = new Thread(() => DeadLockTestThread(1, 2, ev1, ev2, ref e1));
             var thread2 = new Thread(() => DeadLockTestThread(2, 1, ev2, ev1, ref e2));
 
-            // need safe call context else the current one leaks into *both* threads
+            // safe call context ensures that current scope does not leak into starting threads
             using (new SafeCallContext())
             {
                 thread1.Start();
@@ -232,44 +238,48 @@ namespace Umbraco.Tests.Persistence
 
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
         {
-            var database = DatabaseContext.Database;
-            try
+            // in a thread, must create a scope
+            using (DatabaseContext.CreateDatabaseScope())
             {
-                database.BeginTransaction(IsolationLevel.RepeatableRead);
-            }
-            catch (Exception e)
-            {
-                exception = e;
-                return;
-            }
-            try
-            {
-                otherEv.WaitOne();
-                Console.WriteLine($"[{id1}] WAIT {id1}");
-                database.AcquireLockNodeWriteLock(id1);
-                Console.WriteLine($"[{id1}] GRANT {id1}");
-                WriteLocks(database);
-                myEv.Set();
-
-                if (id1 == 1)
+                UmbracoDatabase database;
+                try
+                {
+                    database = DatabaseContext.Database;
+                    database.BeginTransaction(IsolationLevel.RepeatableRead);
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                    return;
+                }
+                try
+                {
                     otherEv.WaitOne();
-                else
-                    Thread.Sleep(200); // cannot wait due to deadlock... just give it a bit of time
+                    Console.WriteLine($"[{id1}] WAIT {id1}");
+                    database.AcquireLockNodeWriteLock(id1);
+                    Console.WriteLine($"[{id1}] GRANT {id1}");
+                    WriteLocks(database);
+                    myEv.Set();
 
-                Console.WriteLine($"[{id1}] WAIT {id2}");
-                database.AcquireLockNodeWriteLock(id2);
-                Console.WriteLine($"[{id1}] GRANT {id2}");
-                WriteLocks(database);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"[{id1}] EXCEPTION {e}");
-                exception = e;
-            }
-            finally
-            {
-                database.CompleteTransaction();
-                database.Dispose();
+                    if (id1 == 1)
+                        otherEv.WaitOne();
+                    else
+                        Thread.Sleep(200); // cannot wait due to deadlock... just give it a bit of time
+
+                    Console.WriteLine($"[{id1}] WAIT {id2}");
+                    database.AcquireLockNodeWriteLock(id2);
+                    Console.WriteLine($"[{id1}] GRANT {id2}");
+                    WriteLocks(database);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"[{id1}] EXCEPTION {e}");
+                    exception = e;
+                }
+                finally
+                {
+                    database.CompleteTransaction();
+                }
             }
         }
 

@@ -54,6 +54,8 @@ namespace Umbraco.Tests.TestHelpers
 
         protected UmbracoTestAttribute Options { get; private set; }
 
+        internal TestObjects TestObjects { get; private set; }
+
         private static PluginManager _pluginManager;
         private static bool _firstDatabaseInSession = true;
         private bool _firstDatabaseInFixture = true;
@@ -67,6 +69,8 @@ namespace Umbraco.Tests.TestHelpers
 
             Container = new ServiceContainer();
             Container.ConfigureUmbracoCore();
+
+            TestObjects = new TestObjects(Container);
 
             // get/merge the attributes marking the method and/or the classes
             var testName = TestContext.CurrentContext.Test.Name;

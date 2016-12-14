@@ -171,7 +171,6 @@
     <Compile Include="HybridUmbracoContextAccessor.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="HybridEventMessagesAccessor.cs" />
-    <Compile Include="HybridUmbracoDatabaseAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Cache\RelationTypeCacheRefresher.cs" />
     <Compile Include="DI\WebModelMappersCompositionRoot.cs" />
