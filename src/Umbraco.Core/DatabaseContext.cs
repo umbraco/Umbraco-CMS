@@ -1,7 +1,5 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.DI;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -20,7 +18,6 @@ namespace Umbraco.Core
     public class DatabaseContext
     {
         private readonly IDatabaseFactory _databaseFactory;
-        private bool _canConnectOnce;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseContext"/> class.
@@ -46,7 +43,7 @@ namespace Umbraco.Core
         public IQueryFactory QueryFactory => _databaseFactory.QueryFactory;
 
         /// <summary>
-        /// Gets the database sql syntax.
+        /// Gets the database Sql syntax.
         /// </summary>
         public ISqlSyntaxProvider SqlSyntax => _databaseFactory.SqlSyntax;
 
@@ -66,10 +63,33 @@ namespace Umbraco.Core
         public IQuery<T> Query<T>() => _databaseFactory.QueryFactory.Create<T>();
 
         /// <summary>
-        /// Gets an "ambient" database for doing CRUD operations against custom tables that resides in the Umbraco database.
+        /// Gets an ambient database for doing CRUD operations against custom tables that resides in the Umbraco database.
         /// </summary>
         /// <remarks>Should not be used for operation against standard Umbraco tables; as services should be used instead.</remarks>
         public UmbracoDatabase Database => _databaseFactory.GetDatabase();
+
+        /// <summary>
+        /// Gets an ambient database scope.
+        /// </summary>
+        /// <returns>A disposable object representing the scope.</returns>
+        public IDisposable CreateDatabaseScope() // fixme - move over to factory
+        {
+            var factory = _databaseFactory as UmbracoDatabaseFactory; // fixme - though... IDatabaseFactory?
+            if (factory == null) throw new NotSupportedException();
+            return factory.CreateScope();
+        }
+
+#if DEBUG_DATABASES
+        public List<UmbracoDatabase> Databases
+        {
+            get
+            {
+                var factory = _databaseFactory as UmbracoDatabaseFactory;
+                if (factory == null) throw new NotSupportedException();
+                return factory.Databases;
+            }
+        }
+#endif
 
         /// <summary>
         /// Gets a value indicating whether the database is configured.
@@ -81,24 +101,6 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets a value indicating whether it is possible to connect to the database.
         /// </summary>
-        public bool CanConnect
-        {
-            get
-            {
-                var canConnect = _databaseFactory.Configured  && _databaseFactory.CanConnect;
-
-                if (_canConnectOnce)
-                {
-                    Current.Logger.Debug<DatabaseContext>("CanConnect: " + canConnect);
-                }
-                else
-                {
-                    Current.Logger.Info<DatabaseContext>("CanConnect: " + canConnect);
-                    _canConnectOnce = canConnect; // keep logging Info until we can connect
-                }
-
-                return canConnect;
-            }
-        }
+        public bool CanConnect => _databaseFactory.Configured && _databaseFactory.CanConnect;
     }
 }

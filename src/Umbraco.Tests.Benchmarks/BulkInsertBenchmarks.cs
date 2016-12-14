@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Benchmarks
             IDatabaseFactory f = null;
             var l = new Lazy<IDatabaseFactory>(() => f);
             var p = new SqlServerSyntaxProvider(l);
-            f = new DefaultDatabaseFactory(
+            f = new UmbracoDatabaseFactory(
                 "server=.\\SQLExpress;database=YOURDB;user id=YOURUSER;password=YOURPASS",
                 Constants.DatabaseProviders.SqlServer,
                 new [] { p },
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Benchmarks
 
         private UmbracoDatabase GetSqlCeDatabase(string cstr, ILogger logger)
         {
-            var f = new DefaultDatabaseFactory(
+            var f = new UmbracoDatabaseFactory(
                 cstr,
                 Constants.DatabaseProviders.SqlCe,
                 new[] { new SqlCeSyntaxProvider() },

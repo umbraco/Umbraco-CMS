@@ -226,7 +226,7 @@ namespace Umbraco.Tests.TestHelpers
                 //mappersBuilder.AddCore();
                 //var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Container.GetInstance<IMapperCollection>();
-                databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, mappers);
+                databaseFactory = new UmbracoDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, mappers);
             }
             repositoryFactory = repositoryFactory  ??  new RepositoryFactory(Mock.Of<IServiceContainer>());
             return new NPocoUnitOfWorkProvider(new DatabaseContext(databaseFactory), repositoryFactory);

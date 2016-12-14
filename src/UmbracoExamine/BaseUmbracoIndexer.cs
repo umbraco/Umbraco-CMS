@@ -32,6 +32,12 @@ namespace UmbracoExamine
     /// </summary>
     public abstract class BaseUmbracoIndexer : LuceneIndexer
     {
+        // note
+        // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
+        // context because they will fork a thread/task/whatever which should *not* capture our
+        // call context (and the database it can contain)! ideally we should be able to override
+        // SafelyProcessQueueItems but that's not possible in the current version of Examine.
+
         /// <summary>
         /// Used to store the path of a content object
         /// </summary>
@@ -232,7 +238,10 @@ namespace UmbracoExamine
             if (CanInitialize())
             {
                 ProfilingLogger.Logger.Debug(GetType(), "Rebuilding index");
-                base.RebuildIndex();
+                using (new SafeCallContext())
+                {
+                    base.RebuildIndex();
+                }
             }
         }
 
@@ -246,7 +255,10 @@ namespace UmbracoExamine
         {
             if (CanInitialize())
             {
-                base.IndexAll(type);
+                using (new SafeCallContext())
+                {
+                    base.IndexAll(type);
+                }
             }
         }
 
@@ -254,7 +266,10 @@ namespace UmbracoExamine
         {
             if (CanInitialize())
             {
-                base.IndexItems(nodes);
+                using (new SafeCallContext())
+                {
+                    base.IndexItems(nodes);
+                }
             }
         }
 
@@ -269,7 +284,10 @@ namespace UmbracoExamine
                 if (node.Attribute("id") != null)
                 {
                     ProfilingLogger.Logger.Debug(GetType(), "ReIndexNode {0} with type {1}", () => node.Attribute("id"), () => type);
-                    base.ReIndexNode(node, type);
+                    using (new SafeCallContext())
+                    {
+                        base.ReIndexNode(node, type);
+                    }
                 }
                 else
                 {
@@ -289,7 +307,10 @@ namespace UmbracoExamine
         {
             if (CanInitialize())
             {
-                base.DeleteFromIndex(nodeId);
+                using (new SafeCallContext())
+                {
+                    base.DeleteFromIndex(nodeId);
+                }
             }
         }
 

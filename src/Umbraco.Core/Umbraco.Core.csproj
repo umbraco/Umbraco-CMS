@@ -295,7 +295,9 @@
     <Compile Include="Models\PublishedContent\PropertyResult.cs" />
     <Compile Include="Models\PublishedContent\PropertyResultType.cs" />
     <Compile Include="Models\Rdbms\ContentNuDto.cs" />
+    <Compile Include="Persistence\DbCommandExtensions.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseAccessor.cs" />
+    <Compile Include="Persistence\IDatabaseScopeAccessor.cs" />
     <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
     <Compile Include="Persistence\Mappers\MapperCollection.cs" />
     <Compile Include="Persistence\Mappers\MapperCollectionBuilder.cs" />
@@ -305,6 +307,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddContentNuTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\RefactorXmlColumns.cs" />
     <Compile Include="Persistence\ThreadStaticUmbracoDatabaseAccessor.cs" />
+    <Compile Include="Persistence\DatabaseScope.cs" />
     <Compile Include="Plugins\HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ICompletable.cs" />
@@ -389,6 +392,7 @@
     <Compile Include="Persistence\BulkDataReader.cs" />
     <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
+    <Compile Include="Persistence\DatabaseDebugHelper.cs" />
     <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
     <Compile Include="Persistence\Factories\MigrationEntryFactory.cs" />
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
@@ -823,7 +827,7 @@
     <Compile Include="Persistence\DatabaseModelDefinitions\ModificationType.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\SystemMethods.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\TableDefinition.cs" />
-    <Compile Include="Persistence\DefaultDatabaseFactory.cs" />
+    <Compile Include="Persistence\UmbracoDatabaseFactory.cs" />
     <Compile Include="Persistence\Factories\ContentFactory.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
     <Compile Include="Persistence\Factories\DataTypeDefinitionFactory.cs" />

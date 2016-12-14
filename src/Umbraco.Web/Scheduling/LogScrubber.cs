@@ -16,14 +16,16 @@ namespace Umbraco.Web.Scheduling
         private readonly IUmbracoSettingsSection _settings;
         private readonly ILogger _logger;
         private readonly ProfilingLogger _proflog;
+        private readonly DatabaseContext _databaseContext;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, ILogger logger, ProfilingLogger proflog)
+            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, DatabaseContext databaseContext, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _auditService = auditService;
             _settings = settings;
+            _databaseContext = databaseContext;
             _logger = logger;
             _proflog = proflog;
         }
@@ -79,6 +81,8 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
+            // running on a background task, requires a database scope
+            using (_databaseContext.CreateDatabaseScope())
             using (_proflog.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 _auditService.CleanLogs(GetLogScrubbingMaximumAge(_settings));

@@ -21,6 +21,8 @@
 //using System.Data.SqlClient;
 //using System.Diagnostics;
 
+//// FIXME WOULD NEED TO WRAP THE WHOLE THING IN DATABASE SCOPE (see 7.6)
+
 //namespace UmbracoExamine.DataServices
 //{
 //    public class UmbracoContentService

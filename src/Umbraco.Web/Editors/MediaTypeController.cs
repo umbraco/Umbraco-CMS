@@ -31,6 +31,7 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.Count();
         }
 
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public MediaTypeDisplay GetById(int id)
         {
             var ct = Services.MediaTypeService.Get(id);

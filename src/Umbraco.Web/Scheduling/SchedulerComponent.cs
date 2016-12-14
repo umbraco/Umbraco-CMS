@@ -13,7 +13,7 @@ namespace Umbraco.Web.Scheduling
     /// Used to do the scheduling for tasks, publishing, etc...
     /// </summary>
     /// <remarks>
-    /// All tasks are run in a background task runner which is web aware and will wind down 
+    /// All tasks are run in a background task runner which is web aware and will wind down
     /// the task correctly instead of killing it completely when the app domain shuts down.
     /// </remarks>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
@@ -24,6 +24,7 @@ namespace Umbraco.Web.Scheduling
         private IAuditService _auditService;
         private ILogger _logger;
         private ProfilingLogger _proflog;
+        private DatabaseContext _databaseContext;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -34,11 +35,12 @@ namespace Umbraco.Web.Scheduling
         private object _locker = new object();
         private IBackgroundTask[] _tasks;
 
-        public void Initialize(IRuntimeState runtime, IUserService userService, IAuditService auditService, ILogger logger, ProfilingLogger proflog)
+        public void Initialize(IRuntimeState runtime, IUserService userService, IAuditService auditService, DatabaseContext databaseContext, ILogger logger, ProfilingLogger proflog)
         {
             _runtime = runtime;
             _userService = userService;
             _auditService = auditService;
+            _databaseContext = databaseContext;
             _logger = logger;
             _proflog = proflog;
 
@@ -76,9 +78,9 @@ namespace Umbraco.Web.Scheduling
                 var tasks = new List<IBackgroundTask>
                 {
                     new KeepAlive(_keepAliveRunner, 60000, 300000, _runtime, _logger, _proflog),
-                    new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _userService, _logger, _proflog),
+                    new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _userService, _databaseContext, _logger, _proflog),
                     new ScheduledTasks(_tasksRunner, 60000, 60000, _runtime, settings, _logger, _proflog),
-                    new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _logger, _proflog)
+                    new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _databaseContext, _logger, _proflog)
                 };
 
                 // ping/keepalive

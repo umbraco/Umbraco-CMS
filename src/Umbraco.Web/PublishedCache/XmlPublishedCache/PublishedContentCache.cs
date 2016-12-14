@@ -207,7 +207,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
                 elt = null;
                 var min = int.MaxValue;
-                foreach (XmlElement e in xml.DocumentElement.ChildNodes)
+                foreach (var e in xml.DocumentElement.ChildNodes.OfType<XmlElement>())
                 {
                     var sortOrder = int.Parse(e.GetAttribute("sortOrder"));
                     if (sortOrder < min)
@@ -229,7 +229,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             if (hideTopLevelNode && startNodeId <= 0)
             {
-                foreach (XmlElement e in elt.ChildNodes)
+                foreach (var e in elt.ChildNodes.OfType<XmlElement>())
                 {
                     var id = NavigateElementRoute(e, urlParts);
                     if (id > 0) return id;
@@ -240,14 +240,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return NavigateElementRoute(elt, urlParts);
         }
 
-        private int NavigateElementRoute(XmlElement elt, string[] urlParts)
+        private static int NavigateElementRoute(XmlElement elt, string[] urlParts)
         {
             var found = true;
             var i = 0;
             while (found && i < urlParts.Length)
             {
                 found = false;
-                foreach (XmlElement child in elt.ChildNodes)
+                foreach (var child in elt.ChildNodes.OfType<XmlElement>())
                 {
                     var noNode = child.GetAttributeNode("isDoc") == null;
                     if (noNode) continue;

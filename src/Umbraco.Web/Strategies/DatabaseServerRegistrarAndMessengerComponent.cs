@@ -39,6 +39,7 @@ namespace Umbraco.Web.Strategies
         private BackgroundTaskRunner<IBackgroundTask> _backgroundTaskRunner;
         private bool _started;
         private TouchServerTask _task;
+        private DatabaseContext _databaseContext;
 
         public override void Compose(Composition composition)
         {
@@ -94,7 +95,7 @@ namespace Umbraco.Web.Strategies
                 indexer.Value.RebuildIndex();
         }
 
-        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerRegistrationService registrationService, ILogger logger)
+        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerRegistrationService registrationService, DatabaseContext databaseContext, ILogger logger)
         {
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
 
@@ -102,6 +103,7 @@ namespace Umbraco.Web.Strategies
             if (_registrar == null) throw new Exception("panic: registar.");
 
             _runtime = runtime;
+            _databaseContext = databaseContext;
             _logger = logger;
             _registrationService = registrationService;
 
@@ -131,10 +133,10 @@ namespace Umbraco.Web.Strategies
                 case EnsureRoutableOutcome.IsRoutable:
                 case EnsureRoutableOutcome.NotDocumentRequest:
                     RegisterBackgroundTasks(e);
-                    break;                
+                    break;
             }
         }
-        
+
         private void RegisterBackgroundTasks(UmbracoRequestEventArgs e)
         {
             // remove handler, we're done
@@ -149,8 +151,8 @@ namespace Umbraco.Web.Strategies
                 var task = new TouchServerTask(_backgroundTaskRunner,
                     15000, //delay before first execution
                     _registrar.Options.RecurringSeconds*1000, //amount of ms between executions
-                    svc, _registrar, serverAddress, _logger);
-                
+                    svc, _registrar, serverAddress, _databaseContext, _logger);
+
                 // perform the rest async, we don't want to block the startup sequence
                 // this will just reoccur on a background thread
                 _backgroundTaskRunner.TryAdd(task);
@@ -164,6 +166,7 @@ namespace Umbraco.Web.Strategies
             private readonly IServerRegistrationService _svc;
             private readonly DatabaseServerRegistrar _registrar;
             private readonly string _serverAddress;
+            private readonly DatabaseContext _databaseContext;
             private readonly ILogger _logger;
 
             /// <summary>
@@ -175,16 +178,18 @@ namespace Umbraco.Web.Strategies
             /// <param name="svc"></param>
             /// <param name="registrar"></param>
             /// <param name="serverAddress"></param>
+            /// <param name="databaseContext"></param>
             /// <param name="logger"></param>
             /// <remarks>The task will repeat itself periodically. Use this constructor to create a new task.</remarks>
             public TouchServerTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress, ILogger logger)
+                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress, DatabaseContext databaseContext, ILogger logger)
                 : base(runner, delayMilliseconds, periodMilliseconds)
             {
                 if (svc == null) throw new ArgumentNullException(nameof(svc));
                 _svc = svc;
                 _registrar = registrar;
                 _serverAddress = serverAddress;
+                _databaseContext = databaseContext;
                 _logger = logger;
             }
 
@@ -200,7 +205,11 @@ namespace Umbraco.Web.Strategies
             {
                 try
                 {
-                    _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
+                    // running on a background task, requires a database scope
+                    using (_databaseContext.CreateDatabaseScope())
+                    {
+                        _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
+                    }
                     return true; // repeat
                 }
                 catch (Exception ex)

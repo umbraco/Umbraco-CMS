@@ -14,15 +14,17 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly IRuntimeState _runtime;
         private readonly IUserService _userService;
+        private readonly DatabaseContext _databaseContext;
         private readonly ILogger _logger;
         private readonly ProfilingLogger _proflog;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IUserService userService, ILogger logger, ProfilingLogger proflog)
+            IRuntimeState runtime, IUserService userService, DatabaseContext databaseContext, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _userService = userService;
+            _databaseContext = databaseContext;
             _logger = logger;
             _proflog = proflog;
         }
@@ -80,8 +82,13 @@ namespace Umbraco.Web.Scheduling
                             Content = new StringContent(string.Empty)
                         };
 
-                        //pass custom the authorization header
+                        // running on a background task, requires a database scope
+                        // (GetAuthenticationHeaderValue uses UserService to load the current user, hence requires a database)
+                        using (_databaseContext.CreateDatabaseScope())
+                        {
+                            //pass custom the authorization header
                         request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_userService);
+                        }
 
                         var result = await wc.SendAsync(request, token);
                     }
@@ -97,7 +104,6 @@ namespace Umbraco.Web.Scheduling
 
         public override bool IsAsync => true;
 
-    
         public override bool RunsOnShutdown => false;
     }
 }

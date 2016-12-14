@@ -550,7 +550,7 @@ namespace Umbraco.Web
 
                     OnEndRequest(new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));
 
-					DisposeHttpContextItems(httpContext);
+                    DisposeHttpContextItems(httpContext);
 		    };
 		}
 
@@ -568,9 +568,9 @@ namespace Umbraco.Web
             RouteAttempt?.Invoke(this, args);
         }
 
-        public static event EventHandler<EventArgs> EndRequest;
+        public static event EventHandler<UmbracoRequestEventArgs> EndRequest;
 
-        private void OnEndRequest(EventArgs args)
+        private void OnEndRequest(UmbracoRequestEventArgs args)
         {
             EndRequest?.Invoke(this, args);
         }

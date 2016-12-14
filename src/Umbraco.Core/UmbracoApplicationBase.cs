@@ -13,7 +13,6 @@ namespace Umbraco.Core
     /// <summary>
     /// Provides an abstract base class for the Umbraco HttpApplication.
     /// </summary>
-    /// This is exposed in the core so that we can have the IApplicationEventHandler in the core project so that 
     public abstract class UmbracoApplicationBase : HttpApplication
     {
         private IRuntime _runtime;

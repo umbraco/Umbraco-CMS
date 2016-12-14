@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Services
                 }
 
                 DatabaseContext.Database.EnableSqlTrace = true;
-                DatabaseContext.Database.EnableSqlCount();
+                DatabaseContext.Database.EnableSqlCount = true;
 
                 var items = ServiceContext.LocalizationService.GetDictionaryItemDescendants(_parentItemGuidId)
                     .ToArray();
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Services
             finally
             {
                 DatabaseContext.Database.EnableSqlTrace = false;
-                DatabaseContext.Database.DisableSqlCount();
+                DatabaseContext.Database.EnableSqlCount = false;
             }
            
         }

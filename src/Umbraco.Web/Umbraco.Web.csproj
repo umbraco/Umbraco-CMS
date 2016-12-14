@@ -167,6 +167,7 @@
     <Compile Include="HealthCheck\HealthCheckCollection.cs" />
     <Compile Include="HealthCheck\HeathCheckCollectionBuilder.cs" />
     <Compile Include="HybridAccessorBase.cs" />
+    <Compile Include="HybridDatabaseScopeAccessor.cs" />
     <Compile Include="HybridUmbracoContextAccessor.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="HybridEventMessagesAccessor.cs" />

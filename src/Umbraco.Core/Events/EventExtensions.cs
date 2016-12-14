@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Umbraco.Core.Events
 {
@@ -47,5 +48,35 @@ namespace Umbraco.Core.Events
 			if (eventHandler != null)
 				eventHandler(sender, args);
 		}
-	}
+
+        // moves the last handler that was added to an instance event, to first position
+	    public static void PromoteLastHandler(object sender, string eventName)
+	    {
+            var fieldInfo = sender.GetType().GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic);
+            if (fieldInfo == null) throw new InvalidOperationException("No event named " + eventName + ".");
+            PromoteLastHandler(sender, fieldInfo);
+        }
+
+        // moves the last handler that was added to a static event, to first position
+        public static void PromoteLastHandler<TSender>(string eventName)
+        {
+            var fieldInfo = typeof(TSender).GetField(eventName, BindingFlags.Static | BindingFlags.NonPublic);
+            if (fieldInfo == null) throw new InvalidOperationException("No event named " + eventName + ".");
+            PromoteLastHandler(null, fieldInfo);
+        }
+
+	    private static void PromoteLastHandler(object sender, FieldInfo fieldInfo)
+	    {
+            var d = fieldInfo.GetValue(sender) as Delegate;
+	        if (d == null) return;
+
+            var l = d.GetInvocationList();
+            var x = l[l.Length - 1];
+            for (var i = l.Length - 1; i > 0; i--)
+                l[i] = l[i - 1];
+            l[0] = x;
+
+            fieldInfo.SetValue(sender, Delegate.Combine(l));
+        }
+    }
 }

@@ -229,13 +229,13 @@ namespace Umbraco.Tests.Services
 		}
 
 		/// <summary>
-		/// A special implementation of <see cref="IDatabaseFactory"/> that mimics the DefaultDatabaseFactory
+		/// A special implementation of <see cref="IDatabaseFactory"/> that mimics the UmbracoDatabaseFactory
 		/// (one db per HttpContext) by providing one db per thread, as required for multi-threaded
 		/// tests.
 		/// </summary>
 		internal class PerThreadSqlCeDatabaseFactory : DisposableObject, IDatabaseFactory
 		{
-            // the DefaultDatabaseFactory uses thread-static databases where there is no http context,
+            // the UmbracoDatabaseFactory uses thread-static databases where there is no http context,
             // so it would need to be disposed in each thread in order for each database to be disposed,
             // instead we use this factory which also maintains one database per thread but can dispose
             // them all in one call

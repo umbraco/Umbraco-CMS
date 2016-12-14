@@ -65,7 +65,7 @@ namespace Umbraco.Web
             return batch;
         }
 
-        private void UmbracoModule_EndRequest(object sender, EventArgs e)
+        private void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
         {
             FlushBatch();
         }

@@ -1460,7 +1460,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_Lazy_Content()
         {
-            var databaseFactory = new DefaultDatabaseFactory(
+            var databaseFactory = new UmbracoDatabaseFactory(
                 Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 TestObjects.GetDefaultSqlSyntaxProviders(Logger),
                 Logger,

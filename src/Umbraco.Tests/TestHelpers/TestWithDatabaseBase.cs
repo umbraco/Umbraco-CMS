@@ -42,7 +42,7 @@ namespace Umbraco.Tests.TestHelpers
     /// </summary>
     /// <remarks>
     /// <para>Can provide a SqlCE database populated with the Umbraco schema. The database should 
-    /// be accessed through the DefaultDatabaseFactory.</para>
+    /// be accessed through the UmbracoDatabaseFactory.</para>
     /// <para>Provides an Umbraco context and Xml content.</para>
     /// <para>fixme what else?</para>
     /// </remarks>
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.TestHelpers
                 var logger = f.GetInstance<ILogger>();
                 var umbracoDatabaseAccessor = f.GetInstance<IUmbracoDatabaseAccessor>();
                 var mappers = f.GetInstance<IMapperCollection>();
-                var factory = new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, logger, umbracoDatabaseAccessor, mappers);
+                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, logger, umbracoDatabaseAccessor, mappers);
                 factory.ResetForTests();
                 return factory;
             });

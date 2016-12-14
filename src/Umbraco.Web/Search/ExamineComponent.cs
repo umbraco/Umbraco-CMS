@@ -34,6 +34,7 @@ namespace Umbraco.Web.Search
             logger.Info<ExamineComponent>("Starting initialize async background thread.");
 
             // make it async in order not to slow down the boot
+            // fixme - should be a proper background task else we cannot stop it!
             var bg = new Thread(() =>
             {
                 try
@@ -83,7 +84,11 @@ namespace Umbraco.Web.Search
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
 
-			var contentIndexer = ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalIndexer] as UmbracoContentIndexer;
+            // fixme - content type?
+            // events handling removed in ef013f9d3b945d0a48a306ff1afbd49c10c3fff8
+            // because, could not make sense of it?
+
+            var contentIndexer = ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalIndexer] as UmbracoContentIndexer;
 			if (contentIndexer != null)
 			{
 				contentIndexer.DocumentWriting += IndexerDocumentWriting;
@@ -103,7 +108,6 @@ namespace Umbraco.Web.Search
             foreach (var indexer in indexers)
                 indexer.Value.RebuildIndex();
         }
-
 
         private static void BindGridToExamine(GridPropertyEditor grid, IExamineIndexCollectionAccessor indexCollection)
         {

@@ -2,9 +2,9 @@
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using NPoco;
 using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence
 {
@@ -68,6 +68,29 @@ namespace Umbraco.Core.Persistence
             return true;
         }
 
+        /// <summary>
+        /// Unwraps a database connection.
+        /// </summary>
+        /// <remarks>UmbracoDatabase wraps the original database connection in various layers (see
+        /// OnConnectionOpened); this unwraps and returns the original database connection.</remarks>
+        internal static IDbConnection UnwrapUmbraco(this IDbConnection connection)
+        {
+            IDbConnection unwrapped;
 
+            var c = connection;
+            do
+            {
+                unwrapped = c;
+
+                var profiled = unwrapped as StackExchange.Profiling.Data.ProfiledDbConnection;
+                if (profiled != null) unwrapped = profiled.InnerConnection;
+
+                var retrying = unwrapped as RetryDbConnection;
+                if (retrying != null) unwrapped = retrying.Inner;
+
+            } while (c != unwrapped);
+
+            return unwrapped;
+        }
     }
 }

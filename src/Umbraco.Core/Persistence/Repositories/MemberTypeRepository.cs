@@ -316,13 +316,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="dtos"></param>
         /// <returns></returns>
-        private static IEnumerable<IMemberType> BuildFromDtos(List<MemberTypeReadOnlyDto> dtos)
+        private IEnumerable<IMemberType> BuildFromDtos(List<MemberTypeReadOnlyDto> dtos)
         {
             if (dtos == null || dtos.Any() == false)
                 return Enumerable.Empty<IMemberType>();
 
             var factory = new MemberTypeReadOnlyFactory();
-            return dtos.Select(factory.BuildEntity);
+            return dtos.Select(x =>
+            {
+                bool needsSaving;
+                var memberType = factory.BuildEntity(x, out needsSaving);
+                if (needsSaving) PersistUpdatedItem(memberType);
+                return memberType;
+            }).ToList();
         }
 
         /// <summary>

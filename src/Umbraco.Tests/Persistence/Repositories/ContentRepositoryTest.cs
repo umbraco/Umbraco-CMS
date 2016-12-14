@@ -482,7 +482,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 try
                 {
                     DatabaseContext.Database.EnableSqlTrace = true;
-                    DatabaseContext.Database.EnableSqlCount();
+                    DatabaseContext.Database.EnableSqlCount = true;
 
                     var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "title", Direction.Ascending, false);
 
@@ -496,7 +496,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 finally
                 {
                     DatabaseContext.Database.EnableSqlTrace = false;
-                    DatabaseContext.Database.DisableSqlCount();
+                    DatabaseContext.Database.EnableSqlCount = false;
                 }
             }
         }
@@ -517,7 +517,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 try
                 {
                     DatabaseContext.Database.EnableSqlTrace = true;
-                    DatabaseContext.Database.EnableSqlCount();
+                    DatabaseContext.Database.EnableSqlCount = true;
                     var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true);
 
                     // Assert
@@ -528,7 +528,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 finally
                 {
                     DatabaseContext.Database.EnableSqlTrace = false;
-                    DatabaseContext.Database.DisableSqlCount();
+                    DatabaseContext.Database.EnableSqlCount = false;
                 }
             }
         }

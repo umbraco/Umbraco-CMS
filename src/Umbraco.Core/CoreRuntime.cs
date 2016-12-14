@@ -115,6 +115,12 @@ namespace Umbraco.Core
                     // throw a BootFailedException for every requests.
                 }
             }
+
+            // after Umbraco has started there is a scope in "context" and that context is
+            // going to stay there and never get destroyed nor reused, so we have to ensure that
+            // everything is cleared
+            var sa = container.GetInstance<IDatabaseScopeAccessor>();
+            sa.Scope?.Dispose();
         }
 
         private void AquireMainDom(IServiceFactory container)
@@ -218,7 +224,7 @@ namespace Umbraco.Core
             // will be initialized with syntax providers and a logger, and will try to configure
             // from the default connection string name, if possible, else will remain non-configured
             // until the database context configures it properly (eg when installing)
-            container.RegisterSingleton<IDatabaseFactory, DefaultDatabaseFactory>();
+            container.RegisterSingleton<IDatabaseFactory, UmbracoDatabaseFactory>();
 
             // register database context
             container.RegisterSingleton<DatabaseContext>();
