@@ -5,6 +5,9 @@
 @scope
 
 @description
+This directive is a wrapper of the bootstrap datetime picker version 3.1.3. Use it to render a date time picker.
+For extra details about settings and events take a look here: https://github.com/Eonasdan/bootstrap-datetimepicker
+
 Use this directive to render a date time picker
 
 <h3>Markup example</h3>
@@ -65,8 +68,11 @@ Use this directive to render a date time picker
 
 @param {object} options (<code>binding</code>): Config object for the date picker.
 @param {string} ngModel (<code>binding</code>): Date value.
+@param {callback} onHide (<code>callback</code>): Hide callback.
+@param {callback} onShow (<code>callback</code>): Show callback.
 @param {callback} onChange (<code>callback</code>): Change callback.
 @param {callback} onError (<code>callback</code>): Error callback.
+@param {callback} onUpdate (<code>callback</code>): Update callback.
 **/
 
 (function () {
@@ -89,6 +95,24 @@ Use this directive to render a date time picker
                 });
             }
 
+            function onHide(event) {
+                if (scope.onChange) {
+                    scope.$apply(function(){
+                        // callback
+                        scope.onHide({event: event});
+                    });
+                }
+            }
+
+            function onShow() {
+                if (scope.onShow) {
+                    scope.$apply(function(){
+                        // callback
+                        scope.onShow();
+                    });
+                }
+            }
+
             function onChange(event) {
                 if (scope.onChange && event.date && event.date.isValid()) {
                     scope.$apply(function(){
@@ -109,12 +133,24 @@ Use this directive to render a date time picker
                 }
             }
 
+            function onUpdate(event) {
+                if (scope.onShow) {
+                    scope.$apply(function(){
+                        // callback
+                        scope.onUpdate({event: event});
+                    });
+                }
+            }
+
             function initDatePicker() {
                 // Open the datepicker and add a changeDate eventlistener
                 element
                     .datetimepicker(angular.extend({ useCurrent: true }, scope.options))
+                    .on("dp.hide", onHide)
+                    .on("dp.show", onShow)
                     .on("dp.change", onChange)
-                    .on("dp.error", onError);
+                    .on("dp.error", onError)
+                    .on("dp.update", onUpdate);
             }
 
             onInit();
@@ -128,8 +164,11 @@ Use this directive to render a date time picker
             scope: {
                 ngModel: "=",
                 options: "=",
+                onHide: "&",
+                onShow: "&",
                 onChange: "&",
-                onError: "&"
+                onError: "&",
+                onUpdate: "&"
             },
             link: link
         };
