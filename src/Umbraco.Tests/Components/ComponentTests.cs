@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Stubs;
 
 namespace Umbraco.Tests.Components
 {
@@ -17,8 +22,16 @@ namespace Umbraco.Tests.Components
 
         private static IServiceContainer MockContainer(Action<Mock<IServiceContainer>> setup = null)
         {
+            // fixme use IDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
+
+            var testObjects = new TestObjects(null);
+            var logger = Mock.Of<ILogger>();
+            var s = testObjects.GetDefaultSqlSyntaxProviders(logger);
+            var f = new UmbracoDatabaseFactory(s, logger, new TestDatabaseScopeAccessor(), new MapperCollection(Enumerable.Empty<BaseMapper>()));
+
             var mock = new Mock<IServiceContainer>();
             mock.Setup(x => x.GetInstance<ProfilingLogger>()).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetInstance<DatabaseContext>()).Returns(new DatabaseContext(f));
             setup?.Invoke(mock);
             return mock.Object;
         }
