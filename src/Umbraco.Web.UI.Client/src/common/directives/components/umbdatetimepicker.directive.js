@@ -84,9 +84,7 @@ Use this directive to render a date time picker
 
             function onInit() {
                 // load css file for the date picker
-                assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css').then(function () {
-
-                });
+                assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css');
                 
                 // load the js file for the date picker
                 assetsService.loadJs('lib/datetimepicker/bootstrap-datetimepicker.js').then(function () {
