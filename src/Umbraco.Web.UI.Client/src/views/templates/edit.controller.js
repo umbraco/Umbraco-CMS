@@ -274,7 +274,7 @@
 
             vm.sectionsOverlay = {
                 view: "templatesections",
-                isMasterTemplate: true,
+                hasMaster: vm.template.masterTemplateAlias,
                 submitButtonLabel: "Insert",
                 show: true,
                 submit: function(model) {
@@ -288,7 +288,7 @@
                     }
 
                     if (model.insertType === 'addSection') {
-                        insert("@section " + model.sectionName + "\r\n{\r\n\r\n}\r\n");
+                        wrap("@section " + model.sectionName + "\r\n{\r\n\r\n\t{0}\r\n\r\n}\r\n");
                     }
 
                     vm.sectionsOverlay.show = false;
@@ -393,8 +393,17 @@
             vm.editor.navigateFileStart();
         }
 
+
         function insert(str) {
             vm.editor.moveCursorToPosition(vm.currentPosition);
+            vm.editor.insert(str);
+            vm.editor.focus();
+        }
+
+        function wrap(str) {
+
+            var selectedContent = vm.editor.session.getTextRange(vm.editor.getSelectionRange());
+            str = str.replace("{0}", selectedContent);
             vm.editor.insert(str);
             vm.editor.focus();
         }
