@@ -93,8 +93,22 @@ namespace Umbraco.Web.Editors
                 if (template == null)
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
+                var changeMaster = template.MasterTemplateAlias != display.MasterTemplateAlias;
                 Mapper.Map(display, template);
+
+                if (changeMaster)
+                {
+                    ITemplate master = null;
+                    if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
+                    {
+                        master = Services.FileService.GetTemplate(display.MasterTemplateAlias);
+                        template.SetMasterTemplate(master);
+                    }
+                }
+
                 Services.FileService.SaveTemplate(template);
+
+                Mapper.Map(template, display);
             }
             else
             {
