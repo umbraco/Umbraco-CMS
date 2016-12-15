@@ -1,62 +1,70 @@
 <div ng-controller="Umbraco.Overlays.TemplateSectionsOverlay as vm">
 
+    <div class="umb-insert-code-box" ng-click="vm.select('renderBody')">
+        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderBody'  }"><i class="icon icon-check"></i></div>
+        <div class="umb-insert-code-box__title">Render child template</div>
+        <div class="umb-insert-code-box__description">
+            Renders the entire contents of a child template, by inserting a
+            <code>@RenderBody()</code>
+        </div>
+    </div>
 
-    <div ng-if="model.isMasterTemplate">
+    <div class="umb-insert-code-box" ng-click="vm.select('renderSection')">
 
-        <div class="umb-insert-code-box" ng-click="vm.select('renderBody')">
-            <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderBody'  }"><i class="icon icon-check"></i></div>
-            <div class="umb-insert-code-box__title">Render child template</div>
-            <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, <span>RenderBody()</span> consectetur adipiscing elit. Mauris pellentesque gravida hendrerit. Nunc lacinia ipsum sed urna volutpat finibus.</div>
+        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderSection' }"><i class="icon icon-check"></i></div>
+        <div class="umb-insert-code-box__title">Render a named section</div>
+        <div class="umb-insert-code-box__description">
+            Inserts a <code>@RenderSection</code> placeholder to render a named section of a child template.
+            This allows you to insert specific the parts of a child template which is
+            wrapped in a <code>@section{ ... }</code> definition.
         </div>
 
-        <div class="umb-insert-code-box" ng-click="vm.select('renderSection')">
-
-            <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderSection' }"><i class="icon icon-check"></i></div>
-            <div class="umb-insert-code-box__title">Render section</div>
-            <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pellentesque gravida hendrerit.</div>
-            
-            <div ng-if="model.insertType === 'renderSection'" style="margin-top: 20px;">
-                <div style="margin-bottom: 20px;">
-                    <label class="bold">Section name <span class="red">*</span></label>
-                    <input type="text" name="renderSectionName" class="-full-width-input" ng-model="model.renderSectionName" required umb-auto-focus />
-                    <small class="red" val-msg-for="renderSectionName" val-toggle-msg="required"><localize key="required" /></small>
-                    <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>
-                </div>
-
-                <div>
-                    <label>
-                        <input type="checkbox" ng-model="model.mandatoryRenderSection"/>
-                        Make section mandatory
-                    </label>
-                    <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>
+        <div ng-if="model.insertType === 'renderSection'" style="margin-top: 20px;">
+            <div style="margin-bottom: 20px;">
+                <label class="bold">Section name <span class="red">*</span></label>
+                <input type="text" name="renderSectionName" class="-full-width-input" ng-model="model.renderSectionName" required umb-auto-focus />
+                <small class="red" val-msg-for="renderSectionName" val-toggle-msg="required"><localize key="required" /></small>
+                <div class="umb-insert-code-box__description">
+                    Set the name of the section to render in this area of the template
                 </div>
             </div>
 
+            <div>
+                <label>
+                    <input type="checkbox" ng-model="model.mandatoryRenderSection" />
+                    Make section mandatory
+                </label>
+                <div class="umb-insert-code-box__description">
+                    If mandatory, and the child template does not contain a section with this name, an error will be displayed.
+                </div>
+            </div>
         </div>
 
     </div>
 
-    <div ng-if="!model.isMasterTemplate">
+    <div ng-if="model.hasMaster" class="umb-insert-code-box" ng-click="vm.select('addSection')">
 
-        <div class="umb-insert-code-box" ng-click="vm.select('addSection')">
-            
-            <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'addSection'  }"><i class="icon icon-check"></i></div>
-            <div class="umb-insert-code-box__title">Define section</div>
-            <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pellentesque gravida hendrerit.</div>
+        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'addSection'  }"><i class="icon icon-check"></i></div>
+        <div class="umb-insert-code-box__title">Define a named section</div>
+        <div class="umb-insert-code-box__description">
+            Marks a part of your template as a named section by wrapping it in
+            a <code>@section { ... }</code>, which can be inserted in a
+            specific area of this templates master using <code>@RenderSection</code>.
+        </div>
 
-            <div ng-if="model.insertType === 'addSection'" style="margin-top: 20px;">
-                <div>
-
-                    <label class="bold">Section name <span class="red">*</span></label>
-                    <input type="text" name="sectionName" class="-full-width-input" ng-model="model.sectionName" required umb-auto-focus />
-                    <small class="red" val-msg-for="sectionName" val-toggle-msg="required"><localize key="required" /></small>
-                    <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>
-
+        <div ng-if="model.insertType === 'addSection'" style="margin-top: 20px;">
+            <div>
+                <label class="bold">Section name <span class="red">*</span></label>
+                <input type="text" name="sectionName" class="-full-width-input" ng-model="model.sectionName" required umb-auto-focus />
+                <small class="red" val-msg-for="sectionName" val-toggle-msg="required"><localize key="required" /></small>
+                <div class="umb-insert-code-box__description">
+                    Give the section a name
                 </div>
             </div>
-
         </div>
+
     </div>
+
 
 
 </div>

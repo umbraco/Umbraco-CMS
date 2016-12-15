@@ -10,7 +10,7 @@
         }
 
         if(!$scope.model.subtitle) {
-            $scope.model.subtitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+            $scope.model.subtitle = "Choose what to insert into your template";
         }
 
         vm.openMacroPicker = openMacroPicker;
@@ -45,8 +45,8 @@
 
         function openPageFieldOverlay() {
             vm.pageFieldOverlay = {
-                title: "Insert page field",
-                description: "Insert data in template",
+                title: "Insert value",
+                description: "Select a value from the currentpage",
                 submitButtonLabel: "Insert",
                 closeButtonlabel: "Cancel",
                 view: "insertfield",
