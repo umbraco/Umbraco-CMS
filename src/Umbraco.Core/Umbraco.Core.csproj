@@ -119,6 +119,7 @@
     <Compile Include="Components\IUmbracoCoreComponent.cs" />
     <Compile Include="Components\IUmbracoUserComponent.cs" />
     <Compile Include="Components\RequireComponentAttribute.cs" />
+    <Compile Include="Components\RequiredComponentAttribute.cs" />
     <Compile Include="Components\RuntimeLevelAttribute.cs" />
     <Compile Include="Components\UmbracoComponentBase.cs" />
     <Compile Include="Components\UmbracoCoreComponent.cs" />
@@ -1169,6 +1170,7 @@
     <Compile Include="Strings\DefaultShortStringHelperConfig.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollection.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
+    <Compile Include="TopoGraph.cs" />
     <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
     <Compile Include="_Legacy\PackageActions\IPackageAction.cs" />
     <Compile Include="_Legacy\PackageActions\PackageActionCollection.cs" />

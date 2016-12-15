@@ -30,6 +30,7 @@ namespace Umbraco.Tests.Components
             var f = new UmbracoDatabaseFactory(s, logger, new TestDatabaseScopeAccessor(), new MapperCollection(Enumerable.Empty<BaseMapper>()));
 
             var mock = new Mock<IServiceContainer>();
+            mock.Setup(x => x.GetInstance<ILogger>()).Returns(logger);
             mock.Setup(x => x.GetInstance<ProfilingLogger>()).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetInstance<DatabaseContext>()).Returns(new DatabaseContext(f));
             setup?.Invoke(mock);
@@ -37,22 +38,49 @@ namespace Umbraco.Tests.Components
         }
 
         [Test]
-        public void Boot()
+        public void Boot1()
         {
             var container = MockContainer();
 
-            var thing = new BootLoader(container);
+            var loader = new BootLoader(container);
             Composed.Clear();
-            thing.Boot(new [] { typeof (Component1), typeof (Component2), typeof (Component3), typeof (Component4) }, RuntimeLevel.Unknown);
-            Assert.AreEqual(4, Composed.Count);
-            Assert.AreEqual(typeof(Component1), Composed[0]);
-            Assert.AreEqual(typeof(Component4), Composed[1]);
-            Assert.AreEqual(typeof(Component2), Composed[2]);
-            Assert.AreEqual(typeof(Component3), Composed[3]);
+            // 2 is Core and requires 4
+            // 3 is User
+            // => reorder components accordingly
+            loader.Boot(TypeArray<Component1, Component2, Component3, Component4>(), RuntimeLevel.Unknown);
+            AssertTypeArray(TypeArray<Component1, Component4, Component2, Component3>(), Composed);
         }
 
         [Test]
-        public void BrokenDependency()
+        public void Boot2()
+        {
+            var container = MockContainer();
+
+            var loader = new BootLoader(container);
+            Composed.Clear();
+            // 21 is required by 20
+            // => reorder components accordingly
+            loader.Boot(TypeArray<Component20, Component21>(), RuntimeLevel.Unknown);
+            AssertTypeArray(TypeArray<Component21, Component20>(), Composed);
+        }
+
+        [Test]
+        public void Boot3()
+        {
+            var container = MockContainer();
+
+            var loader = new BootLoader(container);
+            Composed.Clear();
+            // i23 requires 22
+            // 24, 25 implement i23
+            // 25 required by i23
+            // => reorder components accordingly
+            loader.Boot(TypeArray<Component22, Component24, Component25>(), RuntimeLevel.Unknown);
+            AssertTypeArray(TypeArray<Component22, Component25, Component24>(), Composed);
+        }
+
+        [Test]
+        public void BrokenRequire()
         {
             var container = MockContainer();
 
@@ -60,13 +88,31 @@ namespace Umbraco.Tests.Components
             Composed.Clear();
             try
             {
-                thing.Boot(new[] { typeof(Component1), typeof(Component2), typeof(Component3) }, RuntimeLevel.Unknown);
+                // 2 is Core and requires 4
+                // 4 is missing
+                // => throw
+                thing.Boot(TypeArray < Component1, Component2, Component3>(), RuntimeLevel.Unknown);
                 Assert.Fail("Expected exception.");
             }
             catch (Exception e)
             {
                 Assert.AreEqual("Broken component dependency: Umbraco.Tests.Components.ComponentTests+Component2 -> Umbraco.Tests.Components.ComponentTests+Component4.", e.Message);
             }
+        }
+
+        [Test]
+        public void BrokenRequired()
+        {
+            var container = MockContainer();
+
+            var thing = new BootLoader(container);
+            Composed.Clear();
+            // 2 is Core and requires 4
+            // 13 is required by 1
+            // 1 is missing
+            // => reorder components accordingly
+            thing.Boot(TypeArray<Component2, Component4, Component13>(), RuntimeLevel.Unknown);
+            AssertTypeArray(TypeArray<Component4, Component2, Component13>(), Composed);
         }
 
         [Test]
@@ -153,6 +199,8 @@ namespace Umbraco.Tests.Components
             Assert.AreEqual(typeof(Component8), Composed[1]);
         }
 
+        #region Components
+
         public class TestComponentBase : UmbracoComponentBase
         {
             public override void Compose(Composition composition)
@@ -213,8 +261,90 @@ namespace Umbraco.Tests.Components
         public class Component12 : TestComponentBase, IUmbracoCoreComponent
         { }
 
+        [RequiredComponent(typeof(Component1))]
+        public class Component13 : TestComponentBase
+        { }
+
         public interface ISomeResource { }
 
         public class SomeResource : ISomeResource { }
+
+        public class Component20 : TestComponentBase
+        { }
+
+        [RequiredComponent(typeof(Component20))]
+        public class Component21 : TestComponentBase
+        { }
+
+        public class Component22 : TestComponentBase
+        { }
+
+        [RequireComponent(typeof(Component22))]
+        public interface IComponent23 : IUmbracoComponent
+        { }
+
+        public class Component24 : TestComponentBase, IComponent23
+        { }
+
+        // should insert itself between 22 and anything i23
+        [RequiredComponent(typeof(IComponent23))]
+        //[RequireComponent(typeof(Component22))] - not needed, implement i23
+        public class Component25 : TestComponentBase, IComponent23
+        { }
+
+        #endregion
+
+        #region TypeArray
+
+        // fixme - move to Testing
+
+        private static Type[] TypeArray<T1>()
+        {
+            return new[] { typeof(T1) };
+        }
+
+        private static Type[] TypeArray<T1, T2>()
+        {
+            return new[] { typeof(T1), typeof(T2) };
+        }
+
+        private static Type[] TypeArray<T1, T2, T3>()
+        {
+            return new[] { typeof(T1), typeof(T2), typeof(T3) };
+        }
+
+        private static Type[] TypeArray<T1, T2, T3, T4>()
+        {
+            return new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) };
+        }
+
+        private static Type[] TypeArray<T1, T2, T3, T4, T5>()
+        {
+            return new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) };
+        }
+
+        private static Type[] TypeArray<T1, T2, T3, T4, T5, T6>()
+        {
+            return new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6) };
+        }
+
+        private static Type[] TypeArray<T1, T2, T3, T4, T5, T6, T7>()
+        {
+            return new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7) };
+        }
+
+        private static Type[] TypeArray<T1, T2, T3, T4, T5, T6, T7, T8>()
+        {
+            return new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) };
+        }
+
+        private static void AssertTypeArray(IReadOnlyList<Type> expected, IReadOnlyList<Type> test)
+        {
+            Assert.AreEqual(expected.Count, test.Count);
+            for (var i = 0; i < expected.Count; i++)
+                Assert.AreEqual(expected[i], test[i]);
+        }
+
+        #endregion
     }
 }

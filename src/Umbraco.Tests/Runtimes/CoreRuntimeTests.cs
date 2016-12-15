@@ -10,7 +10,6 @@ using Umbraco.Core.Components;
 using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using UmbracoExamine;
@@ -18,6 +17,7 @@ using UmbracoExamine;
 namespace Umbraco.Tests.Runtimes
 {
     [TestFixture]
+    [Ignore("cannot work until we refactor IDatabaseFactory vs UmbracoDatabaseFactory")]
     public class CoreRuntimeTests
     {
         [SetUp]

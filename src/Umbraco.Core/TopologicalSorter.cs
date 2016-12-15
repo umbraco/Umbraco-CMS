@@ -5,9 +5,10 @@ namespace Umbraco.Core
 {
     /// <summary>
     /// Topological Sort algorithm for sorting items based on dependencies.
-    /// Use the static method TopologicalSorter.GetSortedItems for a convenient 
+    /// Use the static method TopologicalSorter.GetSortedItems for a convenient
     /// way of sorting a list of items with dependencies between them.
     /// </summary>
+    [Obsolete("Use the TopoGraph class instead, perfs are way better.")] // fixme remove!
     public class TopologicalSorter
     {
         private readonly int[] _vertices; // list of vertices
@@ -45,7 +46,7 @@ namespace Umbraco.Core
             {
                 // get a vertex with no successors, or -1
                 var currentVertex = NoSuccessors();
-                if (currentVertex == -1) // must be a cycle                
+                if (currentVertex == -1) // must be a cycle
                     throw new Exception("Graph has cycles");
 
                 // insert vertex label in sorted array (start at end)
@@ -113,7 +114,7 @@ namespace Umbraco.Core
 
         #region Static methods
 
-        public static IEnumerable<T> GetSortedItems<T>(List<DependencyField<T>> fields) where T : class 
+        public static IEnumerable<T> GetSortedItems<T>(List<DependencyField<T>> fields) where T : class
         {
             var sortOrder = GetTopologicalSortOrder(fields);
             var list = new List<T>();
@@ -126,7 +127,7 @@ namespace Umbraco.Core
             return list;
         }
 
-        internal static int[] GetTopologicalSortOrder<T>(List<DependencyField<T>> fields) where T : class 
+        internal static int[] GetTopologicalSortOrder<T>(List<DependencyField<T>> fields) where T : class
         {
             var g = new TopologicalSorter(fields.Count);
             var indexes = new Dictionary<string, int>();
@@ -158,7 +159,7 @@ namespace Umbraco.Core
 
         #endregion
 
-        public class DependencyField<T> where T : class 
+        public class DependencyField<T> where T : class
         {
             public DependencyField()
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using LightInject;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -14,6 +15,7 @@ namespace Umbraco.Core.Components
     {
         private readonly IServiceContainer _container;
         private readonly ProfilingLogger _proflog;
+        private readonly ILogger _logger;
         private IUmbracoComponent[] _components;
         private bool _booted;
 
@@ -28,6 +30,7 @@ namespace Umbraco.Core.Components
             if (container == null) throw new ArgumentNullException(nameof(container));
             _container = container;
             _proflog = container.GetInstance<ProfilingLogger>();
+            _logger = container.GetInstance<ILogger>();
         }
 
         private class EnableInfo
@@ -62,7 +65,7 @@ namespace Umbraco.Core.Components
             }
         }
 
-        private static IEnumerable<Type> PrepareComponentTypes2(IEnumerable<Type> componentTypes, RuntimeLevel level)
+        private IEnumerable<Type> PrepareComponentTypes2(IEnumerable<Type> componentTypes, RuntimeLevel level)
         {
             // create a list, remove those that cannot be enabled due to runtime level
             var componentTypeList = componentTypes
@@ -77,6 +80,84 @@ namespace Umbraco.Core.Components
             if (componentTypeList.Contains(typeof(UmbracoCoreComponent)) == false)
                 componentTypeList.Add(typeof(UmbracoCoreComponent));
 
+            // enable or disable components
+            EnableDisableComponents(componentTypeList);
+
+            // sort the components according to their dependencies
+            var requirements = new Dictionary<Type, List<Type>>();
+            foreach (var type in componentTypeList) requirements[type] = null;
+            foreach (var type in componentTypeList)
+            {
+                GatherRequirementsFromRequireAttribute(type, componentTypeList, requirements);
+                GatherRequirementsFromRequiredAttribute(type, componentTypeList, requirements);
+            }
+
+            // only for debugging, this is verbose
+            //_logger.Debug<BootLoader>(GetComponentsReport(requirements));
+
+            // sort components
+            var graph = new TopoGraph<Type, KeyValuePair<Type, List<Type>>>(kvp => kvp.Key, kvp => kvp.Value);
+            graph.AddItems(requirements);
+            List<Type> sortedComponentTypes;
+            try
+            {
+                sortedComponentTypes = graph.GetSortedItems().Select(x => x.Key).ToList();
+            }
+            catch (Exception e)
+            {
+                // in case of an error, force-dump everything to log
+                _logger.Info<BootLoader>(GetComponentsReport(requirements));
+                _logger.Error<BootLoader>("Failed to sort components.", e);
+                throw;
+            }
+
+            // bit verbose but should help for troubleshooting
+            var text = "Ordered Components: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComponentTypes) + Environment.NewLine;
+            Console.WriteLine(text);
+            _logger.Debug<BootLoader>(text);
+
+            return sortedComponentTypes;
+        }
+
+        private static string GetComponentsReport(Dictionary<Type, List<Type>> requirements)
+        {
+            var text = new StringBuilder();
+            text.AppendLine("Components & Dependencies:");
+            text.AppendLine();
+
+            foreach (var kvp in requirements)
+            {
+                var type = kvp.Key;
+
+                text.AppendLine(type.FullName);
+                foreach (var attribute in type.GetCustomAttributes<RequireComponentAttribute>())
+                    text.AppendLine("  -> " + attribute.RequiredType + (attribute.Weak.HasValue
+                        ? (attribute.Weak.Value ? " (weak)" : (" (strong" + (requirements.ContainsKey(attribute.RequiredType) ? ", missing" : "") + ")"))
+                        : ""));
+                foreach (var attribute in type.GetCustomAttributes<RequiredComponentAttribute>())
+                    text.AppendLine("  -< " + attribute.RequiringType);
+                foreach (var i in type.GetInterfaces())
+                {
+                    text.AppendLine("  : " + i.FullName);
+                    foreach (var attribute in i.GetCustomAttributes<RequireComponentAttribute>())
+                        text.AppendLine("    -> " + attribute.RequiredType + (attribute.Weak.HasValue
+                            ? (attribute.Weak.Value ? " (weak)" : (" (strong" + (requirements.ContainsKey(attribute.RequiredType) ? ", missing" : "") + ")"))
+                            : ""));
+                    foreach (var attribute in i.GetCustomAttributes<RequiredComponentAttribute>())
+                        text.AppendLine("    -< " + attribute.RequiringType);
+                }
+                if (kvp.Value != null)
+                    foreach (var t in kvp.Value)
+                        text.AppendLine("  = " + t);
+                text.AppendLine();
+            }
+            text.AppendLine("/");
+            text.AppendLine();
+            return text.ToString();
+        }
+
+        private static void EnableDisableComponents(ICollection<Type> types)
+        {
             var enabled = new Dictionary<Type, EnableInfo>();
 
             // process the enable/disable attributes
@@ -87,7 +168,7 @@ namespace Umbraco.Core.Components
             // what happens in case of conflicting remote declarations is unspecified. more
             // precisely, the last declaration to be processed wins, but the order of the
             // declarations depends on the type finder and is unspecified.
-            foreach (var componentType in componentTypeList)
+            foreach (var componentType in types)
             {
                 foreach (var attr in componentType.GetCustomAttributes<EnableComponentAttribute>())
                 {
@@ -116,63 +197,80 @@ namespace Umbraco.Core.Components
 
             // remove components that end up being disabled
             foreach (var kvp in enabled.Where(x => x.Value.Enabled == false))
-                componentTypeList.Remove(kvp.Key);
+                types.Remove(kvp.Key);
+        }
 
-            // sort the components according to their dependencies
-            var items = new List<TopologicalSorter.DependencyField<Type>>();
-            var temp = new List<Type>(); // reduce allocs
-            foreach (var type in componentTypeList)
+        private static void GatherRequirementsFromRequireAttribute(Type type, ICollection<Type> types, IDictionary<Type, List<Type>> requirements)
+        {
+            // get 'require' attributes
+            // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
+            var requireAttributes = type
+                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequireComponentAttribute>()) // those marking interfaces
+                .Concat(type.GetCustomAttributes<RequireComponentAttribute>()); // those marking the component
+
+            // what happens in case of conflicting attributes (different strong/weak for same type) is not specified.
+            foreach (var attr in requireAttributes)
             {
-                temp.Clear();
+                if (attr.RequiredType == type) continue; // ignore self-requirements (+ exclude in implems, below)
 
-                //// for tests
-                //Console.WriteLine("Components & Dependencies:");
-                //Console.WriteLine(type.FullName);
-                //foreach (var attribute in type.GetCustomAttributes<RequireComponentAttribute>())
-                //    Console.WriteLine("  -> " + attribute.RequiredType + (attribute.Weak.HasValue ? (attribute.Weak.Value ? " (weak)" : " (strong)") : ""));
-                //foreach (var i in type.GetInterfaces())
-                //{
-                //    Console.WriteLine("  " + i.FullName);
-                //    foreach (var attribute in i.GetCustomAttributes<RequireComponentAttribute>())
-                //        Console.WriteLine("    -> " + attribute.RequiredType + (attribute.Weak.HasValue ? (attribute.Weak.Value ? " (weak)" : " (strong)") : ""));
-                //}
-                //Console.WriteLine("/");
-                //Console.WriteLine();
-
-                // get attributes
-                // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
-                var attributes = type
-                    .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequireComponentAttribute>())
-                    .Concat(type.GetCustomAttributes<RequireComponentAttribute>());
-
-                // what happens in case of conflicting attributes (different strong/weak for same type) is not specified.
-                foreach (var attr in attributes)
+                // requiring an interface = require any enabled component implementing that interface
+                // unless strong, and then require at least one enabled component implementing that interface
+                if (attr.RequiredType.IsInterface)
                 {
-                    // requiring an interface = require any enabled component implementing that interface
-                    // unless strong, and then require at least one enabled component implementing that interface
-                    if (attr.RequiredType.IsInterface)
+                    var implems = types.Where(x => x != type && attr.RequiredType.IsAssignableFrom(x)).ToList();
+                    if (implems.Count > 0)
                     {
-                        var implems = componentTypeList.Where(x => attr.RequiredType.IsAssignableFrom(x)).ToList();
-                        if (implems.Count > 0)
-                            temp.AddRange(implems);
-                        else if (attr.Weak == false) // if explicitely set to !weak, is strong, else is weak
-                            throw new Exception($"Broken component dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
+                        if (requirements[type] == null) requirements[type] = new List<Type>();
+                        requirements[type].AddRange(implems);
                     }
-                    // requiring a class = require that the component is enabled
-                    // unless weak, and then requires it if it is enabled
-                    else
+                    else if (attr.Weak == false) // if explicitely set to !weak, is strong, else is weak
+                        throw new Exception($"Broken component dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
+                }
+                // requiring a class = require that the component is enabled
+                // unless weak, and then requires it if it is enabled
+                else
+                {
+                    if (types.Contains(attr.RequiredType))
                     {
-                        if (componentTypeList.Contains(attr.RequiredType))
-                            temp.Add(attr.RequiredType);
-                        else if (attr.Weak != true) // if not explicitely set to weak, is strong
-                            throw new Exception($"Broken component dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
+                        if (requirements[type] == null) requirements[type] = new List<Type>();
+                        requirements[type].Add(attr.RequiredType);
+                    }
+                    else if (attr.Weak != true) // if not explicitely set to weak, is strong
+                        throw new Exception($"Broken component dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
+                }
+            }
+        }
+
+        private static void GatherRequirementsFromRequiredAttribute(Type type, ICollection<Type> types, IDictionary<Type, List<Type>> requirements)
+        {
+            // get 'required' attributes
+            // fixme explain
+            var requiredAttributes = type
+                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequiredComponentAttribute>())
+                .Concat(type.GetCustomAttributes<RequiredComponentAttribute>());
+
+            foreach (var attr in requiredAttributes)
+            {
+                if (attr.RequiringType == type) continue; // ignore self-requirements (+ exclude in implems, below)
+
+                if (attr.RequiringType.IsInterface)
+                {
+                    var implems = types.Where(x => x != type && attr.RequiringType.IsAssignableFrom(x)).ToList();
+                    foreach (var implem in implems)
+                    {
+                        if (requirements[implem] == null) requirements[implem] = new List<Type>();
+                        requirements[implem].Add(type);
                     }
                 }
-
-                var dependsOn = temp.Distinct().Select(x => x.FullName).ToArray();
-                items.Add(new TopologicalSorter.DependencyField<Type>(type.FullName, dependsOn, new Lazy<Type>(() => type)));
+                else
+                {
+                    if (types.Contains(attr.RequiringType))
+                    {
+                        if (requirements[attr.RequiringType] == null) requirements[attr.RequiringType] = new List<Type>();
+                        requirements[attr.RequiringType].Add(type);
+                    }
+                }
             }
-            return TopologicalSorter.GetSortedItems(items);
         }
 
         private void InstanciateComponents(IEnumerable<Type> types)
