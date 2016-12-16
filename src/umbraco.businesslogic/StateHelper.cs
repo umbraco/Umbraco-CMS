@@ -366,7 +366,7 @@ namespace umbraco.BusinessLogic
                     // although just checking context should be enough?!
                     // but in some (replaced) umbraco code, everything is checked...
                     return context != null
-                        && context.Request != null & context.Request.Cookies != null
+                        && context.Request != null && context.Request.Cookies != null
                         && context.Response != null && context.Response.Cookies != null;
                 }
             }
