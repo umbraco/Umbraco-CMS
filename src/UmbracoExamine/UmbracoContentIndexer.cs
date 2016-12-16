@@ -65,6 +65,7 @@ namespace UmbracoExamine
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IValueSetValidator validator,
             UmbracoContentIndexerOptions options,
+            IUmbracoDatabaseFactory databaseFactory,
             FacetConfiguration facetConfiguration = null,
             IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
             : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, facetConfiguration, indexValueTypes)
@@ -75,6 +76,7 @@ namespace UmbracoExamine
             if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             if (options == null) throw new ArgumentNullException(nameof(options));
+            if (databaseFactory == null) throw new ArgumentNullException(nameof(databaseFactory));
 
             SupportProtectedContent = options.SupportProtectedContent;
             SupportUnpublishedContent = options.SupportUnpublishedContent;
@@ -88,6 +90,7 @@ namespace UmbracoExamine
             MediaService = mediaService;
             UserService = userService;
             _urlSegmentProviders = urlSegmentProviders;
+            _databaseFactory = databaseFactory;
 
             InitializeQueries();
         }

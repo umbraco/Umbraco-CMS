@@ -363,7 +363,7 @@ namespace umbraco.DataLayer
         public static MethodInfo OpenMethod { get; private set; }
         public static MethodInfo CloseMethod { get; private set; }
 
-        private static readonly object DatabaseContext;
+        private static readonly object DatabaseFactory;
         private static readonly PropertyInfo Database;
         private static readonly PropertyInfo ConnectionProperty;
         private static readonly FieldInfo TransactionField;
@@ -378,22 +378,22 @@ namespace umbraco.DataLayer
         {
             var coreAssembly = Assembly.Load("Umbraco.Core");
 
-            var databaseContextType = coreAssembly.GetType("Umbraco.Core.DatabaseContext");
-            var umbracoDatabaseType = coreAssembly.GetType("Umbraco.Core.Persistence.UmbracoDatabase");
+            var databaseFactoryType = coreAssembly.GetType("Umbraco.Core.Persistence.IUmbracoDatabaseFactory");
+            var umbracoDatabaseType = coreAssembly.GetType("Umbraco.Core.Persistence.IUmbracoDatabase");
 
             var nPocoAssembly = Assembly.Load("NPoco");
             var databaseType = nPocoAssembly.GetType("NPoco.Database");
 
             var currentType = coreAssembly.GetType("Umbraco.Core.DI.Current");
-            var databaseContextProperty = currentType.GetProperty("DatabaseContext", BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
-            DatabaseContext = databaseContextProperty.GetValue(null);
+            var databaseFactoryProperty = currentType.GetProperty("DatabaseFactory", BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
+            DatabaseFactory = databaseFactoryProperty.GetValue(null);
 
-            Database = databaseContextType.GetProperty("Database", BindingFlags.Instance | BindingFlags.Public);
+            Database = databaseFactoryType.GetProperty("Database", BindingFlags.Instance | BindingFlags.Public);
 
             OpenMethod = databaseType.GetMethod("OpenSharedConnection", BindingFlags.Instance | BindingFlags.Public);
             CloseMethod = databaseType.GetMethod("CloseSharedConnection", BindingFlags.Instance | BindingFlags.Public);
 
-            ConnectionProperty = umbracoDatabaseType.GetProperty("Connection", BindingFlags.Instance | BindingFlags.Public);
+            ConnectionProperty = databaseType.GetProperty("Connection", BindingFlags.Instance | BindingFlags.Public);
             TransactionField = databaseType.GetField("_transaction", BindingFlags.Instance | BindingFlags.NonPublic);
 
             var retryDbConnectionType = coreAssembly.GetType("Umbraco.Core.Persistence.FaultHandling.RetryDbConnection");
@@ -408,7 +408,7 @@ namespace umbraco.DataLayer
 
         public CurrentConnectionUsing()
         {
-            _database = Database.GetValue(DatabaseContext);
+            _database = Database.GetValue(DatabaseFactory);
 
             var connection = ConnectionProperty.GetValue(_database, NoArgs);
             // we have to open to make sure that we *do* have a connection

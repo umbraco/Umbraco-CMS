@@ -36,7 +36,7 @@ namespace Umbraco.Tests.TestHelpers
     /// Provides a base class for all Umbraco tests that require a database.
     /// </summary>
     /// <remarks>
-    /// <para>Can provide a SqlCE database populated with the Umbraco schema. The database should 
+    /// <para>Can provide a SqlCE database populated with the Umbraco schema. The database should
     /// be accessed through the UmbracoDatabaseFactory.</para>
     /// <para>Provides an Umbraco context and Xml content.</para>
     /// <para>fixme what else?</para>
@@ -194,10 +194,10 @@ namespace Umbraco.Tests.TestHelpers
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
             //if this is the first test in the session, always ensure a new db file is created
-            if (FirstTestInSession 
-                || File.Exists(_databasePath) == false 
-                || Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest 
-                || Options.Database == UmbracoTestOptions.Database.NewEmptyPerTest 
+            if (FirstTestInSession
+                || File.Exists(_databasePath) == false
+                || Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest
+                || Options.Database == UmbracoTestOptions.Database.NewEmptyPerTest
                 || (FirstTestInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture))
             {
                 using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Remove database file"))

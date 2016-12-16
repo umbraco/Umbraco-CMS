@@ -169,6 +169,15 @@ namespace Umbraco.Tests.UmbracoExamine
                 mediaTypeService = mediaTypeServiceMock.Object;
             }
 
+		    var query = new Mock<IQuery<IContent>>();
+            query
+                .Setup(x => x.GetWhereClauses())
+                .Returns(new List<Tuple<string, object[]>> { new Tuple<string, object[]>("cmsDocument.published", new object[] { 1 }) });
+		    var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
+		    databaseFactory
+		        .Setup(x => x.Query<IContent>())
+		        .Returns(query.Object);
+
 		    var i = new UmbracoContentIndexer(
 		        new[] { new FieldDefinition("", FieldDefinitionTypes.FullText) },
 		        luceneDir,
@@ -179,7 +188,8 @@ namespace Umbraco.Tests.UmbracoExamine
 		        userService,
 		        new[] {new DefaultUrlSegmentProvider()},
 		        new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
-		        options);
+		        options,
+                databaseFactory.Object);
 
 			i.IndexingError += IndexingError;
 
