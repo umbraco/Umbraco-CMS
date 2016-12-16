@@ -33,7 +33,7 @@ namespace UmbracoExamine
         protected IUserService UserService { get; }
 
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
-        private readonly IQueryFactory _queryFactory;
+        private readonly DatabaseContext _databaseContext;
         private int? _parentId;
 
         #region Constructors
@@ -47,7 +47,7 @@ namespace UmbracoExamine
             UserService = Current.Services.UserService;
 
             _urlSegmentProviders = Current.UrlSegmentProviders;
-            _queryFactory = Current.DatabaseContext.QueryFactory;
+            _databaseContext = Current.DatabaseContext;
 
             InitializeQueries();
         }
@@ -64,7 +64,6 @@ namespace UmbracoExamine
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IValueSetValidator validator,
             UmbracoContentIndexerOptions options,
-            IQueryFactory queryFactory,
             FacetConfiguration facetConfiguration = null,
             IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
             : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, facetConfiguration, indexValueTypes)
@@ -75,7 +74,6 @@ namespace UmbracoExamine
             if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             if (options == null) throw new ArgumentNullException(nameof(options));
-            if (queryFactory == null) throw new ArgumentNullException(nameof(queryFactory));
 
             SupportProtectedContent = options.SupportProtectedContent;
             SupportUnpublishedContent = options.SupportUnpublishedContent;
@@ -89,7 +87,6 @@ namespace UmbracoExamine
             MediaService = mediaService;
             UserService = userService;
             _urlSegmentProviders = urlSegmentProviders;
-            _queryFactory = queryFactory;
 
             InitializeQueries();
         }
@@ -97,7 +94,7 @@ namespace UmbracoExamine
         private void InitializeQueries()
         {
             if (_publishedQuery == null)
-                _publishedQuery = _queryFactory.Create<IContent>().Where(x => x.Published);
+                _publishedQuery = _databaseContext.Query<IContent>().Where(x => x.Published);
         }
 
         #endregion

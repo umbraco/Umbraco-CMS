@@ -1,19 +1,16 @@
+using NPoco;
+
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
 	/// <summary>
 	/// Represents a persistence unit of work for working with a database.
 	/// </summary>
-	public interface IDatabaseUnitOfWork : IUnitOfWork
+	public interface IDatabaseUnitOfWork : IUnitOfWork, IDatabaseContext
 	{
         /// <summary>
-        /// Gets the database context.
+        /// Gets the database.
         /// </summary>
-        DatabaseContext DatabaseContext { get; }
-
-        /// <summary>
-        /// Gets the current database instance.
-        /// </summary>
-		UmbracoDatabase Database { get; }
+		IUmbracoDatabase Database { get; }
 
         /// <summary>
         /// Read-locks some lock objects.

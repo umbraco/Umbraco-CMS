@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -26,12 +27,14 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IUserTypeRepository _userTypeRepository;
         private readonly CacheHelper _cacheHelper;
+        private readonly IMapperCollection _mapperCollection;
         private PermissionRepository<IContent> _permissionRepository;
 
-        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository)
+        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IMapperCollection mapperCollection)
             : base(work, cacheHelper, logger)
         {
             _userTypeRepository = userTypeRepository;
+            _mapperCollection = mapperCollection;
             _cacheHelper = cacheHelper;
         }
 
@@ -332,9 +335,8 @@ namespace Umbraco.Core.Persistence.Repositories
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
             // get the referenced column name and find the corresp mapped column name
-            var queryFactory = UnitOfWork.DatabaseContext.QueryFactory;
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
-            var mapper = queryFactory.Mappers[typeof(IUser)];
+            var mapper = _mapperCollection[typeof(IUser)];
             var mappedField = mapper.Map(SqlSyntax, expressionMember.Name);
 
             if (mappedField.IsNullOrWhiteSpace())

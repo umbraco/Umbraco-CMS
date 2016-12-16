@@ -418,7 +418,7 @@ namespace Umbraco.Tests.Web.Mvc
             //    new ProfilingLogger(logger, Mock.Of<IProfiler>())) { /*IsReady = true*/ };
 
             var cache = new NullCacheProvider();
-            var provider = new NPocoUnitOfWorkProvider(new DatabaseContext(databaseFactory), new RepositoryFactory(Mock.Of<IServiceContainer>()));
+            var provider = new NPocoUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
             _service = new FacadeService(svcCtx, provider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, Current.Logger, null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;

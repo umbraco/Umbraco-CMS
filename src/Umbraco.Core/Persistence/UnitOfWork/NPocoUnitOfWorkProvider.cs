@@ -6,30 +6,30 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     /// Represents a <see cref="IDatabaseUnitOfWork"/> provider that creates <see cref="NPocoUnitOfWork"/> instances.
     /// </summary>
     public class NPocoUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
-    {
+    {        
         private readonly RepositoryFactory _repositoryFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoUnitOfWorkProvider"/> class with a database factory and a repository factory.
         /// </summary>
-        /// <param name="databaseContext">A database context.</param>
+        /// <param name="databaseFactory">A database factory.</param>
         /// <param name="repositoryFactory">A repository factory.</param>
-        public NPocoUnitOfWorkProvider(DatabaseContext databaseContext, RepositoryFactory repositoryFactory)
+        public NPocoUnitOfWorkProvider(IUmbracoDatabaseFactory databaseFactory, RepositoryFactory repositoryFactory)
         {
-            if (databaseContext == null) throw new ArgumentNullException(nameof(databaseContext));
+            if (databaseFactory == null) throw new ArgumentNullException(nameof(databaseFactory));
             if (repositoryFactory == null) throw new ArgumentNullException(nameof(repositoryFactory));
 
-            DatabaseContext = databaseContext;
+            DatabaseFactory = databaseFactory;
             _repositoryFactory = repositoryFactory;
         }
 
         /// <inheritdoc />
-        public DatabaseContext DatabaseContext { get; }
+        public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
         /// <inheritdoc />
         public IDatabaseUnitOfWork CreateUnitOfWork()
         {
-            return new NPocoUnitOfWork(DatabaseContext, _repositoryFactory);
+            return new NPocoUnitOfWork(DatabaseFactory.Database, _repositoryFactory);
         }
     }
 }

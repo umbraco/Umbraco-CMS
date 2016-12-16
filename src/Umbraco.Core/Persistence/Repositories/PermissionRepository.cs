@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _runtimeCache = cache.IsolatedRuntimeCache.GetOrCreateCache<EntityPermission>();
         }
 
-        private ISqlSyntaxProvider SqlSyntax => _unitOfWork.Database.SqlSyntax;
+        private ISqlSyntaxProvider SqlSyntax => _unitOfWork.SqlSyntax;
 
         /// <summary>
         /// Returns permissions for a given user for any number of nodes
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         whereBuilder.Append(")");
                     }
 
-                    var sql = _unitOfWork.Database.Sql()
+                    var sql = _unitOfWork.Sql()
                         .SelectAll()
                         .From<User2NodePermissionDto>()
                         .Where(whereBuilder.ToString());
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var sql = _unitOfWork.Database.Sql()
+            var sql = _unitOfWork.Sql()
                 .SelectAll()
                 .From<User2NodePermissionDto>()
                 .Where<User2NodePermissionDto>(dto => dto.NodeId == entityId)

@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute
             _context.Expressions.Add(expression);
         }
 
-        public void Code(Func<UmbracoDatabase, string> codeStatement)
+        public void Code(Func<IUmbracoDatabase, string> codeStatement)
         {
             var expression = new ExecuteCodeStatementExpression(_context, _supportedDatabaseTypes) { CodeStatement = codeStatement };
             _context.Expressions.Add(expression);

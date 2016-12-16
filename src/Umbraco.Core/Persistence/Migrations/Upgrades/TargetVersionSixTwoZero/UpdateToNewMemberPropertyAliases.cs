@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
             Execute.Code(Update);
         }
 
-        internal string Update(Database database)
+        internal string Update(IDatabase database)
         {
             if (database != null)
             {

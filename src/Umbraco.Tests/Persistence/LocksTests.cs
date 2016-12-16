@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Persistence
             // cannot use the default TestUmbracoDatabaseAccessor which only handles one instance at a time
 
             // works with...
-            //Container.RegisterSingleton<IDatabaseFactory, ThreadSafetyServiceTest.PerThreadSqlCeDatabaseFactory>();
+            //Container.RegisterSingleton<IUmbracoDatabaseFactory, ThreadSafetyServiceTest.PerThreadSqlCeDatabaseFactory>();
 
             // but it should work with...
             Container.RegisterSingleton<IDatabaseScopeAccessor, HybridDatabaseScopeAccessor>();
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Persistence
             // in a thread, must create a scope
             using (DatabaseContext.CreateDatabaseScope())
             {
-                UmbracoDatabase database;
+                IUmbracoDatabase database;
                 try
                 {
                     database = DatabaseContext.Database;
@@ -175,7 +175,7 @@ namespace Umbraco.Tests.Persistence
             // in a thread, must create a scope
             using (DatabaseContext.CreateDatabaseScope())
             {
-                UmbracoDatabase database;
+                IUmbracoDatabase database;
                 try
                 {
                     database = DatabaseContext.Database;
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.Persistence
             // in a thread, must create a scope
             using (DatabaseContext.CreateDatabaseScope())
             {
-                UmbracoDatabase database;
+                IUmbracoDatabase database;
                 try
                 {
                     database = DatabaseContext.Database;

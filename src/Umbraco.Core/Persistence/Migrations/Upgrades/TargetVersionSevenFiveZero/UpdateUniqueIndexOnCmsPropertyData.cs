@@ -41,7 +41,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
                     var delPropQry = SqlSyntax.GetDeleteSubquery(
                         "cmsPropertyData",
                         "id",
-                        Context.Database.Sql("SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL"),
+                        Sql("SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL"),
                         WhereInType.NotIn);
                     Execute.Sql(delPropQry.SQL);
                 }

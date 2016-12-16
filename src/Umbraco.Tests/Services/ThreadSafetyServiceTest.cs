@@ -186,11 +186,11 @@ namespace Umbraco.Tests.Services
 		}
 
 		/// <summary>
-		/// A special implementation of <see cref="IDatabaseFactory"/> that mimics the UmbracoDatabaseFactory
+		/// A special implementation of <see cref="IUmbracoDatabaseFactory"/> that mimics the UmbracoDatabaseFactory
 		/// (one db per HttpContext) by providing one db per thread, as required for multi-threaded
 		/// tests.
 		/// </summary>
-		internal class PerThreadSqlCeDatabaseFactory : DisposableObject, IDatabaseFactory
+		internal class PerThreadSqlCeDatabaseFactory : DisposableObject, IUmbracoDatabaseFactory
 		{
             // the UmbracoDatabaseFactory uses thread-static databases where there is no http context,
             // so it would need to be disposed in each thread in order for each database to be disposed,
@@ -199,7 +199,6 @@ namespace Umbraco.Tests.Services
 
 		    private readonly ILogger _logger;
 		    private readonly IMapperCollection _mappers;
-            private IQueryFactory _queryFactory;
 
             private readonly DbProviderFactory _dbProviderFactory =
 		        DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
@@ -219,9 +218,14 @@ namespace Umbraco.Tests.Services
 		        throw new NotImplementedException();
 		    }
 
-		    public IQueryFactory QueryFactory => _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappers));
+            public Sql<SqlContext> Sql(string sql, params object[] args)
+            {
+                throw new NotImplementedException();
+            }
 
-		    public DatabaseType DatabaseType => DatabaseType.SQLCe;
+		    public IQuery<T> Query<T>() => new Query<T>(SqlSyntax, _mappers);
+
+            public DatabaseType DatabaseType => DatabaseType.SQLCe;
 
             public PerThreadSqlCeDatabaseFactory(ILogger logger, IMapperCollection mappers)
             {
@@ -229,15 +233,27 @@ namespace Umbraco.Tests.Services
                 _mappers = mappers;
             }
 
-		    private readonly ConcurrentDictionary<int, UmbracoDatabase> _databases = new ConcurrentDictionary<int, UmbracoDatabase>();
+		    private readonly ConcurrentDictionary<int, IUmbracoDatabase> _databases = new ConcurrentDictionary<int, IUmbracoDatabase>();
 
-			public UmbracoDatabase GetDatabase()
+		    public IUmbracoDatabase Database => GetDatabase();
+
+			public IUmbracoDatabase GetDatabase()
 			{
 			    var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
                 var sqlContext = new SqlContext(SqlSyntax, Mock.Of<IPocoDataFactory>(), DatabaseType);
                 return _databases.GetOrAdd(Thread.CurrentThread.ManagedThreadId,
                     i => new UmbracoDatabase(settings.ConnectionString, sqlContext, _dbProviderFactory, _logger));
 			}
+
+		    public IUmbracoDatabase CreateDatabase()
+		    {
+                throw new NotImplementedException();
+            }
+
+		    public IDatabaseScope CreateScope(IUmbracoDatabase database = null)
+		    {
+                throw new NotImplementedException();
+            }
 
 			protected override void DisposeResources()
 			{

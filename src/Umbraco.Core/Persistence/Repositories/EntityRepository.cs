@@ -31,9 +31,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Query Methods
 
-        public IQuery<IUmbracoEntity> Query => UnitOfWork.DatabaseContext.Query<IUmbracoEntity>();
+        public IQuery<IUmbracoEntity> Query => UnitOfWork.Query<IUmbracoEntity>();
 
-        public Sql<SqlContext> Sql() { return UnitOfWork.Database.Sql();}
+        public Sql<SqlContext> Sql() => UnitOfWork.Sql();
 
         public IUmbracoEntity GetByKey(Guid key)
         {

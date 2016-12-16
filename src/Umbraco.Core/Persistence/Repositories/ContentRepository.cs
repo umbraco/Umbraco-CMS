@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _tagRepository = tagRepository;
             _cacheHelper = cacheHelper;
 
-            _publishedQuery =  work.DatabaseContext.Query<IContent>().Where(x => x.Published);
+            _publishedQuery =  work.Query<IContent>().Where(x => x.Published);
 
             EnsureUniqueNaming = true;
         }

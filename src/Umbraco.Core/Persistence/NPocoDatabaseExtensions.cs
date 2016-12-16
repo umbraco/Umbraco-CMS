@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
         /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
-        internal static RecordPersistenceType InsertOrUpdate<T>(this IDatabase db, T poco)
+        internal static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db, T poco)
             where T : class
         {
             return db.InsertOrUpdate(poco, null, null);
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
         /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
-        internal static RecordPersistenceType InsertOrUpdate<T>(this IDatabase db,
+        internal static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db,
             T poco,
             string updateCommand,
             object updateArgs)
@@ -168,7 +168,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="database">The database.</param>
         /// <param name="records">The records.</param>
         /// <param name="useNativeBulkInsert">Whether to use native bulk insert when available.</param>
-        public static void BulkInsertRecordsWithTransaction<T>(this Database database, IEnumerable<T> records, bool useNativeBulkInsert = true)
+        public static void BulkInsertRecordsWithTransaction<T>(this IUmbracoDatabase database, IEnumerable<T> records, bool useNativeBulkInsert = true)
         {
             var recordsA = records.ToArray();
             if (recordsA.Length == 0)
@@ -190,7 +190,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="records">The records.</param>
         /// <param name="useNativeBulkInsert">Whether to use native bulk insert when available.</param>
         /// <returns>The number of records that were inserted.</returns>
-        public static int BulkInsertRecords<T>(this Database database, IEnumerable<T> records, bool useNativeBulkInsert = true)
+        public static int BulkInsertRecords<T>(this IUmbracoDatabase database, IEnumerable<T> records, bool useNativeBulkInsert = true)
         {
             var recordsA = records.ToArray();
             if (recordsA.Length == 0) return 0;
@@ -227,7 +227,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="database">The database.</param>
         /// <param name="records">The records.</param>
         /// <returns>The number of records that were inserted.</returns>
-        private static int BulkInsertRecordsWithCommands<T>(Database database, T[] records)
+        private static int BulkInsertRecordsWithCommands<T>(IUmbracoDatabase database, T[] records)
         {
             foreach (var command in database.GenerateBulkInsertCommands(records))
                 command.ExecuteNonQuery();
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="database">The database.</param>
         /// <param name="records">The records.</param>
         /// <returns>The sql commands to execute.</returns>
-        internal static IDbCommand[] GenerateBulkInsertCommands<T>(this Database database, T[] records)
+        internal static IDbCommand[] GenerateBulkInsertCommands<T>(this IUmbracoDatabase database, T[] records)
         {
             var pocoData = database.PocoDataFactory.ForType(typeof(T));
 
@@ -313,7 +313,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="pocoData">The PocoData object corresponding to the record's type.</param>
         /// <param name="records">The records.</param>
         /// <returns>The number of records that were inserted.</returns>
-        internal static int BulkInsertRecordsSqlCe<T>(Database database, PocoData pocoData, IEnumerable<T> records)
+        internal static int BulkInsertRecordsSqlCe<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
         {
             var columns = pocoData.Columns.ToArray();
 
@@ -363,7 +363,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="pocoData">The PocoData object corresponding to the record's type.</param>
         /// <param name="records">The records.</param>
         /// <returns>The number of records that were inserted.</returns>
-        internal static int BulkInsertRecordsSqlServer<T>(Database database, PocoData pocoData, IEnumerable<T> records)
+        internal static int BulkInsertRecordsSqlServer<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
         {
             // create command against the original database.Connection
             using (var command = database.CreateCommand(database.Connection, CommandType.Text, string.Empty))
@@ -373,9 +373,7 @@ namespace Umbraco.Core.Persistence
                 var tTransaction = GetTypedTransaction<SqlTransaction>(command.Transaction);
                 var tableName = pocoData.TableInfo.TableName;
 
-                var umbracoDatabase = database as UmbracoDatabase;
-                if (umbracoDatabase == null) throw new NotSupportedException("Database must be UmbracoDatabase.");
-                var syntax = umbracoDatabase.SqlSyntax as SqlServerSyntaxProvider;
+                var syntax = database.SqlSyntax as SqlServerSyntaxProvider;
                 if (syntax == null) throw new NotSupportedException("SqlSyntax must be SqlServerSyntaxProvider.");
 
                 using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction) { BulkCopyTimeout = 10000, DestinationTableName = tableName })

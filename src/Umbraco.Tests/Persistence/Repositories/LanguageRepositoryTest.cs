@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                unitOfWork.Database.EnableSqlTrace = true;
+                unitOfWork.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var query = QueryFactory.Create<ILanguage>().Where(x => x.IsoCode == "da-DK");
+                var query = unitOfWork.Query<ILanguage>().Where(x => x.IsoCode == "da-DK");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -196,7 +196,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var query = QueryFactory.Create<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
+                var query = unitOfWork.Query<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert

@@ -8,7 +8,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
-
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
         {
             userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
-            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository);
+            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository, Mock.Of<IMapperCollection>());
             return repository;
         }
 
@@ -168,7 +168,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var id = user.Id;
 
                 var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger);
-                var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo);
+                var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, Mock.Of<IMapperCollection>());
 
                 repository2.Delete(user);
                 unitOfWork.Flush();
@@ -245,7 +245,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = QueryFactory.Create<IUser>().Where(x => x.Username == "TestUser1");
+                var query = unitOfWork.Query<IUser>().Where(x => x.Username == "TestUser1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -330,7 +330,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = QueryFactory.Create<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                var query = unitOfWork.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
                 var result = repository.Count(query);
 
                 // Assert
@@ -486,7 +486,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger);
-                var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo);
+                var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, Mock.Of<IMapperCollection>());
 
                 // Act
                 var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");

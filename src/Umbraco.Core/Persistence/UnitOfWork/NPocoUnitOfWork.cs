@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
 using NPoco;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
@@ -14,20 +16,33 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoUnitOfWork"/> class with a database and a repository factory.
         /// </summary>
-        /// <param name="databaseContext">The database context.</param>
+        /// <param name="database">The database.</param>
         /// <param name="repositoryFactory">A repository factory.</param>
         /// <remarks>This should be used by the NPocoUnitOfWorkProvider exclusively.</remarks>
-        internal NPocoUnitOfWork(DatabaseContext databaseContext, RepositoryFactory repositoryFactory)
+        internal NPocoUnitOfWork(IUmbracoDatabase database, RepositoryFactory repositoryFactory)
             : base(repositoryFactory)
         {
-            DatabaseContext = databaseContext;
+            Database = database;
         }
 
         /// <inheritdoc />
-        public DatabaseContext DatabaseContext { get; }
+        public IUmbracoDatabase Database { get; }
+
+        #region IDatabaseContext
 
         /// <inheritdoc />
-        public UmbracoDatabase Database => DatabaseContext.Database;
+        public ISqlSyntaxProvider SqlSyntax => Database.SqlSyntax;
+
+        /// <inheritdoc />
+        public Sql<SqlContext> Sql() => new Sql<SqlContext>(Database.SqlContext);
+
+        /// <inheritdoc />
+        public Sql<SqlContext> Sql(string sql, params object[] args) => new Sql<SqlContext>(Database.SqlContext, sql, args);
+
+        /// <inheritdoc />
+        public IQuery<T> Query<T>() => new Query<T>(Database.SqlContext);
+
+        #endregion
 
         /// <inheritdoc />
         public override TRepository CreateRepository<TRepository>(string name = null)

@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             SqlCeContextGuardian.CloseBackgroundConnection();
         }
 
-        public override UmbracoDatabase GetConfiguredDatabase()
+        public override IUmbracoDatabase GetConfiguredDatabase()
         {
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
             var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), Mock.Of<IPocoDataFactory>(), DatabaseType.SQLCe);

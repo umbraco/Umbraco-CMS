@@ -22,14 +22,14 @@ namespace Umbraco.Core
     /// </summary>
     public class DatabaseBuilder
     {
-        private readonly IDatabaseFactory _databaseFactory;
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IRuntimeState _runtime;
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly ILogger _logger;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
-        public DatabaseBuilder(IDatabaseFactory databaseFactory, IRuntimeState runtime, IMigrationEntryService migrationEntryService, ILogger logger)
+        public DatabaseBuilder(IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, IMigrationEntryService migrationEntryService, ILogger logger)
         {
             _databaseFactory = databaseFactory;
             _runtime = runtime;
@@ -37,7 +37,7 @@ namespace Umbraco.Core
             _logger = logger;
         }
 
-        public UmbracoDatabase Database => _databaseFactory.GetDatabase();
+        public IUmbracoDatabase Database => _databaseFactory.GetDatabase();
 
         public ISqlSyntaxProvider SqlSyntax => _databaseFactory.SqlSyntax;
 
@@ -103,7 +103,7 @@ namespace Umbraco.Core
             ConfigureEmbeddedDatabaseConnection(_databaseFactory, _logger);
         }
 
-        private static void ConfigureEmbeddedDatabaseConnection(IDatabaseFactory factory, ILogger logger)
+        private static void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, ILogger logger)
         {
             SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, logger);
 
@@ -329,7 +329,7 @@ namespace Umbraco.Core
 
         #region Utils
 
-        internal static void GiveLegacyAChance(IDatabaseFactory factory, ILogger logger)
+        internal static void GiveLegacyAChance(IUmbracoDatabaseFactory factory, ILogger logger)
         {
             // look for the legacy appSettings key
             var legacyConnString = ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName];

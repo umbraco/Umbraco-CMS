@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var member = CreateTestMember(key: key);
 
                 // Act
-                var query = QueryFactory.Create<IMember>().Where(x => x.Key == key);
+                var query = unitOfWork.Query<IMember>().Where(x => x.Key == key);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -249,7 +249,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Correct_Subquery()
         {
-            var query = QueryFactory.Create<IMember>().Where(x =>
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            
+            var query = provider.DatabaseFactory.Query<IMember>().Where(x =>
                         ((Member) x).LongStringPropertyValue.Contains("1095") &&
                         ((Member) x).PropertyTypeAlias == "headshot");
 
@@ -309,7 +311,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             if (isCount)
             {
-                var sqlCount = DatabaseContext.Database.Sql()
+                var sqlCount = DatabaseContext.Sql()
                     .SelectCount()
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -320,7 +322,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 return sqlCount;
             }
 
-            var sql = DatabaseContext.Database.Sql();
+            var sql = DatabaseContext.Sql();
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid",
@@ -344,7 +346,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private Sql<SqlContext> GetSubquery()
         {
-            var sql = DatabaseContext.Database.Sql();
+            var sql = DatabaseContext.Sql();
             sql.Select("umbracoNode.id")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)

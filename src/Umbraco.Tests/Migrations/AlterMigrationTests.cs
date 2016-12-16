@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Migrations
     {
         private ILogger _logger;
         private ISqlSyntaxProvider _sqlSyntax;
-        private UmbracoDatabase _database;
+        private IUmbracoDatabase _database;
 
         [SetUp]
         public void Setup()

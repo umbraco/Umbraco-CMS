@@ -226,34 +226,34 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return "NVARCHAR";
         }
 
-        public virtual bool? SupportsCaseInsensitiveQueries(Database db)
+        public virtual bool? SupportsCaseInsensitiveQueries(IDatabase db)
         {
             return true;
         }
 
-        public virtual IEnumerable<string> GetTablesInSchema(Database db)
+        public virtual IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             return new List<string>();
         }
 
-        public virtual IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        public virtual IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
             return new List<ColumnInfo>();
         }
 
-        public virtual IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        public virtual IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
         {
             return new List<Tuple<string, string>>();
         }
 
-        public virtual IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        public virtual IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
         {
             return new List<Tuple<string, string, string>>();
         }
 
-        public abstract IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db);
+        public abstract IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
 
-        public virtual bool DoesTableExist(Database db, string tableName)
+        public virtual bool DoesTableExist(IDatabase db, string tableName)
         {
             return false;
         }

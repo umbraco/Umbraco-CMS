@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetQuotedTableName(string tableName);
         string GetQuotedColumnName(string columnName);
         string GetQuotedName(string name);
-        bool DoesTableExist(Database db, string tableName);
+        bool DoesTableExist(IDatabase db, string tableName);
         string GetIndexType(IndexTypes indexTypes);
         string GetSpecialDbType(SpecialDbTypes dbTypes);
         string CreateTable { get; }
@@ -68,20 +68,21 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string Format(ForeignKeyDefinition foreignKey);
         string FormatColumnRename(string tableName, string oldName, string newName);
         string FormatTableRename(string oldName, string newName);
+
         Sql<SqlContext> SelectTop(Sql<SqlContext> sql, int top);
+
         bool SupportsClustered();
         bool SupportsIdentityInsert();
-        bool? SupportsCaseInsensitiveQueries(Database db);
+        bool? SupportsCaseInsensitiveQueries(IDatabase db);
         
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }
         string ConvertDecimalToOrderableString { get; }
 
-        IEnumerable<string> GetTablesInSchema(Database db);
-        IEnumerable<ColumnInfo> GetColumnsInSchema(Database db);
-        IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db);
-        IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db);
-
-        IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db);
+        IEnumerable<string> GetTablesInSchema(IDatabase db);
+        IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
+        IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db);
+        IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db);
+        IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
     }
 }

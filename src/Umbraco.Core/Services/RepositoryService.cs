@@ -25,6 +25,6 @@ namespace Umbraco.Core.Services
             UowProvider = provider;
         }
 
-        protected IQuery<T> Query<T>() => UowProvider.DatabaseContext.Query<T>();
+        protected IQuery<T> Query<T>() => UowProvider.DatabaseFactory.Query<T>();
     }
 }

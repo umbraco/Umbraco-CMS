@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     internal class DatabaseSchemaCreation
     {
         private readonly DatabaseSchemaHelper _schemaHelper;
-        private readonly UmbracoDatabase _database;
+        private readonly IUmbracoDatabase _database;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// </summary>
         /// <param name="database"></param>
         /// <param name="logger"></param>
-        public DatabaseSchemaCreation(UmbracoDatabase database, ILogger logger)
+        public DatabaseSchemaCreation(IUmbracoDatabase database, ILogger logger)
         {
             _database = database;
             _logger = logger;

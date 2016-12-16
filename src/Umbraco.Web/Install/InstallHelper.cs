@@ -151,7 +151,7 @@ namespace Umbraco.Web.Install
             //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
             //
             // doing it differently
-            var syntax = context.Database.SqlSyntax;
+            var syntax = context.SqlSyntax;
             if (syntax is SqlCeSyntaxProvider)
                 dbProvider = "SqlServerCE";
             else if (syntax is MySqlSyntaxProvider)

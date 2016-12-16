@@ -23,6 +23,12 @@ namespace Umbraco.Core.Persistence.Querying
             _mappers = mappers;
         }
 
+        public Query(SqlContext sqlContext)
+        {
+            _sqlSyntax = sqlContext.SqlSyntax;
+            _mappers = sqlContext.Mappers;
+        }
+
         /// <summary>
         /// Adds a where clause to the query
         /// </summary>

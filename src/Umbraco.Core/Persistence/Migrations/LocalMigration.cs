@@ -8,9 +8,9 @@ using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
-    internal class LocalMigrationContext : MigrationContext
+    internal class LocalMigration : MigrationContext, ILocalMigration
     {
-        public LocalMigrationContext(UmbracoDatabase database, ILogger logger)
+        public LocalMigration(IUmbracoDatabase database, ILogger logger)
             : base(database, logger)
         { }
 

@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
             }
         }
 
-        private static string UpdateGuids(Database database)
+        private static string UpdateGuids(IDatabase database)
         {
             var updates = new List<Tuple<Guid, int>>();
 

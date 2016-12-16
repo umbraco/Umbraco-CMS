@@ -94,8 +94,6 @@ namespace Umbraco.Tests.Testing
 
         protected IMapperCollection Mappers => Container.GetInstance<IMapperCollection>();
 
-        protected IQueryFactory QueryFactory => Container.GetInstance<DatabaseContext>().QueryFactory;
-
         #endregion
 
         #region Setup
@@ -257,16 +255,16 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<IDatabaseScopeAccessor, TestDatabaseScopeAccessor>();
             var sqlSyntaxProviders = TestObjects.GetDefaultSqlSyntaxProviders(Logger);
             Container.RegisterSingleton<ISqlSyntaxProvider>(_ => sqlSyntaxProviders.OfType<SqlCeSyntaxProvider>().First());
-            Container.RegisterSingleton<IDatabaseFactory>(f => new UmbracoDatabaseFactory(
+            Container.RegisterSingleton<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 sqlSyntaxProviders,
                 Logger, f.GetInstance<IDatabaseScopeAccessor>(),
                 Mock.Of<IMapperCollection>()));
-            Container.RegisterSingleton(f => new DatabaseContext(f.GetInstance<IDatabaseFactory>()));
+            Container.RegisterSingleton(f => new DatabaseContext(f.GetInstance<IUmbracoDatabaseFactory>()));
 
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
             Container.Register(factory
-                => TestObjects.GetDatabaseUnitOfWorkProvider(factory.GetInstance<ILogger>(), factory.TryGetInstance<IDatabaseFactory>(), factory.TryGetInstance<RepositoryFactory>()));
+                => TestObjects.GetDatabaseUnitOfWorkProvider(factory.GetInstance<ILogger>(), factory.TryGetInstance<IUmbracoDatabaseFactory>(), factory.TryGetInstance<RepositoryFactory>()));
 
             Container.RegisterFrom<ServicesCompositionRoot>();
             // composition root is doing weird things, fix

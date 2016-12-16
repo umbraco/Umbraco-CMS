@@ -64,7 +64,7 @@ namespace Umbraco.Core.Sync
 
         protected DatabaseContext DatabaseContext { get; }
 
-        protected UmbracoDatabase Database => DatabaseContext.Database;
+        protected IUmbracoDatabase Database => DatabaseContext.Database;
 
         protected Sql<SqlContext> Sql() => DatabaseContext.Sql();
 

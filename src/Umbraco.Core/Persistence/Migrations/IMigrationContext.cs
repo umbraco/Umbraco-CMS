@@ -3,12 +3,14 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
-    public interface IMigrationContext
+    public interface IMigrationContext : IDatabaseContext
     {
-        UmbracoDatabase Database { get; }
+        IUmbracoDatabase Database { get; }
 
         ICollection<IMigrationExpression> Expressions { get; set; }
 
         ILogger Logger { get; }
+
+        ILocalMigration GetLocalMigration();
     }
 }

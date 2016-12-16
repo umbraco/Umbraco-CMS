@@ -148,7 +148,7 @@ namespace Umbraco.Core
             {
                 try
                 {
-                    var dbfactory = container.GetInstance<IDatabaseFactory>();
+                    var dbfactory = container.GetInstance<IUmbracoDatabaseFactory>();
                     SetRuntimeStateLevel(_state, dbfactory, Logger);
                     Logger.Debug<CoreRuntime>($"Runtime level: {_state.Level}");
                 }
@@ -225,13 +225,10 @@ namespace Umbraco.Core
             // will be initialized with syntax providers and a logger, and will try to configure
             // from the default connection string name, if possible, else will remain non-configured
             // until the database context configures it properly (eg when installing)
-            container.RegisterSingleton<IDatabaseFactory, UmbracoDatabaseFactory>();
+            container.RegisterSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
 
             // register database context
             container.RegisterSingleton<DatabaseContext>();
-
-            // register query factory - fixme kill
-            container.RegisterSingleton(f => f.GetInstance<IDatabaseFactory>().QueryFactory);
 
             // register a database accessor - required by database factory
             // will be replaced by HybridUmbracoDatabaseAccessor in the web runtime
@@ -247,7 +244,7 @@ namespace Umbraco.Core
             builder.AddCore();
         }
 
-        private void SetRuntimeStateLevel(RuntimeState runtimeState, IDatabaseFactory databaseFactory, ILogger logger)
+        private void SetRuntimeStateLevel(RuntimeState runtimeState, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
             var localVersion = LocalVersion; // the local, files, version
             var codeVersion = runtimeState.SemanticVersion; // the executing code version
@@ -340,14 +337,12 @@ namespace Umbraco.Core
             runtimeState.Level = RuntimeLevel.Upgrade;
         }
 
-        protected virtual bool EnsureMigration(IDatabaseFactory databaseFactory, SemVersion codeVersion)
+        protected virtual bool EnsureMigration(IUmbracoDatabaseFactory databaseFactory, SemVersion codeVersion)
         {
-            var uf = databaseFactory as UmbracoDatabaseFactory; // fixme
-            if (uf == null) throw new Exception("oops: db.");
-            using (var database = uf.CreateDatabase()) // no scope - just the database
+            using (var database = databaseFactory.CreateDatabase()) // no scope - just the database
             {
                 var codeVersionString = codeVersion.ToString();
-                var sql = database.Sql()
+                var sql = databaseFactory.Sql()
                     .Select<MigrationDto>()
                     .From<MigrationDto>()
                     .Where<MigrationDto>(x => x.Name.InvariantEquals(GlobalSettings.UmbracoMigrationName) && x.Version == codeVersionString);

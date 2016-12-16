@@ -16,10 +16,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             Execute.Code(MigrationCode);
         }
 
-        private string MigrationCode(UmbracoDatabase database)
+        private string MigrationCode(IUmbracoDatabase database)
         {
             var umbracoRedirectUrlTableName = "umbracoRedirectUrl";
-            var localContext = new LocalMigrationContext(database, Logger);
+            var local = Context.GetLocalMigration();
 
             var tables = SqlSyntax.GetTablesInSchema(database).ToArray();
 
@@ -28,17 +28,17 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
                 var columns = SqlSyntax.GetColumnsInSchema(database).ToArray();
                 if (columns.Any(x => x.TableName.InvariantEquals(umbracoRedirectUrlTableName) && x.ColumnName.InvariantEquals("id") && x.DataType == "uniqueidentifier"))
                     return null;
-                localContext.Delete.Table(umbracoRedirectUrlTableName);
+                local.Delete.Table(umbracoRedirectUrlTableName);
             }
 
-            localContext.Create.Table(umbracoRedirectUrlTableName)
+            local.Create.Table(umbracoRedirectUrlTableName)
                 .WithColumn("id").AsGuid().NotNullable().PrimaryKey("PK_" + umbracoRedirectUrlTableName)
                 .WithColumn("createDateUtc").AsDateTime().NotNullable()
                 .WithColumn("url").AsString(2048).NotNullable()
                 .WithColumn("contentKey").AsGuid().NotNullable()
                 .WithColumn("urlHash").AsString(40).NotNullable();
 
-            localContext.Create.Index("IX_" + umbracoRedirectUrlTableName).OnTable(umbracoRedirectUrlTableName)
+            local.Create.Index("IX_" + umbracoRedirectUrlTableName).OnTable(umbracoRedirectUrlTableName)
                 .OnColumn("urlHash")
                 .Ascending()
                 .OnColumn("contentKey")
@@ -47,11 +47,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
                 .Descending()
                 .WithOptions().NonClustered();
 
-            localContext.Create.ForeignKey("FK_" + umbracoRedirectUrlTableName)
+            local.Create.ForeignKey("FK_" + umbracoRedirectUrlTableName)
                 .FromTable(umbracoRedirectUrlTableName).ForeignColumn("contentKey")
                 .ToTable("umbracoNode").PrimaryColumn("uniqueID");
 
-            return localContext.GetSql();
+            return local.GetSql();
         }
 
         public override void Down()

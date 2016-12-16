@@ -998,7 +998,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
         }
 
-        private void OnRemovedEntity(UmbracoDatabase db, IContentBase item)
+        private void OnRemovedEntity(IUmbracoDatabase db, IContentBase item)
         {
             db.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id", new { id = item.Id });
         }
@@ -1076,7 +1076,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             OnRepositoryRefreshed(db, member, true);
         }
 
-        private void OnRepositoryRefreshed(UmbracoDatabase db, IContentBase content, bool published)
+        private void OnRepositoryRefreshed(IUmbracoDatabase db, IContentBase content, bool published)
         {
             // use a custom SQL to update row version on each update
             //db.InsertOrUpdate(dto);
@@ -1222,7 +1222,7 @@ WHERE cmsContentNu.nodeId IN (
             // insert back - if anything fails the transaction will rollback
             var repository = uow.CreateRepository<IContentRepository>();
             ((ContentRepository) repository).SetNoCachePolicy();
-            var query = _uowProvider.DatabaseContext.Query<IContent>();
+            var query = _uowProvider.DatabaseFactory.Query<IContent>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1292,7 +1292,7 @@ WHERE cmsContentNu.nodeId IN (
             // insert back - if anything fails the transaction will rollback
             var repository = uow.CreateRepository<IMediaRepository>();
             ((MediaRepository)repository).SetNoCachePolicy();
-            var query = _uowProvider.DatabaseContext.Query<IMedia>();
+            var query = _uowProvider.DatabaseFactory.Query<IMedia>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1352,7 +1352,7 @@ WHERE cmsContentNu.nodeId IN (
             // insert back - if anything fails the transaction will rollback
             var repository = uow.CreateRepository<IMemberRepository>();
             ((MemberRepository)repository).SetNoCachePolicy();
-            var query = _uowProvider.DatabaseContext.Query<IMember>();
+            var query = _uowProvider.DatabaseFactory.Query<IMember>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using NPoco;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
     internal class MigrationContext : IMigrationContext
     {
-        public MigrationContext(UmbracoDatabase database, ILogger logger)
+        public MigrationContext(IUmbracoDatabase database, ILogger logger)
         {
             if (database == null) throw new ArgumentNullException(nameof(database));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -21,12 +22,20 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public ICollection<IMigrationExpression> Expressions { get; set; }
 
-        public UmbracoDatabase Database { get; }
+        public IUmbracoDatabase Database { get; }
 
         public ISqlSyntaxProvider SqlSyntax => Database.SqlSyntax;
+
+        public Sql<SqlContext> Sql() => new Sql<SqlContext>(Database.SqlContext);
+
+        public Sql<SqlContext> Sql(string sql, params object[] args) => new Sql<SqlContext>(Database.SqlContext, sql, args);
+
+        public IQuery<T> Query<T>() => new Query<T>(Database.SqlContext);
 
         public DatabaseType DatabaseType => Database.DatabaseType;
 
         public ILogger Logger { get; }
+
+        public ILocalMigration GetLocalMigration() => new LocalMigration(Database, Logger);
     }
 }

@@ -42,13 +42,13 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="logger">A logger.</param>
         /// <param name="lazyFactory">A (lazy) database factory.</param>
         /// <returns>The default ISqlSyntaxProvider objects.</returns>
-        public IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger, Lazy<IDatabaseFactory> lazyFactory = null)
+        public IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger, Lazy<IUmbracoDatabaseFactory> lazyFactory = null)
         {
             return new ISqlSyntaxProvider[]
             {
                 new MySqlSyntaxProvider(logger),
                 new SqlCeSyntaxProvider(),
-                new SqlServerSyntaxProvider(lazyFactory ?? new Lazy<IDatabaseFactory>(() => null))
+                new SqlServerSyntaxProvider(lazyFactory ?? new Lazy<IUmbracoDatabaseFactory>(() => null))
             };
         }
 
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.TestHelpers
         /// that can begin a transaction.</remarks>
         public UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
         {
-            var syntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)); // do NOT try to get the server's version!
+            var syntax = new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null)); // do NOT try to get the server's version!
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, Mock.Of<IPocoDataFactory>(), DatabaseType.SqlServer2008);
             return new UmbracoDatabase(connection, sqlContext, logger);
@@ -105,7 +105,6 @@ namespace Umbraco.Tests.TestHelpers
             CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
-            IQueryFactory queryFactory,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IServiceFactory container = null)
         {
@@ -224,7 +223,7 @@ namespace Umbraco.Tests.TestHelpers
             return new Lazy<T>(() => container?.TryGetInstance<T>() ?? ctor());
         }
 
-        public IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger, IDatabaseFactory databaseFactory = null, RepositoryFactory repositoryFactory = null)
+        public IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger, IUmbracoDatabaseFactory databaseFactory = null, RepositoryFactory repositoryFactory = null)
         {
             if (databaseFactory == null)
             {
@@ -236,7 +235,7 @@ namespace Umbraco.Tests.TestHelpers
                 databaseFactory = new UmbracoDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, mappers);
             }
             repositoryFactory = repositoryFactory  ??  new RepositoryFactory(Mock.Of<IServiceContainer>());
-            return new NPocoUnitOfWorkProvider(new DatabaseContext(databaseFactory), repositoryFactory);
+            return new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
         }
     }
 }

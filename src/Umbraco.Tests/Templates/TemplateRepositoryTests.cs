@@ -34,11 +34,6 @@ namespace Umbraco.Tests.Templates
             var database = TestObjects.GetUmbracoSqlCeDatabase(logger);
             unitOfWorkMock.Setup(x => x.Database).Returns(database);
 
-            var databaseFactoryMock = new Mock<IDatabaseFactory>();
-            databaseFactoryMock.Setup(x => x.QueryFactory).Returns(Mock.Of<IQueryFactory>());
-            var databaseContext = new DatabaseContext(databaseFactoryMock.Object);
-            unitOfWorkMock.Setup(x => x.DatabaseContext).Returns(databaseContext);
-
             _templateRepository = new TemplateRepository(unitOfWorkMock.Object, _cacheMock.Object, logger, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object);
 
         }

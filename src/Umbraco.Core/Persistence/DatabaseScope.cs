@@ -3,19 +3,19 @@ using System.Threading;
 
 namespace Umbraco.Core.Persistence
 {
-    public class DatabaseScope : IDisposeOnRequestEnd // implies IDisposable
+    public class DatabaseScope : IDatabaseScope, IDisposeOnRequestEnd // implies IDisposable
     {
         private readonly DatabaseScope _parent;
         private readonly IDatabaseScopeAccessor _accessor;
-        private readonly UmbracoDatabaseFactory _factory;        
-        private UmbracoDatabase _database;
+        private readonly IUmbracoDatabaseFactory _factory;        
+        private IUmbracoDatabase _database;
         private bool _isParent;
         private int _disposed;
         private bool _disposeDatabase;
 
         // can specify a database to create a "substitute" scope eg for deploy - oh my
 
-        internal DatabaseScope(IDatabaseScopeAccessor accessor, UmbracoDatabaseFactory factory, UmbracoDatabase database = null)
+        internal DatabaseScope(IDatabaseScopeAccessor accessor, IUmbracoDatabaseFactory factory, IUmbracoDatabase database = null)
         {
             _accessor = accessor;
             _factory = factory;
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence
             _accessor.Scope = this;
         }
 
-        public UmbracoDatabase Database
+        public IUmbracoDatabase Database
         {
             get
             {

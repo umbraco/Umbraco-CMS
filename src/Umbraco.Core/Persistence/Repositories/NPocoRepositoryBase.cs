@@ -36,23 +36,23 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Gets the repository's database.
         /// </summary>
-        protected UmbracoDatabase Database => UnitOfWork.Database;
+        protected IUmbracoDatabase Database => UnitOfWork.Database;
 
         /// <summary>
         /// Gets the repository's database sql syntax.
         /// </summary>
-        public ISqlSyntaxProvider SqlSyntax => UnitOfWork.DatabaseContext.SqlSyntax;
+        public ISqlSyntaxProvider SqlSyntax => UnitOfWork.SqlSyntax;
 
         /// <summary>
         /// Creates a new query.
         /// </summary>
-        public override IQuery<T> Query<T>() => UnitOfWork.DatabaseContext.Query<T>();
+        public override IQuery<T> Query<T>() => UnitOfWork.Query<T>();
 
         /// <summary>
         /// Creates a new Sql statement.
         /// </summary>
         /// <returns>A new Sql statement.</returns>
-        protected Sql<SqlContext> Sql() => UnitOfWork.DatabaseContext.Sql();
+        protected Sql<SqlContext> Sql() => UnitOfWork.Sql();
 
         #region Abstract Methods
 

@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -58,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                unitOfWork.Database.EnableSqlTrace = true;
+                unitOfWork.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger);
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
@@ -98,7 +99,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                unitOfWork.Database.EnableSqlTrace = true;
+                unitOfWork.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger);
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]

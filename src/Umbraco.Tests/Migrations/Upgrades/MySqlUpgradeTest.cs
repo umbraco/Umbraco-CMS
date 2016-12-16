@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             //TODO Remove created database here
         }
 
-        public override UmbracoDatabase GetConfiguredDatabase()
+        public override IUmbracoDatabase GetConfiguredDatabase()
         {
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.MySql);
             var sqlContext = new SqlContext(new MySqlSyntaxProvider(Mock.Of<ILogger>()), Mock.Of<IPocoDataFactory>(), DatabaseType.MySQL);

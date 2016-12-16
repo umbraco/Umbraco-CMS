@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public string Path { get; set; }
         public abstract void DatabaseSpecificSetUp();
         public abstract void DatabaseSpecificTearDown();
-        public abstract UmbracoDatabase GetConfiguredDatabase();
+        public abstract IUmbracoDatabase GetConfiguredDatabase();
         public abstract string GetDatabaseSpecificSqlScript();
     }
 }

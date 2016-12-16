@@ -297,10 +297,13 @@
     <Compile Include="Models\PublishedContent\PropertyResultType.cs" />
     <Compile Include="Models\Rdbms\ContentNuDto.cs" />
     <Compile Include="Persistence\DbCommandExtensions.cs" />
+    <Compile Include="Persistence\IDatabaseScope.cs" />
     <Compile Include="Persistence\IDatabaseScopeAccessor.cs" />
+    <Compile Include="Persistence\IDatabaseContext.cs" />
     <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
     <Compile Include="Persistence\Mappers\MapperCollection.cs" />
     <Compile Include="Persistence\Mappers\MapperCollectionBuilder.cs" />
+    <Compile Include="Persistence\Migrations\ILocalMigration.cs" />
     <Compile Include="Persistence\Migrations\IMigrationCollectionBuilder.cs" />
     <Compile Include="Persistence\Migrations\MigrationCollection.cs" />
     <Compile Include="Persistence\Migrations\MigrationCollectionBuilder.cs" />
@@ -308,6 +311,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\RefactorXmlColumns.cs" />
     <Compile Include="Persistence\DatabaseScope.cs" />
     <Compile Include="Persistence\ThreadStaticDatabaseScopeAccessor.cs" />
+    <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />
     <Compile Include="Plugins\HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ICompletable.cs" />
@@ -356,14 +360,12 @@
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Persistence\IUmbracoDatabaseConfig.cs" />
+    <Compile Include="Persistence\IUmbracoDatabase.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddLockObjects.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddLockTable.cs" />
     <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\NPocoDatabaseTypeExtensions.cs" />
-    <Compile Include="Persistence\Querying\IQueryFactory.cs" />
-    <Compile Include="Persistence\Querying\QueryFactory.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
     <Compile Include="Media\Exif\ExifEnums.cs" />
@@ -401,7 +403,7 @@
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
-    <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
+    <Compile Include="Persistence\Migrations\LocalMigration.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveFive\AddLockObjects.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveFive\AddLockTable.cs" />
@@ -842,7 +844,7 @@
     <Compile Include="Persistence\Factories\TemplateFactory.cs" />
     <Compile Include="Persistence\Factories\UserFactory.cs" />
     <Compile Include="Persistence\Factories\UserTypeFactory.cs" />
-    <Compile Include="Persistence\IDatabaseFactory.cs" />
+    <Compile Include="Persistence\IUmbracoDatabaseFactory.cs" />
     <Compile Include="Persistence\Mappers\BaseMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapper.cs" />

@@ -23,32 +23,31 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
             Execute.Code(MigrationCode);
         }
 
-        private string MigrationCode(UmbracoDatabase database)
+        private string MigrationCode(IUmbracoDatabase database)
         {
-            var localContext = new LocalMigrationContext(database, Logger);
+            var local = Context.GetLocalMigration();
             
             //Clear all stylesheet data if the tables exist
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
             if (tables.InvariantContains("cmsStylesheetProperty"))
             {
-                localContext.Delete.FromTable("cmsStylesheetProperty").AllRows();
-                localContext.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) });
+                local.Delete.FromTable("cmsStylesheetProperty").AllRows();
+                local.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) });
 
-                localContext.Delete.Table("cmsStylesheetProperty");
+                local.Delete.Table("cmsStylesheetProperty");
             }
             if (tables.InvariantContains("cmsStylesheet"))
             {
-                localContext.Delete.FromTable("cmsStylesheet").AllRows();
-                localContext.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.Stylesheet) });
+                local.Delete.FromTable("cmsStylesheet").AllRows();
+                local.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.Stylesheet) });
 
-                localContext.Delete.Table("cmsStylesheet");
+                local.Delete.Table("cmsStylesheet");
             }
 
-            return localContext.GetSql();
+            return local.GetSql();
         }
 
         public override void Down()
-        {            
-        }
+        { }
     }
 }

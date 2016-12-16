@@ -179,13 +179,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		        userService,
 		        new[] {new DefaultUrlSegmentProvider()},
 		        new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
-		        options,
-                //TODO: This should be rewritten without the Mock fluent syntax so it can be read better, 
-                // but I'll do that some other time, for this now just mocks the GetWhereClauses to return the 
-                // correct clauses that are expected
-		        Mock.Of<IQueryFactory>(
-		            factory => factory.Create<IContent>() == Mock.Of<IQuery<IContent>>(
-		                query => query.GetWhereClauses() == new List<Tuple<string, object[]>> {new Tuple<string, object[]>("cmsDocument.published", new object[] {1})})));
+		        options);
 
 			i.IndexingError += IndexingError;
 

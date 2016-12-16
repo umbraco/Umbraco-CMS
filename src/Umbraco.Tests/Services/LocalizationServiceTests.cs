@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Tests.Services
 {
@@ -129,22 +130,22 @@ namespace Umbraco.Tests.Services
                     currParentId = desc1.Key;
                 }
 
-                DatabaseContext.Database.EnableSqlTrace = true;
-                DatabaseContext.Database.EnableSqlCount = true;
+                DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                 var items = ServiceContext.LocalizationService.GetDictionaryItemDescendants(_parentItemGuidId)
                     .ToArray();
 
-                Debug.WriteLine("SQL CALLS: " + DatabaseContext.Database.SqlCount);
+                Debug.WriteLine("SQL CALLS: " + DatabaseContext.Database.AsUmbracoDatabase().SqlCount);
 
                 Assert.AreEqual(51, items.Length);
                 //there's a call or two to get languages, so apart from that there should only be one call per level
-                Assert.Less(DatabaseContext.Database.SqlCount, 30);
+                Assert.Less(DatabaseContext.Database.AsUmbracoDatabase().SqlCount, 30);
             }
             finally
             {
-                DatabaseContext.Database.EnableSqlTrace = false;
-                DatabaseContext.Database.EnableSqlCount = false;
+                DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = false;
             }
            
         }

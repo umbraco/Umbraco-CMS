@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Components
 
         private static IServiceContainer MockContainer(Action<Mock<IServiceContainer>> setup = null)
         {
-            // fixme use IDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
+            // fixme use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
 
             var testObjects = new TestObjects(null);
             var logger = Mock.Of<ILogger>();

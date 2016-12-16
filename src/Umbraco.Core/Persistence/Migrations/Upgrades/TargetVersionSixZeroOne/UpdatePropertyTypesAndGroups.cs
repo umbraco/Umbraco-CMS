@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
 
         }
 
-        public static string UpdatePropertyTypesAndGroupsDo(Database database)
+        public static string UpdatePropertyTypesAndGroupsDo(IDatabase database)
         {
             if (database != null)
             {

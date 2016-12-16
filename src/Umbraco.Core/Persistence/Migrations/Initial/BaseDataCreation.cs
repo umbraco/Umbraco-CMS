@@ -11,10 +11,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     /// </summary>
     internal class BaseDataCreation
     {
-        private readonly Database _database;
+        private readonly IDatabase _database;
         private readonly ILogger _logger;
 
-        public BaseDataCreation(Database database, ILogger logger)
+        public BaseDataCreation(IDatabase database, ILogger logger)
         {
             _database = database;
             _logger = logger;

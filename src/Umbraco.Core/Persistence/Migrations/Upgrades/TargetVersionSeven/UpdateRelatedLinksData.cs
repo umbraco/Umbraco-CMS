@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             Execute.Code(UpdateRelatedLinksDataDo);
         }
 
-        public string UpdateRelatedLinksDataDo(Database database)
+        public string UpdateRelatedLinksDataDo(IDatabase database)
         {
             if (database != null)
             {
@@ -133,7 +133,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             throw new DataLossException("Cannot downgrade from a version 7 database to a prior version, the database schema has already been modified");
         }
 
-        private static void UpdateXmlTable(List<PropertyTypeDto> propertyTypes, dynamic data, List<ContentXmlDto> cmsContentXmlEntries, Database database)
+        private static void UpdateXmlTable(List<PropertyTypeDto> propertyTypes, dynamic data, List<ContentXmlDto> cmsContentXmlEntries, IDatabase database)
         {
             //now we need to update the cmsContentXml table
             var propertyType = propertyTypes.SingleOrDefault(x => x.Id == data.propertytypeid);

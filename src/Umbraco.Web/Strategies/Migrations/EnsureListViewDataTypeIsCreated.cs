@@ -28,7 +28,7 @@ namespace Umbraco.Web.Strategies.Migrations
 
         private void EnsureListViewDataTypeCreated(MigrationEventArgs e)
         {
-            var syntax = e.MigrationContext.Database.SqlSyntax;
+            var syntax = e.MigrationContext.SqlSyntax;
 
             using (var transaction = e.MigrationContext.Database.GetTransaction())
             {

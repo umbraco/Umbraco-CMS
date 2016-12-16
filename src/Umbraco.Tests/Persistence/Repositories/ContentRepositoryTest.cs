@@ -456,7 +456,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void RegexAliasTest()
         {
-            var regex = VersionableRepositoryBaseAliasRegex.For(new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)));
+            var regex = VersionableRepositoryBaseAliasRegex.For(new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null)));
             Assert.AreEqual(@"(\[\w+]\.\[\w+])\s+AS\s+(\[\w+])", regex.ToString());
             const string sql = "SELECT [table].[column1] AS [alias1], [table].[column2] AS [alias2] FROM [table];";
             var matches = regex.Matches(sql);
@@ -482,8 +482,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 try
                 {
-                    DatabaseContext.Database.EnableSqlTrace = true;
-                    DatabaseContext.Database.EnableSqlCount = true;
+                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "title", Direction.Ascending, false);
 
@@ -496,8 +496,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 finally
                 {
-                    DatabaseContext.Database.EnableSqlTrace = false;
-                    DatabaseContext.Database.EnableSqlCount = false;
+                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -517,8 +517,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 try
                 {
-                    DatabaseContext.Database.EnableSqlTrace = true;
-                    DatabaseContext.Database.EnableSqlCount = true;
+                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = true;
                     var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true);
 
                     // Assert
@@ -528,8 +528,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 finally
                 {
-                    DatabaseContext.Database.EnableSqlTrace = false;
-                    DatabaseContext.Database.EnableSqlCount = false;
+                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -611,7 +611,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 long totalRecords;
 
-                var filterQuery = QueryFactory.Create<IContent>().Where(x => x.Name.Contains("Page 2"));
+                var filterQuery = unitOfWork.Query<IContent>().Where(x => x.Name.Contains("Page 2"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert
@@ -635,7 +635,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 long totalRecords;
 
-                var filterQuery = QueryFactory.Create<IContent>().Where(x => x.Name.Contains("text"));
+                var filterQuery = unitOfWork.Query<IContent>().Where(x => x.Name.Contains("text"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert

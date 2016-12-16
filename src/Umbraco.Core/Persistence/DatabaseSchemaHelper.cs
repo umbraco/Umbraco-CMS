@@ -12,11 +12,11 @@ namespace Umbraco.Core.Persistence
 {
     public class DatabaseSchemaHelper
     {
-        private readonly UmbracoDatabase _database;
+        private readonly IUmbracoDatabase _database;
         private readonly ILogger _logger;
         private readonly BaseDataCreation _baseDataCreation;
 
-        public DatabaseSchemaHelper(UmbracoDatabase database, ILogger logger)
+        public DatabaseSchemaHelper(IUmbracoDatabase database, ILogger logger)
         {
             _database = database;
             _logger = logger;

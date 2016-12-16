@@ -6,6 +6,7 @@ using NPoco;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -17,18 +18,16 @@ namespace Umbraco.Core.Persistence
     /// <para>Is used everywhere in place of the original NPoco Database object, and provides additional features
     /// such as profiling, retry policies, logging, etc.</para>
     /// <para>Is never created directly but obtained from the <see cref="UmbracoDatabaseFactory"/>.</para>
-    /// <para>It implements IDisposeOnRequestEnd which means it will be disposed when the request ends, which
-    /// automatically closes the connection - as implemented by NPoco Database.Dispose().</para>
     /// </remarks>
-    public class UmbracoDatabase : Database, IDisposeOnRequestEnd, IUmbracoDatabaseConfig
+    public class UmbracoDatabase : Database, IUmbracoDatabase
     {
         // Umbraco's default isolation level is RepeatableRead
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
 
-        private readonly ILogger _logger;
-        private readonly SqlContext _sqlContext;
+        private readonly ILogger _logger;        
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
+        private readonly Guid _instanceGuid = Guid.NewGuid();
 
         #region Ctor
 
@@ -42,7 +41,7 @@ namespace Umbraco.Core.Persistence
         public UmbracoDatabase(string connectionString, SqlContext sqlContext, DbProviderFactory provider, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
             : base(connectionString, sqlContext.DatabaseType, provider, DefaultIsolationLevel)
         {
-            _sqlContext = sqlContext;
+            SqlContext = sqlContext;
 
             _logger = logger;
             _connectionRetryPolicy = connectionRetryPolicy;
@@ -58,7 +57,7 @@ namespace Umbraco.Core.Persistence
         internal UmbracoDatabase(DbConnection connection, SqlContext sqlContext, ILogger logger)
             : base(connection, sqlContext.DatabaseType, DefaultIsolationLevel)
         {
-            _sqlContext = sqlContext;
+            SqlContext = sqlContext;
             _logger = logger;
 
             EnableSqlTrace = EnableSqlTraceDefault;
@@ -66,26 +65,17 @@ namespace Umbraco.Core.Persistence
 
         #endregion
 
-        /// <summary>
-        /// Gets the database Sql syntax.
-        /// </summary>
-        public ISqlSyntaxProvider SqlSyntax => _sqlContext.SqlSyntax;
+        /// <inheritdoc />
+        public SqlContext SqlContext { get; }
 
-        /// <summary>
-        /// Creates a Sql statement.
-        /// </summary>
-        public Sql<SqlContext> Sql()
-        {
-            return NPoco.Sql.BuilderFor(_sqlContext);
-        }
+        /// <inheritdoc />
+        public ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
+        
+        public Sql<SqlContext> Sql() => new Sql<SqlContext>(SqlContext);
 
-        /// <summary>
-        /// Creates a Sql statement.
-        /// </summary>
-        public Sql<SqlContext> Sql(string sql, params object[] args)
-        {
-            return Sql().Append(sql, args);
-        }
+        public Sql<SqlContext> Sql(string sql, params object[] args) => Sql().Append(sql, args);
+
+        public IQuery<T> Query<T>() => new Query<T>(SqlContext);
 
         #region Testing, Debugging and Troubleshooting
 
@@ -95,25 +85,19 @@ namespace Umbraco.Core.Persistence
         private int _spid = -1;
         private const bool EnableSqlTraceDefault = true;
 #else
-        private string _sid;
+        private string _instanceId;
         private const bool EnableSqlTraceDefault = false;
 #endif
 
-        /// <summary>
-        /// Gets this instance's unique identifier.
-        /// </summary>
-        public Guid InstanceId { get; } = Guid.NewGuid();
-
-        /// <summary>
-        /// Gets this instance's string identifier.
-        /// </summary>
-        public string InstanceSid {
+        /// <inheritdoc />
+        public string InstanceId
+        {
             get
             {
 #if DEBUG_DATABASES
-                return InstanceId.ToString("N").Substring(0, 8) + ':' + _spid;
+                return _instanceGuid.ToString("N").Substring(0, 8) + ':' + _spid;
 #else
-                return _sid ?? (_sid = InstanceId.ToString("N").Substring(0, 8));
+                return _instanceId ?? (_instanceId = _instanceGuid.ToString("N").Substring(0, 8));
 #endif
             }
         }
@@ -196,7 +180,7 @@ namespace Umbraco.Core.Persistence
 
         protected override void OnException(Exception x)
         {
-            _logger.Error<UmbracoDatabase>("Exception (" + InstanceSid + ").", x);
+            _logger.Error<UmbracoDatabase>("Exception (" + InstanceId + ").", x);
             base.OnException(x);
         }
 
@@ -210,7 +194,7 @@ namespace Umbraco.Core.Persistence
             {
                 var sb = new StringBuilder();
 #if DEBUG_DATABASES
-                sb.Append(InstanceSid);
+                sb.Append(InstanceId);
                 sb.Append(": ");
 #endif
                 sb.Append(cmd.CommandText);
@@ -225,7 +209,7 @@ namespace Umbraco.Core.Persistence
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)
-            DatabaseDebugHelper.SetCommand(cmd, InstanceSid + " [T" + Thread.CurrentThread.ManagedThreadId + "]");
+            DatabaseDebugHelper.SetCommand(cmd, InstanceId + " [T" + Thread.CurrentThread.ManagedThreadId + "]");
             var refsobj = DatabaseDebugHelper.GetReferencedObjects(cmd.Connection);
             if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
 #endif
@@ -242,16 +226,5 @@ namespace Umbraco.Core.Persistence
         }
 
         #endregion
-        
-        // at the moment, NPoco does not support overriding Dispose
-        /*
-        public override void Dispose(bool disposing)
-        {
-#if DEBUG_DATABASES
-            LogHelper.Debug<UmbracoDatabase>("Dispose (" + InstanceSid + ").");
-#endif
-            base.Dispose();
-        }
-        */
     }
 }

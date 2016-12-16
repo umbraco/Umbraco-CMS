@@ -41,7 +41,7 @@ namespace Umbraco.Core.Services
 
         // lazy-constructed because when the ctor runs, the query factory may not be ready
 
-        private IQuery<IContent> QueryNotTrashed => _queryNotTrashed ?? (_queryNotTrashed = UowProvider.DatabaseContext.Query<IContent>().Where(x => x.Trashed == false));
+        private IQuery<IContent> QueryNotTrashed => _queryNotTrashed ?? (_queryNotTrashed = UowProvider.DatabaseFactory.Query<IContent>().Where(x => x.Trashed == false));
 
         #endregion
 

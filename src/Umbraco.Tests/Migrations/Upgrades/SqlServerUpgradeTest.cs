@@ -21,10 +21,10 @@ namespace Umbraco.Tests.Migrations.Upgrades
         {
         }
 
-        public override UmbracoDatabase GetConfiguredDatabase()
+        public override IUmbracoDatabase GetConfiguredDatabase()
         {
             var dbProviderFactory = DbProviderFactories.GetFactory("System.Data.SqlClient");
-            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)), Mock.Of<IPocoDataFactory>(), DatabaseType.SqlServer2008);
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null)), Mock.Of<IPocoDataFactory>(), DatabaseType.SqlServer2008);
             return new UmbracoDatabase(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco", sqlContext, dbProviderFactory, Mock.Of<ILogger>());
         }
 

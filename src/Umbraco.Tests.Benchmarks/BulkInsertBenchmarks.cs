@@ -44,10 +44,10 @@ namespace Umbraco.Tests.Benchmarks
 
         // fixme - should run on LocalDb same as NPoco tests!
 
-        private UmbracoDatabase GetSqlServerDatabase(ILogger logger)
+        private IUmbracoDatabase GetSqlServerDatabase(ILogger logger)
         {
-            IDatabaseFactory f = null;
-            var l = new Lazy<IDatabaseFactory>(() => f);
+            IUmbracoDatabaseFactory f = null;
+            var l = new Lazy<IUmbracoDatabaseFactory>(() => f);
             var p = new SqlServerSyntaxProvider(l);
             f = new UmbracoDatabaseFactory(
                 "server=.\\SQLExpress;database=YOURDB;user id=YOURUSER;password=YOURPASS",
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Benchmarks
             return f.GetDatabase();
         }
 
-        private UmbracoDatabase GetSqlCeDatabase(string cstr, ILogger logger)
+        private IUmbracoDatabase GetSqlCeDatabase(string cstr, ILogger logger)
         {
             var f = new UmbracoDatabaseFactory(
                 cstr,
@@ -167,8 +167,8 @@ namespace Umbraco.Tests.Benchmarks
         }
 
         private string _dbFile;
-        private UmbracoDatabase _dbSqlCe;
-        private UmbracoDatabase _dbSqlServer;
+        private IUmbracoDatabase _dbSqlCe;
+        private IUmbracoDatabase _dbSqlServer;
 
         /// <summary>
         /// Tests updating the existing XML way

@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public string Path { get; set; }
 
-        public UmbracoDatabase GetConfiguredDatabase()
+        public IUmbracoDatabase GetConfiguredDatabase()
         {
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
             var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), Mock.Of<IPocoDataFactory>(), DatabaseType.SQLCe);

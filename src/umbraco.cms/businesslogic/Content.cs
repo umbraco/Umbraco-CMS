@@ -337,14 +337,14 @@ namespace umbraco.cms.businesslogic
 
         internal protected class ContentDeleteEventArgs : EventArgs
         {
-            public ContentDeleteEventArgs(UmbracoDatabase database, int id)
+            public ContentDeleteEventArgs(IUmbracoDatabase database, int id)
             {
                 Database = database;
                 Id = id;
             }
 
             public int Id { get; private set; }
-            public UmbracoDatabase Database { get; private set; }
+            public IUmbracoDatabase Database { get; private set; }
         }
 
         internal static event TypedEventHandler<Content, ContentDeleteEventArgs> DeletedContent;

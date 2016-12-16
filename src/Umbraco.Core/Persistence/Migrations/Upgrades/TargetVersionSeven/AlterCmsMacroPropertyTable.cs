@@ -41,7 +41,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 //If we are on SQLServer, we need to delete default constraints by name, older versions of umbraco did not name these default constraints
                 // consistently so we need to look up the constraint name to delete, this only pertains to SQL Server and this issue:
                 // http://issues.umbraco.org/issue/U4-4133
-                var sqlServerSyntaxProvider = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null));
+                var sqlServerSyntaxProvider = new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null));
                 var defaultConstraints = sqlServerSyntaxProvider.GetDefaultConstraintsPerColumn(Context.Database).Distinct();
 
                 //lookup the constraint we want to delete, normally would be called "DF_cmsMacroProperty_macroPropertyHidden" but

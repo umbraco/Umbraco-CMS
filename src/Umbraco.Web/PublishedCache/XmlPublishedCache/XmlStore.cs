@@ -563,7 +563,7 @@ AND (umbracoNode.id=@id)";
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
-                var sqlSyntax = uow.Database.SqlSyntax;
+                var sqlSyntax = uow.SqlSyntax;
 
                 var sql = ReadCmsPreviewXmlSql1;
                 sql += " @path LIKE " + sqlSyntax.GetConcat("umbracoNode.Path", "',%"); // concat(umbracoNode.path, ',%')
@@ -1548,7 +1548,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
         }
 
-        private void OnRemovedEntity(UmbracoDatabase db, IContentBase item)
+        private void OnRemovedEntity(IUmbracoDatabase db, IContentBase item)
         {
             var parms = new { id = item.Id };
             db.Execute("DELETE FROM cmsContentXml WHERE nodeId=@id", parms);
@@ -1572,7 +1572,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             OnRemovedVersion(args.UnitOfWork.Database, args.EntityId, args.VersionId);
         }
 
-        private void OnRemovedVersion(UmbracoDatabase db, int entityId, Guid versionId)
+        private void OnRemovedVersion(IUmbracoDatabase db, int entityId, Guid versionId)
         {
             // we do not version cmsPreviewXml anymore - nothing to do here
         }
@@ -1668,7 +1668,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             OnRepositoryRefreshed(db, dto1);
         }
 
-        private void OnRepositoryRefreshed(UmbracoDatabase db, ContentXmlDto dto)
+        private void OnRepositoryRefreshed(IUmbracoDatabase db, ContentXmlDto dto)
         {
             // use a custom SQL to update row version on each update
             //db.InsertOrUpdate(dto);
@@ -1682,7 +1682,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 });
         }
 
-        private void OnRepositoryRefreshed(UmbracoDatabase db, PreviewXmlDto dto)
+        private void OnRepositoryRefreshed(IUmbracoDatabase db, PreviewXmlDto dto)
         {
             // cannot simply update because of PetaPoco handling of the composite key ;-(
             // read http://stackoverflow.com/questions/11169144/how-to-modify-petapoco-class-to-work-with-composite-key-comprising-of-non-numeri
@@ -1812,7 +1812,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseContext.Query<IContent>().Where(x => x.Published);
+            var query = _uowProvider.DatabaseFactory.Query<IContent>().Where(x => x.Published);
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1884,7 +1884,7 @@ WHERE cmsPreviewXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseContext.Query<IContent>();
+            var query = _uowProvider.DatabaseFactory.Query<IContent>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1960,7 +1960,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseContext.Query<IMedia>();
+            var query = _uowProvider.DatabaseFactory.Query<IMedia>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -2030,7 +2030,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseContext.Query<IMember>();
+            var query = _uowProvider.DatabaseFactory.Query<IMember>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 

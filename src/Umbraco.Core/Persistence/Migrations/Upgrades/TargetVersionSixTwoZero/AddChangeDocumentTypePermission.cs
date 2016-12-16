@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
             Execute.Code(UndoChangeDocumentTypePermissionDo);
         }
 
-        private static string AddChangeDocumentTypePermissionDo(Database database)
+        private static string AddChangeDocumentTypePermissionDo(IDatabase database)
         {
             var adminUserType = database.Fetch<UserTypeDto>("WHERE Id = 1").FirstOrDefault();
 
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
             return string.Empty;
         }
 
-        private static string UndoChangeDocumentTypePermissionDo(Database database)
+        private static string UndoChangeDocumentTypePermissionDo(IDatabase database)
         {
             var adminUserType = database.Fetch<UserTypeDto>("WHERE Id = 1").FirstOrDefault();
 

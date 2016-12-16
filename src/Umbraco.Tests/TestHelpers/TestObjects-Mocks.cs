@@ -23,15 +23,15 @@ namespace Umbraco.Tests.TestHelpers
     internal partial class TestObjects
     {
         /// <summary>
-        /// Gets a mocked IDatabaseFactory.
+        /// Gets a mocked IUmbracoDatabaseFactory.
         /// </summary>
-        /// <returns>An IDatabaseFactory.</returns>
+        /// <returns>An IUmbracoDatabaseFactory.</returns>
         /// <param name="configured">A value indicating whether the factory is configured.</param>
         /// <param name="canConnect">A value indicating whether the factory can connect to the database.</param>
         /// <remarks>This is just a void factory that has no actual database.</remarks>
-        public IDatabaseFactory GetDatabaseFactoryMock(bool configured = true, bool canConnect = true)
+        public IUmbracoDatabaseFactory GetDatabaseFactoryMock(bool configured = true, bool canConnect = true)
         {
-            var databaseFactoryMock = new Mock<IDatabaseFactory>();
+            var databaseFactoryMock = new Mock<IUmbracoDatabaseFactory>();
             databaseFactoryMock.Setup(x => x.Configured).Returns(configured);
             databaseFactoryMock.Setup(x => x.CanConnect).Returns(canConnect);
 

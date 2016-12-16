@@ -17,7 +17,7 @@ using UmbracoExamine;
 namespace Umbraco.Tests.Runtimes
 {
     [TestFixture]
-    [Ignore("cannot work until we refactor IDatabaseFactory vs UmbracoDatabaseFactory")]
+    [Ignore("cannot work until we refactor IUmbracoDatabaseFactory vs UmbracoDatabaseFactory")]
     public class CoreRuntimeTests
     {
         [SetUp]
@@ -98,17 +98,17 @@ namespace Umbraco.Tests.Runtimes
 
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db
-            private static IDatabaseFactory GetDatabaseFactory()
+            private static IUmbracoDatabaseFactory GetDatabaseFactory()
             {
-                var mock = new Mock<IDatabaseFactory>();
+                var mock = new Mock<IUmbracoDatabaseFactory>();
                 mock.Setup(x => x.Configured).Returns(true);
                 mock.Setup(x => x.CanConnect).Returns(true);
                 return mock.Object;
             }
 
             // pretend we have the proper migration
-            // else BootFailedException because our mock IDatabaseFactory does not provide databases
-            protected override bool EnsureMigration(IDatabaseFactory databaseFactory, SemVersion codeVersion)
+            // else BootFailedException because our mock IUmbracoDatabaseFactory does not provide databases
+            protected override bool EnsureMigration(IUmbracoDatabaseFactory databaseFactory, SemVersion codeVersion)
             {
                 return true;
             }
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Runtimes
                 base.Compose(composition);
 
                 composition.Container.Register(factory => SettingsForTests.GetDefault());
-                composition.Container.Register(factory => new DatabaseContext(factory.GetInstance<IDatabaseFactory>()), new PerContainerLifetime());
+                composition.Container.Register(factory => new DatabaseContext(factory.GetInstance<IUmbracoDatabaseFactory>()), new PerContainerLifetime());
                 composition.Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
 
                 Composed = true;

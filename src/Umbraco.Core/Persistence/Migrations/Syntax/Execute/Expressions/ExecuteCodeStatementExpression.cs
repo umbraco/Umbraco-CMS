@@ -9,9 +9,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions
             : base(context, supportedDatabaseTypes)
         { }
 
-        public virtual Func<UmbracoDatabase, string> CodeStatement { get; set; }
+        public virtual Func<IUmbracoDatabase, string> CodeStatement { get; set; }
 
-        public override string Process(UmbracoDatabase database)
+        public override string Process(IUmbracoDatabase database)
         {
             if(CodeStatement != null)
                 return CodeStatement(database);

@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
             // Arrange
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=x;password=umbraco";
             const string providerName = Constants.DbProviderNames.SqlServer;
-            var sqlSyntax = new[] { new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)) };
+            var sqlSyntax = new[] { new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null)) };
             var factory = new UmbracoDatabaseFactory(connectionString, providerName, sqlSyntax, Mock.Of<ILogger>(), new TestDatabaseScopeAccessor(), Mock.Of<IMapperCollection>());
             var database = factory.GetDatabase();
 
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
             // Arrange
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco";
             const string providerName = Constants.DbProviderNames.SqlServer;
-            var sqlSyntax = new[] { new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)) };
+            var sqlSyntax = new[] { new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null)) };
             var factory = new UmbracoDatabaseFactory(connectionString, providerName, sqlSyntax, Mock.Of<ILogger>(), new TestDatabaseScopeAccessor(), Mock.Of<IMapperCollection>());
             var database = factory.GetDatabase();
 

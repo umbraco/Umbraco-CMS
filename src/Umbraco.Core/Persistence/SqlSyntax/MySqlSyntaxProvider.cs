@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             InitColumnTypeMap();
         }
 
-        public override IEnumerable<string> GetTablesInSchema(Database db)
+        public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             List<string> list;
             try
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
-        public override IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
             List<ColumnInfo> list;
             try
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
-        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
         {
             List<Tuple<string, string>> list;
             try
@@ -101,7 +101,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
-        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
         {
             List<Tuple<string, string, string>> list;
             try
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
-        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db)
         {
             List<Tuple<string, string, string, bool>> list;
             try
@@ -156,7 +156,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             return list;
         }
 
-        public override bool DoesTableExist(Database db, string tableName)
+        public override bool DoesTableExist(IDatabase db, string tableName)
         {
             long result;
             try
@@ -370,7 +370,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
         public override string ConvertDateToOrderableString { get { return "DATE_FORMAT({0}, '%Y%m%d')"; } }
         public override string ConvertDecimalToOrderableString { get { return "LPAD(FORMAT({0}, 9), 20, '0')"; } }
 
-        public override bool? SupportsCaseInsensitiveQueries(Database db)
+        public override bool? SupportsCaseInsensitiveQueries(IDatabase db)
         {
             bool? supportsCaseInsensitiveQueries = null;
 

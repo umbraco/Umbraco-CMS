@@ -299,7 +299,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        private void CloseDbConnections(UmbracoDatabase database)
+        private void CloseDbConnections(IUmbracoDatabase database)
         {
             //Ensure that any database connections from a previous test is disposed.
             //This is really just double safety as its also done in the TearDown.
@@ -307,7 +307,7 @@ namespace Umbraco.Tests.TestHelpers
             SqlCeContextGuardian.CloseBackgroundConnection();
         }
 
-        private void RemoveDatabaseFile(UmbracoDatabase database, Action<Exception> onFail = null)
+        private void RemoveDatabaseFile(IUmbracoDatabase database, Action<Exception> onFail = null)
         {
             if (database != null) CloseDbConnections(database);
             var path = TestHelper.CurrentAssemblyDirectory;

@@ -17,7 +17,7 @@ namespace Umbraco.Core
     /// </remarks>
     public class DatabaseContext
     {
-        private readonly IDatabaseFactory _databaseFactory;
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseContext"/> class.
@@ -27,20 +27,12 @@ namespace Umbraco.Core
         /// Umbraco connection string is not available because we are installing. In which case this
         /// database builder must sort things out and configure the database factory before it can be
         /// used.</remarks>
-        public DatabaseContext(IDatabaseFactory databaseFactory)
+        public DatabaseContext(IUmbracoDatabaseFactory databaseFactory)
         {
             if (databaseFactory == null) throw new ArgumentNullException(nameof(databaseFactory));
 
             _databaseFactory = databaseFactory;
         }
-
-        // in most cases, this should not be used, keeping it here for compatibility (temp)
-        // todo: get rid of it
-        /// <summary>
-        /// Gets the query factory.
-        /// </summary>
-        /// <remarks>In most cases this should not be used, better use Query{T}.</remarks>
-        public IQueryFactory QueryFactory => _databaseFactory.QueryFactory;
 
         /// <summary>
         /// Gets the database Sql syntax.
@@ -55,18 +47,18 @@ namespace Umbraco.Core
         /// <summary>
         /// Creates a Sql statement.
         /// </summary>
-        public Sql<SqlContext> Sql(string sql, params object[] args) => Sql().Append(sql, args);
+        public Sql<SqlContext> Sql(string sql, params object[] args) => _databaseFactory.Sql(sql, args);
 
         /// <summary>
         /// Creates a Query expression.
         /// </summary>
-        public IQuery<T> Query<T>() => _databaseFactory.QueryFactory.Create<T>();
+        public IQuery<T> Query<T>() => _databaseFactory.Query<T>();
 
         /// <summary>
         /// Gets an ambient database for doing CRUD operations against custom tables that resides in the Umbraco database.
         /// </summary>
         /// <remarks>Should not be used for operation against standard Umbraco tables; as services should be used instead.</remarks>
-        public UmbracoDatabase Database => _databaseFactory.GetDatabase();
+        public IUmbracoDatabase Database => _databaseFactory.GetDatabase();
 
         /// <summary>
         /// Gets an ambient database scope.
@@ -74,9 +66,7 @@ namespace Umbraco.Core
         /// <returns>A disposable object representing the scope.</returns>
         public IDisposable CreateDatabaseScope() // fixme - move over to factory
         {
-            var factory = _databaseFactory as UmbracoDatabaseFactory; // fixme - though... IDatabaseFactory?
-            if (factory == null) throw new NotSupportedException();
-            return factory.CreateScope();
+            return _databaseFactory.CreateScope();
         }
 
 #if DEBUG_DATABASES

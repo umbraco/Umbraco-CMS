@@ -17,18 +17,17 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Core.Persistence
 {
     /// <summary>
-    /// Default implementation of <see cref="IDatabaseFactory"/>.
+    /// Default implementation of <see cref="IUmbracoDatabaseFactory"/>.
     /// </summary>
     /// <remarks>
     /// <para>This factory implementation creates and manages an "ambient" database connection. When running
     /// within an Http context, "ambient" means "associated with that context". Otherwise, it means "static to
     /// the current thread". In this latter case, note that the database connection object is not thread safe.</para>
-    /// <para>It wraps an NPoco DatabaseFactory which is initializes with a proper IPocoDataFactory to ensure
+    /// <para>It wraps an NPoco UmbracoDatabaseFactory which is initializes with a proper IPocoDataFactory to ensure
     /// that NPoco's plumbing is cached appropriately for the whole application.</para>
     /// </remarks>
-    internal class UmbracoDatabaseFactory : DisposableObject, IDatabaseFactory
+    internal class UmbracoDatabaseFactory : DisposableObject, IUmbracoDatabaseFactory
     {
-        //private readonly IUmbracoDatabaseAccessor _umbracoDatabaseAccessor;
         private readonly IDatabaseScopeAccessor _databaseScopeAccessor;
         private readonly ISqlSyntaxProvider[] _sqlSyntaxProviders;
         private readonly IMapperCollection _mappers;
@@ -41,7 +40,6 @@ namespace Umbraco.Core.Persistence
         private DbProviderFactory _dbProviderFactory;
         private DatabaseType _databaseType;
         private ISqlSyntaxProvider _sqlSyntax;
-        private IQueryFactory _queryFactory;
         private SqlContext _sqlContext;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
@@ -121,20 +119,15 @@ namespace Umbraco.Core.Persistence
 
         #endregion
 
-        /// <summary>
-        /// Gets a value indicating whether the database is configured (no connect test).
-        /// </summary>
-        /// <remarks></remarks>
+        /// <inheritdoc />
         public bool Configured { get; private set; }
 
-        /// <summary>
-        /// Gets a value indicating whether it is possible to connect to the database.
-        /// </summary>
+        /// <inheritdoc />
         public bool CanConnect => Configured && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
 
-        /// <summary>
-        /// Gets the database sql syntax provider.
-        /// </summary>
+        #region IDatabaseContext
+
+        /// <inheritdoc />
         public ISqlSyntaxProvider SqlSyntax
         {
             get
@@ -144,20 +137,28 @@ namespace Umbraco.Core.Persistence
             }
         }
 
-        /// <summary>
-        /// Gets the database query factory.
-        /// </summary>
-        public IQueryFactory QueryFactory {
-            get
-            {
-                EnsureConfigured();
-                return _queryFactory;
-            }
+        public IQuery<T> Query<T>()
+        {
+            EnsureConfigured();
+            return new Query<T>(_sqlSyntax, _mappers);
         }
 
-        public Sql<SqlContext> Sql() => NPoco.Sql.BuilderFor(_sqlContext);
+        /// <inheritdoc />
+        public Sql<SqlContext> Sql()
+        {
+            EnsureConfigured();
+            return NPoco.Sql.BuilderFor(_sqlContext);
+        }
 
-        // will be configured by the database context
+        /// <inheritdoc />
+        public Sql<SqlContext> Sql(string sql, params object[] args)
+        {
+            return Sql().Append(sql, args);
+        }
+
+        #endregion
+
+        /// <inheritdoc />
         public void Configure(string connectionString, string providerName)
         {
             using (new WriteLock(_lock))
@@ -194,21 +195,45 @@ namespace Umbraco.Core.Persistence
                 var config = new FluentConfig(xmappers => factory);
 
                 // create the database factory
-                _npocoDatabaseFactory = DatabaseFactory.Config(x => x
+                _npocoDatabaseFactory = NPoco.DatabaseFactory.Config(x => x
                     .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
                     .WithFluentConfig(config)); // with proper configuration
 
-                if (_npocoDatabaseFactory == null) throw new NullReferenceException("The call to DatabaseFactory.Config yielded a null DatabaseFactory instance.");
+                if (_npocoDatabaseFactory == null) throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
 
                 // these are created here because it is the UmbracoDatabaseFactory that determines
                 // the sql syntax, poco data factory, and database type - so it "owns" the context
                 // and the query factory
-                _sqlContext = new SqlContext(_sqlSyntax, _pocoDataFactory, _databaseType);
-                _queryFactory = new QueryFactory(_sqlSyntax, _mappers);
+                _sqlContext = new SqlContext(_sqlSyntax, _pocoDataFactory, _databaseType, _mappers);               
 
                 _logger.Debug<UmbracoDatabaseFactory>("Configured.");
                 Configured = true;
             }
+        }
+
+        /// <inheritdoc />
+        public IUmbracoDatabase Database => GetDatabase();
+
+        /// <inheritdoc />
+		public IUmbracoDatabase GetDatabase()
+        {
+            EnsureConfigured();
+
+            var scope = _databaseScopeAccessor.Scope;
+            if (scope == null) throw new InvalidOperationException("Out of scope.");
+            return scope.Database;
+        }
+
+        /// <inheritdoc />
+        public IUmbracoDatabase CreateDatabase()
+        {
+            return (IUmbracoDatabase) _npocoDatabaseFactory.GetDatabase();
+        }
+
+        /// <inheritdoc />
+        public IDatabaseScope CreateScope(IUmbracoDatabase database = null)
+        {
+            return new DatabaseScope(_databaseScopeAccessor, this, database);
         }
 
         // gets the sql syntax provider that corresponds, from attribute
@@ -227,6 +252,7 @@ namespace Umbraco.Core.Persistence
             //provider = _syntaxProviders.FirstOrDefault(x => x.GetType() == typeof(SqlServerSyntaxProvider));
         }
 
+        // ensures that the database is configured, else throws
         private void EnsureConfigured()
         {
             using (new ReadLock(_lock))
@@ -236,42 +262,10 @@ namespace Umbraco.Core.Persistence
             }
         }
 
-        // method used by NPoco's DatabaseFactory to actually create the database instance
+        // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
         {
             return new UmbracoDatabase(_connectionString, _sqlContext, _dbProviderFactory, _logger, _connectionRetryPolicy, _commandRetryPolicy);
-        }
-
-        // fixme temp?
-        public UmbracoDatabase Database => GetDatabase();
-
-        /// <summary>
-        /// Gets (creates or retrieves) the ambient database connection.
-        /// </summary>
-        /// <returns>The ambient database connection.</returns>
-		public UmbracoDatabase GetDatabase()
-        {
-            EnsureConfigured();
-
-            var scope = _databaseScopeAccessor.Scope;
-            if (scope == null) throw new InvalidOperationException("Out of scope.");
-            return scope.Database;
-
-            //// check if it's in scope
-            //var db = _umbracoDatabaseAccessor.UmbracoDatabase;
-            //if (db != null) return db;
-            //db = (UmbracoDatabase) _npocoDatabaseFactory.GetDatabase();
-            //_umbracoDatabaseAccessor.UmbracoDatabase = db;
-            //return db;
-        }
-
-        /// <summary>
-        /// Creates a new database instance.
-        /// </summary>
-        /// <remarks>The database instance is not part of any scope and must be disposed after being used.</remarks>
-        public UmbracoDatabase CreateDatabase()
-        {
-            return (UmbracoDatabase) _npocoDatabaseFactory.GetDatabase();
         }
 
         protected override void DisposeResources()
@@ -297,84 +291,5 @@ namespace Umbraco.Core.Persistence
             //db?.Dispose();
 	        _databaseScopeAccessor.Scope = null;
 	    }
-
-        //public bool HasAmbient => _umbracoDatabaseAccessor.UmbracoDatabase != null;
-
-        //public UmbracoDatabase DetachAmbient()
-        //{
-        //    var database = _umbracoDatabaseAccessor.UmbracoDatabase;
-        //    _umbracoDatabaseAccessor.UmbracoDatabase = null;
-        //    return database;
-        //}
-
-        //public void AttachAmbient(UmbracoDatabase database)
-        //{
-        //    var tmp = _umbracoDatabaseAccessor.UmbracoDatabase;
-        //    _umbracoDatabaseAccessor.UmbracoDatabase = database;
-        //    tmp?.Dispose();
-
-        //    // fixme - what shall we do with tmp?
-        //    // fixme - what about using "disposing" of the database to remove it from "ambient"?!
-        //}
-
-        //public IDisposable CreateScope(bool force = false) // fixme - why would we ever force?
-        //{
-        //    if (HasAmbient)
-        //    {
-        //        return force
-        //            ? new DatabaseScope(this, DetachAmbient(), GetDatabase())
-        //            : new DatabaseScope(this, null, null);
-        //    }
-
-        //    // create a new, temp, database (will be disposed with DatabaseScope)
-        //    return new DatabaseScope(this, null, GetDatabase());
-        //}
-
-        public IDisposable CreateScope()
-        {
-            return new DatabaseScope(_databaseScopeAccessor, this);
-        }
-
-        /*
-        private class DatabaseScope : IDisposable
-        {
-            private readonly UmbracoDatabaseFactory _factory;
-            private readonly UmbracoDatabase _orig;
-            private readonly UmbracoDatabase _temp;
-
-            // orig is the original database that was ambient when the scope was created
-            //   if not null, it has been detached in order to be replaced by temp, which cannot be null
-            //   if null, either there was no ambient database, or we don't want to replace it
-            // temp is the scope database that is created for the scope
-            //   if not null, it has been attached and is not the ambient database,
-            //     and when the scope is disposed it will be detached, disposed, and replaced by orig
-            //   if null, the scope is nested and reusing the ambient database, without touching anything
-
-            public DatabaseScope(UmbracoDatabaseFactory factory, UmbracoDatabase orig, UmbracoDatabase temp)
-            {
-                if (factory == null) throw new ArgumentNullException(nameof(factory));
-                _factory = factory;
-
-                _orig = orig;
-                _temp = temp;
-            }
-
-            public void Dispose()
-            {
-                if (_temp != null) // if the scope had its own database
-                {
-                    // detach and ensure consistency, then dispose
-                    var temp = _factory.DetachAmbient();
-                    if (temp != _temp) throw new Exception("bam!");
-                    temp.Dispose();
-
-                    // re-instate original database if any
-                    if (_orig != null)
-                        _factory.AttachAmbient(_orig);
-                }
-                GC.SuppressFinalize(this);
-            }
-        }
-        */
     }
 }

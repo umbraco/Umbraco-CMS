@@ -12,8 +12,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     [SqlSyntaxProvider(Constants.DbProviderNames.SqlServer)]
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
-        // IDatabaseFactory to be lazily injected
-        public SqlServerSyntaxProvider(Lazy<IDatabaseFactory> lazyFactory)
+        // IUmbracoDatabaseFactory to be lazily injected
+        public SqlServerSyntaxProvider(Lazy<IUmbracoDatabaseFactory> lazyFactory)
         {
             _serverVersion = new Lazy<ServerVersionInfo>(() =>
             {
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }
         }
 
-        private static ServerVersionInfo DetermineVersion(IDatabaseFactory factory)
+        private static ServerVersionInfo DetermineVersion(IUmbracoDatabaseFactory factory)
         {
             // Edition: "Express Edition", "Windows Azure SQL Database..."
             // EngineEdition: 1/Desktop 2/Standard 3/Enterprise 4/Express 5/Azure
@@ -136,19 +136,19 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// server type that does this, therefore this method doesn't exist on any other syntax provider
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Tuple<string, string, string, string>> GetDefaultConstraintsPerColumn(Database db)
+        public IEnumerable<Tuple<string, string, string, string>> GetDefaultConstraintsPerColumn(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TableName = t.Name,ColumnName = c.Name,dc.Name,dc.[Definition] FROM sys.tables t INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id");
             return items.Select(x => new Tuple<string, string, string, string>(x.TableName, x.ColumnName, x.Name, x.Definition));
         }
 
-        public override IEnumerable<string> GetTablesInSchema(Database db)
+        public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES");
             return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
         }
 
-        public override IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS");
             return
@@ -158,7 +158,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                    item.IS_NULLABLE, item.DATA_TYPE)).ToList();
         }
 
-        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
@@ -166,7 +166,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
-        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
@@ -174,7 +174,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return items.Select(item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
-        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
@@ -190,7 +190,7 @@ order by T.name, I.name");
 
         }
 
-        public override bool DoesTableExist(Database db, string tableName)
+        public override bool DoesTableExist(IDatabase db, string tableName)
         {
             var result =
                 db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @TableName",

@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void SingleDatabaseInstancePerScope()
         {
-            UmbracoDatabase db1, db2;
+            IUmbracoDatabase db1, db2;
 
             using (_dbContext.CreateDatabaseScope())
             {
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void DifferentDatabaseInstancePerScope()
         {
-            UmbracoDatabase db1, db2;
+            IUmbracoDatabase db1, db2;
 
             using (_dbContext.CreateDatabaseScope())
             {

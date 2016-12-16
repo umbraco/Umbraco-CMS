@@ -15,7 +15,6 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -630,7 +629,7 @@ AND umbracoNode.id <> @id",
             }
 
             public static IEnumerable<IMediaType> GetMediaTypes<TRepo>(
-                Database db, ISqlSyntaxProvider sqlSyntax,
+                IDatabase db, ISqlSyntaxProvider sqlSyntax,
                 TRepo contentTypeRepository)
                 where TRepo : IReadRepository<int, TEntity>
             {
@@ -644,7 +643,7 @@ AND umbracoNode.id <> @id",
             }
 
             public static IEnumerable<IContentType> GetContentTypes<TRepo>(
-                Database db, ISqlSyntaxProvider sqlSyntax,
+                IDatabase db, ISqlSyntaxProvider sqlSyntax,
                 TRepo contentTypeRepository,
                 ITemplateRepository templateRepository)
                 where TRepo : IReadRepository<int, TEntity>
@@ -667,7 +666,7 @@ AND umbracoNode.id <> @id",
             }
 
             internal static void MapContentTypeChildren<TRepo>(IContentTypeComposition[] contentTypes,
-                Database db, ISqlSyntaxProvider sqlSyntax,
+                IDatabase db, ISqlSyntaxProvider sqlSyntax,
                 TRepo contentTypeRepository,
                 IDictionary<int, List<int>> allParentContentTypeIds)
                 where TRepo : IReadRepository<int, TEntity>
@@ -721,7 +720,7 @@ AND umbracoNode.id <> @id",
             }
 
             internal static void MapContentTypeTemplates<TRepo>(IContentType[] contentTypes,
-                Database db,
+                IDatabase db,
                 TRepo contentTypeRepository,
                 ITemplateRepository templateRepository,
                 IDictionary<int, List<AssociatedTemplate>> associatedTemplates)
@@ -756,7 +755,7 @@ AND umbracoNode.id <> @id",
 
             }
 
-            internal static IEnumerable<IMediaType> MapMediaTypes(Database db, ISqlSyntaxProvider sqlSyntax,
+            internal static IEnumerable<IMediaType> MapMediaTypes(IDatabase db, ISqlSyntaxProvider sqlSyntax,
                 out IDictionary<int, List<int>> parentMediaTypeIds)
             {
                 Mandate.ParameterNotNull(db, "db");
@@ -894,7 +893,7 @@ AND umbracoNode.id <> @id",
                 return mediaType;
             }
 
-            internal static IEnumerable<IContentType> MapContentTypes(Database db, ISqlSyntaxProvider sqlSyntax,
+            internal static IEnumerable<IContentType> MapContentTypes(IDatabase db, ISqlSyntaxProvider sqlSyntax,
                 out IDictionary<int, List<AssociatedTemplate>> associatedTemplates,
                 out IDictionary<int, List<int>> parentContentTypeIds)
             {
@@ -1081,7 +1080,7 @@ AND umbracoNode.id <> @id",
                 return contentType;
             }
 
-            internal static void MapGroupsAndProperties(int[] contentTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,
+            internal static void MapGroupsAndProperties(int[] contentTypeIds, IDatabase db, ISqlSyntaxProvider sqlSyntax,
                 out IDictionary<int, PropertyTypeCollection> allPropertyTypeCollection,
                 out IDictionary<int, PropertyGroupCollection> allPropertyGroupCollection)
             {

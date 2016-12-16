@@ -1468,8 +1468,7 @@ namespace Umbraco.Tests.Services
                 new TestDatabaseScopeAccessor(),
                 Mappers);
             var repositoryFactory = MockRepositoryFactory();
-            var databaseContext = new DatabaseContext(databaseFactory);
-            var provider = new NPocoUnitOfWorkProvider(databaseContext, repositoryFactory);
+            var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 
@@ -1477,7 +1476,7 @@ namespace Umbraco.Tests.Services
             var c2 = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
             var list = new List<Lazy<IContent>> {c, c2};
 
-            using (databaseContext.CreateDatabaseScope())
+            using (databaseFactory.CreateScope())
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;

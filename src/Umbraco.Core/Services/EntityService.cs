@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services
 
         // lazy-constructed because when the ctor runs, the query factory may not be ready
 
-        private IQuery<IUmbracoEntity> QueryRootEntity => _queryRootEntity ?? (_queryRootEntity = UowProvider.DatabaseContext.Query<IUmbracoEntity>().Where(x => x.ParentId == -1));
+        private IQuery<IUmbracoEntity> QueryRootEntity => _queryRootEntity ?? (_queryRootEntity = UowProvider.DatabaseFactory.Query<IUmbracoEntity>().Where(x => x.ParentId == -1));
 
         #endregion
 
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DataType:
                         case UmbracoObjectTypes.DocumentTypeContainer:
                             id = uow.Database.ExecuteScalar<int?>(
-                                 uow.DatabaseContext.Sql()
+                                 uow.Sql()
                                     .Select("id")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.UniqueId == key));
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
                             guid = uow.Database.ExecuteScalar<Guid?>(
-                                 uow.DatabaseContext.Sql()
+                                 uow.Sql()
                                     .Select("uniqueID")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.NodeId == id));
@@ -548,7 +548,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                var sql = uow.DatabaseContext.Sql()
+                var sql = uow.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.NodeId == id);
@@ -569,7 +569,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                var sql = uow.DatabaseContext.Sql()
+                var sql = uow.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.UniqueId == key);
