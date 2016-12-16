@@ -428,7 +428,9 @@ namespace umbraco.cms.presentation.user
                     if (CurrentUser.IsAdmin() || currentUserApps.Contains(";" + app.alias + ";"))
                     {
                         ListItem li = new ListItem(ui.Text("sections", app.alias), app.alias);
-                        if (!IsPostBack) foreach (Application tmp in uapps) if (app.alias == tmp.alias) li.Selected = true;
+                        foreach (Application tmp in uapps)
+                            if (app.alias == tmp.alias)
+                                li.Selected = true;
                         lapps.Items.Add(li);
                     }
                 }

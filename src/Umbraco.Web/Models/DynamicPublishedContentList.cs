@@ -412,7 +412,7 @@ namespace Umbraco.Web.Models
                 }
                 else if (dominantType == typeof(DateTime))
                 {
-                    if (name != "Min" || name != "Max")
+                    if (name != "Min" && name != "Max")
                     {
                         throw new ArgumentException("Can only use aggregate min or max methods on properties which are datetime");
                     }

@@ -213,12 +213,11 @@ namespace Umbraco.Web.PropertyEditors
                         }
                         else if (p.Value is string)
                         {
-                            var src = p.Value == null ? string.Empty : p.Value.ToString();
                             var config = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
                             var crops = string.IsNullOrEmpty(config) == false ? config : "[]";
                             p.Value = "{src: '" + p.Value + "', crops: " + crops + "}";
                             //Only provide the source path, not the whole JSON value
-                            model.PopulateFileMetaDataProperties(uploadFieldConfigNode, src);
+                            model.PopulateFileMetaDataProperties(uploadFieldConfigNode, p.Value.ToString());
                         }
                     }
                     else

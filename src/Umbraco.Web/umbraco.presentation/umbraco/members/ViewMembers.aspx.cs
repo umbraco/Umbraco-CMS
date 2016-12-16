@@ -93,8 +93,7 @@ namespace umbraco.presentation.members
             {
                 cms.businesslogic.member.Member mem = new global::umbraco.cms.businesslogic.member.Member(memid);
 
-                if (mem != null)
-                    mem.delete();
+                mem.delete();
 
 
                 BindRp();

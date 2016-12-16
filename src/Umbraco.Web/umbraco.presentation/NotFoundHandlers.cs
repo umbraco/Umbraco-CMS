@@ -125,8 +125,6 @@ namespace umbraco {
 
         private static string GetChildContainerName()
         {
-            if (string.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME) == false)
-                return "/" + UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME;
             return "";
         }
     }

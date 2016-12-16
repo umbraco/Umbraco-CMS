@@ -89,12 +89,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     int loginPage = Access.GetLoginPage(documentObject.Path);
                     try
                     {
-                        var loginPageObj = new Document(loginPage);
-                        if (loginPageObj != null)
-                        {
-                            loginPagePicker.Value = loginPage.ToString(CultureInfo.InvariantCulture);
-                        }
-                        var errorPageObj = new Document(errorPage);
+                        loginPagePicker.Value = loginPage.ToString(CultureInfo.InvariantCulture);
                         errorPagePicker.Value = errorPage.ToString(CultureInfo.InvariantCulture);
                     }
                     catch (Exception ex)

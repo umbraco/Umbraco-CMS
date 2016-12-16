@@ -126,8 +126,6 @@ namespace Umbraco.Web.Mvc
             if (string.IsNullOrEmpty(result.ViewName))
                 result.ViewName = controller.ControllerContext.RouteData.GetRequiredString("action");
 
-            if (result.View != null) return;
-
             if (result is PartialViewResult)
             {
                 var viewEngineResult = ViewEngines.Engines.FindPartialView(controller.ControllerContext, result.ViewName);

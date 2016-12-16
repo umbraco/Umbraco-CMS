@@ -209,18 +209,11 @@ namespace umbraco.presentation.developer.packages
                             try
                             {
                                 var dtd = new cms.businesslogic.datatype.DataTypeDefinition(tId);
+                                
+                                var li = new ListItem(dtd.Text, dtd.Id.ToString());
+                                li.Selected = true;
 
-                                if (dtd != null)
-                                {
-                                    var li = new ListItem(dtd.Text, dtd.Id.ToString());
-                                    li.Selected = true;
-
-                                    dataTypes.Items.Add(li);
-                                }
-                                else
-                                {
-                                    tempList.Add(str);
-                                }
+                                dataTypes.Items.Add(li);                                
                             }
                             catch
                             {

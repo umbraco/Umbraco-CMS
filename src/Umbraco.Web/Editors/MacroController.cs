@@ -88,10 +88,6 @@ namespace Umbraco.Web.Editors
 
             //need to get a legacy macro object - eventually we'll have a new format but nto yet
             var macro = new macro(macroAlias);
-            if (macro == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
 
             //if it isn't supposed to be rendered in the editor then return an empty string
             if (macro.DontRenderInEditor)

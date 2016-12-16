@@ -16,8 +16,7 @@ namespace Umbraco.Web.umbraco.presentation.umbraco.Trees
             if (lang != null && global::umbraco.cms.businesslogic.Dictionary.DictionaryItem.hasKey(originalName.Substring(1, originalName.Length - 1)))
             {
                 var dictionaryItem = new global::umbraco.cms.businesslogic.Dictionary.DictionaryItem(originalName.Substring(1, originalName.Length - 1));
-                if (dictionaryItem != null)
-                    return dictionaryItem.Value(lang.id);
+                return dictionaryItem.Value(lang.id);
             }
 
             return "[" + originalName + "]";

@@ -260,7 +260,7 @@ namespace umbraco.presentation.plugins.tinymce3
 					ArrayList list = new ArrayList();
 
 					while (jsonReader.TokenType != JSONToken.EndArray) {
-						if (jsonReader.TokenType == JSONToken.EndArray && jsonReader.Value == null)
+						if (jsonReader.Value == null)
 							break;
 
 						list.Add(ReadValue(jsonReader));
