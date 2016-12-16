@@ -227,9 +227,6 @@ namespace Umbraco.Core
             // until the database context configures it properly (eg when installing)
             container.RegisterSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
 
-            // register database context
-            container.RegisterSingleton<DatabaseContext>();
-
             // register a database accessor - required by database factory
             // will be replaced by HybridUmbracoDatabaseAccessor in the web runtime
             // fixme - we should NOT be using thread static at all + will NOT get replaced = wtf?

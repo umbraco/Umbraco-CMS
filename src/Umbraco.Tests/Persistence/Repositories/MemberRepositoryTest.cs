@@ -311,7 +311,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             if (isCount)
             {
-                var sqlCount = DatabaseContext.Sql()
+                var sqlCount = DatabaseFactory.Sql()
                     .SelectCount()
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -322,7 +322,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 return sqlCount;
             }
 
-            var sql = DatabaseContext.Sql();
+            var sql = DatabaseFactory.Sql();
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid",
@@ -346,7 +346,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private Sql<SqlContext> GetSubquery()
         {
-            var sql = DatabaseContext.Sql();
+            var sql = DatabaseFactory.Sql();
             sql.Select("umbracoNode.id")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)

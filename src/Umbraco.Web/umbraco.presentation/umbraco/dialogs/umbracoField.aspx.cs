@@ -52,7 +52,7 @@ namespace umbraco.dialogs
 			{
                 //exclude built-in memberhip properties from showing up here
 			    var exclude = Constants.Conventions.Member.GetStandardPropertyTypeStubs()
-                    .Select(x => Current.DatabaseContext.SqlSyntax.GetQuotedValue(x.Key)).ToArray();
+                    .Select(x => Current.DatabaseFactory.SqlSyntax.GetQuotedValue(x.Key)).ToArray();
 
 				fieldSql = string.Format(
                     "select distinct alias from cmsPropertyType where alias not in ({0}) order by alias",
@@ -64,7 +64,7 @@ namespace umbraco.dialogs
 			fieldPicker.StandardPropertiesLabel = Services.TextService.Localize("templateEditor/standardFields");
 			fieldPicker.CustomPropertiesLabel = Services.TextService.Localize("templateEditor/customFields");
 
-			var dataTypes = DatabaseContext.Database.Fetch<dynamic>(fieldSql);
+			var dataTypes = DatabaseFactory.Database.Fetch<dynamic>(fieldSql);
 			fieldPicker.DataTextField = "alias";
 			fieldPicker.DataValueField = "alias";
 			fieldPicker.DataSource = dataTypes;
@@ -75,7 +75,7 @@ namespace umbraco.dialogs
 			altFieldPicker.StandardPropertiesLabel = Services.TextService.Localize("templateEditor/standardFields");
 			altFieldPicker.CustomPropertiesLabel = Services.TextService.Localize("templateEditor/customFields");
 
-			var dataTypes2 = DatabaseContext.Database.Fetch<dynamic>(fieldSql);
+			var dataTypes2 = DatabaseFactory.Database.Fetch<dynamic>(fieldSql);
 			altFieldPicker.DataTextField = "alias";
 			altFieldPicker.DataValueField = "alias";
 			altFieldPicker.DataSource = dataTypes2;

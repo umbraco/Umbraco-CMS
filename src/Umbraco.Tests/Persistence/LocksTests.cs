@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Persistence
             base.Initialize();
 
             // create a few lock objects
-            var database = DatabaseContext.Database;
+            var database = DatabaseFactory.Database;
             database.BeginTransaction(IsolationLevel.RepeatableRead);
             try
             {
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void SingleReadLockTest()
         {
-            var database = DatabaseContext.Database;
+            var database = DatabaseFactory.Database;
             database.BeginTransaction(IsolationLevel.RepeatableRead);
             try
             {
@@ -107,12 +107,12 @@ namespace Umbraco.Tests.Persistence
         private void ConcurrentReadersTestThread(Exception[] exceptions, int index, object locker, ref int acquired, int threadCount, ManualResetEventSlim ev)
         {
             // in a thread, must create a scope
-            using (DatabaseContext.CreateDatabaseScope())
+            using (DatabaseFactory.CreateScope())
             {
                 IUmbracoDatabase database;
                 try
                 {
-                    database = DatabaseContext.Database;
+                    database = DatabaseFactory.Database;
                     database.BeginTransaction(IsolationLevel.RepeatableRead);
                 }
                 catch (Exception e)
@@ -173,12 +173,12 @@ namespace Umbraco.Tests.Persistence
         private void ConcurrentWritersTestThread(Exception[] exceptions, int index, object locker, ref int acquired)
         {
             // in a thread, must create a scope
-            using (DatabaseContext.CreateDatabaseScope())
+            using (DatabaseFactory.CreateScope())
             {
                 IUmbracoDatabase database;
                 try
                 {
-                    database = DatabaseContext.Database;
+                    database = DatabaseFactory.Database;
                     database.BeginTransaction(IsolationLevel.RepeatableRead);
                 }
                 catch (Exception e)
@@ -240,12 +240,12 @@ namespace Umbraco.Tests.Persistence
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
         {
             // in a thread, must create a scope
-            using (DatabaseContext.CreateDatabaseScope())
+            using (DatabaseFactory.CreateScope())
             {
                 IUmbracoDatabase database;
                 try
                 {
-                    database = DatabaseContext.Database;
+                    database = DatabaseFactory.Database;
                     database.BeginTransaction(IsolationLevel.RepeatableRead);
                 }
                 catch (Exception e)
@@ -315,7 +315,7 @@ namespace Umbraco.Tests.Persistence
 
         private void NoDeadLockTestThread(int id, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
         {
-            var database = DatabaseContext.Database;
+            var database = DatabaseFactory.Database;
             try
             {
                 database.BeginTransaction(IsolationLevel.RepeatableRead);

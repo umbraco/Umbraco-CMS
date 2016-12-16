@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Services
         public void Can_Get_Members_In_Role()
         {
             ServiceContext.MemberService.AddRole("MyTestRole1");
-            var roleId = DatabaseContext.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
+            var roleId = DatabaseFactory.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
 
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
@@ -168,8 +168,8 @@ namespace Umbraco.Tests.Services
             var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             ServiceContext.MemberService.Save(member2);
 
-            DatabaseContext.Database.Insert(new Member2MemberGroupDto {MemberGroup = roleId, Member = member1.Id});
-            DatabaseContext.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
+            DatabaseFactory.Database.Insert(new Member2MemberGroupDto {MemberGroup = roleId, Member = member1.Id});
+            DatabaseFactory.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
 
             var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
             Assert.AreEqual(2, membersInRole.Count());
@@ -338,7 +338,7 @@ namespace Umbraco.Tests.Services
             IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             ServiceContext.MemberService.Save(member);
 
-            var xml = DatabaseContext.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = member.Id });
+            var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = member.Id });
             Assert.IsNotNull(xml);
         }
 
@@ -1036,14 +1036,14 @@ namespace Umbraco.Tests.Services
                 result.LastLoginDate.TruncateTo(DateTimeExtensions.DateTruncate.Second));
 
             //now ensure the col is correct
-            var sql = DatabaseContext.Sql().Select("cmsPropertyData.*")
+            var sql = DatabaseFactory.Sql().Select("cmsPropertyData.*")
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>()
                 .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
                 .Where<PropertyDataDto>(dto => dto.NodeId == member.Id)
                 .Where<PropertyTypeDto>(dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
             
-            var colResult = DatabaseContext.Database.Fetch<PropertyDataDto>(sql);
+            var colResult = DatabaseFactory.Database.Fetch<PropertyDataDto>(sql);
 
             Assert.AreEqual(1, colResult.Count);
             Assert.IsTrue(colResult.First().Date.HasValue);

@@ -522,15 +522,15 @@ namespace Umbraco.Tests.Services
             // Assert
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
 
-            Assert.AreEqual(4, DatabaseContext.Database.ExecuteScalar<int>(
+            Assert.AreEqual(4, DatabaseFactory.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                 new { nodeId = content.Id, propTypeId = propertyTypeId }));
 
-            Assert.AreEqual(3, DatabaseContext.Database.ExecuteScalar<int>(
+            Assert.AreEqual(3, DatabaseFactory.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                 new { nodeId = child1.Id, propTypeId = propertyTypeId }));
 
-            Assert.AreEqual(2, DatabaseContext.Database.ExecuteScalar<int>(
+            Assert.AreEqual(2, DatabaseFactory.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                 new { nodeId = child2.Id, propTypeId = propertyTypeId }));
         }
@@ -561,7 +561,7 @@ namespace Umbraco.Tests.Services
             //the value will have changed but the tags db table will not have
             Assert.AreEqual(5, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
-            Assert.AreEqual(4, DatabaseContext.Database.ExecuteScalar<int>(
+            Assert.AreEqual(4, DatabaseFactory.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                 new { nodeId = content.Id, propTypeId = propertyTypeId }));
         }
@@ -590,7 +590,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.AreEqual(4, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
 	        var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
-	        Assert.AreEqual(4, DatabaseContext.Database.ExecuteScalar<int>(
+	        Assert.AreEqual(4, DatabaseFactory.Database.ExecuteScalar<int>(
 	            "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
 	            new {nodeId = content.Id, propTypeId = propertyTypeId}));
 	    }
@@ -619,7 +619,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.AreEqual(5, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
-            Assert.AreEqual(5, DatabaseContext.Database.ExecuteScalar<int>(
+            Assert.AreEqual(5, DatabaseFactory.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                 new { nodeId = content.Id, propTypeId = propertyTypeId }));
         }
@@ -648,7 +648,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.AreEqual(2, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
-            Assert.AreEqual(2, DatabaseContext.Database.ExecuteScalar<int>(
+            Assert.AreEqual(2, DatabaseFactory.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                 new { nodeId = content.Id, propTypeId = propertyTypeId }));
         }

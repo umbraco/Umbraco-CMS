@@ -9,7 +9,9 @@ namespace Umbraco.Core
     public class ApplicationContext : IDisposable
     {
         private ApplicationContext()
-        { }
+        {
+            DatabaseContext = new DatabaseContext(DI.Current.DatabaseFactory);
+        }
 
         public static ApplicationContext Current { get; } = new ApplicationContext();
 
@@ -23,7 +25,7 @@ namespace Umbraco.Core
 
 	    public bool IsUpgrading => DI.Current.RuntimeState.Level == RuntimeLevel.Upgrade;
 
-        public DatabaseContext DatabaseContext => DI.Current.DatabaseContext;
+        public DatabaseContext DatabaseContext { get; }
 
         public ServiceContext Services => DI.Current.Services;
 

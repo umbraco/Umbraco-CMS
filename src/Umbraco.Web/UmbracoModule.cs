@@ -13,6 +13,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -55,7 +56,7 @@ namespace Umbraco.Web
         internal FacadeRouter FacadeRouter { get; set; }
 
         [Inject]
-        internal DatabaseContext DatabaseContext { get; set; }
+        internal IUmbracoDatabaseFactory DatabaseFactory { get; set; }
 
         #endregion
 
@@ -85,7 +86,7 @@ namespace Umbraco.Web
             // process
 
             // create the database scope which will be disposed with http context
-		    var scope = DatabaseContext.CreateDatabaseScope();
+		    var scope = DatabaseFactory.CreateScope();
 
             // create the LegacyRequestInitializer
             // and initialize legacy stuff

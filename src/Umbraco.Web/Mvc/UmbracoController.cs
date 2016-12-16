@@ -6,6 +6,7 @@ using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
@@ -38,7 +39,7 @@ namespace Umbraco.Web.Mvc
         /// Gets or sets the database context.
         /// </summary>
         [Inject]
-        public DatabaseContext DatabaseContext { get; set; }
+        public IUmbracoDatabaseFactory DatabaseFactory { get; set; }
 
         /// <summary>
         /// Gets or sets the services context.

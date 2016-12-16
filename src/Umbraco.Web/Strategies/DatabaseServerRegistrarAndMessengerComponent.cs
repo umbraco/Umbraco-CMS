@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
@@ -39,7 +40,7 @@ namespace Umbraco.Web.Strategies
         private BackgroundTaskRunner<IBackgroundTask> _backgroundTaskRunner;
         private bool _started;
         private TouchServerTask _task;
-        private DatabaseContext _databaseContext;
+        private IUmbracoDatabaseFactory _databaseFactory;
 
         public override void Compose(Composition composition)
         {
@@ -48,12 +49,12 @@ namespace Umbraco.Web.Strategies
             composition.SetServerMessenger(factory =>
             {
                 var runtime = factory.GetInstance<IRuntimeState>();
-                var databaseContext = factory.GetInstance<DatabaseContext>();
+                var databaseFactory = factory.GetInstance<IUmbracoDatabaseFactory>();
                 var logger = factory.GetInstance<ILogger>();
                 var proflog = factory.GetInstance<ProfilingLogger>();
 
                 return new BatchedDatabaseServerMessenger(
-                    runtime, databaseContext, logger, proflog,
+                    runtime, databaseFactory, logger, proflog,
                     true,
                     //Default options for web including the required callbacks to build caches
                     new DatabaseServerMessengerOptions
@@ -95,7 +96,7 @@ namespace Umbraco.Web.Strategies
                 indexer.Value.RebuildIndex();
         }
 
-        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerRegistrationService registrationService, DatabaseContext databaseContext, ILogger logger)
+        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerRegistrationService registrationService, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
 
@@ -103,7 +104,7 @@ namespace Umbraco.Web.Strategies
             if (_registrar == null) throw new Exception("panic: registar.");
 
             _runtime = runtime;
-            _databaseContext = databaseContext;
+            _databaseFactory = databaseFactory;
             _logger = logger;
             _registrationService = registrationService;
 
@@ -151,7 +152,7 @@ namespace Umbraco.Web.Strategies
                 var task = new TouchServerTask(_backgroundTaskRunner,
                     15000, //delay before first execution
                     _registrar.Options.RecurringSeconds*1000, //amount of ms between executions
-                    svc, _registrar, serverAddress, _databaseContext, _logger);
+                    svc, _registrar, serverAddress, _databaseFactory, _logger);
 
                 // perform the rest async, we don't want to block the startup sequence
                 // this will just reoccur on a background thread
@@ -166,7 +167,7 @@ namespace Umbraco.Web.Strategies
             private readonly IServerRegistrationService _svc;
             private readonly DatabaseServerRegistrar _registrar;
             private readonly string _serverAddress;
-            private readonly DatabaseContext _databaseContext;
+            private readonly IUmbracoDatabaseFactory _databaseFactory;
             private readonly ILogger _logger;
 
             /// <summary>
@@ -182,14 +183,14 @@ namespace Umbraco.Web.Strategies
             /// <param name="logger"></param>
             /// <remarks>The task will repeat itself periodically. Use this constructor to create a new task.</remarks>
             public TouchServerTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress, DatabaseContext databaseContext, ILogger logger)
+                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
                 : base(runner, delayMilliseconds, periodMilliseconds)
             {
                 if (svc == null) throw new ArgumentNullException(nameof(svc));
                 _svc = svc;
                 _registrar = registrar;
                 _serverAddress = serverAddress;
-                _databaseContext = databaseContext;
+                _databaseFactory = databaseFactory;
                 _logger = logger;
             }
 
@@ -206,7 +207,7 @@ namespace Umbraco.Web.Strategies
                 try
                 {
                     // running on a background task, requires a database scope
-                    using (_databaseContext.CreateDatabaseScope())
+                    using (_databaseFactory.CreateScope())
                     {
                         _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
                     }

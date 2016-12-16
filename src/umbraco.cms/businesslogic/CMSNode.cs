@@ -987,7 +987,7 @@ order by level,sortOrder";
         {
             var xmlDoc = new XmlDocument();
 
-            var xmlStr = Current.DatabaseContext.Database.ExecuteScalar<string>(
+            var xmlStr = Current.DatabaseFactory.Database.ExecuteScalar<string>(
                 "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
                 new { nodeId = Id, versionId = version });
 
@@ -1000,7 +1000,7 @@ order by level,sortOrder";
 
         protected internal virtual bool PreviewExists(Guid versionId)
         {
-            return Current.DatabaseContext.Database.ExecuteScalar<int>(
+            return Current.DatabaseFactory.Database.ExecuteScalar<int>(
                 "SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
                 new {nodeId = Id, versionId = versionId}) != 0;
 
@@ -1017,7 +1017,7 @@ order by level,sortOrder";
             var sql = PreviewExists(versionId) ? "UPDATE cmsPreviewXml SET xml = @xml, timestamp = @timestamp WHERE nodeId=@nodeId AND versionId = @versionId"
                                 : "INSERT INTO cmsPreviewXml(nodeId, versionId, timestamp, xml) VALUES (@nodeId, @versionId, @timestamp, @xml)";
 
-            Current.DatabaseContext.Database.Execute(
+            Current.DatabaseFactory.Database.Execute(
                 sql, new {nodeId = Id, versionId = versionId, timestamp = DateTime.Now, xml = x.OuterXml});
             
         }

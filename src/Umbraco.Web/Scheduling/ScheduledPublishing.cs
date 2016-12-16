@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Mvc;
@@ -14,17 +15,17 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly IRuntimeState _runtime;
         private readonly IUserService _userService;
-        private readonly DatabaseContext _databaseContext;
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger _logger;
         private readonly ProfilingLogger _proflog;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IUserService userService, DatabaseContext databaseContext, ILogger logger, ProfilingLogger proflog)
+            IRuntimeState runtime, IUserService userService, IUmbracoDatabaseFactory databaseFactory, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _userService = userService;
-            _databaseContext = databaseContext;
+            _databaseFactory = databaseFactory;
             _logger = logger;
             _proflog = proflog;
         }
@@ -84,7 +85,7 @@ namespace Umbraco.Web.Scheduling
 
                         // running on a background task, requires a database scope
                         // (GetAuthenticationHeaderValue uses UserService to load the current user, hence requires a database)
-                        using (_databaseContext.CreateDatabaseScope())
+                        using (_databaseFactory.CreateScope())
                         {
                             //pass custom the authorization header
                         request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_userService);

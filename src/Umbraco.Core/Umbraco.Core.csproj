@@ -226,7 +226,6 @@
     <Compile Include="CoreRuntimeComponent.cs" />
     <Compile Include="DatabaseBuilder.cs" />
     <Compile Include="DI\Current.cs" />
-    <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />

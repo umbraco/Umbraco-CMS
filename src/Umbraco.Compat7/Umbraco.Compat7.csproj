@@ -52,6 +52,7 @@
     <Compile Include="Core\ApplicationContext.cs" />
     <Compile Include="Core\ApplicationEventHandler.cs" />
     <Compile Include="Core\Cache\CacheRefreshersResolver.cs" />
+    <Compile Include="Core\DatabaseContext.cs" />
     <Compile Include="Core\Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Core\IApplicationEventHandler.cs" />
     <Compile Include="Core\Logging\LoggerResolver.cs" />

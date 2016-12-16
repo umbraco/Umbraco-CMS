@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Web
 {
@@ -21,9 +22,9 @@ namespace Umbraco.Web
     public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, DatabaseContext dbContext, ILogger logger, ProfilingLogger proflog,
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, ILogger logger, ProfilingLogger proflog,
             bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(runtime, dbContext, logger, proflog, enableDistCalls, options)
+            : base(runtime, databaseFactory, logger, proflog, enableDistCalls, options)
         { }
 
         // invoked by BatchedDatabaseServerMessengerStartup which is an ApplicationEventHandler
@@ -34,7 +35,7 @@ namespace Umbraco.Web
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
             UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
 
-            if (DatabaseContext.CanConnect == false)
+            if (DatabaseFactory.CanConnect == false)
             {
                 Logger.Warn<BatchedDatabaseServerMessenger>(
                     "Cannot connect to the database, distributed calls will not be enabled for this server.");

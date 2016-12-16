@@ -15,6 +15,7 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Store;
 using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using IContentService = Umbraco.Core.Services.IContentService;
@@ -33,7 +34,7 @@ namespace UmbracoExamine
         protected IUserService UserService { get; }
 
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
-        private readonly DatabaseContext _databaseContext;
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
         private int? _parentId;
 
         #region Constructors
@@ -47,7 +48,7 @@ namespace UmbracoExamine
             UserService = Current.Services.UserService;
 
             _urlSegmentProviders = Current.UrlSegmentProviders;
-            _databaseContext = Current.DatabaseContext;
+            _databaseFactory = Current.DatabaseFactory;
 
             InitializeQueries();
         }
@@ -94,7 +95,7 @@ namespace UmbracoExamine
         private void InitializeQueries()
         {
             if (_publishedQuery == null)
-                _publishedQuery = _databaseContext.Query<IContent>().Where(x => x.Published);
+                _publishedQuery = _databaseFactory.Query<IContent>().Where(x => x.Published);
         }
 
         #endregion

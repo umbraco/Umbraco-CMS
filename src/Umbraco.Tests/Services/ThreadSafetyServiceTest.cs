@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Services
 			{
 				var t = new Thread(() =>
 				{
-				    using (DatabaseContext.CreateDatabaseScope())
+				    using (DatabaseFactory.CreateScope())
 				    {
                         try
                         {
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Services
 			{
 				var t = new Thread(() =>
 				{
-				    using (DatabaseContext.CreateDatabaseScope())
+				    using (DatabaseFactory.CreateScope())
 				    {
                         try
                         {

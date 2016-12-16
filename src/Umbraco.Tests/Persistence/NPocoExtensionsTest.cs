@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Persistence
         public void Can_Bulk_Insert_One_By_One()
         {
             // Arrange
-            var db = DatabaseContext.Database;
+            var db = DatabaseFactory.Database;
 
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1000; i++)
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence
         public void Can_Bulk_Insert_One_By_One_Transaction_Rollback()
         {
             // Arrange
-            var db = DatabaseContext.Database;
+            var db = DatabaseFactory.Database;
 
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1000; i++)
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Persistence
         public void Can_Bulk_Insert_Native_Sql_Bulk_Inserts()
         {
             // Arrange
-            var db = DatabaseContext.Database;
+            var db = DatabaseFactory.Database;
 
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1000; i++)
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Persistence
         public void Can_Bulk_Insert_Native_Sql_Bulk_Inserts_Transaction_Rollback()
         {
             // Arrange
-            var db = DatabaseContext.Database;
+            var db = DatabaseFactory.Database;
 
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1000; i++)
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Persistence
         public void Generate_Bulk_Import_Sql()
         {
             // Arrange
-            var db = DatabaseContext.Database;
+            var db = DatabaseFactory.Database;
 
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 2; i++)
@@ -235,7 +235,7 @@ namespace Umbraco.Tests.Persistence
         public void Generate_Bulk_Import_Sql_Exceeding_Max_Params()
         {
             // Arrange
-            var db = DatabaseContext.Database;
+            var db = DatabaseFactory.Database;
 
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1500; i++)

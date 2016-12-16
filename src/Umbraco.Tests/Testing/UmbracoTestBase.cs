@@ -260,7 +260,6 @@ namespace Umbraco.Tests.Testing
                 sqlSyntaxProviders,
                 Logger, f.GetInstance<IDatabaseScopeAccessor>(),
                 Mock.Of<IMapperCollection>()));
-            Container.RegisterSingleton(f => new DatabaseContext(f.GetInstance<IUmbracoDatabaseFactory>()));
 
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
             Container.Register(factory

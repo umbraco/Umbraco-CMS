@@ -5,6 +5,7 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
@@ -27,7 +28,7 @@ namespace Umbraco.Web.WebServices
             // fixme inject somehow
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
-            DatabaseContext = Current.DatabaseContext;
+            DatabaseFactory = Current.DatabaseFactory;
             Services = Current.Services;
         }
 
@@ -63,7 +64,7 @@ namespace Umbraco.Web.WebServices
         /// <summary>
         /// Gets the database context.
         /// </summary>
-        public DatabaseContext DatabaseContext { get; }
+        public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
         /// <summary>
         /// Gets the web security helper.

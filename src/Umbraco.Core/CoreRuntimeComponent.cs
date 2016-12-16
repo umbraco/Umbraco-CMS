@@ -14,6 +14,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
@@ -93,7 +94,7 @@ namespace Umbraco.Core
             composition.Container.RegisterSingleton<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
                     factory.GetInstance<IRuntimeState>(),
-                    factory.GetInstance<DatabaseContext>(),
+                    factory.GetInstance<IUmbracoDatabaseFactory>(),
                     factory.GetInstance<ILogger>(),
                     factory.GetInstance<ProfilingLogger>(),
                     true, new DatabaseServerMessengerOptions()));

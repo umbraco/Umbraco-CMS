@@ -6,6 +6,7 @@ using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.UI.Controls
@@ -26,7 +27,7 @@ namespace Umbraco.Web.UI.Controls
             // fixme inject somehow
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
-            DatabaseContext = Current.DatabaseContext;
+            DatabaseFactory = Current.DatabaseFactory;
             Services = Current.Services;
         }
 
@@ -60,7 +61,7 @@ namespace Umbraco.Web.UI.Controls
 	    /// <summary>
 	    /// Gets the database context.
 	    /// </summary>
-	    protected DatabaseContext DatabaseContext { get; }
+	    protected IUmbracoDatabaseFactory DatabaseFactory { get; }
 
 	    /// <summary>
 	    /// Gets the services context.

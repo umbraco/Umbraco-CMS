@@ -293,7 +293,7 @@ namespace Umbraco.Core
             }
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
-            logger.Info<DatabaseContext>("Configured a new ConnectionString using the '" + providerName + "' provider.");
+            logger.Info<DatabaseBuilder>("Configured a new ConnectionString using the '" + providerName + "' provider.");
         }
 
         internal bool IsConnectionStringConfigured(ConnectionStringSettings databaseSettings)
@@ -399,7 +399,7 @@ namespace Umbraco.Core
                     return readyForInstall.Result;
                 }
 
-                _logger.Info<DatabaseContext>("Database configuration status: Started");
+                _logger.Info<DatabaseBuilder>("Database configuration status: Started");
 
                 var database = _databaseFactory.GetDatabase();
 
@@ -434,12 +434,12 @@ namespace Umbraco.Core
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
-                    _logger.Info<DatabaseContext>("Database configuration status: " + message);
+                    _logger.Info<DatabaseBuilder>("Database configuration status: " + message);
                     return new Result { Message = message, Success = true, Percentage = "100" };
                 }
 
                 //we need to do an upgrade so return a new status message and it will need to be done during the next step
-                _logger.Info<DatabaseContext>("Database requires upgrade");
+                _logger.Info<DatabaseBuilder>("Database requires upgrade");
                 message = "<p>Upgrading database, this may take some time...</p>";
                 return new Result
                 {
@@ -469,7 +469,7 @@ namespace Umbraco.Core
                     return readyForInstall.Result;
                 }
 
-                _logger.Info<DatabaseContext>("Database upgrade started");
+                _logger.Info<DatabaseBuilder>("Database upgrade started");
 
                 var database = _databaseFactory.GetDatabase();
                 //var supportsCaseInsensitiveQueries = SqlSyntax.SupportsCaseInsensitiveQueries(database);
@@ -525,7 +525,7 @@ namespace Umbraco.Core
 
                 //now that everything is done, we need to determine the version of SQL server that is executing
 
-                _logger.Info<DatabaseContext>("Database configuration status: " + message);
+                _logger.Info<DatabaseBuilder>("Database configuration status: " + message);
 
                 return new Result { Message = message, Success = true, Percentage = "100" };
             }
@@ -594,11 +594,11 @@ namespace Umbraco.Core
 
         private Result HandleInstallException(Exception ex)
         {
-            _logger.Error<DatabaseContext>("Database configuration failed", ex);
+            _logger.Error<DatabaseBuilder>("Database configuration failed", ex);
 
             if (_databaseSchemaValidationResult != null)
             {
-                _logger.Info<DatabaseContext>("The database schema validation produced the following summary: \n" + _databaseSchemaValidationResult.GetSummary());
+                _logger.Info<DatabaseBuilder>("The database schema validation produced the following summary: \n" + _databaseSchemaValidationResult.GetSummary());
             }
 
             return new Result

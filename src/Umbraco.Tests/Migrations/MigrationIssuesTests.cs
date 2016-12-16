@@ -35,14 +35,14 @@ namespace Umbraco.Tests.Migrations
                 ParentId = -1,
                 UniqueId = Guid.NewGuid()
             };
-            DatabaseContext.Database.Insert(n);
+            DatabaseFactory.Database.Insert(n);
             var ct = new ContentTypeDto
             {
                 Alias = "alias",
                 NodeId = n.NodeId,
                 Thumbnail = "thumb"
             };
-            DatabaseContext.Database.Insert(ct);
+            DatabaseFactory.Database.Insert(ct);
             n = new NodeDto
             {
                 Text = "text",
@@ -51,21 +51,21 @@ namespace Umbraco.Tests.Migrations
                 ParentId = -1,
                 UniqueId = Guid.NewGuid()
             };
-            DatabaseContext.Database.Insert(n);
+            DatabaseFactory.Database.Insert(n);
             var dt = new DataTypeDto
             {
                 PropertyEditorAlias = Constants.PropertyEditors.RelatedLinksAlias,
                 DbType = "x",
                 DataTypeId = n.NodeId
             };
-            DatabaseContext.Database.Insert(dt);
+            DatabaseFactory.Database.Insert(dt);
             var pt = new PropertyTypeDto
             {
                 Alias = "alias",
                 ContentTypeId = ct.NodeId,
                 DataTypeId = dt.DataTypeId
             };
-            DatabaseContext.Database.Insert(pt);
+            DatabaseFactory.Database.Insert(pt);
             n = new NodeDto
             {
                 Text = "text",
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Migrations
                 ParentId = -1,
                 UniqueId = Guid.NewGuid()
             };
-            DatabaseContext.Database.Insert(n);
+            DatabaseFactory.Database.Insert(n);
             var data = new PropertyDataDto
             {
                 NodeId = n.NodeId,
@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Migrations
                 Text = "text",
                 VersionId = Guid.NewGuid()
             };
-            DatabaseContext.Database.Insert(data);
+            DatabaseFactory.Database.Insert(data);
             data = new PropertyDataDto
             {
                 NodeId = n.NodeId,
@@ -90,13 +90,13 @@ namespace Umbraco.Tests.Migrations
                 Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>",
                 VersionId = Guid.NewGuid()
             };
-            DatabaseContext.Database.Insert(data);
-            var migrationContext = new MigrationContext(DatabaseContext.Database, Logger);
+            DatabaseFactory.Database.Insert(data);
+            var migrationContext = new MigrationContext(DatabaseFactory.Database, Logger);
 
             var migration = new UpdateRelatedLinksData(migrationContext);
-            migration.UpdateRelatedLinksDataDo(DatabaseContext.Database);
+            migration.UpdateRelatedLinksDataDo(DatabaseFactory.Database);
 
-            data = DatabaseContext.Database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();
+            data = DatabaseFactory.Database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();
             Assert.IsNotNull(data);
             Debug.Print(data.Text);
             Assert.AreEqual("[{\"title\":\"\",\"caption\":\"\",\"link\":\"\",\"newWindow\":false,\"type\":\"external\",\"internal\":null,\"edit\":false,\"isInternal\":false}]",
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Migrations
         {
             var logger = new DebugDiagnosticsLogger();
 
-            var migrationContext = new MigrationContext(DatabaseContext.Database, Logger);
+            var migrationContext = new MigrationContext(DatabaseFactory.Database, Logger);
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(

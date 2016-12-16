@@ -315,7 +315,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var mediaTypes = repository.GetAll();
                 int count =
-                    DatabaseContext.Database.ExecuteScalar<int>(
+                    DatabaseFactory.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new {NodeObjectType = new Guid(Constants.ObjectTypes.MediaType)});
 
@@ -341,7 +341,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var mediaTypes = ((IReadRepository<Guid, IMediaType>)repository).GetAll(allGuidIds);
 
                 int count =
-                    DatabaseContext.Database.ExecuteScalar<int>(
+                    DatabaseFactory.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new { NodeObjectType = new Guid(Constants.ObjectTypes.MediaType) });
 

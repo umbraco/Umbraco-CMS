@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
@@ -16,16 +17,16 @@ namespace Umbraco.Web.Scheduling
         private readonly IUmbracoSettingsSection _settings;
         private readonly ILogger _logger;
         private readonly ProfilingLogger _proflog;
-        private readonly DatabaseContext _databaseContext;
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, DatabaseContext databaseContext, ILogger logger, ProfilingLogger proflog)
+            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, IUmbracoDatabaseFactory databaseFactory, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _auditService = auditService;
             _settings = settings;
-            _databaseContext = databaseContext;
+            _databaseFactory = databaseFactory;
             _logger = logger;
             _proflog = proflog;
         }
@@ -82,7 +83,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             // running on a background task, requires a database scope
-            using (_databaseContext.CreateDatabaseScope())
+            using (_databaseFactory.CreateScope())
             using (_proflog.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 _auditService.CleanLogs(GetLogScrubbingMaximumAge(_settings));

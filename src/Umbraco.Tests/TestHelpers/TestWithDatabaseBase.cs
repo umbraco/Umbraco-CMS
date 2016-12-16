@@ -62,7 +62,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected ServiceContext ServiceContext => Core.DI.Current.Services;
 
-        protected DatabaseContext DatabaseContext => Core.DI.Current.DatabaseContext;
+        protected IUmbracoDatabaseFactory DatabaseFactory => Core.DI.Current.DatabaseFactory;
 
         public override void SetUp()
         {
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.TestHelpers
         [TestFixtureTearDown]
         public void FixtureTearDown()
         {
-            RemoveDatabaseFile(Core.DI.Current.HasContainer ? Core.DI.Current.DatabaseContext.Database : null);
+            RemoveDatabaseFile(Core.DI.Current.HasContainer ? Core.DI.Current.DatabaseFactory.Database : null);
         }
 
         public override void TearDown()
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.TestHelpers
             try
             {
                 if (Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest)
-                    RemoveDatabaseFile(Core.DI.Current.HasContainer ? Core.DI.Current.Container.TryGetInstance<DatabaseContext>()?.Database : null);
+                    RemoveDatabaseFile(Core.DI.Current.HasContainer ? Core.DI.Current.Container.TryGetInstance<IUmbracoDatabaseFactory>()?.Database : null);
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
@@ -274,7 +274,7 @@ namespace Umbraco.Tests.TestHelpers
             if (Options.Database == UmbracoTestOptions.Database.None || Options.Database == UmbracoTestOptions.Database.NewEmptyPerTest)
                 return;
 
-            _databaseScope = Core.DI.Current.DatabaseContext.CreateDatabaseScope();
+            _databaseScope = Core.DI.Current.DatabaseFactory.CreateScope();
 
             //create the schema and load default data if:
             // - is the first test in the session
@@ -286,7 +286,7 @@ namespace Umbraco.Tests.TestHelpers
                 || Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest
                 || (FirstTestInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture)))
             {
-                var database = Core.DI.Current.DatabaseContext.Database;
+                var database = Core.DI.Current.DatabaseFactory.Database;
                 var schemaHelper = new DatabaseSchemaHelper(database, Logger);
                 //Create the umbraco database and its base data
                 schemaHelper.CreateDatabaseSchema(Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());

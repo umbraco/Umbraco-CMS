@@ -482,8 +482,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 try
                 {
-                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                    DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "title", Direction.Ascending, false);
 
@@ -496,8 +496,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 finally
                 {
-                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                    DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -517,8 +517,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 try
                 {
-                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                    DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlCount = true;
                     var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true);
 
                     // Assert
@@ -528,8 +528,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 finally
                 {
-                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                    DatabaseContext.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                    DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }

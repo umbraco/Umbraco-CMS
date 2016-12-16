@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Components
             var mock = new Mock<IServiceContainer>();
             mock.Setup(x => x.GetInstance<ILogger>()).Returns(logger);
             mock.Setup(x => x.GetInstance<ProfilingLogger>()).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            mock.Setup(x => x.GetInstance<DatabaseContext>()).Returns(new DatabaseContext(f));
+            mock.Setup(x => x.GetInstance<IUmbracoDatabaseFactory>()).Returns(f);
             setup?.Invoke(mock);
             return mock.Object;
         }

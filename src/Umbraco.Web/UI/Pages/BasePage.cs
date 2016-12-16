@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using System.Web.UI;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Web.UI.Pages
 {
@@ -63,7 +64,7 @@ namespace Umbraco.Web.UI.Pages
         /// <summary>
         /// Gets the database context.
         /// </summary>
-        public DatabaseContext DatabaseContext => Current.DatabaseContext;
+        public IUmbracoDatabaseFactory DatabaseFactory => Current.DatabaseFactory;
 
         /// <summary>
         /// Gets an instance of ClientTools for access to the pages client API.

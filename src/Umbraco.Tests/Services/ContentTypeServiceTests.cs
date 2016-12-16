@@ -56,14 +56,14 @@ namespace Umbraco.Tests.Services
 
             foreach (var c in contentItems1)
             {
-                var xml = DatabaseContext.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
                 Assert.IsNotNull(xml);
                 Assert.IsTrue(xml.Xml.StartsWith("<newAlias"));
             }
 
             foreach (var c in contentItems2)
             {
-                var xml = DatabaseContext.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
                 Assert.IsNotNull(xml);
                 Assert.IsTrue(xml.Xml.StartsWith("<test2")); //should remain the same
             }
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Services
 
             foreach (var c in contentItems1)
             {
-                var xml = DatabaseContext.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
                 Assert.IsNotNull(xml);
                 Assert.IsTrue(xml.Xml.Contains(elementToMatch)); //verify that it is there before we remove the property
             }
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Services
 
             foreach (var c in contentItems1)
             {
-                var xml = DatabaseContext.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
                 Assert.IsNotNull(xml);
                 Assert.IsFalse(xml.Xml.Contains(elementToMatch)); //verify that it is no longer there
             }

@@ -42,16 +42,16 @@ namespace Umbraco.Core.Sync
         protected DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IRuntimeState runtime, DatabaseContext dbContext, ILogger logger, ProfilingLogger proflog,
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, ILogger logger, ProfilingLogger proflog,
             bool distributedEnabled, DatabaseServerMessengerOptions options)
             : base(distributedEnabled)
         {
-            if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+            if (databaseFactory == null) throw new ArgumentNullException(nameof(databaseFactory));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (proflog == null) throw new ArgumentNullException(nameof(proflog));
             if (options == null) throw new ArgumentNullException(nameof(options));
 
-            DatabaseContext = dbContext;
+            DatabaseFactory = databaseFactory;
             Logger = logger;
             _runtime = runtime;
             _profilingLogger = proflog;
@@ -62,11 +62,11 @@ namespace Umbraco.Core.Sync
 
         protected ILogger Logger { get; }
 
-        protected DatabaseContext DatabaseContext { get; }
+        protected IUmbracoDatabaseFactory DatabaseFactory { get; }
 
-        protected IUmbracoDatabase Database => DatabaseContext.Database;
+        protected IUmbracoDatabase Database => DatabaseFactory.Database;
 
-        protected Sql<SqlContext> Sql() => DatabaseContext.Sql();
+        protected Sql<SqlContext> Sql() => DatabaseFactory.Sql();
 
         #region Messenger
 

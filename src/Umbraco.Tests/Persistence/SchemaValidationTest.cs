@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence
         public void DatabaseSchemaCreation_Produces_DatabaseSchemaResult_With_Zero_Errors()
         {
             // Arrange
-            var db = DatabaseContext.Database;
+            var db = DatabaseFactory.Database;
             var schema = new DatabaseSchemaCreation(db, Logger);
 
             // Act

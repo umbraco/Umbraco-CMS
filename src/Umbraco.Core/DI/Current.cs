@@ -6,6 +6,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -70,8 +71,8 @@ namespace Umbraco.Core.DI
 
         public static PluginManager PluginManager
         {
-            get { return _pluginManager 
-                    ?? (_pluginManager = Container.TryGetInstance<PluginManager>() 
+            get { return _pluginManager
+                    ?? (_pluginManager = Container.TryGetInstance<PluginManager>()
                         ?? new PluginManager(ApplicationCache.RuntimeCache, ProfilingLogger)); }
             set { _pluginManager = value; }
         }
@@ -146,8 +147,8 @@ namespace Umbraco.Core.DI
         public static ServiceContext Services
             => Container.GetInstance<ServiceContext>();
 
-        public static DatabaseContext DatabaseContext
-            => Container.GetInstance<DatabaseContext>();
+        public static IUmbracoDatabaseFactory DatabaseFactory
+            => Container.GetInstance<IUmbracoDatabaseFactory>();
 
         #endregion
     }

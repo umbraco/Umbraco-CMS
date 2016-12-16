@@ -820,7 +820,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 unitOfWork.Flush();
 
-                Assert.AreEqual(0, DatabaseContext.Database.ExecuteScalar<int>(
+                Assert.AreEqual(0, DatabaseFactory.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }));
             }

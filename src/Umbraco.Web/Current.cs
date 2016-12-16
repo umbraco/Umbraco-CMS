@@ -9,6 +9,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
@@ -229,7 +230,7 @@ namespace Umbraco.Web
 
         public static ServiceContext Services => CoreCurrent.Services;
 
-        public static DatabaseContext DatabaseContext => CoreCurrent.DatabaseContext;
+        public static IUmbracoDatabaseFactory DatabaseFactory => CoreCurrent.DatabaseFactory;
 
         #endregion
     }

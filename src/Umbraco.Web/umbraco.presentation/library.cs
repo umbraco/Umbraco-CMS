@@ -1106,7 +1106,7 @@ namespace umbraco
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<preValues/>");
 
-            foreach (var dr in Current.DatabaseContext.Database.Query<dynamic>(
+            foreach (var dr in Current.DatabaseFactory.Database.Query<dynamic>(
                 "Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
                 new { dataTypeId = DataTypeId }))
             {
@@ -1128,7 +1128,7 @@ namespace umbraco
         {
             try
             {
-                return Current.DatabaseContext.Database.ExecuteScalar<string>(
+                return Current.DatabaseFactory.Database.ExecuteScalar<string>(
                     "select [value] from cmsDataTypePreValues where id = @id",
                     new {id = Id});
             }

@@ -475,7 +475,7 @@ namespace umbraco
             var t = Current.ApplicationCache.RuntimeCache.GetCacheItem<template>(
                string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
                {
-                   var templateData = Current.DatabaseContext.Database.FirstOrDefault<dynamic>(
+                   var templateData = Current.DatabaseFactory.Database.FirstOrDefault<dynamic>(
                        @"select nodeId, alias, node.parentID as master, text, design
 from cmsTemplate
 inner join umbracoNode node on (node.id = cmsTemplate.nodeId)

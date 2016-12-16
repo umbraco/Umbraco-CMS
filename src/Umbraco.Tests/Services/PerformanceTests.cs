@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Services
                 for (var i = 0; i < 10; i++)
                 {
                     //clear all the xml entries
-                    DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                    DatabaseFactory.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
                                                 (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
                                                     INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
@@ -169,7 +169,7 @@ namespace Umbraco.Tests.Services
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
                     foreach (var xml in xmlItems)
                     {
-                        var result = DatabaseContext.Database.Insert(xml);
+                        var result = DatabaseFactory.Database.Insert(xml);
                     }
                 }
             }
@@ -184,7 +184,7 @@ namespace Umbraco.Tests.Services
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
                     foreach (var xml in xmlItems)
                     {
-                        var result = DatabaseContext.Database.Update(xml);
+                        var result = DatabaseFactory.Database.Update(xml);
                     }
                 }
             }
@@ -196,13 +196,13 @@ namespace Umbraco.Tests.Services
                 for (var i = 0; i < 10; i++)
                 {
                     //clear all the xml entries
-                    DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                    DatabaseFactory.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
                                                 (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
                                                     INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
-                    DatabaseContext.Database.BulkInsertRecordsWithTransaction(xmlItems);
+                    DatabaseFactory.Database.BulkInsertRecordsWithTransaction(xmlItems);
                 }
             }
 
@@ -215,15 +215,15 @@ namespace Umbraco.Tests.Services
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
 
-                    using (var tr = DatabaseContext.Database.GetTransaction())
+                    using (var tr = DatabaseFactory.Database.GetTransaction())
                     {
                         //clear all the xml entries
-                        DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                        DatabaseFactory.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
                                                 (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
                                                     INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
 
-                        DatabaseContext.Database.BulkInsertRecords(xmlItems);
+                        DatabaseFactory.Database.BulkInsertRecords(xmlItems);
 
                         tr.Complete();
                     }
@@ -291,21 +291,21 @@ namespace Umbraco.Tests.Services
                     Path = ""
                 });
             }
-            DatabaseContext.Database.BulkInsertRecordsWithTransaction(nodes);
+            DatabaseFactory.Database.BulkInsertRecordsWithTransaction(nodes);
 
             //re-get the nodes with ids
-            var sql = DatabaseContext.Sql();
+            var sql = DatabaseFactory.Sql();
             sql.SelectAll().From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
-            nodes = DatabaseContext.Database.Fetch<NodeDto>(sql);
+            nodes = DatabaseFactory.Database.Fetch<NodeDto>(sql);
 
             //create the cmsContent data, each with a new content type id (so we can query on it later if needed)
             var contentTypeId = 0;
             var cmsContentItems = nodes.Select(node => new ContentDto { NodeId = node.NodeId, ContentTypeId = contentTypeId++ }).ToList();
-            DatabaseContext.Database.BulkInsertRecordsWithTransaction(cmsContentItems);
+            DatabaseFactory.Database.BulkInsertRecordsWithTransaction(cmsContentItems);
 
             //create the xml data
             var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = TestXmlStructure }).ToList();
-            DatabaseContext.Database.BulkInsertRecordsWithTransaction(xmlItems);
+            DatabaseFactory.Database.BulkInsertRecordsWithTransaction(xmlItems);
 
             return nodes;
         }

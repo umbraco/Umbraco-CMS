@@ -218,7 +218,7 @@ namespace umbraco.cms.presentation.settings
 		public string DoesMacroHaveSettings(string macroId)
 		{
 			if (
-				DatabaseContext.Database.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) ==
+                DatabaseFactory.Database.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) ==
 				    1)
 				    return "1";
 			    else

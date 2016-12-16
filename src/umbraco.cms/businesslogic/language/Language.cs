@@ -242,7 +242,7 @@ namespace umbraco.cms.businesslogic.language
         /// </remarks>
         public void Delete()
         {
-            if (Current.DatabaseContext.Database.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id", new { id = id }) == 0)
+            if (Current.DatabaseFactory.Database.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id", new { id = id }) == 0)
             {
                 Current.Services.LocalizationService.Delete(LanguageEntity);
             }
