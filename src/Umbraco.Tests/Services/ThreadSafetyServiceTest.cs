@@ -20,6 +20,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.DI;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {

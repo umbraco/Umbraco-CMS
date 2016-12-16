@@ -237,7 +237,7 @@
     <Compile Include="Persistence\DatabaseScopeTests.cs" />
     <Compile Include="TestHelpers\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestDatabaseScopeAccessor.cs" />
-    <Compile Include="Testing\NUnitTests.cs" />
+    <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Persistence\Migrations\PostMigrationTests.cs" />
@@ -245,10 +245,10 @@
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Scheduling\DeployTest.cs" />
-    <Compile Include="TestHelpers\UmbracoTestAttribute.cs" />
-    <Compile Include="TestHelpers\UmbracoTestBase.cs" />
+    <Compile Include="Testing\UmbracoTestAttribute.cs" />
+    <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
-    <Compile Include="TestHelpers\UmbracoTestOptions.cs" />
+    <Compile Include="Testing\UmbracoTestOptions.cs" />
     <Compile Include="CoreThings\TryConvertToTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestFacadeAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestIndexCollectionAccessor.cs" />
@@ -299,7 +299,7 @@
     <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
     <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
-    <Compile Include="Testing\MockTests.cs" />
+    <Compile Include="Testing\TestingTests\MockTests.cs" />
     <Compile Include="Models\MacroTests.cs" />
     <Compile Include="Models\Mapping\AutoMapperTests.cs" />
     <Compile Include="Models\Collections\Item.cs" />
@@ -491,7 +491,6 @@
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="DependencyInjection\ActionCollectionTests.cs" />
     <Compile Include="Logging\RingBufferTest.cs" />
-    <Compile Include="TestHelpers\TestWithSettingsBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
@@ -722,7 +721,9 @@
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Testing\Objects\" />
+  </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>

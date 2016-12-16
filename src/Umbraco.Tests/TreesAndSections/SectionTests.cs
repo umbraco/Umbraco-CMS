@@ -6,6 +6,7 @@ using umbraco.BusinessLogic;
 using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TreesAndSections

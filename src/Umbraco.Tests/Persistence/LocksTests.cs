@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.DI;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.Persistence

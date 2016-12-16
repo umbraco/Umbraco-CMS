@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Migrations

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Umbraco.Core;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Tests.Testing
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, /*AllowMultiple = false,*/ Inherited = false)]
     public class UmbracoTestAttribute : Attribute

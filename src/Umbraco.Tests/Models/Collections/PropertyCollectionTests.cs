@@ -3,13 +3,13 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models.Collections
 {
     [TestFixture]
-    public class PropertyCollectionTests : TestWithSettingsBase
+    public class PropertyCollectionTests : UmbracoTestBase
     {
         [Test]
         public void Property_Adds_Case_Insensitive_Compare()

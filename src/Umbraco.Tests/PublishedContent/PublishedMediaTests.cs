@@ -19,6 +19,7 @@ using Umbraco.Core.Strings;
 using UmbracoExamine;
 using Current = Umbraco.Web.Current;
 using Umbraco.Core.DI;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent
 {

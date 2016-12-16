@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Models;
+using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Routing

@@ -7,6 +7,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Tests.Services

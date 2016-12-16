@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.PublishedContent

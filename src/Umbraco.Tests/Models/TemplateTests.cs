@@ -5,12 +5,12 @@ using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class TemplateTests : TestWithSettingsBase
+    public class TemplateTests : UmbracoTestBase
     {
         [Test]
         public void Can_Deep_Clone()

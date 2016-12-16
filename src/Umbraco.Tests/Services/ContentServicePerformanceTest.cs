@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Services

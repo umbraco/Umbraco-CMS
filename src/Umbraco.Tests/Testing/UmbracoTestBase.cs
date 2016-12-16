@@ -11,11 +11,13 @@ using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Plugins;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.DI;
 using Current = Umbraco.Core.DI.Current;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Tests.Testing
 {
     /// <summary>
     /// Provides the top-level base class for all Umbraco integration tests.
@@ -54,11 +56,13 @@ namespace Umbraco.Tests.TestHelpers
 
         protected UmbracoTestAttribute Options { get; private set; }
 
+        protected static bool FirstTestInSession = true;
+
+        protected bool FirstTestInFixture = true;
+
         internal TestObjects TestObjects { get; private set; }
 
         private static PluginManager _pluginManager;
-        private static bool _firstDatabaseInSession = true;
-        private bool _firstDatabaseInFixture = true;
 
         [SetUp]
         public virtual void SetUp()
@@ -90,6 +94,7 @@ namespace Umbraco.Tests.TestHelpers
             ComposePluginManager(Options.ResetPluginManager);
             ComposeDatabase(Options.Database);
             // etc
+            ComposeWtf();
 
             // not sure really
             var composition = new Composition(Container, RuntimeLevel.Run);
@@ -120,6 +125,13 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             Container.RegisterSingleton(f => new ProfilingLogger(f.GetInstance<ILogger>(), f.GetInstance<IProfiler>()));
+        }
+
+        protected virtual void ComposeWtf()
+        {
+            // imported from TestWithSettingsBase
+            // which was inherited by TestWithApplicationBase so pretty much used everywhere
+            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
         }
 
         protected virtual void ComposeCacheHelper()
@@ -188,6 +200,9 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
+            FirstTestInFixture = false;
+            FirstTestInSession = false;
+
             Reset();
         }
 
@@ -200,6 +215,7 @@ namespace Umbraco.Tests.TestHelpers
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath();
+            SettingsForTests.Reset(); // fixme - should it be optional?
         }
 
         #endregion

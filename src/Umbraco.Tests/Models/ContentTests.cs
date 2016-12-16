@@ -5,12 +5,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.DI;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -21,11 +19,12 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentTests : TestWithSettingsBase
+    public class ContentTests : UmbracoTestBase
     {
         public override void SetUp()
         {

@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {

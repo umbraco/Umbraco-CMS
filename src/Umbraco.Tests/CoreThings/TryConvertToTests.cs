@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.DI;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.CoreThings
 {

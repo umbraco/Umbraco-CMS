@@ -20,6 +20,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
 using UmbracoExamine;
 
@@ -36,7 +37,7 @@ namespace Umbraco.Tests.TestHelpers
     /// </remarks>
     [TestFixture]
     [UmbracoTest(AutoMapper = true, ResetPluginManager = false)]
-    public abstract class TestWithApplicationBase : TestWithSettingsBase
+    public abstract class TestWithApplicationBase : UmbracoTestBase
     {
         protected ILogger Logger => Container.GetInstance<ILogger>();
 

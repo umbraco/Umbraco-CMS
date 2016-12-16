@@ -26,6 +26,7 @@ namespace UmbracoExamine
     public class UmbracoMemberIndexer : BaseUmbracoIndexer
     {
         private readonly IMemberService _memberService;
+        private readonly DatabaseContext _databaseContext;
 
         /// <summary>
         /// Default constructor
@@ -34,6 +35,7 @@ namespace UmbracoExamine
             : base()
         {
             _memberService = Current.Services.MemberService;
+            _databaseContext = Current.DatabaseContext;
         }
 
         /// <summary>
@@ -132,34 +134,37 @@ namespace UmbracoExamine
 
             IMember[] members;
 
-            if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
+            using (_databaseContext.CreateDatabaseScope())
             {
-                //if there are specific node types then just index those
-                foreach (var nodeType in IndexerData.IncludeNodeTypes)
+                if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
                 {
+                    //if there are specific node types then just index those
+                    foreach (var nodeType in IndexerData.IncludeNodeTypes)
+                    {
+                        do
+                        {
+                            long total;
+                            members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
+
+                            IndexItems(GetValueSets(members));
+
+                            pageIndex++;
+                        } while (members.Length == pageSize);
+                    }
+                }
+                else
+                {
+                    //no node types specified, do all members
                     do
                     {
                         long total;
-                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
+                        members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
 
                         IndexItems(GetValueSets(members));
 
                         pageIndex++;
                     } while (members.Length == pageSize);
                 }
-            }
-            else
-            {
-                //no node types specified, do all members
-                do
-                {
-                    long total;
-                    members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
-
-                    IndexItems(GetValueSets(members));
-
-                    pageIndex++;
-                } while (members.Length == pageSize);
             }
         }
 

@@ -8,6 +8,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models.Mapping
 {

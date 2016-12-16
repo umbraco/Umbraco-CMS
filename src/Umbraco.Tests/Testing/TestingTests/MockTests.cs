@@ -5,7 +5,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -15,7 +14,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Current;
 
-namespace Umbraco.Tests.Testing
+namespace Umbraco.Tests.Testing.TestingTests
 {
     [TestFixture]
     public class MockTests : UmbracoTestBase

@@ -34,6 +34,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -52,11 +53,6 @@ namespace Umbraco.Tests.TestHelpers
         private CacheHelper _disabledCacheHelper;
         private IFacadeService _facadeService;
         private IDisposable _databaseScope;
-
-        // note: a fixture class is created once for all the tests in that fixture
-        // these flags are used to ensure a new database file is used when appropriate
-        private static bool _isFirstInSession = true; // first test in the entire test session
-        private bool _isFirstInFixture = true; // first test in the test fixture
 
         private string _databasePath;
         private static byte[] _databaseBytes;
@@ -115,10 +111,6 @@ namespace Umbraco.Tests.TestHelpers
 
         public override void TearDown()
         {
-            // before anything else...
-            _isFirstInFixture = false;
-            _isFirstInSession = false;
-
             var profilingLogger = Container.TryGetInstance<ProfilingLogger>();
             var timer = profilingLogger?.TraceDuration<TestWithDatabaseBase>("teardown"); // fixme move that one up
             try
@@ -207,11 +199,11 @@ namespace Umbraco.Tests.TestHelpers
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
             //if this is the first test in the session, always ensure a new db file is created
-            if (_isFirstInSession 
+            if (FirstTestInSession 
                 || File.Exists(_databasePath) == false 
                 || Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest 
                 || Options.Database == UmbracoTestOptions.Database.NewEmptyPerTest 
-                || (_isFirstInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture))
+                || (FirstTestInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture))
             {
                 using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Remove database file"))
                 {
@@ -295,9 +287,9 @@ namespace Umbraco.Tests.TestHelpers
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
             if (_databaseBytes == null &&
-                (_isFirstInSession
+                (FirstTestInSession
                 || Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest
-                || (_isFirstInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture)))
+                || (FirstTestInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture)))
             {
                 var database = Core.DI.Current.DatabaseContext.Database;
                 var schemaHelper = new DatabaseSchemaHelper(database, Logger);

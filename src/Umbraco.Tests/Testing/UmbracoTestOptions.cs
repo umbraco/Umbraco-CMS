@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Tests.TestHelpers
+﻿namespace Umbraco.Tests.Testing
 {
     public static class UmbracoTestOptions
     {

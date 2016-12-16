@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace Umbraco.Tests.Testing
+namespace Umbraco.Tests.Testing.TestingTests
 {
     // these 4 test classes validate that our test class pattern *should* be:
     // - test base classes *not* marked as [TestFixture] but having a virtual SetUp

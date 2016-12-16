@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence
 {

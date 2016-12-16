@@ -10,12 +10,12 @@ using System.Xml.Xsl;
 using Umbraco.Core.Xml;
 using Umbraco.Core.Xml.XPath;
 using NUnit.Framework;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.CoreXml
 {
     [TestFixture]
-    public class NavigableNavigatorTests : TestWithSettingsBase
+    public class NavigableNavigatorTests : UmbracoTestBase
     {
         [Test]
         public void NewNavigatorIsAtRoot()

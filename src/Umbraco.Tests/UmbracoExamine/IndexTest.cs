@@ -6,6 +6,7 @@ using Lucene.Net.Search;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using UmbracoExamine;
 
 namespace Umbraco.Tests.UmbracoExamine

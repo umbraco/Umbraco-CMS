@@ -12,6 +12,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Core.DI;
+using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Cache.PublishedCache

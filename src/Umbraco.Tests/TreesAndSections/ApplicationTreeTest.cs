@@ -4,6 +4,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using System;
 using System.Linq;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
 using Current = Umbraco.Web.Current;
 

@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
