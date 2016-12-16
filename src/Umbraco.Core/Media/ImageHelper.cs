@@ -149,7 +149,7 @@ namespace Umbraco.Core.Media
         {
             // Generate thumbnail
             float f = 1;
-            if (maxWidthHeight >= 0)
+            if (maxWidthHeight > 0)
             {
                 var fx = (float)image.Size.Width / maxWidthHeight;
                 var fy = (float)image.Size.Height / maxWidthHeight;
