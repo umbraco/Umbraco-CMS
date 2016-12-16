@@ -732,7 +732,7 @@ namespace Umbraco.Core
             if (databaseSettings != null && databaseSettings.ProviderName != null)
                 dbIsSqlCe = databaseSettings.ProviderName == Constants.DatabaseProviders.SqlCe;
             var sqlCeDatabaseExists = false;
-            if (dbIsSqlCe)
+            if (dbIsSqlCe && databaseSettings.ConnectionString != null)
             {
                 var parts = databaseSettings.ConnectionString.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 var dataSourcePart = parts.FirstOrDefault(x => x.InvariantStartsWith("Data Source="));

@@ -45,8 +45,8 @@ namespace Umbraco.Web
 
         internal static ImageCropData GetCrop(this IEnumerable<ImageCropData> dataset, string cropAlias)
         {
-            var imageCropDatas = dataset.ToArray();
-            if (dataset == null || imageCropDatas.Any() == false)
+            var imageCropDatas = dataset == null ?  null : dataset.ToArray();
+            if (imageCropDatas == null || imageCropDatas.Any() == false)
                 return null;
 
             if (string.IsNullOrEmpty(cropAlias))

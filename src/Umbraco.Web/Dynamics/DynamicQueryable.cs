@@ -161,35 +161,38 @@ namespace Umbraco.Web.Dynamics
                     //source list is DynamicNode and the lambda returns a Func<object>
 					Func<T, object> func = (Func<T, object>)lambda.Compile();
                     //get the values out
-                    var query = typedSource.ToList().ConvertAll(item => new { node = item, key = EvaluateDynamicNodeFunc(item, func) });
-                    if (query.Count == 0)
+                    if (typedSource != null)
                     {
-                        return source;
-                    }
-                    var types = from i in query
-                                group i by i.key.GetType() into g
-                                where g.Key != typeof(DynamicNull)
-                                orderby g.Count() descending
-                                select new { g, Instances = g.Count() };
-                    var dominantType = types.First().g.Key;
+                        var query = typedSource.ToList().ConvertAll(item => new { node = item, key = EvaluateDynamicNodeFunc(item, func) });
+                        if (query.Count == 0)
+                        {
+                            return source;
+                        }
+                        var types = from i in query
+                            group i by i.key.GetType() into g
+                            where g.Key != typeof(DynamicNull)
+                            orderby g.Count() descending
+                            select new { g, Instances = g.Count() };
+                        var dominantType = types.First().g.Key;
 
-                    // NH - add culture dependencies
-                    StringComparer comp = StringComparer.Create(CultureInfo.CurrentCulture, true);
+                        // NH - add culture dependencies
+                        StringComparer comp = StringComparer.Create(CultureInfo.CurrentCulture, true);
 
-                    if (!descending)
-                    {
-                        // if the dominant type is a string we'll ensure that strings are sorted based on culture settings on node
-                        if (dominantType.FullName == "System.String") 
-                            return query.OrderBy(item => item.key.ToString(), comp).Select(item => item.node).AsQueryable();
+                        if (!descending)
+                        {
+                            // if the dominant type is a string we'll ensure that strings are sorted based on culture settings on node
+                            if (dominantType.FullName == "System.String") 
+                                return query.OrderBy(item => item.key.ToString(), comp).Select(item => item.node).AsQueryable();
+                            else
+                                return query.OrderBy(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
+                        }
                         else
-                            return query.OrderBy(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
-                    }
-                    else
-                    {
-                        if (dominantType.FullName == "System.String")
-                            return query.OrderByDescending(item => item.key.ToString(), comp).Select(item => item.node).AsQueryable();
-                        else
-                            return query.OrderByDescending(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
+                        {
+                            if (dominantType.FullName == "System.String")
+                                return query.OrderByDescending(item => item.key.ToString(), comp).Select(item => item.node).AsQueryable();
+                            else
+                                return query.OrderByDescending(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
+                        }
                     }
                 }
             }

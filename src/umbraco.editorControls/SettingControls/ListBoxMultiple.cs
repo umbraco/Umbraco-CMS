@@ -44,7 +44,7 @@ namespace umbraco.editorControls.SettingControls
             {
                 System.Web.UI.WebControls.ListItem item = new System.Web.UI.WebControls.ListItem(s);
 
-                if (_val.Contains(s + ";"))
+                if (_val != null && _val.Contains(s + ";"))
                     item.Selected = true;
                 
                 lb.Items.Add(item);

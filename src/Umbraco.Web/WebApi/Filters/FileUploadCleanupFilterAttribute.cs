@@ -44,7 +44,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (_incomingModel)
             {
-                if (actionExecutedContext.ActionContext.ActionArguments.Any())
+                if (actionExecutedContext != null && actionExecutedContext.ActionContext.ActionArguments.Any())
                 {
                     var contentItem = actionExecutedContext.ActionContext.ActionArguments.First().Value as IHaveUploadedFiles;
                     if (contentItem != null)

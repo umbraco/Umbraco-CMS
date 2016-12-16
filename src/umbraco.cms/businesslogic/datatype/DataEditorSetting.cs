@@ -49,11 +49,11 @@ namespace umbraco.cms.businesslogic.datatype
             //Type t = System.Web.Compilation.BuildManager.GetType(type, false);
             DataEditorSettingType dst = (DataEditorSettingType)System.Activator.CreateInstance(type, true);
 
-            if(defaultValue != null)
-                dst.DefaultValue = defaultValue.ToString();
-
             if (dst != null)
             {
+                if (defaultValue != null)
+                    dst.DefaultValue = defaultValue.ToString();
+
                 dst.Prevalues = GetPrevalues();
                 dst.IsRequired = isRequired;
                 dst.RegexValidationStatement = regexValidationStatement;

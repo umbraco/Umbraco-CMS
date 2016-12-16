@@ -84,29 +84,33 @@ namespace Umbraco.Web.Models
 
 			if (attempt.Success)
 			{
-				result = attempt.Result.ObjectResult;
+			    if (attempt.Result != null)
+			    {
+			        result = attempt.Result.ObjectResult;
 
-				//need to check the return type and possibly cast if result is from an extension method found
-				if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
-				{					
-					//we don't need to cast if it is already DynamicPublishedContent
-					if (attempt.Result.ObjectResult != null && (!(attempt.Result.ObjectResult is DynamicPublishedContent)))
-					{
-						if (attempt.Result.ObjectResult is IPublishedContent)
-						{
-							result = new DynamicPublishedContent((IPublishedContent)attempt.Result.ObjectResult);
-						}
-						else if (attempt.Result.ObjectResult is IEnumerable<DynamicPublishedContent>)
-						{
-							result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)attempt.Result.ObjectResult);
-						}	
-						else if (attempt.Result.ObjectResult is IEnumerable<IPublishedContent>)
-						{
-							result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)attempt.Result.ObjectResult);
-						}
-					}	
-				}
-				return true;
+			        //need to check the return type and possibly cast if result is from an extension method found
+			        if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
+			        {
+			            //we don't need to cast if it is already DynamicPublishedContent
+			            if (attempt.Result.ObjectResult != null && (!(attempt.Result.ObjectResult is DynamicPublishedContent)))
+			            {
+			                if (attempt.Result.ObjectResult is IPublishedContent)
+			                {
+			                    result = new DynamicPublishedContent((IPublishedContent) attempt.Result.ObjectResult);
+			                }
+			                else if (attempt.Result.ObjectResult is IEnumerable<DynamicPublishedContent>)
+			                {
+							    result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)attempt.Result.ObjectResult);
+			                }
+			                else if (attempt.Result.ObjectResult is IEnumerable<IPublishedContent>)
+			                {
+							    result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)attempt.Result.ObjectResult);
+			                }
+			            }
+			        }
+
+			        return true;
+			    }
 			}
 			
 			//this is the result of an extension method execution gone wrong so we return dynamic null

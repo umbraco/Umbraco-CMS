@@ -229,13 +229,13 @@ namespace Umbraco.Web
             WebSecurity webSecurity,
             bool? preview = null)
         {
+            if (httpContext == null) throw new ArgumentNullException("httpContext");
+            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+
             //This ensures the dispose method is called when the request terminates, though
             // we also ensure this happens in the Umbraco module because the UmbracoContext is added to the
             // http context items.
             httpContext.DisposeOnPipelineCompleted(this);
-
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();

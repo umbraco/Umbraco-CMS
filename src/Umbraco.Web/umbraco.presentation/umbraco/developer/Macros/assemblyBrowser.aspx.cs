@@ -78,13 +78,16 @@ namespace umbraco.developer
                     type = asm.GetType(Request.QueryString["type"]);
                 }
 
-                if (!errorReadingControl)
+                if (!errorReadingControl && type != null)
                 {
-                    string fullControlAssemblyName;
+                    string fullControlAssemblyName = null;
                     if (isUserControl)
                     {
-                        AssemblyName.Text = "Choose Properties from " + type.BaseType.Name;
-                        fullControlAssemblyName = type.BaseType.Namespace + "." + type.BaseType.Name;
+                        if (type.BaseType != null)
+                        {
+                            AssemblyName.Text = "Choose Properties from " + type.BaseType.Name;
+                            fullControlAssemblyName = type.BaseType.Namespace + "." + type.BaseType.Name;
+                        }
                     }
                     else
                     {
@@ -93,12 +96,12 @@ namespace umbraco.developer
                     }
 
 
-                    if (!IsPostBack && type != null)
+                    if (!IsPostBack)
                     {
                         MacroProperties.Items.Clear();
                         foreach (var pi in type.GetProperties())
                         {
-                            if (pi.CanWrite && ((fullControlAssemblyName == pi.DeclaringType.Namespace + "." + pi.DeclaringType.Name) || pi.DeclaringType == type))
+                            if (pi.DeclaringType != null && fullControlAssemblyName != null && pi.CanWrite && (fullControlAssemblyName == pi.DeclaringType.Namespace + "." + pi.DeclaringType.Name || pi.DeclaringType == type))
                             {
                                 MacroProperties.Items.Add(new ListItem(pi.Name + " <span style=\"color: #99CCCC\">(" + pi.PropertyType.Name + ")</span>", pi.PropertyType.Name));
                             }
