@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.DI;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
-    public class PartialViewRepositoryTests : TestWithApplicationBase
+    [UmbracoTest(WithApplication = true)]
+    public class PartialViewRepositoryTests : UmbracoTestBase
     {
         private IFileSystem _fileSystem;
 

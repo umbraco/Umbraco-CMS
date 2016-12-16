@@ -5,14 +5,13 @@ using AutoMapper;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.PropertyEditors;
@@ -20,7 +19,8 @@ using Umbraco.Web.PropertyEditors;
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    public class ContentTypeModelMappingTests : TestWithApplicationBase
+    [UmbracoTest(WithApplication = true)]
+    public class ContentTypeModelMappingTests : UmbracoTestBase
     {
         // mocks of services that can be setup on a test by test basis to return whatever we want
         private readonly Mock<IContentTypeService> _contentTypeService = new Mock<IContentTypeService>();

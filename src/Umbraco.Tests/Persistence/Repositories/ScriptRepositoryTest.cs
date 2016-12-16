@@ -7,16 +7,16 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DI;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
-    public class ScriptRepositoryTest : TestWithApplicationBase
+    [UmbracoTest(WithApplication = true)]
+    public class ScriptRepositoryTest : UmbracoTestBase
     {
         private IFileSystem _fileSystem;
 

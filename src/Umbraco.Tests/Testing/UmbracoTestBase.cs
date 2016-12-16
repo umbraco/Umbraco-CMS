@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using LightInject;
@@ -8,13 +10,26 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.DI;
+using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Mapping;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Plugins;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.DI;
+using Umbraco.Web.Services;
+using UmbracoExamine;
 using Current = Umbraco.Core.DI.Current;
 
 namespace Umbraco.Tests.Testing
@@ -39,6 +54,7 @@ namespace Umbraco.Tests.Testing
         // starting a test runs like this:
         // - SetUp() // when overriding, call base.SetUp() *first* then setup your own stuff
         // --- Compose() // when overriding, call base.Commpose() *first* then compose your own stuff
+        // --- Initialize() // same
         // - test runs
         // - TearDown() // when overriding, clear you own stuff *then* call base.TearDown()
         //
@@ -63,6 +79,26 @@ namespace Umbraco.Tests.Testing
         internal TestObjects TestObjects { get; private set; }
 
         private static PluginManager _pluginManager;
+
+        #region Accessors
+
+        protected ILogger Logger => Container.GetInstance<ILogger>();
+
+        protected IProfiler Profiler => Container.GetInstance<IProfiler>();
+
+        protected ProfilingLogger ProfilingLogger => Container.GetInstance<ProfilingLogger>();
+
+        protected CacheHelper CacheHelper => Container.GetInstance<CacheHelper>();
+
+        protected virtual ISqlSyntaxProvider SqlSyntax => Container.GetInstance<ISqlSyntaxProvider>();
+
+        protected IMapperCollection Mappers => Container.GetInstance<IMapperCollection>();
+
+        protected IQueryFactory QueryFactory => Container.GetInstance<DatabaseContext>().QueryFactory;
+
+        #endregion
+
+        #region Setup
 
         [SetUp]
         public virtual void SetUp()
@@ -93,6 +129,7 @@ namespace Umbraco.Tests.Testing
             ComposeAutoMapper(Options.AutoMapper);
             ComposePluginManager(Options.ResetPluginManager);
             ComposeDatabase(Options.Database);
+            ComposeApplication(Options.WithApplication);
             // etc
             ComposeWtf();
 
@@ -107,9 +144,12 @@ namespace Umbraco.Tests.Testing
         protected virtual void Initialize()
         {
             InitializeAutoMapper(Options.AutoMapper);
+            InitializeApplication(Options.WithApplication);
         }
 
-        #region Composing
+        #endregion
+
+        #region Compose
 
         protected virtual void ComposeLogging(UmbracoTestOptions.Logger option)
         {
@@ -177,6 +217,72 @@ namespace Umbraco.Tests.Testing
 
         }
 
+        protected virtual void ComposeApplication(bool withApplication)
+        {
+            if (withApplication == false) return;
+
+            var settings = SettingsForTests.GetDefault();
+
+            // default Datalayer/Repositories/SQL/Database/etc...
+            Container.RegisterFrom<RepositoryCompositionRoot>();
+
+            // register basic stuff that might need to be there for some container resolvers to work
+            Container.RegisterSingleton(factory => SettingsForTests.GetDefault());
+            Container.RegisterSingleton(factory => settings.Content);
+            Container.RegisterSingleton(factory => settings.Templates);
+            Container.Register<IServiceProvider, ActivatorServiceProvider>();
+            Container.Register(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+            Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
+
+            // replace some stuff
+            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");
+            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem");
+            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem");
+            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "StylesheetFileSystem");
+
+            // need real file systems here as templates content is on-disk only
+            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem");
+            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Views", "/views"), "ViewFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("MasterPages", "/masterpages"), "MasterpageFileSystem");
+
+            // no factory (noop)
+            Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
+
+            // register application stuff (database factory & context, services...)
+            Container.RegisterCollectionBuilder<MapperCollectionBuilder>()
+                .AddCore();
+
+            Container.RegisterSingleton<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
+            Container.RegisterSingleton<IDatabaseScopeAccessor, TestDatabaseScopeAccessor>();
+            var sqlSyntaxProviders = TestObjects.GetDefaultSqlSyntaxProviders(Logger);
+            Container.RegisterSingleton<ISqlSyntaxProvider>(_ => sqlSyntaxProviders.OfType<SqlCeSyntaxProvider>().First());
+            Container.RegisterSingleton<IDatabaseFactory>(f => new UmbracoDatabaseFactory(
+                Core.Configuration.GlobalSettings.UmbracoConnectionName,
+                sqlSyntaxProviders,
+                Logger, f.GetInstance<IDatabaseScopeAccessor>(),
+                Mock.Of<IMapperCollection>()));
+            Container.RegisterSingleton(f => new DatabaseContext(f.GetInstance<IDatabaseFactory>()));
+
+            Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
+            Container.Register(factory
+                => TestObjects.GetDatabaseUnitOfWorkProvider(factory.GetInstance<ILogger>(), factory.TryGetInstance<IDatabaseFactory>(), factory.TryGetInstance<RepositoryFactory>()));
+
+            Container.RegisterFrom<ServicesCompositionRoot>();
+            // composition root is doing weird things, fix
+            Container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
+            Container.RegisterSingleton<ISectionService, SectionService>();
+
+            // somehow property editor ends up wanting this
+            Container.RegisterSingleton(f => new ManifestBuilder(
+                f.GetInstance<IRuntimeCacheProvider>(),
+                new ManifestParser(f.GetInstance<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), f.GetInstance<IRuntimeCacheProvider>())
+            ));
+
+            // note - don't register collections, use builders
+            Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>();
+        }
+
         #endregion
 
         #region Initialize
@@ -193,6 +299,18 @@ namespace Umbraco.Tests.Testing
             });
         }
 
+        protected virtual void InitializeApplication(bool withApplication)
+        {
+            if (withApplication == false) return;
+
+            TestHelper.InitializeContentDirectories();
+
+            // initialize legacy mapings for core editors
+            // create the legacy prop-eds mapping
+            if (LegacyPropertyEditorIdToAliasConverter.Count() == 0)
+                LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
+        }
+
         #endregion
 
         #region TearDown and Reset
@@ -204,6 +322,12 @@ namespace Umbraco.Tests.Testing
             FirstTestInSession = false;
 
             Reset();
+
+            if (Options.WithApplication)
+            {
+                TestHelper.CleanContentDirectories();
+                TestHelper.CleanUmbracoSettingsConfig();
+            }
         }
 
         protected virtual void Reset()

@@ -13,6 +13,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -22,7 +23,8 @@ using Umbraco.Web.Security;
 namespace Umbraco.Tests.Web.Mvc
 {
     [TestFixture]
-    public class SurfaceControllerTests : TestWithApplicationBase
+    [UmbracoTest(WithApplication = true)]
+    public class SurfaceControllerTests : UmbracoTestBase
     {
         public override void SetUp()
         {

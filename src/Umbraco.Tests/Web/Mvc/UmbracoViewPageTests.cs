@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -26,7 +27,8 @@ using Umbraco.Web.Security;
 namespace Umbraco.Tests.Web.Mvc
 {
     [TestFixture]
-    public class UmbracoViewPageTests : TestWithApplicationBase
+    [UmbracoTest(WithApplication = true)]
+    public class UmbracoViewPageTests : UmbracoTestBase
     {
         private FacadeService _service;
 

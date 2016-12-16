@@ -5,9 +5,8 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -18,7 +17,8 @@ using Current = Umbraco.Web.Current;
 namespace Umbraco.Tests.Web
 {
     [TestFixture]
-    public class WebExtensionMethodTests : TestWithApplicationBase
+    [UmbracoTest(WithApplication = true)]
+    public class WebExtensionMethodTests : UmbracoTestBase
     {
         [Test]
         public void RouteDataExtensions_GetUmbracoContext()

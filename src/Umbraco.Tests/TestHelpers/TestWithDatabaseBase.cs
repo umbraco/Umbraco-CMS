@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlServerCe;
-using System.IO;
 using System.Linq;
 using System.Web.Routing;
 using System.Xml;
@@ -13,9 +12,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Manifest;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -29,10 +26,7 @@ using Umbraco.Core.Plugins;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Core.DI;
-using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 
@@ -47,8 +41,9 @@ namespace Umbraco.Tests.TestHelpers
     /// <para>Provides an Umbraco context and Xml content.</para>
     /// <para>fixme what else?</para>
     /// </remarks>
-    [TestFixture, RequiresSTA]
-    public abstract class TestWithDatabaseBase : TestWithApplicationBase
+    [RequiresSTA] // why?
+    [UmbracoTest(WithApplication = true)]
+    public abstract class TestWithDatabaseBase : UmbracoTestBase
     {
         private CacheHelper _disabledCacheHelper;
         private IFacadeService _facadeService;

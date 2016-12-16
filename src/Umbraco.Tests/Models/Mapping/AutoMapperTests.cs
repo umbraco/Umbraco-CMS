@@ -13,8 +13,8 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    [UmbracoTest(AutoMapper = true)]
-    public class AutoMapperTests : TestWithApplicationBase
+    [UmbracoTest(WithApplication = true)]
+    public class AutoMapperTests : UmbracoTestBase
     {
         protected override void Compose()
         {

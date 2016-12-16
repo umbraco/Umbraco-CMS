@@ -5,13 +5,14 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    public class ContentTypeServiceExtensionsTests : TestWithApplicationBase
+    [UmbracoTest(WithApplication = true)]
+    public class ContentTypeServiceExtensionsTests : UmbracoTestBase
     {
         [Test]
         public void GetAvailableCompositeContentTypes_No_Overlap_By_Content_Type_And_Property_Type_Alias()

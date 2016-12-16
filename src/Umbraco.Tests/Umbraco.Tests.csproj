@@ -529,7 +529,6 @@
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
-    <Compile Include="TestHelpers\TestWithApplicationBase.cs" />
     <Compile Include="TestHelpers\SettingsForTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />

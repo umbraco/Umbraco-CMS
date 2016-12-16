@@ -6,8 +6,7 @@ using Microsoft.Owin;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -17,7 +16,8 @@ using Umbraco.Web.Security.Identity;
 namespace Umbraco.Tests.Security
 {
     [TestFixture]
-    public class BackOfficeCookieManagerTests : TestWithApplicationBase
+    [UmbracoTest(WithApplication = true)]
+    public class BackOfficeCookieManagerTests : UmbracoTestBase
     {
         [Test]
         public void ShouldAuthenticateRequest_When_Not_Configured()
