@@ -377,15 +377,11 @@ namespace umbraco.cms.businesslogic.template
         {
             if (masterTemplateId != 0)
             {
-                string masterAlias = new Template(masterTemplateId).Alias.Replace(" ", "");
-                return
-                    String.Format("<asp:Content ContentPlaceHolderID=\"{1}ContentPlaceHolder\" runat=\"server\">",
-                    Alias.Replace(" ", ""), masterAlias);
+                var masterAlias = new Template(masterTemplateId).Alias.Replace(" ", "");
+                return string.Format("<asp:Content ContentPlaceHolderID=\"{0}ContentPlaceHolder\" runat=\"server\">", masterAlias);
             }
-            else
-                return
-                    String.Format("<asp:Content ContentPlaceHolderID=\"ContentPlaceHolderDefault\" runat=\"server\">",
-                    Alias.Replace(" ", ""));
+
+            return "<asp:Content ContentPlaceHolderID=\"ContentPlaceHolderDefault\" runat=\"server\">";
         }
 
         public List<string> contentPlaceholderIds()

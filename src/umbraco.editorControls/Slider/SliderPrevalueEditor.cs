@@ -222,28 +222,28 @@ namespace umbraco.editorControls.Slider
                 @"
 $('#{0}').click(function(){{
     var disable = !$(this).attr('checked');
-    $('#{1},#{3}').attr('disabled', disable);
-    $('#{6}').val(disable && !checkDecimals() ? 'Integer' : 'Nvarchar');
+    $('#{1},#{2}').attr('disabled', disable);
+    $('#{5}').val(disable && !checkDecimals() ? 'Integer' : 'Nvarchar');
     if(!disable) disable = $('#{1}').val() != '';
     
 }});
 $('#{1}').change(function(){{
     var disable = $(this).val() != '';
-    $('#{3}').attr('disabled', disable);
+    $('#{2}').attr('disabled', disable);
 }});
-$('#{4}').click(function(){{
+$('#{3}').click(function(){{
     var disable = !$(this).attr('checked');
-    $('#{5}').attr('disabled', disable);
+    $('#{4}').attr('disabled', disable);
 }});
-$('#{6}').change(function(){{
+$('#{5}').change(function(){{
     var disable = $(this).val() == 'Integer';
     if (checkDecimals() && disable) {{
-        $('#{6}').val('Nvarchar');
+        $('#{5}').val('Nvarchar');
         alert('Please remove decimal points below if you wish to use the Integer datatype');  
     }}
     else {{
     $('#{0}').removeAttr('checked');
-    $('#{1},#{3}').attr('disabled', disable);
+    $('#{1},#{2}').attr('disabled', disable);
     }}
 }});
 $('.slider-numeric').keydown(function(event) {{
@@ -258,8 +258,8 @@ $('.slider-numeric').keydown(function(event) {{
     }}
 }});
 $('.slider-numeric').keyup(function(event) {{
-    if ($('#{6}').val() != 'Nvarchar' && checkDecimals()) {{
-        $('#{6}').val('Nvarchar');
+    if ($('#{5}').val() != 'Nvarchar' && checkDecimals()) {{
+        $('#{5}').val('Nvarchar');
     }}
 }});
 function checkDecimals() {{
@@ -275,7 +275,6 @@ function checkDecimals() {{
 ",
                 this.EnableRange.ClientID,
                 this.RangeValue.ClientID,
-                this.Value.ClientID,
                 this.Value2.ClientID,
                 this.EnableStep.ClientID,
                 this.StepValue.ClientID,

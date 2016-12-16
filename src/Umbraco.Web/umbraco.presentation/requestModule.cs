@@ -202,8 +202,8 @@ namespace umbraco.presentation
 						context.Items["UmbPage"] = path;
 						context.Items["VirtualUrl"] = String.Format("{0}{1}", path, query);
 						// rewrite to the new URL
-						context.RewritePath(string.Format("{0}/default.aspx{2}",
-														  SystemDirectories.Root, path, query));
+						context.RewritePath(string.Format("{0}/default.aspx{1}",
+														  SystemDirectories.Root, query));
 					}
 				}
 			}
