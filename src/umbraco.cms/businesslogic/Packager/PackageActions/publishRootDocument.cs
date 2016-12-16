@@ -31,7 +31,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 
 			foreach (web.Document rootDoc in rootDocs)
 			{
-				if (rootDoc.Text.Trim() == documentName.Trim() && rootDoc != null && rootDoc.ContentType != null)
+				if (rootDoc != null && rootDoc.Text.Trim() == documentName.Trim() && rootDoc.ContentType != null)
 				{
 
 					rootDoc.PublishWithChildrenWithResult(umbraco.BusinessLogic.User.GetUser(0));
