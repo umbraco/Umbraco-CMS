@@ -369,9 +369,8 @@ namespace umbraco
                 else
                 {
                     pageContent.Controls.Add(new LiteralControl(tempOutput.ToString()));
-                    break;
+                    stop = true;
                 }
-
             }
 
             return pageContent;
