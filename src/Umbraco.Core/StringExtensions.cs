@@ -570,7 +570,8 @@ namespace Umbraco.Core
             while (hexValue.Length > 0)
             {
                 strValue += Convert.ToChar(Convert.ToUInt32(hexValue.Substring(0, 2), 16)).ToString();
-                hexValue = hexValue.Substring(2, hexValue.Length - 2);
+                if(hexValue.Length >= 2)
+                    hexValue = hexValue.Substring(2, hexValue.Length - 2);
             }
             return strValue;
         }

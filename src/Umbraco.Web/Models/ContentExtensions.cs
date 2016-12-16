@@ -77,7 +77,7 @@ namespace Umbraco.Web.Models
                 // from which we can figure out the domain
 
                 var pos = route.IndexOf('/');
-                domain = pos == 0
+                domain = pos <= 0
                     ? null
                     : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current).UmbracoDomain;
             }

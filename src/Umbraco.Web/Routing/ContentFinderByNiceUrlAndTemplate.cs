@@ -32,7 +32,7 @@ namespace Umbraco.Web.Routing
             {
                 var pos = path.LastIndexOf('/');
                 var templateAlias = path.Substring(pos + 1);
-                path = pos == 0 ? "/" : path.Substring(0, pos);
+                path = pos <= 0 ? "/" : path.Substring(0, pos);
 
                 var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateAlias);
                 if (template != null)

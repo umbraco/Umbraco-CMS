@@ -130,7 +130,7 @@ namespace umbraco.BusinessLogic.Actions
                     }
                 }
 
-                if (_actionJsList.Length > 0)
+                if (_actionJsList.Length >= 2)
                     _actionJsList = _actionJsList.Substring(2, _actionJsList.Length - 2);
 
                 _actionJsList = "\nvar menuMethods = new Array(\n" + _actionJsList + "\n)\n";

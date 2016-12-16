@@ -144,8 +144,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             route = route.ToLowerInvariant();
 
             var pos = route.IndexOf('/');
-            var path = pos == 0 ? route : route.Substring(pos);
-            var startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
+            var path = pos <= 0 ? route : route.Substring(pos);
+            var startNodeId = pos <= 0 ? 0 : int.Parse(route.Substring(0, pos));
 
             //check if we can find the node in our xml cache
             var id = NavigateRoute(umbracoContext, preview, startNodeId, path, hideTopLevelNode);
