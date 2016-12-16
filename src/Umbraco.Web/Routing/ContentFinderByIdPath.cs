@@ -54,7 +54,8 @@ namespace Umbraco.Web.Routing
                 if (nodeId > 0)
                 {
 					LogHelper.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
-                    node = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(nodeId);
+                    if (docRequest.RoutingContext.UmbracoContext != null)
+                        node = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(nodeId);
 
                     if (node != null)
                     {

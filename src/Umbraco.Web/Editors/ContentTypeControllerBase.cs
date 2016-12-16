@@ -168,7 +168,7 @@ namespace Umbraco.Web.Editors
             // works since that is based on aliases.
             var allAliases = Services.ContentTypeService.GetAllContentTypeAliases();
             var exists = allAliases.InvariantContains(contentTypeSave.Alias);
-            if ((exists) && (ctId == 0 || ct.Alias != contentTypeSave.Alias))
+            if (exists && (ctId == 0 || ct != null && ct.Alias != contentTypeSave.Alias))
             {
                 ModelState.AddModelError("Alias", "A content type, media type or member type with this alias already exists");
             }

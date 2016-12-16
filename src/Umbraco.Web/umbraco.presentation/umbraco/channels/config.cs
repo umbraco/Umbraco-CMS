@@ -79,15 +79,15 @@ namespace umbraco.presentation.channels.businesslogic
             XmlNode channelXml = null;
             if (User != null && User.Id > -1)
                 channelXml = configFile.SelectSingleNode(string.Format("//channel [user = '{0}']", this.User.Id));
-            if (channelXml != null)
+            if (channelXml != null && configFile.DocumentElement != null)
                 configFile.DocumentElement.RemoveChild(channelXml);
 
             // add new node
             XmlElement newChannelxml = configFile.CreateElement("channel");
             newChannelxml.AppendChild(
                 xmlHelper.addTextNode(configFile, "name", Name));
-            newChannelxml.AppendChild(
-                xmlHelper.addTextNode(configFile, "user", User.Id.ToString()));
+            if (User != null)
+                newChannelxml.AppendChild(xmlHelper.addTextNode(configFile, "user", User.Id.ToString()));
             newChannelxml.AppendChild(
                 xmlHelper.addTextNode(configFile, "startNode", StartNode.ToString()));
             newChannelxml.AppendChild(
@@ -113,7 +113,8 @@ namespace umbraco.presentation.channels.businesslogic
             media.Attributes.Append(xmlHelper.addAttribute(configFile, "mediaTypeAlias", MediaTypeAlias));
             media.Attributes.Append(xmlHelper.addAttribute(configFile, "mediaTypeFileProperty", MediaTypeFileProperty));
             newChannelxml.AppendChild(media);
-            configFile.DocumentElement.AppendChild(newChannelxml);
+            if (configFile.DocumentElement != null)
+                configFile.DocumentElement.AppendChild(newChannelxml);
 
             configFile.Save( IOHelper.MapPath( SystemFiles.MetablogConfig ));
 

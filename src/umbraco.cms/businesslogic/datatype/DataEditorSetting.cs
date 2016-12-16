@@ -53,12 +53,12 @@ namespace umbraco.cms.businesslogic.datatype
                 dst.DefaultValue = defaultValue.ToString();
 
             if (dst != null)
+            {
                 dst.Prevalues = GetPrevalues();
-
-            dst.IsRequired = isRequired;
-            dst.RegexValidationStatement = regexValidationStatement;
-
-
+                dst.IsRequired = isRequired;
+                dst.RegexValidationStatement = regexValidationStatement;
+            }
+            
             return dst;
         }
     }

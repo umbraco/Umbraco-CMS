@@ -249,30 +249,30 @@ namespace umbraco.presentation.developer.packages
                                 hl_packageRepo.Text = _repo.Name;
                                 hl_packageRepo.NavigateUrl = "BrowseRepository.aspx?repoGuid=" + _repo.Guid;
                                 pp_repository.Visible = true;
-                            }
 
-                            var repoPackage = _repo.Webservice.PackageByGuid(_pack.Data.PackageGuid);
+                                var repoPackage = _repo.Webservice.PackageByGuid(_pack.Data.PackageGuid);
 
-                            if (repoPackage != null)
-                            {
-                                if (repoPackage.HasUpgrade && repoPackage.UpgradeVersion != _pack.Data.Version)
+                                if (repoPackage != null)
                                 {
-                                    pane_upgrade.Visible = true;
-                                    lt_upgradeReadme.Text = repoPackage.UpgradeReadMe;
-                                    bt_gotoUpgrade.OnClientClick = "window.location.href = 'browseRepository.aspx?url=" + repoPackage.Url + "'; return true;";
-                                }
+                                    if (repoPackage.HasUpgrade && repoPackage.UpgradeVersion != _pack.Data.Version)
+                                    {
+                                        pane_upgrade.Visible = true;
+                                        lt_upgradeReadme.Text = repoPackage.UpgradeReadMe;
+                                        bt_gotoUpgrade.OnClientClick = "window.location.href = 'browseRepository.aspx?url=" + repoPackage.Url + "'; return true;";
+                                    }
                                 
-                                if (!string.IsNullOrEmpty(repoPackage.Demo))
-                                {
-                                    lb_demoLink.OnClientClick = "openDemo(this, '" + _pack.Data.PackageGuid + "'); return false;";
-                                    pp_documentation.Visible = true;
-                                }
+                                    if (!string.IsNullOrEmpty(repoPackage.Demo))
+                                    {
+                                        lb_demoLink.OnClientClick = "openDemo(this, '" + _pack.Data.PackageGuid + "'); return false;";
+                                        pp_documentation.Visible = true;
+                                    }
 
-                                if (!string.IsNullOrEmpty(repoPackage.Documentation))
-                                {
-                                    hl_docLink.NavigateUrl = repoPackage.Documentation;
-                                    hl_docLink.Target = "_blank";
-                                    pp_documentation.Visible = true;
+                                    if (!string.IsNullOrEmpty(repoPackage.Documentation))
+                                    {
+                                        hl_docLink.NavigateUrl = repoPackage.Documentation;
+                                        hl_docLink.Target = "_blank";
+                                        pp_documentation.Visible = true;
+                                    }
                                 }
                             }
                         }

@@ -908,8 +908,11 @@ namespace umbraco
         /// <returns></returns>
         public static string GetFullNiceUrl(this INode node, Domain domain, bool ssl)
         {
+            if (string.IsNullOrEmpty(node.NiceUrl))
+                return node.NiceUrl;
+
             // TODO: [OA] Document on Codeplex
-            if (!string.IsNullOrEmpty(node.NiceUrl) && node.NiceUrl[0] == '/')
+            if (node.NiceUrl[0] == '/')
             {
                 return (ssl ? "https://" : "http://") + domain.Name + node.NiceUrl;
             }

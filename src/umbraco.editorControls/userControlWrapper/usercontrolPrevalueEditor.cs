@@ -227,7 +227,7 @@ namespace umbraco.editorControls.userControlGrapper
 			{
 				var result = k.Value.Validate();
                 Label lbl = _phSettings.FindControlRecursive<Label>("lbl" + k.Key);
-				if(result == null && lbl != null)
+				if(result == null)
 				{
 					if(lbl != null)
 						lbl.Text = string.Empty;

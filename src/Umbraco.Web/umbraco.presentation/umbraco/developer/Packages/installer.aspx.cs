@@ -101,7 +101,10 @@ namespace umbraco.presentation.developer.packages
                 {
                     fb.Style.Add("margin-top", "7px");
                     fb.type = uicontrols.Feedback.feedbacktype.error;
-                    fb.Text = "<strong>No connection to repository.</strong> Runway could not be installed as there was no connection to: '" + _repo.RepositoryUrl + "'";
+                    var repoUrl = "the repository";
+                    if (_repo != null)
+                        repoUrl = _repo.RepositoryUrl;
+                    fb.Text = "<strong>No connection to repository.</strong> Runway could not be installed as there was no connection to: '" + repoUrl + "'";
                     pane_upload.Visible = false;
                 }
             }
