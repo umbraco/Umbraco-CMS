@@ -27,7 +27,6 @@ namespace umbraco.uicontrols
         {
             writer.Write("</div>");
             base.Render(writer);
-            this.Render(writer);
             writer.Write("<div class='btn-group>");
         }
 
