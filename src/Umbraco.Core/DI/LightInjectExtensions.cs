@@ -275,6 +275,12 @@ namespace Umbraco.Core.DI
             }, null);
         }
 
+        /// <summary>
+        /// Registers and instanciates a collection builder.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
+        /// <param name="container">The container.</param>
+        /// <returns>The collection builder.</returns>
         public static TBuilder RegisterCollectionBuilder<TBuilder>(this IServiceContainer container)
         {
             // make sure it's not already registered

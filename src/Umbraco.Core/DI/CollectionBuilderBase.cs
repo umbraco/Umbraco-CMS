@@ -54,11 +54,14 @@ namespace Umbraco.Core.DI
             var argType = typeof(IEnumerable<TItem>);
             var ctorArgTypes = new[] { argType };
             var constructor = typeof(TCollection).GetConstructor(ctorArgTypes);
-            if (constructor == null) throw new InvalidOperationException();
-            var exprArg = Expression.Parameter(argType, "items");
-            var exprNew = Expression.New(constructor, exprArg);
-            var expr = Expression.Lambda<Func<IEnumerable<TItem>, TCollection>>(exprNew, exprArg);
-            _collectionCtor = expr.Compile();
+            if (constructor != null)
+            {
+                var exprArg = Expression.Parameter(argType, "items");
+                var exprNew = Expression.New(constructor, exprArg);
+                var expr = Expression.Lambda<Func<IEnumerable<TItem>, TCollection>>(exprNew, exprArg);
+                _collectionCtor = expr.Compile();
+            }
+            // else _collectionCtor remains null, assuming CreateCollection has been overriden
 
             // we just don't want to support re-registering collections here
             var registration = Container.GetAvailableService<TCollection>();
