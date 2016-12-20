@@ -26,7 +26,17 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
+            return GetBySql(sql);
+        }
 
+        public IMacro Get(Guid id)
+        {
+            var sql = GetBaseQuery().Where("uniqueId=@id", new[] { id });
+            return GetBySql(sql);
+        }
+
+        private IMacro GetBySql(Sql sql)
+        {
             var macroDto = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql).FirstOrDefault();
             if (macroDto == null)
                 return null;
@@ -41,26 +51,26 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity;
         }
 
-        protected override IEnumerable<IMacro> PerformGetAll(params int[] ids)
+        public IEnumerable<IMacro> GetAll(params Guid[] ids)
         {
-            if (ids.Any())
-            {
-                return PerformGetAllOnIds(ids);
-            }
-
-            var sql = GetBaseQuery(false);
-
-            return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql))
-                .ToArray();// we don't want to re-iterate again!
+            return ids.Length > 0 ? ids.Select(Get) : GetAllAll();
         }
 
-        private IEnumerable<IMacro> PerformGetAllOnIds(params int[] ids)
+        public bool Exists(Guid id)
         {
-            if (ids.Any() == false) yield break;
-            foreach (var id in ids)
-            {
-                yield return Get(id);
-            }
+            return Get(id) != null;
+        }
+
+        protected override IEnumerable<IMacro> PerformGetAll(params int[] ids)
+        {
+            return ids.Length > 0 ? ids.Select(Get) : GetAllAll();
+        }
+
+        private IEnumerable<IMacro> GetAllAll()
+        {
+            var sql = GetBaseQuery(false);
+            return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql))
+                .ToArray();// we don't want to re-iterate again!
         }
 
         private IEnumerable<IMacro> ConvertFromDtos(IEnumerable<MacroDto> dtos)

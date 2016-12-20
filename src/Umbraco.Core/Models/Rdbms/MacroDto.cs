@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
@@ -12,6 +13,10 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("id")]
         [PrimaryKeyColumn]
         public int Id { get; set; }
+
+        [Column("uniqueId")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroUniqueId")]
+        public Guid UniqueId { get; set; }
 
         [Column("macroUseInEditor")]
         [Constraint(Default = "0")]

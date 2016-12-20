@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     {
         public MacroProperty()
         {
-            
+            _key = Guid.NewGuid();
         }
 
         /// <summary>
@@ -30,6 +30,7 @@ namespace Umbraco.Core.Models
             _alias = alias;
             _name = name;
             _sortOrder = sortOrder;
+            _key = Guid.NewGuid();
 
             //try to get the new mapped parameter editor
             var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
@@ -55,6 +56,7 @@ namespace Umbraco.Core.Models
             _alias = alias;
             _name = name;
             _sortOrder = sortOrder;
+            _key = Guid.NewGuid();
 
             //try to get the new mapped parameter editor
             var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
@@ -66,6 +68,7 @@ namespace Umbraco.Core.Models
             _editorAlias = editorAlias;
         }
 
+        private Guid _key;
         private string _alias;
         private string _name;
         private int _sortOrder;
@@ -76,11 +79,22 @@ namespace Umbraco.Core.Models
 
         private class PropertySelectors
         {
+            public readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<MacroProperty, Guid>(x => x.Key);
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Alias);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Name);
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, int>(x => x.SortOrder);
             public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
             public readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.EditorAlias);
+        }
+
+        /// <summary>
+        /// Gets or sets the Key of the Property
+        /// </summary>
+        [DataMember]
+        public Guid Key
+        {
+            get { return _key; }
+            set { SetPropertyValueAndDetectChanges(value, ref _key, Ps.Value.KeySelector); }
         }
 
         /// <summary>

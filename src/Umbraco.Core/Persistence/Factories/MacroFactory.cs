@@ -7,12 +7,10 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class MacroFactory 
     {
-        #region Implementation of IEntityFactory<Language,LanguageDto>
-
         public IMacro BuildEntity(MacroDto dto)
         {
             var model = new Macro(dto.Id, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.Python);
-
+            model.Key = dto.UniqueId;
 
             try
             {
@@ -20,7 +18,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 foreach (var p in dto.MacroPropertyDtos)
                 {
-                    model.Properties.Add(new MacroProperty(p.Id, p.Alias, p.Name, p.SortOrder, p.EditorAlias));
+                    model.Properties.Add(new MacroProperty(p.Id, p.Alias, p.Name, p.SortOrder, p.EditorAlias) { Key = p.UniqueId });
                 }
 
                 //on initial construction we don't want to have dirty properties tracked
@@ -38,6 +36,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new MacroDto()
                 {
+                    UniqueId = entity.Key,
                     Alias = entity.Alias,
                     CacheByPage = entity.CacheByPage,
                     CachePersonalized = entity.CacheByMember,
@@ -58,8 +57,6 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        #endregion
-
         private List<MacroPropertyDto> BuildPropertyDtos(IMacro entity)
         {
             var list = new List<MacroPropertyDto>();
@@ -67,6 +64,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 var text = new MacroPropertyDto
                 {
+                    UniqueId = p.Key,
                     Alias = p.Alias,
                     Name = p.Name,
                     Macro = entity.Id,
