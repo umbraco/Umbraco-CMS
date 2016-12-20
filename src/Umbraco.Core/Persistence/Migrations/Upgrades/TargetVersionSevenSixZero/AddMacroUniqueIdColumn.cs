@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
     [Migration("7.6.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AddMacroUniqueIdColumn : MigrationBase
     {
-        public AddMacroUniqueIdColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger) 
+        public AddMacroUniqueIdColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
         { }
 
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             {
                 Create.Column("uniqueId").OnTable("cmsMacro").AsGuid().Nullable();
                 Execute.Code(UpdateMacroGuids);
-                Alter.Column("uniqueId").OnTable("cmsMacro").AsGuid().NotNullable();
+                Alter.Table("cmsMacro").AlterColumn("uniqueId").AsGuid().NotNullable();
                 Create.Index("IX_cmsMacroUniqueId").OnTable("cmsMacro").OnColumn("uniqueId")
                     .Ascending()
                     .WithOptions().NonClustered()
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             {
                 Create.Column("uniqueId").OnTable("cmsMacroProperty").AsGuid().Nullable();
                 Execute.Code(UpdateMacroPropertyGuids);
-                Alter.Column("uniqueId").OnTable("cmsMacroProperty").AsGuid().NotNullable();
+                Alter.Table("cmsMacroProperty").AlterColumn("uniqueId").AsGuid().NotNullable();
                 Create.Index("IX_cmsMacroPropertyUniqueId").OnTable("cmsMacroProperty").OnColumn("uniqueId")
                     .Ascending()
                     .WithOptions().NonClustered()
