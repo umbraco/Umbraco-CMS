@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -87,6 +85,11 @@ namespace Umbraco.Core.Services
         //    }
         //}
 
+        public IEnumerable<IMacro> GetAll()
+        {
+            return GetAll(new int[0]);
+        }
+
         public IEnumerable<IMacro> GetAll(params int[] ids)
         {
             using (var repository = RepositoryFactory.CreateMacroRepository(UowProvider.GetUnitOfWork()))
@@ -95,7 +98,23 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IMacro> GetAll(params Guid[] ids)
+        {
+            using (var repository = RepositoryFactory.CreateMacroRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids);
+            }
+        }
+
         public IMacro GetById(int id)
+        {
+            using (var repository = RepositoryFactory.CreateMacroRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
+
+        public IMacro GetById(Guid id)
         {
             using (var repository = RepositoryFactory.CreateMacroRepository(UowProvider.GetUnitOfWork()))
             {
