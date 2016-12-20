@@ -66,17 +66,17 @@
         if(cfg != null)
             foreach (JProperty property in cfg.Properties())
             {
-                var propertyValue = TemplateUtilities.CleanForXss(property.Value.ToString());
+                var propertyValue = HttpUtility.HtmlAttributeEncode(property.Value.ToString());
                 attrs.Add(property.Name + "=\"" + propertyValue + "\"");
             }
-
+        
         JObject style = contentItem.styles;
 
         if (style != null) {
             var cssVals = new List<string>();
             foreach (JProperty property in style.Properties())
             {
-                var propertyValue = TemplateUtilities.CleanForXss(property.Value.ToString());
+                var propertyValue = property.Value.ToString();
                 if (string.IsNullOrWhiteSpace(propertyValue) == false)
                 {
                     cssVals.Add(property.Name + ":" + propertyValue + ";");
@@ -84,7 +84,7 @@
             }
 
             if (cssVals.Any())
-                attrs.Add("style=\"" + string.Join(" ", cssVals) + "\"");
+                attrs.Add("style=\"" + HttpUtility.HtmlAttributeEncode(string.Join(" ", cssVals)) + "\"");
         }
 
         return new MvcHtmlString(string.Join(" ", attrs));
