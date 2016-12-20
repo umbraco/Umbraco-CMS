@@ -16,17 +16,12 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Configuration
 {
-    //NOTE: Do not expose this class ever until we cleanup all configuration including removal of static classes, etc...
-    // we have this two tasks logged:
-    // http://issues.umbraco.org/issue/U4-58
-    // http://issues.umbraco.org/issue/U4-115	
-
-    //TODO:  Replace checking for if the app settings exist and returning an empty string, instead return the defaults!
+    //TODO:  Replace checking for if the app settings exits and returning an empty string, instead return the defaults!
 
     /// <summary>
     /// The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information from  web.config appsettings 
     /// </summary>
-    internal class GlobalSettings
+    public static class GlobalSettings
     {
 
         #region Private static fields
