@@ -18,7 +18,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.images = [];
             $scope.ids = [];
 
-            if ($scope.model.value) {
+
+            //we only need to lookup ids if a value exists and it is not an object
+            if ($scope.model.value && !angular.isObject($scope.model.value)) {
                 var ids = $scope.model.value.split(',');
 
                 //NOTE: We need to use the entityResource NOT the mediaResource here because
