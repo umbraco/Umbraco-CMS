@@ -72,8 +72,7 @@
 				<span ng-show="filter.term.appliesTo[0] === 'datetime'">
 					<umb-date-time-picker
 						options="vm.datePickerConfig"
-						ng-model="filter.constraintValue"
-						on-change="vm.datePickerChange()">
+						on-change="vm.datePickerChange(event, filter)">
 					</umb-date-time-picker>
 				</span>
 				

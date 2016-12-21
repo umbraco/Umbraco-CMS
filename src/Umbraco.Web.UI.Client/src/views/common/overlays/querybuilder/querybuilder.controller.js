@@ -12,13 +12,7 @@
         vm.datePickerConfig = {
             pickDate: true,
             pickTime: false,
-            format: "YYYY-MM-DD",
-            icons: {
-                time: "icon-time",
-                date: "icon-calendar",
-                up: "icon-chevron-up",
-                down: "icon-chevron-down"
-            }
+            format: "YYYY-MM-DD"
         };
 
         vm.query = {
@@ -147,14 +141,26 @@
 
         function setFilterProperty(filter, property) {
             filter.property = property;
+            filter.term = {};
+            filter.constraintValue = "";
         }
 
         function setFilterTerm(filter, term) {
             filter.term = term;
+            if(filter.constraintValue) {
+                throttledFunc();
+            }
         }
 
         function changeConstraintValue() {
             throttledFunc();
+        }
+
+        function datePickerChange(event, filter) {
+            if(event.date && event.date.isValid()) {
+                filter.constraintValue = event.date.format(vm.datePickerConfig.format);
+                throttledFunc();
+            }
         }
 
         var throttledFunc = _.throttle(function () {
@@ -165,13 +171,6 @@
                 });
 
         }, 200);
-
-        function datePickerChange(event) {
-            templateQueryResource.postTemplateQuery(vm.query)
-                .then(function (response) {
-                    $scope.model.result = response;
-                });
-        }
 
         onInit();
 

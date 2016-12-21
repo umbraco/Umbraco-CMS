@@ -16,7 +16,6 @@ Use this directive to render a date time picker
 
         <umb-date-time-picker
             options="vm.config"
-            ng-model="vm.date"
             on-change="vm.datePickerChange(event)"
             on-error="vm.datePickerError(event)">
         </umb-date-time-picker>
@@ -53,6 +52,9 @@ Use this directive to render a date time picker
 
             function datePickerChange(event) {
                 // handle change
+                if(event.date && event.date.isValid()) {
+                    var date = event.date.format(vm.datePickerConfig.format);
+                }
             }
 
             function datePickerError(event) {
@@ -67,7 +69,6 @@ Use this directive to render a date time picker
 </pre>
 
 @param {object} options (<code>binding</code>): Config object for the date picker.
-@param {string} ngModel (<code>binding</code>): Date value.
 @param {callback} onHide (<code>callback</code>): Hide callback.
 @param {callback} onShow (<code>callback</code>): Show callback.
 @param {callback} onChange (<code>callback</code>): Change callback.
@@ -114,8 +115,6 @@ Use this directive to render a date time picker
             function onChange(event) {
                 if (scope.onChange && event.date && event.date.isValid()) {
                     scope.$apply(function(){
-                        // Update ngModel
-                        scope.ngModel = event.date.format(scope.options.format);
                         // callback
                         scope.onChange({event: event});
                     });
@@ -143,7 +142,7 @@ Use this directive to render a date time picker
             function initDatePicker() {
                 // Open the datepicker and add a changeDate eventlistener
                 element
-                    .datetimepicker(angular.extend({ useCurrent: true }, scope.options))
+                    .datetimepicker(scope.options)
                     .on("dp.hide", onHide)
                     .on("dp.show", onShow)
                     .on("dp.change", onChange)
@@ -160,7 +159,6 @@ Use this directive to render a date time picker
             replace: true,
             templateUrl: 'views/components/umb-date-time-picker.html',
             scope: {
-                ngModel: "=",
                 options: "=",
                 onHide: "&",
                 onShow: "&",
