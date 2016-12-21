@@ -22,19 +22,19 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
                 Create.Column("uniqueId").OnTable("cmsMacro").AsGuid().Nullable();
                 Execute.Code(UpdateMacroGuids);
                 Alter.Table("cmsMacro").AlterColumn("uniqueId").AsGuid().NotNullable();
-                Create.Index("IX_cmsMacroUniqueId").OnTable("cmsMacro").OnColumn("uniqueId")
+                Create.Index("IX_cmsMacro_UniqueId").OnTable("cmsMacro").OnColumn("uniqueId")
                     .Ascending()
                     .WithOptions().NonClustered()
                     .WithOptions().Unique();
 
             }
 
-            if (columns.Any(x => x.TableName.InvariantEquals("cmsMacroProperty") && x.ColumnName.InvariantEquals("uniqueId")) == false)
+            if (columns.Any(x => x.TableName.InvariantEquals("cmsMacroProperty") && x.ColumnName.InvariantEquals("uniquePropertyId")) == false)
             {
-                Create.Column("uniqueId").OnTable("cmsMacroProperty").AsGuid().Nullable();
+                Create.Column("uniquePropertyId").OnTable("cmsMacroProperty").AsGuid().Nullable();
                 Execute.Code(UpdateMacroPropertyGuids);
-                Alter.Table("cmsMacroProperty").AlterColumn("uniqueId").AsGuid().NotNullable();
-                Create.Index("IX_cmsMacroPropertyUniqueId").OnTable("cmsMacroProperty").OnColumn("uniqueId")
+                Alter.Table("cmsMacroProperty").AlterColumn("uniquePropertyId").AsGuid().NotNullable();
+                Create.Index("IX_cmsMacroProperty_UniquePropertyId").OnTable("cmsMacroProperty").OnColumn("uniquePropertyId")
                     .Ascending()
                     .WithOptions().NonClustered()
                     .WithOptions().Unique();
@@ -55,12 +55,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 
         private static string UpdateMacroPropertyGuids(Database database)
         {
-            var updates = database.Query<dynamic>("SELECT id, macroPropertyAlias FROM cmsMacroProperty")
-                .Select(macro => Tuple.Create((int) macro.id, ((string) macro.macroPropertyAlias).ToGuid()))
+            var updates = database.Query<dynamic>(@"SELECT cmsMacroProperty.id id, macroPropertyAlias propertyAlias, cmsMacro.macroAlias macroAlias
+FROM cmsMacroProperty
+JOIN cmsMacro ON cmsMacroProperty.macro=cmsMacro.id")
+                .Select(prop => Tuple.Create((int) prop.id, ((string) prop.macroAlias + "____" + (string) prop.propertyAlias).ToGuid()))
                 .ToList();
 
             foreach (var update in updates)
-                database.Execute("UPDATE cmsMacroProperty set uniqueId=@guid WHERE id=@id", new { guid = update.Item2, id = update.Item1 });
+                database.Execute("UPDATE cmsMacroProperty set uniquePropertyId=@guid WHERE id=@id", new { guid = update.Item2, id = update.Item1 });
 
             return string.Empty;
         }

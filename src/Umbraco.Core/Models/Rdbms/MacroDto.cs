@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int Id { get; set; }
 
         [Column("uniqueId")]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroUniqueId")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacro_UniqueId")]
         public Guid UniqueId { get; set; }
 
         [Column("macroUseInEditor")]

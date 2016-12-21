@@ -13,8 +13,9 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
-        [Column("uniqueId")]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroUniqueId")]
+        // important to use column name != cmsMacro.uniqueId (fix in v8)
+        [Column("uniquePropertyId")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroProperty_UniquePropertyId")]
         public Guid UniqueId { get; set; }
 
         [Column("editorAlias")]        
