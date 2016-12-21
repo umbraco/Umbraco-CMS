@@ -179,7 +179,10 @@ namespace Umbraco.Core.Persistence.Repositories
             if (macro.IsPropertyDirty("Properties") || macro.Properties.Any(x => x.IsDirty()))
             {
                 var ids = dto.MacroPropertyDtos.Where(x => x.Id > 0).Select(x => x.Id).ToArray();
-                Database.Delete<MacroPropertyDto>("WHERE macro=@macro AND id NOT IN (@ids)", new { macro = dto.Id, ids });
+                if (ids.Length > 0)
+                    Database.Delete<MacroPropertyDto>("WHERE macro=@macro AND id NOT IN (@ids)", new { macro = dto.Id, ids });
+                else
+                    Database.Delete<MacroPropertyDto>("WHERE macro=@macro", new { macro = dto.Id });
 
                 // detect new aliases, replace with temp aliases
                 // this ensures that we don't have collisions, ever
