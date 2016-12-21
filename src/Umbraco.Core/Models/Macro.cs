@@ -21,6 +21,8 @@ namespace Umbraco.Core.Models
         {
             _properties = new MacroPropertyCollection();
             _properties.CollectionChanged += PropertiesChanged;
+            _addedProperties = new List<string>();
+            _removedProperties = new List<string>();
         }
         
         /// <summary>
@@ -106,6 +108,8 @@ namespace Umbraco.Core.Models
         private string _scriptPath;
         private string _xslt;
         private MacroPropertyCollection _properties;
+        private List<string> _addedProperties;
+        private List<string> _removedProperties;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -134,12 +138,27 @@ namespace Umbraco.Core.Models
                 //listen for changes
                 var prop = e.NewItems.Cast<MacroProperty>().First();
                 prop.PropertyChanged += PropertyDataChanged;
+
+                var alias = prop.Alias;
+
+                if (_addedProperties.Contains(alias) == false)
+                {
+                    //add to the added props
+                    _addedProperties.Add(alias);
+                }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 //remove listening for changes
                 var prop = e.OldItems.Cast<MacroProperty>().First();
                 prop.PropertyChanged -= PropertyDataChanged;
+
+                var alias = prop.Alias;
+
+                if (_removedProperties.Contains(alias) == false)
+                {
+                    _removedProperties.Add(alias);
+                }
             }
         }
 
@@ -155,11 +174,29 @@ namespace Umbraco.Core.Models
         
         public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
         {
+            _addedProperties.Clear();
+            _removedProperties.Clear();
             base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
             foreach (var prop in Properties)
             {
                 ((TracksChangesEntityBase)prop).ResetDirtyProperties(rememberPreviouslyChangedProperties);
             }
+        }
+
+        /// <summary>
+        /// Used internally to check if we need to add a section in the repository to the db
+        /// </summary>
+        internal IEnumerable<string> AddedProperties
+        {
+            get { return _addedProperties; }
+        }
+
+        /// <summary>
+        /// Used internally to check if we need to remove  a section in the repository to the db
+        /// </summary>
+        internal IEnumerable<string> RemovedProperties
+        {
+            get { return _removedProperties; }
         }
 
         /// <summary>
@@ -289,6 +326,8 @@ namespace Umbraco.Core.Models
             var clone = (Macro)base.DeepClone();
             //turn off change tracking
             clone.DisableChangeTracking();
+            clone._addedProperties = new List<string>();
+            clone._removedProperties = new List<string>();
             clone._properties = (MacroPropertyCollection)Properties.DeepClone();
             //re-assign the event handler
             clone._properties.CollectionChanged += clone.PropertiesChanged;
