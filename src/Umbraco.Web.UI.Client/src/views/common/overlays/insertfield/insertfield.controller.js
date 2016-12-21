@@ -37,11 +37,6 @@
                 $scope.model.title = "Insert value";
             }
 
-            // set default subtitle
-            if(!$scope.model.subtitle) {
-                $scope.model.subtitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-            }
-
             // Load all fields
             contentTypeResource.getAllPropertyTypeAliases().then(function (array) {
                 vm.properties = array;
