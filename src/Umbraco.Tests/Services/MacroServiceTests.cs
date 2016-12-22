@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Services
         }
 
         public override void CreateTestData()
-        {            
+        {
             base.CreateTestData();
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var macroService = ServiceContext.MacroService;
-            
+
             // Act
             var macro = macroService.GetByAlias("test1");
 
@@ -89,6 +89,12 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("Test", result.Name);
             Assert.AreEqual("~/Views/MacroPartials/Test.cshtml", result.ScriptPath);
             Assert.AreEqual(1234, result.CacheDuration);
+
+            result = macroService.GetById(macro.Key);
+            Assert.AreEqual("test", result.Alias);
+            Assert.AreEqual("Test", result.Name);
+            Assert.AreEqual("~/Views/MacroPartials/Test.cshtml", result.ScriptPath);
+            Assert.AreEqual(1234, result.CacheDuration);
         }
 
         [Test]
@@ -104,6 +110,9 @@ namespace Umbraco.Tests.Services
 
             //assert
             var result = macroService.GetById(macro.Id);
+            Assert.IsNull(result);
+
+            result = macroService.GetById(macro.Key);
             Assert.IsNull(result);
         }
 
@@ -128,7 +137,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("New name", macro.Name);
             Assert.AreEqual("NewAlias", macro.Alias);
             Assert.AreEqual(currKey, macro.Key);
-
         }
 
         [Test]
@@ -147,9 +155,9 @@ namespace Umbraco.Tests.Services
             macro.Properties[0].Alias = "new Alias";
             macro.Properties[0].Name = "new Name";
             macro.Properties[0].SortOrder = 1;
-            macro.Properties[0].EditorAlias = "new";            
+            macro.Properties[0].EditorAlias = "new";
             macroService.Save(macro);
-            
+
             macro = macroService.GetById(macro.Id);
 
             //assert
@@ -159,6 +167,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("new Name", macro.Properties[0].Name);
             Assert.AreEqual(1, macro.Properties[0].SortOrder);
             Assert.AreEqual("new", macro.Properties[0].EditorAlias);
+            Assert.AreEqual(currPropKey, macro.Properties[0].Key);
 
         }
 
@@ -181,7 +190,7 @@ namespace Umbraco.Tests.Services
                 lastKey = macro.Properties[i].Key;
             }
 
-            
+
 
             // Act
             macro.Properties["blah1"].Alias = "newAlias";
@@ -213,7 +222,7 @@ namespace Umbraco.Tests.Services
         {
             var macroService = ServiceContext.MacroService;
             var macro = new Macro("test", "Test", scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
-            
+
             //adds some properties
             macro.Properties.Add(new MacroProperty("blah1", "Blah1", 0, "blah1"));
             macro.Properties.Add(new MacroProperty("blah2", "Blah2", 0, "blah2"));
