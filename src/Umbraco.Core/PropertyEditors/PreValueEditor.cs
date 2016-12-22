@@ -178,7 +178,7 @@ namespace Umbraco.Core.PropertyEditors
             return result;
         }
 
-        private void ConvertItemsToJsonIfDetected(IDictionary<string, object> result)
+        internal void ConvertItemsToJsonIfDetected(IDictionary<string, object> result)
         {
             //now we're going to try to see if any of the values are JSON, if they are we'll convert them to real JSON objects
             // so they can be consumed as real json in angular!
