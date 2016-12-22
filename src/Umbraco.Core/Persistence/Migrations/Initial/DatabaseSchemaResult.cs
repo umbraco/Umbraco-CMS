@@ -136,6 +136,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(7, 4, 0);
             }
 
+            //if the error indicates a problem with the column cmsMacroProperty.uniquePropertyId then it is not version 7.6 since that is when it is added
+            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cmsMacroProperty,uniquePropertyId"))))
+            {
+                return new Version(7, 5, 0);
+            }
+
             return UmbracoVersion.Current;
         }
 
