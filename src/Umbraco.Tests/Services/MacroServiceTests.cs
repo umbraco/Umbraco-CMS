@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -82,6 +83,7 @@ namespace Umbraco.Tests.Services
             //assert
             Assert.IsTrue(macro.HasIdentity);
             Assert.Greater(macro.Id, 0);
+            Assert.AreNotEqual(Guid.Empty, macro.Key);
             var result = macroService.GetById(macro.Id);
             Assert.AreEqual("test", result.Alias);
             Assert.AreEqual("Test", result.Name);
@@ -114,6 +116,7 @@ namespace Umbraco.Tests.Services
             macroService.Save(macro);
 
             // Act
+            var currKey = macro.Key;
             macro.Name = "New name";
             macro.Alias = "NewAlias";
             macroService.Save(macro);
@@ -124,6 +127,7 @@ namespace Umbraco.Tests.Services
             //assert
             Assert.AreEqual("New name", macro.Name);
             Assert.AreEqual("NewAlias", macro.Alias);
+            Assert.AreEqual(currKey, macro.Key);
 
         }
 
@@ -136,21 +140,25 @@ namespace Umbraco.Tests.Services
             macro.Properties.Add(new MacroProperty("blah", "Blah", 0, "blah"));
             macroService.Save(macro);
 
-            // Act
-            macro.Properties.First().Alias = "new Alias";
-            macro.Properties.First().Name = "new Name";
-            macro.Properties.First().SortOrder = 1;
-            macro.Properties.First().EditorAlias = "new";
-            macroService.Save(macro);
+            Assert.AreNotEqual(Guid.Empty, macro.Properties[0].Key);
 
+            // Act
+            var currPropKey = macro.Properties[0].Key;
+            macro.Properties[0].Alias = "new Alias";
+            macro.Properties[0].Name = "new Name";
+            macro.Properties[0].SortOrder = 1;
+            macro.Properties[0].EditorAlias = "new";            
+            macroService.Save(macro);
+            
             macro = macroService.GetById(macro.Id);
 
             //assert
-            Assert.AreEqual(1, macro.Properties.Count());
-            Assert.AreEqual("new Alias", macro.Properties.First().Alias);
-            Assert.AreEqual("new Name", macro.Properties.First().Name);
-            Assert.AreEqual(1, macro.Properties.First().SortOrder);
-            Assert.AreEqual("new", macro.Properties.First().EditorAlias);
+            Assert.AreEqual(1, macro.Properties.Count);
+            Assert.AreEqual(currPropKey, macro.Properties[0].Key);
+            Assert.AreEqual("new Alias", macro.Properties[0].Alias);
+            Assert.AreEqual("new Name", macro.Properties[0].Name);
+            Assert.AreEqual(1, macro.Properties[0].SortOrder);
+            Assert.AreEqual("new", macro.Properties[0].EditorAlias);
 
         }
 
@@ -165,22 +173,39 @@ namespace Umbraco.Tests.Services
             macro.Properties.Add(new MacroProperty("blah3", "Blah3", 2, "blah3"));
             macroService.Save(macro);
 
+            var lastKey = macro.Properties[0].Key;
+            for (var i = 1; i < macro.Properties.Count; i++)
+            {
+                Assert.AreNotEqual(Guid.Empty, macro.Properties[i].Key);
+                Assert.AreNotEqual(lastKey, macro.Properties[i].Key);
+                lastKey = macro.Properties[i].Key;
+            }
+
+            
+
             // Act
             macro.Properties["blah1"].Alias = "newAlias";
             macro.Properties["blah1"].Name = "new Name";
             macro.Properties["blah1"].SortOrder = 1;
             macro.Properties["blah1"].EditorAlias = "new";
             macro.Properties.Remove("blah3");
+
+            var allPropKeys = macro.Properties.Select(x => new { x.Alias, x.Key }).ToArray();
+
             macroService.Save(macro);
 
             macro = macroService.GetById(macro.Id);
 
             //assert
-            Assert.AreEqual(2, macro.Properties.Count());
+            Assert.AreEqual(2, macro.Properties.Count);
             Assert.AreEqual("newAlias", macro.Properties["newAlias"].Alias);
             Assert.AreEqual("new Name", macro.Properties["newAlias"].Name);
             Assert.AreEqual(1, macro.Properties["newAlias"].SortOrder);
             Assert.AreEqual("new", macro.Properties["newAlias"].EditorAlias);
+            foreach (var propKey in allPropKeys)
+            {
+                Assert.AreEqual(propKey.Key, macro.Properties[propKey.Alias].Key);
+            }
         }
 
         [Test]
