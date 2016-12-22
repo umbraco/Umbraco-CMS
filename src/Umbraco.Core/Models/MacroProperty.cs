@@ -46,17 +46,18 @@ namespace Umbraco.Core.Models
         /// Ctor for creating an existing property
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="key"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
         /// <param name="sortOrder"></param>
         /// <param name="editorAlias"></param>
-        internal MacroProperty(int id, string @alias, string name, int sortOrder, string editorAlias)
+        internal MacroProperty(int id, Guid key, string @alias, string name, int sortOrder, string editorAlias)
         {
             _id = id;
             _alias = alias;
             _name = name;
             _sortOrder = sortOrder;
-            _key = Guid.NewGuid();
+            _key = key;
 
             //try to get the new mapped parameter editor
             var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);

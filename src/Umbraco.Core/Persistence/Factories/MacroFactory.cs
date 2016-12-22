@@ -9,8 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public IMacro BuildEntity(MacroDto dto)
         {
-            var model = new Macro(dto.Id, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.Python);
-            model.Key = dto.UniqueId;
+            var model = new Macro(dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.Python);
 
             try
             {
@@ -18,7 +17,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 foreach (var p in dto.MacroPropertyDtos)
                 {
-                    model.Properties.Add(new MacroProperty(p.Id, p.Alias, p.Name, p.SortOrder, p.EditorAlias) { Key = p.UniqueId });
+                    model.Properties.Add(new MacroProperty(p.Id, p.UniqueId, p.Alias, p.Name, p.SortOrder, p.EditorAlias));
                 }
 
                 //on initial construction we don't want to have dirty properties tracked
@@ -34,8 +33,8 @@ namespace Umbraco.Core.Persistence.Factories
 
         public MacroDto BuildDto(IMacro entity)
         {
-            var dto = new MacroDto()
-                {
+            var dto = new MacroDto
+            {
                     UniqueId = entity.Key,
                     Alias = entity.Alias,
                     CacheByPage = entity.CacheByPage,

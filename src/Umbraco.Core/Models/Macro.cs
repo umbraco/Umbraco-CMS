@@ -24,11 +24,12 @@ namespace Umbraco.Core.Models
             _addedProperties = new List<string>();
             _removedProperties = new List<string>();
         }
-        
+
         /// <summary>
         /// Creates an item with pre-filled properties
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="key"></param>
         /// <param name="useInEditor"></param>
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
@@ -40,10 +41,11 @@ namespace Umbraco.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="scriptPath"></param>
-        public Macro(int id, bool useInEditor, int cacheDuration, string @alias, string name, string controlType, string controlAssembly, string xsltPath, bool cacheByPage, bool cacheByMember, bool dontRender, string scriptPath)
+        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, string controlType, string controlAssembly, string xsltPath, bool cacheByPage, bool cacheByMember, bool dontRender, string scriptPath)
             : this()
         {
             Id = id;
+            Key = key;
             UseInEditor = useInEditor;
             CacheDuration = cacheDuration;
             Alias = alias.ToCleanString(CleanStringType.Alias);
