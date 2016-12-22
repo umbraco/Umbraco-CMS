@@ -53,7 +53,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<IMacro> GetAll(params Guid[] ids)
         {
-            return ids.Length > 0 ? ids.Select(Get) : GetAllAll();
+            return ids.Length > 0 ? ids.Select(Get) : GetAllNoIds();
         }
 
         public bool Exists(Guid id)
@@ -63,10 +63,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IMacro> PerformGetAll(params int[] ids)
         {
-            return ids.Length > 0 ? ids.Select(Get) : GetAllAll();
+            return ids.Length > 0 ? ids.Select(Get) : GetAllNoIds();
         }
 
-        private IEnumerable<IMacro> GetAllAll()
+        private IEnumerable<IMacro> GetAllNoIds()
         {
             var sql = GetBaseQuery(false);
             return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql))
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = new List<string>
                 {
                     "DELETE FROM cmsMacroProperty WHERE macro = @Id",
-                    "DELETE FROM cmsMacro WHERE id = @Id"                           
+                    "DELETE FROM cmsMacro WHERE id = @Id"
                 };
             return list;
         }
