@@ -578,6 +578,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          value = properties[index].value;
          if (value) {
              var editor = properties[index].editor;
+
+             // If we are displaying something containing an id (a content id from a picker, or a pre-value id)
+             // track the Ids so we can later look-up a more appropriate value to display
              if (editor === 'Umbraco.ContentPickerAlias') {
                  trackReferencedNodeIdsInIncludedProperties(referencedNodeIds, value);
              } else if (editor === 'Umbraco.MultiNodeTreePicker') {
@@ -607,6 +610,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        return -1;
    }
 
+   /** Updates a list tracking any node ids from content pickers that are being displayed in the list view so that
+       later the content can be looked up and the ids replaced with the name of the content */
    function trackReferencedNodeIdsInIncludedProperties(referencedNodeIdsInIncludedProperties, nodeId) {
        var nodeIdAsNumber = parseInt(nodeId);
        if (referencedNodeIdsInIncludedProperties.indexOf(nodeIdAsNumber) === -1) {
@@ -614,6 +619,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        }
    }
 
+   /** Updates a list tracking any pre-value ids from list data types that are being displayed in the list view so that
+       later the label for the pre-value can be looked up and the ids replaced with the name of the content */
    function trackReferencedPreValuesInIncludedProperties(referencedPreValuesInIncludedProperties, property) {
        if (property.editor === 'Umbraco.DropDown' || property.editor === 'Umbraco.RadioButtonList') {
            trackReferencedPreValueInIncludedProperties(referencedPreValuesInIncludedProperties, property, parseInt(property.value));
@@ -624,6 +631,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        }
    }
 
+   /** Updates the list tracking pre-value ids with a single value, if it's not already been recorded */
    function trackReferencedPreValueInIncludedProperties(referencedPreValuesInIncludedProperties, property, value) {
        if (getTrackedPrevalueIndex(referencedPreValuesInIncludedProperties, value) === -1) {
            referencedPreValuesInIncludedProperties.push({
@@ -634,6 +642,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        }
    }
 
+    /** Checks to see if a given pre-value Id from the list view is already in the list being tracked and returns it's index if so */
    function getTrackedPrevalueIndex(referencedPreValuesInIncludedProperties, id) {
        var index = 0;
        for (var i = 0; i < referencedPreValuesInIncludedProperties.length; i++) {
@@ -679,7 +688,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          result[alias] = value;
       });
    }
-    
+   
+   /** For any values in the list view that are being displayed as content ids, update to display the name of the content
+       instead using the provided list of nodes */
    function updatePropertyValuesForReferencedNodes(result, referencedNodes) {
        _.each($scope.options.includeProperties, function (e) {
            var alias = e.alias;
@@ -688,6 +699,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                var editor = result.properties[propertyIndex].editor;
                var currentValue = result[alias];
                var nodeName;
+
+               // If displaying an id from a single or multiple content picker, update with the name of the referenced node
                if (editor === 'Umbraco.ContentPickerAlias') {
                    nodeName = getNameForReferencedNodeId(parseInt(currentValue), referencedNodes);
                    if (nodeName !== '') {
@@ -711,6 +724,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        });
    }
 
+   /** Finds the name of a content node for a given id */
    function getNameForReferencedNodeId(nodeId, referencedNodes) {
        for (var i = 0; i < referencedNodes.length; i++) {
            if (referencedNodes[i].id === nodeId) {
@@ -721,6 +735,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        return '';
    }
 
+   /** For any values in the list view that are being displayed as pre-value ids, update to display the label of the pre-value
+       instead using the provided list of pre-values */
    function updatePropertyValuesForReferencedPreValues(result, referencedPreValues, editor) {
        _.each($scope.options.includeProperties, function (e) {
            var alias = e.alias;
@@ -728,6 +744,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
            if (propertyIndex > -1 && result.properties[propertyIndex].editor === editor) {
                var currentValue = result[alias];
                var preValueLabel;
+
+               // If displaying an id from a single or multiple list , update with the label of the pre-value
                if (editor === 'Umbraco.DropDown' || editor === 'Umbraco.RadioButtonList') {
                    preValueLabel = getLabelForReferencedPreValue(parseInt(currentValue), referencedPreValues);
                    if (preValueLabel !== '') {
@@ -751,6 +769,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        });
    }
 
+    /** Finds the label of a pre-value for a given id */
    function getLabelForReferencedPreValue(preValueId, referencedPreValues) {
        var preValue = referencedPreValues[preValueId];
        if (preValue) {
