@@ -120,7 +120,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        internal static bool DetectIsJson(this string input)
+        public static bool DetectIsJson(this string input)
         {
             input = input.Trim();
             return (input.StartsWith("{") && input.EndsWith("}"))
