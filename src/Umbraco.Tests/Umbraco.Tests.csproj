@@ -179,6 +179,7 @@
     <Compile Include="CallContextTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Migrations\CreateTableMigrationTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
