@@ -13,7 +13,7 @@
     {
         private static string MakeBinaryOperation(this QueryCondition condition, string operand, int token)
         {
-            return string.Format("{0}{1}@{2}", condition.Property.Name, operand, token);
+            return string.Format("{0}{1}@{2}", condition.Property.Alias, operand, token);
         }
 
 
