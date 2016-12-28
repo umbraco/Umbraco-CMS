@@ -65,7 +65,7 @@ namespace Umbraco.Web.Editors
 
             var sb = new StringBuilder();
             
-            sb.Append("Model.Content.Site()");
+            sb.Append("CurrentPage.Site()");
             
             var timer = new Stopwatch();
             
