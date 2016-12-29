@@ -11,16 +11,29 @@
 
     internal static class QueryConditionExtensions
     {
-        private static string MakeBinaryOperation(this QueryCondition condition, string operand, int token)
+        
+        public static string BuildTokenizedCondition(this QueryCondition condition, int token)
         {
-            return string.Format("{0}{1}@{2}", condition.Property.Name, operand, token);
+            return condition.BuildConditionString(string.Empty, token);
         }
 
+        public static string BuildCondition(this QueryCondition condition, string parameterAlias)
+        {
+            return condition.BuildConditionString(parameterAlias + ".");
+        }
 
-        public static string BuildCondition(this QueryCondition condition, int token)
+        private static string BuildConditionString(this QueryCondition condition, string prefix, int token = -1)
         {
             var operand = string.Empty;
             var value = string.Empty;
+            var constraintValue = string.Empty;
+
+            //if a token is used, use a token placeholder, otherwise, use the actual value
+            if(token >= 0){
+                constraintValue = string.Format("@{0}", token);
+            }else {
+                constraintValue = condition.Property.Type == "string" ? string.Format("\"{0}\"", condition.ConstraintValue) : condition.ConstraintValue;
+            }
 
             switch (condition.Term.Operathor)
             {
@@ -43,17 +56,20 @@
                     operand = " <= ";
                     break;
                 case Operathor.Contains:
-                    value = string.Format("{0}.Contains(@{1})", condition.Property.Name, token);
+                    value = string.Format("{0}{1}.Contains({2})", prefix, condition.Property.Name, constraintValue);
                     break;
                 case Operathor.NotContains:
-                    value =  string.Format("!{0}.Contains(@{1})", condition.Property.Name, token);
+                    value =  string.Format("!{0}{1}.Contains({2})", prefix, condition.Property.Name, constraintValue);
                     break;
                 default :
                     operand = " == ";
                     break;
             }
 
-            return string.IsNullOrEmpty(value) ? condition.MakeBinaryOperation(operand, token) : value;
+            if (string.IsNullOrEmpty(value) == false)
+                return value;
+            
+            return string.Format("{0}{1}{2}{3}", prefix, condition.Property.Name, operand, constraintValue);
         }
 
     }
