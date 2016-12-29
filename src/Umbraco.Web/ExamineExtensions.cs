@@ -9,12 +9,12 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
 {
-	/// <summary>
-	/// Extension methods for Examine
-	/// </summary>
-	internal static class ExamineExtensions
+    /// <summary>
+    /// Extension methods for Examine
+    /// </summary>
+    public static class ExamineExtensions
 	{
-        internal static PublishedContentSet<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results,
+        public static PublishedContentSet<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results,
 			ContextualPublishedCache cache)
 		{
 			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IPublishedContent, 
