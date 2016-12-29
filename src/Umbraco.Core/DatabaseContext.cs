@@ -33,6 +33,12 @@ namespace Umbraco.Core
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;
+        private DateTime? _connectionLastChecked = null;
+
+        /// <summary>
+        /// The number of minutes to throttle the checks to CanConnect
+        /// </summary>
+        private const int ConnectionCheckMinutes = 1;
 
         [Obsolete("Use the constructor specifying all dependencies instead")]
         public DatabaseContext(IDatabaseFactory factory)
@@ -148,12 +154,27 @@ namespace Umbraco.Core
         {
             get
             {
-                if (IsDatabaseConfigured == false) return false;
-                var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
-                LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
-                return canConnect;
+                if (IsDatabaseConfigured == false)
+                    return false;
+
+                //Don't check again if the timeout period hasn't elapsed
+                //this ensures we don't keep checking the connection too many times in a row like during startup.
+                //Do check if the _connectionLastChecked is null which means we're just initializing or it could 
+                //not connect last time it was checked.
+                if ((_connectionLastChecked.HasValue && (DateTime.Now - _connectionLastChecked.Value).TotalMinutes > ConnectionCheckMinutes)
+                    || _connectionLastChecked.HasValue == false)
+                {
+                    var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
+                    LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
+
+                    _connectionLastChecked = canConnect == false ? null : (DateTime?) DateTime.Now;
+                    return canConnect;
+                }
+
+                return _connectionLastChecked.HasValue;
             }
         }
+
 
         /// <summary>
         /// Gets the configured umbraco db connection string.
