@@ -561,9 +561,7 @@ WHERE EXISTS(
 
                             var preVals = new PreValueCollection(asDictionary);
 
-                            var contentPropData = new ContentPropertyData(property.Value,
-                                preVals,
-                                new Dictionary<string, object>());
+                            var contentPropData = new ContentPropertyData(property.Value, preVals);
 
                             TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
                         }
