@@ -1,9 +1,11 @@
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope, $routeParams, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService) {
+    function TemplatesEditController($scope, $routeParams, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService) {
 
         var vm = this;
+        var oldMasterTemplateAlias = null;
+
         vm.page = {};
         vm.page.loading = true;
         vm.templates = [];
@@ -20,16 +22,48 @@
             vm.template.content = vm.editor.getValue();
 
             templateResource.save(vm.template).then(function (saved) {
-
+                
                 notificationsService.success("Template saved");
                 vm.page.saveButtonState = "success";
                 vm.template = saved;
 
                 //sync state
                 editorState.set(vm.template);
-                navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
-                    vm.page.menu.currentNode = syncArgs.node;
-                });
+                
+                // sync tree
+                // if master template alias has changed move the node to it's new location
+                if(oldMasterTemplateAlias !== vm.template.masterTemplateAlias) {
+
+                    // move node to new location in tree
+                    //first we need to remove the node that launched the dialog
+                    treeService.removeNode(vm.page.menu.currentNode);
+
+                    //get the currently edited node (if any)
+                    var activeNode = appState.getTreeState("selectedNode");
+
+                    // update stored alias to the new one so the node won't move again unless the alias is changed again
+                    oldMasterTemplateAlias = vm.template.masterTemplateAlias;
+
+                    //we need to do a double sync here: first sync to the moved content - but don't activate the node,
+                    //then sync to the currenlty edited content (note: this might not be the content that was moved!!)
+                    navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true, activate: false }).then(function (args) {
+                        if (activeNode) {
+                            var activeNodePath = treeService.getPath(activeNode).join();
+                            //sync to this node now - depending on what was copied this might already be synced but might not be
+                            navigationService.syncTree({ tree: "templates", path: activeNodePath, forceReload: false, activate: true }).then(function(syncArgs) {
+                                vm.page.menu.currentNode = syncArgs.node;
+                            });
+                        }
+                    });
+
+                } else {
+
+                    // normal tree sync
+                    navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
+                        vm.page.menu.currentNode = syncArgs.node;
+                    });
+
+                }
 
             }, function (err) {
                 notificationsService.error("Template save failed");
@@ -74,6 +108,9 @@
             navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
                 vm.page.menu.currentNode = syncArgs.node;
             });
+
+            // save state of master template to use for comparison when syncing the tree on save
+            oldMasterTemplateAlias = angular.copy(template.masterTemplateAlias);
 
             vm.aceOption = {
                 mode: "razor",
