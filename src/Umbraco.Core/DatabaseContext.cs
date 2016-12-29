@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 using System.Web;
-using System.Web.Configuration;
 using System.Xml.Linq;
 using Semver;
 using Umbraco.Core.Configuration;
@@ -30,7 +30,6 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
         private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
-        private readonly object _locker = new object();
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;
@@ -40,7 +39,7 @@ namespace Umbraco.Core
             : this(factory, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
             {
                 new MySqlSyntaxProvider(LoggerResolver.Current.Logger),
-                new SqlCeSyntaxProvider(), 
+                new SqlCeSyntaxProvider(),
                 new SqlServerSyntaxProvider()
             }))
         {
@@ -80,19 +79,58 @@ namespace Umbraco.Core
             _configured = true;
         }
 
+#if DEBUG_DATABASES
+        public List<UmbracoDatabase> Databases
+        {
+            get
+            {
+                var factory = _factory as DefaultDatabaseFactory;
+                if (factory == null) throw new NotSupportedException();
+                return factory.Databases;
+            }
+        }
+#endif
+
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="Database"/> object for doing CRUD operations
-        /// against custom tables that resides in the Umbraco database.
+        /// Gets an "ambient" database for doing CRUD operations against custom tables that resides in the Umbraco database.
         /// </summary>
         /// <remarks>
-        /// This should not be used for CRUD operations or queries against the
-        /// standard Umbraco tables! Use the Public services for that.
+        /// <para>Should not be used for operation against standard Umbraco tables; as services should be used instead.</para>
+        /// <para>Gets or creates an "ambient" database that is either stored in http context + available for the whole
+        /// request + auto-disposed at the end of the request, or stored in call context if there is no http context - in which
+        /// case it *must* be explicitely disposed (which will remove it from call context).</para>
         /// </remarks>
         public virtual UmbracoDatabase Database
         {
             get { return _factory.CreateDatabase(); }
+        }
+
+        /// <summary>
+        /// Replaces the "ambient" database (if any) and by a new temp database.
+        /// </summary>
+        /// <remarks>
+        /// <para>The returned IDisposable *must* be diposed in order to properly dispose the temp database and
+        /// restore the original "ambient" database (if any).</para>
+        /// <para>This is to be used in background tasks to ensure that they have an "ambient" database which
+        /// will be properly removed from call context and does not interfere with anything else. In most case
+        /// it is not replacing anything, just temporarily installing a database in context.</para>
+        /// </remarks>
+        public virtual IDisposable UseSafeDatabase(bool force = false)
+        {
+            var factory = _factory as DefaultDatabaseFactory;
+            if (factory == null) throw new NotSupportedException();
+
+            if (DefaultDatabaseFactory.HasAmbientDatabase)
+            {
+                return force
+                    ? new UsingDatabase(DefaultDatabaseFactory.DetachAmbientDatabase(), factory.CreateDatabase())
+                    : new UsingDatabase(null, null);
+            }
+
+            // create a new, temp, database (will be disposed with UsingDatabase)
+            return new UsingDatabase(null, factory.CreateDatabase());
         }
 
         /// <summary>
@@ -189,7 +227,7 @@ namespace Umbraco.Core
                 // since it's been like this for quite some time
                 //using (var engine = new SqlCeEngine(connectionString))
                 //{
-                //    engine.CreateDatabase();    
+                //    engine.CreateDatabase();
                 //}
             }
 
@@ -230,14 +268,14 @@ namespace Umbraco.Core
         /// <param name="password">Database Password</param>
         /// <param name="databaseProvider">Type of the provider to be used (Sql, Sql Azure, Sql Ce, MySql)</param>
         public void ConfigureDatabaseConnection(string server, string databaseName, string user, string password, string databaseProvider)
-        {            
+        {
             string providerName;
             var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out providerName);
 
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
         }
-        
+
         public string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
         {
             providerName = Constants.DatabaseProviders.SqlServer;
@@ -268,18 +306,18 @@ namespace Umbraco.Core
 
         public string GetIntegratedSecurityDatabaseConnectionString(string server, string databaseName)
         {
-            return String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);            
+            return String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);
         }
 
         internal string BuildAzureConnectionString(string server, string databaseName, string user, string password)
         {
             if (server.Contains(".") && ServerStartsWithTcp(server) == false)
                 server = string.Format("tcp:{0}", server);
-            
+
             if (server.Contains(".") == false && ServerStartsWithTcp(server))
             {
-                string serverName = server.Contains(",") 
-                                        ? server.Substring(0, server.IndexOf(",", StringComparison.Ordinal)) 
+                string serverName = server.Contains(",")
+                                        ? server.Substring(0, server.IndexOf(",", StringComparison.Ordinal))
                                         : server;
 
                 var portAddition = string.Empty;
@@ -289,10 +327,10 @@ namespace Umbraco.Core
 
                 server = string.Format("{0}.database.windows.net{1}", serverName, portAddition);
             }
-            
+
             if (ServerStartsWithTcp(server) == false)
                 server = string.Format("tcp:{0}.database.windows.net", server);
-            
+
             if (server.Contains(",") == false)
                 server = string.Format("{0},1433", server);
 
@@ -336,7 +374,7 @@ namespace Umbraco.Core
 
             _connectionString = connectionString;
             _providerName = providerName;
-            
+
             var fileName = IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             var connectionstrings = xml.Root.DescendantsAndSelf("connectionStrings").Single();
@@ -381,7 +419,7 @@ namespace Umbraco.Core
                     connString = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
                 }
                 Initialize(providerName, connString);
-                
+
             }
             else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName]) == false)
             {
@@ -418,7 +456,7 @@ namespace Umbraco.Core
 
                 //Remove the legacy connection string, so we don't end up in a loop if something goes wrong.
                 GlobalSettings.RemoveSetting(GlobalSettings.UmbracoConnectionName);
-                
+
             }
             else
             {
@@ -437,15 +475,15 @@ namespace Umbraco.Core
             {
                 if (_syntaxProviders != null)
                 {
-                    SqlSyntax = _syntaxProviders.GetByProviderNameOrDefault(providerName);    
+                    SqlSyntax = _syntaxProviders.GetByProviderNameOrDefault(providerName);
                 }
                 else if (SqlSyntax == null)
                 {
                     throw new InvalidOperationException("No " + typeof(ISqlSyntaxProvider) + " specified or no " + typeof(SqlSyntaxProviders) + " instance specified");
                 }
-                
+
                 SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
-                
+
                 _configured = true;
             }
             catch (Exception e)
@@ -485,7 +523,7 @@ namespace Umbraco.Core
         }
 
         internal Result CreateDatabaseSchemaAndData(ApplicationContext applicationContext)
-        {   
+        {
             try
             {
                 var readyForInstall = CheckReadyForInstall();
@@ -503,7 +541,7 @@ namespace Umbraco.Core
                 // If MySQL, we're going to ensure that database calls are maintaining proper casing as to remove the necessity for checks
                 // for case insensitive queries. In an ideal situation (which is what we're striving for), all calls would be case sensitive.
 
-                /*                
+                /*
                 var supportsCaseInsensitiveQueries = SqlSyntax.SupportsCaseInsensitiveQueries(database);
                 if (supportsCaseInsensitiveQueries  == false)
                 {
@@ -521,9 +559,9 @@ namespace Umbraco.Core
                 message = GetResultMessageForMySql();
 
                 var schemaResult = ValidateDatabaseSchema();
-                
+
                 var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
-                
+
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedSchemaVersion.Equals(new Version(0, 0, 0)))
                 {
@@ -542,9 +580,9 @@ namespace Umbraco.Core
                 message = "<p>Upgrading database, this may take some time...</p>";
                 return new Result
                     {
-                        RequiresUpgrade = true, 
-                        Message = message, 
-                        Success = true, 
+                        RequiresUpgrade = true,
+                        Message = message,
+                        Success = true,
                         Percentage = "30"
                     };
             }
@@ -572,7 +610,7 @@ namespace Umbraco.Core
                 _logger.Info<DatabaseContext>("Database upgrade started");
 
                 var database = new UmbracoDatabase(_connectionString, ProviderName, _logger);
-                //var supportsCaseInsensitiveQueries = SqlSyntax.SupportsCaseInsensitiveQueries(database);                
+                //var supportsCaseInsensitiveQueries = SqlSyntax.SupportsCaseInsensitiveQueries(database);
 
                 var message = GetResultMessageForMySql();
 
@@ -580,32 +618,32 @@ namespace Umbraco.Core
 
                 var installedSchemaVersion = new SemVersion(schemaResult.DetermineInstalledVersion());
 
-                var installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);    
-                
+                var installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);
+
                 var targetVersion = UmbracoVersion.Current;
-                
+
                 //In some cases - like upgrading from 7.2.6 -> 7.3, there will be no migration information in the database and therefore it will
-                // return a version of 0.0.0 and we don't necessarily want to run all migrations from 0 -> 7.3, so we'll just ensure that the 
+                // return a version of 0.0.0 and we don't necessarily want to run all migrations from 0 -> 7.3, so we'll just ensure that the
                 // migrations are run for the target version
                 if (installedMigrationVersion == new SemVersion(new Version(0, 0, 0)) && installedSchemaVersion > new SemVersion(new Version(0, 0, 0)))
                 {
                     //set the installedMigrationVersion to be one less than the target so the latest migrations are guaranteed to execute
                     installedMigrationVersion = new SemVersion(targetVersion.SubtractRevision());
                 }
-                
+
                 //Figure out what our current installed version is. If the web.config doesn't have a version listed, then we'll use the minimum
-                // version detected between the schema installed and the migrations listed in the migration table. 
+                // version detected between the schema installed and the migrations listed in the migration table.
                 // If there is a version in the web.config, we'll take the minimum between the listed migration in the db and what
                 // is declared in the web.config.
-                
+
                 var currentInstalledVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
                     //Take the minimum version between the detected schema version and the installed migration version
                     ? new[] {installedSchemaVersion, installedMigrationVersion}.Min()
                     //Take the minimum version between the installed migration version and the version specified in the config
                     : new[] { SemVersion.Parse(GlobalSettings.ConfigurationStatus), installedMigrationVersion }.Min();
 
-                //Ok, another edge case here. If the current version is a pre-release, 
-                // then we want to ensure all migrations for the current release are executed. 
+                //Ok, another edge case here. If the current version is a pre-release,
+                // then we want to ensure all migrations for the current release are executed.
                 if (currentInstalledVersion.Prerelease.IsNullOrWhiteSpace() == false)
                 {
                     currentInstalledVersion  = new SemVersion(currentInstalledVersion.GetVersion().SubtractRevision());
@@ -740,7 +778,7 @@ namespace Umbraco.Core
                 {
                     var datasource = dataSourcePart.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
                     var filePath = datasource.Replace("Data Source=", string.Empty);
-                    sqlCeDatabaseExists = File.Exists(filePath);                    
+                    sqlCeDatabaseExists = File.Exists(filePath);
                 }
             }
 
@@ -753,6 +791,29 @@ namespace Umbraco.Core
             }
 
             return true;
+        }
+
+        private class UsingDatabase : IDisposable
+        {
+            private readonly UmbracoDatabase _orig;
+            private readonly UmbracoDatabase _temp;
+
+            public UsingDatabase(UmbracoDatabase orig, UmbracoDatabase temp)
+            {
+                _orig = orig;
+                _temp = temp;
+            }
+
+            public void Dispose()
+            {
+                if (_temp != null)
+                {
+                    _temp.Dispose();
+                    if (_orig != null)
+                        DefaultDatabaseFactory.AttachAmbientDatabase(_orig);
+                }
+                GC.SuppressFinalize(this);
+            }
         }
     }
 }

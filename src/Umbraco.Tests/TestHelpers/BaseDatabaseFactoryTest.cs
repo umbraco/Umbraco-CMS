@@ -61,6 +61,11 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
+            // fixme - in theory we should not need this
+            // it's done in base.Initialize() and no idea why we do things
+            // in this order here... not going to change it now though...
+            SafeCallContext.Clear();
+
             _dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName(),

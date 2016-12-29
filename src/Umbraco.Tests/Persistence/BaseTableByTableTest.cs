@@ -581,31 +581,6 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_umbracoDeployDependency_Table()
-        {
-
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
-                DatabaseSchemaHelper.CreateTable<UmbracoDeployDependencyDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_umbracoDeployChecksum_Table()
-        {
-
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
         public void Can_Create_umbracoUser_Table()
         {
             

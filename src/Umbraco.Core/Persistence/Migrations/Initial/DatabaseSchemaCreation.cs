@@ -82,9 +82,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {43, typeof (CacheInstructionDto)},
                                                                               {44, typeof (ExternalLoginDto)},
                                                                               {45, typeof (MigrationDto)},
-                                                                              {46, typeof (UmbracoDeployChecksumDto)},
-                                                                              {47, typeof (UmbracoDeployDependencyDto)},
-                                                                              {48, typeof (RedirectUrlDto) }
+                                                                              //46, removed: UmbracoDeployChecksumDto
+                                                                              //47, removed: UmbracoDeployDependencyDto
+                                                                              {48, typeof (RedirectUrlDto) },
+                                                                              {49, typeof (LockDto) }
                                                                           };
         #endregion
         

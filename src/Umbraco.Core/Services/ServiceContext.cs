@@ -176,6 +176,8 @@ namespace Umbraco.Core.Services
             if (logger == null) throw new ArgumentNullException("logger");
             if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
 
+            EventMessagesFactory = eventMessagesFactory;
+
             BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
                               repositoryFactory,
                               logger, eventMessagesFactory);
@@ -193,6 +195,8 @@ namespace Umbraco.Core.Services
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
         {
+            EventMessagesFactory = eventMessagesFactory;
+
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
@@ -315,6 +319,8 @@ namespace Umbraco.Core.Services
             if (_redirectUrlService == null)
                 _redirectUrlService = new Lazy<IRedirectUrlService>(() => new RedirectUrlService(provider, repositoryFactory, logger, eventMessagesFactory));
         }
+
+        internal IEventMessagesFactory EventMessagesFactory { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IMigrationEntryService"/>

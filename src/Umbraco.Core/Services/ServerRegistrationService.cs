@@ -20,7 +20,7 @@ namespace Umbraco.Core.Services
         private readonly static string CurrentServerIdentityValue = NetworkHelper.MachineName // eg DOMAIN\SERVER
                                                             + "/" + HttpRuntime.AppDomainAppId; // eg /LM/S3SVC/11/ROOT
 
-        private static readonly int[] LockingRepositoryIds = { Constants.System.ServersLock };
+        private static readonly int[] LockingRepositoryIds = { Constants.Locks.Servers };
         private ServerRole _currentServerRole = ServerRole.Unknown;
         private readonly LockingRepository<IServerRegistrationRepository> _lrepo;
 
