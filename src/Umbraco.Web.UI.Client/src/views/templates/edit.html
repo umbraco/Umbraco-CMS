@@ -25,10 +25,23 @@
                 <div class="flex" style="margin-bottom: 30px;">
 
                     <div class="flex">
-                        <a class="btn btn-link" ng-click="vm.openMasterTemplateOverlay()">
-                            <i class="icon icon-layout" style="margin-right:5px;"></i>
-                            <span class="bold">Master template:</span> {{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}
-                        </a>
+
+                        <div ng-class="{'btn-group umb-era-button-group': vm.template.masterTemplateAlias}" style="margin-right: 10px;">
+                            
+                            <button
+                                type="button"
+                                class="umb-era-button umb-button--s"
+                                ng-click="vm.openMasterTemplateOverlay()">
+                                <i class="icon icon-layout"></i>
+                                <span class="bold">Master template:</span> <span style="margin-left: 5px;">{{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}</span>
+                            </button>
+
+                            <a ng-if="vm.template.masterTemplateAlias" ng-click="vm.removeMasterTemplate()" class="umb-era-button umb-button--s dropdown-toggle umb-button-group__toggle">
+                                <span class="icon icon-wrong"></span>
+                            </a>
+
+                        </div>
+                        
                     </div>
 
                     <div class="flex" style="margin-left: auto;">

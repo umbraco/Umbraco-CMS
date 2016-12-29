@@ -143,6 +143,7 @@
         vm.openMasterTemplateOverlay = openMasterTemplateOverlay;
         vm.selectMasterTemplate = selectMasterTemplate;
         vm.getMasterTemplateName = getMasterTemplateName;
+        vm.removeMasterTemplate = removeMasterTemplate;
 
         function openInsertOverlay() {
 
@@ -401,6 +402,15 @@
                 return "No master";
             }
             
+        }
+
+        function removeMasterTemplate() {
+
+            vm.template.masterTemplateAlias = null;
+
+            // call set layout with no paramters to set layout to null
+            setLayout();
+
         }
 
         function setLayout(templatePath){
