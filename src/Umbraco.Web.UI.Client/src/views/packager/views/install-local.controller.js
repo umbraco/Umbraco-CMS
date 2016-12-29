@@ -12,6 +12,7 @@
             status: "",
             progress:0
         };
+        vm.installCompleted = false;
         vm.zipFile = {
             uploadStatus: "idle",
             uploadProgress: 0,
@@ -137,10 +138,10 @@
                             localStorageService.set("packageInstallUri", "installed");
                         }
 
-                        //reload on next digest (after cookie)
-                        $timeout(function () {
-                            $window.location.reload(true);
-                        });
+                        vm.installState.status = localizationService.localize("packager_installStateCompleted");
+                        vm.installCompleted = true;
+                        
+                        
 
                     },
                     installError);
@@ -149,6 +150,13 @@
         function installError() {
             //This will return a rejection meaning that the promise change above will stop
             return $q.reject();
+        }
+
+        vm.reloadPage = function() {
+            //reload on next digest (after cookie)
+            $timeout(function () {
+                $window.location.reload(true);
+            });
         }
     }
 

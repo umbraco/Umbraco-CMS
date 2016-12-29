@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Examine;
 using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
@@ -7,10 +9,14 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
 using Moq;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using UmbracoExamine;
 using UmbracoExamine.Config;
@@ -34,7 +40,8 @@ namespace Umbraco.Tests.UmbracoExamine
                 IMediaService mediaService = null,
                 IDataTypeService dataTypeService = null,
                 IMemberService memberService = null,
-                IUserService userService = null)
+                IUserService userService = null,
+                IContentTypeService contentTypeService = null)
         {
             if (dataService == null)
             {
@@ -94,7 +101,8 @@ namespace Umbraco.Tests.UmbracoExamine
                 long longTotalRecs;
                 int intTotalRecs;
 
-                var allRecs = dataService.MediaService.GetLatestMediaByXpath("//node")
+                var mediaXml = dataService.MediaService.GetLatestMediaByXpath("//node");
+                var allRecs = mediaXml
                     .Root
                     .Elements()
                     .Select(x => Mock.Of<IMedia>(
@@ -114,20 +122,29 @@ namespace Umbraco.Tests.UmbracoExamine
                                 mt.Id == (int)x.Attribute("nodeType"))))
                     .ToArray();
 
+                // MOCK!
+                var mediaServiceMock = new Mock<IMediaService>();
 
-                mediaService = Mock.Of<IMediaService>(
-                    x => x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>()) 
-                        ==
-                        allRecs
-                        && x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
-                        ==
-                        allRecs
-                        && x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out intTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
-                        ==
-                        allRecs);
+                mediaServiceMock
+                    .Setup(x => x.GetPagedDescendants(
+                            It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>())
+                    ).Returns(() => allRecs);
+
+                mediaServiceMock
+                    .Setup(x => x.GetPagedDescendants(
+                            It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
+                    ).Returns(() => allRecs);
+
+                mediaServiceMock
+                   .Setup(x => x.GetPagedDescendants(
+                           It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out intTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
+                   ).Returns(() => allRecs);
+
+                mediaServiceMock.Setup(service => service.GetPagedXmlEntries(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs))
+                    .Returns(() => allRecs.Select(x => x.ToXml()));
+
+                mediaService = mediaServiceMock.Object;
+
             }
             if (dataTypeService == null)
             {
@@ -137,6 +154,18 @@ namespace Umbraco.Tests.UmbracoExamine
             if (memberService == null)
             {
                 memberService = Mock.Of<IMemberService>();
+            }
+
+            if (contentTypeService == null)
+            {
+                var contentTypeServiceMock = new Mock<IContentTypeService>();
+                contentTypeServiceMock.Setup(x => x.GetAllMediaTypes())
+                    .Returns(new List<IMediaType>()
+                    {
+                        new MediaType(-1) {Alias = "Folder", Name = "Folder", Id = 1031, Icon = "icon-folder"},
+                        new MediaType(-1) {Alias = "Image", Name = "Image", Id = 1032, Icon = "icon-picture"}
+                    });
+                contentTypeService = contentTypeServiceMock.Object;
             }
 
             if (analyzer == null)
@@ -154,6 +183,7 @@ namespace Umbraco.Tests.UmbracoExamine
                                                   mediaService,
                                                   dataTypeService,
                                                   userService,
+                                                  contentTypeService,
                                               analyzer,
                                               false);
 

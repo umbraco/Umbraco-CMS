@@ -324,6 +324,8 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current ApplicationContext
         /// </summary>
+        [Obsolete("Do not access the ApplicationContext via the UmbracoContext, either inject the ApplicationContext into the services you need or access it via it's own Singleton accessor ApplicationContext.Current")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public ApplicationContext Application { get; private set; }
 
         /// <summary>

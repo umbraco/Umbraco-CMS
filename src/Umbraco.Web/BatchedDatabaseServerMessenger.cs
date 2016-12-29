@@ -60,7 +60,7 @@ namespace Umbraco.Web
             }
         }
 
-        private void UmbracoModule_EndRequest(object sender, EventArgs e)
+        private void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
         {
             // will clear the batch - will remain in HttpContext though - that's ok
             FlushBatch();

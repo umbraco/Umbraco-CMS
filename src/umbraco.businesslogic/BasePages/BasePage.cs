@@ -49,9 +49,9 @@ namespace umbraco.BasePages
         protected long timeout = 0;
 
         /// <summary>
-        /// Gets the SQL helper.
+        /// Unused, please do not use
         /// </summary>
-        /// <value>The SQL helper.</value>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return BusinessLogic.Application.SqlHelper; }

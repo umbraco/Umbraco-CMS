@@ -69,6 +69,22 @@
         };
     }
 
+    if (!String.prototype.htmlEncode) {
+        /** htmlEncode extension method for string */
+        String.prototype.htmlEncode = function () {
+            //create a in-memory div, set it's inner text(which jQuery automatically encodes)
+            //then grab the encoded contents back out.  The div never exists on the page.
+            return $('<div/>').text(this).html();
+        };
+    }
+
+    if (!String.prototype.htmlDecode) {
+        /** htmlDecode extension method for string */
+        String.prototype.htmlDecode = function () {
+            return $('<div/>').html(this).text();
+        };
+    }
+
     if (!String.prototype.startsWith) {
         /** startsWith extension method for string */
         String.prototype.startsWith = function (str) {            

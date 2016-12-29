@@ -2,24 +2,19 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Xml.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -380,78 +375,57 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of VersionableRepositoryBase<IMembershipUser>
 
-        public void RebuildXmlStructures(Func<IMember, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public override IEnumerable<IMember> GetAllVersions(int id)
         {
-
-            //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
-            using (var tr = Database.GetTransaction())
-            {
-                //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
-                if (contentTypeIds == null)
-                {
-                    var subQuery = new Sql()
-                        .Select("id")
-                        .From<NodeDto>(SqlSyntax)
-                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-
-                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                    Database.Execute(deleteSql);
-                }
-                else
-                {
-                    var subQuery = new Sql()
-                        .Select("umbracoNode.id as nodeId")
-                        .From<ContentDto>(SqlSyntax)
-                        .InnerJoin<NodeDto>(SqlSyntax)
-                        .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                        .WhereIn<ContentDto>(dto => dto.ContentTypeId, contentTypeIds, SqlSyntax)
-                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-
-                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                    Database.Execute(deleteSql);                    
-                }
-
-                //now insert the data, again if something fails here, the whole transaction is reversed
-                if (contentTypeIds == null)
-                {
-                    var query = Query<IMember>.Builder;
-                    RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                }
-                else
-                {
-                    foreach (var contentTypeId in contentTypeIds)
-                    {
-                        //copy local
-                        var id = contentTypeId;
-                        var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == id && x.Trashed == false);
-                        RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                    }
-                }
-
-                tr.Complete();
-            }
+            var sql = GetBaseQuery(false)
+                .Where(GetBaseWhereClause(), new { Id = id })
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+            return ProcessQuery(sql, true);
         }
 
-        private void RebuildXmlStructuresProcessQuery(Func<IMember, XElement> serializer, IQuery<IMember> query, Transaction tr, int pageSize)
+        public void RebuildXmlStructures(Func<IMember, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null)
         {
-            var pageIndex = 0;
-            var total = long.MinValue;
-            var processed = 0;
-            do
+            // the previous way of doing this was to run it all in one big transaction,
+            // and to bulk-insert groups of xml rows - which works, until the transaction
+            // times out - and besides, because v7 transactions are ReadCommited, it does
+            // not bring much safety - so this reverts to updating each record individually,
+            // and it may be slower in the end, but should be more resilient.
+
+            var baseId = 0;
+            var contentTypeIdsA = contentTypeIds == null ? new int[0] : contentTypeIds.ToArray();
+            while (true)
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
+                // get the next group of nodes
+                var query = GetBaseQuery(false);
+                if (contentTypeIdsA.Length > 0)
+                    query = query
+                        .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+                query = query
+                    .Where<NodeDto>(x => x.NodeId > baseId)
+                    .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
+                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
+                    .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
+                    .ToList();
 
-                var xmlItems = (from descendant in descendants
-                                let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
+                // no more nodes, break
+                if (xmlItems.Count == 0) break;
 
-                //bulk insert it into the database
-                Database.BulkInsertRecords(xmlItems, tr);
-
-                processed += xmlItems.Length;
-
-                pageIndex++;
-            } while (processed < total);
+                foreach (var xmlItem in xmlItems)
+                {
+                    try
+                    {
+                        // InsertOrUpdate tries to update first, which is good since it is what
+                        // should happen in most cases, then it tries to insert, and it should work
+                        // unless the node has been deleted, and we just report the exception
+                        Database.InsertOrUpdate(xmlItem);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error<MediaRepository>("Could not rebuild XML for nodeId=" + xmlItem.NodeId, e);
+                    }
+                }
+                baseId = xmlItems.Last().NodeId;
+            }
         }
 
         public override IMember GetByVersion(Guid versionId)
@@ -645,7 +619,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsMember", "nodeId"),
-                ProcessQuery, orderBy, orderDirection, orderBySystemField,
+                sql => ProcessQuery(sql), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
         }
 
@@ -685,59 +659,65 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetEntityPropertyNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IMember> ProcessQuery(Sql sql)
+        private IEnumerable<IMember> ProcessQuery(Sql sql, bool withCache = false)
         {
-            //NOTE: This doesn't allow properties to be part of the query
+            // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
-            var ids = dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray();
+            var content = new IMember[dtos.Count];
+            var defs = new List<DocumentDefinition>();
 
-            //content types
-            var contentTypes = ids.Length == 0 ? Enumerable.Empty<IMemberType>() : _memberTypeRepository.GetAll(ids).ToArray();
+            for (var i = 0; i < dtos.Count; i++)
+            {
+                var dto = dtos[i];
 
-            var dtosWithContentTypes = dtos
-                //This select into and null check are required because we don't have a foreign damn key on the contentType column
-                // http://issues.umbraco.org/issue/U4-5503
-                .Select(x => new { dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentVersionDto.ContentDto.ContentTypeId) })
-                .Where(x => x.contentType != null)
-                .ToArray();
+                // if the cache contains the item, use it
+                if (withCache)
+                {
+                    var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
+                    if (cached != null)
+                    {
+                        content[i] = cached;
+                        continue;
+                    }
+                }
 
-            //Go get the property data for each document
-            IEnumerable<DocumentDefinition> docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
-                d.dto.NodeId,
-                d.dto.ContentVersionDto.VersionId,
-                d.dto.ContentVersionDto.VersionDate,
-                d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                d.contentType));
+                // else, need to fetch from the database
+                // content type repository is full-cache so OK to get each one independently
+                var contentType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+                var factory = new MemberFactory(contentType, NodeObjectTypeId, dto.NodeId);
+                content[i] = factory.BuildEntity(dto);
 
-            var propertyData = GetPropertyCollection(sql, docDefs);
+                // need properties
+                defs.Add(new DocumentDefinition(
+                    dto.NodeId,
+                    dto.ContentVersionDto.VersionId,
+                    dto.ContentVersionDto.VersionDate,
+                    dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                    contentType
+                ));
+            }
 
-            return dtosWithContentTypes.Select(d => CreateMemberFromDto(
-                        d.dto,
-                        contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
-                        propertyData[d.dto.NodeId]));
-        }
+            // load all properties for all documents from database in 1 query
+            var propertyData = GetPropertyCollection(sql, defs);
 
-        /// <summary>
-        /// Private method to create a member object from a MemberDto
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <param name="contentType"></param>
-        /// <param name="propCollection"></param>
-        /// <returns></returns>
-        private IMember CreateMemberFromDto(MemberDto dto,
-            IMemberType contentType,
-            PropertyCollection propCollection)
-        {
-            var factory = new MemberFactory(contentType, NodeObjectTypeId, dto.ContentVersionDto.NodeId);
-            var member = factory.BuildEntity(dto);
+            // assign
+            var dtoIndex = 0;
+            foreach (var def in defs)
+            {
+                // move to corresponding item (which has to exist)
+                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
 
-            member.Properties = propCollection;
+                // complete the item
+                var cc = content[dtoIndex];
+                cc.Properties = propertyData[cc.Id];
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)member).ResetDirtyProperties(false);
-            return member;
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                ((Entity)cc).ResetDirtyProperties(false);
+            }
+
+            return content;
         }
 
         /// <summary>

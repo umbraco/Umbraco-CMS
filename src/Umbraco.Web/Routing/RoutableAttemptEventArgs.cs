@@ -5,7 +5,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Event args containing information about why the request was not routable, or if it is routable
     /// </summary>
-    internal class RoutableAttemptEventArgs : UmbracoRequestEventArgs
+    public class RoutableAttemptEventArgs : UmbracoRequestEventArgs
     {
         public EnsureRoutableOutcome Outcome { get; private set; }
 

@@ -116,7 +116,8 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         /// <returns>The MySQL major version number</returns>
         protected virtual int GetMySqlVersion()
         {
-            return int.Parse(SqlHelper.ExecuteScalar<string>("SELECT SUBSTRING(VERSION(),1,1)"));
+            using (var sqlHelper = SqlHelper)
+                return int.Parse(sqlHelper.ExecuteScalar<string>("SELECT SUBSTRING(VERSION(),1,1)"));
         }
 
         #endregion

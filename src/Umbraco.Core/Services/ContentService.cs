@@ -56,6 +56,12 @@ namespace Umbraco.Core.Services
             _userService = userService;
         }
 
+        #region Static Queries
+
+        private IQuery<IContent> _notTrashedQuery;
+
+        #endregion
+
         public int CountPublished(string contentTypeAlias = null)
         {
             var uow = UowProvider.GetUnitOfWork();
@@ -787,10 +793,15 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         internal IEnumerable<IContent> GetAllPublished()
         {
+            //create it once if it is needed (no need for locking here)
+            if (_notTrashedQuery == null)
+            {
+                _notTrashedQuery = Query<IContent>.Builder.Where(x => x.Trashed == false);
+            }
+
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Trashed == false);
-                return repository.GetByPublishedVersion(query);
+                return repository.GetByPublishedVersion(_notTrashedQuery);
             }
         }
 
