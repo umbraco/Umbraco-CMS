@@ -19,10 +19,10 @@
 
         function onInit() {
 
-            if($scope.model.isMasterTemplate) {
-                $scope.model.insertType = 'renderBody';
-            } else {
+            if($scope.model.hasMaster) {
                 $scope.model.insertType = 'addSection';
+            } else {
+                $scope.model.insertType = 'renderBody';
             }
 
         }

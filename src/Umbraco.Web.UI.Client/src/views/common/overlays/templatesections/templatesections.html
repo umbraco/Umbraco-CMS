@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.TemplateSectionsOverlay as vm">
 
-    <div class="umb-insert-code-box" ng-click="vm.select('renderBody')">
+    <div ng-if="!model.hasMaster" class="umb-insert-code-box" ng-click="vm.select('renderBody')">
         <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderBody'  }"><i class="icon icon-check"></i></div>
         <div class="umb-insert-code-box__title">Render child template</div>
         <div class="umb-insert-code-box__description">
@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div class="umb-insert-code-box" ng-click="vm.select('renderSection')">
+    <div ng-if="!model.hasMaster" class="umb-insert-code-box" ng-click="vm.select('renderSection')">
 
         <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderSection' }"><i class="icon icon-check"></i></div>
         <div class="umb-insert-code-box__title">Render a named section</div>

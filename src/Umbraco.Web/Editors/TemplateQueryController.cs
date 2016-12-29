@@ -65,9 +65,8 @@ namespace Umbraco.Web.Editors
 
             var sb = new StringBuilder();
             var indention = Environment.NewLine + "\t\t\t\t\t\t";
-
+      
             sb.Append("Model.Content.Site()");
-            
             var timer = new Stopwatch();
             
             timer.Start();
