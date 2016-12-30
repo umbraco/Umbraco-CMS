@@ -14,8 +14,7 @@
         vm.page.menu = {};
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
-
-
+        
         vm.save = function () {
             vm.page.saveButtonState = "busy";
 
@@ -35,25 +34,14 @@
                 if(oldMasterTemplateAlias !== vm.template.masterTemplateAlias) {
 
                     // move node to new location in tree
-                    //first we need to remove the node that launched the dialog
+                    //first we need to remove the node that we're working on
                     treeService.removeNode(vm.page.menu.currentNode);
-
-                    //get the currently edited node (if any)
-                    var activeNode = appState.getTreeState("selectedNode");
-
+                    
                     // update stored alias to the new one so the node won't move again unless the alias is changed again
                     oldMasterTemplateAlias = vm.template.masterTemplateAlias;
 
-                    //we need to do a double sync here: first sync to the moved content - but don't activate the node,
-                    //then sync to the currenlty edited content (note: this might not be the content that was moved!!)
-                    navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true, activate: false }).then(function (args) {
-                        if (activeNode) {
-                            var activeNodePath = treeService.getPath(activeNode).join();
-                            //sync to this node now - depending on what was copied this might already be synced but might not be
-                            navigationService.syncTree({ tree: "templates", path: activeNodePath, forceReload: false, activate: true }).then(function(syncArgs) {
-                                vm.page.menu.currentNode = syncArgs.node;
-                            });
-                        }
+                    navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true, activate: true }).then(function (args) {
+                        vm.page.menu.currentNode = args.node;
                     });
 
                 } else {

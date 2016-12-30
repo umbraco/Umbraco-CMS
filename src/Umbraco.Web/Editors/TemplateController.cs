@@ -106,6 +106,11 @@ namespace Umbraco.Web.Editors
                             template.SetMasterTemplate(master);
                         }
                     }
+                    else
+                    {
+                        //remove the master
+                        template.SetMasterTemplate(null);
+                    }
                 }
 
                 Services.FileService.SaveTemplate(template);
