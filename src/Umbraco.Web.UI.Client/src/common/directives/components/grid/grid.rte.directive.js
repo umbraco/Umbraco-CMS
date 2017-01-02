@@ -172,6 +172,55 @@ angular.module("umbraco.directives")
 
                                 });
 
+                                // pin toolbar to top of screen if we have focus and it scrolls off the screen
+                                var pinToolbar = function () {
+
+                                    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
+                                    var toolbarHeight = _toolbar.height();
+
+                                    var _tinyMce = $(editor.editorContainer);
+                                    var tinyMceRect = _tinyMce[0].getBoundingClientRect();
+                                    var tinyMceTop = tinyMceRect.top;
+                                    var tinyMceBottom = tinyMceRect.bottom;
+                                    var tinyMceWidth = tinyMceRect.width;
+
+                                    var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
+
+                                    // set padding in top of mce so the content does not "jump" up
+                                    _tinyMceEditArea.css("padding-top", toolbarHeight);
+
+                                    if (tinyMceTop < 160 && ((160 + toolbarHeight) < tinyMceBottom)) {
+                                        _toolbar
+                                            .css("visibility", "visible")
+                                            .css("position", "fixed")
+                                            .css("top", "160px")
+                                            .css("margin-top", "0")
+                                            .css("width", tinyMceWidth);
+                                    } else {
+                                        _toolbar
+                                            .css("visibility", "visible")
+                                            .css("position", "absolute")
+                                            .css("top", "auto")
+                                            .css("margin-top", "0")
+                                            .css("width", tinyMceWidth);
+                                    }
+                                    
+                                };
+
+                                // unpin toolbar to top of screen
+                                var unpinToolbar = function() {
+
+                                    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
+                                    var _tinyMce = $(editor.editorContainer);
+                                    var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
+
+                                    // reset padding in top of mce so the content does not "jump" up
+                                    _tinyMceEditArea.css("padding-top", "0");
+                                        
+                                    _toolbar.css("position", "static");
+
+                                };
+
                                 //when we leave the editor (maybe)
                                 editor.on('blur', function (e) {
                                     editor.save();
@@ -185,6 +234,9 @@ angular.module("umbraco.directives")
                                             scope.onBlur();
                                         }
 
+                                        unpinToolbar();
+                                        $('.umb-panel-body').off('scroll', pinToolbar);
+
                                     });
                                 });
 
@@ -196,6 +248,9 @@ angular.module("umbraco.directives")
                                             scope.onFocus();
                                         }
 
+                                        pinToolbar();
+                                        $('.umb-panel-body').on('scroll', pinToolbar);
+
                                     });
                                 });
 
@@ -206,6 +261,9 @@ angular.module("umbraco.directives")
                                         if(scope.onClick){
                                             scope.onClick();
                                         }
+
+                                        pinToolbar();
+                                        $('.umb-panel-body').on('scroll', pinToolbar);
 
                                     });
                                 });
