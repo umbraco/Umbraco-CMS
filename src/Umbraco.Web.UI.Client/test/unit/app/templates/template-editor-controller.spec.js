@@ -88,7 +88,15 @@
                     appState: {
                         getSectionState : function() { return {}; }
                     },
-                    macroService: {}
+                    macroService: {},
+                    angularHelper: {
+                        getCurrentForm: function() { 
+                            return {
+                                $setDirty: function() {},
+                                $setPristine: function() {}
+                            }
+                        }
+                    }
                 });
             }
 
