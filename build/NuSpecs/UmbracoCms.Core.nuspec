@@ -39,7 +39,6 @@
       <dependency id="UrlRewritingNet" version="[2.0.7, 3.0.0)" />	  
 	  <!-- Markdown can not be updated due to: https://github.com/hey-red/markdownsharp/issues/71#issuecomment-233585487 -->
       <dependency id="Markdown" version="[1.14.4, 2.0.0)" />
-      <dependency id="Microsoft.IO.RecyclableMemoryStream" version="[1.2.1, 2.0.0)" />
     </dependencies>
   </metadata>
   <files>
