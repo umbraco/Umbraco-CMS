@@ -142,7 +142,7 @@ namespace UmbracoExamine
             _userService = userService;
             _contentTypeService = contentTypeService;
         }
-
+        
         #endregion
 
         #region Constants & Fields
@@ -365,7 +365,7 @@ namespace UmbracoExamine
         /// <summary>
         /// This is a static query, it's parameters don't change so store statically
         /// </summary>
-        private static readonly IQuery<IContent> PublishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
+        private IQuery<IContent> _publishedQuery;
 
         protected override void PerformIndexAll(string type)
         {
@@ -393,8 +393,13 @@ namespace UmbracoExamine
                         }
                         else
                         {
+                            if (_publishedQuery == null)
+                            {
+                                _publishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
+                            }
+
                             //add the published filter
-                            descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, PublishedQuery);
+                            descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, _publishedQuery);
                         }                        
 
                         //if specific types are declared we need to post filter them
