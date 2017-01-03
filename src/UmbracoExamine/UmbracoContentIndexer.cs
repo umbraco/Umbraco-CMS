@@ -419,6 +419,8 @@ namespace UmbracoExamine
                         pageIndex++;
                     } while (content.Length == pageSize);
 
+                    notPublished.Clear();
+
                     break;
                 case IndexTypes.Media:
                     var mediaParentId = -1;
