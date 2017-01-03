@@ -404,8 +404,7 @@ namespace Umbraco.Core.Models
             return content.Properties
                           .Where(property => propertyGroup.PropertyTypes
                                                           .Select(propertyType => propertyType.Id)
-                                                          .Contains(property.PropertyTypeId))
-                          .OrderBy(x => x.PropertyType.SortOrder);
+                                                          .Contains(property.PropertyTypeId));
         }
 
         /// <summary>
