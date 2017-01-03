@@ -336,10 +336,20 @@
 
         function openMasterTemplateOverlay() {
 
+            // make collection of available master templates
+            var availableMasterTemplates = [];
+
+            // filter out the current template and the selected master template
+            angular.forEach(vm.templates, function(template){
+                if(template.alias !== vm.template.alias && template.alias !== vm.template.masterTemplateAlias) {
+                    availableMasterTemplates.push(template);
+                }
+            });
+
             vm.masterTemplateOverlay = {
                 view: "itempicker",
                 title: "Choose master template",
-                availableItems: vm.templates,
+                availableItems: availableMasterTemplates,
                 show: true,
                 submit: function(model) {
 
