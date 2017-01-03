@@ -58,7 +58,9 @@ namespace Umbraco.Web.Security.Identity
         // TODO: Move this method in v8, it doesn't belong in this namespace/extension class
         public static void ConfigureSignalR(this IAppBuilder app)
         {
-            app.MapSignalR("/umbraco/signalr", new HubConfiguration { EnableDetailedErrors = true });
+            var umbracoPath = GlobalSettings.UmbracoMvcArea.EnsureStartsWith('/');
+            
+            app.MapSignalR(umbracoPath + "/BackOffice/signalr", new HubConfiguration { EnableDetailedErrors = true });
         }
 
         /// <summary>
