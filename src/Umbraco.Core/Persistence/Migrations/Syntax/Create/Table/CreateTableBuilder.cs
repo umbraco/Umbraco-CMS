@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
@@ -95,13 +96,15 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
             // it.  For now, this is what I'm doing
             if (Expression.CurrentDatabaseProvider != DatabaseProviders.MySql)
             {
-                var expression = new CreateConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, ConstraintType.PrimaryKey)
+                var expression = new CreateConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders,
+                    Expression.SqlSyntax, ConstraintType.PrimaryKey)
                 {
                     Constraint =
-                {
-                    TableName = CurrentColumn.TableName,
-                    Columns = new[] { CurrentColumn.Name }
-                }
+                    {
+                        ConstraintName = string.Format("PK_{0}_{1}", CurrentColumn.TableName, CurrentColumn.Name),
+                        TableName = CurrentColumn.TableName,
+                        Columns = new[] {CurrentColumn.Name}
+                    }
                 };
                 _context.Expressions.Add(expression);
             }
@@ -162,10 +165,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
 
             var index = new CreateIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new IndexDefinition
             {
-                Name = indexName,
+                Name = indexName,                
+                ColumnName = CurrentColumn.Name,
                 SchemaName = Expression.SchemaName,
                 TableName = Expression.TableName,
-                IsUnique = true
+                IsUnique = true,
+                IsClustered = false,
+                IndexType = IndexTypes.UniqueNonClustered
             });
 
             index.Index.Columns.Add(new IndexColumnDefinition
