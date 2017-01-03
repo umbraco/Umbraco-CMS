@@ -162,7 +162,8 @@ namespace UmbracoExamine
 
             base.Initialize(name, config);
 
-            if (config["useTempStorage"] != null)
+            //detect if a dir factory has been specified, if so then useTempStorage will not be used (deprecated)
+            if (config["directoryFactory"] == null && config["useTempStorage"] != null)
             {
                 var fsDir = base.GetLuceneDirectory() as FSDirectory;
                 if (fsDir != null)

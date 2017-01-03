@@ -73,7 +73,8 @@ namespace UmbracoExamine
 
             base.Initialize(name, config);
 
-            if (config != null && config["useTempStorage"] != null)
+            //detect if a dir factory has been specified, if so then useTempStorage will not be used (deprecated)
+            if (config != null && config["directoryFactory"] == null && config["useTempStorage"] != null)
             {
                 //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
                 // for websites that are running from a remove file server and file IO latency becomes an issue
