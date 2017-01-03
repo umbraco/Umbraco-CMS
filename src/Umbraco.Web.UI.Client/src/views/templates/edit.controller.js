@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope, $routeParams, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService) {
+    function TemplatesEditController($scope, $routeParams, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, angularHelper) {
 
         var vm = this;
         var oldMasterTemplateAlias = null;
@@ -52,6 +52,10 @@
                     });
 
                 }
+
+                // clear $dirty state on form
+                setFormState("pristine");
+
 
             }, function (err) {
                 notificationsService.error("Template save failed");
@@ -426,6 +430,10 @@
             vm.editor.setValue(templateCode);
             vm.editor.clearSelection();
             vm.editor.navigateFileStart();
+            
+            // set form state to $dirty
+            setFormState("dirty");
+
         }
 
 
@@ -433,6 +441,9 @@
             vm.editor.moveCursorToPosition(vm.currentPosition);
             vm.editor.insert(str);
             vm.editor.focus();
+
+            // set form state to $dirty
+            setFormState("dirty");
         }
 
         function wrap(str) {
@@ -441,12 +452,28 @@
             str = str.replace("{0}", selectedContent);
             vm.editor.insert(str);
             vm.editor.focus();
+            
+            // set form state to $dirty
+            setFormState("dirty");
         }
 
         function persistCurrentLocation() {
             vm.currentPosition = vm.editor.getCursorPosition();
         }
 
+        function setFormState(state) {
+            
+            // get the current form
+            var currentForm = angularHelper.getCurrentForm($scope);
+
+            // set state
+            if(state === "dirty") {
+                currentForm.$setDirty();
+            } else if(state === "pristine") {
+                currentForm.$setPristine();
+            }
+        }
+    
         vm.init();
 
     }
