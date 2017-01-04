@@ -50,6 +50,8 @@ namespace Umbraco.Tests.Services
 
         /// <summary>
         /// Ensures that we don't unpublish all nodes when a node is deleted that has an invalid path of -1
+        /// Note: it is actually the MoveToRecycleBin happening on the initial deletion of a node through the UI
+        /// that causes the issue.
         /// Regression test: http://issues.umbraco.org/issue/U4-9336
         /// </summary>
         [Test]
@@ -68,13 +70,17 @@ namespace Umbraco.Tests.Services
             }
 
             //now make the data corrupted :/
-
             DatabaseContext.Database.Execute("UPDATE umbracoNode SET path = '-1' WHERE id = @id", new {id = content.Id});
 
-            //re-get
+            // need to clear the caches otherwise the ContentService will just serve is a cached version with the non-updated path from db.
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearAllCache();
+            
+            //re-get with the corrupt path
             content = contentService.GetById(content.Id);
 
-            ServiceContext.ContentService.Delete(content);
+            // Note to Shan: put a breakpoint at ContentService.cs line: 1021
+            // here we get all descendants by the path of the node being moved to bin, and unpublish all of them.
+            ServiceContext.ContentService.MoveToRecycleBin(content);
 
             //re-get
             hierarchy = contentService.GetByIds(hierarchy.Select(x => x.Id).ToArray()).OrderBy(x => x.Level).ToArray();
