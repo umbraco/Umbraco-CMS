@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Web;
 using Umbraco.Core;
@@ -9,6 +10,8 @@ namespace UmbracoExamine.LocalStorage
     /// <summary>
     /// When running on Azure websites, we can use the local user's storage space
     /// </summary>
+    [Obsolete("This has been superceded by IDirectoryFactory in Examine Core and should not be used")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class AzureLocalStorageDirectory : ILocalStorageDirectory
     {
         public DirectoryInfo GetLocalStorageDirectory(NameValueCollection config, string configuredPath)
