@@ -98,42 +98,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // else actually determine the route
             route = DetermineRouteById(umbracoContext, preview, contentId);
 
-            // node not found
-            if (route == null)
-                return null;
-
-            // find the content back, detect routes collisions: we should find ourselves back,
-            // else it means that another content with "higher priority" is sharing the same route.
-            // perf impact:
-            // - non-colliding, adds one complete "by route" lookup, only on the first time a url is computed (then it's cached anyways)
-            // - colliding, adds one "by route" lookup, the first time the url is computed, then one dictionary looked each time it is computed again
-            // assuming no collisions, the impact is one complete "by route" lookup the first time each url is computed
-            //
-            // U4-9121 - this lookup is too expensive when computing a large amount of urls on a front-end (eg menu)
-            // ... thinking about moving the lookup out of the path into its own async task, so we are not reporting errors
-            //     in the back-office anymore, but at least we are not polluting the cache
-            // instead, refactored DeterminedIdByRoute to stop using XPath, with a 16x improvement according to benchmarks
-            // will it be enough?
-
-            var loopId = preview ? 0 : _routesCache.GetNodeId(route); // might be cached already in case of collision
-            if (loopId == 0)
-            {
-                var content = DetermineIdByRoute(umbracoContext, preview, route, GlobalSettings.HideTopLevelNodeFromPath);
-
-                // add the other route to cache so next time we have it already
-                if (content != null && preview == false)
-                    AddToCacheIfDeepestRoute(umbracoContext, content, route);
-
-                loopId = content == null ? 0 : content.Id; // though... 0 here would be quite weird?
-            }
-
-            // cache if we have a route and not previewing and it's not a colliding route
-            // (the result of DetermineRouteById is always the deepest route)
-            if (/*route != null &&*/ preview == false && loopId == contentId)
-                _routesCache.Store(contentId, route);
-
-            // return route if no collision, else report collision
-            return loopId == contentId ? route : ("err/" + loopId);
+            // may be null if node not found
+            // do NOT cache the route: it may be colliding - and since checking for a collision implies
+            // doing one DetermineIdByRoute anyways we are not causing any perf penalty by not caching
+            return route;
         }
 
         IPublishedContent DetermineIdByRoute(UmbracoContext umbracoContext, bool preview, string route, bool hideTopLevelNode)
@@ -149,18 +117,25 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             //check if we can find the node in our xml cache
             var id = NavigateRoute(umbracoContext, preview, startNodeId, path, hideTopLevelNode);
-            if (id > 0) return GetById(umbracoContext, preview, id);
+            return id > 0 ? GetById(umbracoContext, preview, id) : null;
+        }
 
-            // if hideTopLevelNodePath is true then for url /foo we looked for /*/foo
-            // but maybe that was the url of a non-default top-level node, so we also
-            // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
-            if (hideTopLevelNode && path.Length > 1 && path.IndexOf('/', 1) < 0)
+        private static XmlElement GetXmlElementChildWithLowestSortOrder(XmlNode element)
+        {
+            XmlElement elt = null;
+            var min = int.MaxValue;
+            foreach (var n in element.ChildNodes)
             {
-                var id2 = NavigateRoute(umbracoContext, preview, startNodeId, path, false);
-                if (id2 > 0) return GetById(umbracoContext, preview, id2);
-            }
+                var e = n as XmlElement;
+                if (e == null) continue;
 
-            return null;
+                var sortOrder = int.Parse(e.GetAttribute("sortOrder"));
+                if (sortOrder >= min) continue;
+
+                min = sortOrder;
+                elt = e;
+            }
+            return elt;
         }
 
         private int NavigateRoute(UmbracoContext umbracoContext, bool preview, int startNodeId, string path, bool hideTopLevelNode)
@@ -177,20 +152,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     return elt == null ? -1 : startNodeId;
                 }
 
-                elt = null;
-                var min = int.MaxValue;
-                //Don't use OfType<T> or Cast<T>, this is critical code, all ChildNodes are XmlElement so explicitly cast
-                // https://gist.github.com/Shazwazza/04e2e5642a316f4a87e52dada2901198
-                foreach (var n in xml.DocumentElement.ChildNodes)
-                {
-                    var e = (XmlElement) n;
-                    var sortOrder = int.Parse(e.GetAttribute("sortOrder"));
-                    if (sortOrder < min)
-                    {
-                        min = sortOrder;
-                        elt = e;
-                    }
-                }
+                elt = GetXmlElementChildWithLowestSortOrder(xml.DocumentElement);
                 return elt == null ? -1 : int.Parse(elt.GetAttribute("id"));
             }
 
@@ -208,10 +170,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 // https://gist.github.com/Shazwazza/04e2e5642a316f4a87e52dada2901198
                 foreach (var n in elt.ChildNodes)
                 {
-                    var e = (XmlElement)n;
+                    var e = n as XmlElement;
+                    if (e == null) continue;
+                    
                     var id = NavigateElementRoute(e, urlParts);
                     if (id > 0) return id;
                 }
+
+                if (urlParts.Length == 1)
+                    return NavigateElementRoute(elt, urlParts);
+
                 return -1;
             }
 
@@ -232,9 +200,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 found = false;
                 //Don't use OfType<T> or Cast<T>, this is critical code, all ChildNodes are XmlElement so explicitly cast
                 // https://gist.github.com/Shazwazza/04e2e5642a316f4a87e52dada2901198
+                var sortOrder = -1;
                 foreach (var o in elt.ChildNodes)
                 {
-                    var child = (XmlElement) o;
+                    var child = o as XmlElement;
+                    if (child == null) continue;
+                    
                     var noNode = UseLegacySchema
                         ? child.Name != "node"
                         : child.GetAttributeNode("isDoc") == null;
@@ -242,8 +213,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     if (child.GetAttribute("urlName") != urlParts[i]) continue;
 
                     found = true;
+
+                    var so = int.Parse(child.GetAttribute("sortOrder"));
+                    if (sortOrder >= 0 && so >= sortOrder) continue;
+
+                    sortOrder = so;
                     elt = child;
-                    break;
                 }
                 i++;
             }
@@ -252,7 +227,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         string DetermineRouteById(UmbracoContext umbracoContext, bool preview, int contentId)
         {
-            var elt = GetXml(umbracoContext, preview).GetElementById(contentId.ToString(CultureInfo.InvariantCulture));
+            var xml = GetXml(umbracoContext, preview);
+            var elt = xml.GetElementById(contentId.ToString(CultureInfo.InvariantCulture));
             if (elt == null) return null;
 
             var domainHelper = GetDomainHelper(umbracoContext.Application.Services.DomainService);
@@ -279,7 +255,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
             if (hasDomains == false && GlobalSettings.HideTopLevelNodeFromPath)
-                ApplyHideTopLevelNodeFromPath(umbracoContext, eltId, eltParentId, pathParts);
+            {
+                if (eltParentId == -1)
+                {
+                    var rootNode = GetXmlElementChildWithLowestSortOrder(xml.DocumentElement);
+                    if (rootNode != null && rootNode == elt)
+                        pathParts.RemoveAt(pathParts.Count - 1);
+                }
+                else
+                {
+                    pathParts.RemoveAt(pathParts.Count - 1);
+                }
+            }
 
             // assemble the route
             pathParts.Reverse();
@@ -287,30 +274,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var route = (id == -1 ? "" : id.ToString(CultureInfo.InvariantCulture)) + path;
 
             return route;
-        }
-
-        static void ApplyHideTopLevelNodeFromPath(UmbracoContext umbracoContext, int nodeId, int parentId, IList<string> pathParts)
-        {
-            // in theory if hideTopLevelNodeFromPath is true, then there should be only once
-            // top-level node, or else domains should be assigned. but for backward compatibility
-            // we add this check - we look for the document matching "/" and if it's not us, then
-            // we do not hide the top level path
-            // it has to be taken care of in GetByRoute too so if
-            // "/foo" fails (looking for "/*/foo") we try also "/foo".
-            // this does not make much sense anyway esp. if both "/foo/" and "/bar/foo" exist, but
-            // that's the way it works pre-4.10 and we try to be backward compat for the time being
-            if (parentId == -1)
-            {
-                var rootNode = umbracoContext.ContentCache.GetByRoute("/", true);
-                if (rootNode == null)
-                    throw new Exception("Failed to get node at /.");
-                if (rootNode.Id == nodeId) // remove only if we're the default node
-                    pathParts.RemoveAt(pathParts.Count - 1);
-            }
-            else
-            {
-                pathParts.RemoveAt(pathParts.Count - 1);
-            }
         }
 
         #endregion
