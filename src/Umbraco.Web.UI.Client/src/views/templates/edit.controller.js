@@ -1,10 +1,11 @@
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope, $routeParams, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, angularHelper) {
+    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper) {
 
         var vm = this;
         var oldMasterTemplateAlias = null;
+        var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
         vm.page.loading = true;
@@ -20,8 +21,18 @@
 
             vm.template.content = vm.editor.getValue();
 
-            templateResource.save(vm.template).then(function (saved) {
-                
+            contentEditingHelper.contentEditorPerformSave({
+                statusMessage: localizeSaving,
+                saveMethod: templateResource.save,
+                scope: $scope,
+                content: vm.template,
+                //We do not redirect on failure for templates - this is because it is not possible to actually save the doc
+                // type when server side validation fails - as opposed to content where we are capable of saving the content
+                // item if server side validation fails
+                redirectOnFailure: false,
+                rebindCallback: function (orignal, saved) {}
+            }).then(function (saved) {
+
                 notificationsService.success("Template saved");
                 vm.page.saveButtonState = "success";
                 vm.template = saved;
@@ -58,9 +69,17 @@
 
 
             }, function (err) {
-                notificationsService.error("Template save failed");
+
                 vm.page.saveButtonState = "error";
+                
+                localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
+                    localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
+                        notificationsService.error(headerValue, msgValue);
+                    });
+                });
+
             });
+
         };
 
         vm.init = function () {
