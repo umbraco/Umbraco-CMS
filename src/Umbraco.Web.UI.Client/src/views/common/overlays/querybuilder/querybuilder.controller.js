@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function QueryBuilderOverlayController($scope, $element, templateQueryResource, assetsService, angularHelper) {
+    function QueryBuilderOverlayController($scope, templateQueryResource) {
 
         var vm = this;
 
