@@ -179,8 +179,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
                 elt = null;
                 var min = int.MaxValue;
-                foreach (var e in xml.DocumentElement.ChildNodes.OfType<XmlElement>())
+                //Don't use OfType<T> or Cast<T>, this is critical code, all ChildNodes are XmlElement so explicitly cast
+                // https://gist.github.com/Shazwazza/04e2e5642a316f4a87e52dada2901198
+                foreach (var n in xml.DocumentElement.ChildNodes)
                 {
+                    var e = (XmlElement) n;
                     var sortOrder = int.Parse(e.GetAttribute("sortOrder"));
                     if (sortOrder < min)
                     {
@@ -201,8 +204,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             if (hideTopLevelNode && startNodeId <= 0)
             {
-                foreach (var e in elt.ChildNodes.OfType<XmlElement>())
+                //Don't use OfType<T> or Cast<T>, this is critical code, all ChildNodes are XmlElement so explicitly cast
+                // https://gist.github.com/Shazwazza/04e2e5642a316f4a87e52dada2901198
+                foreach (var n in elt.ChildNodes)
                 {
+                    var e = (XmlElement)n;
                     var id = NavigateElementRoute(e, urlParts);
                     if (id > 0) return id;
                 }
@@ -224,8 +230,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             while (found && i < urlParts.Length)
             {
                 found = false;
-                foreach (var child in elt.ChildNodes.OfType<XmlElement>())
+                //Don't use OfType<T> or Cast<T>, this is critical code, all ChildNodes are XmlElement so explicitly cast
+                // https://gist.github.com/Shazwazza/04e2e5642a316f4a87e52dada2901198
+                foreach (var o in elt.ChildNodes)
                 {
+                    var child = (XmlElement) o;
                     var noNode = UseLegacySchema
                         ? child.Name != "node"
                         : child.GetAttributeNode("isDoc") == null;
