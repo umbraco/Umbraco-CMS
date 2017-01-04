@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope, $routeParams, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, angularHelper) {
+    function TemplatesEditController($scope, $routeParams, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, angularHelper, $timeout) {
 
         var vm = this;
         var oldMasterTemplateAlias = null;
@@ -104,6 +104,7 @@
             // save state of master template to use for comparison when syncing the tree on save
             oldMasterTemplateAlias = angular.copy(template.masterTemplateAlias);
 
+            // ace configuration
             vm.aceOption = {
                 mode: "razor",
                 theme: "chrome",
@@ -114,15 +115,23 @@
                 onLoad: function(_editor) {
                     vm.editor = _editor;
                     
-                    //initial cursor placement
-                    vm.editor.navigateFileEnd();
-                    persistCurrentLocation();
+                    // initial cursor placement
+                    // Keep cursor in name field if we are create a new template
+                    // else set the cursor at the bottom of the code editor
+                    if(!$routeParams.create) {
+                        $timeout(function(){
+                            vm.editor.navigateFileEnd();
+                            vm.editor.focus();
+                            persistCurrentLocation();
+                        });
+                    }
 
                     //change on blur, focus
                     vm.editor.on("blur", persistCurrentLocation);
                     vm.editor.on("focus", persistCurrentLocation);
             	}
             }
+            
         };
 
         vm.openPageFieldOverlay = openPageFieldOverlay;
@@ -174,8 +183,11 @@
 
                 },
                 close: function(oldModel) {
+                    // close the dialog
                     vm.insertOverlay.show = false;
                     vm.insertOverlay = null;
+                    // focus editor
+                    vm.editor.focus();
                 }
             };
 
@@ -197,6 +209,13 @@
                     vm.macroPickerOverlay.show = false;
                     vm.macroPickerOverlay = null;
 
+                },
+                close: function(oldModel) {
+                    // close the dialog
+                    vm.macroPickerOverlay.show = false;
+                    vm.macroPickerOverlay = null;
+                    // focus editor
+                    vm.editor.focus();
                 }
             };
         }
@@ -214,8 +233,11 @@
                     vm.pageFieldOverlay = null;
                 },
                 close: function (model) {
+                    // close the dialog
                     vm.pageFieldOverlay.show = false;
                     vm.pageFieldOverlay = null;
+                    // focus editor
+                    vm.editor.focus();                    
                 }
             };
         }
@@ -239,8 +261,11 @@
                     vm.dictionaryItemOverlay = null;
                 },
                 close: function (model) {
+                    // close dialog
                     vm.dictionaryItemOverlay.show = false;
                     vm.dictionaryItemOverlay = null;
+                    // focus editor
+                    vm.editor.focus();
                 }
             };
         }
@@ -263,8 +288,11 @@
                     vm.partialItemOverlay = null;
                 },
                 close: function (model) {
+                    // close dialog
                     vm.partialItemOverlay.show = false;
                     vm.partialItemOverlay = null;
+                    // focus editor
+                    vm.editor.focus();
                 }
             };
         }
@@ -293,8 +321,11 @@
                 },
 
                 close: function (model) {
+                    // close dialog
                     vm.queryBuilderOverlay.show = false;
                     vm.queryBuilderOverlay = null;
+                    // focus editor
+                    vm.editor.focus();   
                 }
             };
         }
@@ -326,10 +357,11 @@
 
                 },
                 close: function(model) {
-
+                    // close dialog
                     vm.sectionsOverlay.show = false;
                     vm.sectionsOverlay = null;
-
+                    // focus editor
+                    vm.editor.focus();
                 }
             }
         }
@@ -367,8 +399,11 @@
                     vm.masterTemplateOverlay = null;
                 },
                 close: function(oldModel) {
+                    // close dialog
                     vm.masterTemplateOverlay.show = false;
                     vm.masterTemplateOverlay = null;
+                    // focus editor
+                    vm.editor.focus();
                 }
             };
 
@@ -441,6 +476,7 @@
             vm.editor.clearSelection();
             vm.editor.navigateFileStart();
             
+            vm.editor.focus();
             // set form state to $dirty
             setFormState("dirty");
 
