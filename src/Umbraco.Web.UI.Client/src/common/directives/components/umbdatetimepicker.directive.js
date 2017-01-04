@@ -96,7 +96,7 @@ Use this directive to render a date time picker
             }
 
             function onHide(event) {
-                if (scope.onChange) {
+                if (scope.onHide) {
                     scope.$apply(function(){
                         // callback
                         scope.onHide({event: event});
@@ -132,7 +132,7 @@ Use this directive to render a date time picker
             }
 
             function onUpdate(event) {
-                if (scope.onShow) {
+                if (scope.onUpdate) {
                     scope.$apply(function(){
                         // callback
                         scope.onUpdate({event: event});
