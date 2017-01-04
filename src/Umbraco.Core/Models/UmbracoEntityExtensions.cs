@@ -1,16 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Models
 {
     internal static class UmbracoEntityExtensions
     {
+        /// <summary>
+        /// Does a quick check on the entity's set path to ensure that it's valid and consistent
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public static void ValidatePathWithException(this NodeDto entity)
+        {
+            //don't validate if it's empty and it has no id
+            if (entity.NodeId == default(int) && entity.Path.IsNullOrWhiteSpace())
+                return;
+
+            if (entity.Path.IsNullOrWhiteSpace())
+                throw new InvalidDataException(string.Format("The content item {0} has an empty path: {1} with parentID: {2}", entity.NodeId, entity.Path, entity.ParentId));
+
+            var pathParts = entity.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (pathParts.Length < 2)
+            {
+                //a path cannot be less than 2 parts, at a minimum it must be root (-1) and it's own id
+                throw new InvalidDataException(string.Format("The content item {0} has an invalid path: {1} with parentID: {2}", entity.NodeId, entity.Path, entity.ParentId));
+            }
+
+            if (entity.ParentId != default(int) && pathParts[pathParts.Length - 2] != entity.ParentId.ToInvariantString())
+            {
+                //the 2nd last id in the path must be it's parent id
+                throw new InvalidDataException(string.Format("The content item {0} has an invalid path: {1} with parentID: {2}", entity.NodeId, entity.Path, entity.ParentId));
+            }
+        }
+
         /// <summary>
         /// Does a quick check on the entity's set path to ensure that it's valid and consistent
         /// </summary>
