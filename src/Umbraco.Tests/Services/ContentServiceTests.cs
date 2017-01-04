@@ -35,17 +35,53 @@ namespace Umbraco.Tests.Services
         [SetUp]
         public override void Initialize()
         {
-	        base.Initialize();
+            base.Initialize();
         }
-		
-		[TearDown]
-		public override void TearDown()
-		{   
-      		base.TearDown();
-		}
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
+        }
 
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
+
+
+        /// <summary>
+        /// Ensures that we don't unpublish all nodes when a node is deleted that has an invalid path of -1
+        /// Regression test: http://issues.umbraco.org/issue/U4-9336
+        /// </summary>
+        [Test]
+        public void Deleting_Node_With_Invalid_Path()
+        {
+            var contentService = ServiceContext.ContentService;
+            var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
+            Assert.IsTrue(contentService.PublishWithStatus(root).Success);
+            var content = contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
+            Assert.IsTrue(contentService.PublishWithStatus(content).Success);
+            var hierarchy = CreateContentHierarchy().OrderBy(x => x.Level).ToArray();
+            contentService.Save(hierarchy, 0);
+            foreach (var c in hierarchy)
+            {
+                Assert.IsTrue(contentService.PublishWithStatus(c).Success);
+            }
+
+            //now make the data corrupted :/
+
+            DatabaseContext.Database.Execute("UPDATE umbracoNode SET path = '-1' WHERE id = @id", new {id = content.Id});
+
+            //re-get
+            content = contentService.GetById(content.Id);
+
+            ServiceContext.ContentService.Delete(content);
+
+            //re-get
+            hierarchy = contentService.GetByIds(hierarchy.Select(x => x.Id).ToArray()).OrderBy(x => x.Level).ToArray();
+
+            Assert.That(hierarchy.All(c => c.Trashed == false), Is.True);
+            Assert.That(hierarchy.All(c => c.Path.StartsWith("-1,-20") == false), Is.True);
+        }
 
         [Test]
         public void Remove_Scheduled_Publishing_Date()
@@ -104,7 +140,7 @@ namespace Umbraco.Tests.Services
                 results.Add(contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0));
             }
 
-            var sortedGet = contentService.GetByIds(new[] {results[10].Id, results[5].Id, results[12].Id}).ToArray();
+            var sortedGet = contentService.GetByIds(new[] { results[10].Id, results[5].Id, results[12].Id }).ToArray();
 
             // Assert
             Assert.AreEqual(sortedGet[0].Id, results[10].Id);
@@ -121,7 +157,7 @@ namespace Umbraco.Tests.Services
             // Act
             for (int i = 0; i < 20; i++)
             {
-                contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);    
+                contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
             }
 
             // Assert
@@ -230,7 +266,7 @@ namespace Umbraco.Tests.Services
             // Assert
 
             //there should be no tags for this entity
-            var tags = tagService.GetTagsForEntity(content1.Id);            
+            var tags = tagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(0, tags.Count());
 
             //these tags should still be returned since they still have actively published content assigned
@@ -265,7 +301,7 @@ namespace Umbraco.Tests.Services
             contentService.MoveToRecycleBin(content2);
 
             // Assert
-            
+
             //there should be no exposed content tags now that nothing is published.
             var allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
@@ -395,7 +431,7 @@ namespace Umbraco.Tests.Services
                 new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
                 {
                     DataTypeDefinitionId = 1041
-                });            
+                });
             contentTypeService.Save(contentType);
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias) };
 
@@ -410,7 +446,7 @@ namespace Umbraco.Tests.Services
             var child2 = MockedContent.CreateSimpleContent(contentType, "child 2 content", content.Id);
             child2.SetTags("tags", new[] { "hello2", "world2" }, true);
             contentService.Save(child2);
-            
+
             // Act
             contentService.PublishWithChildrenWithStatus(content, includeUnpublished: true);
 
@@ -461,34 +497,34 @@ namespace Umbraco.Tests.Services
                 new { nodeId = content.Id, propTypeId = propertyTypeId }));
         }
 
-	    [Test]
-	    public void Can_Replace_Tag_Data_To_Published_Content()
-	    {
+        [Test]
+        public void Can_Replace_Tag_Data_To_Published_Content()
+        {
             //Arrange
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
-                    {
-                        DataTypeDefinitionId = 1041
-                    });            
+                {
+                    DataTypeDefinitionId = 1041
+                });
             contentTypeService.Save(contentType);
 
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
-	        
-            
+
+
             // Act
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content);
 
             // Assert
             Assert.AreEqual(4, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
-	        var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
-	        Assert.AreEqual(4, DatabaseContext.Database.ExecuteScalar<int>(
-	            "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-	            new {nodeId = content.Id, propTypeId = propertyTypeId}));
-	    }
+            var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
+            Assert.AreEqual(4, DatabaseContext.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
+                new { nodeId = content.Id, propTypeId = propertyTypeId }));
+        }
 
         [Test]
         public void Can_Append_Tag_Data_To_Published_Content()
@@ -506,7 +542,7 @@ namespace Umbraco.Tests.Services
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.PublishWithStatus(content);
-            
+
             // Act
             content.SetTags("tags", new[] { "another", "world" }, false);
             contentService.PublishWithStatus(content);
@@ -548,9 +584,9 @@ namespace Umbraco.Tests.Services
                 new { nodeId = content.Id, propTypeId = propertyTypeId }));
         }
 
-	    [Test]
-	    public void Can_Remove_Property_Type()
-	    {
+        [Test]
+        public void Can_Remove_Property_Type()
+        {
             // Arrange
             var contentService = ServiceContext.ContentService;
 
@@ -560,9 +596,9 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
-	    }
+        }
 
-	    [Test]
+        [Test]
         public void Can_Create_Content()
         {
             // Arrange
@@ -575,7 +611,7 @@ namespace Umbraco.Tests.Services
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
         }
-        
+
         [Test]
         public void Can_Create_Content_Without_Explicitly_Set_User()
         {
@@ -595,12 +631,12 @@ namespace Umbraco.Tests.Services
         public void Can_Save_New_Content_With_Explicit_User()
         {
             var user = new User(ServiceContext.UserService.GetUserTypeByAlias("admin"))
-                {
-                    Name = "Test",
-                    Email = "test@test.com",
-                    Username = "test",
+            {
+                Name = "Test",
+                Email = "test@test.com",
+                Username = "test",
                 RawPasswordValue = "test"
-                };
+            };
             ServiceContext.UserService.Save(user);
             var content = new Content("Test", -1, ServiceContext.ContentTypeService.GetContentType("umbTextpage"));
 
@@ -857,14 +893,14 @@ namespace Umbraco.Tests.Services
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             using (var uow = provider.GetUnitOfWork())
             {
-                uow.Database.TruncateTable("cmsContentXml");    
+                uow.Database.TruncateTable("cmsContentXml");
             }
-            
+
 
             //for this test we are also going to save a revision for a content item that is not published, this is to ensure
             //that it's published version still makes it into the cmsContentXml table!
             contentService.Save(allContent.Last());
-            
+
             // Act
             var published = contentService.RePublishAll(0);
 
@@ -872,7 +908,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(published);
             using (var uow = provider.GetUnitOfWork())
             {
-                Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));    
+                Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
             }
         }
 
@@ -889,7 +925,7 @@ namespace Umbraco.Tests.Services
             var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants())).ToList();
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            
+
             using (var uow = provider.GetUnitOfWork())
             {
                 uow.Database.TruncateTable("cmsContentXml");
@@ -899,7 +935,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(allContent.Last());
 
             // Act
-            contentService.RePublishAll(new int[]{allContent.Last().ContentTypeId});
+            contentService.RePublishAll(new int[] { allContent.Last().ContentTypeId });
 
             // Assert            
             using (var uow = provider.GetUnitOfWork())
@@ -1085,7 +1121,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent("Home US", - 1, "umbTextpage", 0);
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
             content.SetValue("author", "Barack Obama");
 
             // Act
@@ -1116,7 +1152,7 @@ namespace Umbraco.Tests.Services
             var savedVersion = content.Version;
 
             // Act
-            var publishedDescendants = ((ContentService) contentService).GetPublishedDescendants(root).ToList();
+            var publishedDescendants = ((ContentService)contentService).GetPublishedDescendants(root).ToList();
 
             // Assert
             Assert.That(rootPublished, Is.True);
@@ -1146,7 +1182,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent("Home US", - 1, "umbTextpage", 0);
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
             content.SetValue("author", "Barack Obama");
 
             // Act
@@ -1166,7 +1202,7 @@ namespace Umbraco.Tests.Services
             var contentType = contentTypeService.GetContentType("umbTextpage");
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Subpage 1", NodeDto.NodeIdSeed + 2);
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Subpage 2", NodeDto.NodeIdSeed + 2);
-            var list = new List<IContent> {subpage, subpage2};
+            var list = new List<IContent> { subpage, subpage2 };
 
             // Act
             contentService.Save(list, 0);
@@ -1186,9 +1222,9 @@ namespace Umbraco.Tests.Services
             contentService.Save(hierarchy, 0);
 
             Assert.That(hierarchy.Any(), Is.True);
-			Assert.That(hierarchy.Any(x => x.HasIdentity == false), Is.False);
-			//all parent id's should be ok, they are lazy and if they equal zero an exception will be thrown
-			Assert.DoesNotThrow(() => hierarchy.Any(x => x.ParentId != 0));
+            Assert.That(hierarchy.Any(x => x.HasIdentity == false), Is.False);
+            //all parent id's should be ok, they are lazy and if they equal zero an exception will be thrown
+            Assert.DoesNotThrow(() => hierarchy.Any(x => x.ParentId != 0));
 
         }
 
@@ -1375,7 +1411,7 @@ namespace Umbraco.Tests.Services
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var temp = MockedContent.CreateSimpleContent(contentType, "Simple Text Page", -1);
             var prop = temp.Properties.First();
-            temp.SetTags(prop.Alias, new[] {"hello", "world"}, true);
+            temp.SetTags(prop.Alias, new[] { "hello", "world" }, true);
             var status = contentService.PublishWithStatus(temp);
 
             // Act
@@ -1418,14 +1454,14 @@ namespace Umbraco.Tests.Services
 
         [Test]
         public void Can_Save_Lazy_Content()
-        {	        
-	        var unitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
+        {
+            var unitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 
             var c = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Page", root.Id));
             var c2 = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
-            var list = new List<Lazy<IContent>> {c, c2};
+            var list = new List<Lazy<IContent>> { c, c2 };
 
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
@@ -1443,9 +1479,9 @@ namespace Umbraco.Tests.Services
                 Assert.That(c2.Value.Id > 0, Is.True);
 
                 Assert.That(c.Value.ParentId > 0, Is.True);
-                Assert.That(c2.Value.ParentId > 0, Is.True);    
+                Assert.That(c2.Value.ParentId > 0, Is.True);
             }
-            
+
         }
 
         [Test]
@@ -1468,20 +1504,20 @@ namespace Umbraco.Tests.Services
             Assert.That(hasPublishedVersion, Is.True);
         }
 
-	    [Test]
-	    public void Can_Verify_Property_Types_On_Content()
-	    {
+        [Test]
+        public void Can_Verify_Property_Types_On_Content()
+        {
             // Arrange
-	        var contentTypeService = ServiceContext.ContentTypeService;
+            var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateAllTypesContentType("allDataTypes", "All DataTypes");
             contentTypeService.Save(contentType);
-	        var contentService = ServiceContext.ContentService;
-	        var content = MockedContent.CreateAllTypesContent(contentType, "Random Content", -1);
+            var contentService = ServiceContext.ContentService;
+            var content = MockedContent.CreateAllTypesContent(contentType, "Random Content", -1);
             contentService.Save(content);
-	        var id = content.Id;
+            var id = content.Id;
 
             // Act
-	        var sut = contentService.GetById(id);
+            var sut = contentService.GetById(id);
 
             // Arrange
             Assert.That(sut.GetValue<bool>("isTrue"), Is.True);
@@ -1496,7 +1532,7 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<DateTime>("dateTime").ToString("G"), Is.EqualTo(content.GetValue<DateTime>("dateTime").ToString("G")));
             Assert.That(sut.GetValue<string>("colorPicker"), Is.EqualTo("black"));
             //that one is gone in 7.4
-	        //Assert.That(sut.GetValue<string>("folderBrowser"), Is.Null);
+            //Assert.That(sut.GetValue<string>("folderBrowser"), Is.Null);
             Assert.That(sut.GetValue<string>("ddlMultiple"), Is.EqualTo("1234,1235"));
             Assert.That(sut.GetValue<string>("rbList"), Is.EqualTo("random"));
             Assert.That(sut.GetValue<DateTime>("date").ToString("G"), Is.EqualTo(content.GetValue<DateTime>("date").ToString("G")));
@@ -1507,23 +1543,23 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<int>("memberPicker"), Is.EqualTo(1092));
             Assert.That(sut.GetValue<string>("relatedLinks"), Is.EqualTo("<links><link title=\"google\" link=\"http://google.com\" type=\"external\" newwindow=\"0\" /></links>"));
             Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
-	    }
+        }
 
-	    [Test]
-	    public void Can_Delete_Previous_Versions_Not_Latest()
-	    {
+        [Test]
+        public void Can_Delete_Previous_Versions_Not_Latest()
+        {
             // Arrange
             var contentService = ServiceContext.ContentService;
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
-	        var version = content.Version;
+            var version = content.Version;
 
-	        // Act
+            // Act
             contentService.DeleteVersion(NodeDto.NodeIdSeed + 4, version, true, 0);
             var sut = contentService.GetById(NodeDto.NodeIdSeed + 4);
 
             // Assert
             Assert.That(sut.Version, Is.EqualTo(version));
-	    }
+        }
 
         [Test]
         public void Ensure_Content_Xml_Created()
@@ -1542,7 +1578,7 @@ namespace Umbraco.Tests.Services
             }
 
             contentService.Publish(content);
-            
+
             using (var uow = provider.GetUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
@@ -1559,10 +1595,10 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            
+
             using (var uow = provider.GetUnitOfWork())
             {
-                Assert.IsTrue(uow.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId AND versionId = @versionId", new{nodeId = content.Id, versionId = content.Version}) != null);
+                Assert.IsTrue(uow.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId AND versionId = @versionId", new { nodeId = content.Id, versionId = content.Version }) != null);
             }
         }
 
@@ -1665,11 +1701,11 @@ namespace Umbraco.Tests.Services
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 
-			var list = new List<IContent>();
+            var list = new List<IContent>();
 
             for (int i = 0; i < 10; i++)
             {
-				var content = MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Page " + i, root);
+                var content = MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Page " + i, root);
 
                 list.Add(content);
                 list.AddRange(CreateChildrenOf(contentType, content, 4));
@@ -1680,12 +1716,12 @@ namespace Umbraco.Tests.Services
             return list;
         }
 
-		private IEnumerable<IContent> CreateChildrenOf(IContentType contentType, IContent content, int depth)
+        private IEnumerable<IContent> CreateChildrenOf(IContentType contentType, IContent content, int depth)
         {
             var list = new List<IContent>();
             for (int i = 0; i < depth; i++)
             {
-				var c = MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage " + i, content);
+                var c = MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage " + i, content);
                 list.Add(c);
 
                 Debug.Print("Created: 'Hierarchy Simple Text Subpage {0}' - Depth: {1}", i, depth);
