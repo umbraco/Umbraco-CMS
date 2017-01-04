@@ -281,6 +281,7 @@
     <Compile Include="Configuration\UmbracoSettings\ServerCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ServerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TemplatesElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\UmbracoConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UserProviderElement.cs" />
