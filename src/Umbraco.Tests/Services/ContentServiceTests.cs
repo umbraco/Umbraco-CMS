@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Services
         /// Regression test: http://issues.umbraco.org/issue/U4-9336
         /// </summary>
         [Test]
-        public void Deleting_Node_With_Invalid_Path()
+        public void Moving_Node_To_Recycle_Bin_With_Invalid_Path()
         {
             var contentService = ServiceContext.ContentService;
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
@@ -72,15 +72,19 @@ namespace Umbraco.Tests.Services
             //now make the data corrupted :/
             DatabaseContext.Database.Execute("UPDATE umbracoNode SET path = '-1' WHERE id = @id", new {id = content.Id});
 
-            // need to clear the caches otherwise the ContentService will just serve is a cached version with the non-updated path from db.
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearAllCache();
-            
             //re-get with the corrupt path
             content = contentService.GetById(content.Id);
 
-            // Note to Shan: put a breakpoint at ContentService.cs line: 1021
             // here we get all descendants by the path of the node being moved to bin, and unpublish all of them.
-            ServiceContext.ContentService.MoveToRecycleBin(content);
+            // since the path is invalid, there's logic in here to fix that if it's possible and re-persist the entity.
+            var moveResult = ServiceContext.ContentService.WithResult().MoveToRecycleBin(content);
+
+            Assert.IsTrue(moveResult.Success);
+
+            //re-get with the fixed/moved path 
+            content = contentService.GetById(content.Id);
+
+            Assert.AreEqual("-1,-20," + content.Id, content.Path);
 
             //re-get
             hierarchy = contentService.GetByIds(hierarchy.Select(x => x.Id).ToArray()).OrderBy(x => x.Level).ToArray();
