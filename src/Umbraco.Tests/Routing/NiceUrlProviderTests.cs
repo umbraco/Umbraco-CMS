@@ -72,23 +72,9 @@ namespace Umbraco.Tests.Routing
             var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
-			Assert.AreEqual(8, cachedRoutes.Count);
 
-			foreach (var sample in samples)
-			{
-				Assert.IsTrue(cachedRoutes.ContainsKey(sample.Key));
-				Assert.AreEqual(sample.Value, cachedRoutes[sample.Key]);
-			}
-
-			var cachedIds = cache.RoutesCache.GetCachedIds();
-			Assert.AreEqual(8, cachedIds.Count);
-
-			foreach (var sample in samples)
-			{
-				var key = sample.Value;
-				Assert.IsTrue(cachedIds.ContainsKey(key));
-				Assert.AreEqual(sample.Key, cachedIds[key]);
-			}
+            // GetUrl does not write to cache
+			Assert.AreEqual(0, cachedRoutes.Count);
 		}
 
 		// test hideTopLevelNodeFromPath false

@@ -303,18 +303,9 @@ namespace Umbraco.Tests.Routing
             var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
-            Assert.AreEqual(7, cachedRoutes.Count);
 
-            var cachedIds = cache.RoutesCache.GetCachedIds();
-            Assert.AreEqual(7, cachedIds.Count);
-
-            CheckRoute(cachedRoutes, cachedIds, 1001, "1001/");
-            CheckRoute(cachedRoutes, cachedIds, 10011, "10011/");
-            CheckRoute(cachedRoutes, cachedIds, 100111, "10011/1001-1-1");
-            CheckRoute(cachedRoutes, cachedIds, 10012, "10012/");
-            CheckRoute(cachedRoutes, cachedIds, 100121, "10012/1001-2-1");
-            CheckRoute(cachedRoutes, cachedIds, 10013, "1001/1001-3");
-            CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
+            // GetUrl does not write to cache
+            Assert.AreEqual(0, cachedRoutes.Count);
 
             // use the cache
             Assert.AreEqual("/", routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false));
