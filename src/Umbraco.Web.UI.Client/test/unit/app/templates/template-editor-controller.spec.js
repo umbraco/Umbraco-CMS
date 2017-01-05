@@ -47,6 +47,7 @@
                     getCursorPosition: function() {},
                     getValue: function() {},
                     setValue: function() {},
+                    focus: function() {},
                     clearSelection: function() {},
                     navigateFileStart: function() {}
                 };
