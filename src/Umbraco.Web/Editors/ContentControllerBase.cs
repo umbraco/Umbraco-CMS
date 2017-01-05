@@ -99,7 +99,7 @@ namespace Umbraco.Web.Editors
                 var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == property.Alias).ToArray();
 
                 foreach (var file in files)
-                    file.FileName = file.FileName.TrimEnd();
+                    file.FileName = file.FileName.ToSafeFileName();
 
                 if (files.Any())
                     dictionary.Add("files", files);
