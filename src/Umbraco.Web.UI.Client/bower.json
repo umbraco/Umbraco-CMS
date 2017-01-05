@@ -16,7 +16,7 @@
     "tests"
   ],
   "dependencies": {
-    "typeahead.js": "~0.10.5",
+    "typeahead.js": "~0.11.1",
     "underscore": "~1.7.0",
     "rgrove-lazyload": "*",
     "bootstrap-social": "~4.8.0",

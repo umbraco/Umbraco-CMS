@@ -19,12 +19,22 @@ angular.module("umbraco")
                     if (!$scope.model.value) {
                         $scope.model.value = [];
                     }
-                    else {
-                       if($scope.model.value.length > 0) {
-                          $scope.model.value = $scope.model.value.split(",");
-                       }
+                    else if(angular.isString($scope.model.value) && $scope.model.value.length > 0) {
+                        $scope.model.value = $scope.model.value.split(",");
                     }
                 }
+                else if ($scope.model.config.storageType && $scope.model.config.storageType === "Json" && angular.isString($scope.model.value) && !$scope.model.value.detectIsJson()) {
+                    //somehow data may be corrupted, in which case if the storage is json and the value is not empty and the
+                    //value is not json, then we need to 'fix' it. maybe it was CSV and then converted to JSON
+                    $scope.model.value = $scope.model.value.split(",");
+                }
+
+                //We must ensure that each item is Html Encoded and we must also ensure they are html encoded the same way, 
+                // for example, if we html encode them on the server before being sent here the encoding will vary slightly because ASP.NET
+                // and JQuery encoding operate slightly differently depending on the chars, so we need to html encode here
+                $scope.model.value = _.map($scope.model.value, function (i) {
+                    return i.htmlEncode();
+                });
             }
             else {
                 $scope.model.value = [];
@@ -54,7 +64,7 @@ angular.module("umbraco")
             $scope.addTagOnEnter = function (e) {
                 var code = e.keyCode || e.which;
                 if (code == 13) { //Enter keycode   
-                    if ($element.find('.tags-' + $scope.model.alias).parent().find(".tt-dropdown-menu .tt-cursor").length === 0) {
+                    if ($element.find('.tags-' + $scope.model.alias).parent().find(".tt-menu .tt-cursor").length === 0) {
                         //this is required, otherwise the html form will attempt to submit.
                         e.preventDefault();
                         $scope.addTag();
@@ -145,7 +155,9 @@ angular.module("umbraco")
             //configure the type ahead
             $timeout(function () {
 
-                $typeahead = $element.find('.tags-' + $scope.model.alias).typeahead(
+                var thElement = $element.find('.tags-' + $scope.model.alias);
+
+                $typeahead = thElement.typeahead(
                 {
                     //This causes some strangeness as it duplicates the textbox, best leave off for now.
                     hint: false,
@@ -156,28 +168,34 @@ angular.module("umbraco")
                     //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
                     // name = the data set name, we'll make this the tag group name
                     name: $scope.model.config.group,
-                    displayKey: "value",
-                    source: function (query, cb) {
-                        tagsHound.get(query, function (suggestions) {
-                            cb(removeCurrentTagsFromSuggestions(suggestions));
-                        });
-                    },
-                }).bind("typeahead:selected", function (obj, datum, name) {
+                    display: "value",
+                    //source: tagsHound
+                    source: function (query, syncResults, asyncResults) {
+                        tagsHound.search(query,
+                            function(suggestions) {
+                                syncResults(removeCurrentTagsFromSuggestions(suggestions));
+                            },
+                            function(suggestions) {
+                                asyncResults(removeCurrentTagsFromSuggestions(suggestions));
+                            });
+                    }
+                });
+
+                thElement.bind("typeahead:select", function (ev, suggestion) {
+                    console.log('typeahead:select: ' + suggestion);
                     angularHelper.safeApply($scope, function () {
-                        addTag(datum["value"]);
+                        addTag(suggestion.value);
                         $scope.tagToAdd = "";
                         // clear the typed text
                         $typeahead.typeahead('val', '');
                     });
 
-                }).bind("typeahead:autocompleted", function (obj, datum, name) {
+                }).bind("typeahead:autocomplete", function (ev, suggestion) {
+                    console.log('typeahead:autocomplete: ' + suggestion);
                     angularHelper.safeApply($scope, function () {
-                        addTag(datum["value"]);
+                        addTag(suggestion.value);
                         $scope.tagToAdd = "";
                     });
-
-                }).bind("typeahead:opened", function (obj) {
-                    //console.log("opened ");
                 });
             });
 

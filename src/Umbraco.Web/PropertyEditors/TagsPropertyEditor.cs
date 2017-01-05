@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -52,6 +55,34 @@ namespace Umbraco.Web.PropertyEditors
             {
             }
 
+            ///// <summary>
+            ///// We're going to ensure that the values returned for the property editor are HTML encoded
+            ///// </summary>
+            ///// <param name="property"></param>
+            ///// <param name="propertyType"></param>
+            ///// <param name="dataTypeService"></param>
+            ///// <returns></returns>
+            //public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+            //{
+            //    if (property.Value == null)
+            //        return base.ConvertDbToEditor(property, propertyType, dataTypeService);
+
+            //    var asString = property.Value.ToString();
+
+            //    //if it's json notation
+            //    if (asString.DetectIsJson())
+            //    {
+            //        var json = JsonConvert.DeserializeObject<JArray>(asString);
+
+            //        //return a new string array that is html encoded
+            //        return json.Select(x => WebUtility.HtmlEncode(x.Value<string>()));
+            //    }
+
+            //    //it's csv:
+            //    var parts = asString.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            //    return parts.Select(WebUtility.HtmlEncode);
+            //}            
+
             /// <summary>
             /// This needs to return IEnumerable{string}
             /// </summary>
@@ -61,14 +92,12 @@ namespace Umbraco.Web.PropertyEditors
             public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
             {
                 var json = editorValue.Value as JArray;
-                return json == null 
-                    ? null 
+                return json == null
+                    ? null
                     : json.Select(x => x.Value<string>()).Where(x => x.IsNullOrWhiteSpace() == false)
-                        //First we will decode it as html because we know that if this is not a malicious post that the value is
-                        // already Html encoded by the tags JavaScript controller. Then we'll re-Html Encode it to ensure that in case this
-                        // is a malicious post (i.e. someone is submitting data manually by modifying the request).
-                        .Select(WebUtility.HtmlDecode)
-                        .Select(WebUtility.HtmlEncode);
+                        //We know that the editor will html encode each value but we don't want to persist it that way, we want to persist the raw
+                        //value, so we'll html decode it to be stored.
+                        .Select(WebUtility.HtmlDecode);
             }
 
             /// <summary>
