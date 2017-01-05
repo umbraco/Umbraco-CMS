@@ -2,7 +2,7 @@
 
 	<div class="umb-control-group umb-querybuilder">
 
-		<div class="row">
+        <div class="row">
 			<div class="query-items">
 				
 				<span>I want</span>
@@ -67,15 +67,21 @@
 					</ul>
 				</div>
 
-				<!-- Filter term types  (string, int, date) -->
-				<input type="text" ng-show="filter.term.appliesTo[0] === 'string'" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
-				<input type="number" ng-show="filter.term.appliesTo[0] === 'int'" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
-				<span ng-show="filter.term.appliesTo[0] === 'datetime'">
-					<umb-date-time-picker
-						options="vm.datePickerConfig"
-						on-change="vm.datePickerChange(event, filter)">
-					</umb-date-time-picker>
-				</span>
+                <span ng-switch="filter.term.appliesTo[0]">
+
+                    <!-- Filter term types  (string, int, date) -->
+                    <input type="text" ng-switch-when="string" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
+                    <input type="number" ng-switch-when="int" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
+
+                    <span ng-switch-when="datetime">
+                        <umb-date-time-picker options="vm.datePickerConfig"
+                                              on-change="vm.datePickerChange(event, filter)">
+                        </umb-date-time-picker>
+                    </span>
+
+                </span>
+
+				
 				
 				<a href ng-click="vm.addFilter(vm.query)">
 					<i class="icon-add"></i>
@@ -125,7 +131,7 @@
 
 		<pre>
 {{model.result.queryExpression}}
-		</pre>
+        </pre>
 
 	</div>
 
