@@ -12,33 +12,7 @@ angular.module("umbraco")
             $scope.isLoading = false;
 
             //load current value
-
-            if ($scope.model.value) {
-                if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
-                    //it is csv
-                    if (!$scope.model.value) {
-                        $scope.model.value = [];
-                    }
-                    else if(angular.isString($scope.model.value) && $scope.model.value.length > 0) {
-                        $scope.model.value = $scope.model.value.split(",");
-                    }
-                }
-                else if ($scope.model.config.storageType && $scope.model.config.storageType === "Json" && angular.isString($scope.model.value) && !$scope.model.value.detectIsJson()) {
-                    //somehow data may be corrupted, in which case if the storage is json and the value is not empty and the
-                    //value is not json, then we need to 'fix' it. maybe it was CSV and then converted to JSON
-                    $scope.model.value = $scope.model.value.split(",");
-                }
-
-                //We must ensure that each item is Html Encoded and we must also ensure they are html encoded the same way, 
-                // for example, if we html encode them on the server before being sent here the encoding will vary slightly because ASP.NET
-                // and JQuery encoding operate slightly differently depending on the chars, so we need to html encode here
-                $scope.model.value = _.map($scope.model.value, function (i) {
-                    return i.htmlEncode();
-                });
-            }
-            else {
-                $scope.model.value = [];
-            }
+            initializeModelValue();
 
             // Method required by the valPropertyValidator directive (returns true if the property editor has at least one tag selected)
             $scope.validateMandatory = function () {
@@ -98,16 +72,37 @@ angular.module("umbraco")
                 //update the display val again if it has changed from the server
                 $scope.model.value = newVal;
 
-                if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
-                    //it is csv
-                    if (!$scope.model.value) {
-                        $scope.model.value = [];
+                initializeModelValue();
+            };
+
+            function initializeModelValue() {
+                if ($scope.model.value) {
+                    if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
+                        //it is csv
+                        if (!$scope.model.value) {
+                            $scope.model.value = [];
+                        }
+                        else if (angular.isString($scope.model.value) && $scope.model.value.length > 0) {
+                            $scope.model.value = $scope.model.value.split(",");
+                        }
                     }
-                    else {
+                    else if ($scope.model.config.storageType && $scope.model.config.storageType === "Json" && angular.isString($scope.model.value) && !$scope.model.value.detectIsJson()) {
+                        //somehow data may be corrupted, in which case if the storage is json and the value is not empty and the
+                        //value is not json, then we need to 'fix' it. maybe it was CSV and then converted to JSON
                         $scope.model.value = $scope.model.value.split(",");
                     }
+
+                    //We must ensure that each item is Html Encoded and we must also ensure they are html encoded the same way, 
+                    // for example, if we html encode them on the server before being sent here the encoding will vary slightly because ASP.NET
+                    // and JQuery encoding operate slightly differently depending on the chars, so we need to html encode here
+                    $scope.model.value = _.map($scope.model.value, function (i) {
+                        return i.htmlEncode();
+                    });
                 }
-            };
+                else {
+                    $scope.model.value = [];
+                }
+            }
 
             //configure the tags data source
 
@@ -126,7 +121,7 @@ angular.module("umbraco")
             // helper method to remove current tags
             function removeCurrentTagsFromSuggestions(suggestions) {
                 return $.grep(suggestions, function (suggestion) {
-                    return ($.inArray(suggestion.value, $scope.model.value) === -1);
+                    return ($.inArray(suggestion.value.htmlEncode(), $scope.model.value) === -1);
                 });
             }
 
