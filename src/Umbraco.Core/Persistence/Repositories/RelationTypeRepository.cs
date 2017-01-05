@@ -44,6 +44,17 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
+        public IRelationType Get(Guid id)
+        {
+            // use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Key == id);
+        }
+
+        public bool Exists(Guid id)
+        {
+            return Get(id) != null;
+        }
+
         protected override IEnumerable<IRelationType> PerformGetAll(params int[] ids)
         {
             var sql = GetBaseQuery(false);
@@ -55,6 +66,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var dtos = Database.Fetch<RelationTypeDto>(sql);
             var factory = new RelationTypeFactory();
             return dtos.Select(x => DtoToEntity(x, factory));
+        }
+
+        public IEnumerable<IRelationType> GetAll(params Guid[] ids)
+        {
+            // should not happen due to the cache policy
+            if (ids.Any())
+                throw new NotImplementedException();
+
+            return GetAll(new int[0]);
         }
 
         protected override IEnumerable<IRelationType> PerformGetByQuery(IQuery<IRelationType> query)

@@ -130,8 +130,13 @@ namespace Umbraco.Core.Models
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.DataTypeContainer)]
         [FriendlyName("Data Type Container")]
-        DataTypeContainer
+        DataTypeContainer,
 
-
+        /// <summary>
+        /// Relation type
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.RelationType)]
+        [FriendlyName("Relation Type")]
+        RelationType
     }
 }
