@@ -168,7 +168,12 @@ namespace UmbracoExamine
 
             base.Initialize(name, config);
 
-            if (config["useTempStorage"] != null)
+            //NOTES: useTempStorage is obsolete, tempStorageDirectory is obsolete, both have been superceded by Examine Core's IDirectoryFactory
+            //       tempStorageDirectory never actually got finished in Umbraco Core but accidentally got shipped (it's only enabled on the searcher
+            //       and not the indexer). So this whole block is just legacy
+
+            //detect if a dir factory has been specified, if so then useTempStorage will not be used (deprecated)
+            if (config["directoryFactory"] == null && config["useTempStorage"] != null)
             {
                 var fsDir = base.GetLuceneDirectory() as FSDirectory;
                 if (fsDir != null)
