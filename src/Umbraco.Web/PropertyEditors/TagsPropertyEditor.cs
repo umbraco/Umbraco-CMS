@@ -53,35 +53,7 @@ namespace Umbraco.Web.PropertyEditors
             public TagPropertyValueEditor(PropertyValueEditor wrapped)
                 : base(wrapped)
             {
-            }
-
-            ///// <summary>
-            ///// We're going to ensure that the values returned for the property editor are HTML encoded
-            ///// </summary>
-            ///// <param name="property"></param>
-            ///// <param name="propertyType"></param>
-            ///// <param name="dataTypeService"></param>
-            ///// <returns></returns>
-            //public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
-            //{
-            //    if (property.Value == null)
-            //        return base.ConvertDbToEditor(property, propertyType, dataTypeService);
-
-            //    var asString = property.Value.ToString();
-
-            //    //if it's json notation
-            //    if (asString.DetectIsJson())
-            //    {
-            //        var json = JsonConvert.DeserializeObject<JArray>(asString);
-
-            //        //return a new string array that is html encoded
-            //        return json.Select(x => WebUtility.HtmlEncode(x.Value<string>()));
-            //    }
-
-            //    //it's csv:
-            //    var parts = asString.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-            //    return parts.Select(WebUtility.HtmlEncode);
-            //}            
+            }        
 
             /// <summary>
             /// This needs to return IEnumerable{string}
