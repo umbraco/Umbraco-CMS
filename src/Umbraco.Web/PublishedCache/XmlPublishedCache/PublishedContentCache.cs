@@ -172,15 +172,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 {
                     var e = n as XmlElement;
                     if (e == null) continue;
-                    
+
                     var id = NavigateElementRoute(e, urlParts);
                     if (id > 0) return id;
                 }
 
-                if (urlParts.Length == 1)
-                    return NavigateElementRoute(elt, urlParts);
-
-                return -1;
+                if (urlParts.Length > 1)
+                    return -1;
             }
 
             return NavigateElementRoute(elt, urlParts);
@@ -205,7 +203,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 {
                     var child = o as XmlElement;
                     if (child == null) continue;
-                    
+
                     var noNode = UseLegacySchema
                         ? child.Name != "node"
                         : child.GetAttributeNode("isDoc") == null;
