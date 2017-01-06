@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -18,7 +16,6 @@ using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
 using Umbraco.Core.Services;
 using GlobalSettings = umbraco.GlobalSettings;
-using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -83,7 +80,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 && DomainHelper.ExistsDomainInPath(umbracoContext.Application.Services.DomainService.GetAll(false), content.Path, domainRootNodeId) == false;
 
             if (deepest)
-                _routesCache.Store(content.Id, route);
+                _routesCache.Store(content.Id, route, true); // trusted route
         }
 
         public virtual string GetRouteById(UmbracoContext umbracoContext, bool preview, int contentId)
@@ -98,9 +95,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // else actually determine the route
             route = DetermineRouteById(umbracoContext, preview, contentId);
 
-            // may be null if node not found
-            // do NOT cache the route: it may be colliding - and since checking for a collision implies
-            // doing one DetermineIdByRoute anyways we are not causing any perf penalty by not caching
+            // node not found
+            if (route == null)
+                return null;
+
+            // cache the route BUT do NOT trust it as it can be a colliding route
+            // meaning if we GetRouteById again, we'll get it from cache, but it
+            // won't be used for inbound routing
+            if (preview == false)
+                _routesCache.Store(contentId, route, false);
+
             return route;
         }
 

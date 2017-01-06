@@ -7,6 +7,10 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
+    // purpose: test the values returned by PublishedContentCache.GetRouteById
+    // and .GetByRoute (no caching at all, just routing nice urls) including all
+    // the quirks due to hideTopLevelFromPath and backward compatibility.
+
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
     public class NiceUrlRoutesTests : BaseRoutingTest
@@ -85,7 +89,7 @@ GetByRoute(route, hide = null):
 	# there are not other reason not to cache it
 
 	if content and no domain between root and content:
-		cache route
+		cache route (as trusted)
 
 	return content
 
@@ -136,7 +140,11 @@ GetRouteById(id):
 
 	# never cache the route, it may be colliding
 
-	return DetermineRouteById(id)
+	route = DetermineRouteById(id)
+    if route:
+        cache route (as not trusted)
+
+    return route
 
 
 
@@ -180,8 +188,6 @@ DetermineRouteById(id):
          *       C 2005
          *       E 2006
          *
-         * And the tests should verify all the quirks that are due to
-         * hideTopLevelFromPath
          */
 
         [TestCase(1000, false, "/a")]
@@ -214,8 +220,38 @@ DetermineRouteById(id):
 
             SettingsForTests.HideTopLevelNodeFromPath = hide;
 
-            var route = cache.GetRouteById(umbracoContext, false, id);
+            const bool preview = true; // make sure we don't cache
+            var route = cache.GetRouteById(umbracoContext, preview, id);
             Assert.AreEqual(expected, route);
+        }
+
+        [Test]
+        public void GetRouteByIdCache()
+        {
+            var umbracoContext = GetUmbracoContext("/test", 0);
+            var cache = umbracoContext.ContentCache.InnerCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+
+            SettingsForTests.HideTopLevelNodeFromPath = false;
+
+            // make sure we cache
+            PublishedContentCache.UnitTesting = false;
+            const bool preview = false;
+
+            var route = cache.GetRouteById(umbracoContext, preview, 1000);
+            Assert.AreEqual("/a", route);
+
+            // GetRouteById registers a non-trusted route, which is cached for
+            // id -> route queries (fast GetUrl) but *not* for route -> id
+            // queries (safe inbound routing)
+
+            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
+            Assert.AreEqual(1, cachedRoutes.Count);
+            Assert.IsTrue(cachedRoutes.ContainsKey(1000));
+            Assert.AreEqual("/a", cachedRoutes[1000]);
+
+            var cachedIds = cache.RoutesCache.GetCachedIds();
+            Assert.AreEqual(0, cachedIds.Count);
         }
 
         [TestCase("/", false, 1000)]
@@ -241,7 +277,8 @@ DetermineRouteById(id):
 
             SettingsForTests.HideTopLevelNodeFromPath = hide;
 
-            var content = cache.GetByRoute(umbracoContext, false, route);
+            const bool preview = true; // make sure we don't cache
+            var content = cache.GetByRoute(umbracoContext, preview, route);
             if (expected < 0)
             {
                 Assert.IsNull(content);
@@ -251,6 +288,38 @@ DetermineRouteById(id):
                 Assert.IsNotNull(content);
                 Assert.AreEqual(expected, content.Id);
             }
+        }
+
+        [Test]
+        public void GetByRouteCache()
+        {
+            var umbracoContext = GetUmbracoContext("/test", 0);
+            var cache = umbracoContext.ContentCache.InnerCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+
+            SettingsForTests.HideTopLevelNodeFromPath = false;
+
+            // make sure we cache
+            PublishedContentCache.UnitTesting = false;
+            const bool preview = false;
+
+            var content = cache.GetByRoute(umbracoContext, preview, "/a/b/c");
+            Assert.IsNotNull(content);
+            Assert.AreEqual(1002, content.Id);
+
+            // GetByRoute registers a trusted route, which is cached both for
+            // id -> route queries (fast GetUrl) and for route -> id queries
+            // (fast inbound routing)
+
+            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
+            Assert.AreEqual(1, cachedRoutes.Count);
+            Assert.IsTrue(cachedRoutes.ContainsKey(1002));
+            Assert.AreEqual("/a/b/c", cachedRoutes[1002]);
+
+            var cachedIds = cache.RoutesCache.GetCachedIds();
+            Assert.AreEqual(1, cachedIds.Count);
+            Assert.IsTrue(cachedIds.ContainsKey("/a/b/c"));
+            Assert.AreEqual(1002, cachedIds["/a/b/c"]);
         }
     }
 }

@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Routing
         protected override string GetXmlContent(int templateId)
         {
             return @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
 ]>
@@ -302,10 +302,20 @@ namespace Umbraco.Tests.Routing
 
             var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
 
-            // GetUrl does not write to cache
-            Assert.AreEqual(0, cachedRoutes.Count);
+            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
+            Assert.AreEqual(7, cachedRoutes.Count);
+
+            var cachedIds = cache.RoutesCache.GetCachedIds();
+            Assert.AreEqual(0, cachedIds.Count);
+
+            CheckRoute(cachedRoutes, cachedIds, 1001, "1001/");
+            CheckRoute(cachedRoutes, cachedIds, 10011, "10011/");
+            CheckRoute(cachedRoutes, cachedIds, 100111, "10011/1001-1-1");
+            CheckRoute(cachedRoutes, cachedIds, 10012, "10012/");
+            CheckRoute(cachedRoutes, cachedIds, 100121, "10012/1001-2-1");
+            CheckRoute(cachedRoutes, cachedIds, 10013, "1001/1001-3");
+            CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
 
             // use the cache
             Assert.AreEqual("/", routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false));
@@ -319,12 +329,11 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual("http://domain1.com/fr/1001-2-1/", routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain2.com"), false));
         }
 
-        void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
+        private static void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
         {
             Assert.IsTrue(routes.ContainsKey(id));
             Assert.AreEqual(route, routes[id]);
-            Assert.IsTrue(ids.ContainsKey(route));
-            Assert.AreEqual(id, ids[route]);
+            Assert.IsFalse(ids.ContainsKey(route));
         }
 
         [Test]

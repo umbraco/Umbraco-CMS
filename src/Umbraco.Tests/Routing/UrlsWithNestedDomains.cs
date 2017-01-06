@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Routing
 		public void DoNotPolluteCache()
 		{
             SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains            
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
 
             var settings = SettingsForTests.GenerateMockSettings();
             var request = Mock.Get(settings.RequestHandler);
@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Routing
 
 			RoutingContext routingContext;
 			string url = "http://domain1.com/1001-1/1001-1-1";
-			
+
 			// get the nice url for 100111
 		    routingContext = GetRoutingContext(url, 9999, umbracoSettings: settings);
 			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.UrlProvider.GetUrl(100111, true));
@@ -44,8 +44,8 @@ namespace Umbraco.Tests.Routing
 			// check that the proper route has been cached
 		    var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-		    //var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
-			//Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
+		    var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
+			Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
 
 			// route a rogue url
 			url = "http://domain1.com/1001-1/1001-1-1";
@@ -61,9 +61,9 @@ namespace Umbraco.Tests.Routing
 			Assert.AreEqual(100111, pcr.PublishedContent.Id);
 
 			// has the cache been polluted?
-            //cachedRoutes = cache.RoutesCache.GetCachedRoutes();
-			//Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]); // no
-			////Assert.AreEqual("1001/1001-1/1001-1-1", cachedRoutes[100111]); // yes
+            cachedRoutes = cache.RoutesCache.GetCachedRoutes();
+			Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]); // no
+			//Assert.AreEqual("1001/1001-1/1001-1-1", cachedRoutes[100111]); // yes
 
 			// what's the nice url now?
 			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.UrlProvider.GetUrl(100111)); // good
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Routing
 		protected override string GetXmlContent(int templateId)
 		{
 			return @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
 ]>
