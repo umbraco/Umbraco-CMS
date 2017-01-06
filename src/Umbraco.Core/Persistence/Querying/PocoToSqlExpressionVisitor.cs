@@ -14,6 +14,14 @@ namespace Umbraco.Core.Persistence.Querying
     {
         private readonly Database.PocoData _pd;
 
+
+        public PocoToSqlExpressionVisitor(ISqlSyntaxProvider syntaxProvider)
+            : base(syntaxProvider)
+        {
+            
+        }
+
+        [Obsolete("Use the overload the specifies a SqlSyntaxProvider")]
         public PocoToSqlExpressionVisitor()
             : base(SqlSyntaxContext.SqlSyntaxProvider)
         {

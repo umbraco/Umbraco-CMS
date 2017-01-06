@@ -27,9 +27,17 @@ namespace Umbraco.Core.Persistence
             return sql.From(sqlSyntax.GetQuotedTableName(tableName));
         }
 
+        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql Where<T>(this Sql sql, Expression<Func<T, bool>> predicate)
         {
             var expresionist = new PocoToSqlExpressionVisitor<T>();
+            var whereExpression = expresionist.Visit(predicate);
+            return sql.Where(whereExpression, expresionist.GetSqlParameters());
+        }
+
+        public static Sql Where<T>(this Sql sql, Expression<Func<T, bool>> predicate, ISqlSyntaxProvider sqlSyntax)
+        {
+            var expresionist = new PocoToSqlExpressionVisitor<T>(sqlSyntax);
             var whereExpression = expresionist.Visit(predicate);
             return sql.Where(whereExpression, expresionist.GetSqlParameters());
         }
