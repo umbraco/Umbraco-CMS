@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Xml;
@@ -11,6 +12,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -714,7 +716,12 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetDescendants(IContent content)
         {
-            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
+            //This is a check to ensure that the path is correct for this entity to avoid problems like: http://issues.umbraco.org/issue/U4-9336 due to data corruption
+            if (content.ValidatePath() == false)
+                throw new InvalidDataException(string.Format("The content item {0} has an invalid path: {1} with parentID: {2}", content.Id, content.Path, content.ParentId));
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 var pathMatch = content.Path + ",";
                 var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(pathMatch) && x.Id != content.Id);
@@ -996,6 +1003,10 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                //Hack: this ensures that the entity's path is valid and if not it fixes/persists it
+                //see: http://issues.umbraco.org/issue/U4-9336
+                content.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);
+
                 var originalPath = content.Path;
 
                 if (Trashing.IsRaisedEventCancelled(
@@ -1683,16 +1694,16 @@ namespace Umbraco.Core.Services
         /// <returns>True if sorting succeeded, otherwise False</returns>
         public bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
         {
+            var asArray = items.ToArray();
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(items), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(asArray), this))
                     return false;
             }
 
             var shouldBePublished = new List<IContent>();
             var shouldBeSaved = new List<IContent>();
-
-            var asArray = items.ToArray();
+            
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
@@ -1812,6 +1823,23 @@ namespace Umbraco.Core.Services
 
         #region Private Methods
 
+        /// <summary>
+        /// Hack: This is used to fix some data if an entity's properties are invalid/corrupt
+        /// </summary>
+        /// <param name="content"></param>
+        private void QuickUpdate(IContent content)
+        {
+            if (content == null) throw new ArgumentNullException("content");
+            if (content.HasIdentity == false) throw new InvalidOperationException("Cannot update an entity without an Identity");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                repository.AddOrUpdate(content);                
+                uow.Commit();
+            }
+        }
+
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
             var uow = UowProvider.GetUnitOfWork();
@@ -1919,6 +1947,10 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                //Hack: this ensures that the entity's path is valid and if not it fixes/persists it
+                //see: http://issues.umbraco.org/issue/U4-9336
+                content.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);
+
                 var result = new List<Attempt<PublishStatus>>();
 
                 //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
