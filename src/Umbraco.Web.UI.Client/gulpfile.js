@@ -90,7 +90,7 @@ var sources = {
     }
 };
 
-var root = "../__BUILD/umbraco/";
+var root = "../Umbraco.Web.UI/umbraco/";
 var targets = {
     js: "js",
     lib: "lib",
