@@ -234,13 +234,28 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-		/// <summary>
-		/// Dispose any disposable properties
-		/// </summary>
-		/// <remarks>
-		/// Dispose the unit of work
-		/// </remarks>
-		protected override void DisposeResources()
+        public long GetFileSize(string filename)
+        {
+            if (FileSystem.FileExists(filename) == false)
+                return -1;
+
+            try
+            {
+                return FileSystem.GetSize(filename);
+            }
+            catch
+            {
+                return -1; // deal with race conds
+            }
+        }
+
+        /// <summary>
+        /// Dispose any disposable properties
+        /// </summary>
+        /// <remarks>
+        /// Dispose the unit of work
+        /// </remarks>
+        protected override void DisposeResources()
 		{
 			_work.DisposeIfDisposable();
 		}

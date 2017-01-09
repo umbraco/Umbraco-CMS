@@ -513,6 +513,11 @@ namespace Umbraco.Core.Persistence.Repositories
             GetFileSystem(filepath).AddFile(filepath, content, true);
         }
 
+        public long GetFileSize(string filepath)
+        {
+            return GetFileSystem(filepath).GetSize(filepath);
+        }
+
         private IFileSystem GetFileSystem(string filepath)
         {
             var ext = Path.GetExtension(filepath);

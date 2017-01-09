@@ -38,13 +38,12 @@ namespace Umbraco.Core.IO
         }
 
         // GetSize has been added to IFileSystem2 but not IFileSystem
-        // this is implementing GetSize for IFileSystem, the old way
         public static long GetSize(this IFileSystem fs, string path)
         {
-            // if we reach this point, fs is *not* IFileSystem2
-            // so it's not FileSystemWrapper nor shadow nor anything we know
-            // so... fall back to the old & inefficient method
+            var fs2 = fs as IFileSystem2;
+            if (fs2 != null) return fs2.GetSize(path);
 
+            // this is implementing GetSize for IFileSystem, the old way
             using (var file = fs.OpenFile(path))
             {
                 return file.Length;
