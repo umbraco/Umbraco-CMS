@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "name")]
         public string Name { get; set; }
 
-        [RequiredForPersistence]
+        [Required]
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
 
