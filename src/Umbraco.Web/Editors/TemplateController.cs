@@ -92,9 +92,6 @@ namespace Umbraco.Web.Editors
             //Checking the submitted is valid with the Required attributes decorated on the ViewModel
             if (ModelState.IsValid == false)
             {
-                //Unsure of the standard or set way to do this?!
-                //throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("MISSING NAME"));
-
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
