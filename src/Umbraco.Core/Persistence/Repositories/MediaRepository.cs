@@ -324,6 +324,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            nodeDto.ValidatePathWithException();
             Database.Update(nodeDto);
 
             //Update entity with correct values
@@ -397,6 +398,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Updates the (base) node data - umbracoNode
             var nodeDto = dto.ContentDto.NodeDto;
+            nodeDto.ValidatePathWithException();
             var o = Database.Update(nodeDto);
 
             //Only update this DTO if the contentType has actually changed
