@@ -167,23 +167,34 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         }
     }
 
-   //update all of the system includeProperties to enable sorting
+   // Update includeProperties to enable sorting where it can be supported
    _.each($scope.options.includeProperties, function (e, i) {
 
-        //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
+        // NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
         // to do that, we'd need to update the base query for content to include the content type alias column
         // which requires another join and would be slower. BUT We are doing this for members so not sure it makes a diff?
-        if (e.alias != "contentTypeAlias") {
-            e.allowSorting = true;
+        if (e.alias === "contentTypeAlias") {
+            e.allowSorting = false;
         }
 
         // Another special case for members, only fields on the base table (cmsMember) can be used for sorting
-        if (e.isSystem && $scope.entityType == "member") {
-            e.allowSorting = e.alias == 'username' || e.alias == 'email';
+        else if (e.isSystem && $scope.entityType === "member") {
+            e.allowSorting = e.alias === 'username' || e.alias === 'email';
         }
 
+        // For all other columns, allow sorting at this stage only for system properties.
+        // For custom properties we'll only allow sorting from whitelisted data types.  For others not white-listed, 
+        // sorting may be expensive (e.g. those based on NText) or meaningless to sort on (e.g. any raw values 
+        // that store JSON, picked node ids or list pre-value ids).
+        // At this stage though we don't know the data type for the column so we'll need to defer enabling the 
+        // columns we can sort on until we pull back some data.
+        else  {
+            e.allowSorting = e.isSystem;
+        }
+
+        // Localize the headers where we can
         if (e.isSystem) {
-            //localize the header
+            
             var key = getLocalizedKey(e.alias);
             localizationService.localize(key).then(function (v) {
                 e.header = v;
@@ -264,6 +275,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          // Update all values for display
          if ($scope.listViewResultSet.items) {
 
+            // Update column sort enabling for custom columns that we can sort on.
+            if ($scope.listViewResultSet.items.length > 0) {
+                enableSortingOnCustomColumns($scope.listViewResultSet.items[0]);
+            }
+
             // For content, track any values that are referenced node Ids, or referenced pre-value Ids (as later
             // we want to be able to look-up the node names and/or pre-value labels to display instead of the Ids)
             var referencedNodeIds = [];
@@ -326,6 +342,39 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
       });
    };
+
+   /** Updates the column list to allow sorting on white-listed data-types that we determine from the first row
+       of data returned.  
+       For custom properties we'll only allow sorting from whitelisted data types.  For others not white-listed, 
+       sorting may be expensive (e.g. those based on NText) or meaningless to sort on (e.g. any raw values 
+       that store JSON, picked node ids or list pre-value ids). */
+   function enableSortingOnCustomColumns(dataRow) {
+       var editor;
+       var allowedEditors = ['Umbraco.Date',
+            'Umbraco.DateTime',
+            'Umbraco.Decimal',
+            'Umbraco.EmailAddress',
+            'Umbraco.Integer',
+            'Umbraco.Slider',
+            'Umbraco.Tags',
+            'Umbraco.Textbox',
+            'Umbraco.TrueFalse'];
+
+       _.each($scope.options.includeProperties, function (e, i) {
+            var alias = e.alias;
+            editor = '';
+            if (!e.isSystem) {
+                for (var k = 0; k < dataRow.properties.length; k++) {
+                    if (dataRow.properties[k].alias === alias) {
+                        editor = dataRow.properties[k].editor;
+                        break;
+                    }
+                }
+            }
+
+            e.allowSorting = allowedEditors.indexOf(editor) > -1;
+       });
+   }
 
    var searchListView = _.debounce(function () {
       $scope.$apply(function () {
