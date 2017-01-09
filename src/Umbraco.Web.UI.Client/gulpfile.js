@@ -1,10 +1,12 @@
 ﻿var gulp = require('gulp');
-var watch = require("gulp-watch");
-var concat = require("gulp-concat");
-var rename = require("gulp-rename");
-var wrap = require("gulp-wrap");
+var watch = require('gulp-watch');
+var concat = require('gulp-concat');
+var rename = require('gulp-rename');
+var wrap = require('gulp-wrap');
 
-var _ = require("lodash");
+var _ = require('lodash');
+var MergeStream = require('merge-stream');
+
 
 //Less + css
 var postcss = require('gulp-postcss');
@@ -17,17 +19,17 @@ var cssnano = require('cssnano');
 Helper functions
 ***************************************************************/
 function processJs(files, out) {
-    console.log("Compiling JS:" + files + " to " + out);
-
+    
     return gulp.src(files)
      .pipe(concat(out))
      .pipe(wrap('(function(){\n"use strict";\n<%= contents %>\n})();'))
      .pipe(gulp.dest(root + targets.js));
+
+     console.log(out + " compiled");
 }
 
 function processLess(files, out) {
-    console.log("Compiling LESS:" + files + " to " + out);
-
+   
     var processors = [
          autoprefixer,
          cssnano
@@ -38,6 +40,8 @@ function processLess(files, out) {
         .pipe(postcss(processors))
         .pipe(rename(out))
         .pipe(gulp.dest(root + targets.css));
+    
+    console.log(out + " compiled");
 }
 
 /***************************************************************
@@ -60,7 +64,7 @@ var sources = {
         preview: { files: ["src/canvasdesigner/**/*.js"], out: "umbraco.canvasdesigner.js" },
         installer: { files: ["src/installer/**/*.js"], out: "umbraco.installer.js" },
         
-        controllers: { files: ["src/views/**/*.controller.js"], out: "umbraco.controllers.js" },
+        controllers: { files: ["src/{views,controllers}/**/*.controller.js"], out: "umbraco.controllers.js" },
         directives: { files: ["src/common/directives/**/*.js"], out: "umbraco.directives.js" },
         filters: { files: ["src/common/filters/**/*.js"], out: "umbraco.filters.js" },
         resources: { files: ["src/common/resources/**/*.js"], out: "umbraco.resources.js" },
@@ -111,28 +115,43 @@ gulp.task('dependencies', function () {
     //bower component specific copy rules
     //this is to patch the sometimes wonky rules these libs are distrbuted under
 
+    //as we do multiple things in this task, we merge the multiple streams
+    var stream = new MergeStream();
+
     //Tinymce
-    gulp.src("bower_components/tinymce/plugins/**")
-        .pipe(gulp.dest(root + targets.lib + "/tinymce/plugins/"));
+    stream.add(
+            gulp.src("bower_components/tinymce/plugins/**")
+                .pipe(gulp.dest(root + targets.lib + "/tinymce/plugins/"))
+        );
 
     //font-awesome
-    gulp.src("bower_components/font-awesome/{fonts,css}/*")
-        .pipe(gulp.dest(root + targets.lib + "/font-awesome"));
+    stream.add(
+            gulp.src("bower_components/font-awesome/{fonts,css}/*")
+                .pipe(gulp.dest(root + targets.lib + "/font-awesome"))
+        );
 
     //copy over libs which are not on bower (/lib) and 
     //libraries that have been managed by bower-installer (/lib-bower)
-    gulp.src(sources.globs.lib)
-     .pipe(gulp.dest(root + targets.lib));
+    stream.add(
+         gulp.src(sources.globs.lib)
+            .pipe(gulp.dest(root + targets.lib))
+        );
 
     //Copies all static assets into /root / assets folder 
     //css, fonts and image files
-    gulp.src(sources.globs.assets)
-        .pipe(gulp.dest(root + targets.assets));
+    stream.add( 
+            gulp.src(sources.globs.assets)
+                .pipe(gulp.dest(root + targets.assets))
+        );
 
     // Copies all the less files related to the preview into their folder
     //these are not pre-processed as preview has its own less combiler client side
-    gulp.src("src/canvasdesigner/editors/*.less")
-        .pipe(gulp.dest(root + targets.assets + "/less"));     
+    stream.add( 
+            gulp.src("src/canvasdesigner/editors/*.less")
+                .pipe(gulp.dest(root + targets.assets + "/less"))
+        );
+
+    return stream;
 });
 
 
@@ -140,57 +159,95 @@ gulp.task('dependencies', function () {
  * Copies all angular JS files into their seperate umbraco.*.js file
  **************************/
 gulp.task('js', function () { 
+  
+    //we run multiple streams, so merge them all together
+    var stream = new MergeStream();
 
-  gulp.src(sources.globs.js)
-     .pipe(gulp.dest(root + targets.js));
+    stream.add(
+        gulp.src(sources.globs.js)
+            .pipe(gulp.dest(root + targets.js))
+        );
 
-    return _.forEach(sources.js, function (group) {
-        processJs(group.files, group.out);
-    });
+     _.forEach(sources.js, function (group) {
+        stream.add (processJs(group.files, group.out) );
+     });
+
+     return stream;
 });
 
 gulp.task('less', function () {
     
-    gulp.src(sources.globs.assets)
-     .pipe(gulp.dest(targets.assets));
+    var stream = new MergeStream();
 
-    return _.forEach(sources.less, function (group) {
-        processLess(group.files, group.out);
+    _.forEach(sources.less, function (group) {
+        stream.add( processLess(group.files, group.out) );
     });
+
+    return stream;
 });
 
 
 gulp.task('views', function () {
 
-    return _.forEach(sources.views, function (group) {
-        gulp.src(group.files)
-            .pipe(gulp.dest(root + targets.views + group.folder));
+    var stream = new MergeStream();
+
+    _.forEach(sources.views, function (group) {
+
+        stream.add (
+            gulp.src(group.files)
+                .pipe(gulp.dest(root + targets.views + group.folder))
+        );
+    
     });
    
+    return stream;
 });
 
 
 gulp.task('watch', defaultTasks, function () {
 
+    var stream = new MergeStream();
+
     //Setup a watcher for all groups of javascript files
     _.forEach(sources.js, function (group) {
+
         if(group.watch !== false){
-            watch(group.files, { ignoreInitial: true }, function () {
-                processJs(group.files, group.out);
-            });
+
+            stream.add( 
+
+                watch(group.files, { ignoreInitial: true }, function (file) {
+
+                    console.info(file.path + " has changed, added to:  " + group.out);
+                    processJs(group.files, group.out);
+                
+                })
+
+            );
+
         }
+
     });
 
-    //watch all less files and trigger the less task
-    watch(sources.globs.less, { ignoreInitial: true }, function () {
-        gulp.run(['less']);
-    });
+    stream.add( 
+        //watch all less files and trigger the less task
+        watch(sources.globs.less, { ignoreInitial: true }, function () {
+            gulp.run(['less']);
+        })
+
+    );
+
 
     //watch all views - copy single file changes
-    watch(sources.globs.views)
-        .pipe(gulp.dest(root + targets.views));
+    stream.add( 
+        watch(sources.globs.views)
+        .pipe(gulp.dest(root + targets.views))
+    );
 
     //watch all app js files that will not be merged - copy single file changes
-    watch(sources.globs.js)
-        .pipe(gulp.dest(root + targets.js));    
+    stream.add( 
+        watch(sources.globs.js)
+        .pipe(gulp.dest(root + targets.js))
+    );
+
+    return stream;    
 });
