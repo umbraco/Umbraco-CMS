@@ -262,7 +262,7 @@ namespace Umbraco.Web.Editors
                             },
                             {
                                 "mediaTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
-                                    controller => controller.GetAllowedChildren(0))
+                                    controller => controller.GetAllowedChildren("0"))
                             },
                             {
                                 "macroApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MacroController>(
