@@ -359,6 +359,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                     controller => controller.GetAllHealthChecks())
+                            },
+                            {
+                                "codeFileApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CodeFileController>(
+                                    controller => controller.GetByPath("", ""))
                             }
                         }
                     },
