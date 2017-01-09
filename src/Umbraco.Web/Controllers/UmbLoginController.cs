@@ -11,11 +11,11 @@ namespace Umbraco.Web.Controllers
     public class UmbLoginController : SurfaceController
     {
         [HttpPost]
-        public ActionResult HandleLogin([Bind(Prefix="loginModel")]LoginModel model)
+        public ActionResult HandleLogin([Bind(Prefix = "loginModel")]LoginModel model)
         {
             if (ModelState.IsValid == false)
             {
-                return CurrentUmbracoPage();    
+                return CurrentUmbracoPage();
             }
 
             if (Members.Login(model.Username, model.Password) == false)
@@ -30,11 +30,20 @@ namespace Umbraco.Web.Controllers
             //if there is a specified path to redirect to then use it
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
-                return Redirect(model.RedirectUrl);
+                // validate the redirect url
+                if (Url.IsLocalUrl(model.RedirectUrl))
+                {
+                    return Redirect(model.RedirectUrl);
+                }
+                else
+                {
+                    // if it's not a local url we'll redirect to the root of the current site
+                    return Redirect(base.CurrentPage.Site().Url);
+                }
             }
 
             //redirect to current page by default
-            
+
             return RedirectToCurrentUmbracoPage();
             //return RedirectToCurrentUmbracoUrl();
         }

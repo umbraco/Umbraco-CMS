@@ -3,67 +3,37 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class LoggingElement : ConfigurationElement, ILoggingSection
+    internal class LoggingElement : UmbracoConfigurationElement, ILoggingSection
     {
         
         [ConfigurationProperty("autoCleanLogs")]
         internal InnerTextConfigurationElement<bool> AutoCleanLogs
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["autoCleanLogs"],
-                    //set the default
-                    false);            
-            }
+            get { return GetOptionalTextElement("autoCleanLogs", false); }
         }
 
         [ConfigurationProperty("enableLogging")]
         internal InnerTextConfigurationElement<bool> EnableLogging
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["enableLogging"],
-                    //set the default
-                    true);            
-            }
+            get { return GetOptionalTextElement("enableLogging", true); }
         }
 
         [ConfigurationProperty("enableAsyncLogging")]
         internal InnerTextConfigurationElement<bool> EnableAsyncLogging
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["enableAsyncLogging"],
-                    //set the default
-                    true);           
-            }
+            get { return GetOptionalTextElement("enableAsyncLogging", true); }
         }
 
         [ConfigurationProperty("cleaningMiliseconds")]
         internal InnerTextConfigurationElement<int> CleaningMiliseconds
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<int>(
-                    (InnerTextConfigurationElement<int>)this["cleaningMiliseconds"],
-                    //set the default
-                    -1);                      
-            }
+            get { return GetOptionalTextElement("cleaningMiliseconds", -1); }
         }
 
         [ConfigurationProperty("maxLogAge")]
         internal InnerTextConfigurationElement<int> MaxLogAge
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<int>(
-                    (InnerTextConfigurationElement<int>)this["maxLogAge"],
-                    //set the default
-                    -1);
-            }
+            get { return GetOptionalTextElement("maxLogAge", -1); }
         }
 
         [ConfigurationCollection(typeof(DisabledLogTypesCollection), AddItemName = "logTypeAlias")]

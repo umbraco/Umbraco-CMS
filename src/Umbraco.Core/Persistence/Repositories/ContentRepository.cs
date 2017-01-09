@@ -94,13 +94,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return ProcessQuery(sql);
         }
 
-        #endregion
-
-        #region Static Queries
-
-        private readonly IQuery<IContent> _publishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
-
-        #endregion
+        #endregion        
 
         #region Overrides of PetaPocoRepositoryBase<IContent>
 
@@ -348,6 +342,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            nodeDto.ValidatePathWithException();
             Database.Update(nodeDto);
 
             //Update entity with correct values
@@ -485,6 +480,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Updates the (base) node data - umbracoNode
             var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
+            nodeDto.ValidatePathWithException();
             var o = Database.Update(nodeDto);
 
             //Only update this DTO if the contentType has actually changed
@@ -857,7 +853,8 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
                 if (withCache)
                 {
                     var cached = RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
-                    if (cached != null && cached.Published)
+                    //only use this cached version if the dto returned is also the publish version, they must match
+                    if (cached != null && cached.Published && dto.Published)
                     {
                         content[i] = cached;
                         continue;

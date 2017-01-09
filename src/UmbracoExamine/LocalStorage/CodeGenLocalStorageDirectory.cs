@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Web;
 
@@ -11,6 +13,8 @@ namespace UmbracoExamine.LocalStorage
     /// This is the default implementation - but it comes with it's own limitations - the CodeGen folder is cleared whenever new
     /// DLLs are changed in the /bin folder (among other circumstances) which means the index would be re-synced (or rebuilt) there.
     /// </remarks>
+    [Obsolete("This has been superceded by IDirectoryFactory in Examine Core and should not be used")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class CodeGenLocalStorageDirectory : ILocalStorageDirectory
     {
         public DirectoryInfo GetLocalStorageDirectory(NameValueCollection config, string configuredPath)
