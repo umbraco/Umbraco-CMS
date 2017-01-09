@@ -85,6 +85,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LinqCastBenchmarks.cs" />
     <Compile Include="ModelToSqlExpressionHelperBenchmarks.cs" />
     <Compile Include="BulkInsertBenchmarks.cs" />
     <Compile Include="Program.cs" />

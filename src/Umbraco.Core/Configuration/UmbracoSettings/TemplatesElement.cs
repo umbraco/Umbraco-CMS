@@ -3,55 +3,31 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class TemplatesElement : ConfigurationElement, ITemplatesSection
+    internal class TemplatesElement : UmbracoConfigurationElement, ITemplatesSection
     {
         [ConfigurationProperty("useAspNetMasterPages")]
         internal InnerTextConfigurationElement<bool> UseAspNetMasterPages
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["useAspNetMasterPages"],
-                    //set the default
-                    true);
-            }
+            get { return GetOptionalTextElement("useAspNetMasterPages", true); }
         }
 
         [ConfigurationProperty("enableSkinSupport")]
         internal InnerTextConfigurationElement<bool> EnableSkinSupport
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["enableSkinSupport"],
-                    //set the default
-                    true);
-            }
+            get { return GetOptionalTextElement("enableSkinSupport", true); }
         }
 
         [ConfigurationProperty("defaultRenderingEngine", IsRequired = true)]
         internal InnerTextConfigurationElement<RenderingEngine> DefaultRenderingEngine
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<RenderingEngine>(
-                    (InnerTextConfigurationElement<RenderingEngine>)this["defaultRenderingEngine"],
-                    //set the default
-                    RenderingEngine.Mvc);
-            }
+            get { return GetOptionalTextElement("defaultRenderingEngine", RenderingEngine.Mvc); }
         }
 
         [Obsolete("This has no affect and will be removed in future versions")]
         [ConfigurationProperty("enableTemplateFolders")]
         internal InnerTextConfigurationElement<bool> EnableTemplateFolders
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["enableTemplateFolders"],
-                    //set the default
-                    false);
-            }
+            get { return GetOptionalTextElement("enableTemplateFolders", false); }
         }
 
         bool ITemplatesSection.UseAspNetMasterPages
