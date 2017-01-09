@@ -1361,6 +1361,11 @@ namespace Umbraco.Core.Services
             _mediaFileSystem.AddFile(filepath, stream, true);
         }
 
+        public long GetMediaFileSize(string filepath)
+        {
+            return _mediaFileSystem.GetSize(filepath);
+        }
+
         public void DeleteMediaFile(string filepath)
         {
             _mediaFileSystem.DeleteFile(filepath, true);

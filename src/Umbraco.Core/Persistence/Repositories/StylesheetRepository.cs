@@ -144,6 +144,20 @@ namespace Umbraco.Core.Persistence.Repositories
             FileSystem.AddFile(filepath, content, true);
         }
 
+        public long GetFileSize(string filepath)
+        {
+            if (FileSystem.FileExists(filepath) == false) return -1;
+
+            try
+            {
+                return FileSystem.GetSize(filepath);
+            }
+            catch
+            {
+                return -1; // deal with race conds
+            }
+        }
+
         #endregion
     }
 }
