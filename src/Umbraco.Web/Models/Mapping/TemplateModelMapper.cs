@@ -10,7 +10,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            config.CreateMap<ITemplate, TemplateDisplay>();
+            config.CreateMap<ITemplate, TemplateDisplay>()
+                .ForMember(x => x.Notifications, exp => exp.Ignore());
 
             config.CreateMap<TemplateDisplay, Template>()
                 .ForMember(x => x.Key, exp => exp.Ignore())
