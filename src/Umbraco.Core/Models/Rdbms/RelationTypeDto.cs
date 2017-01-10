@@ -15,6 +15,10 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn(IdentitySeed = NodeIdSeed)]
         public int Id { get; set; }
 
+        [Column("typeUniqueId")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_UniqueId")]
+        public Guid UniqueId { get; set; }
+
         [Column("dual")]
         public bool Dual { get; set; }
 

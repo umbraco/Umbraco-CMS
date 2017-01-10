@@ -22,6 +22,13 @@ namespace Umbraco.Core.Services
         IRelationType GetRelationTypeById(int id);
 
         /// <summary>
+        /// Gets a <see cref="RelationType"/> by its Id
+        /// </summary>
+        /// <param name="id">Id of the <see cref="RelationType"/></param>
+        /// <returns>A <see cref="RelationType"/> object</returns>
+        IRelationType GetRelationTypeById(Guid id);
+
+        /// <summary>
         /// Gets a <see cref="RelationType"/> by its Alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="RelationType"/></param>

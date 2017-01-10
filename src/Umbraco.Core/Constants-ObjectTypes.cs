@@ -152,6 +152,16 @@ namespace Umbraco.Core
             /// Guid for a Lock object.
             /// </summary>
             public static readonly Guid LockObjectGuid = new Guid(LockObject);
+
+            /// <summary>
+            /// Guid for a relation type.
+            /// </summary>
+            public const string RelationType = "B1988FAD-8675-4F47-915A-B3A602BC5D8D";
+
+            /// <summary>
+            /// Guid for a relation type.
+            /// </summary>
+            public static readonly Guid RelationTypeGuid = new Guid(RelationType);
         }
     }
 }
