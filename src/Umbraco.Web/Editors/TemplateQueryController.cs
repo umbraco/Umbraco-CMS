@@ -64,9 +64,9 @@ namespace Umbraco.Web.Editors
             var queryResult = new QueryResultModel();
 
             var sb = new StringBuilder();
-            
-            sb.Append("CurrentPage.Site()");
-            
+            var indention = Environment.NewLine + "\t\t\t\t\t\t";
+      
+            sb.Append("Model.Content.Site()");
             var timer = new Stopwatch();
             
             timer.Start();
@@ -129,7 +129,9 @@ namespace Umbraco.Web.Editors
                 sb.Append(".Children");
             }
 
+            //setup 2 clauses, 1 for returning, 1 for testing
             var clause = string.Empty;
+            var tokenizedClause = string.Empty;
 
             // WHERE
             var token = 0;
@@ -141,12 +143,13 @@ namespace Umbraco.Web.Editors
                 foreach (var condition in model.Filters)
                 {
                     if(string.IsNullOrEmpty( condition.ConstraintValue)) continue;
-
-                
-
-                    var operation = condition.BuildCondition(token);
+                    
+                    //x is passed in as the parameter alias for the linq where statement clause
+                    var operation = condition.BuildCondition("x");
+                    var tokenizedOperation = condition.BuildTokenizedCondition(token);
 
                     clause = string.IsNullOrEmpty(clause) ? operation : string.Concat(new[] { clause, " && ",  operation });
+                    tokenizedClause = string.IsNullOrEmpty(tokenizedClause) ? tokenizedOperation : string.Concat(new[] { tokenizedClause, " && ", tokenizedOperation });
 
                     token++;
                 }
@@ -156,19 +159,21 @@ namespace Umbraco.Web.Editors
 
                     timer.Start();
 
-                    //clause = "Visible && " + clause;
-
-                    contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
-                    // contents = contents.Where(clause, values.ToArray());
+                    //trial-run the tokenized clause to time the execution
+                    //for review - this uses a tonized query rather then the normal linq query. 
+                    contents = contents.AsQueryable().Where(tokenizedClause, model.Filters.Select(this.GetConstraintValue).ToArray());
                     contents = contents.Where(x => x.IsVisible());
 
                     timer.Stop();
 
-                    clause = string.Format("\"Visible && {0}\",{1}", clause,
-                        string.Join(",", model.Filters.Select(x => x.Property.Type == "string" ? 
-                                                                       string.Format("\"{0}\"", x.ConstraintValue) : x.ConstraintValue).ToArray()));
+                    
+                    //the query to output to the editor
+                    sb.Append(indention);
+                    sb.Append(".Where(x => x.IsVisible())");
 
-                    sb.AppendFormat(".Where({0})", clause);
+                    sb.Append(indention);
+                    sb.AppendFormat(".Where(x => {0})", clause);
+
                 }
                 else
                 {
@@ -178,7 +183,8 @@ namespace Umbraco.Web.Editors
 
                     timer.Stop();
 
-                    sb.Append(".Where(\"Visible\")");
+                    sb.Append(indention);
+                    sb.Append(".Where(x => x.IsVisible())");
 
                 }
 
@@ -192,6 +198,7 @@ namespace Umbraco.Web.Editors
 
                     var direction = model.Sort.Direction == "ascending" ? string.Empty : " desc";
 
+                    sb.Append(indention);
                     sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.Sort.Property.Alias, direction);
                 }
 
@@ -203,6 +210,7 @@ namespace Umbraco.Web.Editors
 
                     timer.Stop();
 
+                    sb.Append(indention);
                     sb.AppendFormat(".Take({0})", model.Take);
                 }
             }
@@ -217,7 +225,7 @@ namespace Umbraco.Web.Editors
                                                                  });
 
 
-            return queryResult;
+            return queryResult; 
         }
 
         private object GetConstraintValue(QueryCondition condition)

@@ -113,8 +113,10 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         internal virtual void AddingEntity()
         {
-            CreateDate = DateTime.Now;
-            UpdateDate = DateTime.Now;
+            if (IsPropertyDirty("CreateDate") == false || _createDate == default(DateTime))
+                CreateDate = DateTime.Now;
+            if (IsPropertyDirty("UpdateDate") == false || _updateDate == default(DateTime))
+                UpdateDate = CreateDate;
         }
 
         /// <summary>
@@ -122,7 +124,8 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         internal virtual void UpdatingEntity()
         {
-            UpdateDate = DateTime.Now;
+            if (IsPropertyDirty("UpdateDate") == false || _updateDate == default(DateTime))
+                UpdateDate = DateTime.Now;
         }
 
         /// <summary>

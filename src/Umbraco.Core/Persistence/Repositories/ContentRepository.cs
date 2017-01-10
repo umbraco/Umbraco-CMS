@@ -446,7 +446,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                entity.UpdateDate = DateTime.Now;
+                if (entity.IsPropertyDirty("UpdateDate") == false || entity.UpdateDate == default(DateTime))
+                    entity.UpdateDate = DateTime.Now;
             }
 
             //Ensure unique name on the same level

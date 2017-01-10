@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence;
+﻿using System;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
@@ -11,7 +12,12 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("id")]
         [PrimaryKeyColumn]
         public int Id { get; set; }
-        
+
+        // important to use column name != cmsMacro.uniqueId (fix in v8)
+        [Column("uniquePropertyId")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroProperty_UniquePropertyId")]
+        public Guid UniqueId { get; set; }
+
         [Column("editorAlias")]        
         public string EditorAlias { get; set; }
 

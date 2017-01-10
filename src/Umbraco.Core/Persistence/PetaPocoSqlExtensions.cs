@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -63,6 +65,26 @@ namespace Umbraco.Core.Persistence
         {
             var fieldName = GetFieldName(fieldSelector, sqlSyntax);
             return sql.Where(fieldName + " IN (@values)", new { values });
+        }
+
+        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
+        public static Sql WhereAnyIn<TDto>(this Sql sql, Expression<Func<TDto, object>>[] fieldSelectors, IEnumerable values)
+        {
+            return sql.WhereAnyIn(fieldSelectors, values, SqlSyntaxContext.SqlSyntaxProvider);
+        }
+
+        public static Sql WhereAnyIn<TDto>(this Sql sql, Expression<Func<TDto, object>>[] fieldSelectors, IEnumerable values, ISqlSyntaxProvider sqlSyntax)
+        {
+            var fieldNames = fieldSelectors.Select(x => GetFieldName(x, sqlSyntax)).ToArray();
+            var sb = new StringBuilder();
+            sb.Append("(");
+            for (var i = 0; i < fieldNames.Length; i++)
+            {
+                if (i > 0) sb.Append(" OR ");
+                sb.Append(fieldNames[i] + " IN (@values)");
+            }
+            sb.Append(")");
+            return sql.Where(sb.ToString(), new { values });
         }
 
         [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]

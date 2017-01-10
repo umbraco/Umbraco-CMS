@@ -22,6 +22,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -560,9 +561,7 @@ WHERE EXISTS(
 
                             var preVals = new PreValueCollection(asDictionary);
 
-                            var contentPropData = new ContentPropertyData(property.Value,
-                                preVals,
-                                new Dictionary<string, object>());
+                            var contentPropData = new ContentPropertyData(property.Value, preVals);
 
                             TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
                         }
@@ -656,7 +655,7 @@ WHERE EXISTS(
 
             var allsuccess = true;
 
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.MediaFileSystem;
             Parallel.ForEach(files, file =>
             {
                 try

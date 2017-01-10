@@ -206,10 +206,14 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
                 //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
                 //from the server in this method.
-                select(args.node.name, args.node.id);
-
-                //toggle checked state
-                args.node.selected = args.node.selected === true ? false : true;
+                if($scope.model.select){
+                	$scope.model.select(args.node)
+                }else{
+                	select(args.node.name, args.node.id);
+                	//toggle checked state
+                	args.node.selected = args.node.selected === true ? false : true;
+            	}
+                
             }
 	    }
 

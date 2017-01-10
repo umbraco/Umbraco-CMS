@@ -48,12 +48,13 @@ namespace Umbraco.Web.Trees
             nodes.AddRange(found.Select(template => CreateTreeNode(
                 template.Id.ToString(CultureInfo.InvariantCulture),
                 //TODO: Fix parent ID stuff for templates
-                "-1",
+                "-1",   
                 queryStrings,
                 template.Name,
                 template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
-                template.IsMasterTemplate,
-                GetEditorPath(template, queryStrings))));
+                template.IsMasterTemplate, 
+                GetEditorPath(template, queryStrings)
+                )));
 
             return nodes;
         }
@@ -67,15 +68,14 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
+            //Create the normal create action
+            var item = menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+            item.NavigateToRoute(string.Format("{0}/templates/edit/{1}?create=true", queryStrings.GetValue<string>("application"), id));
+
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                //Create the normal create action
-                menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias))
-                    //Since we haven't implemented anything for templates in angular, this needs to be converted to 
-                    //use the legacy format
-                    .ConvertLegacyMenuItem(null, "inittemplates", queryStrings.GetValue<string>("application"));
-
+                
                 //refresh action
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
 
@@ -85,12 +85,6 @@ namespace Umbraco.Web.Trees
             var template = Services.FileService.GetTemplate(int.Parse(id));
             if (template == null) return new MenuItemCollection();
             var entity = FromTemplate(template);
-
-            //Create the create action for creating sub layouts
-            menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias))
-                //Since we haven't implemented anything for templates in angular, this needs to be converted to 
-                //use the legacy format
-                .ConvertLegacyMenuItem(entity, "templates", queryStrings.GetValue<string>("application"));
 
             //don't allow delete if it has child layouts
             if (template.IsMasterTemplate == false)
@@ -132,8 +126,7 @@ namespace Umbraco.Web.Trees
             return Services.FileService.DetermineTemplateRenderingEngine(template) == RenderingEngine.WebForms
                 ? "/" + queryStrings.GetValue<string>("application") + "/framed/" +
                   Uri.EscapeDataString("settings/editTemplate.aspx?templateID=" + template.Id)
-                : "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                  Uri.EscapeDataString("settings/Views/EditView.aspx?treeType=" + Constants.Trees.Templates + "&templateID=" + template.Id);
+                : null;
         }
     }
 }
