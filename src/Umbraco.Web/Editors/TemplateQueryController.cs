@@ -103,7 +103,7 @@ namespace Umbraco.Web.Editors
                     {
                         // we did not find the path
                         sb.Clear();
-                        sb.AppendFormat("Umbraco.Content({0})", model.Source.Id);
+                        sb.AppendFormat("Umbraco.TypedContent({0})", model.Source.Id);
                         pointerNode = targetNode;
                     }
                 }
@@ -126,7 +126,7 @@ namespace Umbraco.Web.Editors
                 timer.Start();
                 contents = pointerNode.Children;
                 timer.Stop();
-                sb.Append(".Children");
+                sb.Append(".Children()");
             }
 
             //setup 2 clauses, 1 for returning, 1 for testing
