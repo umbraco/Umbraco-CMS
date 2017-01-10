@@ -7,19 +7,18 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
@@ -36,6 +35,7 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
+        private readonly MediaFileSystem _mediaFileSystem = FileSystemProviderManager.Current.MediaFileSystem;
 
         public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IDataTypeService dataTypeService, IUserService userService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
@@ -1322,6 +1322,38 @@ namespace Umbraco.Core.Services
             {
                 auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
                 uow.Commit();
+            }
+        }
+
+        public Stream GetMediaFileContentStream(string filepath)
+        {
+            if (_mediaFileSystem.FileExists(filepath) == false)
+                return null;
+            try
+            {
+                return _mediaFileSystem.OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
+        }
+
+        public void SetMediaFileContent(string filepath, Stream stream)
+        {
+            _mediaFileSystem.AddFile(filepath, stream, true);
+        }
+
+        public void DeleteMediaFile(string filepath)
+        {
+            _mediaFileSystem.DeleteFile(filepath, true);
+        }
+
+        public void GenerateThumbnails(string filepath, PropertyType propertyType)
+        {
+            using (var filestream = _mediaFileSystem.OpenFile(filepath))
+            {
+                _mediaFileSystem.GenerateThumbnails(filestream, filepath, propertyType);
             }
         }
 

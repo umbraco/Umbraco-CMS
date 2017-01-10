@@ -133,6 +133,10 @@
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.1\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -186,6 +190,10 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.6.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Dataflow.4.6.0\lib\netstandard1.1\System.Threading.Tasks.Dataflow.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -277,6 +285,7 @@
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Editors\GravatarController.cs" />
+    <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\AcceptableConfiguration.cs" />
@@ -328,11 +337,13 @@
     <Compile Include="Models\ContentEditing\PropertyGroupBasic.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
+    <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
     <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
+    <Compile Include="Models\Mapping\TemplateModelMapper.cs" />
     <Compile Include="Models\PackageInstallResult.cs" />
     <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
     <Compile Include="Models\SetPasswordModel.cs" />
@@ -504,7 +515,6 @@
     <Compile Include="Install\Controllers\InstallApiController.cs" />
     <Compile Include="Install\Controllers\InstallController.cs" />
     <Compile Include="Install\InstallAuthorizeAttribute.cs" />
-    <Compile Include="MediaPropertyExtensions.cs" />
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeValidation.cs" />
@@ -2208,6 +2218,7 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0</VSToolsPath>
