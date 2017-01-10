@@ -182,16 +182,16 @@ namespace Umbraco.Web.Editors
             int idInt;
             if (Guid.TryParse(contentId, out idGuid)) { 
                 var entity = ApplicationContext.Services.EntityService.GetByKey(idGuid);
-                return getAllowedChildren(entity.Id);
+                return GetAllowedChildrenInternal(entity.Id);
             } else if (int.TryParse(contentId, out idInt))
             {
-                return getAllowedChildren(idInt);
+                return GetAllowedChildrenInternal(idInt);
             }
 
-            throw new InvalidCastException("Id must be either an integer or a Guid");
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
-        private IEnumerable<ContentTypeBasic> getAllowedChildren(int contentId)
+        private IEnumerable<ContentTypeBasic> GetAllowedChildrenInternal(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
                 return Enumerable.Empty<ContentTypeBasic>();

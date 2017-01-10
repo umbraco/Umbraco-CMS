@@ -131,7 +131,7 @@ namespace Umbraco.Web.Trees
                 var idEntity = GetEntityFromId(id);
                 if (idEntity == null)
                 {
-                    throw new EntityNotFoundException(id, "The passed id doesn't exist");
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
                 iid = idEntity.Id;
             }
@@ -323,7 +323,7 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                throw new InvalidCastException("Id must be either an integer or a Guid");
+                return null;
             }
 
             return entity;

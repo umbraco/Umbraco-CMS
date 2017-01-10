@@ -195,7 +195,7 @@ namespace Umbraco.Web.Editors
                 }
                 else
                 {
-                    throw new EntityNotFoundException(id, "The passed id doesn't exist");
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
             }
             else if (int.TryParse(id, out idInt))
@@ -203,7 +203,7 @@ namespace Umbraco.Web.Editors
                 return getChildren(idInt, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
             }
 
-            throw new InvalidCastException("Id must be either an integer or a Guid");
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> getChildren(int id,
