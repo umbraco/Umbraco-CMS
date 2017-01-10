@@ -2,7 +2,7 @@
 using System.Resources;
 
 [assembly: AssemblyCompany("Umbraco")]
-[assembly: AssemblyCopyright("Copyright © Umbraco 2016")]
+[assembly: AssemblyCopyright("Copyright © Umbraco 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
