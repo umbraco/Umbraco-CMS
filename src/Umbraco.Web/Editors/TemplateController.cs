@@ -17,7 +17,7 @@ namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
-    public class TemplateController : UmbracoAuthorizedJsonController
+    public class TemplateController : BackOfficeNotificationsController
     {
         /// <summary>
         /// Gets data type by alias

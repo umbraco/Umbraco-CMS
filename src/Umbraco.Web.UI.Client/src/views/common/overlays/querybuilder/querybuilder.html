@@ -2,9 +2,10 @@
 
 	<div class="umb-control-group umb-querybuilder">
 
-		<div class="row">
-			<div>
-				I want
+        <div class="row">
+			<div class="query-items">
+				
+				<span>I want</span>
 
 				<div class="btn-group">
 
@@ -30,7 +31,7 @@
 
 			</div>
 
-			<div ng-repeat="filter in vm.query.filters">
+			<div class="query-items" ng-repeat="filter in vm.query.filters">
 
 				<span ng-if="$first">Where</span>
 				<span ng-if="!$first">And</span>
@@ -66,8 +67,22 @@
 					</ul>
 				</div>
 
-				<input type="text" ng-if="filter.term" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
+                <span ng-switch="filter.term.appliesTo[0]">
 
+                    <!-- Filter term types  (string, int, date) -->
+                    <input type="text" ng-switch-when="string" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
+                    <input type="number" ng-switch-when="int" style="width:90px;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
+
+                    <span ng-switch-when="datetime">
+                        <umb-date-time-picker options="vm.datePickerConfig"
+                                              on-change="vm.datePickerChange(event, filter)">
+                        </umb-date-time-picker>
+                    </span>
+
+                </span>
+
+				
+				
 				<a href ng-click="vm.addFilter(vm.query)">
 					<i class="icon-add"></i>
 				</a>
@@ -79,9 +94,9 @@
 			</div>
 
 
-			<div>
+			<div class="query-items">
 
-				Order by
+				<span>Order by</span>
 
 				<div class="btn-group">
 					<a class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">
@@ -116,7 +131,7 @@
 
 		<pre>
 {{model.result.queryExpression}}
-		</pre>
+        </pre>
 
 	</div>
 

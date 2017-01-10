@@ -24,15 +24,34 @@
 
         private static string BuildConditionString(this QueryCondition condition, string prefix, int token = -1)
         {
+            
+
+
             var operand = string.Empty;
             var value = string.Empty;
             var constraintValue = string.Empty;
+
 
             //if a token is used, use a token placeholder, otherwise, use the actual value
             if(token >= 0){
                 constraintValue = string.Format("@{0}", token);
             }else {
-                constraintValue = condition.Property.Type == "string" ? string.Format("\"{0}\"", condition.ConstraintValue) : condition.ConstraintValue;
+
+                //modify the format of the constraint value
+                switch (condition.Property.Type)
+                {
+                    case "string":
+                        constraintValue = string.Format("\"{0}\"", condition.ConstraintValue);
+                        break;
+                    case "datetime":
+                        constraintValue = string.Format("DateTime.Parse(\"{0}\")", condition.ConstraintValue);
+                        break;
+                    default:
+                        constraintValue = condition.ConstraintValue;
+                        break;
+                }
+
+               // constraintValue = condition.Property.Type == "string" ? string.Format("\"{0}\"", condition.ConstraintValue) : condition.ConstraintValue;
             }
 
             switch (condition.Term.Operathor)
@@ -56,20 +75,23 @@
                     operand = " <= ";
                     break;
                 case Operathor.Contains:
-                    value = string.Format("{0}{1}.Contains({2})", prefix, condition.Property.Name, constraintValue);
+                    value = string.Format("{0}{1}.Contains({2})", prefix, condition.Property.Alias, constraintValue);
                     break;
                 case Operathor.NotContains:
-                    value =  string.Format("!{0}{1}.Contains({2})", prefix, condition.Property.Name, constraintValue);
+                    value =  string.Format("!{0}{1}.Contains({2})", prefix, condition.Property.Alias, constraintValue);
                     break;
                 default :
                     operand = " == ";
                     break;
             }
 
+
             if (string.IsNullOrEmpty(value) == false)
                 return value;
             
-            return string.Format("{0}{1}{2}{3}", prefix, condition.Property.Name, operand, constraintValue);
+
+
+            return string.Format("{0}{1}{2}{3}", prefix, condition.Property.Alias, operand, constraintValue);
         }
 
     }

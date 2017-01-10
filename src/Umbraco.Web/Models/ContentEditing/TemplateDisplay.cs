@@ -10,7 +10,7 @@ using Umbraco.Core.Models.Validation;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "template", Namespace = "")]
-    public class TemplateDisplay
+    public class TemplateDisplay : INotificationModel
     {
 
         [DataMember(Name = "id")]
@@ -35,5 +35,11 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "masterTemplateAlias")]
         public string MasterTemplateAlias { get; set; }
+
+        /// <summary>
+        /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
+        /// </summary>
+        [DataMember(Name = "notifications")]
+        public List<Notification> Notifications { get; private set; }
     }
 }

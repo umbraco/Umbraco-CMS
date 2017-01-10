@@ -9,6 +9,12 @@
         vm.contentTypes = [];
         vm.conditions = [];
 
+        vm.datePickerConfig = {
+            pickDate: true,
+            pickTime: false,
+            format: "YYYY-MM-DD"
+        };
+
         vm.query = {
             contentType: {
                 name: "Everything"
@@ -41,6 +47,7 @@
         vm.setFilterProperty = setFilterProperty;
         vm.setFilterTerm = setFilterTerm;
         vm.changeConstraintValue = changeConstraintValue;
+        vm.datePickerChange = datePickerChange;
 
         function onInit() {
 
@@ -58,7 +65,7 @@
                 .then(function (conditions) {
                     vm.conditions = conditions;
                 });
-            
+                
             throttledFunc();
 
         }
@@ -134,16 +141,26 @@
 
         function setFilterProperty(filter, property) {
             filter.property = property;
-            throttledFunc();
+            filter.term = {};
+            filter.constraintValue = "";
         }
 
         function setFilterTerm(filter, term) {
             filter.term = term;
-            throttledFunc();
+            if(filter.constraintValue) {
+                throttledFunc();
+            }
         }
 
         function changeConstraintValue() {
             throttledFunc();
+        }
+
+        function datePickerChange(event, filter) {
+            if(event.date && event.date.isValid()) {
+                filter.constraintValue = event.date.format(vm.datePickerConfig.format);
+                throttledFunc();
+            }
         }
 
         var throttledFunc = _.throttle(function () {
@@ -154,7 +171,6 @@
                 });
 
         }, 200);
-        
 
         onInit();
 
