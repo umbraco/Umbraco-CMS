@@ -110,11 +110,16 @@ namespace Umbraco.Web.Editors
                 {
                     if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
                     {
+
                         var master = Services.FileService.GetTemplate(display.MasterTemplateAlias);
-                        if (master != null)
+                        if(master == null || master.Id == display.Id)
+                        {
+                            template.SetMasterTemplate(null);
+                        }else
                         {
                             template.SetMasterTemplate(master);
                         }
+
                     }
                     else
                     {
