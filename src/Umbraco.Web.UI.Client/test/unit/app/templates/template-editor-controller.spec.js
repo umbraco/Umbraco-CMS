@@ -101,6 +101,13 @@
                                 $setPristine: function() {}
                             }
                         }
+                    },
+                    templateHelper: {
+                        getInsertDictionary: function() { return ""; },
+                        getInsertPartialSnippet: function() { return ""; },
+                        getQuerySnippet: function() { return ""; },
+                        getRenderBodySnippet: function() { return ""; },
+                        getRenderSectionSnippet: function() { return ""; }
                     }
                 });
             }

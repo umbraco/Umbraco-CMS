@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper) {
+    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper, templateHelper) {
 
         var vm = this;
         var oldMasterTemplateAlias = null;
@@ -169,26 +169,30 @@
 
             vm.insertOverlay = {
                 view: "insert",
+                allowedTypes: {
+                    macro: true,
+                    dictionary: true,
+                    partial: true,
+                    umbracoField: true
+                },
                 hideSubmitButton: true,
                 show: true,
                 submit: function(model) {
 
                     switch(model.insert.type) {
-                        case "macro":
 
+                        case "macro":
                             var macroObject = macroService.collectValueData(model.insert.selectedMacro, model.insert.macroParams, "Mvc");
                             insert(macroObject.syntax);
                             break;
 
                         case "dictionary":
-                            //crappy hack due to dictionary items not in umbracoNode table
-                        	var code = "@Umbraco.GetDictionaryValue(\"" + model.insert.node.name + "\")";
+                        	var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
                         	insert(code);
                             break;
 
                         case "partial":
-                            //crappy hack due to dictionary items not in umbracoNode table
-                            var code = "@Html.Partial(\"" + model.insert.node.name + "\")";
+                            var code = templateHelper.getInsertPartialSnippet(model.insert.node.name);
                             insert(code);
                             break;
                             
@@ -272,8 +276,7 @@
                 show: true,
                 title: "Insert dictionary item",
                 select: function(node){
-                	//crappy hack due to dictionary items not in umbracoNode table
-                	var code = "@Umbraco.GetDictionaryValue(\"" + node.name + "\")";
+                    var code = templateHelper.getInsertDictionarySnippet(node.name);
                 	insert(code);
 
                 	vm.dictionaryItemOverlay.show = false;
@@ -299,8 +302,8 @@
                 show: true,
                 title: "Insert Partial view",
                 select: function(node){
-                    //crappy hack due to dictionary items not in umbracoNode table
-                    var code = "@Html.Partial(\"" + node.name + "\")";
+
+                    var code = templateHelper.getInsertPartialSnippet(node.name);
                     insert(code);
 
                     vm.partialItemOverlay.show = false;
@@ -321,18 +324,9 @@
                 view: "querybuilder",
                 show: true,
                 title: "Query for content",
-
                 submit: function (model) {
 
-                    var code = "\n@{\n" + "\tvar selection = " + model.result.queryExpression + ";\n}\n";
-                    code += "<ul>\n" +
-                                "\t@foreach(var item in selection){\n" +
-                                    "\t\t<li>\n" +
-                                        "\t\t\t<a href=\"@item.Url\">@item.Name</a>\n" +
-                                    "\t\t</li>\n" +
-                                "\t}\n" +
-                            "</ul>\n\n";
-
+                    var code = templateHelper.getQuerySnippet(model.result.queryExpression);
                     insert(code);
                     
                     vm.queryBuilderOverlay.show = false;
@@ -360,15 +354,18 @@
                 submit: function(model) {
 
                     if (model.insertType === 'renderBody') {
-                        insert("@RenderBody()");
+                        var code = templateHelper.getRenderBodySnippet();
+                        insert(code);
                     }
 
                     if (model.insertType === 'renderSection') {
-                        insert("@RenderSection(\"" + model.renderSectionName + "\", " + model.mandatoryRenderSection + ")");
+                        var code = templateHelper.getRenderSectionSnippet(model.renderSectionName, model.mandatoryRenderSection);
+                        insert(code);
                     }
 
                     if (model.insertType === 'addSection') {
-                        wrap("@section " + model.sectionName + "\r\n{\r\n\r\n\t{0}\r\n\r\n}\r\n");
+                        var code = templateHelper.getAddSectionSnippet(model.sectionName);
+                        wrap(code);
                     }
 
                     vm.sectionsOverlay.show = false;
