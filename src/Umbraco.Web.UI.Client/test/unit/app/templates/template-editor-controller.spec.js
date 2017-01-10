@@ -90,6 +90,10 @@
                         getSectionState : function() { return {}; }
                     },
                     macroService: {},
+                    contentEditingHelper: {},
+                    localizationService: {
+                        localize: resolvedPromise({})
+                    },
                     angularHelper: {
                         getCurrentForm: function() { 
                             return {

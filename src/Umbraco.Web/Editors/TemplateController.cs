@@ -6,8 +6,10 @@ using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -86,6 +88,14 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public TemplateDisplay PostSave(TemplateDisplay display)
         {
+
+            //Checking the submitted is valid with the Required attributes decorated on the ViewModel
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+
             if (display.Id > 0)
             {
                 // update
@@ -100,11 +110,16 @@ namespace Umbraco.Web.Editors
                 {
                     if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
                     {
+
                         var master = Services.FileService.GetTemplate(display.MasterTemplateAlias);
-                        if (master != null)
+                        if(master == null || master.Id == display.Id)
+                        {
+                            template.SetMasterTemplate(null);
+                        }else
                         {
                             template.SetMasterTemplate(master);
                         }
+
                     }
                     else
                     {
