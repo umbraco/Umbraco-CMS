@@ -188,7 +188,8 @@
 
                         case "partial":
                             //crappy hack due to dictionary items not in umbracoNode table
-                            var code = "@Html.Partial(\"" + model.insert.node.name + "\")";
+                            var nodeNameWithPath = model.insert.node.id.replace(".cshtml", "");
+                            var code = "@Html.Partial(\"" + nodeNameWithPath + "\")";
                             insert(code);
                             break;
                             
@@ -300,7 +301,8 @@
                 title: "Insert Partial view",
                 select: function(node){
                     //crappy hack due to dictionary items not in umbracoNode table
-                    var code = "@Html.Partial(\"" + node.name + "\")";
+                    var nodeNameWithPath = node.id.replace(".cshtml", "");
+                    var code = "@Html.Partial(\"" + nodeNameWithPath + "\")";
                     insert(code);
 
                     vm.partialItemOverlay.show = false;
