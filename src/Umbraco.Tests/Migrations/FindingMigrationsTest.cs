@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Migrations
             //This is needed because the Migration resolver is creating migration instances with their full ctors
             ApplicationContext.EnsureContext(
                 new ApplicationContext(
-                    new DatabaseContext(Mock.Of<IScopeProvider>(), Mock.Of<ILogger>(), sqlSyntax, "test"),
+                    new DatabaseContext(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), sqlSyntax, "test"),
                     new ServiceContext(), 
                     CacheHelper.CreateDisabledCacheHelper(),
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())),  

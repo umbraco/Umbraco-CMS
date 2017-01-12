@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Routing
         {
             var settings = SettingsForTests.GetDefault();
             return new ApplicationContext(
-                new DatabaseContext(Mock.Of<IScopeProvider>(), Logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(Mock.Of<IScopeProviderInternal>(), Logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
                 GetServiceContext(settings, Logger),
                 CacheHelper,
                 ProfilingLogger)

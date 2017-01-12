@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Create an app context using mocks
             var appContext = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IScopeProvider>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
                 
                 //Create service context using mocks
                 new ServiceContext(

@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Scoping
 {
-    internal class ScopeProvider : IScopeProvider
+    internal class ScopeProvider : IScopeProviderInternal
     {
         public ScopeProvider(IDatabaseFactory2 databaseFactory)
         {

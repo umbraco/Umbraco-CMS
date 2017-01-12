@@ -27,7 +27,7 @@ namespace Umbraco.Core
     /// </remarks>
     public class DatabaseContext
     {
-        internal readonly ScopeProvider ScopeProvider;
+        internal readonly IScopeProviderInternal ScopeProvider;
         private readonly ILogger _logger;
         private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
@@ -42,7 +42,7 @@ namespace Umbraco.Core
         private const int ConnectionCheckMinutes = 1;
 
         [Obsolete("Use the constructor specifying all dependencies instead")]
-        public DatabaseContext(IScopeProvider scopeProvider)
+        internal DatabaseContext(IScopeProviderInternal scopeProvider)
             : this(scopeProvider, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
             {
                 new MySqlSyntaxProvider(LoggerResolver.Current.Logger),
@@ -58,13 +58,13 @@ namespace Umbraco.Core
         /// <param name="scopeProvider"></param>
         /// <param name="logger"></param>
         /// <param name="syntaxProviders"></param>
-        public DatabaseContext(IScopeProvider scopeProvider, ILogger logger, SqlSyntaxProviders syntaxProviders)
+        internal DatabaseContext(IScopeProviderInternal scopeProvider, ILogger logger, SqlSyntaxProviders syntaxProviders)
         {
             if (scopeProvider == null) throw new ArgumentNullException("scopeProvider");
             if (logger == null) throw new ArgumentNullException("logger");
             if (syntaxProviders == null) throw new ArgumentNullException("syntaxProviders");
 
-            ScopeProvider = (ScopeProvider) scopeProvider; // fixme ugly
+            ScopeProvider = scopeProvider;
             _logger = logger;
             _syntaxProviders = syntaxProviders;
         }
@@ -76,12 +76,12 @@ namespace Umbraco.Core
         /// <param name="logger"></param>
         /// <param name="sqlSyntax"></param>
         /// <param name="providerName"></param>
-        public DatabaseContext(IScopeProvider scopeProvider, ILogger logger, ISqlSyntaxProvider sqlSyntax, string providerName)
+        internal DatabaseContext(IScopeProviderInternal scopeProvider, ILogger logger, ISqlSyntaxProvider sqlSyntax, string providerName)
         {
             _providerName = providerName;
             SqlSyntax = sqlSyntax;
             SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
-            ScopeProvider = (ScopeProvider) scopeProvider; // fixme ugly
+            ScopeProvider = scopeProvider;
             _logger = logger;
             _configured = true;
         }
