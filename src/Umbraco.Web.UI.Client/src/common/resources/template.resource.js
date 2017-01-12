@@ -40,21 +40,21 @@ function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.templateResource#getByName
+         * @name umbraco.resources.templateResource#getByAlias
          * @methodOf umbraco.resources.templateResource
          *
          * @description
-         * Gets a template item with a given name
+         * Gets a template item with a given alias
          *
          * ##usage
          * <pre>
-         * templateResource.getByName("upload")
-         *    .then(function(datatype) {
+         * templateResource.getByAlias("upload")
+         *    .then(function(template) {
          *        alert('its here!');
          *    });
          * </pre>
          *
-         * @param {String} name Name of template to retrieve
+         * @param {String} alias Alias of template to retrieve
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -69,6 +69,25 @@ function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
                "Failed to retrieve data for template with alias: " + alias);
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.templateResource#getAll
+         * @methodOf umbraco.resources.templateResource
+         *
+         * @description
+         * Gets all templates
+         *
+         * ##usage
+         * <pre>
+         * templateResource.getAll()
+         *    .then(function(templates) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         *
+         * @returns {Promise} resourcePromise object.
+         *
+         */
         getAll: function () {
 
             return umbRequestHelper.resourcePromise(
@@ -82,8 +101,8 @@ function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.contentResource#getScaffold
-         * @methodOf umbraco.resources.contentResource
+         * @name umbraco.resources.templateResource#getScaffold
+         * @methodOf umbraco.resources.templateResource
          *
          * @description
          * Returns a scaffold of an empty template item
@@ -93,14 +112,8 @@ function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * ##usage
          * <pre>
          * templateResource.getScaffold()
-         *    .then(function(scaffold) {
-         *        var myType = scaffold;
-         *        myType.name = "My new template";
-         *
-         *        templateResource.save(myType, myType.preValues, true)
-         *            .then(function(type){
-         *                alert("Retrieved, updated and saved again");
-         *            });
+         *    .then(function(template) {
+         *        alert('its here!');
          *    });
          * </pre>
          *
@@ -134,7 +147,7 @@ function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *    });
          * </pre>
          *
-         * @param {Int} id id of content item to delete
+         * @param {Int} id id of template to delete
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -148,7 +161,6 @@ function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 "Failed to delete item " + id);
         },
 
-
         /**
          * @ngdoc method
          * @name umbraco.resources.templateResource#save
@@ -156,15 +168,26 @@ function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * @description
          * Saves or update a template
+         * 
+         * ##usage
+         * <pre>
+         * templateResource.save(template)
+         *    .then(function(template) {
+         *        alert('its saved!');
+         *    });
+         * </pre>
          *
-         * @param {Object} template object to create/update
+         * @param {Object} template object to save
          * @returns {Promise} resourcePromise object.
          *
          */
         save: function (template) {
-
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("templateApiBaseUrl", "PostSave"), template),
+                 $http.post(
+                     umbRequestHelper.getApiUrl(
+                         "templateApiBaseUrl", 
+                         "PostSave"), 
+                         template),
                 "Failed to save data for template id " + template.id);
         }
     };
