@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core
@@ -26,7 +27,7 @@ namespace Umbraco.Core
     /// </remarks>
     public class DatabaseContext
     {
-        private readonly IDatabaseFactory _factory;
+        internal readonly ScopeProvider ScopeProvider;
         private readonly ILogger _logger;
         private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
@@ -41,8 +42,8 @@ namespace Umbraco.Core
         private const int ConnectionCheckMinutes = 1;
 
         [Obsolete("Use the constructor specifying all dependencies instead")]
-        public DatabaseContext(IDatabaseFactory factory)
-            : this(factory, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
+        public DatabaseContext(IScopeProvider scopeProvider)
+            : this(scopeProvider, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
             {
                 new MySqlSyntaxProvider(LoggerResolver.Current.Logger),
                 new SqlCeSyntaxProvider(),
@@ -54,16 +55,16 @@ namespace Umbraco.Core
         /// <summary>
         /// Default constructor
         /// </summary>
-        /// <param name="factory"></param>
+        /// <param name="scopeProvider"></param>
         /// <param name="logger"></param>
         /// <param name="syntaxProviders"></param>
-        public DatabaseContext(IDatabaseFactory factory, ILogger logger, SqlSyntaxProviders syntaxProviders)
+        public DatabaseContext(IScopeProvider scopeProvider, ILogger logger, SqlSyntaxProviders syntaxProviders)
         {
-            if (factory == null) throw new ArgumentNullException("factory");
+            if (scopeProvider == null) throw new ArgumentNullException("scopeProvider");
             if (logger == null) throw new ArgumentNullException("logger");
             if (syntaxProviders == null) throw new ArgumentNullException("syntaxProviders");
 
-            _factory = factory;
+            ScopeProvider = (ScopeProvider) scopeProvider; // fixme ugly
             _logger = logger;
             _syntaxProviders = syntaxProviders;
         }
@@ -71,16 +72,16 @@ namespace Umbraco.Core
         /// <summary>
         /// Create a configured DatabaseContext
         /// </summary>
-        /// <param name="factory"></param>
+        /// <param name="scopeProvider"></param>
         /// <param name="logger"></param>
         /// <param name="sqlSyntax"></param>
         /// <param name="providerName"></param>
-        public DatabaseContext(IDatabaseFactory factory, ILogger logger, ISqlSyntaxProvider sqlSyntax, string providerName)
+        public DatabaseContext(IScopeProvider scopeProvider, ILogger logger, ISqlSyntaxProvider sqlSyntax, string providerName)
         {
             _providerName = providerName;
             SqlSyntax = sqlSyntax;
             SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
-            _factory = factory;
+            ScopeProvider = (ScopeProvider) scopeProvider; // fixme ugly
             _logger = logger;
             _configured = true;
         }
@@ -110,7 +111,11 @@ namespace Umbraco.Core
         /// </remarks>
         public virtual UmbracoDatabase Database
         {
-            get { return _factory.CreateDatabase(); }
+            get
+            {
+                var scope = ScopeProvider.AmbientScope;
+                return scope != null ? scope.Database : ScopeProvider.CreateNoScope().Database;
+            }
         }
 
         /// <summary>
@@ -123,6 +128,8 @@ namespace Umbraco.Core
         /// will be properly removed from call context and does not interfere with anything else. In most case
         /// it is not replacing anything, just temporarily installing a database in context.</para>
         /// </remarks>
+        // fixme - this should just entirely be replaced by Scope?
+        /*
         public virtual IDisposable UseSafeDatabase(bool force = false)
         {
             var factory = _factory as DefaultDatabaseFactory;
@@ -138,6 +145,7 @@ namespace Umbraco.Core
             // create a new, temp, database (will be disposed with UsingDatabase)
             return new UsingDatabase(null, factory.CreateDatabase());
         }
+        */
 
         /// <summary>
         /// Boolean indicating whether the database has been configured
@@ -159,7 +167,7 @@ namespace Umbraco.Core
 
                 //Don't check again if the timeout period hasn't elapsed
                 //this ensures we don't keep checking the connection too many times in a row like during startup.
-                //Do check if the _connectionLastChecked is null which means we're just initializing or it could 
+                //Do check if the _connectionLastChecked is null which means we're just initializing or it could
                 //not connect last time it was checked.
                 if ((_connectionLastChecked.HasValue && (DateTime.Now - _connectionLastChecked.Value).TotalMinutes > ConnectionCheckMinutes)
                     || _connectionLastChecked.HasValue == false)
@@ -814,6 +822,7 @@ namespace Umbraco.Core
             return true;
         }
 
+        /*
         private class UsingDatabase : IDisposable
         {
             private readonly UmbracoDatabase _orig;
@@ -836,5 +845,6 @@ namespace Umbraco.Core
                 GC.SuppressFinalize(this);
             }
         }
+        */
     }
 }

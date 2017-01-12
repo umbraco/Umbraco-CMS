@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
@@ -10,6 +10,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	/// </summary>
 	internal class PetaPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
 	{
+	    private readonly IScope _scope;
 
 		/// <summary>
 		/// Used for testing
@@ -19,16 +20,16 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		private Guid _key;
         private readonly Queue<Operation> _operations = new Queue<Operation>();
 
-		/// <summary>
-		/// Creates a new unit of work instance
-		/// </summary>
-		/// <param name="database"></param>
-		/// <remarks>
-		/// This should normally not be used directly and should be created with the UnitOfWorkProvider
-		/// </remarks>
-		internal PetaPocoUnitOfWork(UmbracoDatabase database)
-		{
-			Database = database;
+        /// <summary>
+        /// Creates a new unit of work instance
+        /// </summary>
+        /// <param name="scopeProvider"></param>
+        /// <remarks>
+        /// This should normally not be used directly and should be created with the UnitOfWorkProvider
+        /// </remarks>
+        internal PetaPocoUnitOfWork(IScopeProvider scopeProvider)
+        {
+            _scope = scopeProvider.CreateScope();
 			_key = Guid.NewGuid();
 			InstanceId = Guid.NewGuid();
 		}
@@ -139,7 +140,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 			get { return _key; }
 		}
 
-		public UmbracoDatabase Database { get; private set; }
+		public UmbracoDatabase Database {get { return _scope.Database; } }
 
 		#region Operation
 
@@ -178,6 +179,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		protected override void DisposeResources()
 		{
 			_operations.Clear();
+		    _scope.Dispose();
 		}
 	}
 }

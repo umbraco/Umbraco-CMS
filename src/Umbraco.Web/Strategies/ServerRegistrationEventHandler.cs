@@ -137,8 +137,8 @@ namespace Umbraco.Web.Strategies
             {
                 try
                 {
-                    // running on a background task, requires a safe database (see UsingSafeDatabase doc)
-                    using (ApplicationContext.Current.DatabaseContext.UseSafeDatabase())
+                    // running on a background task, requires its own (safe) scope
+                    using (ApplicationContext.Current.ScopeProvider.CreateScope())
                     {
                         _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
                     }

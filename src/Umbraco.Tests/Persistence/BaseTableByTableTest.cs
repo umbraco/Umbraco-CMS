@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Publishing;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Persistence
 
 
             var dbContext = new DatabaseContext(
-                new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, _logger),
+                new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, _logger)),
                 _logger, SqlSyntaxProvider, Constants.DatabaseProviders.SqlCe);
 
             var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());

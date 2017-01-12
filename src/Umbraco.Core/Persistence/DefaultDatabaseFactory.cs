@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
-using System.Web;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence
 {
@@ -14,30 +12,17 @@ namespace Umbraco.Core.Persistence
 	/// it will create one per context, otherwise it will be a global singleton object which is NOT thread safe
 	/// since we need (at least) a new instance of the database object per thread.
 	/// </remarks>
-	internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory
+	internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory2
 	{
 	    private readonly string _connectionStringName;
 	    private readonly ILogger _logger;
 	    public string ConnectionString { get; private set; }
         public string ProviderName { get; private set; }
 
-        // NO! see notes in v8 HybridAccessorBase
-        //[ThreadStatic]
-        //private static volatile UmbracoDatabase _nonHttpInstance;
+        //private static readonly object Locker = new object();
 
-        private const string ItemKey = "Umbraco.Core.Persistence.DefaultDatabaseFactory";
-
-        private static UmbracoDatabase NonContextValue
-        {
-            get { return (UmbracoDatabase) CallContext.LogicalGetData(ItemKey); }
-            set
-            {
-                if (value == null) CallContext.FreeNamedDataSlot(ItemKey);
-                else CallContext.LogicalSetData(ItemKey, value);
-            }
-        }
-
-        private static readonly object Locker = new object();
+        // bwc imposes a weird x-dependency between database factory and scope provider...
+        public ScopeProvider ScopeProvider { get; set; }
 
 	    /// <summary>
 	    /// Constructor accepting custom connection string
@@ -76,6 +61,10 @@ namespace Umbraco.Core.Persistence
 
 		public UmbracoDatabase CreateDatabase()
 		{
+            var scope = ScopeProvider.AmbientScope;
+            return scope != null ? scope.Database : ScopeProvider.CreateNoScope().Database;
+
+            /*
             UmbracoDatabase database;
 
             // gets or creates a database, using either the call context (if no http context) or
@@ -128,9 +117,11 @@ namespace Umbraco.Core.Persistence
             }
 
             return database;
+            */
 		}
 
         // called by UmbracoDatabase when disposed, so that the factory can de-list it from context
+        /*
 	    internal void OnDispose(UmbracoDatabase disposing)
 	    {
 	        var value = disposing;
@@ -168,6 +159,7 @@ namespace Umbraco.Core.Persistence
             _databases.Remove(value);
 #endif
         }
+        */
 
 #if DEBUG_DATABASES
         // helps identifying when non-httpContext databases are created by logging the stack trace
@@ -202,6 +194,12 @@ namespace Umbraco.Core.Persistence
             CallContext
         }
 
+	    public UmbracoDatabase CreateNewDatabase()
+	    {
+	        return CreateDatabaseInstance(ContextOwner.None);
+
+	    }
+
         internal UmbracoDatabase CreateDatabaseInstance(ContextOwner contextOwner)
 	    {
             var database = string.IsNullOrEmpty(ConnectionString) == false && string.IsNullOrEmpty(ProviderName) == false
@@ -221,6 +219,7 @@ namespace Umbraco.Core.Persistence
 
         protected override void DisposeResources()
 		{
+            /*
             UmbracoDatabase database;
 
             if (HttpContext.Current == null)
@@ -239,88 +238,7 @@ namespace Umbraco.Core.Persistence
             }
 
             if (database != null) database.Dispose(); // removes it from call context
+            */
         }
-
-        // during tests, the thread static var can leak between tests
-        // this method provides a way to force-reset the variable
-        internal void ResetForTests()
-	    {
-            var value = NonContextValue;
-            if (value != null) value.Dispose();
-            NonContextValue = null;
-        }
-
-        #region SafeCallContext
-
-        // see notes in SafeCallContext - need to do this since we are using
-        // the logical call context...
-
-        static DefaultDatabaseFactory()
-        {
-            SafeCallContext.Register(DetachAmbientDatabase, AttachAmbientDatabase);
-        }
-
-        // gets a value indicating whether there is an ambient database
-	    internal static bool HasAmbientDatabase
-	    {
-	        get
-	        {
-	            return HttpContext.Current == null
-	                ? NonContextValue != null
-	                : HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] != null;
-	        }
-	    }
-
-        // detaches the current database
-        // ie returns the database and remove it from whatever is "context"
-        internal static UmbracoDatabase DetachAmbientDatabase()
-        {
-            UmbracoDatabase database;
-
-            if (HttpContext.Current == null)
-            {
-                database = NonContextValue;
-                NonContextValue = null;
-            }
-            else
-            {
-                database = (UmbracoDatabase) HttpContext.Current.Items[typeof (DefaultDatabaseFactory)];
-                HttpContext.Current.Items.Remove(typeof (DefaultDatabaseFactory));
-            }
-
-            if (database != null) database.ContextOwner = ContextOwner.None;
-            return database;
-        }
-
-        // attach a current database
-        // ie assign it to whatever is "context"
-        // throws if there already is a database
-        internal static void AttachAmbientDatabase(object o)
-        {
-            var database = o as UmbracoDatabase;
-            if (o != null && database == null) throw new ArgumentException("Not an UmbracoDatabase.", "o");
-
-            var ambient = DetachAmbientDatabase();
-            if (ambient != null) ambient.Dispose();
-
-            if (HttpContext.Current == null)
-            {
-                //if (NonContextValue != null) throw new InvalidOperationException();
-                if (database == null) return;
-
-                NonContextValue = database;
-                database.ContextOwner = ContextOwner.CallContext;
-            }
-            else
-            {
-                //if (HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] != null) throw new InvalidOperationException();
-                if (database == null) return;
-
-                HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] = database;
-                database.ContextOwner = ContextOwner.HttpContext;
-            }
-        }
-
-        #endregion
     }
 }

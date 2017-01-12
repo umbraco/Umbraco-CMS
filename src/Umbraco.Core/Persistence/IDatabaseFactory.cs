@@ -7,6 +7,13 @@ namespace Umbraco.Core.Persistence
 	/// </summary>
 	public interface IDatabaseFactory : IDisposable
 	{
+        // gets or creates the ambient database
 		UmbracoDatabase CreateDatabase();
 	}
+
+    public interface IDatabaseFactory2 : IDatabaseFactory
+    {
+        // creates a new database
+        UmbracoDatabase CreateNewDatabase();
+    }
 }

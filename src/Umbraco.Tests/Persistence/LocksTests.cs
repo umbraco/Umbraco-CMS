@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.TestHelpers;
@@ -36,8 +37,9 @@ namespace Umbraco.Tests.Persistence
             //threading environment, or a single apartment threading environment will not work for this test because
             //it is multi-threaded.
             _dbFactory = new ThreadSafetyServiceTest.PerThreadDatabaseFactory(Logger);
+            var scopeProvider = new ScopeProvider(_dbFactory);
             //overwrite the local object
-            ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory, Logger, new SqlCeSyntaxProvider(), Constants.DatabaseProviders.SqlCe);
+            ApplicationContext.DatabaseContext = new DatabaseContext(scopeProvider, Logger, new SqlCeSyntaxProvider(), Constants.DatabaseProviders.SqlCe);
 
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();

@@ -512,6 +512,12 @@
     <Compile Include="Publishing\UnPublishedStatusType.cs" />
     <Compile Include="Publishing\UnPublishStatus.cs" />
     <Compile Include="SafeCallContext.cs" />
+    <Compile Include="Scoping\IScope.cs" />
+    <Compile Include="Scoping\IScopeProvider.cs" />
+    <Compile Include="Scoping\IScopeProviderInternal.cs" />
+    <Compile Include="Scoping\NoScope.cs" />
+    <Compile Include="Scoping\Scope.cs" />
+    <Compile Include="Scoping\ScopeProvider.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />

@@ -77,8 +77,8 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            // running on a background task, requires a safe database (see UsingSafeDatabase doc)
-            using (ApplicationContext.Current.DatabaseContext.UseSafeDatabase())
+            // running on a background task, requires its own (safe) scope
+            using (ApplicationContext.Current.ScopeProvider.CreateScope())
             using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));

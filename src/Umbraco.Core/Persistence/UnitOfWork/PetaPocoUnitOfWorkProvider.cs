@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
@@ -9,25 +10,25 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     /// </summary>
     public class PetaPocoUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
     {
-        private readonly IDatabaseFactory _dbFactory;
+        private readonly IScopeProvider _scopeProvider;
 
         [Obsolete("Use the constructor specifying an ILogger instead")]
         public PetaPocoUnitOfWorkProvider()
-            : this(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, LoggerResolver.Current.Logger))
+            : this(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, LoggerResolver.Current.Logger)))
         {
 
         }
 
         [Obsolete("Use the constructor specifying an ILogger instead")]
         public PetaPocoUnitOfWorkProvider(string connectionString, string providerName)
-            : this(new DefaultDatabaseFactory(connectionString, providerName, LoggerResolver.Current.Logger))
+            : this(new ScopeProvider(new DefaultDatabaseFactory(connectionString, providerName, LoggerResolver.Current.Logger)))
         { }
 
         /// <summary>
         /// Parameterless constructor uses defaults
         /// </summary>
         public PetaPocoUnitOfWorkProvider(ILogger logger)
-            : this(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, logger))
+            : this(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, logger)))
         {
 
         }
@@ -39,17 +40,17 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="connectionString">Connection String to use with Database</param>
         /// <param name="providerName">Database Provider for the Connection String</param>
         public PetaPocoUnitOfWorkProvider(ILogger logger, string connectionString, string providerName)
-            : this(new DefaultDatabaseFactory(connectionString, providerName, logger))
+            : this(new ScopeProvider(new DefaultDatabaseFactory(connectionString, providerName, logger)))
         { }
 
         /// <summary>
         /// Constructor accepting an IDatabaseFactory instance
         /// </summary>
-        /// <param name="dbFactory"></param>
-        public PetaPocoUnitOfWorkProvider(IDatabaseFactory dbFactory)
+        /// <param name="scopeProvider"></param>
+        public PetaPocoUnitOfWorkProvider(IScopeProvider scopeProvider)
         {
-            Mandate.ParameterNotNull(dbFactory, "dbFactory");
-            _dbFactory = dbFactory;
+            Mandate.ParameterNotNull(scopeProvider, "scopeProvider");
+            _scopeProvider = scopeProvider;
         }
 
         #region Implementation of IUnitOfWorkProvider
@@ -65,7 +66,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </remarks>
         public IDatabaseUnitOfWork GetUnitOfWork()
         {
-            return new PetaPocoUnitOfWork(_dbFactory.CreateDatabase());
+            return new PetaPocoUnitOfWork(_scopeProvider);
         }
 
         #endregion
@@ -76,6 +77,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <returns></returns>
         internal static IDatabaseUnitOfWork CreateUnitOfWork(ILogger logger)
         {
+            // fixme wtf?
             var provider = new PetaPocoUnitOfWorkProvider(logger);
             return provider.GetUnitOfWork();
         }

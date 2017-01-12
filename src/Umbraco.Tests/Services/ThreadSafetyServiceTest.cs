@@ -19,6 +19,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
 using Umbraco.Core.Events;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Services
 {
@@ -39,8 +40,9 @@ namespace Umbraco.Tests.Services
 			//threading environment, or a single apartment threading environment will not work for this test because 
 			//it is multi-threaded.
 			_dbFactory = new PerThreadDatabaseFactory(Logger);
+		    var scopeProvider = new ScopeProvider(_dbFactory);
 			//overwrite the local object
-            ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory, Logger, new SqlCeSyntaxProvider(), Constants.DatabaseProviders.SqlCe);
+            ApplicationContext.DatabaseContext = new DatabaseContext(scopeProvider, Logger, new SqlCeSyntaxProvider(), Constants.DatabaseProviders.SqlCe);
 
             //disable cache
 		    var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
@@ -218,7 +220,7 @@ namespace Umbraco.Tests.Services
 		/// <summary>
 		/// Creates a Database object per thread, this mimics the web context which is per HttpContext and is required for the multi-threaded test
 		/// </summary>
-		internal class PerThreadDatabaseFactory : DisposableObject, IDatabaseFactory
+		internal class PerThreadDatabaseFactory : DisposableObject, IDatabaseFactory2
 		{
 		    private readonly ILogger _logger;
 
@@ -237,7 +239,12 @@ namespace Umbraco.Tests.Services
 				return db;
 			}
 
-			protected override void DisposeResources()
+		    public UmbracoDatabase CreateNewDatabase()
+		    {
+		        return new UmbracoDatabase(Constants.System.UmbracoConnectionName, _logger);
+		    }
+
+		    protected override void DisposeResources()
 			{
 				//dispose the databases
 				_databases.ForEach(x => x.Value.Dispose());
@@ -249,26 +256,21 @@ namespace Umbraco.Tests.Services
 		/// </summary>
 		internal class PerThreadPetaPocoUnitOfWorkProvider : DisposableObject, IDatabaseUnitOfWorkProvider
 		{
-			private readonly PerThreadDatabaseFactory _dbFactory;
+		    private readonly ScopeProvider _scopeProvider;
 
 			public PerThreadPetaPocoUnitOfWorkProvider(PerThreadDatabaseFactory dbFactory)
 			{
-				_dbFactory = dbFactory;
+                _scopeProvider = new ScopeProvider(dbFactory);
 			}
 
 			public IDatabaseUnitOfWork GetUnitOfWork()
 			{
 				//Create or get a database instance for this thread.
-				var db = _dbFactory.CreateDatabase();
-				return new PetaPocoUnitOfWork(db);
+				return new PetaPocoUnitOfWork(_scopeProvider);
 			}
 
 			protected override void DisposeResources()
-			{
-				//dispose the databases
-				_dbFactory.Dispose();
-			}
+			{ }
 		}
-
 	}
 }

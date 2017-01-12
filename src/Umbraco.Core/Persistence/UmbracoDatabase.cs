@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence
     /// can then override any additional execution (such as additional loggging, functionality, etc...) that we need to without breaking compatibility since we'll always be exposing
     /// this object instead of the base PetaPoco database object.
     /// </remarks>
-    public class UmbracoDatabase : Database, IDisposeOnRequestEnd
+    public class UmbracoDatabase : Database
     {
         private readonly ILogger _logger;
         private readonly Guid _instanceId = Guid.NewGuid();
@@ -259,6 +259,7 @@ namespace Umbraco.Core.Persistence
             base.BuildSqlDbSpecificPagingQuery(databaseType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
         }
 
+        /*
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
@@ -267,5 +268,6 @@ namespace Umbraco.Core.Persistence
 #endif
             if (DatabaseFactory != null) DatabaseFactory.OnDispose(this);
         }
+        */
     }
 }

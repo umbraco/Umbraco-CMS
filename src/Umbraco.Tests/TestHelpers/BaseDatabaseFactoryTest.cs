@@ -24,6 +24,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -70,7 +71,6 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbConnectionString(),
                 GetDbProviderName(),
                 Logger);
-            _dbFactory.ResetForTests();
 
             base.Initialize();
 
@@ -92,11 +92,12 @@ namespace Umbraco.Tests.TestHelpers
             var repositoryFactory = new RepositoryFactory(CacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
 
             var evtMsgs = new TransientMessagesFactory();
+            var scopeProvider = new ScopeProvider(_dbFactory);
             _appContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(_dbFactory, Logger, SqlSyntax, GetDbProviderName()),
+                new DatabaseContext(scopeProvider, Logger, SqlSyntax, GetDbProviderName()),
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
                 CacheHelper,
                 ProfilingLogger)
             {

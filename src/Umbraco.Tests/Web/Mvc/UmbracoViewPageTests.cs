@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -463,7 +464,7 @@ namespace Umbraco.Tests.Web.Mvc
             var svcCtx = GetServiceContext(umbracoSettings, logger);
 
             var appCtx = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(Mock.Of<IScopeProvider>(), logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
                 svcCtx,
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(logger, Mock.Of<IProfiler>())) { IsReady = true };
