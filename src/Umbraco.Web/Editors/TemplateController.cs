@@ -70,13 +70,24 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public TemplateDisplay GetEmpty()
+        public TemplateDisplay GetScaffold(int id)
         {
+            //empty default
             var dt = new Template("", "");
-            var content = ViewHelper.GetDefaultFileContent();
+            dt.Path = "-1";
 
+            if (id > 0)
+            {
+                var master = Services.FileService.GetTemplate(id);
+                if(master != null)
+                {
+                    dt.SetMasterTemplate(master);
+                }
+            }
+
+            var content = ViewHelper.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
             var scaffold = Mapper.Map<ITemplate, TemplateDisplay>(dt);
-            scaffold.Path = "-1";
+           
             scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
             return scaffold;
         }

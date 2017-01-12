@@ -107,13 +107,14 @@ function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the template scaffold.
          *
          */
-        getScaffold: function () {
+        getScaffold: function (id) {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "templateApiBaseUrl",
-                       "GetEmpty")),
+                       "GetScaffold",
+                        [{ id: id }] )),
                "Failed to retrieve data for empty template");
         },
 
