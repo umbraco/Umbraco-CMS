@@ -2,6 +2,7 @@
 
    <div class="umb-control-group">
       <umb-tree-search-box
+         ng-if="enableSearh"
          hide-search-callback="hideSearch"
          search-callback="onSearchResults"
          search-from-id="{{searchInfo.searchFromId}}"

@@ -16,6 +16,8 @@
     'lib/ng-file-upload/ng-file-upload.min.js',
     'lib/angular-local-storage/angular-local-storage.min.js',
 
+    //"lib/ace-builds/src-min-noconflict/ace.js",
+
     'lib/bootstrap/js/bootstrap.2.3.2.min.js',
     'lib/bootstrap-tabdrop/bootstrap-tabdrop.js',
     'lib/umbraco/Extensions.js',
