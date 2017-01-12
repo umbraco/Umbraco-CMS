@@ -31,13 +31,13 @@ namespace Umbraco.Core.Events
         [Obsolete("Use constructor accepting a product name instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationEventArgs(IList<IMigration> eventObject, SemVersion configuredVersion, SemVersion targetVersion, bool canCancel)
-            : this(eventObject, null, configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName, canCancel)
+            : this(eventObject, null, configuredVersion, targetVersion, Constants.System.UmbracoMigrationName, canCancel)
         { }
 
         [Obsolete("Use constructor accepting SemVersion instances and a product name instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationEventArgs(IList<IMigration> eventObject, Version configuredVersion, Version targetVersion, bool canCancel)
-			: this(eventObject, null, new SemVersion(configuredVersion), new SemVersion(targetVersion), GlobalSettings.UmbracoMigrationName, canCancel)
+			: this(eventObject, null, new SemVersion(configuredVersion), new SemVersion(targetVersion), Constants.System.UmbracoMigrationName, canCancel)
          { }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Events
             MigrationContext = migrationContext;
             ConfiguredSemVersion = configuredVersion;
             TargetSemVersion = targetVersion;
-            ProductName = GlobalSettings.UmbracoMigrationName;
+            ProductName = Constants.System.UmbracoMigrationName;
         }
 
         /// <summary>
@@ -97,13 +97,13 @@ namespace Umbraco.Core.Events
         [Obsolete("Use constructor accepting a product name instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationEventArgs(IList<IMigration> eventObject, SemVersion configuredVersion, SemVersion targetVersion)
-            : this(eventObject, null, configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName, false)
+            : this(eventObject, null, configuredVersion, targetVersion, Constants.System.UmbracoMigrationName, false)
         { }
 
         [Obsolete("Use constructor accepting SemVersion instances and a product name instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationEventArgs(IList<IMigration> eventObject, Version configuredVersion, Version targetVersion)
-			: this(eventObject, null, new SemVersion(configuredVersion), new SemVersion(targetVersion), GlobalSettings.UmbracoMigrationName, false)
+			: this(eventObject, null, new SemVersion(configuredVersion), new SemVersion(targetVersion), Constants.System.UmbracoMigrationName, false)
 		{ }
 
 		/// <summary>

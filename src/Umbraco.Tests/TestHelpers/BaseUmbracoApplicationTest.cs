@@ -164,7 +164,7 @@ namespace Umbraco.Tests.TestHelpers
             var evtMsgs = new TransientMessagesFactory();
             var applicationContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger), Logger, sqlSyntax, Constants.DatabaseProviders.SqlCe),
+                new DatabaseContext(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, Logger), Logger, sqlSyntax, Constants.DatabaseProviders.SqlCe),
                 //assign the service context
                 new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
                 CacheHelper,

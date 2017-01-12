@@ -195,14 +195,14 @@ namespace Umbraco.Core
                     return _providerName;
 
                 _providerName = Constants.DatabaseProviders.SqlServer;
-                if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
+                if (ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName] != null)
                 {
-                    if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName) == false)
-                        _providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
+                    if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ProviderName) == false)
+                        _providerName = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ProviderName;
                 }
                 else
                 {
-                    throw new InvalidOperationException("Can't find a connection string with the name '" + GlobalSettings.UmbracoConnectionName + "'");
+                    throw new InvalidOperationException("Can't find a connection string with the name '" + Constants.System.UmbracoConnectionName + "'");
                 }
                 return _providerName;
             }
@@ -388,9 +388,9 @@ namespace Umbraco.Core
         {
             //Set the connection string for the new datalayer
             var connectionStringSettings = string.IsNullOrEmpty(providerName)
-                                      ? new ConnectionStringSettings(GlobalSettings.UmbracoConnectionName,
+                                      ? new ConnectionStringSettings(Constants.System.UmbracoConnectionName,
                                                                      connectionString)
-                                      : new ConnectionStringSettings(GlobalSettings.UmbracoConnectionName,
+                                      : new ConnectionStringSettings(Constants.System.UmbracoConnectionName,
                                                                      connectionString, providerName);
 
             _connectionString = connectionString;
@@ -401,10 +401,10 @@ namespace Umbraco.Core
             var connectionstrings = xml.Root.DescendantsAndSelf("connectionStrings").Single();
 
             // Update connectionString if it exists, or else create a new appSetting for the given key and value
-            var setting = connectionstrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == GlobalSettings.UmbracoConnectionName);
+            var setting = connectionstrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == Constants.System.UmbracoConnectionName);
             if (setting == null)
                 connectionstrings.Add(new XElement("add",
-                    new XAttribute("name", GlobalSettings.UmbracoConnectionName),
+                    new XAttribute("name", Constants.System.UmbracoConnectionName),
                     new XAttribute("connectionString", connectionStringSettings),
                     new XAttribute("providerName", providerName)));
             else
@@ -429,23 +429,23 @@ namespace Umbraco.Core
         /// </remarks>
         internal void Initialize()
         {
-            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             if (databaseSettings != null && string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) == false && string.IsNullOrWhiteSpace(databaseSettings.ProviderName) == false)
             {
                 var providerName = Constants.DatabaseProviders.SqlServer;
                 string connString = null;
-                if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
+                if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ProviderName))
                 {
-                    providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
-                    connString = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
+                    providerName = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ProviderName;
+                    connString = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ConnectionString;
                 }
                 Initialize(providerName, connString);
 
             }
-            else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName]) == false)
+            else if (ConfigurationManager.AppSettings.ContainsKey(Constants.System.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[Constants.System.UmbracoConnectionName]) == false)
             {
                 //A valid connectionstring does not exist, but the legacy appSettings key was found, so we'll reconfigure the conn.string.
-                var legacyConnString = ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName];
+                var legacyConnString = ConfigurationManager.AppSettings[Constants.System.UmbracoConnectionName];
                 if (legacyConnString.ToLowerInvariant().Contains("sqlce4umbraco"))
                 {
                     ConfigureEmbeddedDatabaseConnection();
@@ -476,7 +476,7 @@ namespace Umbraco.Core
                 }
 
                 //Remove the legacy connection string, so we don't end up in a loop if something goes wrong.
-                GlobalSettings.RemoveSetting(GlobalSettings.UmbracoConnectionName);
+                GlobalSettings.RemoveSetting(Constants.System.UmbracoConnectionName);
 
             }
             else
@@ -672,7 +672,7 @@ namespace Umbraco.Core
 
                 //DO the upgrade!
 
-                var runner = new MigrationRunner(migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), Constants.System.UmbracoMigrationName);
 
                 var upgraded = runner.Execute(database, true);
 

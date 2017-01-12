@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class RemoveUmbracoDeployTables : MigrationBase
     {
         public RemoveUmbracoDeployTables(ISqlSyntaxProvider sqlSyntax, ILogger logger) 

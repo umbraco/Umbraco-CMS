@@ -310,7 +310,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             var dto = new MigrationDto
             {
                 Id = 1,
-                Name = GlobalSettings.UmbracoMigrationName,
+                Name = Constants.System.UmbracoMigrationName,
                 Version = UmbracoVersion.GetSemanticVersion().ToString(),
                 CreateDate = DateTime.Now
             };

@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.CodeAnnotations;
+﻿using System;
+using System.ComponentModel;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models
 {
@@ -17,6 +19,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.ContentItemType)]
         [FriendlyName("Content Item Type")]
+        [Obsolete("This is not used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         ContentItemType,
 
         /// <summary>
@@ -67,6 +71,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.ContentItem)]
         [FriendlyName("Content Item")]
+        [Obsolete("This is not used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         ContentItem,
 
         /// <summary>

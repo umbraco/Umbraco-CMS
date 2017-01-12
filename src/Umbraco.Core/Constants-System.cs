@@ -25,6 +25,9 @@
             public const int DefaultContentListViewDataTypeId = -95;
             public const int DefaultMediaListViewDataTypeId = -96;
             public const int DefaultMembersListViewDataTypeId = -97;
+
+            public const string UmbracoConnectionName = "umbracoDbDSN";
+            public const string UmbracoMigrationName = "Umbraco";
         }
 
         public static class DatabaseProviders

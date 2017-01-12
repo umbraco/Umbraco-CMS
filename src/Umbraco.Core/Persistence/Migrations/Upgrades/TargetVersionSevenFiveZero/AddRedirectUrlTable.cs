@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero
 {
-    [Migration("7.5.0", 100, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.5.0", 100, Constants.System.UmbracoMigrationName)]
     public class AddRedirectUrlTable : MigrationBase
     {
         public AddRedirectUrlTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)

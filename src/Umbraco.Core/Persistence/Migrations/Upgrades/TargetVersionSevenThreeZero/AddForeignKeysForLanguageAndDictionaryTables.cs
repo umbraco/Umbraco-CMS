@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
-    [Migration("7.3.0", 14, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 14, Constants.System.UmbracoMigrationName)]
     public class AddForeignKeysForLanguageAndDictionaryTables : MigrationBase
     {
         public AddForeignKeysForLanguageAndDictionaryTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)

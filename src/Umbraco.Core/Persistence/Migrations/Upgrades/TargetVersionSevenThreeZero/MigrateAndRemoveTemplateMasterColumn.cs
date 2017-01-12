@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     /// <summary>
     /// Remove the master column after we've migrated all of the values into the 'ParentId' and Path column of Umbraco node
     /// </summary>
-    [Migration("7.3.0", 1, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 1, Constants.System.UmbracoMigrationName)]
     public class MigrateAndRemoveTemplateMasterColumn : MigrationBase
     {
 

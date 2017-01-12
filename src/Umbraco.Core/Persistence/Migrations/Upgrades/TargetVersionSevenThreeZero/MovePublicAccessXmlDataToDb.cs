@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
-    [Migration("7.3.0", 7, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 7, Constants.System.UmbracoMigrationName)]
     public class MovePublicAccessXmlDataToDb : MigrationBase
     {
         public MovePublicAccessXmlDataToDb(ISqlSyntaxProvider sqlSyntax, ILogger logger)

@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             if (ValidTables.Any(x => x.InvariantEquals("umbracoMigration")))
             {
-                var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
+                var allMigrations = migrationEntryService.GetAll(Constants.System.UmbracoMigrationName);
                  mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
             }
 
