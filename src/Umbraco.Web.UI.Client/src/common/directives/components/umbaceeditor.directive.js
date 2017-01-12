@@ -1,11 +1,7 @@
 (function() {
     'use strict';
 
-    function AceEditorDirective(umbAceEditorConfig, assetsService) {
-
-        if (angular.isUndefined(window.ace)) {
-            throw new Error('ui-ace need ace to work... (o rly?)');
-        }
+    function AceEditorDirective(umbAceEditorConfig, assetsService, angularHelper) {
 
         /**
          * Sets editor options such as the wrapping mode or the syntax checker.
@@ -128,213 +124,211 @@
 
         function link(scope, el, attr, ngModel) {
 
-
-            /**
-             * Corresponds the umbAceEditorConfig ACE configuration.
-             * @type object
-             */
-            var options = umbAceEditorConfig.ace || {};
-
-            /**
-             * umbAceEditorConfig merged with user options via json in attribute or data binding
-             * @type object
-             */
-            var opts = angular.extend({}, options, scope.$eval(attr.umbAceEditor));
-
-
-            //load ace libraries here... 
-
-            /**
-             * ACE editor
-             * @type object
-             */
-            var acee = window.ace.edit(el[0]);
-            acee.$blockScrolling = Infinity;
-
-            /**
-             * ACE editor session.
-             * @type object
-             * @see [EditSession]{@link http://ace.c9.io/#nav=api&api=edit_session}
-             */
-            var session = acee.getSession();
-
-            /**
-             * Reference to a change listener created by the listener factory.
-             * @function
-             * @see listenerFactory.onChange
-             */
-            var onChangeListener;
-
-            /**
-             * Reference to a blur listener created by the listener factory.
-             * @function
-             * @see listenerFactory.onBlur
-             */
-            var onBlurListener;
-
-            /**
-             * Calls a callback by checking its existing. The argument list
-             * is variable and thus this function is relying on the arguments
-             * object.
-             * @throws {Error} If the callback isn't a function
-             */
-            var executeUserCallback = function() {
-
-                /**
-                 * The callback function grabbed from the array-like arguments
-                 * object. The first argument should always be the callback.
-                 *
-                 * @see [arguments]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/arguments}
-                 * @type {*}
-                 */
-                var callback = arguments[0];
-
-                /**
-                 * Arguments to be passed to the callback. These are taken
-                 * from the array-like arguments object. The first argument
-                 * is stripped because that should be the callback function.
-                 *
-                 * @see [arguments]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/arguments}
-                 * @type {Array}
-                 */
-                var args = Array.prototype.slice.call(arguments, 1);
-
-                if (angular.isDefined(callback)) {
-                    scope.$evalAsync(function() {
-                        if (angular.isFunction(callback)) {
-                            callback(args);
-                        } else {
-                            throw new Error('ui-ace use a function as callback.');
-                        }
-                    });
+            // Load in ace library
+            assetsService.loadJs('lib/ace-builds/src-min-noconflict/ace.js').then(function () {
+                if (angular.isUndefined(window.ace)) {
+                    throw new Error('ui-ace need ace to work... (o rly?)');
+                } else {
+                    // init editor
+                    init();
                 }
-            };
-
-
-
-            /**
-             * Listener factory. Until now only change listeners can be created.
-             * @type object
-             */
-            var listenerFactory = {
-                /**
-                 * Creates a change listener which propagates the change event
-                 * and the editor session to the callback from the user option
-                 * onChange. It might be exchanged during runtime, if this
-                 * happens the old listener will be unbound.
-                 *
-                 * @param callback callback function defined in the user options
-                 * @see onChangeListener
-                 */
-                onChange: function(callback) {
-                    return function(e) {
-                        var newValue = session.getValue();
-
-                        if (ngModel && newValue !== ngModel.$viewValue &&
-                            // HACK make sure to only trigger the apply outside of the
-                            // digest loop 'cause ACE is actually using this callback
-                            // for any text transformation !
-                            !scope.$$phase && !scope.$root.$$phase) {
-                            scope.$evalAsync(function() {
-                                ngModel.$setViewValue(newValue);
-                            });
-                        }
-
-                        executeUserCallback(callback, e, acee);
-                    };
-                },
-                /**
-                 * Creates a blur listener which propagates the editor session
-                 * to the callback from the user option onBlur. It might be
-                 * exchanged during runtime, if this happens the old listener
-                 * will be unbound.
-                 *
-                 * @param callback callback function defined in the user options
-                 * @see onBlurListener
-                 */
-                onBlur: function(callback) {
-                    return function() {
-                        executeUserCallback(callback, acee);
-                    };
-                }
-            };
-
-            attr.$observe('readonly', function(value) {
-                acee.setReadOnly(!!value || value === '');
             });
 
-            // Value Blind
-            if (ngModel) {
-                ngModel.$formatters.push(function(value) {
-                    if (angular.isUndefined(value) || value === null) {
-                        return '';
-                    } else if (angular.isObject(value) || angular.isArray(value)) {
-                        throw new Error('ui-ace cannot use an object or an array as a model');
+            function init() {
+
+                /**
+                 * Corresponds the umbAceEditorConfig ACE configuration.
+                 * @type object
+                 */
+                var options = umbAceEditorConfig.ace || {};
+
+                /**
+                 * umbAceEditorConfig merged with user options via json in attribute or data binding
+                 * @type object
+                 */
+                var opts = angular.extend({}, options, scope.umbAceEditor);
+
+
+                //load ace libraries here... 
+
+                /**
+                 * ACE editor
+                 * @type object
+                 */
+                var acee = window.ace.edit(el[0]);
+                acee.$blockScrolling = Infinity;
+
+                /**
+                 * ACE editor session.
+                 * @type object
+                 * @see [EditSession]{@link http://ace.c9.io/#nav=api&api=edit_session}
+                 */
+                var session = acee.getSession();
+
+                /**
+                 * Reference to a change listener created by the listener factory.
+                 * @function
+                 * @see listenerFactory.onChange
+                 */
+                var onChangeListener;
+
+                /**
+                 * Reference to a blur listener created by the listener factory.
+                 * @function
+                 * @see listenerFactory.onBlur
+                 */
+                var onBlurListener;
+
+                /**
+                 * Calls a callback by checking its existing. The argument list
+                 * is variable and thus this function is relying on the arguments
+                 * object.
+                 * @throws {Error} If the callback isn't a function
+                 */
+                var executeUserCallback = function() {
+
+                    /**
+                     * The callback function grabbed from the array-like arguments
+                     * object. The first argument should always be the callback.
+                     *
+                     * @see [arguments]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/arguments}
+                     * @type {*}
+                     */
+                    var callback = arguments[0];
+
+                    /**
+                     * Arguments to be passed to the callback. These are taken
+                     * from the array-like arguments object. The first argument
+                     * is stripped because that should be the callback function.
+                     *
+                     * @see [arguments]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/arguments}
+                     * @type {Array}
+                     */
+                    var args = Array.prototype.slice.call(arguments, 1);
+
+                    if (angular.isDefined(callback)) {
+                        scope.$evalAsync(function() {
+                            if (angular.isFunction(callback)) {
+                                callback(args);
+                            } else {
+                                throw new Error('ui-ace use a function as callback.');
+                            }
+                        });
                     }
-                    return value;
+                };
+
+
+
+                /**
+                 * Listener factory. Until now only change listeners can be created.
+                 * @type object
+                 */
+                var listenerFactory = {
+                    /**
+                     * Creates a change listener which propagates the change event
+                     * and the editor session to the callback from the user option
+                     * onChange. It might be exchanged during runtime, if this
+                     * happens the old listener will be unbound.
+                     *
+                     * @param callback callback function defined in the user options
+                     * @see onChangeListener
+                     */
+                    onChange: function(callback) {
+                        return function(e) {
+                            var newValue = session.getValue();
+                            angularHelper.safeApply(scope, function () {
+                                scope.model = newValue;
+                            });
+                            executeUserCallback(callback, e, acee);
+                        };
+                    },
+                    /**
+                     * Creates a blur listener which propagates the editor session
+                     * to the callback from the user option onBlur. It might be
+                     * exchanged during runtime, if this happens the old listener
+                     * will be unbound.
+                     *
+                     * @param callback callback function defined in the user options
+                     * @see onBlurListener
+                     */
+                    onBlur: function(callback) {
+                        return function() {
+                            executeUserCallback(callback, acee);
+                        };
+                    }
+                };
+
+                attr.$observe('readonly', function(value) {
+                    acee.setReadOnly(!!value || value === '');
                 });
 
-                ngModel.$render = function() {
-                    session.setValue(ngModel.$viewValue);
+                // Value Blind
+                if(scope.model) {
+                    session.setValue(scope.model);
+                }
+
+                // Listen for option updates
+                var updateOptions = function(current, previous) {
+                    if (current === previous) {
+                        return;
+                    }
+
+                    opts = angular.extend({}, options, scope.umbAceEditor);
+
+                    opts.callbacks = [opts.onLoad];
+                    if (opts.onLoad !== options.onLoad) {
+                        // also call the global onLoad handler
+                        opts.callbacks.unshift(options.onLoad);
+                    }
+
+                    // EVENTS
+
+                    // unbind old change listener
+                    session.removeListener('change', onChangeListener);
+
+                    // bind new change listener
+                    onChangeListener = listenerFactory.onChange(opts.onChange);
+                    session.on('change', onChangeListener);
+
+                    // unbind old blur listener
+                    //session.removeListener('blur', onBlurListener);
+                    acee.removeListener('blur', onBlurListener);
+
+                    // bind new blur listener
+                    onBlurListener = listenerFactory.onBlur(opts.onBlur);
+                    acee.on('blur', onBlurListener);
+
+                    setOptions(acee, session, opts);
                 };
+
+                scope.$watch(scope.umbAceEditor, updateOptions, /* deep watch */ true);
+
+                // set the options here, even if we try to watch later, if this
+                // line is missing things go wrong (and the tests will also fail)
+                updateOptions(options);
+
+                el.on('$destroy', function() {
+                    acee.session.$stopWorker();
+                    acee.destroy();
+                });
+
+                scope.$watch(function() {
+                    return [el[0].offsetWidth, el[0].offsetHeight];
+                }, function() {
+                    acee.resize();
+                    acee.renderer.updateFull();
+                }, true);
+
             }
-
-            // Listen for option updates
-            var updateOptions = function(current, previous) {
-                if (current === previous) {
-                    return;
-                }
-                opts = angular.extend({}, options, scope.$eval(attr.umbAceEditor));
-
-                opts.callbacks = [opts.onLoad];
-                if (opts.onLoad !== options.onLoad) {
-                    // also call the global onLoad handler
-                    opts.callbacks.unshift(options.onLoad);
-                }
-
-                // EVENTS
-
-                // unbind old change listener
-                session.removeListener('change', onChangeListener);
-
-                // bind new change listener
-                onChangeListener = listenerFactory.onChange(opts.onChange);
-                session.on('change', onChangeListener);
-
-                // unbind old blur listener
-                //session.removeListener('blur', onBlurListener);
-                acee.removeListener('blur', onBlurListener);
-
-                // bind new blur listener
-                onBlurListener = listenerFactory.onBlur(opts.onBlur);
-                acee.on('blur', onBlurListener);
-
-                setOptions(acee, session, opts);
-            };
-
-            scope.$watch(attr.umbAceEditor, updateOptions, /* deep watch */ true);
-
-            // set the options here, even if we try to watch later, if this
-            // line is missing things go wrong (and the tests will also fail)
-            updateOptions(options);
-
-            el.on('$destroy', function() {
-                acee.session.$stopWorker();
-                acee.destroy();
-            });
-
-            scope.$watch(function() {
-                return [el[0].offsetWidth, el[0].offsetHeight];
-            }, function() {
-                acee.resize();
-                acee.renderer.updateFull();
-            }, true);
 
         }
 
         var directive = {
             restrict: 'EA',
-            require: '?ngModel',
+            scope: {
+                "umbAceEditor": "=",
+                "model": "="
+            },
             link: link
         };
 
