@@ -4,8 +4,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-
-    internal class ContentElement : ConfigurationElement, IContentSection
+    internal class ContentElement : UmbracoConfigurationElement, IContentSection
     {
         [ConfigurationProperty("imaging")]
         internal ContentImagingElement Imaging
@@ -22,25 +21,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("ResolveUrlsFromTextString")]
         internal InnerTextConfigurationElement<bool> ResolveUrlsFromTextString
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                       (InnerTextConfigurationElement<bool>)this["ResolveUrlsFromTextString"],
-                        //set the default
-                       false);
-            }
+            get { return GetOptionalTextElement<bool>("ResolveUrlsFromTextString", false); }
         }
 
         [ConfigurationProperty("UploadAllowDirectories")]
         internal InnerTextConfigurationElement<bool> UploadAllowDirectories
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                       (InnerTextConfigurationElement<bool>)this["UploadAllowDirectories"],
-                    //set the default
-                       true);
-            }
+            get { return GetOptionalTextElement("UploadAllowDirectories", true); }
         }
 
         public IEnumerable<IContentErrorPage> Error404Collection
@@ -63,121 +50,61 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("ensureUniqueNaming")]
         internal InnerTextConfigurationElement<bool> EnsureUniqueNaming
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                      (InnerTextConfigurationElement<bool>)this["ensureUniqueNaming"],
-                    //set the default
-                      true);
-            }
+            get { return GetOptionalTextElement("ensureUniqueNaming", true); }
         }
 
         [ConfigurationProperty("TidyEditorContent")]
         internal InnerTextConfigurationElement<bool> TidyEditorContent
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                      (InnerTextConfigurationElement<bool>)this["TidyEditorContent"],
-                    //set the default
-                      false);
-            }
+            get { return GetOptionalTextElement("TidyEditorContent", false); }
         }
 
         [ConfigurationProperty("TidyCharEncoding")]
         internal InnerTextConfigurationElement<string> TidyCharEncoding
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<string>(
-                          (InnerTextConfigurationElement<string>)this["TidyCharEncoding"],
-                            //set the default
-                          "UTF8");
-            }
+            get { return GetOptionalTextElement("TidyCharEncoding", "UTF8"); }
         }
 
         [ConfigurationProperty("XmlCacheEnabled")]
         internal InnerTextConfigurationElement<bool> XmlCacheEnabled
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                          (InnerTextConfigurationElement<bool>)this["XmlCacheEnabled"],
-                    //set the default
-                          true);
-            }
+            get { return GetOptionalTextElement("XmlCacheEnabled", true); }
         }
 
         [ConfigurationProperty("ContinouslyUpdateXmlDiskCache")]
         internal InnerTextConfigurationElement<bool> ContinouslyUpdateXmlDiskCache
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                          (InnerTextConfigurationElement<bool>)this["ContinouslyUpdateXmlDiskCache"],
-                    //set the default
-                          true);                
-            }
+            get { return GetOptionalTextElement("ContinouslyUpdateXmlDiskCache", true); }
         }
 
         [ConfigurationProperty("XmlContentCheckForDiskChanges")]
         internal InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                          (InnerTextConfigurationElement<bool>)this["XmlContentCheckForDiskChanges"],
-                    //set the default
-                          false); 
-            }
+            get { return GetOptionalTextElement("XmlContentCheckForDiskChanges", false); }
         }
 
         [ConfigurationProperty("EnableSplashWhileLoading")]
         internal InnerTextConfigurationElement<bool> EnableSplashWhileLoading
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                          (InnerTextConfigurationElement<bool>)this["EnableSplashWhileLoading"],
-                    //set the default
-                          false); 
-            }
+            get { return GetOptionalTextElement("EnableSplashWhileLoading", false); }
         }
 
         [ConfigurationProperty("PropertyContextHelpOption")]
         internal InnerTextConfigurationElement<string> PropertyContextHelpOption
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<string>(
-                          (InnerTextConfigurationElement<string>)this["PropertyContextHelpOption"],
-                    //set the default
-                          "text"); 
-            }
+            get { return GetOptionalTextElement("PropertyContextHelpOption", "text"); }
         }
 
         [ConfigurationProperty("UseLegacyXmlSchema")]
         internal InnerTextConfigurationElement<bool> UseLegacyXmlSchema
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                          (InnerTextConfigurationElement<bool>)this["UseLegacyXmlSchema"],
-                    //set the default
-                          false); 
-            }
+            get { return GetOptionalTextElement("UseLegacyXmlSchema", false); }
         }
         
         [ConfigurationProperty("ForceSafeAliases")]
         internal InnerTextConfigurationElement<bool> ForceSafeAliases
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                          (InnerTextConfigurationElement<bool>)this["ForceSafeAliases"],
-                    //set the default
-                          true); 
-            }
+            get { return GetOptionalTextElement("ForceSafeAliases", true); }
         }
 
         [ConfigurationProperty("PreviewBadge")]
@@ -185,123 +112,63 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get
             {
-                return new OptionalInnerTextConfigurationElement<string>(
-                          (InnerTextConfigurationElement<string>)this["PreviewBadge"],
-                    //set the default
-                          @"<a id=""umbracoPreviewBadge"" style=""position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={2}""><span style=""display:none;"">In Preview Mode - click to end</span></a>"); 
+                return GetOptionalTextElement("PreviewBadge", @"<a id=""umbracoPreviewBadge"" style=""position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={2}""><span style=""display:none;"">In Preview Mode - click to end</span></a>");                
             }
         }
 
         [ConfigurationProperty("UmbracoLibraryCacheDuration")]
         internal InnerTextConfigurationElement<int> UmbracoLibraryCacheDuration
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<int>(
-                          (InnerTextConfigurationElement<int>)this["UmbracoLibraryCacheDuration"],
-                    //set the default
-                          1800); 
-                
-            }
+            get { return GetOptionalTextElement("UmbracoLibraryCacheDuration", 1800); }
         }
 
         [ConfigurationProperty("MacroErrors")]
         internal InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors
         {
-            get
-            {
-
-                return new OptionalInnerTextConfigurationElement<MacroErrorBehaviour>(
-                          (InnerTextConfigurationElement<MacroErrorBehaviour>)this["MacroErrors"],
-                    //set the default
-                          MacroErrorBehaviour.Inline); 
-            }
+            get { return GetOptionalTextElement("MacroErrors", MacroErrorBehaviour.Inline); }
         }
 
         [Obsolete("This is here so that if this config element exists we won't get a YSOD, it is not used whatsoever and will be removed in future versions")]
         [ConfigurationProperty("DocumentTypeIconList")]
         internal InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<IconPickerBehaviour>(
-                          (InnerTextConfigurationElement<IconPickerBehaviour>)this["DocumentTypeIconList"],
-                    //set the default
-                          IconPickerBehaviour.HideFileDuplicates);
-            }
+            get { return GetOptionalTextElement("DocumentTypeIconList", IconPickerBehaviour.HideFileDuplicates); }
         }
 
         [ConfigurationProperty("disallowedUploadFiles")]
         internal CommaDelimitedConfigurationElement DisallowedUploadFiles
         {
-            get
-            {
-                return new OptionalCommaDelimitedConfigurationElement(
-                       (CommaDelimitedConfigurationElement)this["disallowedUploadFiles"],
-                    //set the default
-                       new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd" });
-
-            }
+            get { return GetOptionalDelimitedElement("disallowedUploadFiles", new[] {"ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd"}); }
         }
 
         [ConfigurationProperty("cloneXmlContent")]
         internal InnerTextConfigurationElement<bool> CloneXmlContent
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["cloneXmlContent"],
-                    //set the default
-                    true);
-            }
+            get { return GetOptionalTextElement("cloneXmlContent", true); }
         }
 
         [ConfigurationProperty("GlobalPreviewStorageEnabled")]
         internal InnerTextConfigurationElement<bool> GlobalPreviewStorageEnabled
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["GlobalPreviewStorageEnabled"],
-                    //set the default
-                    false);
-            }
+            get { return GetOptionalTextElement("GlobalPreviewStorageEnabled", false); }
         }
 
         [ConfigurationProperty("defaultDocumentTypeProperty")]
         internal InnerTextConfigurationElement<string> DefaultDocumentTypeProperty
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<string>(
-                    (InnerTextConfigurationElement<string>)this["defaultDocumentTypeProperty"],
-                    //set the default
-                    "Textstring");
-            }
+            get { return GetOptionalTextElement("defaultDocumentTypeProperty", "Textstring"); }
         }
 
         [ConfigurationProperty("EnableInheritedDocumentTypes")]
         internal InnerTextConfigurationElement<bool> EnableInheritedDocumentTypes
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>) this["EnableInheritedDocumentTypes"],
-                    //set the default
-                    true);
-            }
+            get { return GetOptionalTextElement("EnableInheritedDocumentTypes", true); }
         }
 
         [ConfigurationProperty("EnableInheritedMediaTypes")]
         internal InnerTextConfigurationElement<bool> EnableInheritedMediaTypes
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["EnableInheritedMediaTypes"],
-                    //set the default
-                    true);
-            }
+            get { return GetOptionalTextElement("EnableInheritedMediaTypes", true); }
         }
 
         string IContentSection.NotificationEmailAddress
