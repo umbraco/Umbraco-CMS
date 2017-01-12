@@ -1025,17 +1025,48 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="preview">Preview</key>
     <key alias="styles">Styles</key>
   </area>
+  
   <area alias="template">
     <key alias="edittemplate">Edit template</key>
+
+    <key alias="insertSections">Sections</key>
     <key alias="insertContentArea">Insert content area</key>
     <key alias="insertContentAreaPlaceHolder">Insert content area placeholder</key>
-    <key alias="insertDictionaryItem">Insert dictionary item</key>
-    <key alias="insertMacro">Insert Macro</key>
-    <key alias="insertPageField">Insert Umbraco page field</key>
+    
+    <key alias="insertDictionaryItem">Dictionary item</key>
+    <key alias="insertDictionaryItemDesc">A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create designs for multilingual websites.</key>
+    
+    <key alias="insertMacro">Macro</key>
+    <key alias="insertMacroDesc">
+      A Macro is a configurable component which is great for
+      reusable parts of your design, where you need the option to provide parameters,
+      such as galleries, forms and lists.
+    </key>
+
+    <key alias="insertPageField">Value</key>
+    <key alias="insertPageFieldDesc">Displays the value of a named field from the current page, with options to modify the value or fallback to alternative values.</key>
+    
+    <key alias="insertPartialView">Partial view</key>
+    <key alias="insertPartialViewDesc">
+      A partial view is a separate template file which can be rendered inside another
+      template, it's great for reusing markup or for separating complex templates into separate files.
+    </key>
+    
     <key alias="mastertemplate">Master template</key>
-    <key alias="quickGuide">Quick Guide to Umbraco template tags</key>
+    
+    <key alias="queryBuilder">Query builder</key>
+    <key alias="itemsReturned">items returned, in</key>
+
+    <key alias="iWant">I want</key>
+    <key alias="from">from</key>
+    <key alias="where">where</key>
+    <key alias="and">and</key>
+    <key alias="everything">everything</key>
+    
+    
     <key alias="template">Template</key>
   </area>
+  
   <area alias="grid">
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
