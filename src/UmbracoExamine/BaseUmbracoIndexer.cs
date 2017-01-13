@@ -95,7 +95,7 @@ namespace UmbracoExamine
         /// Determines if the manager will call the indexing methods when content is saved or deleted as
         /// opposed to cache being updated.
         /// </summary>
-        public bool SupportUnpublishedContent { get; protected set; }
+        public bool SupportUnpublishedContent { get; protected internal set; }
 
         /// <summary>
         /// The data service used for retreiving and submitting data to the cms

@@ -41,7 +41,8 @@ namespace Umbraco.Tests.UmbracoExamine
                 IDataTypeService dataTypeService = null,
                 IMemberService memberService = null,
                 IUserService userService = null,
-                IContentTypeService contentTypeService = null)
+                IContentTypeService contentTypeService = null, 
+                bool supportUnpublishedContent = false)
         {
             if (dataService == null)
             {
@@ -185,7 +186,10 @@ namespace Umbraco.Tests.UmbracoExamine
                                                   userService,
                                                   contentTypeService,
                                               analyzer,
-                                              false);
+                                              false)
+            {
+                SupportUnpublishedContent = supportUnpublishedContent
+            };
 
             //i.IndexSecondsInterval = 1;
 
