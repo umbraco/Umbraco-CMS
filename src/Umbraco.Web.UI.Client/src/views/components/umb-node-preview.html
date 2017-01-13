@@ -1,0 +1,13 @@
+<div class="umb-node-preview" ng-class="{'umb-node-preview--sortable': sortable }">
+    <i ng-if="icon" class="umb-node-preview__icon {{ icon }}"></i>
+    <div class="umb-node-preview__content">
+        <div class="umb-node-preview__name">{{ name }}</div>
+        <div ng-if="description" class="umb-node-preview__description">{{ description }}</div>
+    </div>
+    <div class="umb-node-preview__actions">
+        <a class="umb-node-preview__action" title="Edit" href="" ng-if="allowEdit"  ng-click="onEdit()"><i class="icon-edit"></i></a>
+        <a class="umb-node-preview__action" title="Open" href="" ng-if="allowOpen" ng-click="onOpen()"><i class="icon-out"></i></a>
+        <a class="umb-node-preview__action" title="Remove" href="" ng-if="allowRemove" ng-click="onRemove()"><i class="icon-trash"></i></a>
+    <div>
+
+</div>
