@@ -221,5 +221,18 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("preVal1", preVals.PreValuesAsArray.First().Value);
             Assert.AreEqual("preVal2", preVals.PreValuesAsArray.Last().Value);            
         }
+
+        [Test]
+        public void Cannot_Save_DataType_With_Empty_Name()
+        {
+            // Arrange
+            var dataTypeService = ServiceContext.DataTypeService;
+
+            // Act
+            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = string.Empty, DatabaseType = DataTypeDatabaseType.Ntext };
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));
+        }
     }
 }

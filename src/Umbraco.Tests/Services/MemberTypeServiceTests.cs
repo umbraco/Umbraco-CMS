@@ -173,6 +173,16 @@ namespace Umbraco.Tests.Services
             }
         }
 
+        [Test]
+        public void Cannot_Save_MemberType_With_Empty_Name()
+        {
+            // Arrange
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType("memberTypeAlias", string.Empty);
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => ServiceContext.MemberTypeService.Save(memberType));
+        }
+
         //[Test]
         //public void Can_Save_MemberType_Structure_And_Create_A_Member_Based_On_It()
         //{

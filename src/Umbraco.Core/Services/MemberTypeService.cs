@@ -78,6 +78,11 @@ namespace Umbraco.Core.Services
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(memberType), this))
                 return;
 
+            if (string.IsNullOrWhiteSpace(memberType.Name))
+            {
+                throw new ArgumentException("Cannot save MemberType with empty name.");
+            }
+
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
