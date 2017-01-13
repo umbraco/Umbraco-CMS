@@ -1,16 +1,16 @@
 (function () {
     "use strict";
 
-    function InsertOverlayController($scope) {
+    function InsertOverlayController($scope, localizationService) {
 
         var vm = this;
 
         if(!$scope.model.title) {
-            $scope.model.title = "Insert";
+            $scope.model.title = localizationService.localize("template_insert");
         }
 
         if(!$scope.model.subtitle) {
-            $scope.model.subtitle = "Choose what to insert into your template";
+            $scope.model.subtitle = localizationService.localize("template_insertDesc");
         }
 
         vm.openMacroPicker = openMacroPicker;
@@ -22,7 +22,7 @@
 
             vm.macroPickerOverlay = {
                 view: "macropicker",
-                title: "Insert macro",
+                title: localizationService.localize("template_insertMacro"),
                 dialogData: {},
                 show: true,
                 submit: function(model) {
@@ -45,8 +45,8 @@
 
         function openPageFieldOverlay() {
             vm.pageFieldOverlay = {
-                title: "Insert value",
-                description: "Select a value from the currentpage",
+                title: localizationService.localize("template_insertPageField"),
+                description: localizationService.localize("template_insertPageFieldDesc"),
                 submitButtonLabel: "Insert",
                 closeButtonlabel: "Cancel",
                 view: "insertfield",
@@ -78,7 +78,8 @@
                 treeAlias: "dictionary",
                 entityType: "dictionary",
                 multiPicker: false,
-                title: "Insert dictionary item",
+                title: localizationService.localize("template_insertDictionaryItem"),
+                description: localizationService.localize("template_insertDictionaryItemDesc"),
                 show: true,
                 select: function(node){
 
@@ -108,7 +109,7 @@
                 entityType: "partialView",
                 multiPicker: false,
                 show: true,
-                title: "Insert partial view",
+                title: localizationService.localize("template_insertPartialView"),
 
                 select: function(node){
                     

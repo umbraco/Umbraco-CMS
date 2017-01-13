@@ -36,6 +36,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "masterTemplateAlias")]
         public string MasterTemplateAlias { get; set; }
 
+        [DataMember(Name = "isMasterTemplate")]
+        public bool IsMasterTemplate { get; set; }
+
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
