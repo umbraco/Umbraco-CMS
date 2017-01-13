@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 
-function contentPickerController($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper, angularHelper, navigationService, $location) {
+function contentPickerController($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper, angularHelper, navigationService, $location, $timeout, miniEditorHelper) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -77,6 +77,8 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
         : "Document";
     $scope.allowOpenButton = entityType === "Document" || entityType === "Media";
     $scope.allowEditButton = entityType === "Document";
+    $scope.allowRemoveButton = true;
+    $scope.sortable = true;
 
     //the dialog options for the picker
     var dialogOptions = {
@@ -199,6 +201,10 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
 
     $scope.clear = function () {
         $scope.renderModel = [];
+    };
+
+    $scope.openMiniEditor = function(node) {
+        miniEditorHelper.launchMiniEditor(node);
     };
         
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
