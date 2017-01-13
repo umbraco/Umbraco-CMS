@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 
-function contentPickerController($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper, angularHelper, navigationService, $location, $timeout, miniEditorHelper) {
+function contentPickerController($scope, dialogService, entityResource, contentResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper, angularHelper, navigationService, $location, $timeout, miniEditorHelper) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -221,26 +221,32 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
 
     //load current data
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
-    entityResource.getByIds(modelIds, entityType).then(function (data) {
+    var nodePromise = (entityType === "Document") ? contentResource.getByIds(modelIds) : entityResource.getByIds(modelIds, entityType);
 
-        //Ensure we populate the render model in the same order that the ids were stored!
-        _.each(modelIds, function (id, i) {
-            var entity = _.find(data, function (d) {                
-                return d.id == id;
-            });
-           
-            if (entity) {
-                entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
-                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon, path: entity.path });
-            }
+    nodePromise.then(function (data) {
+
+             _.each(modelIds, function (id, i) {
+                var entity = _.find(data, function (d) {                
+                    return d.id == id;
+                });
+            
+                if (entity) {
+                    entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
+
+                    var url = (entity.urls && entity.urls.length > 0) ? entity.urls[0] : "";
+                    var path = ($scope.model.config.showPathOnHover) ? entity.path : "";
+
+                    $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon, path: path, url: url });
+                }
             
            
-        });
+         });
 
         //everything is loaded, start the watch on the model
         startWatch();
 
     });
+
 }
 
 angular.module('umbraco').controller("Umbraco.PropertyEditors.ContentPickerController", contentPickerController);

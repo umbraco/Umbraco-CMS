@@ -16,10 +16,8 @@
                 name: "=",
                 description: "=?",
                 sortable: "=?",
-                allowEdit: "=?",
                 allowOpen: "=?",
                 allowRemove: "=?",
-                onEdit: "&?",
                 onOpen: "&?",
                 onRemove: "&?"
             },
