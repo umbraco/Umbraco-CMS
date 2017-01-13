@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
         [Obsolete("Use the constructor specifying an ILogger instead")]
         public PetaPocoUnitOfWorkProvider()
-            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, LoggerResolver.Current.Logger))
+            : this(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, LoggerResolver.Current.Logger))
         {
 
         }
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// Parameterless constructor uses defaults
         /// </summary>
         public PetaPocoUnitOfWorkProvider(ILogger logger)
-            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, logger))
+            : this(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, logger))
         {
 
         }

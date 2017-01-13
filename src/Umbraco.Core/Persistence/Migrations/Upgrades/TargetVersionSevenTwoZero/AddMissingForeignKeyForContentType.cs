@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
 {
-    [Migration("7.2.0", 1, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.2.0", 1, Constants.System.UmbracoMigrationName)]
     public class AddMissingForeignKeyForContentType : MigrationBase
     {
         public AddMissingForeignKeyForContentType(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

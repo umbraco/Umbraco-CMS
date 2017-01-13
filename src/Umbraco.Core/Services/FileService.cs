@@ -569,6 +569,14 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public long GetTemplateFileSize(string filepath)
+        {
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileSize(filepath);
+            }
+        }
+
         #endregion
 
         public Stream GetStylesheetFileContentStream(string filepath)
@@ -584,6 +592,14 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateStylesheetRepository(UowProvider.GetUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
+            }
+        }
+
+        public long GetStylesheetFileSize(string filepath)
+        {
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileSize(filepath);
             }
         }
 
@@ -603,6 +619,14 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public long GetScriptFileSize(string filepath)
+        {
+            using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileSize(filepath);
+            }
+        }
+
         public Stream GetXsltFileContentStream(string filepath)
         {
             using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetUnitOfWork()))
@@ -616,6 +640,14 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
+            }
+        }
+
+        public long GetXsltFileSize(string filepath)
+        {
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileSize(filepath);
             }
         }
 
@@ -890,6 +922,14 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public long GetPartialViewMacroFileSize(string filepath)
+        {
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileSize(filepath);
+            }
+        }
+
         public Stream GetPartialViewFileContentStream(string filepath)
         {
             using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetUnitOfWork()))
@@ -903,6 +943,14 @@ namespace Umbraco.Core.Services
             using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
+            }
+        }
+
+        public long GetPartialViewFileSize(string filepath)
+        {
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileSize(filepath);
             }
         }
 

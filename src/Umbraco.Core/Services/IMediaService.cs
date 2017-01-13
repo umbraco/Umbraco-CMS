@@ -431,6 +431,13 @@ namespace Umbraco.Core.Services
         void SetMediaFileContent(string filepath, Stream content);
 
         /// <summary>
+        /// Gets the size of a media.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        /// <returns>The size of the media.</returns>
+        long GetMediaFileSize(string filepath);
+
+        /// <summary>
         /// Deletes a media file and all thumbnails.
         /// </summary>
         /// <param name="filepath">The filesystem path to the media.</param>

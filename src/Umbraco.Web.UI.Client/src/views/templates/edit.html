@@ -51,7 +51,7 @@
                                 type="button"
                                 class="umb-era-button umb-button--s"
                                 ng-click="vm.openInsertOverlay()">
-                                <i class="icon icon-add"></i> Insert
+                                <i class="icon icon-add"></i> <localize key="general_insert">Insert</localize>
                             </button>
 
                             <a class="umb-era-button umb-button--s dropdown-toggle umb-button-group__toggle" data-toggle="dropdown">
@@ -59,10 +59,10 @@
                             </a>
 
                             <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up umb-button-group__sub-buttons" role="menu">
-                                <li><a href="" ng-click="vm.openPageFieldOverlay()">Value</a></li>
-                                <li><a href="" ng-click="vm.openPartialOverlay()">Partial view</a></li>
-                                <li><a href="" ng-click="vm.openDictionaryItemOverlay()">Dictionary</a></li>
-                                <li><a href="" ng-click="vm.openMacroOverlay()">Macro</a></li>
+                                <li><a href="" ng-click="vm.openPageFieldOverlay()"><localize key="template_insertPageField">Value</localize></a></li>
+                                <li><a href="" ng-click="vm.openPartialOverlay()"><localize key="template_insertPartialView">Partial view</localize></a></li>
+                                <li><a href="" ng-click="vm.openDictionaryItemOverlay()"><localize key="template_insertDictionaryItem">Dictionary</localize></a></li>
+                                <li><a href="" ng-click="vm.openMacroOverlay()"><localize key="general_insertMacro">Macro</localize></a></li>
                             </ul>
 
                         </div>
@@ -72,14 +72,14 @@
                             style="margin-right: 10px;"
                             class="umb-era-button umb-button--s"
                             ng-click="vm.openQueryBuilderOverlay()">
-                            <i class="icon icon-wand"></i> Query builder
+                            <i class="icon icon-wand"></i> <localize key="template_queryBuilder">Query builder</localize>
                         </button>
 
                         <button
                             type="button"
                             class="umb-era-button umb-button--s"
                             ng-click="vm.openSectionsOverlay()">
-                            <i class="icon icon-indent"></i> Sections
+                            <i class="icon icon-indent"></i> <localize key="template_insertSections">Sections</localize>
                         </button>
 
                     </div>
@@ -89,9 +89,8 @@
                 <div
                     auto-scale="85"
                     umb-ace-editor="vm.aceOption"
-                    ng-model="vm.template.content">
+                    model="vm.template.content">
                 </div>
-
 
             </umb-editor-container>
 

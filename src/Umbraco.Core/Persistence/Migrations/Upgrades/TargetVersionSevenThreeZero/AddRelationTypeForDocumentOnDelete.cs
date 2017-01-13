@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
-    [Migration("7.3.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 0, Constants.System.UmbracoMigrationName)]
     public class AddRelationTypeForDocumentOnDelete : MigrationBase
     {
         public AddRelationTypeForDocumentOnDelete(ISqlSyntaxProvider sqlSyntax, ILogger logger)

@@ -173,7 +173,6 @@
         }, 200);
 
         onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.QueryBuilderController", QueryBuilderOverlayController);

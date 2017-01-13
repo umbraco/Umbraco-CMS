@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence
             SafeCallContext.Clear();
 
             _dbContext = new DatabaseContext(
-                new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Mock.Of<ILogger>()),
+                new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, Mock.Of<ILogger>()),
                 Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), Constants.DatabaseProviders.SqlCe);
 
 			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             //Get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             //by default the conn string is: Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;
             //we'll just replace the sdf file with our custom one:

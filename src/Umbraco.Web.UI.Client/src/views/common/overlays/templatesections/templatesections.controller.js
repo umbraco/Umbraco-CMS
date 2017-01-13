@@ -11,10 +11,6 @@
             $scope.model.title = "Sections";
         }
 
-        if(!$scope.model.subtitle) {
-            $scope.model.subtitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-        }
-
         vm.select = select;
 
         function onInit() {

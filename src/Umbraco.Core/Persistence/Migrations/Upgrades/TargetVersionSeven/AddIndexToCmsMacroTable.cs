@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// <summary>
     /// Creates a unique index on the macro alias so we cannot have duplicates by alias
     /// </summary>
-    [Migration("7.0.0", 4, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 4, Constants.System.UmbracoMigrationName)]
     public class AddIndexToCmsMacroTable : MigrationBase
     {
         private readonly bool _forTesting;

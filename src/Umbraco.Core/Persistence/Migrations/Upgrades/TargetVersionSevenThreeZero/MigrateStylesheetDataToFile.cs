@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     /// These files will then be copied over once the entire migration is complete so that if any migration fails and the db changes are
     /// rolled back, the original files won't be affected.
     /// </remarks>
-    [Migration("7.3.0", 2, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 2, Constants.System.UmbracoMigrationName)]
     public class MigrateStylesheetDataToFile : MigrationBase
     {
         public MigrateStylesheetDataToFile(ISqlSyntaxProvider sqlSyntax, ILogger logger)

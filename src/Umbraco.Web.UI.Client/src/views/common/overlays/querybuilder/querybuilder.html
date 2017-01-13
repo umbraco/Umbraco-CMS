@@ -5,7 +5,7 @@
         <div class="row">
 			<div class="query-items">
 				
-				<span>I want</span>
+				<span><localize key="template_iWant">I Want</localize></span>
 
 				<div class="btn-group">
 
@@ -22,7 +22,7 @@
 
 				</div>
 
-				<span>from</span>
+				<span><localize key="template_fromt">from</localize></span>
 
 				<a href class="btn btn-link" ng-click="vm.chooseSource(vm.query)">
 					{{vm.query.source.name}}
@@ -33,8 +33,12 @@
 
 			<div class="query-items" ng-repeat="filter in vm.query.filters">
 
-				<span ng-if="$first">Where</span>
-				<span ng-if="!$first">And</span>
+				<span ng-if="$first">
+                    <localize key="template_where">where</localize>
+                </span>
+				<span ng-if="!$first">
+                    <localize key="template_and">and</localize>
+                </span>
 
 				<div class="btn-group">
 
@@ -96,7 +100,7 @@
 
 			<div class="query-items">
 
-				<span>Order by</span>
+				<span<localize key="template_orderBy">order by</localize></span>
 
 				<div class="btn-group">
 					<a class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">
@@ -121,7 +125,7 @@
 			</div>
 		</div>
 
-		<h5>Returns {{model.result.resultCount}} items in {{model.result.executionTime}} miliseconds</h5>
+		<h5>{{model.result.resultCount}} <localize key="template_itemsReturned">items, returned in</localize> {{model.result.executionTime}} ms</h5>
 
 		<ul class="nav unstyled">
 			<li ng-repeat="item in model.result.sampleResults">

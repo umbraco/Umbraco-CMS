@@ -1325,6 +1325,23 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Hack: This is used to fix some data if an entity's properties are invalid/corrupt
+        /// </summary>
+        /// <param name="media"></param>
+        private void QuickUpdate(IMedia media)
+        {
+            if (media == null) throw new ArgumentNullException("media");
+            if (media.HasIdentity == false) throw new InvalidOperationException("Cannot update an entity without an Identity");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateMediaRepository(uow))
+            {
+                repository.AddOrUpdate(media);
+                uow.Commit();
+            }
+        }
+        
         public Stream GetMediaFileContentStream(string filepath)
         {
             if (_mediaFileSystem.FileExists(filepath) == false)
@@ -1342,6 +1359,11 @@ namespace Umbraco.Core.Services
         public void SetMediaFileContent(string filepath, Stream stream)
         {
             _mediaFileSystem.AddFile(filepath, stream, true);
+        }
+
+        public long GetMediaFileSize(string filepath)
+        {
+            return _mediaFileSystem.GetSize(filepath);
         }
 
         public void DeleteMediaFile(string filepath)

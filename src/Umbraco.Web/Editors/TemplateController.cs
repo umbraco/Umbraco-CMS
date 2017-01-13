@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
             var template = Services.FileService.GetTemplate(id);
             if (template == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-
+            
             return Mapper.Map<ITemplate, TemplateDisplay>(template);
         }
 
@@ -70,13 +70,24 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public TemplateDisplay GetEmpty()
+        public TemplateDisplay GetScaffold(int id)
         {
+            //empty default
             var dt = new Template("", "");
-            var content = ViewHelper.GetDefaultFileContent();
+            dt.Path = "-1";
 
+            if (id > 0)
+            {
+                var master = Services.FileService.GetTemplate(id);
+                if(master != null)
+                {
+                    dt.SetMasterTemplate(master);
+                }
+            }
+
+            var content = ViewHelper.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
             var scaffold = Mapper.Map<ITemplate, TemplateDisplay>(dt);
-            scaffold.Path = "-1";
+           
             scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
             return scaffold;
         }
@@ -104,6 +115,8 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
                 var changeMaster = template.MasterTemplateAlias != display.MasterTemplateAlias;
+                var changeAlias = template.Alias != display.Alias;
+
                 Mapper.Map(display, template);
 
                 if (changeMaster)
@@ -130,6 +143,11 @@ namespace Umbraco.Web.Editors
 
                 Services.FileService.SaveTemplate(template);
 
+                if (changeAlias)
+                {
+                    template = Services.FileService.GetTemplate(template.Id);
+                }
+
                 Mapper.Map(template, display);
             }
             else
@@ -144,6 +162,7 @@ namespace Umbraco.Web.Editors
                 }
 
                 var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Content, master);
+                //template = Services.FileService.GetTemplate(template.Id);
                 Mapper.Map(template, display);
             }
 

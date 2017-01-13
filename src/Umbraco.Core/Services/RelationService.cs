@@ -49,6 +49,19 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets a <see cref="RelationType"/> by its Id
+        /// </summary>
+        /// <param name="id">Id of the <see cref="RelationType"/></param>
+        /// <returns>A <see cref="RelationType"/> object</returns>
+        public IRelationType GetRelationTypeById(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateRelationTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
+
+        /// <summary>
         /// Gets a <see cref="RelationType"/> by its Alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="RelationType"/></param>

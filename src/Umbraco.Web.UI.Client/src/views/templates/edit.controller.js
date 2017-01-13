@@ -95,7 +95,7 @@
 
             if($routeParams.create){
 
-            	templateResource.getScaffold().then(function(template){
+                templateResource.getScaffold(($routeParams.id)).then(function (template) {
             		vm.ready(template);
             	});
 

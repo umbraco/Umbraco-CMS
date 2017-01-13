@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Services
 			{
 				var db = _databases.GetOrAdd(
                     Thread.CurrentThread.ManagedThreadId,
-                    i => new UmbracoDatabase(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, _logger));
+                    i => new UmbracoDatabase(Constants.System.UmbracoConnectionName, _logger));
 				return db;
 			}
 

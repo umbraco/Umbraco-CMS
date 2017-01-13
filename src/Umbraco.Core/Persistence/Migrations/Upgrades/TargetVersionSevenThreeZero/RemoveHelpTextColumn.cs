@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
-    [Migration("7.3.0", 8, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 8, Constants.System.UmbracoMigrationName)]
     public class RemoveHelpTextColumn : MigrationBase
     {
         public RemoveHelpTextColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)

@@ -38,6 +38,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 				  }
 			  }
 		  }
+		
+		// Search is only working for content, media and member section so we will remove it from everything else
+		if($scope.section === "content" || $scope.section === "media" || $scope.section === "member" ) {
+			$scope.enableSearh = true;
+		}
 
 	    //create the custom query string param for this tree
 	    $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";

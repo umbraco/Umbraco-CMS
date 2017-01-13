@@ -167,6 +167,7 @@
     <Compile Include="Persistence\PetaPocoExpressionsTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Scheduling\DeployTest.cs" />
+    <Compile Include="Routing\NiceUrlRoutesTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TryConvertToTests.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />

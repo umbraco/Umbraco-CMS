@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class AddMacroUniqueIdColumn : MigrationBase
     {
         public AddMacroUniqueIdColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
