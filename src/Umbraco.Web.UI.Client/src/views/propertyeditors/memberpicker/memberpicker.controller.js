@@ -8,6 +8,7 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
     }
 
     $scope.renderModel = [];
+    $scope.allowRemove = true;
 
     var dialogOptions = {
         multiPicker: false,
