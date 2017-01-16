@@ -57,6 +57,20 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         internal bool EnableSqlTrace { get; set; }
 
+        public bool InTransaction { get; private set; }
+
+        public override void OnBeginTransaction()
+        {
+            base.OnBeginTransaction();
+            InTransaction = true;
+        }
+
+        public override void OnEndTransaction()
+        {
+            base.OnEndTransaction();
+            InTransaction = false;
+        }
+
 #if DEBUG_DATABASES
         private const bool EnableSqlTraceDefault = true;
 #else

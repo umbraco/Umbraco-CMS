@@ -332,8 +332,16 @@ namespace Umbraco.Core.Persistence
 			if (_transactionDepth == 1)
 			{
 				OpenSharedConnection();
-				_transaction = _sharedConnection.BeginTransaction(isolationLevel);
-				_transactionCancelled = false;
+			    try
+			    {
+			        _transaction = _sharedConnection.BeginTransaction(isolationLevel);
+			    }
+
+			    catch (Exception e)
+			    {
+			        throw;
+			    }
+                _transactionCancelled = false;
 				OnBeginTransaction();
 			}
             else if (isolationLevel > _transaction.IsolationLevel)

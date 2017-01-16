@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence
         //private static readonly object Locker = new object();
 
         // bwc imposes a weird x-dependency between database factory and scope provider...
-        public ScopeProvider ScopeProvider { get; set; }
+        public IScopeProviderInternal ScopeProvider { get; set; }
 
 	    /// <summary>
 	    /// Constructor accepting custom connection string
@@ -61,8 +61,9 @@ namespace Umbraco.Core.Persistence
 
 		public UmbracoDatabase CreateDatabase()
 		{
-            var scope = ScopeProvider.AmbientScope;
-            return scope != null ? scope.Database : ScopeProvider.CreateNoScope().Database;
+		    return ScopeProvider.AmbientOrNoScope.Database;
+            //var scope = ScopeProvider.AmbientScope;
+            //return scope != null ? scope.Database : ScopeProvider.CreateNoScope().Database;
 
             /*
             UmbracoDatabase database;

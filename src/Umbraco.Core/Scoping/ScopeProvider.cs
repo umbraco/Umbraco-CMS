@@ -66,31 +66,29 @@ namespace Umbraco.Core.Scoping
             }
         }
 
+        /// <inheritdoc />
         public IScope AmbientScope
         {
             get { return StaticAmbientScope; }
             set { StaticAmbientScope = value; }
         }
 
-        // fixme should we do...
-        // using (var s = scopeProvider.AttachScope(other))
-        // {
-        // }
-        // can't because disposing => detach or commit? cannot tell!
-        // var scope = scopeProvider.CreateScope();
-        // scope = scopeProvider.Detach();
-        // scope.Detach();
-        // scopeProvider.Attach(scope);
-        // ... do things ...
-        // scopeProvider.Detach();
-        // scopeProvider.Attach(scope);
-        // scope.Dispose();
+        /// <inheritdoc />
+        public IScope AmbientOrNoScope
+        {
+            get
+            {
+                return AmbientScope ?? (AmbientScope = new NoScope(this));
+            }
+        }
 
+        /// <inheritdoc />
         public IScope CreateDetachedScope()
         {
             return new Scope(this, true);
         }
 
+        /// <inheritdoc />
         public void AttachScope(IScope other)
         {
             var otherScope = other as Scope;
@@ -119,6 +117,7 @@ namespace Umbraco.Core.Scoping
             AmbientScope = otherScope;
         }
 
+        /// <inheritdoc />
         public IScope DetachScope()
         {
             var ambient = AmbientScope;
@@ -141,17 +140,20 @@ namespace Umbraco.Core.Scoping
             return scope;
         }
 
+        /// <inheritdoc />
         public IScope CreateScope()
         {
             var ambient = AmbientScope;
             if (ambient == null)
                 return AmbientScope = new Scope(this);
 
+            // replace noScope with a real one
             var noScope = ambient as NoScope;
             if (noScope != null)
             {
                 // peta poco nulls the shared connection after each command unless there's a trx
-                if (noScope.HasDatabase && noScope.Database.Connection != null)
+                var database = noScope.DatabaseOrNull;
+                if (database != null && database.InTransaction)
                     throw new Exception();
                 return AmbientScope = new Scope(this, noScope);
             }
@@ -160,13 +162,6 @@ namespace Umbraco.Core.Scoping
             if (scope == null) throw new Exception();
 
             return AmbientScope = new Scope(this, scope);
-        }
-
-        public IScope CreateNoScope()
-        {
-            var ambient = AmbientScope;
-            if (ambient != null) throw new Exception();
-            return AmbientScope = new NoScope(this);
         }
 
         public void Disposing(IScope disposing, bool? completed = null)
@@ -178,7 +173,13 @@ namespace Umbraco.Core.Scoping
             if (noScope != null)
             {
                 // fixme - kinda legacy
-                if (noScope.HasDatabase) noScope.Database.Dispose();
+                var noScopeDatabase = noScope.DatabaseOrNull;
+                if (noScopeDatabase != null)
+                {
+                    if (noScopeDatabase.InTransaction)
+                        throw new Exception();
+                    noScopeDatabase.Dispose();
+                }
                 AmbientScope = null;
                 return;
             }
@@ -198,27 +199,19 @@ namespace Umbraco.Core.Scoping
 
             // fixme - a scope is in a transaction only if ... there is a db transaction, or always?
             // what shall we do with events if not in a transaction?
+            // fixme - when completing... the db should be released, no need to dispose the db?
 
             // note - messages
             // at the moment we are totally not filtering the messages based on completion
             // status, so whether the scope is committed or rolled back makes no difference
 
+            var database = scope.DatabaseOrNull;
+            if (database == null) return;
+
             if (completed.HasValue && completed.Value)
-            {
-                var database = scope.HasDatabase ? scope.Database : null;
-                if (database != null)
-                {
-                    database.CompleteTransaction();
-                }
-            }
+                database.CompleteTransaction();
             else
-            {
-                var database = scope.HasDatabase ? scope.Database : null;
-                if (database != null)
-                {
-                    database.AbortTransaction();
-                }
-            }
+                database.AbortTransaction();
         }
     }
 }

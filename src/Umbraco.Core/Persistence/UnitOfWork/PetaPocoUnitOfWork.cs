@@ -10,15 +10,16 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	/// </summary>
 	internal class PetaPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
 	{
-	    private readonly IScope _scope;
-
-		/// <summary>
-		/// Used for testing
-		/// </summary>
-		internal Guid InstanceId { get; private set; }
-
-		private Guid _key;
         private readonly Queue<Operation> _operations = new Queue<Operation>();
+        private readonly IScopeProvider _scopeProvider;
+        private bool _completeScope = true; // scope is completed by default
+        private IScope _scope;
+        private Guid _key;
+
+        /// <summary>
+        /// Used for testing
+        /// </summary>
+        internal Guid InstanceId { get; private set; }
 
         /// <summary>
         /// Creates a new unit of work instance
@@ -29,7 +30,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </remarks>
         internal PetaPocoUnitOfWork(IScopeProvider scopeProvider)
         {
-            _scope = scopeProvider.CreateScope();
+            _scopeProvider = scopeProvider;
 			_key = Guid.NewGuid();
 			InstanceId = Guid.NewGuid();
 		}
@@ -102,33 +103,33 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </param>
         internal void Commit(Action<UmbracoDatabase> transactionCompleting)
         {
-            using (var transaction = Database.GetTransaction())
+            // this happens in a scope-managed transaction
+
+            // in case anything goes wrong
+            _completeScope = false;
+
+            while (_operations.Count > 0)
             {
-                while (_operations.Count > 0)
+                var operation = _operations.Dequeue();
+                switch (operation.Type)
                 {
-                    var operation = _operations.Dequeue();
-                    switch (operation.Type)
-                    {
-                        case TransactionType.Insert:
-                            operation.Repository.PersistNewItem(operation.Entity);
-                            break;
-                        case TransactionType.Delete:
-                            operation.Repository.PersistDeletedItem(operation.Entity);
-                            break;
-                        case TransactionType.Update:
-                            operation.Repository.PersistUpdatedItem(operation.Entity);
-                            break;
-                    }
+                    case TransactionType.Insert:
+                        operation.Repository.PersistNewItem(operation.Entity);
+                        break;
+                    case TransactionType.Delete:
+                        operation.Repository.PersistDeletedItem(operation.Entity);
+                        break;
+                    case TransactionType.Update:
+                        operation.Repository.PersistUpdatedItem(operation.Entity);
+                        break;
                 }
-
-                //Execute the callback if there is one
-                if (transactionCompleting != null)
-                {
-                    transactionCompleting(Database);    
-                }
-
-                transaction.Complete();
             }
+
+            if (transactionCompleting != null)
+                transactionCompleting(Database);    
+
+            // all is ok
+            _completeScope = true;
 
             // Clear everything
             _operations.Clear();
@@ -140,7 +141,16 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 			get { return _key; }
 		}
 
-		public UmbracoDatabase Database {get { return _scope.Database; } }
+	    public UmbracoDatabase Database
+	    {
+	        get
+	        {
+                if (_scope == null)
+                    //throw new InvalidOperationException("Out-of-scope UnitOfWork.");
+                    _scope = _scopeProvider.CreateScope();
+                return _scope.Database;
+	        }
+	    }
 
 		#region Operation
 
@@ -179,7 +189,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		protected override void DisposeResources()
 		{
 			_operations.Clear();
+		    if (_scope == null) return;
+
+		    if (_completeScope) _scope.Complete();
 		    _scope.Dispose();
+		    _scope = null;
 		}
 	}
 }

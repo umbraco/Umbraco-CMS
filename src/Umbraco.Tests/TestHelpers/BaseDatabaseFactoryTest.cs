@@ -72,6 +72,12 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbProviderName(),
                 Logger);
 
+            // fixme - bah
+            var scopeProvider = new ScopeProvider(null);
+            if (scopeProvider.AmbientScope != null)
+                scopeProvider.AmbientScope.Dispose();
+            scopeProvider.AmbientScope = null;
+
             base.Initialize();
 
             using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("init"))

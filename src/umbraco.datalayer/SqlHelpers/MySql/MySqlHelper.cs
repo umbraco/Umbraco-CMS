@@ -122,12 +122,12 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         {
             using (var cc = UseCurrentConnection)
             {
-                return new MySqlDataReader(ExecuteReader((MSC.MySqlConnection) cc.Connection, (MSC.MySqlTransaction) cc.Transaction, commandText, parameters, true));
+                return new MySqlDataReader(ExecuteReader((MSC.MySqlConnection) cc.Connection, (MSC.MySqlTransaction) cc.Transaction, commandText, parameters));
             }
         }
 
         // copied & adapted from MySqlHelper
-        private static MSC.MySqlDataReader ExecuteReader(MSC.MySqlConnection connection, MSC.MySqlTransaction trx, string commandText, MSC.MySqlParameter[] commandParameters, bool externalConn)
+        private static MSC.MySqlDataReader ExecuteReader(MSC.MySqlConnection connection, MSC.MySqlTransaction trx, string commandText, MSC.MySqlParameter[] commandParameters)
         {
             MSC.MySqlCommand mySqlCommand = new MSC.MySqlCommand();
             mySqlCommand.Connection = connection;
@@ -139,7 +139,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
                 foreach (var commandParameter in commandParameters)
                     mySqlCommand.Parameters.Add(commandParameter);
             }
-            MSC.MySqlDataReader mySqlDataReader = !externalConn ? mySqlCommand.ExecuteReader(CommandBehavior.CloseConnection) : mySqlCommand.ExecuteReader();
+            MSC.MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader();
             mySqlCommand.Parameters.Clear();
             return mySqlDataReader;
         }

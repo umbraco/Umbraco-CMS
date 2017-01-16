@@ -8,6 +8,7 @@ namespace Umbraco.Core.Scoping
     internal class NoScope : IScope
     {
         private readonly ScopeProvider _scopeProvider;
+        private bool _disposed;
 
         private UmbracoDatabase _database;
         private IList<EventMessage> _messages;
@@ -17,18 +18,44 @@ namespace Umbraco.Core.Scoping
             _scopeProvider = scopeProvider;
         }
 
-        public bool HasDatabase { get { return _database != null; } }
+        //public bool HasDatabase { get { return _database != null; } }
 
         public UmbracoDatabase Database
         {
-            get { return _database ?? (_database = _scopeProvider.DatabaseFactory.CreateNewDatabase()); }
+            get
+            {
+                EnsureNotDisposed();
+                return _database ?? (_database = _scopeProvider.DatabaseFactory.CreateNewDatabase());
+            }
         }
 
-        public bool HasMessages { get { return _messages != null; } }
+        public UmbracoDatabase DatabaseOrNull
+        {
+            get
+            {
+                EnsureNotDisposed();
+                return _database;
+            }
+        }
+
+        //public bool HasMessages { get { return _messages != null; } }
 
         public IList<EventMessage> Messages
         {
-            get { return _messages ?? (_messages = new List<EventMessage>()); }
+            get
+            {
+                EnsureNotDisposed();
+                return _messages ?? (_messages = new List<EventMessage>());
+            }
+        }
+
+        public IList<EventMessage> MessagesOrNull
+        {
+            get
+            {
+                EnsureNotDisposed();
+                return _messages;
+            }
         }
 
         public void Complete()
@@ -36,9 +63,17 @@ namespace Umbraco.Core.Scoping
             throw new NotImplementedException();
         }
 
+        private void EnsureNotDisposed()
+        {
+            if (_disposed)
+                throw new ObjectDisposedException("this");
+        }
+
         public void Dispose()
         {
+            EnsureNotDisposed();
             _scopeProvider.Disposing(this);
+            _disposed = true;
             GC.SuppressFinalize(this);
         }
     }

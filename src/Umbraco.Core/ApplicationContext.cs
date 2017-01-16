@@ -422,10 +422,17 @@ namespace Umbraco.Core
                 this.ApplicationCache = null;
                 if (_databaseContext != null) //need to check the internal field here
                 {
+                    if (_databaseContext.ScopeProvider.AmbientScope != null)
+                    {
+                        var scope = _databaseContext.ScopeProvider.AmbientScope;
+                        scope.Dispose();
+                    }
+                    /*
                     if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.Database != null)
                     {
                         DatabaseContext.Database.Dispose();       
-                    }                    
+                    } 
+                    */                   
                 }
                 this.DatabaseContext = null;
                 this.Services = null;

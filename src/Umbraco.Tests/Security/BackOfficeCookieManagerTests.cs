@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -28,7 +29,7 @@ namespace Umbraco.Tests.Security
             //should force app ctx to show not-configured
             ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", "");
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
+            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
             dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(false);
 
             var appCtx = new ApplicationContext(
@@ -53,7 +54,7 @@ namespace Umbraco.Tests.Security
         [Test]
         public void ShouldAuthenticateRequest_When_Configured()
         {
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
+            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
             dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
 
             var appCtx = new ApplicationContext(

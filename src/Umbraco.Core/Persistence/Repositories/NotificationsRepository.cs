@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class NotificationsRepository
+    internal class NotificationsRepository : IDisposable
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
 
@@ -101,6 +101,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 };
             _unitOfWork.Database.Insert(dto);
             return new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);
+        }
+
+        public void Dispose()
+        {
+            _unitOfWork.Dispose();
         }
     }
 }

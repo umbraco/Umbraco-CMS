@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(moveResult.Success);
 
-            //re-get with the fixed/moved path 
+            //re-get with the fixed/moved path
             content = contentService.GetById(content.Id);
 
             Assert.AreEqual("-1,-20," + content.Id, content.Path);
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Services
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content2);
 
-            // Act            
+            // Act
             contentService.MoveToRecycleBin(content1);
 
             // Assert
@@ -306,7 +306,7 @@ namespace Umbraco.Tests.Services
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content2);
 
-            // Act            
+            // Act
             contentService.MoveToRecycleBin(content1);
             contentService.MoveToRecycleBin(content2);
 
@@ -339,7 +339,7 @@ namespace Umbraco.Tests.Services
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content2);
 
-            // Act            
+            // Act
             contentService.UnPublish(content1);
             contentService.UnPublish(content2);
 
@@ -375,7 +375,7 @@ namespace Umbraco.Tests.Services
             contentService.UnPublish(content1);
             contentService.UnPublish(content2);
 
-            // Act            
+            // Act
             contentService.Publish(content1);
 
             // Assert
@@ -411,7 +411,7 @@ namespace Umbraco.Tests.Services
             contentService.MoveToRecycleBin(content1);
             contentService.MoveToRecycleBin(content2);
 
-            // Act            
+            // Act
             contentService.Move(content1, -1);
             contentService.Publish(content1);
 
@@ -839,8 +839,10 @@ namespace Umbraco.Tests.Services
             bool published = contentService.Publish(content, 0);
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var uow = provider.GetUnitOfWork();
-            Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+            using (var uow = provider.GetUnitOfWork())
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
 
             // Act
             bool unpublished = contentService.UnPublish(content, 0);
@@ -850,8 +852,10 @@ namespace Umbraco.Tests.Services
             Assert.That(unpublished, Is.True);
             Assert.That(content.Published, Is.False);
 
-            uow = provider.GetUnitOfWork();
-            Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+            using (var uow = provider.GetUnitOfWork())
+            {
+                Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
         }
 
         /// <summary>
@@ -947,7 +951,7 @@ namespace Umbraco.Tests.Services
             // Act
             contentService.RePublishAll(new int[] { allContent.Last().ContentTypeId });
 
-            // Assert            
+            // Assert
             using (var uow = provider.GetUnitOfWork())
             {
                 Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
