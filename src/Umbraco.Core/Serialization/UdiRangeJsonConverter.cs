@@ -1,15 +1,14 @@
-﻿using System;
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Core.Serialization
 {
-
-    public class UdiJsonConverter : JsonConverter
+    public class UdiRangeJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Udi).IsAssignableFrom(objectType);
+            return typeof(UdiRange).IsAssignableFrom(objectType);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -21,7 +20,7 @@ namespace Umbraco.Core.Serialization
         {
             var jo = JToken.ReadFrom(reader);
             var val = jo.ToObject<string>();
-            return val == null ? null : Udi.Parse(val);
+            return val == null ? null : UdiRange.Parse(val);
         }
     }
 }

@@ -5,18 +5,6 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Contains the valid selector values.
-    /// </summary>
-    internal static class DeploySelector
-    {
-        public const string This = "this";
-        public const string ThisAndChildren = "this-and-children";
-        public const string ThisAndDescendants = "this-and-descendants";
-        public const string ChildrenOfThis = "children";
-        public const string DescendantsOfThis = "descendants";
-    }
-
-    /// <summary>
     /// Defines well-known entity types.
     /// </summary>
     /// <remarks>Well-known entity types are those that Deploy already knows about,
