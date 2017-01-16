@@ -232,9 +232,8 @@ function contentPickerController($scope, dialogService, entityResource, contentR
 
     //load current data
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
-    var nodePromise = entityResource.getByIds(modelIds, entityType);
 
-    nodePromise.then(function (data) {
+    entityResource.getByIds(modelIds, entityType).then(function (data) {
 
         _.each(modelIds, function (id, i) {
             var entity = _.find(data, function (d) {                
