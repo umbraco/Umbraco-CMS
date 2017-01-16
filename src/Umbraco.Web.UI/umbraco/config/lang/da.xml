@@ -1009,11 +1009,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="edittemplate">Rediger skabelong</key>
 
     <key alias="insertSections">Sektioner</key>
-    <key alias="insertContentArea">Insert content area</key>
-    <key alias="insertContentAreaPlaceHolder">Insert content area placeholder</key>
+    <key alias="insertContentArea">Indsæt indholdsområde</key>
+    <key alias="insertContentAreaPlaceHolder">Indsæt indholdsområde placeholder</key>
 
     <key alias="insert">Indsæt</key>
-    <key alias="insertDesc">Vælg hvad du vil indsætte</key>
+    <key alias="insertDesc">Hvad vil du indsætte ?</key>
 
     <key alias="insertDictionaryItem">Oversættelse</key>
     <key alias="insertDictionaryItemDesc">Indsætter en oversætbar tekst som skifter efter det sprog som websitet vises i.</key>
@@ -1021,17 +1021,20 @@ Mange hilsner fra Umbraco robotten
     <key alias="insertMacro">Makro</key>
     <key alias="insertMacroDesc">
       En makro er et element som kan have forskellige indstillinger når det indsættes.
-      Det er glimrende som en genbrugelig del af dit design såsom gallerier, formularer
+      Brug det som en genbrugelig del af dit design såsom gallerier, formularer
       og lister.
     </key>
 
-    <key alias="insertPageField">Value</key>
-    <key alias="insertPageFieldDesc">Displays the value of a named field from the current page, with options to modify the value or fallback to alternative values.</key>
+    <key alias="insertPageField">Side værdi</key>
+    <key alias="insertPageFieldDesc">
+      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller
+      vise en standard værdi i tilfælde af at feltet er tomt.
+    </key>
 
     <key alias="insertPartialView">Partial view</key>
     <key alias="insertPartialViewDesc">
-      A partial view is a separate template file which can be rendered inside another
-      template, it's great for reusing markup or for separating complex templates into separate files.
+      Et Partial View er et skabelon element som kan indsættes i andre skabeloner og derved
+      genbruges og deles på tværs af side-skabelonerne.
     </key>
 
     <key alias="mastertemplate">Master skabelon</key>
@@ -1080,8 +1083,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="from">fra</key>
     <key alias="where">filtre</key>
     <key alias="and">og</key>
-
-
 
     <key alias="template">Skabelon</key>
   </area>
