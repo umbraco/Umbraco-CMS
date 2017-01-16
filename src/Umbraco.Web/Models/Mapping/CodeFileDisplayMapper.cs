@@ -16,14 +16,17 @@ namespace Umbraco.Web.Models.Mapping
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<IPartialView, CodeFileDisplay>()
-            .ForMember(x => x.Notifications, exp => exp.Ignore())
-            .ForMember(x => x.Snippet, exp => exp.Ignore());
+                .ForMember(x => x.FileType, exp => exp.Ignore())
+                .ForMember(x => x.Notifications, exp => exp.Ignore())
+                .ForMember(x => x.Snippet, exp => exp.Ignore());
 
             config.CreateMap<Script, CodeFileDisplay>()
+                .ForMember(x => x.FileType, exp => exp.Ignore())
                 .ForMember(x => x.Notifications, exp => exp.Ignore())
                 .ForMember(x => x.Snippet, exp => exp.Ignore());
 
             config.CreateMap<CodeFileDisplay, IPartialView>()
+                .ForMember(x => x.Id, exp => exp.Ignore())
                 .ForMember(x => x.Key, exp => exp.Ignore())
                 .ForMember(x => x.Path, exp => exp.Ignore())
                 .ForMember(x => x.CreateDate, exp => exp.Ignore())
@@ -35,6 +38,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.HasIdentity, exp => exp.Ignore());
 
             config.CreateMap<CodeFileDisplay, Script>()
+                .ForMember(x => x.Id, exp => exp.Ignore())
                 .ForMember(x => x.Key, exp => exp.Ignore())
                 .ForMember(x => x.Path, exp => exp.Ignore())
                 .ForMember(x => x.CreateDate, exp => exp.Ignore())
