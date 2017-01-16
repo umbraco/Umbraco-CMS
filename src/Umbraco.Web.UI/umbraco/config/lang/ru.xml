@@ -27,6 +27,9 @@
     <key alias="publish">Опубликовать</key>
     <key alias="refreshNode">Обновить узлы</key>
     <key alias="republish">Опубликовать весь сайт</key>
+    <key alias="SetPermissionsForThePage">Установить разрешения для страницы '%0%'</key>
+    <key alias="chooseWhereToMove">Выберите, куда переместить</key>
+    <key alias="toInTheTreeStructureBelow">В структуре документов ниже</key>
     <key alias="restore" version="7.3.0">Восстановить</key>
     <key alias="rights">Разрешения</key>
     <key alias="rollback">Откатить</key>
@@ -189,7 +192,7 @@
     <key alias="memberrole">Роль участника</key>
     <key alias="membertype">Тип участника</key>
     <key alias="noDate">Дата не указана</key>
-    <key alias="nodeName">Заголовок страницы</key>
+    <key alias="nodeName">Заголовок ссылки</key>
     <key alias="notmemberof">Не является членом групп(ы)</key>
     <key alias="otherElements">Свойства</key>
     <key alias="parentNotPublished">Этот документ опубликован, но скрыт, потому что его родительский документ '%0%' не опубликован</key>
@@ -341,9 +344,10 @@
     <key alias="viewCacheItem">Просмотр элемента кэша</key>
     <key alias="createFolder">Создать папку...</key>
     <key alias="relateToOriginalLabel">Связать с оригиналом</key>
+    <key alias="includeDescendants">Включая все дочерние</key>
     <key alias="theFriendliestCommunity">Самое дружелюбное сообщество</key>
     <key alias="linkToPage">Ссылка на страницу</key>
-    <key alias="openInNewWindow">Открывает документ по ссылке в новом окне или вкладке браузера</key>
+    <key alias="openInNewWindow">Открывать ссылку в новом окне или вкладке браузера</key>
     <key alias="linkToMedia">Ссылка на медиа-файл</key>
     <key alias="selectMedia">Выбрать медиа</key>
     <key alias="selectIcon">Выбрать значок</key>
