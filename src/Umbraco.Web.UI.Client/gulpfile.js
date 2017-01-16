@@ -75,28 +75,29 @@ var sources = {
     //selectors for copying all views into the build
     //processed in the views task
     views:{
-        umbraco: {files: ["src/views/**/*html"], folder: "/"},
+        umbraco: {files: ["src/views/**/*html"], folder: ""},
         preview: { files: ["src/canvasdesigner/**/*.html"], folder: "../preview"},
-        installer: {files: ["src/installer/steps/*.html"], folder: "/install"}
+        installer: {files: ["src/installer/steps/*.html"], folder: "install"}
     },
 
     //globs for file-watching
     globs:{
-        views: "src/views/**/*html",
-        less: "src/less*.less",
-        js: "src/*.js",
-        lib: "lib/**/*.*, lib-bower/**/*.*",
-        assets: "src/assets/**"    
+        views: "./src/views/**/*.html",
+        less: "./src/less/**/*.less",
+        js: "./src/*.js",
+        lib: "./lib/**/*",
+        bower: "./lib-bower/**/*",
+        assets: "./src/assets/**"    
     }
 };
 
-var root = "../Umbraco.Web.UI/umbraco/";
+var root = "../Umbraco.Web.UI/Umbraco/";
 var targets = {
-    js: "js",
-    lib: "lib",
-    views: "views",
-    css: "assets/css",
-    assets: "assets"
+    js: "js/",
+    lib: "lib/",
+    views: "views/",
+    css: "assets/css/",
+    assets: "assets/"
 };
 
 
@@ -120,13 +121,13 @@ gulp.task('dependencies', function () {
 
     //Tinymce
     stream.add(
-            gulp.src("bower_components/tinymce/plugins/**")
+            gulp.src("./bower_components/tinymce/plugins/**")
                 .pipe(gulp.dest(root + targets.lib + "/tinymce/plugins/"))
         );
 
     //font-awesome
     stream.add(
-            gulp.src("bower_components/font-awesome/{fonts,css}/*")
+            gulp.src("./bower_components/font-awesome/{fonts,css}/*")
                 .pipe(gulp.dest(root + targets.lib + "/font-awesome"))
         );
 
@@ -134,6 +135,11 @@ gulp.task('dependencies', function () {
     //libraries that have been managed by bower-installer (/lib-bower)
     stream.add(
          gulp.src(sources.globs.lib)
+            .pipe(gulp.dest(root + targets.lib))
+        );
+
+    stream.add(
+         gulp.src(sources.globs.bower)
             .pipe(gulp.dest(root + targets.lib))
         );
 
@@ -193,9 +199,11 @@ gulp.task('views', function () {
 
     _.forEach(sources.views, function (group) {
 
+        console.log("copying " + group.files + " to " + root + targets.views + group.folder)
+
         stream.add (
             gulp.src(group.files)
-                .pipe(gulp.dest(root + targets.views + group.folder))
+                .pipe( gulp.dest(root + targets.views + group.folder) )
         );
     
     });
@@ -233,9 +241,7 @@ gulp.task('watch', defaultTasks, function () {
         watch(sources.globs.less, { ignoreInitial: true }, function () {
             gulp.run(['less']);
         })
-
     );
-
 
     //watch all views - copy single file changes
     stream.add( 

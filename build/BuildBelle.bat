@@ -26,7 +26,7 @@ ECHO Do npm install and the grunt build of Belle
 call npm cache clean --quiet
 call npm install --quiet
 call npm install -g gulp-cli --quiet
-call gulp --buildversion=%release%
+call gulp
 
 ECHO Move back to the build folder
 CD %buildFolder% 
