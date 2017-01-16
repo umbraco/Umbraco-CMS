@@ -3,6 +3,7 @@ using System.Collections;
 using System.Configuration.Provider;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -320,13 +321,14 @@ namespace umbraco.cms.presentation.user
             }
 
             // Populate dropdowns
-            foreach (DocumentType dt in DocumentType.GetAllAsList())
-                cDocumentType.Items.Add(
-                    new ListItem(dt.Text, dt.Alias)
-                    );
+            var allContentTypes = Services.ContentTypeService.GetAllContentTypes().ToList();
+            foreach (var dt in allContentTypes)
+            {
+                cDocumentType.Items.Add(new ListItem(dt.Name, dt.Alias));
+            }
 
             // populate fields
-            ArrayList fields = new ArrayList();
+            var fields = new ArrayList();
             cDescription.ID = "cDescription";
             cCategories.ID = "cCategories";
             cExcerpt.ID = "cExcerpt";
@@ -334,9 +336,9 @@ namespace umbraco.cms.presentation.user
             cCategories.Items.Add(new ListItem(ui.Text("choose"), ""));
             cExcerpt.Items.Add(new ListItem(ui.Text("choose"), ""));
 
-            foreach (PropertyType pt in PropertyType.GetAll())
+            foreach (var pt in allContentTypes.SelectMany(x => x.PropertyTypes).OrderBy(x => x.Name))
             {
-                if (!fields.Contains(pt.Alias))
+                if (fields.Contains(pt.Alias) == false)
                 {
                     cDescription.Items.Add(new ListItem(string.Format("{0} ({1})", pt.Name, pt.Alias), pt.Alias));
                     cCategories.Items.Add(new ListItem(string.Format("{0} ({1})", pt.Name, pt.Alias), pt.Alias));
