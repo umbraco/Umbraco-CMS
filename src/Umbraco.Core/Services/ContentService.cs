@@ -2192,6 +2192,11 @@ namespace Umbraco.Core.Services
                 }
             }
 
+            if (string.IsNullOrWhiteSpace(content.Name))
+            {
+                throw new ArgumentException("Cannot save content with empty name.");
+            }
+
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();

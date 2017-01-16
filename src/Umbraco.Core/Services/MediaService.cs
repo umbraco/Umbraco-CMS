@@ -837,7 +837,11 @@ namespace Umbraco.Core.Services
                 {
                     return OperationStatus.Cancelled(evtMsgs);
                 }
+            }
 
+            if (string.IsNullOrWhiteSpace(media.Name))
+            {
+                throw new ArgumentException("Cannot save media with empty name.");
             }
 
             var uow = UowProvider.GetUnitOfWork();
