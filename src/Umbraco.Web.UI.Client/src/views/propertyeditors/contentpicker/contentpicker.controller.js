@@ -289,7 +289,7 @@ function contentPickerController($scope, dialogService, entityResource, contentR
             "icon": item.icon,
             "path": item.path,
             "url": item.url,
-            "published": (item.metaData.IsPublished === false && entityType === "Document") ? false : true
+            "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
         });
 
