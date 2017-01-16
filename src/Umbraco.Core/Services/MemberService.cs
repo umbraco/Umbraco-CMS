@@ -978,6 +978,11 @@ namespace Umbraco.Core.Services
                 }
             }
 
+            if (string.IsNullOrWhiteSpace(entity.Name))
+            {
+                throw new ArgumentException("Cannot save member with empty name.");
+            }
+
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {

@@ -718,6 +718,16 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Cannot_Save_ContentType_With_Empty_Name()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateSimpleContentType("contentType", string.Empty);
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => ServiceContext.ContentTypeService.Save(contentType));
+        }
+
+        [Test]
         public void Cannot_Rename_PropertyType_Alias_On_Composition_Which_Would_Cause_Conflict_In_Other_Composition()
         {
             /*
