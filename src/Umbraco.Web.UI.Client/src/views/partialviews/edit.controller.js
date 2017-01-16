@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PartialViewsEditController($scope, $routeParams, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper) {
+    function PartialViewsEditController($scope, $routeParams, codefileResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -33,7 +33,7 @@
 
             contentEditingHelper.contentEditorPerformSave({
                 statusMessage: localizeSaving,
-                saveMethod: templateResource.save,
+                saveMethod: codefileResource.save,
                 scope: $scope,
                 content: vm.partialView,
                 //We do not redirect on failure for stylesheets - this is because it is not possible to actually save the doc
@@ -229,11 +229,11 @@
             //we need to load this somewhere, for now its here.
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
             if ($routeParams.create) {
-                templateResource.getScaffold().then(function (partialView) {
+                codefileResource.getScaffold().then(function (partialView) {
                     ready(partialView);
                 });
             } else {
-                templateResource.getById($routeParams.id).then(function (partialView) {
+                codefileResource.getByPath('partialViews', $routeParams.id).then(function (partialView) {
                     ready(partialView);
                 });
             }
@@ -246,7 +246,7 @@
 
             //sync state
             editorState.set(vm.partialView);
-            navigationService.syncTree({ tree: "partialViews", path: vm.partialView.path, forceReload: true }).then(function (syncArgs) {
+            navigationService.syncTree({ tree: "partialViews", path: vm.partialView.virtualPath, forceReload: true }).then(function (syncArgs) {
                 vm.page.menu.currentNode = syncArgs.node;
             });
 

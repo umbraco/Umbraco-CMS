@@ -16,9 +16,11 @@ namespace Umbraco.Web.Models.Mapping
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<IPartialView, CodeFileDisplay>()
-                .ForMember(x => x.Snippet, exp => exp.Ignore());
+            .ForMember(x => x.Notifications, exp => exp.Ignore())
+            .ForMember(x => x.Snippet, exp => exp.Ignore());
 
             config.CreateMap<Script, CodeFileDisplay>()
+                .ForMember(x => x.Notifications, exp => exp.Ignore())
                 .ForMember(x => x.Snippet, exp => exp.Ignore());
 
             config.CreateMap<CodeFileDisplay, IPartialView>()
