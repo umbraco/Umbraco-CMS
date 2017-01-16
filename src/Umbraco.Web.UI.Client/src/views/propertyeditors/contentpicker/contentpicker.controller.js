@@ -231,7 +231,26 @@ function contentPickerController($scope, dialogService, entityResource, contentR
                 });
             
                 if (entity) {
-                    entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
+                    
+                    // set icon
+                    if(entity.icon) {
+                        entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
+                    }
+
+                    // set default icon
+                    if (!entity.icon) {
+                        switch (entityType) {
+                            case "Document":
+                                entity.icon = "icon-document";
+                                break;
+                            case "Media":
+                                entity.icon = "icon-picture";
+                                break;
+                            case "Member":
+                                entity.icon = "icon-user";
+                                break;
+                        }
+                    }
 
                     var url = (entity.urls && entity.urls.length > 0) ? entity.urls[0] : "";
                     var path = ($scope.model.config.showPathOnHover) ? entity.path : "";
