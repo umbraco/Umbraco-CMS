@@ -15,6 +15,7 @@
                 icon: "=?",
                 name: "=",
                 description: "=?",
+                published: "=?",
                 sortable: "=?",
                 allowOpen: "=?",
                 allowRemove: "=?",

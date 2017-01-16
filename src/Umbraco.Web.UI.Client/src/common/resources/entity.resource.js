@@ -56,7 +56,7 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * entityResource.getPath(id)
+         * entityResource.getPath(id, type)
          *    .then(function(pathArray) {
          *        alert('its here!');
          *    });
@@ -75,6 +75,37 @@ function entityResource($q, $http, umbRequestHelper) {
                        "GetPath",
                        [{ id: id }, {type: type }])),
                'Failed to retrieve path for id:' + id);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.entityResource#getUrl
+         * @methodOf umbraco.resources.entityResource
+         *
+         * @description
+         * Returns a url, given a node ID and type
+         *
+         * ##usage
+         * <pre>
+         * entityResource.getUrl(id, type)
+         *    .then(function(url) {
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id Id of node to return the public url to
+         * @param {string} type Object type name
+         * @returns {Promise} resourcePromise object containing the url.
+         *
+         */
+        getUrl: function(id, type) {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetUrl",
+                       [{ id: id }, {type: type }])),
+               'Failed to retrieve url for id:' + id);
         },
 
         /**

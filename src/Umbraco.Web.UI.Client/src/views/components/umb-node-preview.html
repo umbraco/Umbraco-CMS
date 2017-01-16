@@ -1,4 +1,4 @@
-<div class="umb-node-preview" ng-class="{'umb-node-preview--sortable': sortable }">
+<div class="umb-node-preview" ng-class="{'umb-node-preview--sortable': sortable, 'umb-node-preview--unpublished': published === false }">
     <i ng-if="icon" class="umb-node-preview__icon {{ icon }}"></i>
     <div class="umb-node-preview__content">
         <div class="umb-node-preview__name">{{ name }}</div>

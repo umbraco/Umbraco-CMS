@@ -144,6 +144,37 @@ namespace Umbraco.Web.Editors
             return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
+
+
+
+        public dynamic GetUrl(int id, UmbracoEntityTypes type)
+        {
+            dynamic result = new System.Dynamic.ExpandoObject();
+            
+
+            if(type == UmbracoEntityTypes.Document)
+            {
+                var foundUrl = Umbraco.Url(id);
+                if (string.IsNullOrEmpty(foundUrl) == false && foundUrl != "#")
+                {
+                    result.url = foundUrl;
+                    return result;
+                }   
+            }
+
+            var ancestors = GetAncestors(id, type);
+
+            //if content, skip the first node for replicating NiceUrl defaults
+            if(type == UmbracoEntityTypes.Document) {
+                ancestors = ancestors.Skip(1);
+            }
+
+            result.url = "/" + string.Join("/", ancestors.Select(x => x.Name) );
+
+
+            return result;
+        }
+
         /// <summary>
         /// Gets an entity by it's unique id if the entity supports that
         /// </summary>

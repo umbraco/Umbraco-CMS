@@ -194,8 +194,19 @@ function contentPickerController($scope, dialogService, entityResource, contentR
         });
 
         if (currIds.indexOf(item.id) < 0) {
-            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, path: item.path });
+            
+            // get url for content and media items
+            if(entityType !== "Member") {
+                entityResource.getUrl(item.id, entityType).then(function(data){
+                    // update url
+                    item.url = data.url;
+                    // push item to render model
+                    addSelectedItem(item);
+                });
+            } else {
+                addSelectedItem(item);
+            }
+
         }
     };
 
@@ -221,43 +232,28 @@ function contentPickerController($scope, dialogService, entityResource, contentR
 
     //load current data
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
-    var nodePromise = (entityType === "Document") ? contentResource.getByIds(modelIds) : entityResource.getByIds(modelIds, entityType);
+    var nodePromise = entityResource.getByIds(modelIds, entityType);
 
     nodePromise.then(function (data) {
 
-             _.each(modelIds, function (id, i) {
-                var entity = _.find(data, function (d) {                
-                    return d.id == id;
-                });
-            
-                if (entity) {
-                    
-                    // set icon
-                    if(entity.icon) {
-                        entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
-                    }
-
-                    // set default icon
-                    if (!entity.icon) {
-                        switch (entityType) {
-                            case "Document":
-                                entity.icon = "icon-document";
-                                break;
-                            case "Media":
-                                entity.icon = "icon-picture";
-                                break;
-                            case "Member":
-                                entity.icon = "icon-user";
-                                break;
-                        }
-                    }
-
-                    var url = (entity.urls && entity.urls.length > 0) ? entity.urls[0] : "";
-                    var path = ($scope.model.config.showPathOnHover) ? entity.path : "";
-
-                    $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon, path: path, url: url });
+        _.each(modelIds, function (id, i) {
+            var entity = _.find(data, function (d) {                
+                return d.id == id;
+            });
+        
+            if (entity) {
+                // get url for content and media items
+                if(entityType !== "Member") {
+                    entityResource.getUrl(entity.id, entityType).then(function(data){
+                        // update url
+                        entity.url = data.url;
+                        // push item to render model
+                        addSelectedItem(entity);
+                    });
+                } else {
+                    addSelectedItem(entity);
                 }
-            
+            }
            
          });
 
@@ -265,6 +261,40 @@ function contentPickerController($scope, dialogService, entityResource, contentR
         startWatch();
 
     });
+
+    function addSelectedItem(item) {
+
+        // set icon
+        if(item.icon) {
+            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+        }
+
+        // set default icon
+        if (!item.icon) {
+            switch (entityType) {
+                case "Document":
+                    item.icon = "icon-document";
+                    break;
+                case "Media":
+                    item.icon = "icon-picture";
+                    break;
+                case "Member":
+                    item.icon = "icon-user";
+                    break;
+            }
+        }
+
+        $scope.renderModel.push({ 
+            "name": item.name,
+            "id": item.id,
+            "icon": item.icon,
+            "path": item.path,
+            "url": item.url,
+            "published": (item.metaData.IsPublished === false && entityType === "Document") ? false : true
+            // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
+        });
+
+    }
 
 }
 
