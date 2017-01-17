@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -136,6 +137,30 @@ namespace Umbraco.Core.Persistence.Repositories
         protected abstract void PerformDeleteVersion(int id, Guid versionId);
 
         #endregion
+
+        /// <summary>
+        /// Gets paged content descendants as XML by path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>
+        public IEnumerable<XElement> GetPagedXmlEntriesByPath(string path, long pageIndex, int pageSize, out long totalRecords)
+        {
+            Sql query;
+            if (path == "-1")
+            {
+                query = new Sql().Select("nodeId, xml").From("cmsContentXml").Where("nodeId IN (SELECT id FROM umbracoNode WHERE nodeObjectType = @0)", NodeObjectTypeId).OrderBy("nodeId");
+            }
+            else
+            {
+                query = new Sql().Select("nodeId, xml").From("cmsContentXml").Where("nodeId IN (SELECT id FROM umbracoNode WHERE path LIKE (@0))", path.EnsureEndsWith(",%")).OrderBy("nodeId");
+            }
+            var pagedResult = Database.Page<ContentXmlDto>(pageIndex + 1, pageSize, query);
+            totalRecords = pagedResult.TotalItems;
+            return pagedResult.Items.Select(dto => XElement.Parse(dto.Xml));
+        }
 
         public int CountDescendants(int parentId, string contentTypeAlias = null)
         {
