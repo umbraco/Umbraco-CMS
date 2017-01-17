@@ -2,14 +2,14 @@
 
     <ng-form name="contentPickerForm">
 
-        <div ui-sortable ng-model="renderModel">
+        <div ui-sortable="sortableOptions" ng-model="renderModel">
             <umb-node-preview
                 ng-repeat="node in renderModel"
                 icon="node.icon"
                 name="node.name"
                 published="node.published"
                 description="node.url"
-                sortable="sortable"
+                sortable="!sortableOptions.disabled"
                 allow-remove="allowRemoveButton"
                 allow-open="model.config.showOpenButton && allowOpenButton && !dialogEditor"
                 on-remove="remove($index)"

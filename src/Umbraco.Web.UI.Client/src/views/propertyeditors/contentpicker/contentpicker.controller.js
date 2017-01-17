@@ -39,6 +39,9 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             else {
                 $scope.contentPickerForm.maxCount.$setValidity("maxCount", true);
             }
+
+            setSortingState($scope.renderModel);
+
         });
     }
 
@@ -57,6 +60,14 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             type: "content",
 	            id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
         }
+    };
+
+    // sortable options
+    $scope.sortableOptions = {
+        distance: 10,
+        tolerance: "pointer",
+        scroll: true,
+        zIndex: 6000
     };
 
     if ($scope.model.config) {
@@ -78,7 +89,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.allowOpenButton = entityType === "Document" || entityType === "Media";
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
-    $scope.sortable = true;
 
     //the dialog options for the picker
     var dialogOptions = {
@@ -285,6 +295,15 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
         });
 
+    }
+
+    function setSortingState(items) {
+        // disable sorting if the list only consist of one item
+        if(items.length > 1) {
+            $scope.sortableOptions.disabled = false;
+        } else {
+            $scope.sortableOptions.disabled = true;
+        }
     }
 
 }
