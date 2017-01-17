@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -359,17 +360,16 @@ namespace UmbracoExamine
         }
         #endregion
 
-        #region Protected
-
-        /// <summary>
-        /// This is a static query, it's parameters don't change so store statically
-        /// </summary>
-        private IQuery<IContent> _publishedQuery;
+        #region Protected        
 
         protected override void PerformIndexAll(string type)
         {
             const int pageSize = 10000;
             var pageIndex = 0;
+
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             switch (type)
             {
@@ -395,11 +395,6 @@ namespace UmbracoExamine
                         }
                         else
                         {
-                            if (_publishedQuery == null)
-                            {
-                                _publishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
-                            }
-
                             //get all paged records but order by level ascending, we need to do this because we need to track which nodes are not published so that we can determine
                             // which descendent nodes are implicitly not published
                             descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null);
@@ -415,7 +410,12 @@ namespace UmbracoExamine
                         {
                             content = descendants.ToArray();
                         }
-                        AddNodesToIndex(GetSerializedContent(content, notPublished).WhereNotNull(), type);
+
+                        AddNodesToIndex(GetSerializedContent(
+                            SupportUnpublishedContent,
+                            c => _serializer.Serialize(_contentService, _dataTypeService, _userService, c),
+                            content, notPublished).WhereNotNull(), type);
+
                         pageIndex++;
                     } while (content.Length == pageSize);
 
@@ -471,19 +471,27 @@ namespace UmbracoExamine
 
                     break;
             }
+
+            stopwatch.Stop();
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}, took {1}ms", type, stopwatch.ElapsedMilliseconds));
         }
 
-        private IEnumerable<XElement> GetSerializedContent(IEnumerable<IContent> content, ISet<string> notPublished)
+        internal static IEnumerable<XElement> GetSerializedContent(
+            bool supportUnpublishdContent, 
+            Func<IContent, XElement> serializer, 
+            IEnumerable<IContent> content, 
+            ISet<string> notPublished)
         {            
             foreach (var c in content)
             {
-                if (SupportUnpublishedContent == false)
+                if (supportUnpublishdContent == false)
                 {
                     //if we don't support published content and this is not published then track it and return null
                     if (c.Published == false)
                     {
                         notPublished.Add(c.Path);
                         yield return null;
+                        continue;
                     }
 
                     //if we don't support published content, check if this content item exists underneath any already tracked
@@ -491,14 +499,11 @@ namespace UmbracoExamine
                     if (notPublished.Any(path => c.Path.StartsWith(string.Format("{0},", path))))
                     {
                         yield return null;
+                        continue;
                     }
-                }
+                }                
 
-                var xml = _serializer.Serialize(
-                    _contentService,
-                    _dataTypeService,
-                    _userService,
-                    c);
+                var xml = serializer(c);                
 
                 //add a custom 'icon' attribute
                 xml.Add(new XAttribute("icon", c.ContentType.Icon));
@@ -520,7 +525,7 @@ namespace UmbracoExamine
 
         public override void RebuildIndex()
         {
-            DataService.LogService.AddVerboseLog(-1, "Rebuilding index");
+            DataService.LogService.AddInfoLog(-1, "Rebuilding index");
             base.RebuildIndex();
         }
 
