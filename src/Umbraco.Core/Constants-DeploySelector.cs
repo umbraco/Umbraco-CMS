@@ -9,7 +9,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Contains the valid selector values.
         /// </summary>
-        internal static class DeploySelector
+        public static class DeploySelector
         {
             public const string This = "this";
             public const string ThisAndChildren = "this-and-children";

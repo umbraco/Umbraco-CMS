@@ -13,7 +13,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <remarks>Well-known entity types are those that Deploy already knows about,
         /// but entity types are strings and so can be extended beyond what is defined here.</remarks>
-        internal static class DeployEntityType
+        public static class DeployEntityType
         {
             // guid entity types
 
