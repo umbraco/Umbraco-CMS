@@ -90,7 +90,7 @@ describe('Content picker controller tests', function () {
             }, 1000);
         });
 
-        it("Adding a dublicate item should note update renderModel, ids and model.value", function(){
+        it("Adding a duplicate item should note update renderModel, ids and model.value", function(){
             scope.add(item);
             scope.$apply();
             setTimeout(function(){
