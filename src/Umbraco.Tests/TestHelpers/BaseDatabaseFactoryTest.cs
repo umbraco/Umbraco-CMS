@@ -280,9 +280,9 @@ namespace Umbraco.Tests.TestHelpers
                 _isFirstTestInFixture = false; //ensure this is false before anything!
 
                 if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
-                {
-                    RemoveDatabaseFile();
-                }
+                    RemoveDatabaseFile(); // closes connections too
+                else
+                    CloseDbConnections();
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
@@ -294,10 +294,14 @@ namespace Umbraco.Tests.TestHelpers
 
         private void CloseDbConnections()
         {
-            //Ensure that any database connections from a previous test is disposed.
-            //This is really just double safety as its also done in the TearDown.
-            if (ApplicationContext != null && DatabaseContext != null && DatabaseContext.Database != null)
-                DatabaseContext.Database.Dispose();
+            // just to be sure, although it's also done in TearDown
+            if (ApplicationContext != null
+                && ApplicationContext.DatabaseContext != null
+                && ApplicationContext.DatabaseContext.ScopeProvider != null)
+            {
+                ApplicationContext.DatabaseContext.ScopeProvider.Reset();
+            }
+
             SqlCeContextGuardian.CloseBackgroundConnection();
         }
 

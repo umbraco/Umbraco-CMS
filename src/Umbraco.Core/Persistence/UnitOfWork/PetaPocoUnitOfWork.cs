@@ -141,15 +141,14 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 			get { return _key; }
 		}
 
+	    private IScope ThisScope
+	    {
+	        get { return _scope ?? (_scope = _scopeProvider.CreateScope()); }
+	    }
+
 	    public UmbracoDatabase Database
 	    {
-	        get
-	        {
-                if (_scope == null)
-                    //throw new InvalidOperationException("Out-of-scope UnitOfWork.");
-                    _scope = _scopeProvider.CreateScope();
-                return _scope.Database;
-	        }
+	        get { return ThisScope.Database; }
 	    }
 
 		#region Operation

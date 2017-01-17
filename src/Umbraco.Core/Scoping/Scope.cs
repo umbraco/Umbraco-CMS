@@ -5,8 +5,10 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Scoping
 {
-    // note - scope is not thread-safe obviously
-
+    /// <summary>
+    /// Implements <see cref="IScope"/>.
+    /// </summary>
+    /// <remarks>Not thread-safe obviously.</remarks>
     internal class Scope : IScope
     {
         private readonly ScopeProvider _scopeProvider;
@@ -53,11 +55,6 @@ namespace Umbraco.Core.Scoping
         // the original scope (when attaching a detachable scope)
         public Scope OrigScope { get; set; }
 
-        //public bool HasDatabase
-        //{
-        //    get { return ParentScope == null ? _database != null : ParentScope.HasDatabase; }
-        //}
-
         /// <inheritdoc />
         public UmbracoDatabase Database
         {
@@ -88,11 +85,6 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        //public bool HasMessages
-        //{
-        //    get { return ParentScope == null ? _messages != null : ParentScope.HasMessages; }
-        //}
-
         /// <inheritdoc />
         public IList<EventMessage> Messages
         {
@@ -122,26 +114,16 @@ namespace Umbraco.Core.Scoping
                 _completed = true;
         }
 
-        public void CompleteChild(bool? completed)
+        public void Reset()
         {
-            if (completed.HasValue)
-            {
-                if (completed.Value)
-                {
-                    // child did complete
-                    // nothing to do
-                }
-                else
-                {
-                    // child did not complete, we cannot complete
-                    _completed = false;
-                }
-            }
-            else
-            {
-                // child did not complete, we cannot complete
+            _completed = null;
+        }
+
+        public void ChildCompleted(bool? completed)
+        {
+            // if child did not complete we cannot complete
+            if (completed.HasValue == false || completed.Value == false)
                 _completed = false;
-            }
         }
 
         private void EnsureNotDisposed()
@@ -153,9 +135,42 @@ namespace Umbraco.Core.Scoping
         public void Dispose()
         {
             EnsureNotDisposed();
-            _scopeProvider.Disposing(this, _completed);
+
+            if (this != _scopeProvider.AmbientScope)
+                throw new InvalidOperationException("Not the ambient scope.");
+
+            var parent = ParentScope;
+            _scopeProvider.AmbientScope = parent;
+
+            if (parent != null)
+                parent.ChildCompleted(_completed);
+            else
+                DisposeLastScope();
+
             _disposed = true;
             GC.SuppressFinalize(this);
+        }
+
+        private void DisposeLastScope()
+        {
+            // note - messages
+            // at the moment we are totally not filtering the messages based on completion
+            // status, so whether the scope is committed or rolled back makes no difference
+
+            if (_database == null) return;
+
+            try
+            {
+                if (_completed.HasValue && _completed.Value)
+                    _database.CompleteTransaction();
+                else
+                    _database.AbortTransaction();
+            }
+            finally
+            {
+                _database.Dispose();
+                _database = null;
+            }
         }
     }
 }

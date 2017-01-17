@@ -29,7 +29,6 @@ namespace Umbraco.Core.Persistence
         private int _spid = -1;
 #endif
 
-        internal DefaultDatabaseFactory.ContextOwner ContextOwner = DefaultDatabaseFactory.ContextOwner.None;
         internal DefaultDatabaseFactory DatabaseFactory = null;
 
         /// <summary>
@@ -156,6 +155,8 @@ namespace Umbraco.Core.Persistence
             // propagate timeout if none yet
 
 #if DEBUG_DATABASES
+            // determines the database connection SPID for debugging
+
             if (DatabaseType == DBType.MySql)
             {
                 using (var command = connection.CreateCommand())
@@ -220,6 +221,7 @@ namespace Umbraco.Core.Persistence
             }
 
 #if DEBUG_DATABASES
+            // ensures the database does not have an open reader, for debugging
             DatabaseDebugHelper.SetCommand(cmd, InstanceSid + " [T" + Thread.CurrentThread.ManagedThreadId + "]");
             var refsobj = DatabaseDebugHelper.GetReferencedObjects(cmd.Connection);
             if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
@@ -272,16 +274,5 @@ namespace Umbraco.Core.Persistence
             //use the defaults
             base.BuildSqlDbSpecificPagingQuery(databaseType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
         }
-
-        /*
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-#if DEBUG_DATABASES
-            LogHelper.Debug<UmbracoDatabase>("Dispose (" + InstanceSid + ").");
-#endif
-            if (DatabaseFactory != null) DatabaseFactory.OnDispose(this);
-        }
-        */
     }
 }

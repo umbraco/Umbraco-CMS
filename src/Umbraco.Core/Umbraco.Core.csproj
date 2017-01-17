@@ -518,6 +518,7 @@
     <Compile Include="Scoping\NoScope.cs" />
     <Compile Include="Scoping\Scope.cs" />
     <Compile Include="Scoping\ScopeProvider.cs" />
+    <Compile Include="Scoping\ScopeReference.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />

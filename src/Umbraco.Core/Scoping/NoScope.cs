@@ -5,6 +5,9 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Scoping
 {
+    /// <summary>
+    /// Implements <see cref="IScope"/> when there is no scope.
+    /// </summary>
     internal class NoScope : IScope
     {
         private readonly ScopeProvider _scopeProvider;
@@ -18,8 +21,7 @@ namespace Umbraco.Core.Scoping
             _scopeProvider = scopeProvider;
         }
 
-        //public bool HasDatabase { get { return _database != null; } }
-
+        /// <inheritdoc />
         public UmbracoDatabase Database
         {
             get
@@ -38,8 +40,7 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        //public bool HasMessages { get { return _messages != null; } }
-
+        /// <inheritdoc />
         public IList<EventMessage> Messages
         {
             get
@@ -58,6 +59,7 @@ namespace Umbraco.Core.Scoping
             }
         }
 
+        /// <inheritdoc />
         public void Complete()
         {
             throw new NotImplementedException();
@@ -72,7 +74,15 @@ namespace Umbraco.Core.Scoping
         public void Dispose()
         {
             EnsureNotDisposed();
-            _scopeProvider.Disposing(this);
+
+            if (this != _scopeProvider.AmbientScope)
+                throw new InvalidOperationException("Not the ambient scope.");
+
+            if (_database != null)
+                _database.Dispose();
+
+            _scopeProvider.AmbientScope = null;
+
             _disposed = true;
             GC.SuppressFinalize(this);
         }

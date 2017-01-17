@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 
@@ -7,7 +8,7 @@ namespace Umbraco.Core.Scoping
     /// <summary>
     /// Represents a scope.
     /// </summary>
-    public interface IScope : IDisposeOnRequestEnd // implies IDisposable
+    public interface IScope : IDisposable
     {
         /// <summary>
         /// Gets the scope database.

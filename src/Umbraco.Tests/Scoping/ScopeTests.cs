@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
@@ -15,11 +16,11 @@ namespace Umbraco.Tests.Scoping
         {
             base.Initialize();
 
-            // initialization leaves a NoScope around, remove it
-            var scope = DatabaseContext.ScopeProvider.AmbientScope;
-            Assert.IsNotNull(scope);
-            Assert.IsInstanceOf<NoScope>(scope);
-            scope.Dispose();
+            //// initialization leaves a NoScope around, remove it
+            //var scope = DatabaseContext.ScopeProvider.AmbientScope;
+            //Assert.IsNotNull(scope);
+            //Assert.IsInstanceOf<NoScope>(scope);
+            //scope.Dispose();
             Assert.IsNull(DatabaseContext.ScopeProvider.AmbientScope); // gone
         }
 
@@ -102,7 +103,7 @@ namespace Umbraco.Tests.Scoping
                     Assert.IsInstanceOf<Scope>(nested);
                     Assert.IsNotNull(scopeProvider.AmbientScope);
                     Assert.AreSame(nested, scopeProvider.AmbientScope);
-                    Assert.AreSame(scope, ((Scope)nested).ParentScope);
+                    Assert.AreSame(scope, ((Scope) nested).ParentScope);
                     Assert.AreSame(database, nested.Database);
                 }
                 Assert.IsNotNull(database.Connection); // still
@@ -196,7 +197,7 @@ namespace Umbraco.Tests.Scoping
                 Assert.IsNotNull(database.Connection); // no more
 
                 // nested does not have a parent
-                Assert.IsNull(((Scope)nested).ParentScope);
+                Assert.IsNull(((Scope) nested).ParentScope);
             }
 
             // and when nested is gone, scope is gone
@@ -223,7 +224,8 @@ namespace Umbraco.Tests.Scoping
             Assert.Throws<Exception>(() =>
             {
                 // could not steal the database
-                /*var nested =*/ scopeProvider.CreateScope();
+                /*var nested =*/
+                scopeProvider.CreateScope();
             });
 
             // cleanup
@@ -386,6 +388,40 @@ namespace Umbraco.Tests.Scoping
                 n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
                 Assert.AreEqual("b", n);
             }
+        }
+
+        [Test]
+        public void CallContextScope()
+        {
+            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scope = scopeProvider.CreateScope();
+            Assert.IsNotNull(scopeProvider.AmbientScope);
+            using (new SafeCallContext())
+            {
+                Assert.IsNull(scopeProvider.AmbientScope);
+            }
+            Assert.IsNotNull(scopeProvider.AmbientScope);
+            Assert.AreSame(scope, scopeProvider.AmbientScope);
+        }
+
+        [Test]
+        public void ScopeReference()
+        {
+            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scope = scopeProvider.CreateScope();
+            var nested = scopeProvider.CreateScope();
+            Assert.IsNotNull(scopeProvider.AmbientScope);
+            var scopeRef = new ScopeReference(scopeProvider);
+            scopeRef.Dispose();
+            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.Throws<ObjectDisposedException>(() =>
+            {
+                var db = scope.Database;
+            });
+            Assert.Throws<ObjectDisposedException>(() =>
+            {
+                var db = nested.Database;
+            });
         }
     }
 }

@@ -5,6 +5,9 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Scoping
 {
+    /// <summary>
+    /// Implements <see cref="IScopeProvider"/>.
+    /// </summary>
     internal class ScopeProvider : IScopeProviderInternal
     {
         public ScopeProvider(IDatabaseFactory2 databaseFactory)
@@ -26,13 +29,17 @@ namespace Umbraco.Core.Scoping
                     var ambient = StaticAmbientScope;
                     if (ambient != null)
                         ambient.Dispose();
-                    StaticAmbientScope = (IScope) scope;
+                    StaticAmbientScope = (IScope)scope;
                 });
         }
 
         public IDatabaseFactory2 DatabaseFactory { get; private set; }
 
         private const string ItemKey = "Umbraco.Core.Scoping.IScope";
+        private const string ItemRefKey = "Umbraco.Core.Scoping.ScopeReference";
+
+        // only 1 instance which can be disposed and disposed again
+        private static readonly ScopeReference StaticScopeReference = new ScopeReference(new ScopeProvider(null));
 
         private static IScope CallContextValue
         {
@@ -49,8 +56,17 @@ namespace Umbraco.Core.Scoping
             get { return (IScope) HttpContext.Current.Items[ItemKey]; }
             set
             {
-                if (value == null) HttpContext.Current.Items.Remove(ItemKey);
-                else HttpContext.Current.Items[ItemKey] = value;
+                if (value == null)
+                {
+                    HttpContext.Current.Items.Remove(ItemKey);
+                    HttpContext.Current.Items.Remove(ItemRefKey);
+                }
+                else
+                {
+                    HttpContext.Current.Items[ItemKey] = value;
+                    if (HttpContext.Current.Items[ItemRefKey] == null)
+                        HttpContext.Current.Items[ItemRefKey] = StaticScopeReference;
+                }
             }
         }
 
@@ -164,54 +180,14 @@ namespace Umbraco.Core.Scoping
             return AmbientScope = new Scope(this, scope);
         }
 
-        public void Disposing(IScope disposing, bool? completed = null)
+        /// <inheritdoc />
+        public void Reset()
         {
-            if (disposing != AmbientScope)
-                throw new InvalidOperationException();
+            var scope = AmbientScope as Scope;
+            if (scope != null)
+                scope.Reset();
 
-            var noScope = disposing as NoScope;
-            if (noScope != null)
-            {
-                // fixme - kinda legacy
-                var noScopeDatabase = noScope.DatabaseOrNull;
-                if (noScopeDatabase != null)
-                {
-                    if (noScopeDatabase.InTransaction)
-                        throw new Exception();
-                    noScopeDatabase.Dispose();
-                }
-                AmbientScope = null;
-                return;
-            }
-
-            var scope = disposing as Scope;
-            if (scope == null)
-                throw new Exception();
-
-            var parent = scope.ParentScope;
-            AmbientScope = parent;
-
-            if (parent != null)
-            {
-                parent.CompleteChild(completed);
-                return;
-            }
-
-            // fixme - a scope is in a transaction only if ... there is a db transaction, or always?
-            // what shall we do with events if not in a transaction?
-            // fixme - when completing... the db should be released, no need to dispose the db?
-
-            // note - messages
-            // at the moment we are totally not filtering the messages based on completion
-            // status, so whether the scope is committed or rolled back makes no difference
-
-            var database = scope.DatabaseOrNull;
-            if (database == null) return;
-
-            if (completed.HasValue && completed.Value)
-                database.CompleteTransaction();
-            else
-                database.AbortTransaction();
+            StaticScopeReference.Dispose();
         }
     }
 }
