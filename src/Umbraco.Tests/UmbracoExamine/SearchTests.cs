@@ -20,17 +20,14 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Test_Sort_Order_Sorting()
         {
-            //var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\SearchTests", Guid.NewGuid().ToString()));
-            //System.IO.Directory.CreateDirectory(newIndexFolder.FullName);
-
             using (var luceneDir = new RAMDirectory())
-            //using (var luceneDir = new SimpleFSDirectory(newIndexFolder))
             {
                 var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir, null,
                     new TestDataService()
                         {
                             ContentService = new TestContentService(TestFiles.umbraco_sort)
-                        });
+                        },
+                    supportUnpublishedContent:true);
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
 
@@ -69,25 +66,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 currentSort = sort;
             }
             return true;
-        }
-
-        //[Test]
-        //public void Test_Index_Type_With_German_Analyzer()
-        //{
-        //    using (var luceneDir = new RAMDirectory())
-        //    {
-        //        var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir,
-        //            new GermanAnalyzer());
-        //        indexer.RebuildIndex();
-        //        var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);    
-        //    }
-        //}
-
-        //private readonly TestContentService _contentService = new TestContentService();
-        //private readonly TestMediaService _mediaService = new TestMediaService();
-        //private static UmbracoExamineSearcher _searcher;
-        //private static UmbracoContentIndexer _indexer;
-        //private Lucene.Net.Store.Directory _luceneDir;
+        }        
 
     }
 }
