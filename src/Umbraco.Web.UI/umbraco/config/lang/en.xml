@@ -305,6 +305,7 @@
     <key alias="selectMemberGroup">Select member group</key>
     <key alias="noIconsFound">No icons were found</key>
     <key alias="noMacroParams">There are no parameters for this macro</key>
+    <key alias="noMacros">There are no macros available to insert</key>
     <key alias="externalLoginProviders">External login providers</key>
     <key alias="exceptionDetail">Exception Details</key>
     <key alias="stacktrace">Stacktrace</key>
@@ -1057,6 +1058,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     
     <key alias="mastertemplate">Master template</key>
     <key alias="noMastertemplate">No master template</key>
+    <key alias="noMaster">No master</key>
 
     <key alias="renderBody">Render child template</key>
     <key alias="renderBodyDesc">

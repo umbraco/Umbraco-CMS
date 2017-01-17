@@ -444,23 +444,15 @@
         }
 
         function getMasterTemplateName(masterTemplateAlias, templates) {
-
             if(masterTemplateAlias) {
-
                 var templateName = "";
-
                 angular.forEach(templates, function(template){
                     if(template.alias === masterTemplateAlias) {
                         templateName = template.name;
                     }
                 });
-
                 return templateName;
-
-            } else {
-                return "no master";
             }
-            
         }
 
         function removeMasterTemplate() {
