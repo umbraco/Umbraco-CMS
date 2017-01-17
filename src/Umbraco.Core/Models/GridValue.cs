@@ -3,26 +3,29 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Umbraco.Core.Deploy
+namespace Umbraco.Core.Models
 {
+    /// <summary>
+    /// A model representing the value saved for the grid
+    /// </summary>
     public class GridValue
     {
         [JsonProperty("name")]
         public string Name { get; set; }
 
         [JsonProperty("sections")]
-        public IEnumerable<Section> Sections { get; set; }
+        public IEnumerable<GridSection> Sections { get; set; }
 
-        public class Section
+        public class GridSection
         {
             [JsonProperty("grid")]
             public string Grid { get; set; }
 
             [JsonProperty("rows")]
-            public IEnumerable<Row> Rows { get; set; }
+            public IEnumerable<GridRow> Rows { get; set; }
         }
 
-        public class Row
+        public class GridRow
         {
             [JsonProperty("name")]
             public string Name { get; set; }
@@ -31,7 +34,7 @@ namespace Umbraco.Core.Deploy
             public Guid Id { get; set; }
 
             [JsonProperty("areas")]
-            public IEnumerable<Area> Areas { get; set; }
+            public IEnumerable<GridArea> Areas { get; set; }
 
             [JsonProperty("styles")]
             public JToken Styles { get; set; }
@@ -40,13 +43,13 @@ namespace Umbraco.Core.Deploy
             public JToken Config { get; set; }
         }
 
-        public class Area
+        public class GridArea
         {
             [JsonProperty("grid")]
             public string Grid { get; set; }
 
             [JsonProperty("controls")]
-            public IEnumerable<Control> Controls { get; set; }
+            public IEnumerable<GridControl> Controls { get; set; }
 
             [JsonProperty("styles")]
             public JToken Styles { get; set; }
@@ -55,13 +58,13 @@ namespace Umbraco.Core.Deploy
             public JToken Config { get; set; }
         }
 
-        public class Control
+        public class GridControl
         {
             [JsonProperty("value")]
             public JToken Value { get; set; }
 
             [JsonProperty("editor")]
-            public Editor Editor { get; set; }
+            public GridEditor Editor { get; set; }
 
             [JsonProperty("styles")]
             public JToken Styles { get; set; }
@@ -70,7 +73,7 @@ namespace Umbraco.Core.Deploy
             public JToken Config { get; set; }
         }
 
-        public class Editor
+        public class GridEditor
         {
             [JsonProperty("alias")]
             public string Alias { get; set; }
