@@ -132,6 +132,8 @@ namespace UmbracoExamine
             const int pageSize = 1000;
             var pageIndex = 0;
 
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
+
             IMember[] members;
 
             if (IndexerData.IncludeNodeTypes.Any())
@@ -163,6 +165,8 @@ namespace UmbracoExamine
                     pageIndex++;
                 } while (members.Length == pageSize);
             }
+
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}", type));
         }
 
         private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
