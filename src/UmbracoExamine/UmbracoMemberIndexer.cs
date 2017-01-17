@@ -238,7 +238,9 @@ namespace UmbracoExamine
             var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
 
             //adds the special path property to the index
-            fields.Add("__key", allValuesForIndexing["__key"]);
+            string valuesForIndexing;
+            if (allValuesForIndexing.TryGetValue("__key", out valuesForIndexing))
+                fields.Add("__key", valuesForIndexing);
 
             return fields;
 
