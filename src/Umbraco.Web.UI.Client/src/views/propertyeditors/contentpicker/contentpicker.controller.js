@@ -194,19 +194,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         });
 
         if (currIds.indexOf(item.id) < 0) {
-            
-            // get url for content and media items
-            if(entityType !== "Member") {
-                entityResource.getUrl(item.id, entityType).then(function(data){
-                    // update url
-                    item.url = data.url;
-                    // push item to render model
-                    addSelectedItem(item);
-                });
-            } else {
-                addSelectedItem(item);
-            }
-
+            setEntityUrl(item);
         }
     };
 
@@ -241,17 +229,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             });
         
             if (entity) {
-                // get url for content and media items
-                if(entityType !== "Member") {
-                    entityResource.getUrl(entity.id, entityType).then(function(data){
-                        // update url
-                        entity.url = data.url;
-                        // push item to render model
-                        addSelectedItem(entity);
-                    });
-                } else {
-                    addSelectedItem(entity);
-                }
+                setEntityUrl(entity);
             }
            
          });
@@ -260,6 +238,20 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         startWatch();
 
     });
+
+    function setEntityUrl(entity) {
+        // get url for content and media items
+        if(entityType !== "Member") {
+            entityResource.getUrl(entity.id, entityType).then(function(data){
+                // update url
+                entity.url = data.url;
+                // push item to render model
+                addSelectedItem(entity);
+            });
+        } else {
+            addSelectedItem(entity);
+        }
+    }
 
     function addSelectedItem(item) {
 
