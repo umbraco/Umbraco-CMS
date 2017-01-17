@@ -1765,6 +1765,27 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets paged content descendants as XML by path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>
+        public IEnumerable<XElement> GetPagedXmlEntries(string path, long pageIndex, int pageSize, out long totalRecords)
+        {
+            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                var contents = repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize, out totalRecords);
+                return contents;
+            }
+        }
+
+        /// <summary>
         /// This builds the Xml document used for the XML cache
         /// </summary>
         /// <returns></returns>
