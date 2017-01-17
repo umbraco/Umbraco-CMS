@@ -86,18 +86,6 @@ namespace Umbraco.Core
             _configured = true;
         }
 
-#if DEBUG_DATABASES
-        public List<UmbracoDatabase> Databases
-        {
-            get
-            {
-                var factory = _factory as DefaultDatabaseFactory;
-                if (factory == null) throw new NotSupportedException();
-                return factory.Databases;
-            }
-        }
-#endif
-
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
         /// <summary>

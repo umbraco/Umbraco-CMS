@@ -64,32 +64,6 @@ namespace Umbraco.Core.Persistence
 		    return ScopeProvider.AmbientOrNoScope.Database;
 		}
 
-#if DEBUG_DATABASES
-        // helps identifying when non-httpContext databases are created by logging the stack trace
-        private void LogCallContextStack()
-        {
-            var trace = Environment.StackTrace;
-            if (trace.IndexOf("ScheduledPublishing") > 0)
-                LogHelper.Debug<DefaultDatabaseFactory>("CallContext: Scheduled Publishing");
-            else if (trace.IndexOf("TouchServerTask") > 0)
-                LogHelper.Debug<DefaultDatabaseFactory>("CallContext: Server Registration");
-            else if (trace.IndexOf("LogScrubber") > 0)
-                LogHelper.Debug<DefaultDatabaseFactory>("CallContext: Log Scrubber");
-            else
-                LogHelper.Debug<DefaultDatabaseFactory>("CallContext: " + Environment.StackTrace);
-        }
-
-        private readonly List<UmbracoDatabase> _databases = new List<UmbracoDatabase>();
-
-        // helps identifying database leaks by keeping track of all instances
-        public List<UmbracoDatabase> Databases { get { return _databases; } }
-
-        private static void Log(string message, UmbracoDatabase database)
-        {
-            LogHelper.Debug<DefaultDatabaseFactory>(message + " (" + (database == null ? "" : database.InstanceSid) + ").");
-        }
-#endif
-
 	    public UmbracoDatabase CreateNewDatabase()
 	    {
 	        return CreateDatabaseInstance();

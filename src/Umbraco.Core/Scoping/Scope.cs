@@ -53,7 +53,7 @@ namespace Umbraco.Core.Scoping
         public Scope ParentScope { get; set; }
 
         // the original scope (when attaching a detachable scope)
-        public Scope OrigScope { get; set; }
+        public IScope OrigScope { get; set; }
 
         /// <inheritdoc />
         public UmbracoDatabase Database
