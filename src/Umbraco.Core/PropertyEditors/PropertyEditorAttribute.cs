@@ -61,6 +61,12 @@ namespace Umbraco.Core.PropertyEditors
         public bool IsParameterEditor { get; set; }
 
         /// <summary>
+        /// If set to true, this property editor will not show up in the DataType's drop down list
+        /// if there is not already one of them chosen for a DataType
+        /// </summary>
+        public bool IsDeprecated { get; set; }
+
+        /// <summary>
         /// If this is is true than the editor will be displayed full width without a label
         /// </summary>
         public bool HideLabel { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
@@ -61,7 +62,7 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
-                .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing(new AvailablePropertyEditorsResolver()))
+                .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing(new AvailablePropertyEditorsResolver(UmbracoConfig.For.UmbracoSettings().Content)))
                 .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
                     new PreValueDisplayResolver(lazyDataTypeService)))
                 .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(

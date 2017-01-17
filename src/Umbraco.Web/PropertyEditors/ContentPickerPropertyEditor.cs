@@ -4,7 +4,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ContentPickerAlias, "Content Picker", PropertyEditorValueTypes.Integer, "contentpicker", IsParameterEditor = true, Group = "Pickers")]
+    [PropertyEditor(Constants.PropertyEditors.ContentPickerAlias, "[Legacy] Content Picker", PropertyEditorValueTypes.Integer, "contentpicker", IsParameterEditor = true, Group = "Pickers", IsDeprecated = true)]
     public class ContentPickerPropertyEditor : PropertyEditor
     {
 
