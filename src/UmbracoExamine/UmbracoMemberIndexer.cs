@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using UmbracoExamine.Config;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Examine;
 using System.IO;
 using UmbracoExamine.DataServices;
@@ -133,6 +134,8 @@ namespace UmbracoExamine
             var pageIndex = 0;
 
             DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             IMember[] members;
 
@@ -166,7 +169,8 @@ namespace UmbracoExamine
                 } while (members.Length == pageSize);
             }
 
-            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}", type));
+            stopwatch.Stop();
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}, took {1}ms", type, stopwatch.ElapsedMilliseconds));
         }
 
         private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)

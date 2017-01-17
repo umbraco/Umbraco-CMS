@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -372,6 +373,8 @@ namespace UmbracoExamine
             var pageIndex = 0;
 
             DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             switch (type)
             {
@@ -474,7 +477,8 @@ namespace UmbracoExamine
                     break;
             }
 
-            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}", type));
+            stopwatch.Stop();
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}, took {1}ms", type, stopwatch.ElapsedMilliseconds));
         }
 
         private IEnumerable<XElement> GetSerializedContent(IEnumerable<IContent> content, ISet<string> notPublished)
