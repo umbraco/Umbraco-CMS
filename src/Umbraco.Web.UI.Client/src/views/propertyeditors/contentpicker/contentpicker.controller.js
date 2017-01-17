@@ -86,7 +86,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         : $scope.model.config.startNode.type === "media"
         ? "Media"
         : "Document";
-    $scope.allowOpenButton = entityType === "Document" || entityType === "Media";
+    $scope.allowOpenButton = entityType === "Document";
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
 
