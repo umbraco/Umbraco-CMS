@@ -23,6 +23,9 @@ namespace Umbraco.Core.Scoping
         {
             _scopeProvider = scopeProvider;
             Detachable = detachable;
+#if DEBUG_SCOPES
+            _scopeProvider.Register(this);
+#endif
         }
 
         // initializes a new scope in a nested scopes chain, with its parent
@@ -44,6 +47,11 @@ namespace Umbraco.Core.Scoping
             if (_database != null && _database.InTransaction)
                     throw new Exception("NoScope instance is not free.");
         }
+
+#if DEBUG_SCOPES
+        private readonly Guid _instanceId = Guid.NewGuid();
+        public Guid InstanceId { get { return _instanceId; } }
+#endif
 
         // a value indicating whether the scope is detachable
         // ie whether it was created by CreateDetachedScope
@@ -138,6 +146,10 @@ namespace Umbraco.Core.Scoping
 
             if (this != _scopeProvider.AmbientScope)
                 throw new InvalidOperationException("Not the ambient scope.");
+
+#if DEBUG_SCOPES
+            _scopeProvider.Disposed(this);
+#endif
 
             var parent = ParentScope;
             _scopeProvider.AmbientScope = parent;

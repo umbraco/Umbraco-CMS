@@ -24,5 +24,9 @@ namespace Umbraco.Core.Scoping
         /// Completes the scope.
         /// </summary>
         void Complete();
+
+#if DEBUG_SCOPES
+        Guid InstanceId { get; }
+#endif
     }
 }

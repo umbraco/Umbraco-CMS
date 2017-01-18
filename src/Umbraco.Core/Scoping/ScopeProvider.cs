@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Web;
 using Umbraco.Core.Persistence;
@@ -46,6 +48,12 @@ namespace Umbraco.Core.Scoping
             get { return (IScope) CallContext.LogicalGetData(ItemKey); }
             set
             {
+#if DEBUG_SCOPES
+                var ambient = (IScope)CallContext.LogicalGetData(ItemKey);
+                if (ambient != null) RegisterContext(ambient, null);
+                if (value != null)
+                    RegisterContext(value, "lcc");
+#endif
                 if (value == null) CallContext.FreeNamedDataSlot(ItemKey);
                 else CallContext.LogicalSetData(ItemKey, value);
             }
@@ -56,6 +64,12 @@ namespace Umbraco.Core.Scoping
             get { return (IScope) HttpContext.Current.Items[ItemKey]; }
             set
             {
+#if DEBUG_SCOPES
+                var ambient = (IScope) HttpContext.Current.Items[ItemKey];
+                if (ambient != null) RegisterContext(ambient, null);
+                if (value != null)
+                    RegisterContext(value, "http");
+#endif
                 if (value == null)
                 {
                     HttpContext.Current.Items.Remove(ItemKey);
@@ -152,6 +166,9 @@ namespace Umbraco.Core.Scoping
             var noScope = ambient as NoScope;
             if (noScope != null)
             {
+#if DEBUG_SCOPES
+                Disposed(noScope);
+#endif
                 // peta poco nulls the shared connection after each command unless there's a trx
                 var database = noScope.DatabaseOrNull;
                 if (database != null && database.InTransaction)
@@ -182,29 +199,82 @@ namespace Umbraco.Core.Scoping
         // so we can track leaks
 
         // helps identifying when non-httpContext scopes are created by logging the stack trace
-        private void LogCallContextStack()
-        {
-            var trace = Environment.StackTrace;
-            if (trace.IndexOf("ScheduledPublishing") > 0)
-                LogHelper.Debug<ScopeProvider>("CallContext: Scheduled Publishing");
-            else if (trace.IndexOf("TouchServerTask") > 0)
-                LogHelper.Debug<ScopeProvider>("CallContext: Server Registration");
-            else if (trace.IndexOf("LogScrubber") > 0)
-                LogHelper.Debug<ScopeProvider>("CallContext: Log Scrubber");
-            else
-                LogHelper.Debug<ScopeProvider>("CallContext: " + Environment.StackTrace);
-        }
-
-        private readonly List<IScope> _scopes = new List<IScope>();
+        //private void LogCallContextStack()
+        //{
+        //    var trace = Environment.StackTrace;
+        //    if (trace.IndexOf("ScheduledPublishing") > 0)
+        //        LogHelper.Debug<ScopeProvider>("CallContext: Scheduled Publishing");
+        //    else if (trace.IndexOf("TouchServerTask") > 0)
+        //        LogHelper.Debug<ScopeProvider>("CallContext: Server Registration");
+        //    else if (trace.IndexOf("LogScrubber") > 0)
+        //        LogHelper.Debug<ScopeProvider>("CallContext: Log Scrubber");
+        //    else
+        //        LogHelper.Debug<ScopeProvider>("CallContext: " + Environment.StackTrace);
+        //}
 
         // helps identifying scope leaks by keeping track of all instances
-        public List<IScope> Scopes { get { return _scopes; } }
+        public static readonly List<ScopeInfo> StaticScopeInfos = new List<ScopeInfo>();
 
-        private static void Log(string message, UmbracoDatabase database)
+        public IEnumerable<ScopeInfo> ScopeInfos { get { return StaticScopeInfos; } }
+
+        //private static void Log(string message, UmbracoDatabase database)
+        //{
+        //    LogHelper.Debug<ScopeProvider>(message + " (" + (database == null ? "" : database.InstanceSid) + ").");
+        //}
+
+        public void Register(IScope scope)
         {
-            LogHelper.Debug<ScopeProvider>(message + " (" + (database == null ? "" : database.InstanceSid) + ").");
+            if (StaticScopeInfos.Any(x => x.Scope == scope)) throw new Exception();
+            StaticScopeInfos.Add(new ScopeInfo(scope, Environment.StackTrace));
+        }
+
+        public static void RegisterContext(IScope scope, string context)
+        {
+            var info = StaticScopeInfos.FirstOrDefault(x => x.Scope == scope);
+            if (info == null)
+            {
+                if (context == null) return;
+                throw new Exception();
+            }
+            if (context == null) info.NullStack = Environment.StackTrace;
+            info.Context = context;
+        }
+
+        public void Disposed(IScope scope)
+        {
+            var info = StaticScopeInfos.FirstOrDefault(x => x.Scope == scope);
+            if (info != null)
+            {
+                // enable this by default
+                StaticScopeInfos.Remove(info);
+
+                // instead, enable this to keep *all* scopes
+                // beware, there can be a lot of scopes!
+                //info.Disposed = true;
+                //info.DisposedStack = Environment.StackTrace;
+            }
         }
 #endif
-
     }
+
+#if DEBUG_SCOPES
+    public class ScopeInfo
+    {
+        public ScopeInfo(IScope scope, string ctorStack)
+        {
+            Scope = scope;
+            Created = DateTime.Now;
+            CtorStack = ctorStack;
+        }
+
+        public IScope Scope { get; private set; }
+        public Guid Parent { get { return (Scope is NoScope || ((Scope) Scope).ParentScope == null) ? Guid.Empty : ((Scope) Scope).ParentScope.InstanceId; } }
+        public DateTime Created { get; private set; }
+        public bool Disposed { get; set; }
+        public string Context { get; set; }
+        public string CtorStack { get; private set; } // the stacktrace of the scope ctor
+        public string DisposedStack { get; set; } // the stacktrace when disposed
+        public string NullStack { get; set; } // the stacktrace when context went null
+    }
+#endif
 }

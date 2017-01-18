@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence
 
         public TResult WithReadLocked<TResult>(Func<LockedRepository<TRepository>, TResult> func, bool autoCommit = true)
         {
-            var uow = _uowProvider.GetUnitOfWork();
+            using (var uow = _uowProvider.GetUnitOfWork())
             using (var transaction = uow.Database.GetTransaction(IsolationLevel.RepeatableRead))
             {
                 foreach (var lockId in _readLockIds)
@@ -65,7 +65,9 @@ namespace Umbraco.Core.Persistence
 
         public void WithWriteLocked(Action<LockedRepository<TRepository>> action, bool autoCommit = true)
         {
-            var uow = _uowProvider.GetUnitOfWork();
+            // must use the uow to ensure it's disposed if GetTransaction fails!
+
+            using (var uow = _uowProvider.GetUnitOfWork())
             using (var transaction = uow.Database.GetTransaction(IsolationLevel.RepeatableRead))
             {
                 foreach (var lockId in _writeLockIds)
@@ -79,11 +81,25 @@ namespace Umbraco.Core.Persistence
                     transaction.Complete();
                 }
             }
+            // fixme
+            // the change above ensures that scopes are properly disposed
+            // TODO apply to all methods
+            // now how can we manage the isolation level?
+
+            //uow.ScopeIsolationLevel = IsolationLevel.RepeatableRead; // might throw when creating the scope
+            // getTransaction here throws because of different levels
+            // but the exception gets eaten because on the way out, disposing the _outer_ scope fails
+            // so... how shall we figure it out?!
+            // - we should be able to set the isolation level on the uow scope
+            // - should we be able to dispose parent scopes and then what happens? NO!
+            //
+            // if we can create scopes with isolation levels what happens when we nest scopes?
+            // note: this is a *very* special use case
         }
 
         public TResult WithWriteLocked<TResult>(Func<LockedRepository<TRepository>, TResult> func, bool autoCommit = true)
         {
-            var uow = _uowProvider.GetUnitOfWork();
+            using (var uow = _uowProvider.GetUnitOfWork())
             using (var transaction = uow.Database.GetTransaction(IsolationLevel.RepeatableRead))
             {
                 foreach (var lockId in _writeLockIds)

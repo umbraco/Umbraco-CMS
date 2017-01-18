@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Scoping
+﻿using System.Collections.Generic;
+
+namespace Umbraco.Core.Scoping
 {
     /// <summary>
     /// Provides scopes.
@@ -43,5 +45,9 @@
         /// <para>Only a scope previously attached by <see cref="AttachScope"/> can be detached.</para>
         /// </remarks>
         IScope DetachScope();
+
+#if DEBUG_SCOPES
+        IEnumerable<ScopeInfo> ScopeInfos { get; }
+#endif
     }
 }

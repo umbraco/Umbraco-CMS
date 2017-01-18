@@ -19,7 +19,15 @@ namespace Umbraco.Core.Scoping
         public NoScope(ScopeProvider scopeProvider)
         {
             _scopeProvider = scopeProvider;
+#if DEBUG_SCOPES
+            _scopeProvider.Register(this);
+#endif
         }
+
+#if DEBUG_SCOPES
+        private readonly Guid _instanceId = Guid.NewGuid();
+        public Guid InstanceId { get { return _instanceId; } }
+#endif
 
         /// <inheritdoc />
         public UmbracoDatabase Database
@@ -77,6 +85,10 @@ namespace Umbraco.Core.Scoping
 
             if (this != _scopeProvider.AmbientScope)
                 throw new InvalidOperationException("Not the ambient scope.");
+
+#if DEBUG_SCOPES
+            _scopeProvider.Disposed(this);
+#endif
 
             if (_database != null)
                 _database.Dispose();
