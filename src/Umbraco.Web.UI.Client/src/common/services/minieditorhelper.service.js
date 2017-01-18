@@ -1,11 +1,13 @@
 (function () {
     'use strict';
 
-    function miniEditorHelper(dialogService, editorState, fileManager, contentEditingHelper) {
+    function miniEditorHelper(dialogService, editorState, fileManager, contentEditingHelper, $q) {
 
         var launched = false;
 
         function launchMiniEditor(node) {
+
+            var deferred = $q.defer();
 
             launched = true;
 
@@ -47,6 +49,9 @@
                     }
 
                     launched = false;
+                    
+                    deferred.resolve(data);
+
                 },
                 closeCallback: function () {
                     //reset the fileManager to what it was
@@ -59,8 +64,13 @@
                     editorState.set(currEditorState);
 
                     launched = false;
+
+                    deferred.reject();
+
                 }
             });
+
+            return deferred.promise;
 
         }
 

@@ -213,7 +213,16 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     };
 
     $scope.openMiniEditor = function(node) {
-        miniEditorHelper.launchMiniEditor(node);
+        miniEditorHelper.launchMiniEditor(node).then(function(updatedNode){
+            // update the node
+            node.name = updatedNode.name;
+            node.published = updatedNode.hasPublishedVersion;
+            if(entityType !== "Member") {
+                entityResource.getUrl(updatedNode.id, entityType).then(function(data){
+                    node.url = data;
+                });
+            }
+        });
     };
         
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
