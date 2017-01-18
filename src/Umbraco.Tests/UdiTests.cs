@@ -106,13 +106,13 @@ namespace Umbraco.Tests
         public void RangeTest()
         {
             // can parse open string udi
-            const string stringUdiString = "umb://stylesheet";
+            var stringUdiString = "umb://" + Constants.DeployEntityType.AnyString;
             Udi stringUdi;
             Assert.IsTrue(Udi.TryParse(stringUdiString, out stringUdi));
             Assert.AreEqual(string.Empty, ((StringUdi)stringUdi).Id);
 
             // can parse open guid udi
-            const string guidUdiString = "umb://document";
+            var guidUdiString = "umb://" + Constants.DeployEntityType.AnyGuid;
             Udi guidUdi;
             Assert.IsTrue(Udi.TryParse(guidUdiString, out guidUdi));
             Assert.AreEqual(Guid.Empty, ((GuidUdi)guidUdi).Guid);
