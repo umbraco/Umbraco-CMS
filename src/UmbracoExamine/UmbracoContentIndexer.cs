@@ -416,6 +416,7 @@ namespace UmbracoExamine
                             var notPublished = new HashSet<string>();
 
                             IContent[] content;
+                            int currentPageSize;
                             do
                             {
                                 long total;
@@ -431,6 +432,9 @@ namespace UmbracoExamine
                                     // which descendent nodes are implicitly not published
                                     descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null);
                                 }
+
+                                // need to store decendants count before filtering, in order for loop to work correctly
+                                currentPageSize = descendants.Count();
 
                                 //if specific types are declared we need to post filter them
                                 //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
@@ -449,7 +453,7 @@ namespace UmbracoExamine
                                     content, notPublished).WhereNotNull(), type);
 
                                 pageIndex++;
-                            } while (content.Length == pageSize);
+                            } while (currentPageSize == pageSize);
                         }
 
                         break;
