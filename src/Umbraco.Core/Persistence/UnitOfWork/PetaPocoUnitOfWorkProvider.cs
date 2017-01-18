@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
@@ -67,6 +68,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         public IDatabaseUnitOfWork GetUnitOfWork()
         {
             return new PetaPocoUnitOfWork(_scopeProvider);
+        }
+
+        public IDatabaseUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel)
+        {
+            return new PetaPocoUnitOfWork(_scopeProvider, isolationLevel);
         }
 
         #endregion

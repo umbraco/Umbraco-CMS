@@ -24,11 +24,6 @@ namespace Umbraco.Tests.Scoping
         {
             base.Initialize();
 
-            //// initialization leaves a NoScope around, remove it
-            //var scope = DatabaseContext.ScopeProvider.AmbientScope;
-            //Assert.IsNotNull(scope);
-            //Assert.IsInstanceOf<NoScope>(scope);
-            //scope.Dispose();
             Assert.IsNull(DatabaseContext.ScopeProvider.AmbientScope); // gone
         }
 

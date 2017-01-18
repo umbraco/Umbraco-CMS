@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 
@@ -12,16 +13,21 @@ namespace Umbraco.Core.Scoping
     internal class Scope : IScope
     {
         private readonly ScopeProvider _scopeProvider;
+        private readonly IsolationLevel _isolationLevel;
         private bool _disposed;
         private bool? _completed;
 
         private UmbracoDatabase _database;
         private IList<EventMessage> _messages;
 
+        // this is v7, in v8 this has to change to RepeatableRead
+        private const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
+
         // initializes a new scope
-        public Scope(ScopeProvider scopeProvider, bool detachable = false)
+        public Scope(ScopeProvider scopeProvider, IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool detachable = false)
         {
             _scopeProvider = scopeProvider;
+            _isolationLevel = isolationLevel;
             Detachable = detachable;
 #if DEBUG_SCOPES
             _scopeProvider.Register(this);
@@ -29,15 +35,15 @@ namespace Umbraco.Core.Scoping
         }
 
         // initializes a new scope in a nested scopes chain, with its parent
-        public Scope(ScopeProvider scopeProvider, Scope parent)
-            : this(scopeProvider)
+        public Scope(ScopeProvider scopeProvider, Scope parent, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
+            : this(scopeProvider, isolationLevel)
         {
             ParentScope = parent;
         }
 
         // initializes a new scope, replacing a NoScope instance
-        public Scope(ScopeProvider scopeProvider, NoScope noScope)
-            : this(scopeProvider)
+        public Scope(ScopeProvider scopeProvider, NoScope noScope, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
+            : this(scopeProvider, isolationLevel)
         {
             // steal everything from NoScope
             _database = noScope.DatabaseOrNull;
@@ -63,24 +69,56 @@ namespace Umbraco.Core.Scoping
         // the original scope (when attaching a detachable scope)
         public IScope OrigScope { get; set; }
 
+        private IsolationLevel IsolationLevel
+        {
+            get
+            {
+                if (_isolationLevel != IsolationLevel.Unspecified) return _isolationLevel;
+                if (ParentScope != null) return ParentScope.IsolationLevel;
+                return DefaultIsolationLevel;
+            }
+        }
+
         /// <inheritdoc />
         public UmbracoDatabase Database
         {
             get
             {
                 EnsureNotDisposed();
-                if (ParentScope != null) return ParentScope.Database;
+                if (ParentScope != null)
+                {
+                    var database = ParentScope.Database;
+                    if (_isolationLevel > IsolationLevel.Unspecified && database.CurrentTransactionIsolationLevel < _isolationLevel)
+                        throw new Exception("Scope requires isolation level " + _isolationLevel + ", but got " + database.CurrentTransactionIsolationLevel + " from parent.");
+                }
+
                 if (_database != null)
                 {
-                    if (_database.InTransaction == false) // stolen from noScope
-                        _database.BeginTransaction(); // a scope implies a transaction, always
-                    // fixme - what-if exception?
+                    // if the database has been created by a Scope instance it has to be
+                    // in a transaction, however it can be a database that was stolen from
+                    // a NoScope instance, in which case we need to enter a transaction, as
+                    // a scope implies a transaction, always
+                    if (_database.InTransaction)
+                        return _database;
+                }
+                else
+                {
+                    // create a new database
+                    _database = _scopeProvider.DatabaseFactory.CreateNewDatabase();
+                }
+
+                // enter a transaction, as a scope implies a transaction, always
+                try
+                {
+                    _database.BeginTransaction(IsolationLevel);
                     return _database;
                 }
-                var database = _scopeProvider.DatabaseFactory.CreateNewDatabase();
-                database.BeginTransaction(); // a scope implies a transaction, always
-                // fixme - should dispose db on exception?
-                return _database = database;
+                catch
+                {
+                    _database.Dispose();
+                    _database = null;
+                    throw;
+                }
             }
         }
 

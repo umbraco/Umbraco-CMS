@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Scoping;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	internal class PetaPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
 	{
         private readonly Queue<Operation> _operations = new Queue<Operation>();
+	    private readonly IsolationLevel _isolationLevel;
         private readonly IScopeProvider _scopeProvider;
         private bool _completeScope = true; // scope is completed by default
         private IScope _scope;
@@ -28,9 +30,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <remarks>
         /// This should normally not be used directly and should be created with the UnitOfWorkProvider
         /// </remarks>
-        internal PetaPocoUnitOfWork(IScopeProvider scopeProvider)
+        internal PetaPocoUnitOfWork(IScopeProvider scopeProvider, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
         {
             _scopeProvider = scopeProvider;
+            _isolationLevel = isolationLevel;
 			_key = Guid.NewGuid();
 			InstanceId = Guid.NewGuid();
 		}
@@ -143,7 +146,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
 	    private IScope ThisScope
 	    {
-	        get { return _scope ?? (_scope = _scopeProvider.CreateScope()); }
+	        get { return _scope ?? (_scope = _scopeProvider.CreateScope(_isolationLevel)); }
 	    }
 
 	    public UmbracoDatabase Database

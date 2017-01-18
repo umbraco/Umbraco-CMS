@@ -28,92 +28,88 @@ namespace Umbraco.Core.Persistence
 
         public void WithReadLocked(Action<LockedRepository<TRepository>> action, bool autoCommit = true)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var transaction = uow.Database.GetTransaction(IsolationLevel.RepeatableRead))
+            using (var uow = ((PetaPocoUnitOfWorkProvider) _uowProvider).GetUnitOfWork(IsolationLevel.RepeatableRead))
             {
+                // getting the database creates a scope and a transaction
+                // the scope is IsolationLevel.RepeatableRead (because UnitOfWork is)
+                // and will throw if outer scope (if any) has a lower isolation level
+
                 foreach (var lockId in _readLockIds)
                     uow.Database.AcquireLockNodeReadLock(lockId);
 
                 using (var repository = _repositoryFactory(uow))
                 {
-                    action(new LockedRepository<TRepository>(transaction, uow, repository));
+                    action(new LockedRepository<TRepository>(uow, repository));
                     if (autoCommit == false) return;
                     uow.Commit();
-                    transaction.Complete();
-                }
-            }
+
+                } // dispose repository => dispose uow => complete (or not) scope
+            } // dispose uow again => nothing
         }
 
         public TResult WithReadLocked<TResult>(Func<LockedRepository<TRepository>, TResult> func, bool autoCommit = true)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
-            using (var transaction = uow.Database.GetTransaction(IsolationLevel.RepeatableRead))
+            using (var uow = ((PetaPocoUnitOfWorkProvider) _uowProvider).GetUnitOfWork(IsolationLevel.RepeatableRead))
             {
+                // getting the database creates a scope and a transaction
+                // the scope is IsolationLevel.RepeatableRead (because UnitOfWork is)
+                // and will throw if outer scope (if any) has a lower isolation level
+
                 foreach (var lockId in _readLockIds)
                     uow.Database.AcquireLockNodeReadLock(lockId);
 
                 using (var repository = _repositoryFactory(uow))
                 {
-                    var ret = func(new LockedRepository<TRepository>(transaction, uow, repository));
+                    var ret = func(new LockedRepository<TRepository>(uow, repository));
                     if (autoCommit == false) return ret;
                     uow.Commit();
-                    transaction.Complete();
                     return ret;
-                }
-            }
+
+                }  // dispose repository => dispose uow => complete (or not) scope
+            } // dispose uow again => nothing
         }
 
         public void WithWriteLocked(Action<LockedRepository<TRepository>> action, bool autoCommit = true)
         {
-            // must use the uow to ensure it's disposed if GetTransaction fails!
-
-            using (var uow = _uowProvider.GetUnitOfWork())
-            using (var transaction = uow.Database.GetTransaction(IsolationLevel.RepeatableRead))
+            using (var uow = ((PetaPocoUnitOfWorkProvider) _uowProvider).GetUnitOfWork(IsolationLevel.RepeatableRead))
             {
+                // getting the database creates a scope and a transaction
+                // the scope is IsolationLevel.RepeatableRead (because UnitOfWork is)
+                // and will throw if outer scope (if any) has a lower isolation level
+
                 foreach (var lockId in _writeLockIds)
                     uow.Database.AcquireLockNodeWriteLock(lockId);
 
                 using (var repository = _repositoryFactory(uow))
                 {
-                    action(new LockedRepository<TRepository>(transaction, uow, repository));
+                    action(new LockedRepository<TRepository>(uow, repository));
                     if (autoCommit == false) return;
                     uow.Commit();
-                    transaction.Complete();
-                }
-            }
-            // fixme
-            // the change above ensures that scopes are properly disposed
-            // TODO apply to all methods
-            // now how can we manage the isolation level?
 
-            //uow.ScopeIsolationLevel = IsolationLevel.RepeatableRead; // might throw when creating the scope
-            // getTransaction here throws because of different levels
-            // but the exception gets eaten because on the way out, disposing the _outer_ scope fails
-            // so... how shall we figure it out?!
-            // - we should be able to set the isolation level on the uow scope
-            // - should we be able to dispose parent scopes and then what happens? NO!
-            //
-            // if we can create scopes with isolation levels what happens when we nest scopes?
-            // note: this is a *very* special use case
+                } // dispose repository => dispose uow => complete (or not) scope
+            } // dispose uow again => nothing
         }
 
         public TResult WithWriteLocked<TResult>(Func<LockedRepository<TRepository>, TResult> func, bool autoCommit = true)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
-            using (var transaction = uow.Database.GetTransaction(IsolationLevel.RepeatableRead))
+            using (var uow = ((PetaPocoUnitOfWorkProvider) _uowProvider).GetUnitOfWork(IsolationLevel.RepeatableRead))
             {
+                // getting the database creates a scope and a transaction
+                // the scope is IsolationLevel.RepeatableRead (because UnitOfWork is)
+                // and will throw if outer scope (if any) has a lower isolation level
+
                 foreach (var lockId in _writeLockIds)
                     uow.Database.AcquireLockNodeReadLock(lockId);
 
                 using (var repository = _repositoryFactory(uow))
                 {
-                    var ret = func(new LockedRepository<TRepository>(transaction, uow, repository));
+                    var ret = func(new LockedRepository<TRepository>(uow, repository));
                     if (autoCommit == false) return ret;
                     uow.Commit();
-                    transaction.Complete();
                     return ret;
-                }
-            }
+
+                } // dispose repository => dispose uow => complete (or not) scope
+            } // dispose uow again => nothing
         }
     }
 }

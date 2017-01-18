@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 
 namespace Umbraco.Core.Scoping
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Scoping
         /// <para>If an ambient scope already exists, it becomes the parent of the created scope.</para>
         /// <para>When the created scope is disposed, the parent scope becomes the ambient scope again.</para>
         /// </remarks>
-        IScope CreateScope();
+        IScope CreateScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified);
 
         /// <summary>
         /// Creates a detached scope.
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Scoping
         /// <para>A detached scope is not ambient and has no parent.</para>
         /// <para>It is meant to be attached by <see cref="AttachScope"/>.</para>
         /// </remarks>
-        IScope CreateDetachedScope();
+        IScope CreateDetachedScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified);
 
         /// <summary>
         /// Attaches a scope.

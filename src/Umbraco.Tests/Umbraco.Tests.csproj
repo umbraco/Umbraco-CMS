@@ -165,6 +165,7 @@
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\PetaPocoExpressionsTests.cs" />
+    <Compile Include="Persistence\Repositories\LockedRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Scheduling\DeployTest.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />

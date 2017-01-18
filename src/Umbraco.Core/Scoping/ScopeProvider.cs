@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Web;
@@ -113,9 +114,9 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IScope CreateDetachedScope()
+        public IScope CreateDetachedScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified)
         {
-            return new Scope(this, true);
+            return new Scope(this, isolationLevel, true);
         }
 
         /// <inheritdoc />
@@ -156,11 +157,11 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IScope CreateScope()
+        public IScope CreateScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified)
         {
             var ambient = AmbientScope;
             if (ambient == null)
-                return AmbientScope = new Scope(this);
+                return AmbientScope = new Scope(this, isolationLevel);
 
             // replace noScope with a real one
             var noScope = ambient as NoScope;
@@ -173,13 +174,13 @@ namespace Umbraco.Core.Scoping
                 var database = noScope.DatabaseOrNull;
                 if (database != null && database.InTransaction)
                     throw new Exception("NoScope is in a transaction.");
-                return AmbientScope = new Scope(this, noScope);
+                return AmbientScope = new Scope(this, noScope, isolationLevel);
             }
 
             var scope = ambient as Scope;
             if (scope == null) throw new Exception("Ambient scope is not a Scope instance.");
 
-            return AmbientScope = new Scope(this, scope);
+            return AmbientScope = new Scope(this, scope, isolationLevel);
         }
 
         /// <inheritdoc />
