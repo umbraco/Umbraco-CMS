@@ -64,7 +64,9 @@ namespace Umbraco.Core
             // after Umbraco has started there is a scope in "context" and that context is
             // going to stay there and never get destroyed nor reused, so we have to ensure that
             // the scope is disposed (along with database etc) - reset it all entirely
-            ((ScopeProvider) ApplicationContext.Current.ScopeProvider).Reset();
+            var scopeProvider = ApplicationContext.Current.ScopeProvider as ScopeProvider;
+            if (scopeProvider != null) // can be mocked...
+                scopeProvider.Reset();
         }
 
         /// <summary>

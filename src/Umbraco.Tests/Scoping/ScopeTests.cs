@@ -295,7 +295,7 @@ namespace Umbraco.Tests.Scoping
                 using (var nested = scopeProvider.CreateScope())
                 {
                     nested.Database.Execute("INSERT INTO tmp (id, name) VALUES (2, 'b')");
-                    var nn = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
+                    var nn = nested.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
                     Assert.AreEqual("b", nn);
                 }
 
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Scoping
                 using (var nested = scopeProvider.CreateScope())
                 {
                     nested.Database.Execute("INSERT INTO tmp (id, name) VALUES (2, 'b')");
-                    var nn = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
+                    var nn = nested.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
                     Assert.AreEqual("b", nn);
                     nested.Complete();
                 }
@@ -366,7 +366,7 @@ namespace Umbraco.Tests.Scoping
                 using (var nested = scopeProvider.CreateScope())
                 {
                     nested.Database.Execute("INSERT INTO tmp (id, name) VALUES (2, 'b')");
-                    var nn = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
+                    var nn = nested.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
                     Assert.AreEqual("b", nn);
                     nested.Complete();
                 }

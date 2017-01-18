@@ -90,6 +90,7 @@ namespace Umbraco.Core.Scoping
                     var database = ParentScope.Database;
                     if (_isolationLevel > IsolationLevel.Unspecified && database.CurrentTransactionIsolationLevel < _isolationLevel)
                         throw new Exception("Scope requires isolation level " + _isolationLevel + ", but got " + database.CurrentTransactionIsolationLevel + " from parent.");
+                    _database = database;
                 }
 
                 if (_database != null)
