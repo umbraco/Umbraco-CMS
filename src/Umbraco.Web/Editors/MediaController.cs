@@ -191,7 +191,7 @@ namespace Umbraco.Web.Editors
                 var entity = Services.EntityService.GetByKey(idGuid);
                 if (entity != null)
                 {
-                    return getChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+                    return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
                 }
                 else
                 {
@@ -200,13 +200,13 @@ namespace Umbraco.Web.Editors
             }
             else if (int.TryParse(id, out idInt))
             {
-                return getChildren(idInt, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+                return GetChildren(idInt, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
-        private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> getChildren(int id,
+        private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
             int pageNumber = 0,
             int pageSize = 0,
             string orderBy = "SortOrder",
