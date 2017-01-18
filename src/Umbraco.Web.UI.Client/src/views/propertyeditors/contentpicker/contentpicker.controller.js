@@ -254,7 +254,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         if(entityType !== "Member") {
             entityResource.getUrl(entity.id, entityType).then(function(data){
                 // update url
-                entity.url = data.url;
+                entity.url = data;
+
                 // push item to render model
                 addSelectedItem(entity);
             });
