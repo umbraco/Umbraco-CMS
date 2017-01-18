@@ -2,19 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -24,6 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentTypeRepository : ContentTypeBaseRepository<IContentType>, IContentTypeRepository
     {
         private readonly ITemplateRepository _templateRepository;
+        private IRepositoryCachePolicy<IContentType, int> _cachePolicy;
 
         public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository)
             : base(work, cache, logger, sqlSyntax)
@@ -31,16 +26,11 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<IContentType, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IContentType, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<IContentType, int> CachePolicy
         {
             get
             {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IContentType, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), 
-                    //allow this cache to expire
-                    expires:true));
+                return _cachePolicy ?? (_cachePolicy = new FullDataSetRepositoryCachePolicy<IContentType, int>(RuntimeCache, GetEntityId, /*expires:*/ true));
             }
         }
 

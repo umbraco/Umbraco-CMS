@@ -19,20 +19,21 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class RelationTypeRepository : PetaPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
+        private IRepositoryCachePolicy<IRelationType, int> _cachePolicy;
+
         public RelationTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         { }
 
-        // assuming we don't have tons of relation types, use a FullDataSet policy, ie
-        // cache the entire GetAll result once in a single collection - which can expire
-        private FullDataSetRepositoryCachePolicyFactory<IRelationType, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IRelationType, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<IRelationType, int> CachePolicy
         {
             get
             {
-                return _cachePolicyFactory 
-                    ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IRelationType, int>(
-                        RuntimeCache, GetEntityId, () => PerformGetAll(), expires: true));
+                if (_cachePolicy != null) return _cachePolicy;
+
+                _cachePolicy = new FullDataSetRepositoryCachePolicy<IRelationType, int>(RuntimeCache, GetEntityId, /*expires:*/ true);
+
+                return _cachePolicy;
             }
         }
 

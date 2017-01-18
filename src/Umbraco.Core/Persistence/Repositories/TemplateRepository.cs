@@ -33,6 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplatesSection _templateConfig;
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
+        private IRepositoryCachePolicy<ITemplate, int> _cachePolicy;
 
         internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
             : base(work, cache, logger, sqlSyntax)
@@ -45,14 +46,15 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
 
-        private FullDataSetRepositoryCachePolicyFactory<ITemplate, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<ITemplate, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<ITemplate, int> CachePolicy
         {
             get
             {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ITemplate, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
+                if (_cachePolicy != null) return _cachePolicy;
+
+                _cachePolicy = new FullDataSetRepositoryCachePolicy<ITemplate, int>(RuntimeCache, GetEntityId, /*expires:*/ false);
+
+                return _cachePolicy;
             }
         }
 

@@ -22,22 +22,22 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MediaTypeRepository : ContentTypeBaseRepository<IMediaType>, IMediaTypeRepository
     {
+        private IRepositoryCachePolicy<IMediaType, int> _cachePolicy;
 
         public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<IMediaType, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IMediaType, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<IMediaType, int> CachePolicy
         {
             get
             {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IMediaType, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(),
-                    //allow this cache to expire
-                    expires: true));
+                if (_cachePolicy != null) return _cachePolicy;
+
+                _cachePolicy = new FullDataSetRepositoryCachePolicy<IMediaType, int>(RuntimeCache, GetEntityId, /*expires:*/ true);
+
+                return _cachePolicy;
             }
         }
 

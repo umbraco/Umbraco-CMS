@@ -136,9 +136,7 @@
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\DefaultRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\FullDataSetRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\ICacheProvider.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
@@ -146,7 +144,6 @@
     <Compile Include="Cache\HttpRequestCacheProvider.cs" />
     <Compile Include="Cache\IRepositoryCachePolicy.cs" />
     <Compile Include="Cache\IPayloadCacheRefresher.cs" />
-    <Compile Include="Cache\IRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\IsolatedRuntimeCache.cs" />
     <Compile Include="Cache\ObjectCacheRuntimeCacheProvider.cs" />
     <Compile Include="Cache\IRuntimeCacheProvider.cs" />
@@ -156,7 +153,6 @@
     <Compile Include="Cache\NullCacheProvider.cs" />
     <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\OnlySingleItemsRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />

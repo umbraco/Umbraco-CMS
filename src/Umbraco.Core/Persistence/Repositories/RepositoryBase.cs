@@ -82,7 +82,6 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-
         #region Static Queries
 
         private IQuery<TEntity> _hasIdQuery;
@@ -102,30 +101,25 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>(); }
         }
 
-        private IRepositoryCachePolicyFactory<TEntity, TId> _cachePolicyFactory;
-        /// <summary>
-        /// Returns the Cache Policy for the repository
-        /// </summary>
-        /// <remarks>
-        /// The Cache Policy determines how each entity or entity collection is cached
-        /// </remarks>
-        protected virtual IRepositoryCachePolicyFactory<TEntity, TId> CachePolicyFactory
+        private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
+
+        protected virtual IRepositoryCachePolicy<TEntity, TId> CachePolicy
         {
             get
             {
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new DefaultRepositoryCachePolicyFactory<TEntity, TId>(
-                    RuntimeCache,
-                    new RepositoryCachePolicyOptions(() =>
-                    {
-                        //create it once if it is needed (no need for locking here)
-                        if (_hasIdQuery == null)
-                        {
-                            _hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0);
-                        }
+                if (_cachePolicy != null) return _cachePolicy;
 
-                        //Get count of all entities of current type (TEntity) to ensure cached result is correct
-                        return PerformCount(_hasIdQuery);
-                    })));
+                var options = new RepositoryCachePolicyOptions(() =>
+                {
+                    //Get count of all entities of current type (TEntity) to ensure cached result is correct
+                    //create query once if it is needed (no need for locking here)
+                    var query = _hasIdQuery ?? (_hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0));
+                    return PerformCount(query);
+                });
+
+                _cachePolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, options);
+
+                return _cachePolicy;
             }
         }
 
@@ -166,10 +160,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public TEntity Get(TId id)
         {
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                return p.Get(id, PerformGet);
-            }
+            return CachePolicy.Get(id, PerformGet, PerformGetAll);
         }
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
@@ -192,13 +183,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new InvalidOperationException("Cannot perform a query with more than 2000 parameters");
             }
 
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                var result = p.GetAll(ids, PerformGetAll);
-                return result;
-            }          
+            return CachePolicy.GetAll(ids, PerformGetAll);
         }
-        
+
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
         /// <summary>
         /// Gets a list of entities by the passed in query
@@ -220,10 +207,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public bool Exists(TId id)
         {
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                return p.Exists(id, PerformExists);
-            }
+            return CachePolicy.Exists(id, PerformExists, PerformGetAll);
         }
 
         protected abstract int PerformCount(IQuery<TEntity> query);
@@ -236,19 +220,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return PerformCount(query);
         }
-        
+
         /// <summary>
         /// Unit of work method that tells the repository to persist the new entity
         /// </summary>
         /// <param name="entity"></param>
         public virtual void PersistNewItem(IEntity entity)
         {
-            var casted = (TEntity)entity;
-
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                p.CreateOrUpdate(casted, PersistNewItem);
-            }
+            CachePolicy.Create((TEntity) entity, PersistNewItem);
         }
 
         /// <summary>
@@ -257,12 +236,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistUpdatedItem(IEntity entity)
         {
-            var casted = (TEntity)entity;
-
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                p.CreateOrUpdate(casted, PersistUpdatedItem);
-            }
+            CachePolicy.Update((TEntity) entity, PersistUpdatedItem);
         }
 
         /// <summary>
@@ -271,19 +245,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistDeletedItem(IEntity entity)
         {
-            var casted = (TEntity)entity;
-
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                p.Remove(casted, PersistDeletedItem);
-            }            
+            CachePolicy.Delete((TEntity) entity, PersistDeletedItem);
         }
-        
 
         protected abstract void PersistNewItem(TEntity item);
         protected abstract void PersistUpdatedItem(TEntity item);
         protected abstract void PersistDeletedItem(TEntity item);
-
 
         /// <summary>
         /// Dispose disposable properties

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlServerCe;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
