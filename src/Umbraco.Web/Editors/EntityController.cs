@@ -17,6 +17,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
+using System.Net.Http;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Web.WebApi.Filters;
@@ -146,19 +147,27 @@ namespace Umbraco.Web.Editors
 
 
 
-
-        public dynamic GetUrl(int id, UmbracoEntityTypes type)
+        /// <summary>
+        /// Gets the url of an entity
+        /// </summary>
+        /// <param name="id">Int id of the entity to fetch URL for</param>
+        /// <param name="type">The tpye of entity such as Document, Media, Member</param>
+        /// <returns>The URL or path to the item</returns>
+        public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type)
         {
-            dynamic result = new System.Dynamic.ExpandoObject();
-            
+            var returnUrl = string.Empty;
 
-            if(type == UmbracoEntityTypes.Document)
+            if (type == UmbracoEntityTypes.Document)
             {
                 var foundUrl = Umbraco.Url(id);
                 if (string.IsNullOrEmpty(foundUrl) == false && foundUrl != "#")
                 {
-                    result.url = foundUrl;
-                    return result;
+                    returnUrl = foundUrl;
+
+                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(returnUrl)
+                    };
                 }   
             }
 
@@ -169,10 +178,12 @@ namespace Umbraco.Web.Editors
                 ancestors = ancestors.Skip(1);
             }
 
-            result.url = "/" + string.Join("/", ancestors.Select(x => x.Name) );
+            returnUrl = "/" + string.Join("/", ancestors.Select(x => x.Name));
 
-
-            return result;
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(returnUrl)
+            };
         }
 
         /// <summary>
