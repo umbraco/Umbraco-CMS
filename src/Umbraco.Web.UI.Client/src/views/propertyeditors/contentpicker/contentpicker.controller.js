@@ -259,18 +259,24 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     });
 
     function setEntityUrl(entity) {
+
         // get url for content and media items
         if(entityType !== "Member") {
             entityResource.getUrl(entity.id, entityType).then(function(data){
-                // update url
-                entity.url = data;
-
-                // push item to render model
-                addSelectedItem(entity);
+                // update url                
+                angular.forEach($scope.renderModel, function(item){
+                    if(item.id === entity.id) {
+                        item.url = data;
+                    }
+                });
             });
-        } else {
-            addSelectedItem(entity);
         }
+
+        // add the selected item to the renderModel
+        // if it needs to show a url the item will get 
+        // updated when the url comes back from server
+        addSelectedItem(entity);
+
     }
 
     function addSelectedItem(item) {
