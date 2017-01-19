@@ -1780,7 +1780,11 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
-                var contents = repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize, out totalRecords);
+                var contents = repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize,
+                    //This order by is VERY important! This allows us to figure out what is implicitly not published, see ContentRepository.BuildXmlCache and
+                    // UmbracoContentIndexer.PerformIndexAll which uses the logic based on this sort order
+                    new[] {"level", "parentID", "sortOrder"},
+                    out totalRecords);
                 return contents;
             }
         }

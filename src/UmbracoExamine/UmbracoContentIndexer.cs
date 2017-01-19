@@ -399,13 +399,58 @@ namespace UmbracoExamine
                         
                         if (SupportUnpublishedContent == false && DisableXmlDocumentLookup == false)
                         {
+                            //get all node Ids that have a published version - this is a fail safe check, in theory
+                            // only document nodes that have a published version would exist in the cmsContentXml table
+                            var allNodesWithPublishedVersions = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                                "select DISTINCT cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1");
+
+                            XElement last = null;
+                            var trackedIds = new HashSet<string>();
+
                             ReindexWithXmlEntries(type, contentParentId,
                                 () => _contentTypeService.GetAllContentTypes().ToArray(),
                                 (path, pIndex, pSize) =>
                                 {
                                     long totalContent;
+
+                                    //sorted by: umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder
                                     var result = _contentService.GetPagedXmlEntries(path, pIndex, pSize, out totalContent).ToArray();
-                                    return new Tuple<long, XElement[]>(totalContent, result);
+
+                                    //then like we do in the ContentRepository.BuildXmlCache we need to track what Parents have been processed
+                                    // already so that we can then exclude implicitly unpublished content items
+                                    var filtered = new List<XElement>();
+
+                                    foreach (var xml in result)
+                                    {
+                                        var id = xml.AttributeValue<int>("id");
+                                        
+                                        //don't include this if it doesn't have a published version
+                                        if (allNodesWithPublishedVersions.Contains(id) == false)
+                                            continue;
+
+                                        var parentId = xml.AttributeValue<string>("parentID");
+
+                                        if (parentId == null) continue; //this shouldn't happen
+
+                                        //if the parentid is changing
+                                        if (last != null && last.AttributeValue<string>("parentID") != parentId)
+                                        {
+                                            var found = trackedIds.Contains(parentId);
+                                            if (found == false)
+                                            {
+                                                //Need to short circuit here, if the parent is not there it means that the parent is unpublished
+                                                // and therefore the child is not published either so cannot be included in the xml cache
+                                                continue;
+                                            }                                            
+                                        }
+                                        
+                                        last = xml;
+                                        trackedIds.Add(xml.AttributeValue<string>("id"));
+
+                                        filtered.Add(xml);
+                                    }
+
+                                    return new Tuple<long, XElement[]>(totalContent, filtered.ToArray());
                                 },
                                 i => _contentService.GetById(i));
                         }

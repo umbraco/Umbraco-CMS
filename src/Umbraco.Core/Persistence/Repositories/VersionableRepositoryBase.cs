@@ -139,24 +139,34 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         /// <summary>
-        /// Gets paged content descendants as XML by path
+        /// Gets paged document descendants as XML by path
         /// </summary>
         /// <param name="path">Path starts with</param>
         /// <param name="pageIndex">Page number</param>
         /// <param name="pageSize">Page size</param>
+        /// <param name="orderBy"></param>
         /// <param name="totalRecords">Total records the query would return without paging</param>
         /// <returns>A paged enumerable of XML entries of content items</returns>
-        public IEnumerable<XElement> GetPagedXmlEntriesByPath(string path, long pageIndex, int pageSize, out long totalRecords)
+        public virtual IEnumerable<XElement> GetPagedXmlEntriesByPath(string path, long pageIndex, int pageSize, string[] orderBy, out long totalRecords)
         {
-            Sql query;
+            var query = new Sql().Select(string.Format("umbracoNode.id, cmsContentXml.{0}", SqlSyntax.GetQuotedColumnName("xml")))
+                .From("umbracoNode")
+                .InnerJoin("cmsContentXml").On("cmsContentXml.nodeId = umbracoNode.id");
+
             if (path == "-1")
             {
-                query = new Sql().Select("nodeId, xml").From("cmsContentXml").Where("nodeId IN (SELECT id FROM umbracoNode WHERE nodeObjectType = @0)", NodeObjectTypeId).OrderBy("nodeId");
+                query.Where("umbracoNode.nodeObjectType = @type", new { type = NodeObjectTypeId });
             }
             else
             {
-                query = new Sql().Select("nodeId, xml").From("cmsContentXml").Where("nodeId IN (SELECT id FROM umbracoNode WHERE path LIKE (@0))", path.EnsureEndsWith(",%")).OrderBy("nodeId");
+                query.Where(string.Format("umbracoNode.{0} LIKE (@0)", SqlSyntax.GetQuotedColumnName("path")), path.EnsureEndsWith(",%"));
             }
+
+            //each order by param needs to be in a bracket! see: https://github.com/toptensoftware/PetaPoco/issues/177
+            query.OrderBy(orderBy == null
+                ? "(umbracoNode.id)"                
+                : string.Join(",", orderBy.Select(x => string.Format("({0})", SqlSyntax.GetQuotedColumnName(x)))));
+
             var pagedResult = Database.Page<ContentXmlDto>(pageIndex + 1, pageSize, query);
             totalRecords = pagedResult.TotalItems;
             return pagedResult.Items.Select(dto => XElement.Parse(dto.Xml));
