@@ -42,7 +42,12 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-                notificationsService.success("Partial View Macro File saved");
+                localizationService.localize("speechBubbles_partialViewSavedHeader").then(function (headerValue) {
+                    localizationService.localize("speechBubbles_partialViewSavedText").then(function(msgValue) {
+                        notificationsService.success(headerValue, msgValue);
+                    });
+                });
+
                 vm.page.saveButtonState = "success";
                 vm.partialViewMacro = saved;
 
