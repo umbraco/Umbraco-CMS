@@ -14,6 +14,7 @@ namespace Umbraco.Core.Scoping
         private bool _disposed;
 
         private UmbracoDatabase _database;
+        private IEventManager _eventManager;
         private IList<EventMessage> _messages;
 
         public NoScope(ScopeProvider scopeProvider)
@@ -57,13 +58,23 @@ namespace Umbraco.Core.Scoping
                 return _messages ?? (_messages = new List<EventMessage>());
             }
         }
-
+        
         public IList<EventMessage> MessagesOrNull
         {
             get
             {
                 EnsureNotDisposed();
                 return _messages;
+            }
+        }
+
+        /// <inheritdoc />
+        public IEventManager EventManager
+        {
+            get
+            {
+                EnsureNotDisposed();
+                return _eventManager ?? (_eventManager = new NoScopedEventManager());
             }
         }
 
@@ -97,6 +108,6 @@ namespace Umbraco.Core.Scoping
 
             _disposed = true;
             GC.SuppressFinalize(this);
-        }
+        }        
     }
 }

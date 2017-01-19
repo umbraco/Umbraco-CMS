@@ -9,9 +9,4 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	{
 		UmbracoDatabase Database { get; }
 	}
-
-    internal interface IScopeUnitOfWork : IDatabaseUnitOfWork
-    {
-        
-    }
 }

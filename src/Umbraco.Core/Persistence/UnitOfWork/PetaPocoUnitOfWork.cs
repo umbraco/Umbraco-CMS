@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Scoping;
 
@@ -198,5 +199,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		    _scope.Dispose();
 		    _scope = null;
 		}
-	}
+
+        public IEventManager EventManager
+        {
+            get { throw new NotImplementedException(); }
+        }
+    }
 }

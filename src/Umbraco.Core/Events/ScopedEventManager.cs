@@ -1,0 +1,35 @@
+using System;
+using System.Collections.Generic;
+
+namespace Umbraco.Core.Events
+{
+    internal class ScopedEventManager : IEventManager
+    {
+        public void TrackEvent(EventHandler e, object sender, EventArgs args)
+        {
+            _tracked.Add(new EventDefinition(e, sender, args));
+        }
+
+        public void TrackEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args)
+        {
+            _tracked.Add(new EventDefinition<TEventArgs>(e, sender, args));
+        }
+
+        public void TrackEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args)
+        {            
+            _tracked.Add(new EventDefinition<TSender, TEventArgs>(e, sender, args));
+        }
+
+        public IEnumerable<IEventDefinition> GetEvents()
+        {
+            return _tracked;
+        }        
+
+        private readonly List<EventDefinitionBase> _tracked = new List<EventDefinitionBase>();
+
+        public bool SupportsEventCancellation
+        {
+            get { return false; }
+        }
+    }
+}

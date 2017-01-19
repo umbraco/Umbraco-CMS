@@ -21,6 +21,11 @@ namespace Umbraco.Core.Scoping
         IList<EventMessage> Messages { get; }
 
         /// <summary>
+        /// Gets the event manager
+        /// </summary>
+        IEventManager EventManager { get; }
+
+        /// <summary>
         /// Completes the scope.
         /// </summary>
         void Complete();

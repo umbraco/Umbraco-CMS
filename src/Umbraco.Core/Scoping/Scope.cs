@@ -14,6 +14,7 @@ namespace Umbraco.Core.Scoping
     {
         private readonly ScopeProvider _scopeProvider;
         private readonly IsolationLevel _isolationLevel;
+        private IEventManager _eventManager;
         private bool _disposed;
         private bool? _completed;
 
@@ -154,6 +155,15 @@ namespace Umbraco.Core.Scoping
             }
         }
 
+        public IEventManager EventManager
+        {
+            get
+            {
+                EnsureNotDisposed();
+                return _eventManager ?? (_eventManager = new ScopedEventManager());
+            }
+        }
+
         /// <inheritdoc />
         public void Complete()
         {
@@ -222,6 +232,6 @@ namespace Umbraco.Core.Scoping
                 _database.Dispose();
                 _database = null;
             }
-        }
+        }        
     }
 }
