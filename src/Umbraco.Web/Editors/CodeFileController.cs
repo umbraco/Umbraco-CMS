@@ -49,6 +49,7 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrWhiteSpace(type) == false && string.IsNullOrWhiteSpace(virtualPath) == false)
             {
+                virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
                 if (type == Core.Constants.Trees.PartialViews)
                 {
                     var view = Services.FileService.GetPartialView(virtualPath);
@@ -170,8 +171,11 @@ namespace Umbraco.Web.Editors
                     var view = Services.FileService.GetPartialView(display.VirtualPath);
                     if (view != null)
                     {
+                        // might need to find the path
+                        var orgPath = view.OriginalPath.Substring(0, view.OriginalPath.IndexOf(view.Name));
+                        view.Path = orgPath + display.Name;
+
                         view.Content = display.Content;
-                        view.Path = display.Name;
                         var result = Services.FileService.SavePartialView(view, Security.CurrentUser.Id);
                         if (result.Success == true)
                         {

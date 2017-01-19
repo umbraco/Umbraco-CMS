@@ -13,6 +13,7 @@ namespace Umbraco.Web.Trees
     {
         protected abstract string FilePath { get; }
         protected abstract string FileSearchPattern { get; }
+        protected abstract string FileIcon { get; }
 
         /// <summary>
         /// Inheritors can override this method to modify the file node that is created.
@@ -79,7 +80,7 @@ namespace Umbraco.Web.Trees
                     if (filterByMultipleExtensions && Array.IndexOf<string>(allowedExtensions, file.Extension.ToLower().Trim('.')) < 0)
                         continue;
 
-                    var node = CreateTreeNode(orgPath + file.Name, orgPath, queryStrings, file.Name, "icon-file", false);
+                    var node = CreateTreeNode(System.Web.HttpUtility.UrlEncode(orgPath + file.Name), orgPath, queryStrings, file.Name, FileIcon, false);
 
                     OnRenderFileNode(ref node);
 

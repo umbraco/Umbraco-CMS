@@ -22,6 +22,10 @@ namespace Umbraco.Web.Trees
 		{
 			get { return "*.cshtml"; }
 		}
+        protected override string FileIcon
+        {
+            get { return "icon-article"; }
+        }
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
