@@ -43,6 +43,12 @@
             }).then(function (saved) {
 
                 notificationsService.success("Partial View saved");
+                localizationService.localize("speechBubbles_partialViewSavedHeader").then(function (headerValue) {
+                    localizationService.localize("speechBubbles_partialViewSavedText").then(function(msgValue) {
+                        notificationsService.success(headerValue, msgValue);
+                    });
+                });
+
                 vm.page.saveButtonState = "success";
                 vm.partialView = saved;
 
