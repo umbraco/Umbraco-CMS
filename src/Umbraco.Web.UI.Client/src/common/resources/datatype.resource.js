@@ -348,6 +348,46 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to move content');
         },
 
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.dataTypeResource#copy
+          * @methodOf umbraco.resources.dataTypeResource
+          *
+          * @description
+          * Copies a node underneath a new parentId
+          *
+          * ##usage
+          * <pre>
+          * dataTypeResource.copy({ parentId: 1244, id: 123 })
+          *    .then(function() {
+          *        alert("node was copied");
+          *    }, function(err){
+          *      alert("node wasnt copy:" + err.data.Message); 
+          *    });
+          * </pre> 
+          * @param {Object} args arguments object
+          * @param {Int} args.id the ID of the node to copy
+          * @param {Int} args.parentId the ID of the parent node to copy to
+          * @returns {Promise} resourcePromise object.
+          *
+          */
+        copy: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.id) {
+                throw "args.id cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                   $http.post(umbRequestHelper.getApiUrl("dataTypeApiBaseUrl", "PostCopy"),
+                         args),
+                   'Failed to copy content');
+        },
+
         createContainer: function (parentId, name) {
 
             return umbRequestHelper.resourcePromise(
