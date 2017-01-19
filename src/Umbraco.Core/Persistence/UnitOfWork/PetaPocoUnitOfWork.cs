@@ -156,12 +156,17 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	        get { return ThisScope.Database; }
 	    }
 
-		#region Operation
+        public IEventManager EventManager
+        {
+            get { return ThisScope.EventManager; }
+        }
 
-		/// <summary>
-		/// Provides a snapshot of an entity and the repository reference it belongs to.
-		/// </summary>
-		private sealed class Operation
+        #region Operation
+
+        /// <summary>
+        /// Provides a snapshot of an entity and the repository reference it belongs to.
+        /// </summary>
+        private sealed class Operation
 		{
 			/// <summary>
 			/// Gets or sets the entity.
@@ -199,10 +204,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		    _scope.Dispose();
 		    _scope = null;
 		}
-
-        public IEventManager EventManager
-        {
-            get { throw new NotImplementedException(); }
-        }
+        
     }
 }
