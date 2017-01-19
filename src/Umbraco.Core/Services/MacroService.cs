@@ -142,19 +142,24 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user deleting the macro</param>
         public void Save(IMacro macro, int userId = 0)
         {
-	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this)) 
-				return;
-	        
-			var uow = UowProvider.GetUnitOfWork();
-	        using (var repository = RepositoryFactory.CreateMacroRepository(uow))
-	        {
-		        repository.AddOrUpdate(macro);
-		        uow.Commit();
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this))
+                return;
 
-		        Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
-	        }
+            if (string.IsNullOrWhiteSpace(macro.Name))
+            {
+                throw new ArgumentException("Cannot save macro with empty name.");
+            }
 
-	        Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateMacroRepository(uow))
+            {
+                repository.AddOrUpdate(macro);
+                uow.Commit();
+
+                Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
+            }
+
+            Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
         }
 
         ///// <summary>

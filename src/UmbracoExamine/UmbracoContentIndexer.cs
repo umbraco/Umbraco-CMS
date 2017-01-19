@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using Examine;
 using Lucene.Net.Documents;
@@ -15,6 +17,7 @@ using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
 using UmbracoExamine.Config;
 using Lucene.Net.Analysis;
+using Lucene.Net.Index;
 using Umbraco.Core.Persistence.Querying;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
@@ -144,6 +147,34 @@ namespace UmbracoExamine
             _contentTypeService = contentTypeService;
         }
 
+        /// <summary>
+        /// Creates an NRT indexer
+        /// </summary>
+        /// <param name="indexerData"></param>
+        /// <param name="writer"></param>
+        /// <param name="dataService"></param>
+        /// <param name="contentTypeService"></param>
+        /// <param name="async"></param>
+        /// <param name="contentService"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        public UmbracoContentIndexer(IIndexCriteria indexerData, IndexWriter writer, IDataService dataService,
+            IContentService contentService,
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
+            IUserService userService,
+            IContentTypeService contentTypeService,
+            bool async) 
+            : base(indexerData, writer, dataService, async)
+        {
+            _contentService = contentService;
+            _mediaService = mediaService;
+            _dataTypeService = dataTypeService;
+            _userService = userService;
+            _contentTypeService = contentTypeService;
+        }
+
         #endregion
 
         #region Constants & Fields        
@@ -229,13 +260,24 @@ namespace UmbracoExamine
                 SupportProtectedContent = supportProtected;
             else
                 SupportProtectedContent = false;
-            
+
+            bool disableXmlDocLookup;
+            if (config["disableXmlDocLookup"] != null && bool.TryParse(config["disableXmlDocLookup"], out disableXmlDocLookup))
+                DisableXmlDocumentLookup = disableXmlDocLookup;
+            else
+                DisableXmlDocumentLookup = false;
+
             base.Initialize(name, config);
         }
 
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Whether to use the cmsContentXml data to re-index when possible (i.e. for published content, media and members)
+        /// </summary>
+        public bool DisableXmlDocumentLookup { get; private set; }
 
         /// <summary>
         /// By default this is false, if set to true then the indexer will include indexing content that is flagged as publicly protected.
@@ -359,131 +401,250 @@ namespace UmbracoExamine
         }
         #endregion
 
-        #region Protected
-
-        /// <summary>
-        /// This is a static query, it's parameters don't change so store statically
-        /// </summary>
-        private IQuery<IContent> _publishedQuery;
+        #region Protected        
 
         protected override void PerformIndexAll(string type)
         {
+            if (SupportedTypes.Contains(type) == false)
+                return;
+
             const int pageSize = 10000;
             var pageIndex = 0;
 
-            switch (type)
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            try
             {
-                case IndexTypes.Content:
-                    var contentParentId = -1;
-                    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
-                    {
-                        contentParentId = IndexerData.ParentNodeId.Value;
-                    }
-                    IContent[] content;
-
-                    //used to track non-published entities so we can determine what items are implicitly not published
-                    var notPublished = new HashSet<string>();
-
-                    do
-                    {
-                        long total;
-
-                        IEnumerable<IContent> descendants;
-                        if (SupportUnpublishedContent)
+                switch (type)
+                {
+                    case IndexTypes.Content:
+                        var contentParentId = -1;
+                        if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
                         {
-                            descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
-                        }
-                        else
-                        {
-                            if (_publishedQuery == null)
-                            {
-                                _publishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
-                            }
-
-                            //get all paged records but order by level ascending, we need to do this because we need to track which nodes are not published so that we can determine
-                            // which descendent nodes are implicitly not published
-                            descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null);
-                        }                        
-
-                        //if specific types are declared we need to post filter them
-                        //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                        if (IndexerData.IncludeNodeTypes.Any())
-                        {
-                            content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
-                        }
-                        else
-                        {
-                            content = descendants.ToArray();
-                        }
-                        AddNodesToIndex(GetSerializedContent(content, notPublished).WhereNotNull(), type);
-                        pageIndex++;
-                    } while (content.Length == pageSize);
-
-                    notPublished.Clear();
-
-                    break;
-                case IndexTypes.Media:
-                    var mediaParentId = -1;
-
-                    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
-                    {
-                        mediaParentId = IndexerData.ParentNodeId.Value;
-                    }
-                    
-                    XElement[] mediaXElements;
-                    
-                    var mediaTypes = _contentTypeService.GetAllMediaTypes().ToArray();
-                    var icons = mediaTypes.ToDictionary(x => x.Id, y => y.Icon);
-
-                    do
-                    {
-                        long total;
-                        if (mediaParentId == -1)
-                        {
-                            mediaXElements = _mediaService.GetPagedXmlEntries("-1", pageIndex, pageSize, out total).ToArray();
-                        }
-                        else
-                        {
-                            //Get the parent
-                            var parent = _mediaService.GetById(mediaParentId);
-                            if (parent == null)
-                                mediaXElements = new XElement[0];
-                            else
-                                mediaXElements = _mediaService.GetPagedXmlEntries(parent.Path, pageIndex, pageSize, out total).ToArray();
-                        }
-
-                        //if specific types are declared we need to post filter them
-                        //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                        if (IndexerData.IncludeNodeTypes.Any())
-                        {
-                            var includeNodeTypeIds = mediaTypes.Where(x => IndexerData.IncludeNodeTypes.Contains(x.Alias)).Select(x => x.Id);
-                            mediaXElements = mediaXElements.Where(elm => includeNodeTypeIds.Contains(elm.AttributeValue<int>("nodeType"))).ToArray();
+                            contentParentId = IndexerData.ParentNodeId.Value;
                         }
                         
-                        foreach (var element in mediaXElements)
+                        if (SupportUnpublishedContent == false && DisableXmlDocumentLookup == false)
                         {
-                            element.Add(new XAttribute("icon", icons[element.AttributeValue<int>("nodeType")]));
+                            //get all node Ids that have a published version - this is a fail safe check, in theory
+                            // only document nodes that have a published version would exist in the cmsContentXml table
+                            var allNodesWithPublishedVersions = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                                "select DISTINCT cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1");
+
+                            XElement last = null;
+                            var trackedIds = new HashSet<string>();
+
+                            ReindexWithXmlEntries(type, contentParentId,
+                                () => _contentTypeService.GetAllContentTypes().ToArray(),
+                                (path, pIndex, pSize) =>
+                                {
+                                    long totalContent;
+
+                                    //sorted by: umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder
+                                    var result = _contentService.GetPagedXmlEntries(path, pIndex, pSize, out totalContent).ToArray();
+
+                                    //then like we do in the ContentRepository.BuildXmlCache we need to track what Parents have been processed
+                                    // already so that we can then exclude implicitly unpublished content items
+                                    var filtered = new List<XElement>();
+
+                                    foreach (var xml in result)
+                                    {
+                                        var id = xml.AttributeValue<int>("id");
+                                        
+                                        //don't include this if it doesn't have a published version
+                                        if (allNodesWithPublishedVersions.Contains(id) == false)
+                                            continue;
+
+                                        var parentId = xml.AttributeValue<string>("parentID");
+
+                                        if (parentId == null) continue; //this shouldn't happen
+
+                                        //if the parentid is changing
+                                        if (last != null && last.AttributeValue<string>("parentID") != parentId)
+                                        {
+                                            var found = trackedIds.Contains(parentId);
+                                            if (found == false)
+                                            {
+                                                //Need to short circuit here, if the parent is not there it means that the parent is unpublished
+                                                // and therefore the child is not published either so cannot be included in the xml cache
+                                                continue;
+                                            }                                            
+                                        }
+                                        
+                                        last = xml;
+                                        trackedIds.Add(xml.AttributeValue<string>("id"));
+
+                                        filtered.Add(xml);
+                                    }
+
+                                    return new Tuple<long, XElement[]>(totalContent, filtered.ToArray());
+                                },
+                                i => _contentService.GetById(i));
+                        }
+                        else
+                        {
+                            //used to track non-published entities so we can determine what items are implicitly not published
+                            //currently this is not in use apart form in tests
+                            var notPublished = new HashSet<string>();
+
+                            int currentPageSize;
+                            do
+                            {
+                                long total;
+
+                                IContent[] descendants;
+                                if (SupportUnpublishedContent)
+                                {
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total).ToArray();
+                                }
+                                else
+                                {
+                                    //get all paged records but order by level ascending, we need to do this because we need to track which nodes are not published so that we can determine
+                                    // which descendent nodes are implicitly not published
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null).ToArray();
+                                }
+
+                                // need to store decendants count before filtering, in order for loop to work correctly
+                                currentPageSize = descendants.Length;
+
+                                //if specific types are declared we need to post filter them
+                                //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                                IEnumerable<IContent> content;
+                                if (IndexerData.IncludeNodeTypes.Any())
+                                {
+                                    content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias));
+                                }
+                                else
+                                {
+                                    content = descendants;
+                                }
+
+                                AddNodesToIndex(GetSerializedContent(
+                                    SupportUnpublishedContent,
+                                    c => _serializer.Serialize(_contentService, _dataTypeService, _userService, c),
+                                    content, notPublished).WhereNotNull(), type);
+
+                                pageIndex++;
+                            } while (currentPageSize == pageSize);
                         }
 
-                        AddNodesToIndex(mediaXElements, type);
-                        pageIndex++;
-                    } while (mediaXElements.Length == pageSize);
+                        break;
+                    case IndexTypes.Media:
+                        var mediaParentId = -1;
 
-                    break;
+                        if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+                        {
+                            mediaParentId = IndexerData.ParentNodeId.Value;
+                        }
+
+                        ReindexWithXmlEntries(type, mediaParentId,
+                            () => _contentTypeService.GetAllMediaTypes().ToArray(),
+                            (path, pIndex, pSize) =>
+                            {
+                                long totalMedia;
+                                var result = _mediaService.GetPagedXmlEntries(path, pIndex, pSize, out totalMedia).ToArray();
+                                return new Tuple<long, XElement[]>(totalMedia, result);
+                            },
+                            i => _mediaService.GetById(i));
+
+                        break;
+                }
             }
+            finally
+            {
+                stopwatch.Stop();
+            }
+            
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}, took {1}ms", type, stopwatch.ElapsedMilliseconds));
         }
 
-        private IEnumerable<XElement> GetSerializedContent(IEnumerable<IContent> content, ISet<string> notPublished)
+        /// <summary>
+        /// Performs a reindex of a type based on looking up entries from the cmsContentXml table - but using callbacks to get this data since
+        /// we don't have a common underlying service interface for the media/content stuff
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="parentId"></param>
+        /// <param name="getContentTypes"></param>
+        /// <param name="getPagedXmlEntries"></param>
+        /// <param name="getContent"></param>
+        internal void ReindexWithXmlEntries<TContentType>(
+            string type, 
+            int parentId,
+            Func<TContentType[]> getContentTypes, 
+            Func<string, int, int, Tuple<long, XElement[]>> getPagedXmlEntries,
+            Func<int, IContentBase> getContent)
+            where TContentType: IContentTypeComposition
+        {
+            const int pageSize = 10000;
+            var pageIndex = 0;            
+
+            XElement[] xElements;
+
+            var contentTypes = getContentTypes();
+            var icons = contentTypes.ToDictionary(x => x.Id, y => y.Icon);
+
+            do
+            {
+                long total;
+                if (parentId == -1)
+                {
+                    var pagedElements = getPagedXmlEntries("-1", pageIndex, pageSize);
+                    total = pagedElements.Item1;
+                    xElements = pagedElements.Item2;
+                }
+                else
+                {
+                    //Get the parent
+                    var parent = getContent(parentId);
+                    if (parent == null)
+                        xElements = new XElement[0];
+                    else
+                    {
+                        var pagedElements = getPagedXmlEntries(parent.Path, pageIndex, pageSize);
+                        total = pagedElements.Item1;
+                        xElements = pagedElements.Item2;
+                    }
+                }
+
+                //if specific types are declared we need to post filter them
+                //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                if (IndexerData.IncludeNodeTypes.Any())
+                {
+                    var includeNodeTypeIds = contentTypes.Where(x => IndexerData.IncludeNodeTypes.Contains(x.Alias)).Select(x => x.Id);
+                    xElements = xElements.Where(elm => includeNodeTypeIds.Contains(elm.AttributeValue<int>("nodeType"))).ToArray();
+                }
+
+                foreach (var element in xElements)
+                {
+                    if (element.Attribute("icon") == null)
+                    {
+                        element.Add(new XAttribute("icon", icons[element.AttributeValue<int>("nodeType")]));
+                    }
+                }
+
+                AddNodesToIndex(xElements, type);
+                pageIndex++;
+            } while (xElements.Length == pageSize);
+        }
+
+        internal static IEnumerable<XElement> GetSerializedContent(
+            bool supportUnpublishdContent, 
+            Func<IContent, XElement> serializer, 
+            IEnumerable<IContent> content, 
+            ISet<string> notPublished)
         {            
             foreach (var c in content)
             {
-                if (SupportUnpublishedContent == false)
+                if (supportUnpublishdContent == false)
                 {
                     //if we don't support published content and this is not published then track it and return null
                     if (c.Published == false)
                     {
                         notPublished.Add(c.Path);
                         yield return null;
+                        continue;
                     }
 
                     //if we don't support published content, check if this content item exists underneath any already tracked
@@ -491,14 +652,11 @@ namespace UmbracoExamine
                     if (notPublished.Any(path => c.Path.StartsWith(string.Format("{0},", path))))
                     {
                         yield return null;
+                        continue;
                     }
-                }
+                }                
 
-                var xml = _serializer.Serialize(
-                    _contentService,
-                    _dataTypeService,
-                    _userService,
-                    c);
+                var xml = serializer(c);                
 
                 //add a custom 'icon' attribute
                 xml.Add(new XAttribute("icon", c.ContentType.Icon));
@@ -520,7 +678,7 @@ namespace UmbracoExamine
 
         public override void RebuildIndex()
         {
-            DataService.LogService.AddVerboseLog(-1, "Rebuilding index");
+            DataService.LogService.AddInfoLog(-1, "Rebuilding index");
             base.RebuildIndex();
         }
 

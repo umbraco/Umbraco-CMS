@@ -612,6 +612,26 @@ namespace Umbraco.Core.Services
             Audit(AuditType.Publish, "MemberService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
         }
 
+        /// <summary>
+        /// Gets paged member descendants as XML by path
+        /// </summary>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of member items</returns>
+        public IEnumerable<XElement> GetPagedXmlEntries(long pageIndex, int pageSize, out long totalRecords)
+        {
+            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateMemberRepository(uow))
+            {
+                var contents = repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);
+                return contents;
+            }
+        }
+
         #endregion
 
         #region IMembershipMemberService Implementation
@@ -976,6 +996,11 @@ namespace Umbraco.Core.Services
                 {
                     return;
                 }
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.Name))
+            {
+                throw new ArgumentException("Cannot save member with empty name.");
             }
 
             var uow = UowProvider.GetUnitOfWork();

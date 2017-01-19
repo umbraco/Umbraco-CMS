@@ -49,6 +49,7 @@ namespace UmbracoExamine
         /// <param name="indexPath"></param>
         /// <param name="dataService"></param>
         /// <param name="analyzer"></param>
+        /// <param name="async"></param>
         protected BaseUmbracoIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
             : base(indexerData, indexPath, analyzer, async)
         {
@@ -60,6 +61,19 @@ namespace UmbracoExamine
 		{
 			DataService = dataService;
 		}
+
+        /// <summary>
+        /// Creates an NRT indexer
+        /// </summary>
+        /// <param name="indexerData"></param>
+        /// <param name="writer"></param>
+        /// <param name="async"></param>
+        /// <param name="dataService"></param>
+        protected BaseUmbracoIndexer(IIndexCriteria indexerData, IndexWriter writer, IDataService dataService, bool async) 
+            : base(indexerData, writer, async)
+        {
+            DataService = dataService;
+        }
 
         #endregion
 
@@ -95,7 +109,7 @@ namespace UmbracoExamine
         /// Determines if the manager will call the indexing methods when content is saved or deleted as
         /// opposed to cache being updated.
         /// </summary>
-        public bool SupportUnpublishedContent { get; protected set; }
+        public bool SupportUnpublishedContent { get; protected internal set; }
 
         /// <summary>
         /// The data service used for retreiving and submitting data to the cms

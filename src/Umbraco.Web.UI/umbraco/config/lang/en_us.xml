@@ -1142,7 +1142,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 
   <area alias="modelsBuilder">
       <key alias="buildingModels">Building models</key>
-      <key alias="waitingMessage">this can take abit of time, don't worry</key>
+      <key alias="waitingMessage">this can take a bit of time, don't worry</key>
       <key alias="modelsGenerated">Models generated</key>
       <key alias="modelsGeneratedError">Models could not be generated</key>
       <key alias="modelsExceptionInUlog">Models generation has failed, see exception in U log</key>

@@ -837,7 +837,11 @@ namespace Umbraco.Core.Services
                 {
                     return OperationStatus.Cancelled(evtMsgs);
                 }
+            }
 
+            if (string.IsNullOrWhiteSpace(media.Name))
+            {
+                throw new ArgumentException("Cannot save media with empty name.");
             }
 
             var uow = UowProvider.GetUnitOfWork();
@@ -1224,7 +1228,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateMediaRepository(uow))
             {
-                var contents = repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize, out totalRecords);
+                var contents = repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize, null, out totalRecords);
                 return contents;
             }
         }
