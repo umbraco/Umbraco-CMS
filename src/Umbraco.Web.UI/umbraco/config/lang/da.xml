@@ -291,7 +291,7 @@
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
-    <key alias="noMacros">Der er ikke tilføjet nogle makroer</key>
+    <key alias="noMacros">Der er ikke tilføjet nogen makroer</key>
     <key alias="linkYour">Link dit</key>
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
@@ -1007,39 +1007,38 @@ Mange hilsner fra Umbraco robotten
   </area>
 
   <area alias="template">
-    <key alias="edittemplate">Rediger skabelong</key>
+    <key alias="edittemplate">Rediger skabelon</key>
 
     <key alias="insertSections">Sektioner</key>
     <key alias="insertContentArea">Indsæt indholdsområde</key>
-    <key alias="insertContentAreaPlaceHolder">Indsæt indholdsområde placeholder</key>
+    <key alias="insertContentAreaPlaceHolder">Indsæt pladsholder for indholdsområde</key>
 
     <key alias="insert">Indsæt</key>
     <key alias="insertDesc">Hvad vil du indsætte ?</key>
 
     <key alias="insertDictionaryItem">Oversættelse</key>
-    <key alias="insertDictionaryItemDesc">Indsætter en oversætbar tekst som skifter efter det sprog som websitet vises i.</key>
+    <key alias="insertDictionaryItemDesc">Indsætter en oversætbar tekst, som skifter efter det sprog, som websitet vises i.</key>
 
     <key alias="insertMacro">Makro</key>
     <key alias="insertMacroDesc">
-      En makro er et element som kan have forskellige indstillinger når det indsættes.
-      Brug det som en genbrugelig del af dit design såsom gallerier, formularer
-      og lister.
+      En makro er et element, som kan have forskellige indstillinger, når det indsættes. 
+      Brug det som en genbrugelig del af dit design såsom gallerier, formularer og lister.
     </key>
 
-    <key alias="insertPageField">Side værdi</key>
+    <key alias="insertPageField">Sideværdi</key>
     <key alias="insertPageFieldDesc">
-      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller
-      vise en standard værdi i tilfælde af at feltet er tomt.
+      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller 
+      vise en standardværdi i tilfælde af, at feltet er tomt.
     </key>
 
     <key alias="insertPartialView">Partial view</key>
     <key alias="insertPartialViewDesc">
-      Et Partial View er et skabelon element som kan indsættes i andre skabeloner og derved
-      genbruges og deles på tværs af side-skabelonerne.
+      Et Partial View er et skabelonelement, som kan indsættes i andre skabeloner og derved 
+      genbruges og deles på tværs af sideskabelonerne.
     </key>
 
     <key alias="mastertemplate">Master skabelon</key>
-    <key alias="noMastertemplate">Ingen master skabelon</key>
+    <key alias="noMastertemplate">Ingen masterskabelon</key>
     <key alias="noMaster">Ingen master</key>
 
     <key alias="renderBody">Indsæt en underliggende skabelon</key>
@@ -1069,11 +1068,11 @@ Mange hilsner fra Umbraco robotten
       ]]>
     </key>
 
-    <key alias="sectionName">Sektion navn</key>
-    <key alias="sectionMandatory">Sektionen er oblikatorisk</key>
+    <key alias="sectionName">Sektionsnavn</key>
+    <key alias="sectionMandatory">Sektionen er obligatorisk</key>
     
     <key alias="sectionMandatoryDesc">
-      Hvis oblikatorisk, skal under-skabelonen indeholde en <code>@section</code> definition. 
+      Hvis obligatorisk, skal underskabelonen indeholde en <code>@section</code> -definition.
     </key>
 
 
