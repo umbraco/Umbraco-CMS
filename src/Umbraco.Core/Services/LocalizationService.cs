@@ -16,7 +16,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the Localization Service, which is an easy access to operations involving <see cref="Language"/> and <see cref="DictionaryItem"/>
     /// </summary>
-    public class LocalizationService : RepositoryService, ILocalizationService
+    public class LocalizationService : ScopeRepositoryService, ILocalizationService
     {
         
 

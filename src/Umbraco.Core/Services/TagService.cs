@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services
     /// <remarks>
     /// If there is unpublished content with tags, those tags will not be contained
     /// </remarks>
-    public class TagService : RepositoryService, ITagService
+    public class TagService : ScopeRepositoryService, ITagService
     {
       
         public TagService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)

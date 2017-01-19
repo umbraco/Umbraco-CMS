@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public class MediaService : RepositoryService, IMediaService, IMediaServiceOperations
+    public class MediaService : ScopeRepositoryService, IMediaService, IMediaServiceOperations
     {
 
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 

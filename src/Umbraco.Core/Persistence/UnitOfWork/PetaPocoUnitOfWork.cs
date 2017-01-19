@@ -9,8 +9,8 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	/// <summary>
 	/// Represents the Unit of Work implementation for PetaPoco
 	/// </summary>
-	internal class PetaPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
-	{
+	internal class PetaPocoUnitOfWork : DisposableObject, IScopeUnitOfWork
+    {
         private readonly Queue<Operation> _operations = new Queue<Operation>();
 	    private readonly IsolationLevel _isolationLevel;
         private readonly IScopeProvider _scopeProvider;
@@ -27,6 +27,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// Creates a new unit of work instance
         /// </summary>
         /// <param name="scopeProvider"></param>
+        /// <param name="isolationLevel"></param>
         /// <remarks>
         /// This should normally not be used directly and should be created with the UnitOfWorkProvider
         /// </remarks>

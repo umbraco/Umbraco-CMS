@@ -7,7 +7,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public sealed class AuditService : RepositoryService, IAuditService
+    public sealed class AuditService : ScopeRepositoryService, IAuditService
     {
         public AuditService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)

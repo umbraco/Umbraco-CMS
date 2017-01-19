@@ -6,10 +6,12 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
+
+
     /// <summary>
     /// Represents a Unit of Work Provider for creating a <see cref="PetaPocoUnitOfWork"/>
     /// </summary>
-    public class PetaPocoUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
+    public class PetaPocoUnitOfWorkProvider : IScopeUnitOfWorkProvider
     {
         private readonly IScopeProvider _scopeProvider;
 
@@ -45,7 +47,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         { }
 
         /// <summary>
-        /// Constructor accepting an IDatabaseFactory instance
+        /// Constructor accepting a <see cref="IScopeProvider"/> instance
         /// </summary>
         /// <param name="scopeProvider"></param>
         public PetaPocoUnitOfWorkProvider(IScopeProvider scopeProvider)

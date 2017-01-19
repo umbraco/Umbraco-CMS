@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class TaskService : RepositoryService, ITaskService
+    public class TaskService : ScopeRepositoryService, ITaskService
     {
         public TaskService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)

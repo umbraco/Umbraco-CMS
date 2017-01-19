@@ -24,7 +24,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the MemberService.
     /// </summary>
-    public class MemberService : RepositoryService, IMemberService
+    public class MemberService : ScopeRepositoryService, IMemberService
     {
         private readonly IMemberGroupService _memberGroupService;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();

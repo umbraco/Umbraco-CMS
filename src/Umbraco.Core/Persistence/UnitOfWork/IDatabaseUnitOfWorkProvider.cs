@@ -1,3 +1,6 @@
+using System.Data;
+using Umbraco.Core.Scoping;
+
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
 	/// <summary>
@@ -6,5 +9,13 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	public interface IDatabaseUnitOfWorkProvider
 	{
 		IDatabaseUnitOfWork GetUnitOfWork();
+    }
+    
+    /// <summary>
+	/// Defines a Unit of Work Provider for working with <see cref="IScope"/>
+	/// </summary>
+	internal interface IScopeUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
+    {
+        IDatabaseUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel);
     }
 }

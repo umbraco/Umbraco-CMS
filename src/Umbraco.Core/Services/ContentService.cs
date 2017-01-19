@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the Content Service, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public class ContentService : RepositoryService, IContentService, IContentServiceOperations
+    public class ContentService : ScopeRepositoryService, IContentService, IContentServiceOperations
     {
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
