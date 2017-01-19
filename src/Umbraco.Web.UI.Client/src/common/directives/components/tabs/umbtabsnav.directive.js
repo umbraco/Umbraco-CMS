@@ -43,7 +43,8 @@
       templateUrl: "views/components/tabs/umb-tabs-nav.html",
       scope: {
         model: "=",
-        tabdrop: "="
+        tabdrop: "=",
+        idSuffix: "@"
       },
       link: link
     };

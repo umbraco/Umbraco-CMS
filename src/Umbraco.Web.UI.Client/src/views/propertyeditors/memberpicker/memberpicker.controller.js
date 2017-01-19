@@ -8,6 +8,7 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
     }
 
     $scope.renderModel = [];
+    $scope.allowRemove = true;
 
     var dialogOptions = {
         multiPicker: false,
@@ -96,7 +97,8 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
     entityResource.getByIds(modelIds, "Member").then(function (data) {
         _.each(data, function (item, i) {
-            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+            // set default icon if it's missing
+            item.icon = (item.icon) ? iconHelper.convertFromLegacyIcon(item.icon) : "icon-user";
             $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
         });
     });

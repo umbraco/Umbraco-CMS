@@ -33,6 +33,15 @@ angular.module('umbraco.mocks').
           return [200, nodes, null];
       }
 
+      function returnEntityUrl() {
+
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+
+          return [200, "url", null];
+
+      }
 
       return {
           register: function () {
@@ -48,6 +57,10 @@ angular.module('umbraco.mocks').
               $httpBackend
                   .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetById?'))
                   .respond(returnEntitybyId);
+            
+            $httpBackend
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetUrl?'))
+                    .respond(returnEntityUrl);
           }
       };
   }]);

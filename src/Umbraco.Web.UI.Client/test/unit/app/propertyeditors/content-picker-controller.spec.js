@@ -17,7 +17,11 @@ describe('Content picker controller tests', function () {
                         value:"1233,1231,23121",
                         label: "My content picker",
                         description: "desc",
-                        config: {}
+                        config: {
+                            startNode: {
+                                type: "content"
+                            }
+                        }
                       };
 
         //this controller requires an angular form controller applied to it
@@ -47,6 +51,12 @@ describe('Content picker controller tests', function () {
     }));
 
     describe('content edit controller save and publish', function () {
+        
+        var item = {
+            name: "meh",
+            id: 666,
+            icon: "woop"
+        };
 
         it('should define the default properties on construction', function () {
             expect(scope.model.value).toNotBe(undefined);
@@ -65,7 +75,6 @@ describe('Content picker controller tests', function () {
         });
 
         it("Removing an item should update renderModel, ids and model.value", function(){
-            
             scope.remove(1);
             scope.$apply();
             expect(scope.renderModel.length).toBe(2);
@@ -73,24 +82,29 @@ describe('Content picker controller tests', function () {
         });
 
         it("Adding an item should update renderModel, ids and model.value", function(){
-            
-            scope.add({name: "meh", id: 666, icon: "woop"});
+            scope.add(item);
             scope.$apply();
-            expect(scope.renderModel.length).toBe(4);
-            expect(scope.model.value).toBe("1233,1231,23121,666");
+            setTimeout(function(){
+                expect(scope.renderModel.length).toBe(4);
+                expect(scope.model.value).toBe("1233,1231,23121,666");
+            }, 1000);
         });
 
-        it("Adding a dublicate item should note update renderModel, ids and model.value", function(){
-            
-            scope.add({ name: "meh", id: 666, icon: "woop" });
+        it("Adding a duplicate item should note update renderModel, ids and model.value", function(){
+            scope.add(item);
             scope.$apply();
-            expect(scope.renderModel.length).toBe(4);
-            expect(scope.model.value).toBe("1233,1231,23121,666");
+            setTimeout(function(){
+                expect(scope.renderModel.length).toBe(4);
+                expect(scope.model.value).toBe("1233,1231,23121,666");
+            }, 1000);
 
-            scope.add({ name: "meh 2", id: 666, icon: "woop 2" });
+            scope.add(item);
             scope.$apply();
-            expect(scope.renderModel.length).toBe(4);
-            expect(scope.model.value).toBe("1233,1231,23121,666");
+            setTimeout(function(){
+                expect(scope.renderModel.length).toBe(4);
+                expect(scope.model.value).toBe("1233,1231,23121,666");
+            }, 1000);
+
         });  
     });
 });

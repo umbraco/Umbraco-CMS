@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 
-function contentPickerController($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper, angularHelper, navigationService, $location) {
+function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -39,6 +39,9 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
             else {
                 $scope.contentPickerForm.maxCount.$setValidity("maxCount", true);
             }
+
+            setSortingState($scope.renderModel);
+
         });
     }
 
@@ -59,6 +62,14 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
         }
     };
 
+    // sortable options
+    $scope.sortableOptions = {
+        distance: 10,
+        tolerance: "pointer",
+        scroll: true,
+        zIndex: 6000
+    };
+
     if ($scope.model.config) {
         //merge the server config on top of the default config, then set the server config to use the result
         $scope.model.config = angular.extend(defaultConfig, $scope.model.config);
@@ -75,8 +86,9 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
         : $scope.model.config.startNode.type === "media"
         ? "Media"
         : "Document";
-    $scope.allowOpenButton = entityType === "Document" || entityType === "Media";
+    $scope.allowOpenButton = entityType === "Document";
     $scope.allowEditButton = entityType === "Document";
+    $scope.allowRemoveButton = true;
 
     //the dialog options for the picker
     var dialogOptions = {
@@ -192,13 +204,25 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
         });
 
         if (currIds.indexOf(item.id) < 0) {
-            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, path: item.path });
+            setEntityUrl(item);
         }
     };
 
     $scope.clear = function () {
         $scope.renderModel = [];
+    };
+
+    $scope.openMiniEditor = function(node) {
+        miniEditorHelper.launchMiniEditor(node).then(function(updatedNode){
+            // update the node
+            node.name = updatedNode.name;
+            node.published = updatedNode.hasPublishedVersion;
+            if(entityType !== "Member") {
+                entityResource.getUrl(updatedNode.id, entityType).then(function(data){
+                    node.url = data;
+                });
+            }
+        });
     };
         
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
@@ -215,26 +239,83 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
 
     //load current data
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
+
     entityResource.getByIds(modelIds, entityType).then(function (data) {
 
-        //Ensure we populate the render model in the same order that the ids were stored!
         _.each(modelIds, function (id, i) {
             var entity = _.find(data, function (d) {                
                 return d.id == id;
             });
-           
+        
             if (entity) {
-                entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
-                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon, path: entity.path });
+                setEntityUrl(entity);
             }
-            
            
-        });
+         });
 
         //everything is loaded, start the watch on the model
         startWatch();
 
     });
+
+    function setEntityUrl(entity) {
+        // get url for content and media items
+        if(entityType !== "Member") {
+            entityResource.getUrl(entity.id, entityType).then(function(data){
+                // update url
+                entity.url = data;
+
+                // push item to render model
+                addSelectedItem(entity);
+            });
+        } else {
+            addSelectedItem(entity);
+        }
+    }
+
+    function addSelectedItem(item) {
+
+        // set icon
+        if(item.icon) {
+            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+        }
+
+        // set default icon
+        if (!item.icon) {
+            switch (entityType) {
+                case "Document":
+                    item.icon = "icon-document";
+                    break;
+                case "Media":
+                    item.icon = "icon-picture";
+                    break;
+                case "Member":
+                    item.icon = "icon-user";
+                    break;
+            }
+        }
+
+        $scope.renderModel.push({ 
+            "name": item.name,
+            "id": item.id,
+            "icon": item.icon,
+            "path": item.path,
+            "url": item.url,
+            "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
+            // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
+        });
+
+    }
+
+    function setSortingState(items) {
+        // disable sorting if the list only consist of one item
+        if(items.length > 1) {
+            $scope.sortableOptions.disabled = false;
+        } else {
+            $scope.sortableOptions.disabled = true;
+        }
+    }
+
 }
 
 angular.module('umbraco').controller("Umbraco.PropertyEditors.ContentPickerController", contentPickerController);
