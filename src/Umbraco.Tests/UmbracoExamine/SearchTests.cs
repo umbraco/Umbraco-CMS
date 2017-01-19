@@ -8,6 +8,8 @@ using Examine.LuceneEngine.Providers;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using Examine.LuceneEngine.SearchCriteria;
+using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Index;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UmbracoExamine
@@ -20,16 +22,17 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Test_Sort_Order_Sorting()
         {
-            using (var luceneDir = new RAMDirectory())
-            {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir, null,
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer, null,
                     new TestDataService()
-                        {
-                            ContentService = new TestContentService(TestFiles.umbraco_sort)
-                        },
-                    supportUnpublishedContent:true);
-                indexer.RebuildIndex();
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                    {
+                        ContentService = new TestContentService(TestFiles.umbraco_sort)
+                    },
+                    supportUnpublishedContent: true))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
+            {                
+                indexer.RebuildIndex();                
 
                 var s = (LuceneSearcher)searcher;
                 var luceneSearcher = s.GetSearcher();

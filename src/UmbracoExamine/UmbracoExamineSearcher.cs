@@ -51,12 +51,41 @@ namespace UmbracoExamine
         /// </summary>
         public override string Name
         {
-            get
-            {
-                return _name;
-            }
+            get { return _name; }
+        }
+        
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="indexPath"></param>
+        /// <param name="analyzer"></param>
+
+        public UmbracoExamineSearcher(DirectoryInfo indexPath, Analyzer analyzer)
+            : base(indexPath, analyzer)
+        {
         }
 
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="luceneDirectory"></param>
+        /// <param name="analyzer"></param>
+        public UmbracoExamineSearcher(Lucene.Net.Store.Directory luceneDirectory, Analyzer analyzer)
+            : base(luceneDirectory, analyzer)
+        {
+        }
+
+        /// <summary>
+        /// Creates an NRT searcher
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="analyzer"></param>
+        public UmbracoExamineSearcher(IndexWriter writer, Analyzer analyzer) 
+            : base(writer, analyzer)
+        {
+        }
+
+        #endregion
 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
@@ -114,30 +143,6 @@ namespace UmbracoExamine
                 }
             }
         }
-
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="indexPath"></param>
-        /// <param name="analyzer"></param>
-
-        public UmbracoExamineSearcher(DirectoryInfo indexPath, Analyzer analyzer)
-            : base(indexPath, analyzer)
-        {
-        }
-
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="luceneDirectory"></param>
-        /// <param name="analyzer"></param>
-
-        public UmbracoExamineSearcher(Lucene.Net.Store.Directory luceneDirectory, Analyzer analyzer)
-            : base(luceneDirectory, analyzer)
-        {
-        }
-
-        #endregion
 
         /// <summary>
         /// Used for unit tests

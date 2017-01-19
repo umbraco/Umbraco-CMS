@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -13,6 +14,15 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IMemberService : IMembershipMemberService
     {
+        /// <summary>
+        /// Gets all XML entries found in the cmsContentXml table
+        /// </summary>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>        
+        IEnumerable<XElement> GetPagedXmlEntries(long pageIndex, int pageSize, out long totalRecords);
+
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>

@@ -27,6 +27,7 @@ using UmbracoExamine;
 using UmbracoExamine.DataServices;
 using umbraco.BusinessLogic;
 using System.Linq;
+using Lucene.Net.Index;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -106,11 +107,14 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Ensure_Children_Sorted_With_Examine()
         {
-            using (var luceneDir = new RAMDirectory())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                //var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
                 indexer.RebuildIndex();
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                //var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
                 var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
@@ -135,11 +139,14 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Do_Not_Find_In_Recycle_Bin()
         {
-            using (var luceneDir = new RAMDirectory())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                //var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
                 indexer.RebuildIndex();
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                //var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
                 var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
@@ -175,11 +182,14 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Children_With_Examine()
         {
-            using (var luceneDir = new RAMDirectory())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                //var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
                 indexer.RebuildIndex();
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                //var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
                 var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
@@ -197,11 +207,14 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Descendants_With_Examine()
         {
-            using (var luceneDir = new RAMDirectory())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                //var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
                 indexer.RebuildIndex();
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                //var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
                 var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
@@ -219,11 +232,14 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void DescendantsOrSelf_With_Examine()
         {
-            using (var luceneDir = new RAMDirectory())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                //var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
                 indexer.RebuildIndex();
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                //var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
                 var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
@@ -241,12 +257,15 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Ancestors_With_Examine()
         {
-            using (var luceneDir = new RAMDirectory())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                //var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
                 indexer.RebuildIndex();
                 var ctx = GetUmbracoContext("/test", 1234);
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                //var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
@@ -260,12 +279,15 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void AncestorsOrSelf_With_Examine()
         {
-            using (var luceneDir = new RAMDirectory())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                //var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
                 indexer.RebuildIndex();
                 var ctx = GetUmbracoContext("/test", 1234);
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                //var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
