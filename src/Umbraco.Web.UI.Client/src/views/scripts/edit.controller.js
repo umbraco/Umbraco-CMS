@@ -39,8 +39,8 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-                localizationService.localize("speechBubbles_scriptSavedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_scriptSavedText").then(function(msgValue) {
+                localizationService.localize("speechBubbles_fileSavedHeader").then(function (headerValue) {
+                    localizationService.localize("speechBubbles_fileSavedText").then(function(msgValue) {
                         notificationsService.success(headerValue, msgValue);
                     });
                 });
