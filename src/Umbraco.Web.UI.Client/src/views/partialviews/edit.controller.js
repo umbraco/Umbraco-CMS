@@ -9,7 +9,6 @@
         vm.page = {};
         vm.page.loading = true;
         vm.partialView = {};
-        vm.partialViewPathPrefix = "Partials /";
 
         //menu
         vm.page.menu = {};
@@ -94,11 +93,6 @@
                         case "dictionary":
                         	var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
                         	insert(code);
-                            break;
-
-                        case "partial":
-                            var code = templateHelper.getInsertPartialSnippet(model.insert.node.name);
-                            insert(code);
                             break;
                             
                         case "umbracoField":
