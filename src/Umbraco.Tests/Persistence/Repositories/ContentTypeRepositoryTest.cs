@@ -173,6 +173,38 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Get_All_Containers()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container1, container2, container3;
+            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
+            {
+                container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "container1" };
+                containerRepository.AddOrUpdate(container1);
+                container2 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "container2" };
+                containerRepository.AddOrUpdate(container2);
+                container3 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "container3" };
+                containerRepository.AddOrUpdate(container3);
+                unitOfWork.Commit();
+                Assert.That(container1.Id, Is.GreaterThan(0));
+                Assert.That(container2.Id, Is.GreaterThan(0));
+                Assert.That(container3.Id, Is.GreaterThan(0));
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
+            {
+                var found1 = containerRepository.Get(container1.Id);
+                Assert.IsNotNull(found1);
+                var found2 = containerRepository.Get(container2.Id);
+                Assert.IsNotNull(found2);
+                var found3 = containerRepository.Get(container3.Id);
+                Assert.IsNotNull(found3);
+                var allContainers = containerRepository.GetAll();
+                Assert.AreEqual(3, allContainers.Count());
+            }
+        }
+
+        [Test]
         public void Can_Delete_Container()
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
