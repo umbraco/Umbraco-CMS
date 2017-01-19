@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -22,6 +17,12 @@ namespace Umbraco.Web.Editors
     public class CodeFileController : BackOfficeNotificationsController
     {
 
+        /// <summary>
+        /// Used to create a brand new file
+        /// </summary>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="display"></param>
+        /// <returns>Will return a simple 200 if file creation succeeds</returns>
         [ValidationFilter]
         public HttpResponseMessage PostCreate(string type, CodeFileDisplay display)
         {
@@ -31,27 +32,41 @@ namespace Umbraco.Web.Editors
                     var view = new PartialView(display.VirtualPath);
                     var result = Services.FileService.CreatePartialView(view, display.Snippet, Security.CurrentUser.Id);
                     return result.Success == true ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+
                 case Core.Constants.Trees.PartialViewMacros:
                     var viewMacro = new PartialView(display.VirtualPath);
                     var resultMacro = Services.FileService.CreatePartialViewMacro(viewMacro, display.Snippet, Security.CurrentUser.Id);
                     return resultMacro.Success == true ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateNotificationValidationErrorResponse(resultMacro.Exception.Message);
+
                 case Core.Constants.Trees.Scripts:
                     var script = new Script(display.VirtualPath);
                     Services.FileService.SaveScript(script, Security.CurrentUser.Id);
                     return Request.CreateResponse(HttpStatusCode.OK);
+
                 default:
                     return Request.CreateResponse(HttpStatusCode.NotFound);
             }
         }
 
-
+        /// <summary>
+        /// Used to get a specific file from disk via the FileService
+        /// </summary>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="virtualPath">The filename or urlencoded path of the file to open</param>
+        /// <returns>The file and its contents from the virtualPath</returns>
         public CodeFileDisplay GetByPath(string type, string virtualPath)
         {
-            if (string.IsNullOrWhiteSpace(type) == false && string.IsNullOrWhiteSpace(virtualPath) == false)
+            if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(virtualPath))
             {
-                virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
-                if (type == Core.Constants.Trees.PartialViews)
-                {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
+
+
+            switch (type)
+            {
+                case Core.Constants.Trees.PartialViews:
                     var view = Services.FileService.GetPartialView(virtualPath);
                     if (view != null)
                     {
@@ -59,13 +74,9 @@ namespace Umbraco.Web.Editors
                         display.FileType = Core.Constants.Trees.PartialViews;
                         return display;
                     }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                else if (type == Core.Constants.Trees.PartialViewMacros)
-                {
+                    return null;
+
+                case Core.Constants.Trees.PartialViewMacros:
                     var viewMacro = Services.FileService.GetPartialViewMacro(virtualPath);
                     if (viewMacro != null)
                     {
@@ -73,13 +84,9 @@ namespace Umbraco.Web.Editors
                         display.FileType = Core.Constants.Trees.PartialViewMacros;
                         return display;
                     }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                else if (type == Core.Constants.Trees.Scripts)
-                {
+                    return null;
+
+                case Core.Constants.Trees.Scripts:
                     var script = Services.FileService.GetScriptByName(virtualPath);
                     if (script != null)
                     {
@@ -87,23 +94,18 @@ namespace Umbraco.Web.Editors
                         display.FileType = Core.Constants.Trees.Scripts;
                         return display;
                     }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
+            }
 
-                }
-                else
-                {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-            }
-            else
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
+        /// <summary>
+        /// Used to delete a specific file from disk via the FileService
+        /// </summary>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="virtualPath">The filename or urlencoded path of the file to delete</param>
+        /// <returns>Will return a simple 200 if file deletion succeeds</returns>
         [HttpDelete]
         [HttpPost]
         public HttpResponseMessage Delete(string type, string virtualPath)
@@ -117,42 +119,36 @@ namespace Umbraco.Web.Editors
                         {
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
-                        else
-                        {
-                            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View found with the specified path");
-                        }
-                        break;
+                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View found with the specified path");
+
                     case Core.Constants.Trees.PartialViewMacros:
                         if (Services.FileService.DeletePartialViewMacro(virtualPath, Security.CurrentUser.Id))
                         {
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
-                        else
-                        {
-                            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro found with the specified path");
-                        }
-                        break;
+                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro found with the specified path");
+
                     case Core.Constants.Trees.Scripts:
                         if (Services.FileService.GetScriptByName(virtualPath) != null)
                         {
                             Services.FileService.DeleteScript(virtualPath, Security.CurrentUser.Id);
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
-                        else
-                        {
-                            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script found with the specified path");
-                        }
-                        break;
+                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script found with the specified path");
+
                     default:
                         return Request.CreateResponse(HttpStatusCode.NotFound);
                 }
             }
-            else
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
+        /// <summary>
+        /// Used to save/update an existing file after its initial creation
+        /// </summary>
+        /// <param name="display"></param>
+        /// <returns>The updated CodeFileDisplay model</returns>
         public CodeFileDisplay PostSave(CodeFileDisplay display)
         {
             if (ModelState.IsValid == false)
@@ -160,14 +156,15 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (display == null && string.IsNullOrWhiteSpace(display.FileType) == true)
+            if (display == null || string.IsNullOrWhiteSpace(display.FileType))
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            else
+
+
+            switch (display.FileType)
             {
-                if (display.FileType == Core.Constants.Trees.PartialViews)
-                {
+                case Core.Constants.Trees.PartialViews:
                     var view = Services.FileService.GetPartialView(display.VirtualPath);
                     if (view != null)
                     {
@@ -180,20 +177,19 @@ namespace Umbraco.Web.Editors
                         if (result.Success == true)
                         {
                             return Mapper.Map(view, display);
-                        } else
-                        {
-                            display.AddErrorNotification(
-                                Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
-                                Services.TextService.Localize("speechBubbles/partialViewErrorText"));
                         }
+
+                        display.AddErrorNotification(
+                            Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
+                            Services.TextService.Localize("speechBubbles/partialViewErrorText"));
                     }
                     else
                     {
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                     }
-                }
-                else if (display.FileType == Core.Constants.Trees.PartialViewMacros)
-                {
+                    break;
+
+                case Core.Constants.Trees.PartialViewMacros:
                     var viewMacro = Services.FileService.GetPartialViewMacro(display.VirtualPath);
                     if (viewMacro != null)
                     {
@@ -211,9 +207,9 @@ namespace Umbraco.Web.Editors
                     {
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                     }
-                }
-                else if (display.FileType == Core.Constants.Trees.Scripts)
-                {
+                    break;
+
+                case Core.Constants.Trees.Scripts:
                     var script = Services.FileService.GetScriptByName(display.VirtualPath);
                     if (script != null)
                     {
@@ -226,13 +222,13 @@ namespace Umbraco.Web.Editors
                     {
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                     }
-                }
-                else
-                {
+                    break;
+
+                default:
                     throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-                return display;
             }
+
+            return display;
         }
     }
 }
