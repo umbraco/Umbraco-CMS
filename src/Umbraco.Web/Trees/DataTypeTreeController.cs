@@ -119,6 +119,7 @@ namespace Umbraco.Web.Trees
                 }
 
                 menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), hasSeparator: true);
+                menu.Items.Add<ActionCopy>(Services.TextService.Localize(string.Format("actions/{0}", ActionCopy.Instance.Alias)), hasSeparator: true);
             }
             
             return menu;
