@@ -230,6 +230,23 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Copies a data type item and places the copy as a child of a given parent Id
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostCopy(MoveOrCopy copy)
+        {
+            var toCopy = Services.DataTypeService.GetDataTypeDefinitionById(copy.Id);
+
+            var dt = Services.DataTypeService.Copy(toCopy, copy.ParentId);
+
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(dt.Path, Encoding.UTF8, "application/json");
+            return response;
+        }
+
+
+        /// <summary>
         /// Move the media type
         /// </summary>
         /// <param name="move"></param>
