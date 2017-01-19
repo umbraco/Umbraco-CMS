@@ -1,34 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Dynamic;
+using System.Linq;
 using System.Net;
-using System.Text;
 using System.Web.Http;
-using System.Web.Http.ModelBinding;
 using AutoMapper;
-using ClientDependency.Core;
-using Examine.LuceneEngine;
-using Examine.LuceneEngine.Providers;
-using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Core.Xml;
+using Umbraco.Web.Dynamics;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using System.Linq;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models;
-using Umbraco.Web.WebApi.Filters;
-using umbraco.cms.businesslogic.packager;
+using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
-using Examine;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
-using Umbraco.Web.Dynamics;
-using umbraco;
-using System.Text.RegularExpressions;
-using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Editors
 {
@@ -42,6 +27,13 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
+        private readonly IUmbracoTreeSearcher _umbracoTreeSearcher;
+
+        public EntityController()
+        {
+            _umbracoTreeSearcher = UmbracoTreeSearcherResolver.GetInstance(Umbraco);
+        }
+
         /// <summary>
         /// Returns an Umbraco alias given a string
         /// </summary>
@@ -51,7 +43,7 @@ namespace Umbraco.Web.Editors
         public dynamic GetSafeAlias(string value, bool camelCase = true)
         {
             var returnValue = (string.IsNullOrWhiteSpace(value)) ? string.Empty : value.ToSafeAlias(camelCase);
-            dynamic returnObj = new System.Dynamic.ExpandoObject();
+            dynamic returnObj = new ExpandoObject();
             returnObj.alias = returnValue;
             returnObj.original = value;
             returnObj.camelCase = camelCase;
@@ -77,7 +69,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
-            return ExamineSearch(query, type, searchFrom);
+            return SearchByUmbracoSearcher(query, type, searchFrom);
         }
 
         /// <summary>
@@ -106,16 +98,16 @@ namespace Umbraco.Web.Editors
             if (allowedSections.InvariantContains(Constants.Applications.Content))
             {
                 result.Add(new EntityTypeSearchResult
-                    {
-                        Results = ExamineSearch(query, UmbracoEntityTypes.Document),
-                        EntityType = UmbracoEntityTypes.Document.ToString()
-                    });
+                {
+                    Results = SearchByUmbracoSearcher(query, UmbracoEntityTypes.Document),
+                    EntityType = UmbracoEntityTypes.Document.ToString()
+                });
             }
             if (allowedSections.InvariantContains(Constants.Applications.Media))
             {
                 result.Add(new EntityTypeSearchResult
                 {
-                    Results = ExamineSearch(query, UmbracoEntityTypes.Media),
+                    Results = SearchByUmbracoSearcher(query, UmbracoEntityTypes.Media),
                     EntityType = UmbracoEntityTypes.Media.ToString()
                 });
             }
@@ -123,7 +115,7 @@ namespace Umbraco.Web.Editors
             {
                 result.Add(new EntityTypeSearchResult
                 {
-                    Results = ExamineSearch(query, UmbracoEntityTypes.Member),
+                    Results = SearchByUmbracoSearcher(query, UmbracoEntityTypes.Member),
                     EntityType = UmbracoEntityTypes.Member.ToString()
                 });
 
@@ -141,7 +133,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetResultForId(id, type);
 
-            return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
         /// <summary>
@@ -166,7 +158,7 @@ namespace Umbraco.Web.Editors
         {
             //TODO: Rename this!!! It's a bit misleading, it should be GetByXPath
 
-          
+
             if (type != UmbracoEntityTypes.Document)
                 throw new ArgumentException("Get by query is only compatible with enitities of type Document");
 
@@ -193,7 +185,7 @@ namespace Umbraco.Web.Editors
                 },
                 publishedContentExists: i => Umbraco.TypedContent(i) != null);
         }
-        
+
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
         {
             return GetResultForId(id, type);
@@ -241,246 +233,10 @@ namespace Umbraco.Web.Editors
         /// A starting point for the search, generally a node id, but for members this is a member type alias
         /// </param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
+        private IEnumerable<EntityBasic> SearchByUmbracoSearcher(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
-            var sb = new StringBuilder();
-
-            string type;
-            var searcher = Constants.Examine.InternalSearcher;            
-            var fields = new[] { "id", "__NodeId" };
-            
-            //TODO: WE should really just allow passing in a lucene raw query
-            switch (entityType)
-            {
-                case UmbracoEntityTypes.Member:
-                    searcher = Constants.Examine.InternalMemberSearcher;
-                    type = "member";
-                    fields = new[] { "id", "__NodeId", "email", "loginName"};
-                    if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
-                    {
-                        sb.Append("+__NodeTypeAlias:");
-                        sb.Append(searchFrom);
-                        sb.Append(" ");
-                    }
-                    break;
-                case UmbracoEntityTypes.Media:
-                    type = "media";
-
-                    var mediaSearchFrom = int.MinValue;
-
-                    if (Security.CurrentUser.StartMediaId > 0 ||
-                        //if searchFrom is specified and it is greater than 0
-                        (searchFrom != null && int.TryParse(searchFrom, out mediaSearchFrom) && mediaSearchFrom > 0))
-                    {
-                        sb.Append("+__Path: \\-1*\\,");
-                        sb.Append(mediaSearchFrom > 0
-                            ? mediaSearchFrom.ToString(CultureInfo.InvariantCulture)
-                            : Security.CurrentUser.StartMediaId.ToString(CultureInfo.InvariantCulture));
-                        sb.Append("\\,* ");
-                    }
-                    break;
-                case UmbracoEntityTypes.Document:
-                    type = "content";
-
-                    var contentSearchFrom = int.MinValue;
-
-                    if (Security.CurrentUser.StartContentId > 0 || 
-                        //if searchFrom is specified and it is greater than 0
-                        (searchFrom != null && int.TryParse(searchFrom, out contentSearchFrom) && contentSearchFrom > 0))
-                    {
-                        sb.Append("+__Path: \\-1*\\,");
-                        sb.Append(contentSearchFrom > 0
-                            ? contentSearchFrom.ToString(CultureInfo.InvariantCulture)
-                            : Security.CurrentUser.StartContentId.ToString(CultureInfo.InvariantCulture));
-                        sb.Append("\\,* ");
-                    }
-                    break;
-                default:
-                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
-            }
-
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
-
-            //build a lucene query:
-            // the __nodeName will be boosted 10x without wildcards
-            // then __nodeName will be matched normally with wildcards
-            // the rest will be normal without wildcards
-            
-            
-            //check if text is surrounded by single or double quotes, if so, then exact match
-            var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
-                                     || Regex.IsMatch(query, "^\'.*?\'$");
-            
-            if (surroundedByQuotes)
-            {
-                //strip quotes, escape string, the replace again
-                query = query.Trim(new[] { '\"', '\'' });
-
-                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
-
-                if (query.IsNullOrWhiteSpace())
-                {
-                    return new List<EntityBasic>();
-                }
-
-                //add back the surrounding quotes
-                query = string.Format("{0}{1}{0}", "\"", query);
-
-                //node name exactly boost x 10
-                sb.Append("+(__nodeName: (");
-                sb.Append(query.ToLower());
-                sb.Append(")^10.0 ");
-
-                foreach (var f in fields)
-                {
-                    //additional fields normally
-                    sb.Append(f);
-                    sb.Append(": (");
-                    sb.Append(query);
-                    sb.Append(") ");
-                }
-            }
-            else
-            {
-                if (query.Trim(new[] { '\"', '\'' }).IsNullOrWhiteSpace())
-                {
-                    return new List<EntityBasic>();
-                }
-                
-                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
-
-                var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                //node name exactly boost x 10
-                sb.Append("+(__nodeName:");
-                sb.Append("\"");
-                sb.Append(query.ToLower());
-                sb.Append("\"");
-                sb.Append("^10.0 ");
-
-                //node name normally with wildcards
-                sb.Append(" __nodeName:");
-                sb.Append("(");
-                foreach (var w in querywords)
-                {
-                    sb.Append(w.ToLower());
-                    sb.Append("* ");
-                }
-                sb.Append(") ");
-
-
-                foreach (var f in fields)
-                {
-                    //additional fields normally
-                    sb.Append(f);
-                    sb.Append(":");
-                    sb.Append("(");
-                    foreach (var w in querywords)
-                    {
-                        sb.Append(w.ToLower());
-                        sb.Append("* ");
-                    }
-                    sb.Append(")");
-                    sb.Append(" ");
-                }
-            }
-
-            //must match index type
-            sb.Append(") +__IndexType:");
-            sb.Append(type);
-
-            
-            var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
-            
-            //limit results to 200 to avoid huge over processing (CPU)
-            var result = internalSearcher.Search(raw, 200);
-
-            switch (entityType)
-            {
-                case UmbracoEntityTypes.Member:
-                    return MemberFromSearchResults(result);
-                case UmbracoEntityTypes.Media:
-                    return MediaFromSearchResults(result);                    
-                case UmbracoEntityTypes.Document:
-                    return ContentFromSearchResults(result);
-                default:
-                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
-            }
+            return _umbracoTreeSearcher.Search(query, entityType, Security.CurrentUser, searchFrom);
         }
-
-        /// <summary>
-        /// Returns a collection of entities for media based on search results
-        /// </summary>
-        /// <param name="results"></param>
-        /// <returns></returns>
-        private IEnumerable<EntityBasic> MemberFromSearchResults(ISearchResults results)
-        {
-            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
-            //add additional data
-            foreach (var m in mapped)
-            {
-                //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
-                {
-                    m.Icon = "icon-user";
-                }
-
-                var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
-                if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
-                {
-                    m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];    
-                }
-                if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
-                {
-                    Guid key;
-                    if (Guid.TryParse(searchResult.Fields["__key"], out key))
-                    {
-                        m.Key = key;
-                    }
-                }
-            }
-            return mapped;
-        } 
-
-        /// <summary>
-        /// Returns a collection of entities for media based on search results
-        /// </summary>
-        /// <param name="results"></param>
-        /// <returns></returns>
-        private IEnumerable<EntityBasic> MediaFromSearchResults(ISearchResults results)
-        {
-            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
-            //add additional data
-            foreach (var m in mapped)
-            {
-                //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
-                {
-                    m.Icon = "icon-picture";                     
-                }
-            }
-            return mapped;
-        } 
-
-        /// <summary>
-        /// Returns a collection of entities for content based on search results
-        /// </summary>
-        /// <param name="results"></param>
-        /// <returns></returns>
-        private IEnumerable<EntityBasic> ContentFromSearchResults(ISearchResults results)
-        {
-            var mapped = Mapper.Map<ISearchResults, IEnumerable<EntityBasic>>(results).ToArray();
-            //add additional data
-            foreach (var m in mapped)
-            {
-                var intId = m.Id.TryConvertTo<int>();
-                if (intId.Success)
-                {
-                    m.AdditionalData["Url"] = Umbraco.NiceUrl(intId.Result);
-                }
-            }
-            return mapped;
-        } 
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
         {
@@ -547,7 +303,7 @@ namespace Umbraco.Web.Editors
             {
                 //TODO: Should we order this by something ?
                 var entities = Services.EntityService.GetAll(objectType.Value).WhereNotNull().Select(Mapper.Map<EntityBasic>);
-                return ExecutePostFilter(entities, postFilter, postFilterParams);                
+                return ExecutePostFilter(entities, postFilter, postFilterParams);
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -557,7 +313,7 @@ namespace Umbraco.Web.Editors
                     var filteredTemplates = ExecutePostFilter(templates, postFilter, postFilterParams);
                     return filteredTemplates.Select(Mapper.Map<EntityBasic>);
 
-                case UmbracoEntityTypes.Macro:                    
+                case UmbracoEntityTypes.Macro:
                     //Get all macros from the macro service
                     var macros = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
                     var filteredMacros = ExecutePostFilter(macros, postFilter, postFilterParams);
@@ -614,7 +370,7 @@ namespace Umbraco.Web.Editors
                     .Select(Mapper.Map<EntityBasic>);
 
                 // entities are in "some" order, put them back in order
-                var xref = entities.ToDictionary(x => x.Id);
+                var xref = Enumerable.ToDictionary<EntityBasic, object>(entities, x => x.Id);
                 var result = keysArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;
@@ -646,7 +402,7 @@ namespace Umbraco.Web.Editors
                     .Select(Mapper.Map<EntityBasic>);
 
                 // entities are in "some" order, put them back in order
-                var xref = entities.ToDictionary(x => x.Id);
+                var xref = Enumerable.ToDictionary<EntityBasic, object>(entities, x => x.Id);
                 var result = idsArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;
@@ -708,22 +464,22 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
                 return Mapper.Map<EntityBasic>(found);
-            }                
+            }
             //now we need to convert the unknown ones
             switch (entityType)
             {
                 case UmbracoEntityTypes.PropertyType:
-                    
+
                 case UmbracoEntityTypes.PropertyGroup:
 
                 case UmbracoEntityTypes.Domain:
-                    
+
                 case UmbracoEntityTypes.Language:
-                    
+
                 case UmbracoEntityTypes.User:
-                    
+
                 case UmbracoEntityTypes.Macro:
-                    
+
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
             }
@@ -778,7 +534,7 @@ namespace Umbraco.Web.Editors
 
             }
             return entities;
-        } 
+        }
 
     }
 }

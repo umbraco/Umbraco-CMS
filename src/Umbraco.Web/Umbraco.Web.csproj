@@ -361,6 +361,11 @@
     <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
+    <Compile Include="Search\ExamineTreeSearcher.cs" />
+    <Compile Include="Search\Factory\IUmbracoTreeSearcherFactory.cs" />
+    <Compile Include="Search\Factory\UmbracoTreeSearcherFactory.cs" />
+    <Compile Include="Search\IUmbracoTreeSearcher.cs" />
+    <Compile Include="Search\UmbracoTreeSearcherResolver.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\Identity\ForceRenewalCookieAuthenticationHandler.cs" />
