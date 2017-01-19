@@ -11,10 +11,10 @@ namespace Umbraco.Core.Persistence
         where TRepository : IDisposable, IRepository
     {
         private readonly IScopeUnitOfWorkProvider _uowProvider;
-        private readonly Func<IDatabaseUnitOfWork, TRepository> _repositoryFactory;
+        private readonly Func<IScopeUnitOfWork, TRepository> _repositoryFactory;
         private readonly int[] _readLockIds, _writeLockIds;
 
-        public LockingRepository(IScopeUnitOfWorkProvider uowProvider, Func<IDatabaseUnitOfWork, TRepository> repositoryFactory,
+        public LockingRepository(IScopeUnitOfWorkProvider uowProvider, Func<IScopeUnitOfWork, TRepository> repositoryFactory,
             IEnumerable<int> readLockIds, IEnumerable<int> writeLockIds)
         {
             Mandate.ParameterNotNull(uowProvider, "uowProvider");

@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
     internal class DomainRepository : PetaPocoRepositoryBase<int, IDomain>, IDomainRepository
     {
-        public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public DomainRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {           
         }

@@ -31,7 +31,7 @@ namespace Umbraco.Core.Services
         /// <param name="repositoryFactory">A repository factory.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory"></param>
-        public ServerRegistrationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public ServerRegistrationService(IScopeUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(uowProvider, repositoryFactory, logger, eventMessagesFactory)
         {            
             _lrepo = new LockingRepository<IServerRegistrationRepository>(UowProvider,

@@ -393,7 +393,7 @@ namespace Umbraco.Tests.Web.Mvc
                     new Mock<IEntityService>().Object,
                     new Mock<IUserService>().Object,
                     new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), logger, Mock.Of<ISqlSyntaxProvider>(), umbracoSettings),
-                    new Mock<IDatabaseUnitOfWorkProvider>().Object),
+                    new Mock<IScopeUnitOfWorkProvider>().Object),
                 new Mock<IEntityService>().Object,
                 new RelationService(
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,

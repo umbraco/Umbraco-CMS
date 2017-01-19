@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ICacheProvider _staticCache;
 
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, ICacheProvider staticCache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public ServerRegistrationRepository(IScopeUnitOfWork work, ICacheProvider staticCache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax)
         {
             _staticCache = staticCache;

@@ -57,6 +57,12 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         }
 
         #region Implementation of IUnitOfWorkProvider
+        
+        //explicit implementation
+        IDatabaseUnitOfWork IDatabaseUnitOfWorkProvider.GetUnitOfWork()
+        {
+            return new PetaPocoUnitOfWork(_scopeProvider);
+        }
 
         /// <summary>
         /// Creates a Unit of work with a new UmbracoDatabase instance for the work item/transaction.
@@ -67,13 +73,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
         /// and we Dispose of this Database object when the UOW is disposed.
         /// </remarks>
-        public IDatabaseUnitOfWork GetUnitOfWork()
-        {
-            return new PetaPocoUnitOfWork(_scopeProvider);
-        }
-
-        //explicit implementation
-        IScopeUnitOfWork IScopeUnitOfWorkProvider.GetUnitOfWork()
+        public IScopeUnitOfWork GetUnitOfWork()
         {
             return new PetaPocoUnitOfWork(_scopeProvider);
         }
@@ -85,16 +85,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         }
 
         #endregion
-
-        /// <summary>
-        /// Static helper method to return a new unit of work
-        /// </summary>
-        /// <returns></returns>
-        internal static IDatabaseUnitOfWork CreateUnitOfWork(ILogger logger)
-        {
-            // fixme wtf?
-            var provider = new PetaPocoUnitOfWorkProvider(logger);
-            return provider.GetUnitOfWork();
-        }
+      
     }
 }
