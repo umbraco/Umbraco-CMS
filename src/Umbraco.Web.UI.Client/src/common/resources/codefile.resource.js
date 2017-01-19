@@ -17,7 +17,14 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * codefileResource.getByPath('partialView', 'oooh-la-la')
+         * codefileResource.getByPath('scripts', 'oooh-la-la.js')
+         *    .then(function(codefile) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         * 
+         * <pre>
+         * codefileResource.getByPath('partialView', 'Grid%2fEditors%2fBase.cshtml')
          *    .then(function(codefile) {
          *        alert('its here!');
          *    });
@@ -41,15 +48,15 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.templateResource#getByAlias
-         * @methodOf umbraco.resources.templateResource
+         * @name umbraco.resources.codefileResource#getByAlias
+         * @methodOf umbraco.resources.codefileResource
          *
          * @description
          * Gets a template item with a given alias
          *
          * ##usage
          * <pre>
-         * templateResource.getByAlias("upload")
+         * codefileResource.getByAlias("upload")
          *    .then(function(template) {
          *        alert('its here!');
          *    });
@@ -73,23 +80,23 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.templateResource#getScaffold
-         * @methodOf umbraco.resources.templateResource
+         * @name umbraco.resources.codefileResource#getScaffold
+         * @methodOf umbraco.resources.codefileResource
          *
          * @description
-         * Returns a scaffold of an empty template item
+         * Returns a scaffold of an empty codefile item
          *
-         * The scaffold is used to build editors for templates that has not yet been populated with data.
+         * The scaffold is used to build editors for code file editors that has not yet been populated with data.
          *
          * ##usage
          * <pre>
-         * templateResource.getScaffold()
+         * codefileResource.getScaffold()
          *    .then(function(template) {
          *        alert('its here!');
          *    });
          * </pre>
          *
-         * @returns {Promise} resourcePromise object containing the template scaffold.
+         * @returns {Promise} resourcePromise object containing the codefile scaffold.
          *
          */
         getScaffold: function (id) {
@@ -105,21 +112,29 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.templateResource#deleteById
-         * @methodOf umbraco.resources.templateResource
+         * @name umbraco.resources.codefileResource#deleteByPath
+         * @methodOf umbraco.resources.codefileResource
          *
          * @description
-         * Deletes a template with a given id
+         * Deletes a codefile with a given type & path
          *
          * ##usage
          * <pre>
-         * templateResource.deleteById(1234)
+         * codefileResource.deleteByPath('scripts', 'oooh-la-la.js')
+         *    .then(function() {
+         *        alert('its gone!');
+         *    });
+         * </pre>
+         * 
+         * <pre>
+         * codefileResource.deleteByPath('partialView', 'Grid%2fEditors%2fBase.cshtml')
          *    .then(function() {
          *        alert('its gone!');
          *    });
          * </pre>
          *
-         * @param {Int} id id of template to delete
+         * @param {type} the type of script (partialView, partialViewMacro, script)
+         * @param {virtualpath} the virtual path of the script
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -135,16 +150,16 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.templateResource#save
-         * @methodOf umbraco.resources.templateResource
+         * @name umbraco.resources.codefileResource#save
+         * @methodOf umbraco.resources.codefileResource
          *
          * @description
-         * Saves or update a template
+         * Saves or update a codeFile
          * 
          * ##usage
          * <pre>
-         * templateResource.save(template)
-         *    .then(function(template) {
+         * codefileResource.save(codeFile)
+         *    .then(function(codeFile) {
          *        alert('its saved!');
          *    });
          * </pre>
@@ -153,14 +168,14 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object.
          *
          */
-        save: function (partialView) {
+        save: function (codeFile) {
             return umbRequestHelper.resourcePromise(
                  $http.post(
                      umbRequestHelper.getApiUrl(
                          "codeFileApiBaseUrl",
                          "PostSave"),
-                         partialView),
-                "Failed to save data for partialView " + partialView.virtualPath);
+                         codeFile),
+                "Failed to save data for code file " + partialView.virtualPath);
         }
     };
 }
