@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         }
 
         //explicit implementation
-        IScopeUnitOfWork IScopeUnitOfWorkProvider.GetUnitOfWork(IsolationLevel isolationLevel)
+        public IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel)
         {
             return new PetaPocoUnitOfWork(_scopeProvider, isolationLevel);
         }
