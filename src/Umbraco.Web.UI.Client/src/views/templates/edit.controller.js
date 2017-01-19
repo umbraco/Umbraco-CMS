@@ -33,7 +33,13 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-                notificationsService.success("Template saved");
+                localizationService.localize("speechBubbles_templateSavedHeader").then(function (headerValue) {
+                    localizationService.localize("speechBubbles_templateSavedText").then(function(msgValue) {
+                        notificationsService.success(headerValue, msgValue);
+                    });
+                });
+
+
                 vm.page.saveButtonState = "success";
                 vm.template = saved;
 
