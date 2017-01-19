@@ -460,36 +460,36 @@ namespace UmbracoExamine
                             //currently this is not in use apart form in tests
                             var notPublished = new HashSet<string>();
 
-                            IContent[] content;
                             int currentPageSize;
                             do
                             {
                                 long total;
 
-                                IEnumerable<IContent> descendants;
+                                IContent[] descendants;
                                 if (SupportUnpublishedContent)
                                 {
-                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total).ToArray();
                                 }
                                 else
                                 {
                                     //get all paged records but order by level ascending, we need to do this because we need to track which nodes are not published so that we can determine
                                     // which descendent nodes are implicitly not published
-                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null);
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null).ToArray();
                                 }
 
                                 // need to store decendants count before filtering, in order for loop to work correctly
-                                currentPageSize = descendants.Count();
+                                currentPageSize = descendants.Length;
 
                                 //if specific types are declared we need to post filter them
                                 //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                                IEnumerable<IContent> content;
                                 if (IndexerData.IncludeNodeTypes.Any())
                                 {
-                                    content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
+                                    content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias));
                                 }
                                 else
                                 {
-                                    content = descendants.ToArray();
+                                    content = descendants;
                                 }
 
                                 AddNodesToIndex(GetSerializedContent(
