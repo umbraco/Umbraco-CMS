@@ -194,12 +194,13 @@ namespace Umbraco.Web.Editors
                     if (viewMacro != null)
                     {
                         viewMacro.Content = display.Content;
+                        viewMacro.Path = display.Name;
                         var result = Services.FileService.SavePartialViewMacro(viewMacro, Security.CurrentUser.Id);
                         if (result.Success == false)
                         {
                             display.AddErrorNotification(
-                                Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
-                                Services.TextService.Localize("speechBubbles/partialViewErrorText"));
+                                Services.TextService.Localize("speechBubbles/macroPartialViewErrorHeader"),
+                                Services.TextService.Localize("speechBubbles/macroPartialViewErrorText"));
                         }
                     }
                     else
@@ -213,6 +214,7 @@ namespace Umbraco.Web.Editors
                     if (script != null)
                     {
                         script.Content = display.Content;
+                        script.Path = display.Name;
                         Services.FileService.SaveScript(script, Security.CurrentUser.Id);
 
                     }
