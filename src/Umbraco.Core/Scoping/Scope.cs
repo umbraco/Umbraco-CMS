@@ -208,6 +208,11 @@ namespace Umbraco.Core.Scoping
             else
                 DisposeLastScope();
 
+            if (_eventManager != null)
+            {
+                _eventManager.Dispose();
+            }
+
             _disposed = true;
             GC.SuppressFinalize(this);
         }

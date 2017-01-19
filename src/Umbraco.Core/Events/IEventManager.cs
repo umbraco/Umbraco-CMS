@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Events
 {
-    public interface IEventManager
+    public interface IEventManager : IDisposable
     {
         IEnumerable<IEventDefinition> GetEvents();
         void TrackEvent(EventHandler e, object sender, EventArgs args);

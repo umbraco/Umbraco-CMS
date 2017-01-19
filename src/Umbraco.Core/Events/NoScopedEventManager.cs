@@ -4,7 +4,10 @@ using System.Linq;
 
 namespace Umbraco.Core.Events
 {
-    internal class NoScopedEventManager : IEventManager
+    /// <summary>
+    /// This event manager supports event cancellation and will raise the events as soon as they are tracked, it does not store tracked events
+    /// </summary>
+    internal class NoScopedEventManager : DisposableObject, IEventManager
     {
         public void TrackEvent(EventHandler e, object sender, EventArgs args)
         {
@@ -29,6 +32,11 @@ namespace Umbraco.Core.Events
         public bool SupportsEventCancellation
         {
             get { return true; }
+        }
+
+        protected override void DisposeResources()
+        {
+            //noop
         }
     }
 }

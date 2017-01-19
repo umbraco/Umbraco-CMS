@@ -3,7 +3,10 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Events
 {
-    internal class ScopedEventManager : IEventManager
+    /// <summary>
+    /// This event manager does not support event cancellation and will track all raised events in a list which can be retrieved
+    /// </summary>
+    internal class ScopedEventManager : DisposableObject, IEventManager
     {
         public void TrackEvent(EventHandler e, object sender, EventArgs args)
         {
@@ -30,6 +33,11 @@ namespace Umbraco.Core.Events
         public bool SupportsEventCancellation
         {
             get { return false; }
+        }
+
+        protected override void DisposeResources()
+        {
+            _tracked.Clear();
         }
     }
 }
