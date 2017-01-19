@@ -39,7 +39,12 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-                notificationsService.success("Script saved");
+                localizationService.localize("speechBubbles_scriptSavedHeader").then(function (headerValue) {
+                    localizationService.localize("speechBubbles_scriptSavedText").then(function(msgValue) {
+                        notificationsService.success(headerValue, msgValue);
+                    });
+                });
+
                 vm.page.saveButtonState = "success";
                 vm.script = saved;
 
