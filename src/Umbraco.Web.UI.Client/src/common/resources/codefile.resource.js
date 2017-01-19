@@ -175,7 +175,7 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                          "codeFileApiBaseUrl",
                          "PostSave"),
                          codeFile),
-                "Failed to save data for code file " + partialView.virtualPath);
+                "Failed to save data for code file " + codeFile.virtualPath);
         }
     };
 }
