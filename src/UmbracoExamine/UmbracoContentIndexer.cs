@@ -17,6 +17,7 @@ using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
 using UmbracoExamine.Config;
 using Lucene.Net.Analysis;
+using Lucene.Net.Index;
 using Umbraco.Core.Persistence.Querying;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
@@ -138,6 +139,34 @@ namespace UmbracoExamine
             IContentTypeService contentTypeService,
             Analyzer analyzer, bool async)
             : base(indexerData, luceneDirectory, dataService, analyzer, async)
+        {
+            _contentService = contentService;
+            _mediaService = mediaService;
+            _dataTypeService = dataTypeService;
+            _userService = userService;
+            _contentTypeService = contentTypeService;
+        }
+
+        /// <summary>
+        /// Creates an NRT indexer
+        /// </summary>
+        /// <param name="indexerData"></param>
+        /// <param name="writer"></param>
+        /// <param name="dataService"></param>
+        /// <param name="contentTypeService"></param>
+        /// <param name="async"></param>
+        /// <param name="contentService"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        public UmbracoContentIndexer(IIndexCriteria indexerData, IndexWriter writer, IDataService dataService,
+            IContentService contentService,
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
+            IUserService userService,
+            IContentTypeService contentTypeService,
+            bool async) 
+            : base(indexerData, writer, dataService, async)
         {
             _contentService = contentService;
             _mediaService = mediaService;
