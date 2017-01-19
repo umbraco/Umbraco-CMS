@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using Umbraco.Web.Dynamics;
 using Umbraco.Web.Models.TemplateQuery;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -297,9 +298,10 @@ namespace Umbraco.Web.Editors
         {
             var contentTypes =
                 ApplicationContext.Services.ContentTypeService.GetAllContentTypes()
-                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = x.Name })
+                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name } ) })
                     .OrderBy(x => x.Name).ToList();
-            contentTypes.Insert(0, new ContentTypeModel() { Alias = string.Empty, Name = "Everything" });
+
+            contentTypes.Insert(0, new ContentTypeModel() { Alias = string.Empty, Name = Services.TextService.Localize("template/allContent") });
 
             return contentTypes;
         }

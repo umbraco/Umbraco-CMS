@@ -1080,8 +1080,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="itemsReturned">sider returneret, på</key>
 
     <key alias="iWant">Returner</key>
-    <key alias="everything">alt</key>
+    <key alias="allContent">alt indhold</key>
+    <key alias="contentOfType">indhold af typen &quot;%0%&quot;</key>
+    
     <key alias="from">fra</key>
+    <key alias="websiteRoot">mit website</key>
     <key alias="where">filtre</key>
     <key alias="and">og</key>
 

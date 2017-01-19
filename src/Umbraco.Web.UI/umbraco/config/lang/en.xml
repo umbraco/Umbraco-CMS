@@ -1096,15 +1096,17 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="queryBuilder">Query builder</key>
     <key alias="itemsReturned">items returned, in</key>
 
-    <key alias="iWant">I want</key>
-    <key alias="everything">everything</key>
+    <key alias="iWant">I want</key>   
+    <key alias="allContent">all content</key>
+    <key alias="contentOfType">content of type &quot;%0%&quot;</key>
     <key alias="from">from</key>
+    <key alias="websiteRoot">my website</key>
     <key alias="where">where</key>
     <key alias="and">and</key>
     
     
-    
     <key alias="template">Template</key>
+    
   </area>
   
   <area alias="grid">
