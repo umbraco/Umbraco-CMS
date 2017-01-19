@@ -44,5 +44,15 @@
             var clone = (PreValue)MemberwiseClone();            
             return clone;
         }
+
+        public PreValue DeepCloneWithResetIdentities()
+        {
+            var clone = (PreValue)DeepClone();
+
+            //Resetting the Id to default(int) will work as it doesn't have an hasIdentity flag
+            clone.Id = default(int);
+
+            return clone;
+        }
     }
 }

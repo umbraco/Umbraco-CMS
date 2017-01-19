@@ -234,5 +234,37 @@ namespace Umbraco.Tests.Services
             // Act & Assert
             Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));
         }
+
+        [Test]
+        public void Can_Copy_DataType()
+        {
+            // Arrange
+            var dataTypeService = ServiceContext.DataTypeService;
+            var original = dataTypeService.GetDataTypeDefinitionByName("Richtext editor");
+
+            // Act
+            var copy = dataTypeService.Copy(original, original.ParentId, 0);
+
+            var originalPrevalues = dataTypeService.GetPreValuesCollectionByDataTypeId(original.Id).FormatAsDictionary();
+            var copyPrevalues = dataTypeService.GetPreValuesCollectionByDataTypeId(copy.Id).FormatAsDictionary();
+
+            // Assert
+            Assert.That(copy, Is.Not.Null);
+            Assert.That(copy.Id, Is.Not.EqualTo(original.Id));
+            Assert.AreNotSame(original, copy);
+
+            // Assert Prevalues
+
+            Assert.AreEqual(copyPrevalues.Count(), originalPrevalues.Count());
+
+            foreach (var key in copyPrevalues.Keys)
+            {
+                var originalPrevalue = originalPrevalues[key];
+                var copyPrevalue = copyPrevalues[key];
+
+                Assert.AreNotEqual(copyPrevalue.Id, originalPrevalue.Id);
+                Assert.AreEqual(copyPrevalue.Value, originalPrevalue.Value);
+            }
+        }
     }
 }

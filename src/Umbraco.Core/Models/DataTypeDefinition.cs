@@ -215,5 +215,18 @@ namespace Umbraco.Core.Models
         {
             get { return _additionalData; }
         }
+
+        /// <summary>
+        /// Creates a deep clone of the current entity with its identity and it's property identities reset
+        /// </summary>
+        /// <returns></returns>
+        public IDataTypeDefinition DeepCloneWithResetIdentities()
+        {
+            var clone = (DataTypeDefinition)DeepClone();
+            clone.Key = Guid.Empty;
+            clone.ResetIdentity();
+
+            return clone;
+        }
     }
 }

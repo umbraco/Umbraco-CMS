@@ -20,5 +20,7 @@ namespace Umbraco.Core.Models
         /// Gets or Sets the DatabaseType for which the DataType's value is saved as
         /// </summary>
         DataTypeDatabaseType DatabaseType { get; set; }
+
+        IDataTypeDefinition DeepCloneWithResetIdentities();
     }
 }

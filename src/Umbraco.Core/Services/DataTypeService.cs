@@ -560,6 +560,49 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Copies an <see cref="IDataTypeDefinition"/> object by creating a new DataTypeDefinition object of the same type and copies all data from the current 
+        /// to the new copy which is returned.
+        /// </summary>
+        /// <param name="dataTypeDefinition">The <see cref="IDataTypeDefinition"/> to copy</param>
+        /// <param name="parentId">Id of the DataTypeDefinition's new Parent</param>
+        /// <param name="userId">Optional Id of the User copying the Data Type</param>
+        /// <returns>The newly created <see cref="IDataTypeDefinition"/> object</returns>
+        public IDataTypeDefinition Copy(IDataTypeDefinition dataTypeDefinition, int parentId, int userId = 0)
+        {
+            var copy = dataTypeDefinition.DeepCloneWithResetIdentities();
+            var prevalues = GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
+
+            copy.ParentId = parentId;
+
+            if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IDataTypeDefinition>(dataTypeDefinition, copy, parentId), this))
+                return null;
+
+            var copyPrevalues = new Dictionary<string, PreValue>();
+
+            foreach (var prevalue in prevalues.FormatAsDictionary())
+            {
+                copyPrevalues.Add(prevalue.Key, prevalue.Value.DeepCloneWithResetIdentities());
+            }
+
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            {
+                copy.CreatorId = userId;
+
+                repository.AddOrUpdate(copy);
+                repository.AddOrUpdatePreValues(copy, copyPrevalues);
+
+                uow.Commit();
+            }
+
+            Copied.RaiseEvent(new CopyEventArgs<IDataTypeDefinition>(dataTypeDefinition, copy, false, parentId), this);
+
+            Audit(AuditType.Copy, "Copy Data Type Definition performed by user", dataTypeDefinition.CreatorId, dataTypeDefinition.Id);
+            return copy;
+        }
+
+        /// <summary>
         /// Gets the <see cref="IDataType"/> specified by it's unique ID
         /// </summary>
         /// <param name="id">Id of the DataType, which corresponds to the Guid Id of the control</param>
@@ -626,6 +669,17 @@ namespace Umbraco.Core.Services
         /// Occurs after Move
         /// </summary>
         public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataTypeDefinition>> Moved;
+
+
+        /// <summary>
+        /// Occurs before Copy
+        /// </summary>
+        public static event TypedEventHandler<IDataTypeService, CopyEventArgs<IDataTypeDefinition>> Copying;
+
+        /// <summary>
+        /// Occurs after Copy
+        /// </summary>
+        public static event TypedEventHandler<IDataTypeService, CopyEventArgs<IDataTypeDefinition>> Copied;
         #endregion
 
 

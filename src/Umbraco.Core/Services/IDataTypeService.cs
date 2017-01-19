@@ -162,6 +162,15 @@ namespace Umbraco.Core.Services
         string GetPreValueAsString(int id);
 
         Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
-        
+
+        /// <summary>
+        /// Copies an <see cref="IDataTypeDefinition"/> object by creating a new DataTypeDefinition object of the same type and copies all data from the current 
+        /// to the new copy which is returned.
+        /// </summary>
+        /// <param name="dataTypeDefinition">The <see cref="IDataTypeDefinition"/> to copy</param>
+        /// <param name="parentId">Id of the DataTypeDefinition's new Parent</param>
+        /// <param name="userId">Optional Id of the User copying the Data Type</param>
+        /// <returns>The newly created <see cref="IDataTypeDefinition"/> object</returns>
+        IDataTypeDefinition Copy(IDataTypeDefinition dataTypeDefinition, int parentId, int userId = 0);
     }
 }
