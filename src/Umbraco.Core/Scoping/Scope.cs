@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 
@@ -14,9 +15,11 @@ namespace Umbraco.Core.Scoping
     {
         private readonly ScopeProvider _scopeProvider;
         private readonly IsolationLevel _isolationLevel;
+        private readonly RepositoryCacheMode _repositoryCacheMode;
         private bool _disposed;
         private bool? _completed;
 
+        private IsolatedRuntimeCache _isolatedRuntimeCache;
         private UmbracoDatabase _database;
         private IList<EventMessage> _messages;
 
@@ -24,10 +27,11 @@ namespace Umbraco.Core.Scoping
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
 
         // initializes a new scope
-        public Scope(ScopeProvider scopeProvider, IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool detachable = false)
+        public Scope(ScopeProvider scopeProvider, IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool detachable = false)
         {
             _scopeProvider = scopeProvider;
             _isolationLevel = isolationLevel;
+            _repositoryCacheMode = repositoryCacheMode;
             Detachable = detachable;
 #if DEBUG_SCOPES
             _scopeProvider.Register(this);
@@ -35,15 +39,19 @@ namespace Umbraco.Core.Scoping
         }
 
         // initializes a new scope in a nested scopes chain, with its parent
-        public Scope(ScopeProvider scopeProvider, Scope parent, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
-            : this(scopeProvider, isolationLevel)
+        public Scope(ScopeProvider scopeProvider, Scope parent, IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
+            : this(scopeProvider, isolationLevel, repositoryCacheMode)
         {
             ParentScope = parent;
+
+            // cannot specify a different mode!
+            if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode != repositoryCacheMode)
+                throw new ArgumentException("Cannot be different from parent.", "repositoryCacheMode");
         }
 
         // initializes a new scope, replacing a NoScope instance
-        public Scope(ScopeProvider scopeProvider, NoScope noScope, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
-            : this(scopeProvider, isolationLevel)
+        public Scope(ScopeProvider scopeProvider, NoScope noScope, IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
+            : this(scopeProvider, isolationLevel, repositoryCacheMode)
         {
             // steal everything from NoScope
             _database = noScope.DatabaseOrNull;
@@ -58,6 +66,29 @@ namespace Umbraco.Core.Scoping
         private readonly Guid _instanceId = Guid.NewGuid();
         public Guid InstanceId { get { return _instanceId; } }
 #endif
+
+        /// <inheritdoc />
+        public RepositoryCacheMode RepositoryCacheMode
+        {
+            get
+            {
+                if (_repositoryCacheMode != RepositoryCacheMode.Unspecified) return _repositoryCacheMode;
+                if (ParentScope != null) return ParentScope.RepositoryCacheMode;
+                return RepositoryCacheMode.Default;
+            }
+        }
+
+        /// <inheritdoc />
+        public IsolatedRuntimeCache IsolatedRuntimeCache
+        {
+            get
+            {
+                if (ParentScope != null) return ParentScope.IsolatedRuntimeCache;
+
+                return _isolatedRuntimeCache ?? (_isolatedRuntimeCache
+                    = new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+            }
+        }
 
         // a value indicating whether the scope is detachable
         // ie whether it was created by CreateDetachedScope
@@ -208,20 +239,54 @@ namespace Umbraco.Core.Scoping
             // at the moment we are totally not filtering the messages based on completion
             // status, so whether the scope is committed or rolled back makes no difference
 
-            if (_database == null) return;
+            var completed = _completed.HasValue && _completed.Value;
 
-            try
+            if (_database != null)
             {
-                if (_completed.HasValue && _completed.Value)
-                    _database.CompleteTransaction();
-                else
-                    _database.AbortTransaction();
+                try
+                {
+                    if (completed)
+                        _database.CompleteTransaction();
+                    else
+                        _database.AbortTransaction();
+                }
+                finally
+                {
+                    _database.Dispose();
+                    _database = null;
+                }
             }
-            finally
+
+            // run everything we need to run when completing
+            foreach (var action in Actions.Values)
+                action(completed); // fixme try catch and everything
+        }
+
+        // fixme - wip
+        private IDictionary<string, Action<bool>> _actions;
+
+        private IDictionary<string, Action<bool>> Actions
+        {
+            get
             {
-                _database.Dispose();
-                _database = null;
+                if (ParentScope != null) return ParentScope.Actions;
+
+                return _actions ?? (_actions
+                    = new Dictionary<string, Action<bool>>());
             }
+        }
+
+        public void Register(string name, Action action)
+        {
+            Actions[name] = completed =>
+            {
+                if (completed) action();
+            };
+        }
+
+        public void Register(string name, Action<bool> action)
+        {
+            Actions[name] = action;
         }
     }
 }

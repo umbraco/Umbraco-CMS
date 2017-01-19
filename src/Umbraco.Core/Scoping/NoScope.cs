@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 
@@ -28,6 +29,15 @@ namespace Umbraco.Core.Scoping
         private readonly Guid _instanceId = Guid.NewGuid();
         public Guid InstanceId { get { return _instanceId; } }
 #endif
+
+        /// <inheritdoc />
+        public RepositoryCacheMode RepositoryCacheMode
+        {
+            get { return RepositoryCacheMode.Default; }
+        }
+
+        /// <inheritdoc />
+        public IsolatedRuntimeCache IsolatedRuntimeCache { get { throw new NotImplementedException(); } }
 
         /// <inheritdoc />
         public UmbracoDatabase Database

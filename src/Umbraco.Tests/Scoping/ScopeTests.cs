@@ -418,5 +418,25 @@ namespace Umbraco.Tests.Scoping
                 var db = nested.Database;
             });
         }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ScopeAction(bool complete)
+        {
+            var scopeProvider = DatabaseContext.ScopeProvider;
+
+            bool? completed = null;
+
+            Assert.IsNull(scopeProvider.AmbientScope);
+            using (var scope = scopeProvider.CreateScope())
+            {
+                ((Scope) scope).Register("name", x => completed = x);
+                if (complete)
+                    scope.Complete();
+            }
+            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.IsNotNull(completed);
+            Assert.AreEqual(complete, completed.Value);
+        }
     }
 }

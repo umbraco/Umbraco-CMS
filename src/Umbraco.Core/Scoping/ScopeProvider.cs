@@ -114,9 +114,9 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IScope CreateDetachedScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified)
+        public IScope CreateDetachedScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
         {
-            return new Scope(this, isolationLevel, true);
+            return new Scope(this, isolationLevel, repositoryCacheMode, true);
         }
 
         /// <inheritdoc />
@@ -157,11 +157,11 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IScope CreateScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified)
+        public IScope CreateScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
         {
             var ambient = AmbientScope;
             if (ambient == null)
-                return AmbientScope = new Scope(this, isolationLevel);
+                return AmbientScope = new Scope(this, isolationLevel, repositoryCacheMode);
 
             // replace noScope with a real one
             var noScope = ambient as NoScope;
@@ -174,13 +174,13 @@ namespace Umbraco.Core.Scoping
                 var database = noScope.DatabaseOrNull;
                 if (database != null && database.InTransaction)
                     throw new Exception("NoScope is in a transaction.");
-                return AmbientScope = new Scope(this, noScope, isolationLevel);
+                return AmbientScope = new Scope(this, noScope, isolationLevel, repositoryCacheMode);
             }
 
             var scope = ambient as Scope;
             if (scope == null) throw new Exception("Ambient scope is not a Scope instance.");
 
-            return AmbientScope = new Scope(this, scope, isolationLevel);
+            return AmbientScope = new Scope(this, scope, isolationLevel, repositoryCacheMode);
         }
 
         /// <inheritdoc />

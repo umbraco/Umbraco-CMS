@@ -9,6 +9,7 @@ using Umbraco.Core.Models.EntityBase;
 
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -84,7 +85,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Static Queries
 
-        private IQuery<TEntity> _hasIdQuery;
+        private static IQuery<TEntity> _hasIdQuery;
 
         #endregion
 
@@ -101,23 +102,56 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>(); }
         }
 
-        private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
+        private static RepositoryCachePolicyOptions _defaultOptions;
+        protected virtual RepositoryCachePolicyOptions DefaultOptions
+        {
+            get
+            {
+                return _defaultOptions ?? (_defaultOptions
+                    = new RepositoryCachePolicyOptions(() =>
+                    {
+                        // get count of all entities of current type (TEntity) to ensure cached result is correct
+                        // create query once if it is needed (no need for locking here) - query is static!
+                        var query = _hasIdQuery ?? (_hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0));
+                        return PerformCount(query);
+                    }));
+            }
+        }
 
+        // this would be better for perfs BUT it breaks the tests - l8tr
+        //
+        //private static IRepositoryCachePolicy<TEntity, TId> _defaultCachePolicy;
+        //protected virtual IRepositoryCachePolicy<TEntity, TId> DefaultCachePolicy
+        //{
+        //    get
+        //    {
+        //        return _defaultCachePolicy ?? (_defaultCachePolicy
+        //            = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, DefaultOptions));
+        //    }
+        //}
+
+        private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
         protected virtual IRepositoryCachePolicy<TEntity, TId> CachePolicy
         {
             get
             {
                 if (_cachePolicy != null) return _cachePolicy;
 
-                var options = new RepositoryCachePolicyOptions(() =>
+                var scope = ((PetaPocoUnitOfWork) UnitOfWork).Scope;
+                switch (scope.RepositoryCacheMode)
                 {
-                    //Get count of all entities of current type (TEntity) to ensure cached result is correct
-                    //create query once if it is needed (no need for locking here)
-                    var query = _hasIdQuery ?? (_hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0));
-                    return PerformCount(query);
-                });
-
-                _cachePolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, options);
+                    case RepositoryCacheMode.Default:
+                        //_cachePolicy = DefaultCachePolicy;
+                        _cachePolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, DefaultOptions);
+                        break;
+                    case RepositoryCacheMode.Scoped:
+                        var scopedCache = scope.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+                        var scopedPolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(scopedCache, DefaultOptions);
+                        _cachePolicy = new ScopedDefaultRepositoryCachePolicy<TEntity, TId>(scopedPolicy, RuntimeCache, scope);
+                        break;
+                    default:
+                        throw new Exception();
+                }
 
                 return _cachePolicy;
             }

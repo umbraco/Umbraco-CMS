@@ -17,7 +17,7 @@ namespace Umbraco.Core.Scoping
         /// <para>If an ambient scope already exists, it becomes the parent of the created scope.</para>
         /// <para>When the created scope is disposed, the parent scope becomes the ambient scope again.</para>
         /// </remarks>
-        IScope CreateScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified);
+        IScope CreateScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified);
 
         /// <summary>
         /// Creates a detached scope.
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Scoping
         /// <para>A detached scope is not ambient and has no parent.</para>
         /// <para>It is meant to be attached by <see cref="AttachScope"/>.</para>
         /// </remarks>
-        IScope CreateDetachedScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified);
+        IScope CreateDetachedScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified);
 
         /// <summary>
         /// Attaches a scope.

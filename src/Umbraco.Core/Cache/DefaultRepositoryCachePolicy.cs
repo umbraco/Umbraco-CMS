@@ -238,7 +238,9 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void ClearAll()
         {
-            Cache.ClearCacheByKeySearch(GetEntityTypeCacheKey());
+            // fixme the cache should NOT contain anything else so we can clean all, can't we?
+            Cache.ClearAllCache();
+            //Cache.ClearCacheByKeySearch(GetEntityTypeCacheKey());
         }
     }
 }

@@ -144,14 +144,14 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 			get { return _key; }
 		}
 
-	    private IScope ThisScope
+	    public IScope Scope
 	    {
 	        get { return _scope ?? (_scope = _scopeProvider.CreateScope(_isolationLevel)); }
 	    }
 
 	    public UmbracoDatabase Database
 	    {
-	        get { return ThisScope.Database; }
+	        get { return Scope.Database; }
 	    }
 
 		#region Operation

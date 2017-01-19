@@ -156,6 +156,7 @@
     <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
+    <Compile Include="Cache\ScopedDefaultRepositoryCachePolicy.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="Cache\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
@@ -515,6 +516,7 @@
     <Compile Include="Scoping\Scope.cs" />
     <Compile Include="Scoping\ScopeProvider.cs" />
     <Compile Include="Scoping\ScopeReference.cs" />
+    <Compile Include="Scoping\RepositoryCacheMode.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 
@@ -19,6 +20,14 @@ namespace Umbraco.Core.Scoping
         /// Gets the scope event messages.
         /// </summary>
         IList<EventMessage> Messages { get; }
+
+        /// <summary>
+        /// Gets the repository cache mode.
+        /// </summary>
+        RepositoryCacheMode RepositoryCacheMode { get; }
+
+        // fixme
+        IsolatedRuntimeCache IsolatedRuntimeCache { get; }
 
         /// <summary>
         /// Completes the scope.
