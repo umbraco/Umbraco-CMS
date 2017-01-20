@@ -26,13 +26,32 @@ namespace Umbraco.Core.Scoping
         /// </summary>
         RepositoryCacheMode RepositoryCacheMode { get; }
 
-        // fixme
+        /// <summary>
+        /// Gets the isolated cache.
+        /// </summary>
         IsolatedRuntimeCache IsolatedRuntimeCache { get; }
 
         /// <summary>
         /// Completes the scope.
         /// </summary>
         void Complete();
+
+        /// <summary>
+        /// Registers an action to execute on exit.
+        /// </summary>
+        /// <param name="key">The unique key of the action.</param>
+        /// <param name="action">The action.</param>
+        /// <remarks>
+        /// <para>The key is unique (as in, dictionary key).</para>
+        /// <para>The action will execute only if the scope completes.</para>
+        /// </remarks>
+        void OnExit(string key, Action action);
+
+        /// <remarks>
+        /// <para>The key is unique (as in, dictionary key).</para>
+        /// <para>The action always executes, with an argument indicating whether the scope completed.</para>
+        /// </remarks>
+        void OnExit(string key, Action<bool> action);
 
 #if DEBUG_SCOPES
         Guid InstanceId { get; }

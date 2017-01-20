@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence
         private readonly ILogger _logger;
         private readonly ISqlSyntaxProvider _sqlSyntax;
         private readonly CacheHelper _cacheHelper;
-        private readonly CacheHelper _noCache;
+        private readonly CacheHelper _nullCache;
         private readonly IUmbracoSettingsSection _settings;
 
         #region Ctors
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence
                 };
             }
 
-            _noCache = CacheHelper.CreateDisabledCacheHelper();
+            _nullCache = CacheHelper.NoCache;
             _logger = logger;
             _sqlSyntax = sqlSyntax;
             _settings = settings;
@@ -76,12 +76,12 @@ namespace Umbraco.Core.Persistence
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
             _cacheHelper = cacheHelper;
-            _noCache = CacheHelper.CreateDisabledCacheHelper();
+            _nullCache = CacheHelper.NoCache;
         }
 
         [Obsolete("Use the ctor specifying all dependencies instead")]
         public RepositoryFactory(bool disableAllCache)
-            : this(disableAllCache ? CacheHelper.CreateDisabledCacheHelper() : ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
+            : this(disableAllCache ? CacheHelper.NoCache : ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
         {
         }
 
@@ -105,14 +105,14 @@ namespace Umbraco.Core.Persistence
         public virtual ITaskRepository CreateTaskRepository(IDatabaseUnitOfWork uow)
         {
             return new TaskRepository(uow,
-                _noCache, //never cache
+                _nullCache, //never cache
                 _logger, _sqlSyntax);
         }
 
         public virtual IAuditRepository CreateAuditRepository(IDatabaseUnitOfWork uow)
         {
             return new AuditRepository(uow,
-                _noCache, //never cache
+                _nullCache, //never cache
                 _logger, _sqlSyntax);
         }
 
@@ -197,7 +197,7 @@ namespace Umbraco.Core.Persistence
         {
             return new RelationRepository(
                 uow,
-                _noCache,
+                _nullCache,
                 _logger, _sqlSyntax,
                 CreateRelationTypeRepository(uow));
         }
@@ -249,7 +249,7 @@ namespace Umbraco.Core.Persistence
         {
             return new MigrationEntryRepository(
                 uow,
-                _noCache, //never cache
+                _nullCache, //never cache
                 _logger, _sqlSyntax);
         }
 
@@ -326,7 +326,7 @@ namespace Umbraco.Core.Persistence
         public ITaskTypeRepository CreateTaskTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new TaskTypeRepository(uow,
-                _noCache, //never cache
+                _nullCache, //never cache
                 _logger, _sqlSyntax);
         }
 

@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cache, logger, sqlSyntax)
         {
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);            
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.NoCache, logger, sqlSyntax);            
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -521,8 +521,7 @@ AND umbracoNode.id <> @id",
         {
             public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
                 : base(work, cache, logger, sqlSyntax)
-            {
-            }
+            { }
 
             #region Not implemented (don't need to for the purposes of this repo)
             protected override PreValueEntity PerformGet(int id)

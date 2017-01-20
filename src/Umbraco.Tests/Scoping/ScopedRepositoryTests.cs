@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -45,7 +44,7 @@ namespace Umbraco.Tests.Scoping
             var user = (IUser) new User("name", "email", "username", "rawPassword", userType);
             service.Save(user);
 
-            // global cache contains the user entity
+            // global cache contains the entity
             var globalCached = (IUser) globalCache.GetCacheItem(GetCacheIdKey<IUser>(user.Id), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(user.Id, globalCached.Id);
@@ -65,7 +64,7 @@ namespace Umbraco.Tests.Scoping
                 user.Name = "changed";
                 service.Save(user);
 
-                // scoped cache contains the "new" user entity
+                // scoped cache contains the "new" entity
                 var scopeCached = (IUser) scopedCache.GetCacheItem(GetCacheIdKey<IUser>(user.Id), () => null);
                 Assert.IsNotNull(scopeCached);
                 Assert.AreEqual(user.Id, scopeCached.Id);
@@ -121,7 +120,7 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNull(globalFullCached);
             var reload = service.GetLanguageById(lang.Id);
 
-            // global cache contains the user entity
+            // global cache contains the entity
             globalFullCached = (IEnumerable<ILanguage>) globalCache.GetCacheItem(GetCacheTypeKey<ILanguage>(), () => null);
             Assert.IsNotNull(globalFullCached);
             var globalCached = globalFullCached.First(x => x.Id == lang.Id);
@@ -148,7 +147,7 @@ namespace Umbraco.Tests.Scoping
                 Assert.IsNull(scopeFullCached);
                 reload = service.GetLanguageById(lang.Id);
 
-                // scoped cache contains the "new" user entity
+                // scoped cache contains the "new" entity
                 scopeFullCached = (IEnumerable<ILanguage>) scopedCache.GetCacheItem(GetCacheTypeKey<ILanguage>(), () => null);
                 Assert.IsNotNull(scopeFullCached);
                 var scopeCached = scopeFullCached.First(x => x.Id == lang.Id);
@@ -192,6 +191,84 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(lang.Id, globalCached.Id);
             Assert.AreEqual(complete ? "de-DE" : "fr-FR", lang.IsoCode);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void SingleItemsOnlyRepositoryCachePolicy(bool complete)
+        {
+            var scopeProvider = DatabaseContext.ScopeProvider;
+            var service = ApplicationContext.Services.LocalizationService;
+            var globalCache = ApplicationContext.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof (IDictionaryItem));
+
+            var lang = (ILanguage)new Language("fr-FR");
+            service.Save(lang);
+
+            var item = (IDictionaryItem) new DictionaryItem("item-key");
+            item.Translations = new IDictionaryTranslation[]
+            {
+                new DictionaryTranslation(lang.Id, "item-value"),
+            };
+            service.Save(item);
+
+            // global cache contains the entity
+            var globalCached = (IDictionaryItem) globalCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+            Assert.IsNotNull(globalCached);
+            Assert.AreEqual(item.Id, globalCached.Id);
+            Assert.AreEqual("item-key", globalCached.ItemKey);
+
+            Assert.IsNull(scopeProvider.AmbientScope);
+            using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            {
+                Assert.IsInstanceOf<Scope>(scope);
+                Assert.IsNotNull(scopeProvider.AmbientScope);
+                Assert.AreSame(scope, scopeProvider.AmbientScope);
+
+                // scope has its own isolated cache
+                var scopedCache = scope.IsolatedRuntimeCache.GetOrCreateCache(typeof (IDictionaryItem));
+                Assert.AreNotSame(globalCache, scopedCache);
+
+                item.ItemKey = "item-changed";
+                service.Save(item);
+
+                // scoped cache contains the "new" entity
+                var scopeCached = (IDictionaryItem) scopedCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+                Assert.IsNotNull(scopeCached);
+                Assert.AreEqual(item.Id, scopeCached.Id);
+                Assert.AreEqual("item-changed", scopeCached.ItemKey);
+
+                // global cache is unchanged
+                globalCached = (IDictionaryItem) globalCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+                Assert.IsNotNull(globalCached);
+                Assert.AreEqual(item.Id, globalCached.Id);
+                Assert.AreEqual("item-key", globalCached.ItemKey);
+
+                if (complete)
+                    scope.Complete();
+            }
+            Assert.IsNull(scopeProvider.AmbientScope);
+
+            globalCached = (IDictionaryItem) globalCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+            if (complete)
+            {
+                // global cache has been cleared
+                Assert.IsNull(globalCached);
+            }
+            else
+            {
+                // global cache has *not* been cleared
+                Assert.IsNotNull(globalCached);
+            }
+
+            // get again, updated if completed
+            item = service.GetDictionaryItemById(item.Id);
+            Assert.AreEqual(complete ? "item-changed" : "item-key", item.ItemKey);
+
+            // global cache contains the entity again
+            globalCached = (IDictionaryItem) globalCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+            Assert.IsNotNull(globalCached);
+            Assert.AreEqual(item.Id, globalCached.Id);
+            Assert.AreEqual(complete ? "item-changed" : "item-key", globalCached.ItemKey);
         }
 
         public static string GetCacheIdKey<T>(object id)

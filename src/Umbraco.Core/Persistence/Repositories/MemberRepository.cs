@@ -37,8 +37,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
-            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.NoCache, logger, sqlSyntax);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.NoCache, logger, sqlSyntax);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>

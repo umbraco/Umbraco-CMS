@@ -27,11 +27,10 @@ namespace Umbraco.Core.Cache
         // when the scope completes we need to clear the global isolated cache
         // for now, we are not doing it selectively at all - just kill everything
         // later on we might want to be more clever
-        private void RegisterDirty(TEntity entity = null)
+        private void RegisterDirty()
         {
             // use unique names to de-duplicate
-            // fixme - casting!
-            ((Scope) _scope).Register("dirty_" + typeof (TEntity).Name, 
+            _scope.OnExit("dirty_" + typeof (TEntity).Name, 
                 () => _globalIsolatedCache.ClearAllCache());
         }
 
@@ -57,21 +56,21 @@ namespace Umbraco.Core.Cache
         {
             // writes into the local cache
             _cachePolicy.Create(entity, persistNew);
-            RegisterDirty(entity);
+            RegisterDirty();
         }
 
         public void Update(TEntity entity, Action<TEntity> persistUpdated)
         {
             // writes into the local cache
             _cachePolicy.Update(entity, persistUpdated);
-            RegisterDirty(entity);
+            RegisterDirty();
         }
 
         public void Delete(TEntity entity, Action<TEntity> persistDeleted)
         {
             // deletes the local cache
             _cachePolicy.Delete(entity, persistDeleted);
-            RegisterDirty(entity);
+            RegisterDirty();
         }
 
         public TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
@@ -82,7 +81,7 @@ namespace Umbraco.Core.Cache
 
         public void ClearAll()
         {
-            // fixme - what's this doing?
+            // clears the local cache
             _cachePolicy.ClearAll();
             RegisterDirty();
         }

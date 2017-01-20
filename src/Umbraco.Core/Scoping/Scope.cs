@@ -22,6 +22,7 @@ namespace Umbraco.Core.Scoping
         private IsolatedRuntimeCache _isolatedRuntimeCache;
         private UmbracoDatabase _database;
         private IList<EventMessage> _messages;
+        private IDictionary<string, Action<bool>> _exitActions;
 
         // this is v7, in v8 this has to change to RepeatableRead
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
@@ -258,35 +259,45 @@ namespace Umbraco.Core.Scoping
             }
 
             // run everything we need to run when completing
-            foreach (var action in Actions.Values)
-                action(completed); // fixme try catch and everything
+            List<Exception> exceptions = null;
+            foreach (var action in ExitActions.Values)
+            {
+                try
+                {
+                    action(completed); // fixme try catch and everything
+                }
+                catch (Exception e)
+                {
+                    if (exceptions == null)
+                        exceptions = new List<Exception>();
+                    exceptions.Add(e);
+                }
+            }
+            if (exceptions != null)
+                throw new AggregateException("Exceptions were throws by complete actions.", exceptions);
         }
 
-        // fixme - wip
-        private IDictionary<string, Action<bool>> _actions;
-
-        private IDictionary<string, Action<bool>> Actions
+        private IDictionary<string, Action<bool>> ExitActions
         {
             get
             {
-                if (ParentScope != null) return ParentScope.Actions;
+                if (ParentScope != null) return ParentScope.ExitActions;
 
-                return _actions ?? (_actions
+                return _exitActions ?? (_exitActions
                     = new Dictionary<string, Action<bool>>());
             }
         }
 
-        public void Register(string name, Action action)
+        /// <inheritdoc />
+        public void OnExit(string key, Action action)
         {
-            Actions[name] = completed =>
-            {
-                if (completed) action();
-            };
+            ExitActions[key] = completed => { if (completed) action(); };
         }
 
-        public void Register(string name, Action<bool> action)
+        /// <inheritdoc />
+        public void OnExit(string key, Action<bool> action)
         {
-            Actions[name] = action;
+            ExitActions[key] = action;
         }
     }
 }

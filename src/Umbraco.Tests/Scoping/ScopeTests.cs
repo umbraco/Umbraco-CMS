@@ -430,7 +430,7 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
             {
-                ((Scope) scope).Register("name", x => completed = x);
+                ((Scope) scope).OnExit("name", x => completed = x);
                 if (complete)
                     scope.Complete();
             }

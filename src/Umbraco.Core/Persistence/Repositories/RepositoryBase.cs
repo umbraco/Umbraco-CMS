@@ -160,6 +160,9 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (_cachePolicy != null) return _cachePolicy;
 
+                if (GlobalCache == CacheHelper.NoCache)
+                    return _cachePolicy = NoRepositoryCachePolicy<TEntity, TId>.Instance;
+                
                 _cachePolicy = CreateCachePolicy(IsolatedCache);
                 var scope = ((PetaPocoUnitOfWork) UnitOfWork).Scope; // fixme cast!
                 switch (scope.RepositoryCacheMode)

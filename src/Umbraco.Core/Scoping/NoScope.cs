@@ -83,6 +83,18 @@ namespace Umbraco.Core.Scoping
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
+        public void OnExit(string key, Action action)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public void OnExit(string key, Action<bool> action)
+        {
+            throw new NotImplementedException();
+        }
+
         private void EnsureNotDisposed()
         {
             if (_disposed)
