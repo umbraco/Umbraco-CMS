@@ -15,6 +15,96 @@
         vm.page.menu = {};
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
+
+        //Used to toggle the keyboard shortcut modal
+        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
+        vm.showKeyboardShortcut = false;
+
+        //Keyboard shortcuts
+        //TODO: Localise strings
+        vm.page.keyboardShortcutsOverview = [
+			{
+			    "name": "General",
+			    "shortcuts": [
+                    {
+				        "description": "Undo",
+				        "keys": [{ "key": "ctrl" }, { "key": "z" }]
+				    },
+                    {
+				        "description": "Redo",
+				        "keys": [{ "key": "ctrl" }, { "key": "y" }]
+				    },
+                    {
+				        "description": "Save",
+				        "keys": [{ "key": "ctrl" }, { "key": "s" }]
+				    }
+			    ]
+			},
+			{
+			    "name": "Editor",
+			    "shortcuts": [
+                    {
+				        "description": "Comment/Uncomment lines",
+				        "keys": [{ "key": "ctrl" }, { "key": "/" }]
+				    },
+                    {
+				        "description": "Remove Line",
+				        "keys": [{ "key": "ctrl" }, { "key": "d" }]
+				    },
+                    {
+				        "description": "Copy Lines Up",
+				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "up" }]
+				    },
+                    {
+				        "description": "Copy Lines Down",
+				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "down" }]
+				    },
+                    {
+				        "description": "Move Lines Up",
+				        "keys": [{ "key": "alt" }, { "key": "up" }]
+				    },
+                    {
+				        "description": "Move Lines Down",
+				        "keys": [{ "key": "alt" }, { "key": "down" }]
+				    }
+                ]
+			},
+            {
+			    "name": "Umbraco",
+			    "shortcuts": [
+                    {
+                        "description": "Insert Value",
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "v" }]
+                    },
+                    {
+                        "description": "Insert Partial View",
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
+                    },
+                    {
+                        "description": "Insert Dictionary Item",
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
+                    },
+                    {
+                        "description": "Insert Macro Item",
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "m" }]
+                    },
+                    {
+                        "description": "Insert Query",
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "q" }]
+                    },
+                    {
+                        "description": "Insert Section",
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "s" }]
+                    },
+                    {
+                        "description": "Choose Master Template",
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                    },
+                ]
+			}
+        ];
+
+
         
         vm.save = function () {
             vm.page.saveButtonState = "busy";
@@ -139,6 +229,111 @@
                 },
                 onLoad: function(_editor) {
                     vm.editor = _editor;
+                    
+                    //TODO: Move all these keybinding config out into some helper/service
+                    _editor.commands.addCommands([
+                        //Disable (alt+shift+K)
+                        //Conflicts with our own show shortcuts dialog - this overrides it
+                        {
+                            name: 'unSelectOrFindPrevious',
+                            bindKey: {
+                                win: 'Alt-Shift-K'
+                            },
+                            exec: function() {
+                                //Toggle the show keyboard shortcuts overlay
+                                $scope.$apply(function(){
+                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
+                                });
+                                
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertUmbracoValue',
+                            bindKey: {
+                                win: 'Alt-Shift-V'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openPageFieldOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertPartialView',
+                            bindKey: {
+                                win: 'Alt-Shift-P'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openPartialOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                         {
+                            name: 'insertDictionary',
+                            bindKey: {
+                                win: 'Alt-Shift-D'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openDictionaryItemOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertUmbracoMacro',
+                            bindKey: {
+                                win: 'Alt-Shift-M'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openMacroOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertQuery',
+                            bindKey: {
+                                win: 'Alt-Shift-Q'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openQueryBuilderOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertSection',
+                            bindKey: {
+                                win: 'Alt-Shift-S'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openSectionsOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'chooseMasterTemplate',
+                            bindKey: {
+                                win: 'Alt-Shift-T'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openMasterTemplateOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        
+                    ]);
                     
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
