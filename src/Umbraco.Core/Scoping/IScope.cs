@@ -22,6 +22,11 @@ namespace Umbraco.Core.Scoping
         IList<EventMessage> Messages { get; }
 
         /// <summary>
+        /// Gets the event manager
+        /// </summary>
+        IEventManager Events { get; }
+
+        /// <summary>
         /// Gets the repository cache mode.
         /// </summary>
         RepositoryCacheMode RepositoryCacheMode { get; }
@@ -30,11 +35,6 @@ namespace Umbraco.Core.Scoping
         /// Gets the isolated cache.
         /// </summary>
         IsolatedRuntimeCache IsolatedRuntimeCache { get; }
-
-        /// <summary>
-        /// Gets the event manager
-        /// </summary>
-        IEventManager EventManager { get; }
 
         /// <summary>
         /// Completes the scope.

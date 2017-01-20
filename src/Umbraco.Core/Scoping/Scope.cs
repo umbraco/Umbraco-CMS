@@ -156,14 +156,14 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        public UmbracoDatabase DatabaseOrNull
-        {
-            get
-            {
-                EnsureNotDisposed();
-                return ParentScope == null ? _database : ParentScope.DatabaseOrNull;
-            }
-        }
+        //public UmbracoDatabase DatabaseOrNull
+        //{
+        //    get
+        //    {
+        //        EnsureNotDisposed();
+        //        return ParentScope == null ? _database : ParentScope.DatabaseOrNull;
+        //    }
+        //}
 
         /// <inheritdoc />
         public IList<EventMessage> Messages
@@ -172,26 +172,26 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Messages;
-                if (_messages == null)
-                    _messages = new List<EventMessage>();
-                return _messages;
+                return _messages ?? (_messages = new List<EventMessage>());
             }
         }
 
-        public IList<EventMessage> MessagesOrNull
+        //public IList<EventMessage> MessagesOrNull
+        //{
+        //    get
+        //    {
+        //        EnsureNotDisposed();
+        //        return ParentScope == null ? _messages : ParentScope.MessagesOrNull;
+        //    }
+        //}
+
+        /// <inheritdoc />
+        public IEventManager Events
         {
             get
             {
                 EnsureNotDisposed();
-                return ParentScope == null ? _messages : ParentScope.MessagesOrNull;
-            }
-        }
-
-        public IEventManager EventManager
-        {
-            get
-            {
-                EnsureNotDisposed();
+                if (ParentScope != null) return ParentScope.Events;
                 return _eventManager ?? (_eventManager = new ScopedEventManager());
             }
         }
@@ -240,11 +240,6 @@ namespace Umbraco.Core.Scoping
             else
                 DisposeLastScope();
 
-            if (_eventManager != null)
-            {
-                _eventManager.Dispose();
-            }
-
             _disposed = true;
             GC.SuppressFinalize(this);
         }
@@ -279,7 +274,7 @@ namespace Umbraco.Core.Scoping
             {
                 try
                 {
-                    action(completed); // fixme try catch and everything
+                    action(completed);
                 }
                 catch (Exception e)
                 {
@@ -290,6 +285,11 @@ namespace Umbraco.Core.Scoping
             }
             if (exceptions != null)
                 throw new AggregateException("Exceptions were throws by complete actions.", exceptions);
+
+            // now trigger every events
+            // fixme - should some of them trigger within the transaction?
+            if (_eventManager != null)
+                _eventManager.Dispose();
         }
 
         private IDictionary<string, Action<bool>> ExitActions

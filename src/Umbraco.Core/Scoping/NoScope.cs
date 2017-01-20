@@ -68,7 +68,7 @@ namespace Umbraco.Core.Scoping
                 return _messages ?? (_messages = new List<EventMessage>());
             }
         }
-        
+
         public IList<EventMessage> MessagesOrNull
         {
             get
@@ -130,6 +130,6 @@ namespace Umbraco.Core.Scoping
 
             _disposed = true;
             GC.SuppressFinalize(this);
-        }        
+        }
     }
 }
