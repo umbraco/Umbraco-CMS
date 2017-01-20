@@ -158,7 +158,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
         public IEventManager EventManager
         {
-            get { return ThisScope.EventManager; }
+            get { return Scope.Events; }
         }
 
         #region Operation

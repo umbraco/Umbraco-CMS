@@ -19,14 +19,14 @@ namespace Umbraco.Core.Events
         }
 
         public void TrackEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args)
-        {            
+        {
             _tracked.Add(new EventDefinition<TSender, TEventArgs>(e, sender, args));
         }
 
         public IEnumerable<IEventDefinition> GetEvents()
         {
             return _tracked;
-        }        
+        }
 
         private readonly List<EventDefinitionBase> _tracked = new List<EventDefinitionBase>();
 
@@ -39,7 +39,5 @@ namespace Umbraco.Core.Events
         {
             _tracked.Clear();
         }
-
-        
     }
 }

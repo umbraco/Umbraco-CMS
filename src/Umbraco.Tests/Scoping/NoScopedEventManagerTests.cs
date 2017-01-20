@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Scoping
         public void Does_Support_Event_Cancellation()
         {
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            Assert.IsTrue(scopeProvider.AmbientOrNoScope.EventManager.SupportsEventCancellation);
+            Assert.IsTrue(scopeProvider.AmbientOrNoScope.Events.SupportsEventCancellation);
         }
 
         [Test]
@@ -41,9 +41,9 @@ namespace Umbraco.Tests.Scoping
             };
 
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            scopeProvider.AmbientOrNoScope.EventManager.TrackEvent(DoThing1, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.EventManager.TrackEvent(DoThing2, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.EventManager.TrackEvent(DoThing3, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing1, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing2, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing3, this, new EventArgs());
 
             Assert.AreEqual(3, counter);
 
@@ -53,11 +53,11 @@ namespace Umbraco.Tests.Scoping
         public void Can_Not_Raise_Events_Later()
         {
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            scopeProvider.AmbientOrNoScope.EventManager.TrackEvent(DoThing1, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.EventManager.TrackEvent(DoThing2, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.EventManager.TrackEvent(DoThing3, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing1, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing2, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing3, this, new EventArgs());
 
-            Assert.AreEqual(0, scopeProvider.AmbientOrNoScope.EventManager.GetEvents().Count());
+            Assert.AreEqual(0, scopeProvider.AmbientOrNoScope.Events.GetEvents().Count());
         }
 
         public event EventHandler DoThing1;

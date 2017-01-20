@@ -79,7 +79,7 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IEventManager EventManager
+        public IEventManager Events
         {
             get
             {
