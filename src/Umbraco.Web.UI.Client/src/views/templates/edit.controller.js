@@ -24,18 +24,18 @@
         //TODO: Localise strings
         vm.page.keyboardShortcutsOverview = [
 			{
-			    "name": "General",
+			    "name": "General - warren", 
 			    "shortcuts": [
                     {
-				        "description": "Undo",
+				        "description": localizationService.localize("buttons_undo"),
 				        "keys": [{ "key": "ctrl" }, { "key": "z" }]
 				    },
                     {
-				        "description": "Redo",
+				        "description": localizationService.localize("buttons_redo"),
 				        "keys": [{ "key": "ctrl" }, { "key": "y" }]
 				    },
                     {
-				        "description": "Save",
+				        "description": localizationService.localize("buttons_save"),
 				        "keys": [{ "key": "ctrl" }, { "key": "s" }]
 				    }
 			    ]
@@ -44,36 +44,36 @@
 			    "name": "Editor",
 			    "shortcuts": [
                     {
-				        "description": "Comment/Uncomment lines",
+				        "description": localizationService.localize("shortcuts_commentLine"),
 				        "keys": [{ "key": "ctrl" }, { "key": "/" }]
 				    },
                     {
-				        "description": "Remove Line",
+				        "description": localizationService.localize("shortcuts_removeLine"),
 				        "keys": [{ "key": "ctrl" }, { "key": "d" }]
 				    },
                     {
-				        "description": "Copy Lines Up",
+				        "description": localizationService.localize("shortcuts_copyLineUp"),
 				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "up" }]
 				    },
                     {
-				        "description": "Copy Lines Down",
+				        "description": localizationService.localize("shortcuts_copyLineDown"),
 				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "down" }]
 				    },
                     {
-				        "description": "Move Lines Up",
+				        "description": localizationService.localize("shortcuts_moveLineUp"),
 				        "keys": [{ "key": "alt" }, { "key": "up" }]
 				    },
                     {
-				        "description": "Move Lines Down",
+				        "description": localizationService.localize("shortcuts_moveLineDown"),
 				        "keys": [{ "key": "alt" }, { "key": "down" }]
 				    }
                 ]
 			},
             {
-			    "name": "Umbraco",
+			    "name": "Umbraco", //No need to localise Umbraco is the same in all languages :)
 			    "shortcuts": [
                     {
-                        "description": "Insert Value",
+                        "description": "Insert Value", //Check Per's PR of localisation - can we reuse keys?
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "v" }]
                     },
                     {
@@ -224,6 +224,22 @@
                 onLoad: function(_editor) {
                     vm.editor = _editor;
                     
+                    //Enable simple/basic auto complete
+                    _editor.setOptions({
+                        enableBasicAutocompletion: true,
+                        enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
+                        enableLiveAutocompletion: true
+                    });
+
+                    //Update the auto-complete method to use ctrl+alt+space
+                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
+                    
+                    //Unassigns the keybinding (That was previously auto-complete)
+                    //As conflicts with our own tree search shortcut
+                    _editor.commands.bindKey("ctrl-space", null);
+
+
+
                     //TODO: Move all these keybinding config out into some helper/service
                     _editor.commands.addCommands([
                         //Disable (alt+shift+K)
