@@ -674,7 +674,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // if the cache contains the item, use it
                 if (withCache)
                 {
-                    var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
                     if (cached != null)
                     {
                         content[i] = cached;

@@ -5,27 +5,34 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
-    internal class ScopedDefaultRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
+    internal class ScopedRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        private readonly DefaultRepositoryCachePolicy<TEntity, TId> _cachePolicy;
+        private readonly IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
         private readonly IRuntimeCacheProvider _globalIsolatedCache;
         private readonly IScope _scope;
 
-        public ScopedDefaultRepositoryCachePolicy(DefaultRepositoryCachePolicy<TEntity, TId> cachePolicy, IRuntimeCacheProvider globalIsolatedCache, IScope scope)
+        public ScopedRepositoryCachePolicy(IRepositoryCachePolicy<TEntity, TId> cachePolicy, IRuntimeCacheProvider globalIsolatedCache, IScope scope)
         {
             _cachePolicy = cachePolicy;
             _globalIsolatedCache = globalIsolatedCache;
             _scope = scope;
         }
 
+        public IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope)
+        {
+            throw new InvalidOperationException(); // obviously
+        }
+
         // when the scope completes we need to clear the global isolated cache
         // for now, we are not doing it selectively at all - just kill everything
+        // later on we might want to be more clever
         private void RegisterDirty(TEntity entity = null)
         {
-            // "name" would be used to de-duplicate?
+            // use unique names to de-duplicate
             // fixme - casting!
-            ((Scope) _scope).Register("name", completed => _globalIsolatedCache.ClearAllCache());
+            ((Scope) _scope).Register("dirty_" + typeof (TEntity).Name, 
+                () => _globalIsolatedCache.ClearAllCache());
         }
 
         public TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)

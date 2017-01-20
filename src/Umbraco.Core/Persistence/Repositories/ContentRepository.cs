@@ -853,7 +853,7 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
                 // if the cache contains the published version, use it
                 if (withCache)
                 {
-                    var cached = RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
                     //only use this cached version if the dto returned is also the publish version, they must match
                     if (cached != null && cached.Published && dto.Published)
                     {

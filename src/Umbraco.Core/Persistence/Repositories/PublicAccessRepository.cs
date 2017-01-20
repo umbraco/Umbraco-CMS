@@ -15,22 +15,13 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class PublicAccessRepository : PetaPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
     {
-        private IRepositoryCachePolicy<PublicAccessEntry, Guid> _cachePolicy;
-
         public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         { }
 
-        protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CachePolicy
+        protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(RuntimeCache, GetEntityId, /*expires:*/ false);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         protected override PublicAccessEntry PerformGet(Guid id)

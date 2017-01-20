@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
@@ -16,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class RepositoryBase : DisposableObject
     {
         private readonly IUnitOfWork _work;
-        private readonly CacheHelper _cache;
+        private readonly CacheHelper _globalCache;
 
         protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
         {
@@ -25,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (logger == null) throw new ArgumentNullException("logger");
             Logger = logger;
             _work = work;
-            _cache = cache;
+            _globalCache = cache;
         }
 
         /// <summary>
@@ -44,18 +42,18 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return (Guid)_work.Key; }
         }
 
-        protected CacheHelper RepositoryCache
+        /// <summary>
+        /// Gets the global application cache.
+        /// </summary>
+        protected CacheHelper GlobalCache
         {
-            get { return _cache; }
+            get { return _globalCache; }
         }
 
         /// <summary>
-        /// The runtime cache used for this repo - by standard this is the runtime cache exposed by the CacheHelper but can be overridden
+        /// Gets the repository isolated cache.
         /// </summary>
-        protected virtual IRuntimeCacheProvider RuntimeCache
-        {
-            get { return _cache.RuntimeCache; }
-        }
+        protected abstract IRuntimeCacheProvider IsolatedCache { get; }
 
         public static string GetCacheIdKey<T>(object id)
         {
@@ -97,9 +95,34 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// The runtime cache used for this repo by default is the isolated cache for this type
         /// </summary>
-        protected override IRuntimeCacheProvider RuntimeCache
+        private IRuntimeCacheProvider _isolatedCache;
+        protected override IRuntimeCacheProvider IsolatedCache
         {
-            get { return RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>(); }
+            get
+            {
+                if (_isolatedCache != null) return _isolatedCache;
+
+                var scope = ((PetaPocoUnitOfWork) UnitOfWork).Scope; // fixme cast!
+                IsolatedRuntimeCache provider;
+                switch (scope.RepositoryCacheMode)
+                {
+                    case RepositoryCacheMode.Default:
+                        provider = GlobalCache.IsolatedRuntimeCache;
+                        break;
+                    case RepositoryCacheMode.Scoped:
+                        provider = scope.IsolatedRuntimeCache;
+                        break;
+                    default:
+                        throw new Exception("oops: cache mode.");
+                }
+
+                return _isolatedCache = GetIsolatedCache(provider);
+            }
+        }
+
+        protected virtual IRuntimeCacheProvider GetIsolatedCache(IsolatedRuntimeCache provider)
+        {
+            return provider.GetOrCreateCache<TEntity>();
         }
 
         private static RepositoryCachePolicyOptions _defaultOptions;
@@ -126,35 +149,37 @@ namespace Umbraco.Core.Persistence.Repositories
         //    get
         //    {
         //        return _defaultCachePolicy ?? (_defaultCachePolicy
-        //            = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, DefaultOptions));
+        //            = new DefaultRepositoryCachePolicy<TEntity, TId>(IsolatedCache, DefaultOptions));
         //    }
         //}
 
         private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
-        protected virtual IRepositoryCachePolicy<TEntity, TId> CachePolicy
+        protected IRepositoryCachePolicy<TEntity, TId> CachePolicy
         {
             get
             {
                 if (_cachePolicy != null) return _cachePolicy;
 
-                var scope = ((PetaPocoUnitOfWork) UnitOfWork).Scope;
+                _cachePolicy = CreateCachePolicy(IsolatedCache);
+                var scope = ((PetaPocoUnitOfWork) UnitOfWork).Scope; // fixme cast!
                 switch (scope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
-                        //_cachePolicy = DefaultCachePolicy;
-                        _cachePolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, DefaultOptions);
                         break;
                     case RepositoryCacheMode.Scoped:
-                        var scopedCache = scope.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
-                        var scopedPolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(scopedCache, DefaultOptions);
-                        _cachePolicy = new ScopedDefaultRepositoryCachePolicy<TEntity, TId>(scopedPolicy, RuntimeCache, scope);
+                        _cachePolicy = _cachePolicy.Scoped(GetIsolatedCache(GlobalCache.IsolatedRuntimeCache), scope);
                         break;
                     default:
-                        throw new Exception();
+                        throw new Exception("oops: cache mode.");
                 }
 
                 return _cachePolicy;
             }
+        }
+
+        protected virtual IRepositoryCachePolicy<TEntity, TId> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        {
+            return new DefaultRepositoryCachePolicy<TEntity, TId>(runtimeCache, DefaultOptions);
         }
 
         /// <summary>

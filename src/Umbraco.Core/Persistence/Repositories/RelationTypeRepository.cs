@@ -19,22 +19,13 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class RelationTypeRepository : PetaPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
-        private IRepositoryCachePolicy<IRelationType, int> _cachePolicy;
-
         public RelationTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         { }
 
-        protected override IRepositoryCachePolicy<IRelationType, int> CachePolicy
+        protected override IRepositoryCachePolicy<IRelationType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<IRelationType, int>(RuntimeCache, GetEntityId, /*expires:*/ true);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<IRelationType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
 
         #region Overrides of RepositoryBase<int,RelationType>

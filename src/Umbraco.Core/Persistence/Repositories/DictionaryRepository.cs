@@ -20,28 +20,19 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class DictionaryRepository : PetaPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
-        private IRepositoryCachePolicy<IDictionaryItem, int> _cachePolicy;
-
         public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntax)
             : base(work, cache, logger, syntax)
         { }
 
-        protected override IRepositoryCachePolicy<IDictionaryItem, int> CachePolicy
+        protected override IRepositoryCachePolicy<IDictionaryItem, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
+            var options = new RepositoryCachePolicyOptions
             {
-                if (_cachePolicy != null) return _cachePolicy;
+                //allow zero to be cached
+                GetAllCacheAllowZeroCount = true
+            };
 
-                var options = new RepositoryCachePolicyOptions
-                {
-                    //allow zero to be cached
-                    GetAllCacheAllowZeroCount = true
-                };
-
-                _cachePolicy = new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(RuntimeCache, options);
-
-                return _cachePolicy;
-            }
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(runtimeCache, options);
         }
 
         #region Overrides of RepositoryBase<int,DictionaryItem>
@@ -185,8 +176,8 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.ResetDirtyProperties();
 
             //Clear the cache entries that exist by uniqueid/item key
-            RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.ItemKey));
-            RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.Key));
+            IsolatedCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.ItemKey));
+            IsolatedCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.Key));
         }
 
         protected override void PersistDeletedItem(IDictionaryItem entity)
@@ -197,8 +188,8 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = entity.Key });
 
             //Clear the cache entries that exist by uniqueid/item key
-            RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.ItemKey));
-            RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.Key));
+            IsolatedCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.ItemKey));
+            IsolatedCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.Key));
         }
 
         private void RecursiveDelete(Guid parentId)
@@ -212,8 +203,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = dto.UniqueId });
 
                 //Clear the cache entries that exist by uniqueid/item key
-                RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(dto.Key));
-                RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(dto.UniqueId));
+                IsolatedCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(dto.Key));
+                IsolatedCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(dto.UniqueId));
             }
         }
 
@@ -240,7 +231,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionaryItem Get(Guid uniqueId)
         {
-            using (var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            // note: normal to use GlobalCache here since we're passing it to a new repository
+            using (var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, GlobalCache, Logger, SqlSyntax))
             {
                 return uniqueIdRepo.Get(uniqueId);
             }
@@ -248,7 +240,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionaryItem Get(string key)
         {
-            using (var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            // note: normal to use GlobalCache here since we're passing it to a new repository
+            using (var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, GlobalCache, Logger, SqlSyntax))
             {
                 return keyRepo.Get(key);
             }
@@ -294,7 +287,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private class DictionaryByUniqueIdRepository : SimpleGetRepository<Guid, IDictionaryItem, DictionaryDto>
         {
-            private IRepositoryCachePolicy<IDictionaryItem, Guid> _cachePolicy;
             private readonly DictionaryRepository _dictionaryRepository;
 
             public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
@@ -333,28 +325,20 @@ namespace Umbraco.Core.Persistence.Repositories
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " in (@ids)";
             }
 
-            protected override IRepositoryCachePolicy<IDictionaryItem, Guid> CachePolicy
+            protected override IRepositoryCachePolicy<IDictionaryItem, Guid> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
             {
-                get
+                var options = new RepositoryCachePolicyOptions
                 {
-                    if (_cachePolicy != null) return _cachePolicy;
+                    //allow zero to be cached
+                    GetAllCacheAllowZeroCount = true
+                };
 
-                    var options = new RepositoryCachePolicyOptions
-                    {
-                        //allow zero to be cached
-                        GetAllCacheAllowZeroCount = true
-                    };
-
-                    _cachePolicy = new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(RuntimeCache, options);
-
-                    return _cachePolicy;
-                }
+                return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(runtimeCache, options);
             }
         }
 
         private class DictionaryByKeyRepository : SimpleGetRepository<string, IDictionaryItem, DictionaryDto>
         {
-            private IRepositoryCachePolicy<IDictionaryItem, string> _cachePolicy;
             private readonly DictionaryRepository _dictionaryRepository;
 
             public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
@@ -393,22 +377,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " in (@ids)";
             }
 
-            protected override IRepositoryCachePolicy<IDictionaryItem, string> CachePolicy
+            protected override IRepositoryCachePolicy<IDictionaryItem, string> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
             {
-                get
+                var options = new RepositoryCachePolicyOptions
                 {
-                    if (_cachePolicy != null) return _cachePolicy;
+                    //allow zero to be cached
+                    GetAllCacheAllowZeroCount = true
+                };
 
-                    var options = new RepositoryCachePolicyOptions
-                    {
-                        //allow zero to be cached
-                        GetAllCacheAllowZeroCount = true
-                    };
-
-                    _cachePolicy = new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(RuntimeCache, options);
-
-                    return _cachePolicy;
-                }
+                return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(runtimeCache, options);
             }
         }
     }

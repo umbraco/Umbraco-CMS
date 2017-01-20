@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -17,9 +15,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -33,7 +29,6 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplatesSection _templateConfig;
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
-        private IRepositoryCachePolicy<ITemplate, int> _cachePolicy;
 
         internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
             : base(work, cache, logger, sqlSyntax)
@@ -45,17 +40,9 @@ namespace Umbraco.Core.Persistence.Repositories
             _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
-
-        protected override IRepositoryCachePolicy<ITemplate, int> CachePolicy
+        protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<ITemplate, int>(RuntimeCache, GetEntityId, /*expires:*/ false);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<ITemplate, int>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>

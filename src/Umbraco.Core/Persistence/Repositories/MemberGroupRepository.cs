@@ -131,7 +131,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IMemberGroup GetByName(string name)
         {
-            return RuntimeCache.GetCacheItem<IMemberGroup>(
+            return IsolatedCache.GetCacheItem<IMemberGroup>(
                 string.Format("{0}.{1}", typeof (IMemberGroup).FullName, name),
                 () =>
                 {

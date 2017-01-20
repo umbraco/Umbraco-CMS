@@ -156,7 +156,7 @@
     <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
-    <Compile Include="Cache\ScopedDefaultRepositoryCachePolicy.cs" />
+    <Compile Include="Cache\ScopedRepositoryCachePolicy.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="Cache\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />

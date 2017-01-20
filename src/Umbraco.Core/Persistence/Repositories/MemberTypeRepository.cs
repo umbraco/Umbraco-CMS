@@ -21,23 +21,14 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MemberTypeRepository : ContentTypeBaseRepository<IMemberType>, IMemberTypeRepository
     {
-        private IRepositoryCachePolicy<IMemberType, int> _cachePolicy;
-
         public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
 
-        protected override IRepositoryCachePolicy<IMemberType, int> CachePolicy
+        protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<IMemberType, int>(RuntimeCache, GetEntityId, /*expires:*/ true);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<IMemberType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
 
         protected override IMemberType PerformGet(int id)

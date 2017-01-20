@@ -18,7 +18,6 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentTypeRepository : ContentTypeBaseRepository<IContentType>, IContentTypeRepository
     {
         private readonly ITemplateRepository _templateRepository;
-        private IRepositoryCachePolicy<IContentType, int> _cachePolicy;
 
         public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository)
             : base(work, cache, logger, sqlSyntax)
@@ -26,12 +25,9 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
         }
 
-        protected override IRepositoryCachePolicy<IContentType, int> CachePolicy
+        protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                return _cachePolicy ?? (_cachePolicy = new FullDataSetRepositoryCachePolicy<IContentType, int>(RuntimeCache, GetEntityId, /*expires:*/ true));
-            }
+            return new FullDataSetRepositoryCachePolicy<IContentType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
 
         protected override IContentType PerformGet(int id)

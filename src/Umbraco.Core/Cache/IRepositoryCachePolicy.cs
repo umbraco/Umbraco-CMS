@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
@@ -17,7 +18,10 @@ namespace Umbraco.Core.Cache
         // it is not *that* complicated but then RepositoryBase needs to have a TRepository generic
         // type parameter and it all becomes convoluted - keeping it simple for the time being.
 
-        /// <summary>
+        // fixme explain
+        IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope);
+
+            /// <summary>
         /// Gets an entity from the cache, else from the repository.
         /// </summary>
         /// <param name="id">The identifier.</param>

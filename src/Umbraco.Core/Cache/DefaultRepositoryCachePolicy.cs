@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
@@ -27,6 +28,11 @@ namespace Umbraco.Core.Cache
         {            
             if (options == null) throw new ArgumentNullException("options");
             _options = options;         
+        }
+
+        public override IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope)
+        {
+            return new ScopedRepositoryCachePolicy<TEntity, TId>(this, runtimeCache, scope);
         }
 
         protected string GetEntityCacheKey(object id)
