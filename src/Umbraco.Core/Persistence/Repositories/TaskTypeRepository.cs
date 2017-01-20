@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class TaskTypeRepository : PetaPocoRepositoryBase<int, TaskType>, ITaskTypeRepository
     {
-        public TaskTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public TaskTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }

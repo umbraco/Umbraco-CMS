@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Umbraco.Core.Events
 {
@@ -30,7 +31,23 @@ namespace Umbraco.Core.Events
 
 			return args.Cancel;
 		}
-        
+
+        internal static bool IsRaisedEventCancelled<TSender, TArgs>(
+            this TypedEventHandler<TSender, TArgs> eventHandler,
+            TArgs args,
+            TSender sender,
+            IEventManager eventManager)
+            where TArgs : CancellableEventArgs
+        {
+            if (eventManager.SupportsEventCancellation)
+            {
+                eventManager.TrackEvent(eventHandler, sender, args);
+                return args.Cancel;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Raises the event
         /// </summary>
@@ -49,8 +66,27 @@ namespace Umbraco.Core.Events
 				eventHandler(sender, args);
 		}
 
+        /// <summary>
+        /// Raises/tracks an event with the event manager
+        /// </summary>
+        /// <typeparam name="TSender"></typeparam>
+        /// <typeparam name="TArgs"></typeparam>
+        /// <param name="eventHandler"></param>
+        /// <param name="eventManager"></param>
+        /// <param name="args"></param>
+        /// <param name="sender"></param>
+        internal static void RaiseEvent<TSender, TArgs>(
+            this TypedEventHandler<TSender, TArgs> eventHandler,            
+            TArgs args,
+            TSender sender,
+            IEventManager eventManager)
+            where TArgs : EventArgs
+        {
+            eventManager.TrackEvent(eventHandler, sender, args);
+        }
+
         // moves the last handler that was added to an instance event, to first position
-	    public static void PromoteLastHandler(object sender, string eventName)
+        public static void PromoteLastHandler(object sender, string eventName)
 	    {
             var fieldInfo = sender.GetType().GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic);
             if (fieldInfo == null) throw new InvalidOperationException("No event named " + eventName + ".");

@@ -6,10 +6,12 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
+
+
     /// <summary>
     /// Represents a Unit of Work Provider for creating a <see cref="PetaPocoUnitOfWork"/>
     /// </summary>
-    public class PetaPocoUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
+    public class PetaPocoUnitOfWorkProvider : IScopeUnitOfWorkProvider
     {
         private readonly IScopeProvider _scopeProvider;
 
@@ -45,7 +47,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         { }
 
         /// <summary>
-        /// Constructor accepting an IDatabaseFactory instance
+        /// Constructor accepting a <see cref="IScopeProvider"/> instance
         /// </summary>
         /// <param name="scopeProvider"></param>
         public PetaPocoUnitOfWorkProvider(IScopeProvider scopeProvider)
@@ -55,6 +57,12 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         }
 
         #region Implementation of IUnitOfWorkProvider
+        
+        //explicit implementation
+        IDatabaseUnitOfWork IDatabaseUnitOfWorkProvider.GetUnitOfWork()
+        {
+            return new PetaPocoUnitOfWork(_scopeProvider);
+        }
 
         /// <summary>
         /// Creates a Unit of work with a new UmbracoDatabase instance for the work item/transaction.
@@ -65,27 +73,26 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
         /// and we Dispose of this Database object when the UOW is disposed.
         /// </remarks>
-        public IDatabaseUnitOfWork GetUnitOfWork()
+        public IScopeUnitOfWork GetUnitOfWork()
         {
             return new PetaPocoUnitOfWork(_scopeProvider);
         }
 
-        public IDatabaseUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel)
+        /// <summary>
+        /// Creates a Unit of work with a new UmbracoDatabase instance for the work item/transaction.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Each PetaPoco UOW uses it's own Database object, not the shared Database object that comes from
+        /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
+        /// and we Dispose of this Database object when the UOW is disposed.
+        /// </remarks>
+        public IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel)
         {
             return new PetaPocoUnitOfWork(_scopeProvider, isolationLevel);
         }
 
         #endregion
-
-        /// <summary>
-        /// Static helper method to return a new unit of work
-        /// </summary>
-        /// <returns></returns>
-        internal static IDatabaseUnitOfWork CreateUnitOfWork(ILogger logger)
-        {
-            // fixme wtf?
-            var provider = new PetaPocoUnitOfWorkProvider(logger);
-            return provider.GetUnitOfWork();
-        }
+      
     }
 }

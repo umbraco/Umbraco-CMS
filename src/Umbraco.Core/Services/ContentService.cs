@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the Content Service, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public class ContentService : RepositoryService, IContentService, IContentServiceOperations
+    public class ContentService : ScopeRepositoryService, IContentService, IContentServiceOperations
     {
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
@@ -164,8 +164,9 @@ namespace Umbraco.Core.Services
             var parent = GetById(content.ParentId);
             content.Path = string.Concat(parent.IfNotNull(x => x.Path, content.ParentId.ToString()), ",", content.Id);
 
+            var uow = UowProvider.GetUnitOfWork();
 
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this, uow.EventManager))
             {
                 content.WasCancelled = true;
                 return content;
@@ -174,9 +175,8 @@ namespace Umbraco.Core.Services
             content.CreatorId = userId;
             content.WriterId = userId;
 
-            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
-
-            var uow = UowProvider.GetUnitOfWork();
+            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this, uow.EventManager);
+            
             using (var auditRepo = RepositoryFactory.CreateAuditRepository(uow))
             {
                 auditRepo.AddOrUpdate(new AuditItem(content.Id, string.Format("Content '{0}' was created", name), AuditType.New, content.CreatorId));
@@ -208,20 +208,23 @@ namespace Umbraco.Core.Services
             var content = new Content(name, parent, contentType);
             content.Path = string.Concat(parent.Path, ",", content.Id);
 
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                content.WasCancelled = true;
+                if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this, uow.EventManager))
+                {
+                    content.WasCancelled = true;
+                    return content;
+                }
+
+                content.CreatorId = userId;
+                content.WriterId = userId;
+
+                Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this, uow.EventManager);
+
+                Audit(AuditType.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
+
                 return content;
             }
-
-            content.CreatorId = userId;
-            content.WriterId = userId;
-
-            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
-
-            Audit(AuditType.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
-
-            return content;
         }
 
         /// <summary>
@@ -242,21 +245,22 @@ namespace Umbraco.Core.Services
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parentId, contentType);
 
+            var uow = UowProvider.GetUnitOfWork();
+
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this, uow.EventManager))
             {
                 content.WasCancelled = true;
                 return content;
             }
 
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this, uow.EventManager))
             {
                 content.WasCancelled = true;
                 return content;
             }
-
-            var uow = UowProvider.GetUnitOfWork();
+            
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 content.CreatorId = userId;
@@ -265,11 +269,11 @@ namespace Umbraco.Core.Services
                 //Generate a new preview
                 repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                 uow.Commit();
+
+                Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this, uow.EventManager);
+
+                Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this, uow.EventManager);
             }
-
-            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
-
-            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
 
             Audit(AuditType.New, string.Format("Content '{0}' was created with Id {1}", name, content.Id), content.CreatorId, content.Id);
 
@@ -296,21 +300,22 @@ namespace Umbraco.Core.Services
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parent, contentType);
 
+            var uow = UowProvider.GetUnitOfWork();
+
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this, uow.EventManager))
             {
                 content.WasCancelled = true;
                 return content;
             }
 
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this, uow.EventManager))
             {
                 content.WasCancelled = true;
                 return content;
             }
-
-            var uow = UowProvider.GetUnitOfWork();
+            
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 content.CreatorId = userId;
@@ -319,11 +324,11 @@ namespace Umbraco.Core.Services
                 //Generate a new preview
                 repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                 uow.Commit();
+
+                Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this, uow.EventManager);
+
+                Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this, uow.EventManager);
             }
-
-            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
-
-            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
 
             Audit(AuditType.New, string.Format("Content '{0}' was created with Id {1}", name, content.Id), content.CreatorId, content.Id);
 
@@ -1003,6 +1008,8 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                var uow = UowProvider.GetUnitOfWork();
+
                 //Hack: this ensures that the entity's path is valid and if not it fixes/persists it
                 //see: http://issues.umbraco.org/issue/U4-9336
                 content.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);
@@ -1011,7 +1018,7 @@ namespace Umbraco.Core.Services
 
                 if (Trashing.IsRaisedEventCancelled(
                   new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),
-                  this))
+                  this, uow.EventManager))
                 {
                     return OperationStatus.Cancelled(evtMsgs);
                 }
@@ -1035,8 +1042,7 @@ namespace Umbraco.Core.Services
                     //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
                     UnPublish(descendant, userId);
                 }
-
-                var uow = UowProvider.GetUnitOfWork();
+                
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     content.WriterId = userId;
@@ -1056,7 +1062,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                Trashed.RaiseEvent(new MoveEventArgs<IContent>(false, evtMsgs, moveInfo.ToArray()), this);
+                Trashed.RaiseEvent(new MoveEventArgs<IContent>(false, evtMsgs, moveInfo.ToArray()), this, uow.EventManager);
 
                 Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
@@ -1177,11 +1183,13 @@ namespace Umbraco.Core.Services
 
             var evtMsgs = EventMessagesFactory.Get();
 
+            var uow = UowProvider.GetUnitOfWork();
+
             if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(
                     new SaveEventArgs<IContent>(asArray, evtMsgs),
-                    this))
+                    this, uow.EventManager))
                 {
                     return OperationStatus.Cancelled(evtMsgs);
                 }
@@ -1189,8 +1197,7 @@ namespace Umbraco.Core.Services
             using (new WriteLock(Locker))
             {
                 var containsNew = asArray.Any(x => x.HasIdentity == false);
-
-                var uow = UowProvider.GetUnitOfWork();
+                
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     if (containsNew)
@@ -1223,7 +1230,7 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IContent>(asArray, false, evtMsgs), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(asArray, false, evtMsgs), this, uow.EventManager);
 
                 Audit(AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
@@ -1246,9 +1253,11 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                var uow = UowProvider.GetUnitOfWork();
+
                 if (Deleting.IsRaisedEventCancelled(
                   new DeleteEventArgs<IContent>(content, evtMsgs),
-                  this))
+                  this, uow.EventManager))
                 {
                     return OperationStatus.Cancelled(evtMsgs);
                 }
@@ -1265,15 +1274,14 @@ namespace Umbraco.Core.Services
                 {
                     Delete(child, userId);
                 }
-
-                var uow = UowProvider.GetUnitOfWork();
+                
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     repository.Delete(content);
                     uow.Commit();
 
                     var args = new DeleteEventArgs<IContent>(content, false, evtMsgs);
-                    Deleted.RaiseEvent(args, this);
+                    Deleted.RaiseEvent(args, this, uow.EventManager);
 
                     //remove any flagged media files
                     repository.DeleteMediaFiles(args.MediaFilesToDelete);
@@ -1346,7 +1354,7 @@ namespace Umbraco.Core.Services
                     var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
                     var contents = repository.GetByQuery(query).ToArray();
 
-                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
+                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this, uow.EventManager))
                         return;
 
                     foreach (var content in contents.OrderByDescending(x => x.ParentId))
@@ -1396,17 +1404,18 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
         {
-            if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
-                return;
-
             var uow = UowProvider.GetUnitOfWork();
+
+            if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this, uow.EventManager))
+                return;
+            
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 repository.DeleteVersions(id, versionDate);
                 uow.Commit();
             }
 
-            DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
+            DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this, uow.EventManager);
 
             Audit(AuditType.Delete, "Delete Content by version date performed by user", userId, Constants.System.Root);
         }
@@ -1423,7 +1432,9 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
+                var uow = UowProvider.GetUnitOfWork();
+
+                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this, uow.EventManager))
                     return;
 
                 if (deletePriorVersions)
@@ -1431,15 +1442,14 @@ namespace Umbraco.Core.Services
                     var content = GetByVersion(versionId);
                     DeleteVersions(id, content.UpdateDate, userId);
                 }
-
-                var uow = UowProvider.GetUnitOfWork();
+                
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     repository.DeleteVersion(versionId);
                     uow.Commit();
                 }
 
-                DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this);
+                DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this, uow.EventManager);
 
                 Audit(AuditType.Delete, "Delete Content by version performed by user", userId, Constants.System.Root);
             }
@@ -1478,20 +1488,23 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
-                if (Moving.IsRaisedEventCancelled(
-                    new MoveEventArgs<IContent>(
-                        new MoveEventInfo<IContent>(content, content.Path, parentId)), this))
+                using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    return;
+                    if (Moving.IsRaisedEventCancelled(
+                    new MoveEventArgs<IContent>(
+                        new MoveEventInfo<IContent>(content, content.Path, parentId)), this, uow.EventManager))
+                    {
+                        return;
+                    }
+
+                    //used to track all the moved entities to be given to the event
+                    var moveInfo = new List<MoveEventInfo<IContent>>();
+
+                    //call private method that does the recursive moving
+                    PerformMove(content, parentId, userId, moveInfo);
+
+                    Moved.RaiseEvent(new MoveEventArgs<IContent>(false, moveInfo.ToArray()), this, uow.EventManager);
                 }
-
-                //used to track all the moved entities to be given to the event
-                var moveInfo = new List<MoveEventInfo<IContent>>();
-
-                //call private method that does the recursive moving
-                PerformMove(content, parentId, userId, moveInfo);
-
-                Moved.RaiseEvent(new MoveEventArgs<IContent>(false, moveInfo.ToArray()), this);
 
                 Audit(AuditType.Move, "Move Content performed by user", userId, content.Id);
             }
@@ -1509,7 +1522,8 @@ namespace Umbraco.Core.Services
                 bool success;
                 var nodeObjectType = new Guid(Constants.ObjectTypes.Document);
 
-                using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
+                var uow = UowProvider.GetUnitOfWork();
+                using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     //Create a dictionary of ids -> dictionary of property aliases + values
                     entities = repository.GetEntitiesInRecycleBin()
@@ -1519,12 +1533,12 @@ namespace Umbraco.Core.Services
 
                     files = ((ContentRepository)repository).GetFilesInRecycleBinForUploadField();
 
-                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, entities, files), this))
+                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, entities, files), this, uow.EventManager))
                         return;
 
                     success = repository.EmptyRecycleBin();
 
-                    EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, entities, files, success), this);
+                    EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, entities, files, success), this, uow.EventManager);
 
                     if (success)
                         repository.DeleteMediaFiles(files);
@@ -1570,10 +1584,11 @@ namespace Umbraco.Core.Services
                 // A copy should never be set to published automatically even if the original was.
                 copy.ChangePublishedState(PublishedState.Unpublished);
 
-                if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
-                    return null;
-
                 var uow = UowProvider.GetUnitOfWork();
+
+                if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this, uow.EventManager))
+                    return null;
+                
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     // Update the create author and last edit author
@@ -1612,7 +1627,7 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId, relateToOriginal), this);
+                Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId, relateToOriginal), this, uow.EventManager);
 
                 Audit(AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
                 return copy;
@@ -1628,17 +1643,20 @@ namespace Umbraco.Core.Services
         /// <returns>True if sending publication was succesfull otherwise false</returns>
         public bool SendToPublication(IContent content, int userId = 0)
         {
-            if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this))
-                return false;
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this, uow.EventManager))
+                    return false;
 
-            //Save before raising event
-            Save(content, userId);
+                //Save before raising event
+                Save(content, userId);
 
-            SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this);
+                SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this, uow.EventManager);
 
-            Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+                Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
 
-            return true;
+                return true;
+            }
         }
 
         /// <summary>
@@ -1657,10 +1675,11 @@ namespace Umbraco.Core.Services
         {
             var content = GetByVersion(versionId);
 
-            if (RollingBack.IsRaisedEventCancelled(new RollbackEventArgs<IContent>(content), this))
-                return content;
-
             var uow = UowProvider.GetUnitOfWork();
+
+            if (RollingBack.IsRaisedEventCancelled(new RollbackEventArgs<IContent>(content), this, uow.EventManager))
+                return content;
+            
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 content.WriterId = userId;
@@ -1673,7 +1692,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            RolledBack.RaiseEvent(new RollbackEventArgs<IContent>(content, false), this);
+            RolledBack.RaiseEvent(new RollbackEventArgs<IContent>(content, false), this, uow.EventManager);
 
             Audit(AuditType.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
 
@@ -1694,19 +1713,20 @@ namespace Umbraco.Core.Services
         /// <returns>True if sorting succeeded, otherwise False</returns>
         public bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
         {
-            var asArray = items.ToArray();
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(asArray), this))
-                    return false;
-            }
-
             var shouldBePublished = new List<IContent>();
             var shouldBeSaved = new List<IContent>();
             
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
+
+                var asArray = items.ToArray();
+                if (raiseEvents)
+                {
+                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(asArray), this, uow.EventManager))
+                        return false;
+                }
+
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     int i = 0;
@@ -1747,15 +1767,15 @@ namespace Umbraco.Core.Services
 
                     uow.Commit();
                 }
-            }
 
-            if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IContent>(asArray, false), this);
+                if (raiseEvents)
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(asArray, false), this, uow.EventManager);
 
-            if (shouldBePublished.Any())
-            {
-                //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
-                _publishingStrategy.PublishingFinalized(shouldBePublished, false);
+                if (shouldBePublished.Any())
+                {
+                    //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
+                    _publishingStrategy.PublishingFinalized(shouldBePublished, false);
+                }
             }
 
 
@@ -2080,19 +2100,21 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         private Attempt<PublishStatus> SaveAndPublishDo(IContent content, int userId = 0, bool raiseEvents = true)
         {
-            var evtMsgs = EventMessagesFactory.Get();
-
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<IContent>(content, evtMsgs), this))
-                {
-                    return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent, evtMsgs));
-                }
-            }
+            var evtMsgs = EventMessagesFactory.Get();            
 
             using (new WriteLock(Locker))
             {
+                var uow = UowProvider.GetUnitOfWork();
+
+                if (raiseEvents)
+                {
+                    if (Saving.IsRaisedEventCancelled(
+                        new SaveEventArgs<IContent>(content, evtMsgs), this, uow.EventManager))
+                    {
+                        return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent, evtMsgs));
+                    }
+                }
+
                 //Has this content item previously been published? If so, we don't need to refresh the children
                 var previouslyPublished = content.HasIdentity && HasPublishedVersion(content.Id); //content might not have an id
                 var publishStatus = new PublishStatus(content, PublishStatusType.Success, evtMsgs); //initially set to success
@@ -2119,8 +2141,7 @@ namespace Umbraco.Core.Services
 
                 //we are successfully published if our publishStatus is still Successful
                 bool published = publishStatus.StatusType == PublishStatusType.Success;
-
-                var uow = UowProvider.GetUnitOfWork();
+                
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     if (published == false)
@@ -2149,7 +2170,7 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this, uow.EventManager);
 
                 //Save xml to db and call following method to fire event through PublishingStrategy to update cache
                 if (published)
@@ -2181,20 +2202,21 @@ namespace Umbraco.Core.Services
         private Attempt<OperationStatus> Save(IContent content, bool changeState, int userId = 0, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
-
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(
-                  new SaveEventArgs<IContent>(content, evtMsgs),
-                  this))
-                {
-                    return OperationStatus.Cancelled(evtMsgs);
-                }
-            }
-
+            
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
+
+                if (raiseEvents)
+                {
+                    if (Saving.IsRaisedEventCancelled(
+                      new SaveEventArgs<IContent>(content, evtMsgs),
+                      this, uow.EventManager))
+                    {
+                        return OperationStatus.Cancelled(evtMsgs);
+                    }
+                }
+
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     if (content.HasIdentity == false)
@@ -2216,7 +2238,7 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this, uow.EventManager);
 
                 Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
 

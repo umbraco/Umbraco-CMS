@@ -23,6 +23,7 @@ namespace Umbraco.Core.Scoping
         private UmbracoDatabase _database;
         private IList<EventMessage> _messages;
         private IDictionary<string, Action<bool>> _exitActions;
+        private IEventManager _eventManager;
 
         // this is v7, in v8 this has to change to RepeatableRead
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
@@ -186,6 +187,15 @@ namespace Umbraco.Core.Scoping
             }
         }
 
+        public IEventManager EventManager
+        {
+            get
+            {
+                EnsureNotDisposed();
+                return _eventManager ?? (_eventManager = new ScopedEventManager());
+            }
+        }
+
         /// <inheritdoc />
         public void Complete()
         {
@@ -229,6 +239,11 @@ namespace Umbraco.Core.Scoping
                 parent.ChildCompleted(_completed);
             else
                 DisposeLastScope();
+
+            if (_eventManager != null)
+            {
+                _eventManager.Dispose();
+            }
 
             _disposed = true;
             GC.SuppressFinalize(this);

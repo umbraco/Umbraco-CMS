@@ -32,6 +32,11 @@ namespace Umbraco.Core.Scoping
         IsolatedRuntimeCache IsolatedRuntimeCache { get; }
 
         /// <summary>
+        /// Gets the event manager
+        /// </summary>
+        IEventManager EventManager { get; }
+
+        /// <summary>
         /// Completes the scope.
         /// </summary>
         void Complete();

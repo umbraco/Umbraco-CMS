@@ -10,11 +10,11 @@ namespace Umbraco.Core.Persistence
     internal class LockingRepository<TRepository>
         where TRepository : IDisposable, IRepository
     {
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-        private readonly Func<IDatabaseUnitOfWork, TRepository> _repositoryFactory;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
+        private readonly Func<IScopeUnitOfWork, TRepository> _repositoryFactory;
         private readonly int[] _readLockIds, _writeLockIds;
 
-        public LockingRepository(IDatabaseUnitOfWorkProvider uowProvider, Func<IDatabaseUnitOfWork, TRepository> repositoryFactory,
+        public LockingRepository(IScopeUnitOfWorkProvider uowProvider, Func<IScopeUnitOfWork, TRepository> repositoryFactory,
             IEnumerable<int> readLockIds, IEnumerable<int> writeLockIds)
         {
             Mandate.ParameterNotNull(uowProvider, "uowProvider");
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence
 
         public void WithReadLocked(Action<LockedRepository<TRepository>> action, bool autoCommit = true)
         {
-            using (var uow = ((PetaPocoUnitOfWorkProvider) _uowProvider).GetUnitOfWork(IsolationLevel.RepeatableRead))
+            using (var uow = _uowProvider.GetUnitOfWork(IsolationLevel.RepeatableRead))
             {
                 // getting the database creates a scope and a transaction
                 // the scope is IsolationLevel.RepeatableRead (because UnitOfWork is)
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Persistence
 
         public TResult WithReadLocked<TResult>(Func<LockedRepository<TRepository>, TResult> func, bool autoCommit = true)
         {
-            using (var uow = ((PetaPocoUnitOfWorkProvider) _uowProvider).GetUnitOfWork(IsolationLevel.RepeatableRead))
+            using (var uow = _uowProvider.GetUnitOfWork(IsolationLevel.RepeatableRead))
             {
                 // getting the database creates a scope and a transaction
                 // the scope is IsolationLevel.RepeatableRead (because UnitOfWork is)
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence
 
         public void WithWriteLocked(Action<LockedRepository<TRepository>> action, bool autoCommit = true)
         {
-            using (var uow = ((PetaPocoUnitOfWorkProvider) _uowProvider).GetUnitOfWork(IsolationLevel.RepeatableRead))
+            using (var uow = _uowProvider.GetUnitOfWork(IsolationLevel.RepeatableRead))
             {
                 // getting the database creates a scope and a transaction
                 // the scope is IsolationLevel.RepeatableRead (because UnitOfWork is)
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Persistence
 
         public TResult WithWriteLocked<TResult>(Func<LockedRepository<TRepository>, TResult> func, bool autoCommit = true)
         {
-            using (var uow = ((PetaPocoUnitOfWorkProvider) _uowProvider).GetUnitOfWork(IsolationLevel.RepeatableRead))
+            using (var uow = _uowProvider.GetUnitOfWork(IsolationLevel.RepeatableRead))
             {
                 // getting the database creates a scope and a transaction
                 // the scope is IsolationLevel.RepeatableRead (because UnitOfWork is)

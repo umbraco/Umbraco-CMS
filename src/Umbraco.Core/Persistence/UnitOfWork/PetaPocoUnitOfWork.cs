@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Scoping;
 
@@ -9,8 +10,8 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	/// <summary>
 	/// Represents the Unit of Work implementation for PetaPoco
 	/// </summary>
-	internal class PetaPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
-	{
+	internal class PetaPocoUnitOfWork : DisposableObject, IScopeUnitOfWork
+    {
         private readonly Queue<Operation> _operations = new Queue<Operation>();
 	    private readonly IsolationLevel _isolationLevel;
         private readonly IScopeProvider _scopeProvider;
@@ -27,6 +28,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// Creates a new unit of work instance
         /// </summary>
         /// <param name="scopeProvider"></param>
+        /// <param name="isolationLevel"></param>
         /// <remarks>
         /// This should normally not be used directly and should be created with the UnitOfWorkProvider
         /// </remarks>
@@ -154,12 +156,17 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	        get { return Scope.Database; }
 	    }
 
-		#region Operation
+        public IEventManager EventManager
+        {
+            get { return ThisScope.EventManager; }
+        }
 
-		/// <summary>
-		/// Provides a snapshot of an entity and the repository reference it belongs to.
-		/// </summary>
-		private sealed class Operation
+        #region Operation
+
+        /// <summary>
+        /// Provides a snapshot of an entity and the repository reference it belongs to.
+        /// </summary>
+        private sealed class Operation
 		{
 			/// <summary>
 			/// Gets or sets the entity.
@@ -197,5 +204,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		    _scope.Dispose();
 		    _scope = null;
 		}
-	}
+        
+    }
 }
