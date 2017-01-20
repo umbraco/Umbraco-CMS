@@ -114,11 +114,11 @@ When this combination is hit an overview is opened with shortcuts based on the m
 
     function link(scope, el, attr, ctrl) {
 
-      scope.shortcutOverlay = false;
-
       scope.toggleShortcutsOverlay = function() {
-        scope.shortcutOverlay = !scope.shortcutOverlay;
+        scope.showOverlay = !scope.showOverlay;
+        scope.onToggle();
       };
+
 
     }
 
@@ -128,7 +128,9 @@ When this combination is hit an overview is opened with shortcuts based on the m
       templateUrl: 'views/components/umb-keyboard-shortcuts-overview.html',
       link: link,
       scope: {
-        model: "="
+        model: "=",
+        onToggle: "&",
+        showOverlay: "="
       }
     };
 
