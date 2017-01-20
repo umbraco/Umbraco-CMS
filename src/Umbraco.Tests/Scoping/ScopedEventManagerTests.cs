@@ -1,4 +1,10 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Events;
@@ -8,9 +14,18 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Scoping
 {
+
     [TestFixture]
     public class ScopedEventManagerTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            //remove all handlers first
+            DoThing1 = null;
+            DoThing2 = null;
+            DoThing3 = null;
+        }
 
         [Test]
         public void Does_Not_Support_Event_Cancellation()
@@ -22,19 +37,46 @@ namespace Umbraco.Tests.Scoping
             }
         }
 
+
         [Test]
-        public void Does_Not_Immediately_Raise_Events()
+        public void Can_Get_Event_Info()
         {
-            this.DoThing1 += OnDoThingFail;
-            this.DoThing2 += OnDoThingFail;
-            this.DoThing3 += OnDoThingFail;
+            DoThing1 += OnDoThingFail;
+            DoThing2 += OnDoThingFail;
+            DoThing3 += OnDoThingFail;
 
             var provider = new PetaPocoUnitOfWorkProvider(new ScopeProvider(Mock.Of<IDatabaseFactory2>()));
             using (var uow = provider.GetUnitOfWork())
             {
-                uow.EventManager.TrackEvent(DoThing1, this, new EventArgs());
-                uow.EventManager.TrackEvent(DoThing2, this, new EventArgs());
-                uow.EventManager.TrackEvent(DoThing3, this, new EventArgs());
+                uow.EventManager.TrackEvent(DoThing1, this, new SaveEventArgs<string>("test"));
+                uow.EventManager.TrackEvent(DoThing2, this, new SaveEventArgs<int>(0));
+                uow.EventManager.TrackEvent(DoThing3, this, new SaveEventArgs<decimal>(0));
+                
+                var e = uow.EventManager.GetEvents().ToArray();
+                var knownNames = new [] {"DoThing1", "DoThing2", "DoThing3"};
+                var knownArgTypes = new [] { typeof(SaveEventArgs<string>), typeof(SaveEventArgs<int>), typeof(SaveEventArgs<decimal>) };
+
+                for (int i = 0; i < e.Length; i++)
+                {
+                    Assert.AreEqual(knownNames[i], e[i].EventName);
+                    Assert.AreEqual(knownArgTypes[i], e[i].Args.GetType());
+                }
+            }
+        }
+
+        [Test]
+        public void Does_Not_Immediately_Raise_Events()
+        {
+            DoThing1 += OnDoThingFail;
+            DoThing2 += OnDoThingFail;
+            DoThing3 += OnDoThingFail;
+
+            var provider = new PetaPocoUnitOfWorkProvider(new ScopeProvider(Mock.Of<IDatabaseFactory2>()));
+            using (var uow = provider.GetUnitOfWork())
+            {
+                uow.EventManager.TrackEvent(DoThing1, this, new SaveEventArgs<string>("test"));
+                uow.EventManager.TrackEvent(DoThing2, this, new SaveEventArgs<int>(0));
+                uow.EventManager.TrackEvent(DoThing3, this, new SaveEventArgs<decimal>(0));
 
                 Assert.Pass();
             }
@@ -45,17 +87,17 @@ namespace Umbraco.Tests.Scoping
         {
             var counter = 0;
 
-            this.DoThing1 += (sender, args) =>
+            DoThing1 += (sender, args) =>
             {
                 counter++;
             };
 
-            this.DoThing2 += (sender, args) =>
+            DoThing2 += (sender, args) =>
             {
                 counter++;
             };
 
-            this.DoThing3 += (sender, args) =>
+            DoThing3 += (sender, args) =>
             {
                 counter++;
             };
@@ -63,9 +105,9 @@ namespace Umbraco.Tests.Scoping
             var provider = new PetaPocoUnitOfWorkProvider(new ScopeProvider(Mock.Of<IDatabaseFactory2>()));
             using (var uow = provider.GetUnitOfWork())
             {
-                uow.EventManager.TrackEvent(DoThing1, this, new EventArgs());
-                uow.EventManager.TrackEvent(DoThing2, this, new EventArgs());
-                uow.EventManager.TrackEvent(DoThing3, this, new EventArgs());
+                uow.EventManager.TrackEvent(DoThing1, this, new SaveEventArgs<string>("test"));
+                uow.EventManager.TrackEvent(DoThing2, this, new SaveEventArgs<int>(0));
+                uow.EventManager.TrackEvent(DoThing3, this, new SaveEventArgs<decimal>(0));
 
                 Assert.AreEqual(0, counter);
 
@@ -83,8 +125,12 @@ namespace Umbraco.Tests.Scoping
             Assert.Fail();
         }
 
-        public event EventHandler DoThing1;
-        public event EventHandler<EventArgs> DoThing2;
-        public event TypedEventHandler<ScopedEventManagerTests, EventArgs> DoThing3;
+
+        public static event EventHandler<SaveEventArgs<string>> DoThing1;
+
+        public static event EventHandler<SaveEventArgs<int>> DoThing2;
+
+        public static event TypedEventHandler<ScopedEventManagerTests, SaveEventArgs<decimal>> DoThing3;
     }
+    
 }

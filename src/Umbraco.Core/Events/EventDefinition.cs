@@ -9,6 +9,7 @@ namespace Umbraco.Core.Events
         private readonly EventArgs _args;
 
         public EventDefinition(EventHandler trackedEvent, object sender, EventArgs args)
+            : base(sender, args)
         {
             _trackedEvent = trackedEvent;
             _sender = sender;
@@ -31,6 +32,7 @@ namespace Umbraco.Core.Events
         private readonly TEventArgs _args;
 
         public EventDefinition(EventHandler<TEventArgs> trackedEvent, object sender, TEventArgs args)
+            : base(sender, args)
         {
             _trackedEvent = trackedEvent;
             _sender = sender;
@@ -53,6 +55,7 @@ namespace Umbraco.Core.Events
         private readonly TEventArgs _args;
 
         public EventDefinition(TypedEventHandler<TSender, TEventArgs> trackedEvent, TSender sender, TEventArgs args)
+            : base(sender, args)
         {
             _trackedEvent = trackedEvent;
             _sender = sender;

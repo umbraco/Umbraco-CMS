@@ -4,7 +4,9 @@ namespace Umbraco.Core.Events
 {
     public interface IEventDefinition
     {
-        Guid EventId { get; }
+        object Sender { get; }
+        object Args { get; }
+        string EventName { get; }
 
         void RaiseEvent();
     }

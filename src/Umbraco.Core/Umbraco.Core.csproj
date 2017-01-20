@@ -315,6 +315,9 @@
     <Compile Include="Events\EventDefinition.cs" />
     <Compile Include="Events\EventDefinitionBase.cs" />
     <Compile Include="Events\EventExtensions.cs" />
+    <Compile Include="Events\EventNameExtractor.cs" />
+    <Compile Include="Events\EventNameExtractorError.cs" />
+    <Compile Include="Events\EventNameExtractorResult.cs" />
     <Compile Include="Events\IEventDefinition.cs" />
     <Compile Include="Events\NoScopedEventManager.cs" />
     <Compile Include="Events\ScopedEventManager.cs" />

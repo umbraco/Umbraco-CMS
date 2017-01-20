@@ -39,5 +39,7 @@ namespace Umbraco.Core.Events
         {
             _tracked.Clear();
         }
+
+        
     }
 }
