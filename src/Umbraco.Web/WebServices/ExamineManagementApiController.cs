@@ -166,6 +166,8 @@ namespace Umbraco.Web.WebServices
             var msg = ValidateLuceneIndexer(indexerName, out indexer);
             if (msg.IsSuccessStatusCode)
             {
+                LogHelper.Info<ExamineManagementApiController>(string.Format("Rebuilding index '{0}'", indexerName));
+
                 //remove it in case there's a handler there alraedy
                 indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
                 //now add a single handler
@@ -200,6 +202,8 @@ namespace Umbraco.Web.WebServices
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
+
+            LogHelper.Info<ExamineManagementApiController>(string.Format("Rebuilding index '{0}' done, {1} items committed (can differ from the number of items in the index)", indexer.Name, indexer.CommitCount));
 
             var cacheKey = "temp_indexing_op_" + indexer.Name;
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(cacheKey);
@@ -266,7 +270,10 @@ namespace Umbraco.Web.WebServices
                 var val = p.GetValue(indexer, null);
                 if (val == null)
                 {
-                    LogHelper.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexer.Name + " property: " + p.Name);
+                    // Do not warn for new new attribute that is optional
+                    if(string.Equals(p.Name, "DirectoryFactory", StringComparison.InvariantCultureIgnoreCase) == false)
+                        LogHelper.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexer.Name + " property: " + p.Name);
+
                     val = string.Empty;
                 }
                 indexerModel.ProviderProperties.Add(p.Name, val.ToString());
