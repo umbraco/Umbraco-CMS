@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -405,11 +406,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            //no matter what we always MUST order the result also by umbracoNode.id to ensure that all records being ordered by are unique.
-            // if we do not do this then we end up with issues where we are ordering by a field that has duplicate values (i.e. the 'text' column
-            // is empty for many nodes)
-            // see: http://issues.umbraco.org/issue/U4-8831
-            sortedSql.OrderBy("umbracoNode.id");
+            if (orderBySystemField && orderBy != "umbracoNode.id")
+            {
+                //no matter what we always MUST order the result also by umbracoNode.id to ensure that all records being ordered by are unique.
+                // if we do not do this then we end up with issues where we are ordering by a field that has duplicate values (i.e. the 'text' column
+                // is empty for many nodes)
+                // see: http://issues.umbraco.org/issue/U4-8831
+                sortedSql.OrderBy("umbracoNode.id");
+            }
+            
 
             return sortedSql;
 
@@ -511,9 +516,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected IDictionary<int, PropertyCollection> GetPropertyCollection(
             Sql docSql,
-            IEnumerable<DocumentDefinition> documentDefs)
+            IReadOnlyCollection<DocumentDefinition> documentDefs)
         {
-            if (documentDefs.Any() == false) return new Dictionary<int, PropertyCollection>();
+            if (documentDefs.Count == 0) return new Dictionary<int, PropertyCollection>();
 
             //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use 
             // the statement to go get the property data for all of the items by using an inner join
@@ -524,6 +529,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.LastIndexOf("ORDER BY ", StringComparison.Ordinal));
             }
 
+            //It's Important with the sort order here! We require this to be sorted by node id,
+            // this is required because this data set can be huge depending on the page size. Due
+            // to it's size we need to be smart about iterating over the property values to build 
+            // the document. Before we used to use Linq to get the property data for a given content node 
+            // and perform a Distinct() call. This kills performance because that would mean if we had 7000 nodes
+            // and on each iteration we will perform a lookup on potentially 100,000 property rows against the node
+            // id which turns out to be a crazy amount of iterations. Instead we know it's sorted by this value we'll 
+            // keep an index stored of the rows being read so we never have to re-iterate the entire data set
+            // on each document iteration.
             var propSql = new Sql(@"SELECT cmsPropertyData.*
 FROM cmsPropertyData
 INNER JOIN cmsPropertyType
@@ -531,8 +545,8 @@ ON cmsPropertyData.propertytypeid = cmsPropertyType.id
 INNER JOIN 
 	(" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
 ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.contentNodeId = docData.nodeId
-LEFT OUTER JOIN cmsDataTypePreValues
-ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arguments);
+ORDER BY contentNodeId, propertytypeid
+", docSql.Arguments);
 
             var allPropertyData = Database.Fetch<PropertyDataDto>(propSql);
 
@@ -556,59 +570,81 @@ WHERE EXISTS(
             });
 
             var result = new Dictionary<int, PropertyCollection>();
-
             var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();
+            //used to track the resolved composition property types per content type so we don't have to re-resolve (ToArray) the list every time
+            var resolvedCompositionProperties = new Dictionary<int, PropertyType[]>();
+            var propertyDataSetIndex = 0;
 
-            //iterate each definition grouped by it's content type - this will mean less property type iterations while building 
-            // up the property collections
-            foreach (var compositionGroup in documentDefs.GroupBy(x => x.Composition))
+            //This must be sorted by node id because this is how we are sorting the query to lookup property types above,
+            // which allows us to more efficiently iterate over the large data set of property values
+            foreach (var def in documentDefs.OrderBy(x => x.Id))
             {
-                var compositionProperties = compositionGroup.Key.CompositionPropertyTypes.ToArray();
-
-                foreach (var def in compositionGroup)
+                //get the resolved proeprties from our local cache, or resolve them and put them in cache
+                PropertyType[] compositionProperties;
+                if (resolvedCompositionProperties.ContainsKey(def.Composition.Id))
                 {
-                    var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
-
-                    var propertyFactory = new PropertyFactory(compositionProperties, def.Version, def.Id, def.CreateDate, def.VersionDate);
-                    var properties = propertyFactory.BuildEntity(propertyDataDtos.ToArray()).ToArray();
-
-                    foreach (var property in properties)
-                    {
-                        //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
-                        var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
-
-                        var tagSupport = propertiesWithTagSupport.ContainsKey(property.PropertyType.PropertyEditorAlias)
-                            ? propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias]
-                            : TagExtractor.GetAttribute(editor);
-
-                        if (tagSupport != null)
-                        {
-                            //add to local cache so we don't need to reflect next time for this property editor alias
-                            propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport;
-
-                            //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
-                            var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
-                                .Distinct()
-                                .ToArray();
-
-                            var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
-
-                            var preVals = new PreValueCollection(asDictionary);
-
-                            var contentPropData = new ContentPropertyData(property.Value,
-                                preVals,
-                                new Dictionary<string, object>());
-
-                            TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
-                        }
-                    }
-
-                    if (result.ContainsKey(def.Id))
-                    {
-                        Logger.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
-                    }
-                    result[def.Id] = new PropertyCollection(properties);
+                    compositionProperties = resolvedCompositionProperties[def.Composition.Id];
                 }
+                else
+                {
+                    compositionProperties = def.Composition.CompositionPropertyTypes.ToArray();
+                    resolvedCompositionProperties[def.Composition.Id] = compositionProperties;
+                }
+
+                var propertyDataDtos = new List<PropertyDataDto>();
+
+                for (var i = propertyDataSetIndex; i < allPropertyData.Count; i++)
+                {
+                    if (allPropertyData[i].NodeId == def.Id)
+                    {
+                        propertyDataDtos.Add(allPropertyData[i]);
+                    }
+                    else
+                    {
+                        //the node id has changed so we need to exit the loop and store the index
+                        propertyDataSetIndex = i;
+                        break;
+                    }
+                }
+                
+                var properties = PropertyFactory.BuildEntity(propertyDataDtos, compositionProperties, def.CreateDate, def.VersionDate).ToArray();
+
+                foreach (var property in properties)
+                {
+                    //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
+                    var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+
+                    var tagSupport = propertiesWithTagSupport.ContainsKey(property.PropertyType.PropertyEditorAlias)
+                        ? propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias]
+                        : TagExtractor.GetAttribute(editor);
+
+                    if (tagSupport != null)
+                    {
+                        //add to local cache so we don't need to reflect next time for this property editor alias
+                        propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport;
+
+                        //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
+                        var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
+                            .Distinct()
+                            .ToArray();
+
+                        var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+
+                        var preVals = new PreValueCollection(asDictionary);
+
+                        var contentPropData = new ContentPropertyData(property.Value,
+                            preVals,
+                            new Dictionary<string, object>());
+
+                        TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
+                    }
+                }
+
+                if (result.ContainsKey(def.Id))
+                {
+                    Logger.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
+                }
+                result[def.Id] = new PropertyCollection(properties);
             }
 
             return result;

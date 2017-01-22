@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
-                .Where<DocumentDto>(x => x.Newest)
+                .Where<DocumentDto>(x => x.Newest, SqlSyntax)
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
             var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
@@ -77,7 +77,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //we only want the newest ones with this method
-            sql.Where<DocumentDto>(x => x.Newest);
+            sql.Where<DocumentDto>(x => x.Newest, SqlSyntax);
 
             return ProcessQuery(sql);
         }
@@ -87,9 +87,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
-                                .Where<DocumentDto>(x => x.Newest)
-                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
-                                .OrderBy<NodeDto>(x => x.SortOrder);
+                                .Where<DocumentDto>(x => x.Newest, SqlSyntax)
+                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax)
+                                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
             return ProcessQuery(sql);
         }
@@ -183,8 +183,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     query = query
                         .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
                 query = query
-                    .Where<NodeDto>(x => x.NodeId > baseId && x.Trashed == false)
-                    .Where<DocumentDto>(x => x.Published)
+                    .Where<NodeDto>(x => x.NodeId > baseId && x.Trashed == false, SqlSyntax)
+                    .Where<DocumentDto>(x => x.Published, SqlSyntax)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
                 var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
@@ -222,7 +222,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
             var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
 
@@ -238,10 +238,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql()
                 .Select("*")
-                .From<DocumentDto>()
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
-                .Where<ContentVersionDto>(x => x.VersionId == versionId)
-                .Where<DocumentDto>(x => x.Newest != true);
+                .From<DocumentDto>(SqlSyntax)
+                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, DocumentDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
+                .Where<ContentVersionDto>(x => x.VersionId == versionId, SqlSyntax)
+                .Where<DocumentDto>(x => x.Newest != true, SqlSyntax);
             var dto = Database.Fetch<DocumentDto, ContentVersionDto>(sql).FirstOrDefault();
 
             if (dto == null) return;
@@ -848,7 +848,12 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             var content = new IContent[dtos.Count];
             var defs = new List<DocumentDefinition>();
             var templateIds = new List<int>();
-
+            
+            //track the looked up content types, even though the content types are cached
+            // they still need to be deep cloned out of the cache and we don't want to add
+            // the overhead of deep cloning them on every item in this loop
+            var contentTypes = new Dictionary<int, IContentType>();
+            
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
@@ -867,9 +872,19 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
                 // else, need to fetch from the database
                 // content type repository is full-cache so OK to get each one independently
-                var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
-                var factory = new ContentFactory(contentType, NodeObjectTypeId, dto.NodeId);
-                content[i] = factory.BuildEntity(dto);
+
+                IContentType contentType;
+                if (contentTypes.ContainsKey(dto.ContentVersionDto.ContentDto.ContentTypeId))
+                {
+                    contentType = contentTypes[dto.ContentVersionDto.ContentDto.ContentTypeId];
+                }
+                else
+                {
+                    contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+                    contentTypes[dto.ContentVersionDto.ContentDto.ContentTypeId] = contentType;
+                }
+                
+                content[i] = ContentFactory.BuildEntity(dto, contentType);
 
                 // need template
                 if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
@@ -910,7 +925,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
-                ((Entity) cc).ResetDirtyProperties(false);
+                cc.ResetDirtyProperties(false);
             }
 
             return content;
@@ -927,8 +942,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         {
             var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
-            var factory = new ContentFactory(contentType, NodeObjectTypeId, dto.NodeId);
-            var content = factory.BuildEntity(dto);
+            var content = ContentFactory.BuildEntity(dto, contentType);
 
             //Check if template id is set on DocumentDto, and get ITemplate if it is.
             if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
