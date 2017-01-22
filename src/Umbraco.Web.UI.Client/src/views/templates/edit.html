@@ -33,7 +33,11 @@
                                 class="umb-era-button umb-button--s"
                                 ng-click="vm.openMasterTemplateOverlay()">
                                 <i class="icon icon-layout"></i>
-                                <span class="bold">Master template:</span> <span style="margin-left: 5px;">{{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}</span>
+                                <span class="bold"><localize key="template_mastertemplate">Master template</localize>:</span>
+                                <span style="margin-left: 5px;">
+                                    <span ng-if="vm.template.masterTemplateAlias">{{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}</span>
+                                    <span ng-if="!vm.template.masterTemplateAlias"><localize key="template_noMaster">No master</localize></span>
+                                </span>
                             </button>
 
                             <a ng-if="vm.template.masterTemplateAlias" ng-click="vm.removeMasterTemplate()" class="umb-era-button umb-button--s dropdown-toggle umb-button-group__toggle">
@@ -62,7 +66,7 @@
                                 <li><a href="" ng-click="vm.openPageFieldOverlay()"><localize key="template_insertPageField">Value</localize></a></li>
                                 <li><a href="" ng-click="vm.openPartialOverlay()"><localize key="template_insertPartialView">Partial view</localize></a></li>
                                 <li><a href="" ng-click="vm.openDictionaryItemOverlay()"><localize key="template_insertDictionaryItem">Dictionary</localize></a></li>
-                                <li><a href="" ng-click="vm.openMacroOverlay()"><localize key="general_insertMacro">Macro</localize></a></li>
+                                <li><a href="" ng-click="vm.openMacroOverlay()"><localize key="template_insertMacro">Macro</localize></a></li>
                             </ul>
 
                         </div>

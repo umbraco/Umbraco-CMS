@@ -1,7 +1,10 @@
 (function () {
     "use strict";
 
-    function QueryBuilderOverlayController($scope, templateQueryResource) {
+    function QueryBuilderOverlayController($scope, templateQueryResource, localizationService) {
+
+        var everything = localizationService.localize("template_allContent");
+        var myWebsite = localizationService.localize("template_myWebsite");
 
         var vm = this;
 
@@ -17,10 +20,10 @@
 
         vm.query = {
             contentType: {
-                name: "Everything"
+                name: everything
             },
             source: {
-                name: "My website"
+                name: myWebsite
             },
             filters: [
                 {
@@ -113,6 +116,12 @@
 
         function trashFilter(query) {
             query.filters.splice(query, 1);
+
+            //if we remove the last one, add a new one to generate ui for it.
+            if (query.filters.length == 0) {
+                query.filters.push({});
+            }
+
         }
 
         function changeSortOrder(query) {
