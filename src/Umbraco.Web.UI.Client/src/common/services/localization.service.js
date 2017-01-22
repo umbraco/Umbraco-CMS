@@ -135,8 +135,13 @@ angular.module('umbraco.services')
          *
          * @description
          * Checks the dictionary for a localized resource string
-         * @param {String} value the area/key to localize
-         * @param {Array} tokens if specified this array will be sent as parameter values 
+         * @param {String} value the area/key to localize in the format of 'section_key' 
+         * alternatively if no section is set such as 'key' then we assume the key is to be looked in
+         * the 'general' section
+         * 
+         * @param {Array} tokens if specified this array will be sent as parameter values
+         * This replaces %0% and %1% etc in the dictionary key value with the passed in strings
+         * 
          * @returns {String} localized resource string
          */
         localize: function (value, tokens) {
