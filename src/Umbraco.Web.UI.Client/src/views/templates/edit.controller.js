@@ -20,11 +20,10 @@
         //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
         vm.showKeyboardShortcut = false;
 
-        //Keyboard shortcuts
-        //TODO: Localise strings
+        //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [
 			{
-			    "name": "General - warren", 
+			    "name": "General - FooBar", 
 			    "shortcuts": [
                     {
 				        "description": localizationService.localize("buttons_undo"),
@@ -73,31 +72,31 @@
 			    "name": "Umbraco", //No need to localise Umbraco is the same in all languages :)
 			    "shortcuts": [
                     {
-                        "description": "Insert Value", //Check Per's PR of localisation - can we reuse keys?
+                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertPageField"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "v" }]
                     },
                     {
-                        "description": "Insert Partial View",
+                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertPartialView"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
                     },
                     {
-                        "description": "Insert Dictionary Item",
+                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertDictionaryItem"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
                     },
                     {
-                        "description": "Insert Macro Item",
+                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertMacro"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "m" }]
                     },
                     {
-                        "description": "Insert Query",
+                        "description": localizationService.localize("template_queryBuilder"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "q" }]
                     },
                     {
-                        "description": "Insert Section",
+                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertSections"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "s" }]
                     },
                     {
-                        "description": "Choose Master Template",
+                        "description": localizationService.localize("template_mastertemplate"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
                     },
                 ]
