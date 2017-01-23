@@ -45,7 +45,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
         public IEnumerable<Stylesheet> GetStylesheets(params string[] names)
         {
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetUnitOfWork(), UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetAll(names);
             }
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Stylesheet"/> object</returns>
         public Stylesheet GetStylesheetByName(string name)
         {
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetUnitOfWork(), UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Get(name);
             }
@@ -71,21 +71,22 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveStylesheet(Stylesheet stylesheet, int userId = 0)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(uow))
             {
                 if (SavingStylesheet.IsRaisedEventCancelled(new SaveEventArgs<Stylesheet>(stylesheet), this, uow.EventManager))
-                    return;
-
-                using (var repository = RepositoryFactory.CreateStylesheetRepository(uow, UowProvider.GetUnitOfWork()))
                 {
-                    repository.AddOrUpdate(stylesheet);
                     uow.Commit();
-
-                    SavedStylesheet.RaiseEvent(new SaveEventArgs<Stylesheet>(stylesheet, false), this);
+                    return;
                 }
 
-                Audit(AuditType.Save, string.Format("Save Stylesheet performed by user"), userId, -1);
+                repository.AddOrUpdate(stylesheet);
+                uow.Commit();
+
+                SavedStylesheet.RaiseEvent(new SaveEventArgs<Stylesheet>(stylesheet, false), this, uow.EventManager);
             }
+
+            Audit(AuditType.Save, string.Format("Save Stylesheet performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -96,21 +97,28 @@ namespace Umbraco.Core.Services
         public void DeleteStylesheet(string path, int userId = 0)
         {
             var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(uow, UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(uow))
             {
                 var stylesheet = repository.Get(path);
-                if (stylesheet == null) return;
+                if (stylesheet == null)
+                {
+                    uow.Commit();
+                    return;
+                }
 
                 if (DeletingStylesheet.IsRaisedEventCancelled(new DeleteEventArgs<Stylesheet>(stylesheet), this, uow.EventManager))
+                {
+                    uow.Commit();
                     return;
+                }
 
                 repository.Delete(stylesheet);
                 uow.Commit();
 
-                DeletedStylesheet.RaiseEvent(new DeleteEventArgs<Stylesheet>(stylesheet, false), this);
-
-                Audit(AuditType.Delete, string.Format("Delete Stylesheet performed by user"), userId, -1);
+                DeletedStylesheet.RaiseEvent(new DeleteEventArgs<Stylesheet>(stylesheet, false), this, uow.EventManager);
             }
+
+            Audit(AuditType.Delete, string.Format("Delete Stylesheet performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -122,7 +130,7 @@ namespace Umbraco.Core.Services
         {
 
             var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(uow, UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(uow))
             {
                 return repository.ValidateStylesheet(stylesheet);
             }
@@ -137,7 +145,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Script"/> objects</returns>
         public IEnumerable<Script> GetScripts(params string[] names)
         {
-            using (var repository = RepositoryFactory.CreateScriptRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateScriptRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetAll(names);
             }
@@ -150,7 +158,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Script"/> object</returns>
         public Script GetScriptByName(string name)
         {
-            using (var repository = RepositoryFactory.CreateScriptRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateScriptRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Get(name);
             }
@@ -163,16 +171,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveScript(Script script, int userId = 0)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            var uow = _fileUowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateScriptRepository(uow))
             {
                 if (SavingScript.IsRaisedEventCancelled(new SaveEventArgs<Script>(script), this, uow.EventManager))
+                {
+                    uow.Commit();
                     return;
+                }
 
                 repository.AddOrUpdate(script);
                 uow.Commit();
 
-                SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this);
+                SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this, uow.EventManager);
             }
 
             Audit(AuditType.Save, string.Format("Save Script performed by user"), userId, -1);
@@ -185,22 +196,29 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteScript(string path, int userId = 0)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            var uow = _fileUowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateScriptRepository(uow))
             {
                 var script = repository.Get(path);
-                if (script == null) return;
+                if (script == null)
+                {
+                    uow.Commit();
+                    return;
+                }
 
                 if (DeletingScript.IsRaisedEventCancelled(new DeleteEventArgs<Script>(script), this, uow.EventManager))
-                    return; ;
+                {
+                    uow.Commit();
+                    return;
+                }
 
                 repository.Delete(script);
                 uow.Commit();
 
-                DeletedScript.RaiseEvent(new DeleteEventArgs<Script>(script, false), this);
-
-                Audit(AuditType.Delete, string.Format("Delete Script performed by user"), userId, -1);
+                DeletedScript.RaiseEvent(new DeleteEventArgs<Script>(script, false), this, uow.EventManager);
             }
+
+            Audit(AuditType.Delete, string.Format("Delete Script performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -269,21 +287,23 @@ namespace Umbraco.Core.Services
             {
                 {"CreateTemplateForContentType", true},
                 {"ContentTypeAlias", contentTypeAlias},
-            };
-            if (SavingTemplate.IsRaisedEventCancelled(
-                  new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData),
-                  this))
-            {
-                return Attempt.Fail(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.FailedCancelledByEvent, evtMsgs));
-            }
+            };            
 
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
             {
+                if (SavingTemplate.IsRaisedEventCancelled(
+                  new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData),
+                  this, uow.EventManager))
+                {
+                    uow.Commit();
+                    return Attempt.Fail(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                }
+
                 repository.AddOrUpdate(template);
                 uow.Commit();
 
-                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false, evtMsgs), this);
+                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false, evtMsgs), this, uow.EventManager);
             }
 
             Audit(AuditType.Save, string.Format("Save Template performed by user"), userId, template.Id);
@@ -311,7 +331,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
         public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetAll(aliases).OrderBy(x => x.Name);
             }
@@ -323,7 +343,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
         public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
             }
@@ -336,7 +356,7 @@ namespace Umbraco.Core.Services
         /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
         public ITemplate GetTemplate(string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Get(alias);
             }
@@ -349,7 +369,7 @@ namespace Umbraco.Core.Services
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         public ITemplate GetTemplate(int id)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Get(id);
             }
@@ -362,7 +382,7 @@ namespace Umbraco.Core.Services
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         public ITemplate GetTemplate(Guid id)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 var query = Query<ITemplate>.Builder.Where(x => x.Key == id);
                 return repository.GetByQuery(query).SingleOrDefault();
@@ -371,7 +391,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<ITemplate> GetTemplateDescendants(string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetDescendants(alias);
             }
@@ -384,7 +404,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetDescendants(masterTemplateId);
             }
@@ -397,7 +417,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateChildren(string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetChildren(alias);
             }
@@ -410,7 +430,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetChildren(masterTemplateId);
             }
@@ -425,7 +445,7 @@ namespace Umbraco.Core.Services
         [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateNode GetTemplateNode(string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetTemplateNode(alias);
             }
@@ -441,7 +461,7 @@ namespace Umbraco.Core.Services
         [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.FindTemplateInTree(anyNode, alias);
             }
@@ -454,16 +474,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveTemplate(ITemplate template, int userId = 0)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
             {
                 if (SavingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(template), this, uow.EventManager))
+                {
+                    uow.Commit();
                     return;
+                }
 
                 repository.AddOrUpdate(template);
                 uow.Commit();
 
-                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false), this);
+                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false), this, uow.EventManager);
             }
 
             Audit(AuditType.Save, string.Format("Save Template performed by user"), userId, template.Id);
@@ -476,11 +499,14 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user</param>
         public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = 0)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
             {
                 if (SavingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(templates), this, uow.EventManager))
+                {
+                    uow.Commit();
                     return;
+                }
 
                 foreach (var template in templates)
                 {
@@ -488,7 +514,7 @@ namespace Umbraco.Core.Services
                 }
                 uow.Commit();
 
-                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(templates, false), this);
+                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(templates, false), this, uow.EventManager);
             }
 
             Audit(AuditType.Save, string.Format("Save Template performed by user"), userId, -1);
@@ -509,7 +535,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
             {
                 return repository.DetermineTemplateRenderingEngine(template);
@@ -523,22 +549,29 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteTemplate(string alias, int userId = 0)
         {
+            var template = GetTemplate(alias);
+            if (template == null)
+            {
+                return;
+            }
+
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
-            {
-                var template = repository.Get(alias);
-                if (template == null) return;
+            {                
 
                 if (DeletingTemplate.IsRaisedEventCancelled(new DeleteEventArgs<ITemplate>(template), this, uow.EventManager))
+                {
+                    uow.Commit();
                     return;
+                }
 
                 repository.Delete(template);
                 uow.Commit();
 
-                DeletedTemplate.RaiseEvent(new DeleteEventArgs<ITemplate>(template, false), this);
-
-                Audit(AuditType.Delete, string.Format("Delete Template performed by user"), userId, template.Id);
+                DeletedTemplate.RaiseEvent(new DeleteEventArgs<ITemplate>(template, false), this, uow.EventManager);
             }
+
+            Audit(AuditType.Delete, string.Format("Delete Template performed by user"), userId, template.Id);
         }
 
         /// <summary>
@@ -548,7 +581,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if Script is valid, otherwise false</returns>
         public bool ValidateTemplate(ITemplate template)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
             {
                 return repository.ValidateTemplate(template);
@@ -557,7 +590,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetTemplateFileContentStream(string filepath)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileContentStream(filepath);
             }
@@ -565,7 +598,7 @@ namespace Umbraco.Core.Services
 
         public void SetTemplateFileContent(string filepath, Stream content)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
             }
@@ -573,7 +606,7 @@ namespace Umbraco.Core.Services
 
         public long GetTemplateFileSize(string filepath)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileSize(filepath);
             }
@@ -583,7 +616,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetStylesheetFileContentStream(string filepath)
         {
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileContentStream(filepath);
             }
@@ -591,7 +624,7 @@ namespace Umbraco.Core.Services
 
         public void SetStylesheetFileContent(string filepath, Stream content)
         {
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
             }
@@ -599,7 +632,7 @@ namespace Umbraco.Core.Services
 
         public long GetStylesheetFileSize(string filepath)
         {
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileSize(filepath);
             }
@@ -607,7 +640,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetScriptFileContentStream(string filepath)
         {
-            using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileContentStream(filepath);
             }
@@ -615,7 +648,7 @@ namespace Umbraco.Core.Services
 
         public void SetScriptFileContent(string filepath, Stream content)
         {
-            using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
             }
@@ -623,7 +656,7 @@ namespace Umbraco.Core.Services
 
         public long GetScriptFileSize(string filepath)
         {
-            using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateScriptRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileSize(filepath);
             }
@@ -631,7 +664,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetXsltFileContentStream(string filepath)
         {
-            using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileContentStream(filepath);
             }
@@ -639,7 +672,7 @@ namespace Umbraco.Core.Services
 
         public void SetXsltFileContent(string filepath, Stream content)
         {
-            using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
             }
@@ -647,7 +680,7 @@ namespace Umbraco.Core.Services
 
         public long GetXsltFileSize(string filepath)
         {
-            using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileSize(filepath);
             }
@@ -693,7 +726,7 @@ namespace Umbraco.Core.Services
 
         public IPartialView GetPartialView(string path)
         {
-            using (var repository = RepositoryFactory.CreatePartialViewRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreatePartialViewRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Get(path);
             }
@@ -701,7 +734,7 @@ namespace Umbraco.Core.Services
 
         public IPartialView GetPartialViewMacro(string path)
         {
-            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Get(path);
             }
@@ -709,7 +742,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IPartialView> GetPartialViewMacros(params string[] names)
         {
-            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetAll(names).OrderBy(x => x.Name);
             }
@@ -717,7 +750,7 @@ namespace Umbraco.Core.Services
 
         public IXsltFile GetXsltFile(string path)
         {
-            using (var repository = RepositoryFactory.CreateXsltFileRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Get(path);
             }
@@ -725,7 +758,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IXsltFile> GetXsltFiles(params string[] names)
         {
-            using (var repository = RepositoryFactory.CreateXsltFileRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateXsltFileRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetAll(names).OrderBy(x => x.Name);
             }
@@ -743,7 +776,7 @@ namespace Umbraco.Core.Services
 
         private Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string snippetName = null, int userId = 0)
         {
-            if (CreatingPartialView.IsRaisedEventCancelled(new NewEventArgs<IPartialView>(partialView, true, partialView.Alias, -1), this))
+            if (CreatingPartialView.IsRaisedEventCancelled(new NewEventArgs<IPartialView>(partialView, true, partialView.Alias, -1), this ,UowProvider))
                 return Attempt<IPartialView>.Fail();
 
             string partialViewHeader;
@@ -788,7 +821,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(partialView);
                 uow.Commit();
 
-                CreatedPartialView.RaiseEvent(new NewEventArgs<IPartialView>(partialView, false, partialView.Alias, -1), this);
+                CreatedPartialView.RaiseEvent(new NewEventArgs<IPartialView>(partialView, false, partialView.Alias, -1), this, uow.EventManager);
             }
 
             Audit(AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
@@ -813,18 +846,24 @@ namespace Umbraco.Core.Services
             {
                 var partialView = repository.Get(path);
                 if (partialView == null)
+                {
+                    uow.Commit();
                     return true;
+                }
 
                 if (DeletingPartialView.IsRaisedEventCancelled(new DeleteEventArgs<IPartialView>(partialView), this, uow.EventManager))
+                {
+                    uow.Commit();
                     return false;
+                }
 
                 repository.Delete(partialView);
                 uow.Commit();
 
-                DeletedPartialView.RaiseEvent(new DeleteEventArgs<IPartialView>(partialView, false), this);
-
-                Audit(AuditType.Delete, string.Format("Delete {0} performed by user", partialViewType), userId, -1);
+                DeletedPartialView.RaiseEvent(new DeleteEventArgs<IPartialView>(partialView, false), this, uow.EventManager);
             }
+
+            Audit(AuditType.Delete, string.Format("Delete {0} performed by user", partialViewType), userId, -1);
 
             return true;
 
@@ -842,26 +881,28 @@ namespace Umbraco.Core.Services
 
         private Attempt<IPartialView> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = 0)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            var uow = _fileUowProvider.GetUnitOfWork();
             using (var repository = GetPartialViewRepository(partialViewType, uow))
             {
                 if (SavingPartialView.IsRaisedEventCancelled(new SaveEventArgs<IPartialView>(partialView), this, uow.EventManager))
+                {
+                    uow.Commit();
                     return Attempt<IPartialView>.Fail();
+                }
 
                 repository.AddOrUpdate(partialView);
                 uow.Commit();
+                SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView, false), this, uow.EventManager);
             }
 
             Audit(AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
-
-            SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView, false), this);
 
             return Attempt.Succeed(partialView);
         }
 
         public bool ValidatePartialView(PartialView partialView)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreatePartialViewRepository(uow))
             {
                 return repository.ValidatePartialView(partialView);
@@ -870,7 +911,7 @@ namespace Umbraco.Core.Services
 
         public bool ValidatePartialViewMacro(PartialView partialView)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow))
             {
                 return repository.ValidatePartialView(partialView);
@@ -910,7 +951,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetPartialViewMacroFileContentStream(string filepath)
         {
-            using (var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, UowProvider.GetUnitOfWork()))
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileContentStream(filepath);
             }
@@ -918,7 +959,7 @@ namespace Umbraco.Core.Services
 
         public void SetPartialViewMacroFileContent(string filepath, Stream content)
         {
-            using (var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, UowProvider.GetUnitOfWork()))
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, UowProvider.GetReadOnlyUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
             }
@@ -926,7 +967,7 @@ namespace Umbraco.Core.Services
 
         public long GetPartialViewMacroFileSize(string filepath)
         {
-            using (var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, UowProvider.GetUnitOfWork()))
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileSize(filepath);
             }
@@ -934,7 +975,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetPartialViewFileContentStream(string filepath)
         {
-            using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetUnitOfWork()))
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileContentStream(filepath);
             }
@@ -942,7 +983,7 @@ namespace Umbraco.Core.Services
 
         public void SetPartialViewFileContent(string filepath, Stream content)
         {
-            using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetUnitOfWork()))
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetReadOnlyUnitOfWork()))
             {
                 repository.SetFileContent(filepath, content);
             }
@@ -950,7 +991,7 @@ namespace Umbraco.Core.Services
 
         public long GetPartialViewFileSize(string filepath)
         {
-            using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetUnitOfWork()))
+            using (var repository = GetPartialViewRepository(PartialViewType.PartialView, UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetFileSize(filepath);
             }

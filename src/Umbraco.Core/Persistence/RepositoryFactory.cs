@@ -1,5 +1,6 @@
 using Umbraco.Core.Configuration;
 using System;
+using System.ComponentModel;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -225,6 +226,13 @@ namespace Umbraco.Core.Persistence
             return new PartialViewMacroRepository(uow, FileSystemProviderManager.Current.MacroPartialsFileSystem);
         }
 
+        public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow)
+        {
+            return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
+        }
+
+        [Obsolete("Do not use this method, use the method with only the single unit of work parameter")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow, IDatabaseUnitOfWork db)
         {
             return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
@@ -348,9 +356,6 @@ namespace Umbraco.Core.Persistence
                 _sqlSyntax);
         }
 
-        internal IStylesheetRepository CreateStylesheetRepository(IScopeUnitOfWork uow)
-        {
-            return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
-        }
+       
     }
 }
