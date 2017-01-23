@@ -151,6 +151,46 @@ angular.module('umbraco.services')
             });
         },
 
+        localizeMany: function(keys) {
+            if(keys){
+
+                //The LocalizationService.localize promises we want to resolve
+                var promises = [];
+
+                for(var i = 0; i < keys.length; i++){
+                    promises.push(service.localize(keys[i], undefined));
+                }
+
+                return $q.all(promises).then(function(localizedValues){
+                    return localizedValues;
+                });
+            }
+        },
+
+        concat: function(keys) {
+            if(keys){
+
+                //The LocalizationService.localize promises we want to resolve
+                var promises = [];
+
+                for(var i = 0; i < keys.length; i++){
+                    promises.push(service.localize(keys[i], undefined));
+                }
+
+                return $q.all(promises).then(function(localizedValues){
+
+                    //Build a concat string by looping over the array of resolved promises/translations
+                    var returnValue = "";
+
+                    for(var i = 0; i < localizedValues.length; i++){
+                        returnValue += localizedValues[i];
+                    }
+
+                    return returnValue;
+                });
+            }
+        }
+
     };
 
     //This happens after login / auth and assets loading
