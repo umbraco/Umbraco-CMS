@@ -1,0 +1,16 @@
+FROM microsoft/aspnet
+
+# setup IIS with url rewrite v2
+RUN powershell.exe -commandInvoke-WebRequest 'http://download.microsoft.com/download/C/9/E/C9E8180D-4E51-40A6-A9BF-776990D8BCA9/rewrite_amd64.msi' -OutFile c:/urlrewrite2.msi; /
+    powershell.exe -commandStart-Process 'c:/urlrewrite2.msi' '/qn' -PassThru | Wait-Process
+
+# deploy umbraco
+COPY . /app
+
+# configure umbraco in IIS on port 8080
+RUN powershell -NoProfile -Command \
+    Import-module IISAdministration; \
+    New-IISSite -Name "cms.umbraco.local" -PhysicalPath "C:\app" -BindingInformation "*:8080:" 
+
+# This instruction tells the container to listen on port 8080. 
+EXPOSE 8080
