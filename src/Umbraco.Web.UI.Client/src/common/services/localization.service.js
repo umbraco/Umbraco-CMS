@@ -151,6 +151,30 @@ angular.module('umbraco.services')
             });
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.localizationService#localizeMany
+         * @methodOf umbraco.services.localizationService
+         *
+         * @description
+         * Checks the dictionary for multipe localized resource strings at once, preventing the need for nested promises
+         * with localizationService.localize
+         * 
+         * ##Usage
+         * <pre>
+         * localizationService.localizeMany(["speechBubbles_templateErrorHeader", "speechBubbles_templateErrorText"]).then(function(data){
+         *      var header = data[0];
+         *      var message = data[1];
+         *      notificationService.error(header, message);
+         * });
+         * </pre>
+         * 
+         * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key' 
+         * alternatively if no section is set such as 'key' then we assume the key is to be looked in
+         * the 'general' section
+         * 
+         * @returns {Array} An array of localized resource string in the same order
+         */
         localizeMany: function(keys) {
             if(keys){
 
@@ -167,6 +191,28 @@ angular.module('umbraco.services')
             }
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.localizationService#concat
+         * @methodOf umbraco.services.localizationService
+         *
+         * @description
+         * Checks the dictionary for multipe localized resource strings at once & concats them to a single string
+         * Which was not possible with localizationSerivce.localize() due to returning a promise
+         * 
+         * ##Usage
+         * <pre>
+         * localizationService.concat(["speechBubbles_templateErrorHeader", "speechBubbles_templateErrorText"]).then(function(data){
+         *      var combinedText = data;
+         * });
+         * </pre>
+         * 
+         * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key' 
+         * alternatively if no section is set such as 'key' then we assume the key is to be looked in
+         * the 'general' section
+         * 
+         * @returns {String} An concatenated string of localized resource string passed into the function in the same order
+         */
         concat: function(keys) {
             if(keys){
 
@@ -187,6 +233,57 @@ angular.module('umbraco.services')
                     }
 
                     return returnValue;
+                });
+            }
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.localizationService#format
+         * @methodOf umbraco.services.localizationService
+         *
+         * @description
+         * Checks the dictionary for multipe localized resource strings at once & formats a tokenized message
+         * Which was not possible with localizationSerivce.localize() due to returning a promise
+         * 
+         * ##Usage
+         * <pre>
+         * localizationService.format(["template_insert", "template_insertSections"], "%0% %1%").then(function(data){
+         *      //Will return 'Insert Sections'
+         *      var formattedResult = data;
+         * });
+         * </pre>
+         * 
+         * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key' 
+         * alternatively if no section is set such as 'key' then we assume the key is to be looked in
+         * the 'general' section
+         * 
+         * @param {String} message is the string you wish to replace containing tokens in the format of %0% and %1%
+         * with the localized resource strings
+         * 
+         * @returns {String} An concatenated string of localized resource string passed into the function in the same order
+         */
+        format: function(keys, message){
+            if(keys){
+
+                //The LocalizationService.localize promises we want to resolve
+                var promises = [];
+
+                for(var i = 0; i < keys.length; i++){
+                    promises.push(service.localize(keys[i], undefined));
+                }
+
+                return $q.all(promises).then(function(localizedValues){
+
+                    //Replace {0} and {1} etc in message with the localized values
+                    for(var i = 0; i < localizedValues.length; i++){
+                        var token = "%" + i + "%";
+                        var regex = new RegExp(token, "g");
+
+                        message = message.replace(regex, localizedValues[i]);
+                    }
+
+                    return message;
                 });
             }
         }
