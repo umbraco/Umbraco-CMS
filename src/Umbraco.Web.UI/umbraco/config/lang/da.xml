@@ -1088,6 +1088,30 @@ Mange hilsner fra Umbraco robotten
     <key alias="where">filtre</key>
     <key alias="and">og</key>
 
+    <key alias="is">is DA</key>
+    <key alias="isNot">is not DA</key>
+    <key alias="before">before DA</key>
+    <key alias="beforeIncDate">before (including selected date) DA</key>
+    <key alias="after">after DA</key>
+    <key alias="afterIncDate">after (including selected date) DA</key>
+    <key alias="equals">equals DA</key>
+    <key alias="doesNotEqual">does not equal DA</key>
+    <key alias="contains">contains DA</key>
+    <key alias="doesNotContain">does not contain DA</key>
+    <key alias="greaterThan">greater than DA</key>
+    <key alias="greaterThanEqual">greater than or equal to DA</key>
+    <key alias="lessThan">less than DA</key>
+    <key alias="lessThanEqual">less than or equal to DA</key>
+
+    <key alias="id">Id DA</key>
+    <key alias="name">Name DA</key>
+    <key alias="createdDate">Created Date DA</key>
+    <key alias="lastUpdatedDate">Last Updated Date DA</key>
+
+    <key alias="orderBy">order by DA</key>
+    <key alias="ascending">ascending DA</key>
+    <key alias="descending">descending DA</key>
+
     <key alias="template">Skabelon</key>
   </area>
   
