@@ -171,6 +171,7 @@
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
     <Compile Include="Scoping\LeakTests.cs" />
     <Compile Include="Scoping\ScopedRepositoryTests.cs" />
+    <Compile Include="Scoping\ScopedXmlTests.cs" />
     <Compile Include="Scoping\ScopeTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TryConvertToTests.cs" />

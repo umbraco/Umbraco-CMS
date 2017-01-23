@@ -95,6 +95,12 @@ namespace Umbraco.Core.Scoping
             throw new NotImplementedException();
         }
 
+        // fixme
+        public T Enlist<T>(string key, Func<T> creator, Action<ActionTime, bool, T> action)
+        {
+            throw new NotImplementedException();
+        }
+
         private void EnsureNotDisposed()
         {
             if (_disposed)

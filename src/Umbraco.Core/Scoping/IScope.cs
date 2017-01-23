@@ -53,6 +53,9 @@ namespace Umbraco.Core.Scoping
         /// </remarks>
         void OnExit(string key, Action<bool> action);
 
+        // fixme
+        T Enlist<T>(string key, Func<T> creator, Action<ActionTime, bool, T> action);
+
 #if DEBUG_SCOPES
         Guid InstanceId { get; }
 #endif

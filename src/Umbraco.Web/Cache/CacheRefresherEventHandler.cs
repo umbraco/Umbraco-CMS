@@ -9,8 +9,6 @@ using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using System.Linq;
-using System.Reflection;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Publishing;
@@ -132,6 +130,113 @@ namespace Umbraco.Web.Cache
 
             RelationService.SavedRelationType += RelationType_Saved;
             RelationService.DeletedRelationType += RelationType_Deleted;
+        }
+
+        // for tests
+        internal void Destroy()
+        {
+            //bind to application tree events
+            ApplicationTreeService.Deleted -= ApplicationTreeDeleted;
+            ApplicationTreeService.Updated -= ApplicationTreeUpdated;
+            ApplicationTreeService.New -= ApplicationTreeNew;
+
+            //bind to application events
+            SectionService.Deleted -= ApplicationDeleted;
+            SectionService.New -= ApplicationNew;
+
+            //bind to user / user type events
+            UserService.SavedUserType -= UserServiceSavedUserType;
+            UserService.DeletedUserType -= UserServiceDeletedUserType;
+            UserService.SavedUser -= UserServiceSavedUser;
+            UserService.DeletedUser -= UserServiceDeletedUser;
+
+            //Bind to dictionary events
+
+            LocalizationService.DeletedDictionaryItem -= LocalizationServiceDeletedDictionaryItem;
+            LocalizationService.SavedDictionaryItem -= LocalizationServiceSavedDictionaryItem;
+
+            //Bind to data type events
+            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
+
+            DataTypeService.Deleted -= DataTypeServiceDeleted;
+            DataTypeService.Saved -= DataTypeServiceSaved;
+
+            //Bind to stylesheet events
+
+            FileService.SavedStylesheet -= FileServiceSavedStylesheet;
+            FileService.DeletedStylesheet -= FileServiceDeletedStylesheet;
+
+            //Bind to domain events
+
+            DomainService.Saved -= DomainService_Saved;
+            DomainService.Deleted -= DomainService_Deleted;
+
+            //Bind to language events
+
+            LocalizationService.SavedLanguage -= LocalizationServiceSavedLanguage;
+            LocalizationService.DeletedLanguage -= LocalizationServiceDeletedLanguage;
+
+            //Bind to content type events
+
+            ContentTypeService.SavedContentType -= ContentTypeServiceSavedContentType;
+            ContentTypeService.SavedMediaType -= ContentTypeServiceSavedMediaType;
+            ContentTypeService.DeletedContentType -= ContentTypeServiceDeletedContentType;
+            ContentTypeService.DeletedMediaType -= ContentTypeServiceDeletedMediaType;
+            MemberTypeService.Saved -= MemberTypeServiceSaved;
+            MemberTypeService.Deleted -= MemberTypeServiceDeleted;
+
+            //Bind to permission events
+
+            //TODO: Wrap legacy permissions so we can get rid of this
+            Permission.New -= PermissionNew;
+            Permission.Updated -= PermissionUpdated;
+            Permission.Deleted -= PermissionDeleted;
+            PermissionRepository<IContent>.AssignedPermissions -= CacheRefresherEventHandler_AssignedPermissions;
+
+            //Bind to template events
+
+            FileService.SavedTemplate -= FileServiceSavedTemplate;
+            FileService.DeletedTemplate -= FileServiceDeletedTemplate;
+
+            //Bind to macro events
+
+            MacroService.Saved -= MacroServiceSaved;
+            MacroService.Deleted -= MacroServiceDeleted;
+
+            //Bind to member events
+
+            MemberService.Saved -= MemberServiceSaved;
+            MemberService.Deleted -= MemberServiceDeleted;
+            MemberGroupService.Saved -= MemberGroupService_Saved;
+            MemberGroupService.Deleted -= MemberGroupService_Deleted;
+
+            //Bind to media events
+
+            MediaService.Saved -= MediaServiceSaved;
+            MediaService.Deleted -= MediaServiceDeleted;
+            MediaService.Moved -= MediaServiceMoved;
+            MediaService.Trashed -= MediaServiceTrashed;
+            MediaService.EmptiedRecycleBin -= MediaServiceEmptiedRecycleBin;
+
+            //Bind to content events - this is for unpublished content syncing across servers (primarily for examine)
+
+            ContentService.Saved -= ContentServiceSaved;
+            ContentService.Deleted -= ContentServiceDeleted;
+            ContentService.Copied -= ContentServiceCopied;
+            //TODO: The Move method of the content service fires Saved/Published events during its execution so we don't need to listen to moved
+            //ContentService.Moved -= ContentServiceMoved;
+            ContentService.Trashed -= ContentServiceTrashed;
+            ContentService.EmptiedRecycleBin -= ContentServiceEmptiedRecycleBin;
+
+            PublishingStrategy.Published -= PublishingStrategy_Published;
+            PublishingStrategy.UnPublished -= PublishingStrategy_UnPublished;
+
+            //public access events
+            PublicAccessService.Saved -= PublicAccessService_Saved;
+            PublicAccessService.Deleted -= PublicAccessService_Deleted;
+
+            RelationService.SavedRelationType -= RelationType_Saved;
+            RelationService.DeletedRelationType -= RelationType_Deleted;
         }
 
         #region Publishing

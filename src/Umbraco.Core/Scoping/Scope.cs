@@ -275,6 +275,24 @@ namespace Umbraco.Core.Scoping
             }
             if (exceptions != null)
                 throw new AggregateException("Exceptions were throws by complete actions.", exceptions);
+
+            // run enlisted actions
+            exceptions = null;
+            foreach (var enlisted in Enlisted.Values)
+            {
+                try
+                {
+                    enlisted.Execute(ActionTime.BeforeDispose, completed);
+                }
+                catch (Exception e)
+                {
+                    if (exceptions == null)
+                        exceptions = new List<Exception>();
+                    exceptions.Add(e);
+                }
+            }
+            if (exceptions != null)
+                throw new AggregateException("Exceptions were thrown by listed actions at ActionTime.BeforeDispose.", exceptions);
         }
 
         private IDictionary<string, Action<bool>> ExitActions
@@ -299,5 +317,62 @@ namespace Umbraco.Core.Scoping
         {
             ExitActions[key] = action;
         }
+
+        private IDictionary<string, IEnlistedObject> _enlisted;
+
+        private IDictionary<string, IEnlistedObject> Enlisted
+        {
+            get
+            {
+                if (ParentScope != null) return ParentScope.Enlisted;
+
+                return _enlisted ?? (_enlisted
+                    = new Dictionary<string, IEnlistedObject>());
+            }
+        }
+
+        private interface IEnlistedObject
+        {
+            void Execute(ActionTime actionTime, bool completed);
+        }
+
+        private class EnlistedObject<T> : IEnlistedObject
+        {
+            private readonly Action<ActionTime, bool, T> _action;
+
+            public EnlistedObject(T item, Action<ActionTime, bool, T> action)
+            {
+                Item = item;
+                _action = action;
+            }
+
+            public T Item { get; private set; }
+
+            public void Execute(ActionTime actionTime, bool completed)
+            {
+                _action(actionTime, completed, Item);
+            }
+        }
+
+        public T Enlist<T>(string key, Func<T> creator, Action<ActionTime, bool, T> action)
+        {
+            IEnlistedObject enlisted;
+            if (Enlisted.TryGetValue(key, out enlisted))
+            {
+                var enlistedAs = enlisted as EnlistedObject<T>;
+                if (enlistedAs == null) throw new Exception("An item with a different type has already been enlisted with the same key.");
+                return enlistedAs.Item;
+            }
+            var enlistedOfT = new EnlistedObject<T>(creator(), action);
+            Enlisted[key] = enlistedOfT;
+            return enlistedOfT.Item;
+        }
+    }
+
+    public enum ActionTime
+    {
+        BeforeCommit,
+        BeforeEvent,
+        BeforeDispose
     }
 }
