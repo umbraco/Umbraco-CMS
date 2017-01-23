@@ -360,11 +360,12 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
         public void Save(IDataTypeDefinition dataTypeDefinition, int userId = 0)
-        {
-	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this)) 
-				return;
-
+        {        
             var uow = UowProvider.GetUnitOfWork();
+
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, uow.EventManager))
+                return;
+
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
                 dataTypeDefinition.CreatorId = userId;
@@ -395,27 +396,29 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
         public void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId, bool raiseEvents)
         {
-            if (raiseEvents)
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions), this))
-                    return;
-            }
-
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
-            {
-                foreach (var dataTypeDefinition in dataTypeDefinitions)
-                {
-                    dataTypeDefinition.CreatorId = userId;
-                    repository.AddOrUpdate(dataTypeDefinition);
-                }
-                uow.Commit();
-
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false), this);
-            }
+                {
+                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions), this, uow.EventManager))
+                        return;
+                }
 
-            Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
+                using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+                {
+                    foreach (var dataTypeDefinition in dataTypeDefinitions)
+                    {
+                        dataTypeDefinition.CreatorId = userId;
+                        repository.AddOrUpdate(dataTypeDefinition);
+                    }
+                    uow.Commit();
+
+                    if (raiseEvents)
+                        Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false), this);
+                }
+
+                Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
+            }            
         }
 
         /// <summary>
@@ -501,30 +504,32 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values, int userId = 0)
         {
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this))
-                return;
-
-            // if preValues contain the data type, override the data type definition accordingly
-            if (values != null && values.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
-                dataTypeDefinition.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
-
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                dataTypeDefinition.CreatorId = userId;
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, uow.EventManager))
+                    return;
 
-                //add/update the dtd
-                repository.AddOrUpdate(dataTypeDefinition);
+                // if preValues contain the data type, override the data type definition accordingly
+                if (values != null && values.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
+                    dataTypeDefinition.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
 
-                //add/update the prevalues
-                repository.AddOrUpdatePreValues(dataTypeDefinition, values);
+                using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+                {
+                    dataTypeDefinition.CreatorId = userId;
 
-                uow.Commit();
+                    //add/update the dtd
+                    repository.AddOrUpdate(dataTypeDefinition);
 
-                Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
+                    //add/update the prevalues
+                    repository.AddOrUpdatePreValues(dataTypeDefinition, values);
+
+                    uow.Commit();
+
+                    Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
+                }
+
+                Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
             }
-            
-            Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
@@ -537,21 +542,23 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
         /// <param name="userId">Optional Id of the user issueing the deletion</param>
         public void Delete(IDataTypeDefinition dataTypeDefinition, int userId = 0)
-        {            
-	        if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition), this)) 
-				return;
-	        
-			var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
-	        {
-                repository.Delete(dataTypeDefinition);
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, uow.EventManager))
+                    return;
 
-		        uow.Commit();
+                using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+                {
+                    repository.Delete(dataTypeDefinition);
 
-		        Deleted.RaiseEvent(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this); 		        
-	        }
+                    uow.Commit();
 
-	        Audit(AuditType.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+                    Deleted.RaiseEvent(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
+                }
+
+                Audit(AuditType.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+            }
         }
 
         /// <summary>

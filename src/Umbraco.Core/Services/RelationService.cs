@@ -397,12 +397,13 @@ namespace Umbraco.Core.Services
                 Save(relationType);
 
             var relation = new Relation(parent.Id, child.Id, relationType);
-            if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
-                return relation;
 
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
+                if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this, uow.EventManager))
+                    return relation;
+
                 repository.AddOrUpdate(relation);
                 uow.Commit();
             }
@@ -425,12 +426,13 @@ namespace Umbraco.Core.Services
                 throw new ArgumentNullException(string.Format("No RelationType with Alias '{0}' exists.", relationTypeAlias));
 
             var relation = new Relation(parent.Id, child.Id, relationType);
-            if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
-                return relation;
 
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
+                if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this, uow.EventManager))
+                    return relation;
+
                 repository.AddOrUpdate(relation);
                 uow.Commit();
             }
@@ -545,12 +547,11 @@ namespace Umbraco.Core.Services
         /// <param name="relation">Relation to save</param>
         public void Save(IRelation relation)
         {
-            if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
+                if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this, uow.EventManager))
+                    return;
                 repository.AddOrUpdate(relation);
                 uow.Commit();
             }
@@ -564,12 +565,11 @@ namespace Umbraco.Core.Services
         /// <param name="relationType">RelationType to Save</param>
         public void Save(IRelationType relationType)
         {
-            if (SavingRelationType.IsRaisedEventCancelled(new SaveEventArgs<IRelationType>(relationType), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateRelationTypeRepository(uow))
             {
+                if (SavingRelationType.IsRaisedEventCancelled(new SaveEventArgs<IRelationType>(relationType), this, uow.EventManager))
+                    return;
                 repository.AddOrUpdate(relationType);
                 uow.Commit();
             }
@@ -583,12 +583,11 @@ namespace Umbraco.Core.Services
         /// <param name="relation">Relation to Delete</param>
         public void Delete(IRelation relation)
         {
-            if (DeletingRelation.IsRaisedEventCancelled(new DeleteEventArgs<IRelation>(relation), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
+                if (DeletingRelation.IsRaisedEventCancelled(new DeleteEventArgs<IRelation>(relation), this, uow.EventManager))
+                    return;
                 repository.Delete(relation);
                 uow.Commit();
             }
@@ -602,12 +601,11 @@ namespace Umbraco.Core.Services
         /// <param name="relationType">RelationType to Delete</param>
         public void Delete(IRelationType relationType)
         {
-            if (DeletingRelationType.IsRaisedEventCancelled(new DeleteEventArgs<IRelationType>(relationType), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateRelationTypeRepository(uow))
             {
+                if (DeletingRelationType.IsRaisedEventCancelled(new DeleteEventArgs<IRelationType>(relationType), this, uow.EventManager))
+                    return;
                 repository.Delete(relationType);
                 uow.Commit();
             }

@@ -161,8 +161,8 @@ namespace Umbraco.Core.Services
         /// <param name="eventMessagesFactory"></param>
         public ServiceContext(
             RepositoryFactory repositoryFactory,
-            IScopeUnitOfWorkProvider dbUnitOfWorkProvider, 
-            IUnitOfWorkProvider fileUnitOfWorkProvider, 
+            IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
+            IScopeUnitOfWorkProvider fileUnitOfWorkProvider, 
             BasePublishingStrategy publishingStrategy, 
             CacheHelper cache, 
             ILogger logger,
@@ -188,7 +188,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         private void BuildServiceCache(
             IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
-            IUnitOfWorkProvider fileUnitOfWorkProvider,
+            IScopeUnitOfWorkProvider fileUnitOfWorkProvider,
             BasePublishingStrategy publishingStrategy,
             CacheHelper cache,
             RepositoryFactory repositoryFactory,

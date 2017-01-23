@@ -284,7 +284,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var missingRoles = roleNames.Except(existingRoles);
             var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
 
-            if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(missingGroups), this))
+            if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(missingGroups), this, UnitOfWork.EventManager))
             {
                 return;
             }

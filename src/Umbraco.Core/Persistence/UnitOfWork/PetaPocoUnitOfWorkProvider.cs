@@ -1,98 +1,44 @@
 ﻿using System;
-using System.Data;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
-
-
     /// <summary>
-    /// Represents a Unit of Work Provider for creating a <see cref="PetaPocoUnitOfWork"/>
+    /// Represents a Unit of Work Provider for creating a <see cref="ScopeUnitOfWork"/>
     /// </summary>
-    public class PetaPocoUnitOfWorkProvider : IScopeUnitOfWorkProvider
-    {
-        private readonly IScopeProvider _scopeProvider;
-
+    public class PetaPocoUnitOfWorkProvider : ScopeUnitOfWorkProvider
+    {       
         [Obsolete("Use the constructor specifying an ILogger instead")]
         public PetaPocoUnitOfWorkProvider()
-            : this(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, LoggerResolver.Current.Logger)))
-        {
-
-        }
+            : base(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, LoggerResolver.Current.Logger)))
+        { }
 
         [Obsolete("Use the constructor specifying an ILogger instead")]
         public PetaPocoUnitOfWorkProvider(string connectionString, string providerName)
-            : this(new ScopeProvider(new DefaultDatabaseFactory(connectionString, providerName, LoggerResolver.Current.Logger)))
+            : base(new ScopeProvider(new DefaultDatabaseFactory(connectionString, providerName, LoggerResolver.Current.Logger)))
         { }
 
         /// <summary>
-        /// Parameterless constructor uses defaults
+        /// Constructor
         /// </summary>
         public PetaPocoUnitOfWorkProvider(ILogger logger)
-            : this(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, logger)))
-        {
-
-        }
+            : base(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, logger)))
+        { }
 
         /// <summary>
-        /// Constructor accepting custom connectino string and provider name
+        /// Constructor accepting custom connection string and provider name
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="connectionString">Connection String to use with Database</param>
         /// <param name="providerName">Database Provider for the Connection String</param>
         public PetaPocoUnitOfWorkProvider(ILogger logger, string connectionString, string providerName)
-            : this(new ScopeProvider(new DefaultDatabaseFactory(connectionString, providerName, logger)))
+            : base(new ScopeProvider(new DefaultDatabaseFactory(connectionString, providerName, logger)))
         { }
 
-        /// <summary>
-        /// Constructor accepting a <see cref="IScopeProvider"/> instance
-        /// </summary>
-        /// <param name="scopeProvider"></param>
-        public PetaPocoUnitOfWorkProvider(IScopeProvider scopeProvider)
+        public PetaPocoUnitOfWorkProvider(IScopeProvider scopeProvider) : base(scopeProvider)
         {
-            Mandate.ParameterNotNull(scopeProvider, "scopeProvider");
-            _scopeProvider = scopeProvider;
         }
-
-        #region Implementation of IUnitOfWorkProvider
-        
-        //explicit implementation
-        IDatabaseUnitOfWork IDatabaseUnitOfWorkProvider.GetUnitOfWork()
-        {
-            return new PetaPocoUnitOfWork(_scopeProvider);
-        }
-
-        /// <summary>
-        /// Creates a Unit of work with a new UmbracoDatabase instance for the work item/transaction.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Each PetaPoco UOW uses it's own Database object, not the shared Database object that comes from
-        /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
-        /// and we Dispose of this Database object when the UOW is disposed.
-        /// </remarks>
-        public IScopeUnitOfWork GetUnitOfWork()
-        {
-            return new PetaPocoUnitOfWork(_scopeProvider);
-        }
-
-        /// <summary>
-        /// Creates a Unit of work with a new UmbracoDatabase instance for the work item/transaction.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Each PetaPoco UOW uses it's own Database object, not the shared Database object that comes from
-        /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
-        /// and we Dispose of this Database object when the UOW is disposed.
-        /// </remarks>
-        public IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel)
-        {
-            return new PetaPocoUnitOfWork(_scopeProvider, isolationLevel);
-        }
-
-        #endregion
-      
     }
 }

@@ -177,12 +177,8 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this, uow.EventManager);
             
-            using (var auditRepo = RepositoryFactory.CreateAuditRepository(uow))
-            {
-                auditRepo.AddOrUpdate(new AuditItem(content.Id, string.Format("Content '{0}' was created", name), AuditType.New, content.CreatorId));
-                uow.Commit();
-            }
-
+            Audit(AuditType.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
+            
             return content;
         }
 

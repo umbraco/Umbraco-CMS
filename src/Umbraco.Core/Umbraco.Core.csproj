@@ -512,6 +512,7 @@
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWorkProvider.cs" />
+    <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWorkProvider.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueTypes.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
@@ -1116,7 +1117,7 @@
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
-    <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
     <Compile Include="Profiling\IProfiler.cs" />
     <Compile Include="Profiling\LogProfiler.cs" />

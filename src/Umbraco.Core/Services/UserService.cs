@@ -151,7 +151,7 @@ namespace Umbraco.Core.Services
                 user.AddAllowedSection("content");
                 user.AddAllowedSection("media");
 
-                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
+                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this, uow.EventManager))
                     return user;
 
                 repository.AddOrUpdate(user);
@@ -284,12 +284,11 @@ namespace Umbraco.Core.Services
             }
             else
             {
-                if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(user), this))
-                    return;
-
-                var uow = UowProvider.GetUnitOfWork();
+                using (var uow = UowProvider.GetUnitOfWork())
                 using (var repository = RepositoryFactory.CreateUserRepository(uow))
                 {
+                    if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(user), this, uow.EventManager))
+                        return;
                     repository.Delete(user);
                     uow.Commit();
                 }
@@ -306,15 +305,14 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IUser entity, bool raiseEvents = true)
         {
-            if (raiseEvents)
-            {
-                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(entity), this))
-                    return;
-            }
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
+                if (raiseEvents)
+                {
+                    if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(entity), this, uow.EventManager))
+                        return;
+                }
                 repository.AddOrUpdate(entity);
                 try
                 {
@@ -342,15 +340,14 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IEnumerable<IUser> entities, bool raiseEvents = true)
         {
-            if (raiseEvents)
-            {
-                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(entities), this))
-                    return;
-            }
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
+                if (raiseEvents)
+                {
+                    if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(entities), this, uow.EventManager))
+                        return;
+                }
                 foreach (var member in entities)
                 {
                     repository.AddOrUpdate(member);
@@ -651,15 +648,14 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void SaveUserType(IUserType userType, bool raiseEvents = true)
         {
-            if (raiseEvents)
-            {
-                if (SavingUserType.IsRaisedEventCancelled(new SaveEventArgs<IUserType>(userType), this))
-                    return;
-            }
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateUserTypeRepository(uow))
             {
+                if (raiseEvents)
+                {
+                    if (SavingUserType.IsRaisedEventCancelled(new SaveEventArgs<IUserType>(userType), this, uow.EventManager))
+                        return;
+                }
                 repository.AddOrUpdate(userType);
                 uow.Commit();
             }
@@ -674,12 +670,11 @@ namespace Umbraco.Core.Services
         /// <param name="userType">UserType to delete</param>
         public void DeleteUserType(IUserType userType)
         {
-            if (DeletingUserType.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateUserTypeRepository(uow))
             {
+                if (DeletingUserType.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this, uow.EventManager))
+                    return;
                 repository.Delete(userType);
                 uow.Commit();
             }

@@ -63,17 +63,16 @@ namespace Umbraco.Core.Services
 
         public void Save(IMemberGroup memberGroup, bool raiseEvents = true)
         {
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(memberGroup), this))
-                {
-                    return;
-                }
-            }
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
+                if (raiseEvents)
+                {
+                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(memberGroup), this, uow.EventManager))
+                    {
+                        return;
+                    }
+                }
                 repository.AddOrUpdate(memberGroup);
                 uow.Commit();
             }
@@ -84,12 +83,11 @@ namespace Umbraco.Core.Services
 
         public void Delete(IMemberGroup memberGroup)
         {
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberGroup>(memberGroup), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
+                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberGroup>(memberGroup), this, uow.EventManager))
+                    return;
                 repository.Delete(memberGroup);
                 uow.Commit();
             }

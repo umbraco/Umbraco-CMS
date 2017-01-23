@@ -75,20 +75,19 @@ namespace Umbraco.Core.Services
 
         public void Save(IMemberType memberType, int userId = 0)
         {
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(memberType), this))
-                return;
-
             using (new WriteLock(Locker))
             {
-                var uow = UowProvider.GetUnitOfWork();
+                using (var uow = UowProvider.GetUnitOfWork())
                 using (var repository = RepositoryFactory.CreateMemberTypeRepository(uow))
                 {
+                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(memberType), this, uow.EventManager))
+                        return;
+
                     memberType.CreatorId = userId;
                     repository.AddOrUpdate(memberType);
 
                     uow.Commit();
                 }
-
                 UpdateContentXmlStructure(memberType);
             }
             Saved.RaiseEvent(new SaveEventArgs<IMemberType>(memberType, false), this);
@@ -97,15 +96,14 @@ namespace Umbraco.Core.Services
         public void Save(IEnumerable<IMemberType> memberTypes, int userId = 0)
         {
             var asArray = memberTypes.ToArray();
-
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(asArray), this))
-                return;
-
+            
             using (new WriteLock(Locker))
             {
-                var uow = UowProvider.GetUnitOfWork();
+                using (var uow = UowProvider.GetUnitOfWork())
                 using (var repository = RepositoryFactory.CreateMemberTypeRepository(uow))
                 {
+                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(asArray), this, uow.EventManager))
+                        return;
                     foreach (var memberType in asArray)
                     {
                         memberType.CreatorId = userId;
@@ -123,14 +121,14 @@ namespace Umbraco.Core.Services
 
         public void Delete(IMemberType memberType, int userId = 0)
         {
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(memberType), this))
-                return;
-
             using (new WriteLock(Locker))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(memberType), this, uow.EventManager))
+                    return;
+
                 _memberService.DeleteMembersOfType(memberType.Id);
 
-                var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateMemberTypeRepository(uow))
                 {
                     repository.Delete(memberType);
@@ -144,18 +142,18 @@ namespace Umbraco.Core.Services
         public void Delete(IEnumerable<IMemberType> memberTypes, int userId = 0)
         {
             var asArray = memberTypes.ToArray();
-
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(asArray), this))
-                return;
-
+            
             using (new WriteLock(Locker))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(asArray), this, uow.EventManager))
+                    return;
+
                 foreach (var contentType in asArray)
                 {
                     _memberService.DeleteMembersOfType(contentType.Id);
                 }
 
-                var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateMemberTypeRepository(uow))
                 {
                     foreach (var memberType in asArray)
@@ -166,7 +164,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(asArray, false), this);
-                }                
+                }
             }
         }
 

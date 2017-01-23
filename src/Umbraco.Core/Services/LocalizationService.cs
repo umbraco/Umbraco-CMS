@@ -88,7 +88,7 @@ namespace Umbraco.Core.Services
                     item.Translations = translations;
                 }
 
-                if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(item), this))
+                if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(item), this, uow.EventManager))
                     return item;
 
                 repository.AddOrUpdate(item);
@@ -220,12 +220,12 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the dictionary item</param>
         public void Save(IDictionaryItem dictionaryItem, int userId = 0)
         {
-            if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(dictionaryItem), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateDictionaryRepository(uow))
             {
+                if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(dictionaryItem), this, uow.EventManager))
+                    return;
+
                 repository.AddOrUpdate(dictionaryItem);
                 uow.Commit();
                 //ensure the lazy Language callback is assigned
@@ -245,12 +245,12 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user deleting the dictionary item</param>
         public void Delete(IDictionaryItem dictionaryItem, int userId = 0)
         {
-            if (DeletingDictionaryItem.IsRaisedEventCancelled(new DeleteEventArgs<IDictionaryItem>(dictionaryItem), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateDictionaryRepository(uow))
             {
+                if (DeletingDictionaryItem.IsRaisedEventCancelled(new DeleteEventArgs<IDictionaryItem>(dictionaryItem), this, uow.EventManager))
+                    return;
+
                 //NOTE: The recursive delete is done in the repository
                 repository.Delete(dictionaryItem);
                 uow.Commit();
@@ -320,12 +320,12 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the language</param>
         public void Save(ILanguage language, int userId = 0)
         {
-            if (SavingLanguage.IsRaisedEventCancelled(new SaveEventArgs<ILanguage>(language), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateLanguageRepository(uow))
             {
+                if (SavingLanguage.IsRaisedEventCancelled(new SaveEventArgs<ILanguage>(language), this, uow.EventManager))
+                    return;
+
                 repository.AddOrUpdate(language);
                 uow.Commit();
             }
@@ -342,12 +342,12 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user deleting the language</param>
         public void Delete(ILanguage language, int userId = 0)
         {
-            if (DeletingLanguage.IsRaisedEventCancelled(new DeleteEventArgs<ILanguage>(language), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateLanguageRepository(uow))
             {
+                if (DeletingLanguage.IsRaisedEventCancelled(new DeleteEventArgs<ILanguage>(language), this, uow.EventManager))
+                    return;
+
                 //NOTE: There isn't any constraints in the db, so possible references aren't deleted
                 repository.Delete(language);
                 uow.Commit();

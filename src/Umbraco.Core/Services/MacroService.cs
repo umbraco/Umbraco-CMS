@@ -139,17 +139,17 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user deleting the macro</param>
         public void Delete(IMacro macro, int userId = 0)
         {
-			if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMacro>(macro), this))
-				return;
+            using (var uow = UowProvider.GetUnitOfWork())
+            using (var repository = RepositoryFactory.CreateMacroRepository(uow))
+            {
+                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMacro>(macro), this, uow.EventManager))
+                    return;
 
-			var uow = UowProvider.GetUnitOfWork();
-			using (var repository = RepositoryFactory.CreateMacroRepository(uow))
-			{
-				repository.Delete(macro);
-				uow.Commit();
+                repository.Delete(macro);
+                uow.Commit();
 
-				Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this);
-			}
+                Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this);
+            }
 
 			Audit(AuditType.Delete, "Delete Macro performed by user", userId, -1);
         }
@@ -161,17 +161,17 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user deleting the macro</param>
         public void Save(IMacro macro, int userId = 0)
         {
-	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this)) 
-				return;
-	        
-			var uow = UowProvider.GetUnitOfWork();
-	        using (var repository = RepositoryFactory.CreateMacroRepository(uow))
-	        {
-		        repository.AddOrUpdate(macro);
-		        uow.Commit();
+            using (var uow = UowProvider.GetUnitOfWork())
+            using (var repository = RepositoryFactory.CreateMacroRepository(uow))
+            {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this, uow.EventManager))
+                    return;
 
-		        Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
-	        }
+                repository.AddOrUpdate(macro);
+                uow.Commit();
+
+                Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
+            }
 
 	        Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
         }

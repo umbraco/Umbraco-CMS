@@ -230,7 +230,7 @@ namespace Umbraco.Core.Services
                     var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
                     var members = repository.GetByQuery(query).ToArray();
 
-                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(members), this))
+                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(members), this, uow.EventManager))
                         return;
 
                     foreach (var member in members)
@@ -853,15 +853,15 @@ namespace Umbraco.Core.Services
 
             var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType);
 
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
-            {
-                member.WasCancelled = true;
-                return member;
-            }
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this, uow.EventManager))
+                {
+                    member.WasCancelled = true;
+                    return member;
+                }
+
                 repository.AddOrUpdate(member);
                 //insert the xml
                 repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
@@ -945,12 +945,12 @@ namespace Umbraco.Core.Services
         /// <param name="member"><see cref="IMember"/> to Delete</param>
         public void Delete(IMember member)
         {
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(member), this))
-                return;
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
+                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(member), this, uow.EventManager))
+                    return;
+
                 repository.Delete(member);
                 uow.Commit();
 
@@ -970,17 +970,16 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IMember entity, bool raiseEvents = true)
         {
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(entity), this))
-                {
-                    return;
-                }
-            }
-
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
+                if (raiseEvents)
+                {
+                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(entity), this, uow.EventManager))
+                    {
+                        return;
+                    }
+                }
                 repository.AddOrUpdate(entity);
                 repository.AddOrUpdateContentXml(entity, m => _entitySerializer.Serialize(_dataTypeService, m));
                 // generate preview for blame history?
@@ -1005,17 +1004,18 @@ namespace Umbraco.Core.Services
         public void Save(IEnumerable<IMember> entities, bool raiseEvents = true)
         {
             var asArray = entities.ToArray();
-
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(asArray), this))
-                    return;
-            }
+            
             using (new WriteLock(Locker))
             {
-                var uow = UowProvider.GetUnitOfWork();
+                using (var uow = UowProvider.GetUnitOfWork())
                 using (var repository = RepositoryFactory.CreateMemberRepository(uow))
                 {
+                    if (raiseEvents)
+                    {
+                        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(asArray), this, uow.EventManager))
+                            return;
+                    }
+
                     foreach (var member in asArray)
                     {
                         repository.AddOrUpdate(member);

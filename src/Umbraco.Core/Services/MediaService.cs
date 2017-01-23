@@ -67,19 +67,24 @@ namespace Umbraco.Core.Services
             var parent = GetById(media.ParentId);
             media.Path = string.Concat(parent.IfNotNull(x => x.Path, media.ParentId.ToString()), ",", media.Id);
 
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                media.WasCancelled = true;
+                if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this, uow.EventManager))
+                {
+                    media.WasCancelled = true;
+                    return media;
+                }
+
+                media.CreatorId = userId;
+
+                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
+
+                Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
+
                 return media;
             }
 
-            media.CreatorId = userId;
-
-            Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
-
-            Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
-
-            return media;
+               
         }
 
         /// <summary>
@@ -104,19 +109,22 @@ namespace Umbraco.Core.Services
             var media = new Models.Media(name, parent, mediaType);
             media.Path = string.Concat(parent.Path, ",", media.Id);
 
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                media.WasCancelled = true;
+                if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this, uow.EventManager))
+                {
+                    media.WasCancelled = true;
+                    return media;
+                }
+
+                media.CreatorId = userId;
+
+                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
+
+                Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
+
                 return media;
             }
-
-            media.CreatorId = userId;
-
-            Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
-
-            Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
-
-            return media;
         }
 
         /// <summary>
@@ -137,21 +145,22 @@ namespace Umbraco.Core.Services
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parentId, mediaType);
 
+            var uow = UowProvider.GetUnitOfWork();
+
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this, uow.EventManager))
             {
                 media.WasCancelled = true;
                 return media;
             }
 
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this, uow.EventManager))
             {
                 media.WasCancelled = true;
                 return media;
             }
 
-            var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateMediaRepository(uow))
             {
                 media.CreatorId = userId;
@@ -196,21 +205,22 @@ namespace Umbraco.Core.Services
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parent, mediaType);
 
+            var uow = UowProvider.GetUnitOfWork();
+
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this, uow.EventManager))
             {
                 media.WasCancelled = true;
                 return media;
             }
 
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this, uow.EventManager))
             {
                 media.WasCancelled = true;
                 return media;
             }
-
-            var uow = UowProvider.GetUnitOfWork();
+            
             using (var repository = RepositoryFactory.CreateMediaRepository(uow))
             {
                 media.CreatorId = userId;
@@ -934,7 +944,7 @@ namespace Umbraco.Core.Services
 
                     files = ((MediaRepository)repository).GetFilesInRecycleBinForUploadField();
 
-                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, entities, files), this))
+                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, entities, files), this, uow.EventManager))
                         return;
 
                     success = repository.EmptyRecycleBin();
@@ -969,7 +979,7 @@ namespace Umbraco.Core.Services
                     var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
                     var contents = repository.GetByQuery(query).ToArray();
 
-                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(contents), this))
+                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(contents), this, uow.EventManager))
                         return;
 
                     foreach (var content in contents.OrderByDescending(x => x.ParentId))
@@ -1164,13 +1174,15 @@ namespace Umbraco.Core.Services
         public bool Sort(IEnumerable<IMedia> items, int userId = 0, bool raiseEvents = true)
         {
             var asArray = items.ToArray();
+
+            var uow = UowProvider.GetUnitOfWork();
+
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(asArray), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(asArray), this, uow.EventManager))
                     return false;
             }
 
-            var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateMediaRepository(uow))
             {
                 int i = 0;

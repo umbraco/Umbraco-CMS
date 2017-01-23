@@ -719,12 +719,13 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the ContentType</param>
         public void Save(IContentType contentType, int userId = 0)
         {
-	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this))
-				return;
-
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
+
+                if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this, uow.EventManager))
+                    return;
+
                 using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                 {
                     ValidateLocked(contentType); // throws if invalid
@@ -749,12 +750,13 @@ namespace Umbraco.Core.Services
         {
             var asArray = contentTypes.ToArray();
 
-            if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(asArray), this))
-				return;
-
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
+
+                if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(asArray), this, uow.EventManager))
+                    return;
+
                 using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                 {
                     // all-or-nothing, validate them all first
@@ -785,13 +787,14 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user issueing the delete</param>
         /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
         public void Delete(IContentType contentType, int userId = 0)
-        {
-	        if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentType), this))
-				return;
-
+        {	        
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
+
+                if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentType), this, uow.EventManager))
+                    return;
+
                 using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                 {
                     //TODO: This needs to change, if we are deleting a content type, we should just delete the data,
@@ -828,14 +831,15 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public void Delete(IEnumerable<IContentType> contentTypes, int userId = 0)
         {
-            var asArray = contentTypes.ToArray();
-
-            if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(asArray), this))
-				return;
+            var asArray = contentTypes.ToArray();            
 
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
+
+                if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(asArray), this, uow.EventManager))
+                    return;
+
                 using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                 {
                     var deletedContentTypes = new List<IContentType>();
@@ -1173,12 +1177,13 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user saving the MediaType</param>
         public void Save(IMediaType mediaType, int userId = 0)
         {
-	        if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaType), this))
-				return;
-
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
+
+                if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaType), this, uow.EventManager))
+                    return;
+
                 using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
                 {
                     ValidateLocked(mediaType); // throws if invalid
@@ -1203,13 +1208,14 @@ namespace Umbraco.Core.Services
         public void Save(IEnumerable<IMediaType> mediaTypes, int userId = 0)
         {
             var asArray = mediaTypes.ToArray();
-
-            if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(asArray), this))
-				return;
-
+            
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
+
+                if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(asArray), this, uow.EventManager))
+                    return;
+
                 using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
                 {
                     // all-or-nothing, validate them all first
@@ -1241,14 +1247,16 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user deleting the MediaType</param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IMediaType mediaType, int userId = 0)
-        {
-	        if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaType), this))
-				return;
+        {	        
             using (new WriteLock(Locker))
             {
+                var uow = UowProvider.GetUnitOfWork();
+                
+                if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaType), this, uow.EventManager))
+                    return;
+
                 _mediaService.DeleteMediaOfType(mediaType.Id, userId);
 
-                var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
                 {
                     var deletedMediaTypes = new List<IMediaType>() {mediaType};
@@ -1273,17 +1281,19 @@ namespace Umbraco.Core.Services
         public void Delete(IEnumerable<IMediaType> mediaTypes, int userId = 0)
         {
             var asArray = mediaTypes.ToArray();
-
-            if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(asArray), this))
-				return;
+            
             using (new WriteLock(Locker))
             {
+                var uow = UowProvider.GetUnitOfWork();
+
+                if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(asArray), this, uow.EventManager))
+                    return;
+
                 foreach (var mediaType in asArray)
                 {
                     _mediaService.DeleteMediaOfType(mediaType.Id);
                 }
-
-                var uow = UowProvider.GetUnitOfWork();
+                
                 using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
                 {
                     var deletedMediaTypes = new List<IMediaType>();
