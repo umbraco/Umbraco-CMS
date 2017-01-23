@@ -50,7 +50,7 @@ namespace Umbraco.Core.Services
         /// <returns>Alias of the default MemberType</returns>
         public string GetDefaultMemberType()
         {
-            using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 var types = repository.GetAll(new int[] { }).Select(x => x.Alias).ToArray();
 
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Services
         /// <returns><c>True</c> if the Member exists otherwise <c>False</c></returns>
         public bool Exists(string username)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Exists(username);
             }
@@ -121,7 +121,7 @@ namespace Umbraco.Core.Services
         /// <returns><c>True</c> if the Member exists otherwise <c>False</c></returns>
         public bool Exists(int id)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Exists(id);
             }
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember GetById(int id)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Get(id);
             }
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember GetByKey(Guid id)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 var query = Query<IMember>.Builder.Where(x => x.Key == id);
                 var member = repository.GetByQuery(query).FirstOrDefault();
@@ -164,7 +164,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 var query = Query<IMember>.Builder.Where(x => x.ContentTypeAlias == memberTypeAlias);
                 var members = repository.GetByQuery(query);
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByMemberType(int memberTypeId)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 repository.Get(memberTypeId);
                 var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByGroup(string memberGroupName)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetByMemberGroup(memberGroupName);
             }
@@ -209,7 +209,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetAllMembers(params int[] ids)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetAll(ids);
             }
@@ -223,21 +223,31 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                using (var uow = UowProvider.GetUnitOfWork())
+                var memberList = new List<IMember>();
+
+                var uow = UowProvider.GetUnitOfWork();
+                using (var repository = RepositoryFactory.CreateMemberRepository(uow))
                 {
-                    var repository = RepositoryFactory.CreateMemberRepository(uow);
                     //TODO: What about content that has the contenttype as part of its composition?
                     var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
                     var members = repository.GetByQuery(query).ToArray();
 
                     if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(members), this, uow.EventManager))
+                    {
+                        uow.Commit();
                         return;
-
+                    }
                     foreach (var member in members)
                     {
-                        //Permantly delete the member
-                        Delete(member);
+                        //track the memer for deletion which will be done outside this uow
+                        memberList.Add(member);
                     }
+                }
+
+                foreach (var member in memberList)
+                {
+                    //Permantly delete the member
+                    Delete(member);
                 }
             }
         }
@@ -263,7 +273,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 var query = new Query<IMember>();
@@ -314,7 +324,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 var query = new Query<IMember>();
@@ -365,7 +375,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 var query = new Query<IMember>();
@@ -404,7 +414,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 IQuery<IMember> query;
 
@@ -460,7 +470,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 IQuery<IMember> query;
 
@@ -518,7 +528,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 var query =
                     Query<IMember>.Builder.Where(
@@ -540,7 +550,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 IQuery<IMember> query;
 
@@ -601,7 +611,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         public void RebuildXmlStructures(params int[] memberTypeIds)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 repository.RebuildXmlStructures(
@@ -628,7 +638,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="System.int"/> with number of Members for passed in type</returns>
         public int GetCount(MemberCountType countType)
         {
-            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 IQuery<IMember> query;
 
@@ -685,7 +695,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
@@ -712,7 +722,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField, string memberTypeAlias, string filter)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 if (memberTypeAlias == null)
@@ -732,7 +742,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="System.int"/> with number of Members</returns>
         public int Count(string memberTypeAlias = null)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 return repository.Count(memberTypeAlias);
@@ -853,11 +863,12 @@ namespace Umbraco.Core.Services
 
             var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType);
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this, uow.EventManager))
                 {
+                    uow.Commit();
                     member.WasCancelled = true;
                     return member;
                 }
@@ -872,10 +883,10 @@ namespace Umbraco.Core.Services
                 }
 
                 uow.Commit();
-            }
 
-            Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
-            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this);
+                Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this, uow.EventManager);
+                Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this, uow.EventManager);
+            }
 
             return member;
         }
@@ -908,7 +919,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember GetByEmail(string email)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 var query = Query<IMember>.Builder.Where(x => x.Email.Equals(email));
@@ -929,7 +940,7 @@ namespace Umbraco.Core.Services
             // a caching mechanism since this method is used by all the membership providers and could be
             // called quite a bit when dealing with members.
 
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 var query = Query<IMember>.Builder.Where(x => x.Username.Equals(username));
@@ -945,17 +956,20 @@ namespace Umbraco.Core.Services
         /// <param name="member"><see cref="IMember"/> to Delete</param>
         public void Delete(IMember member)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(member), this, uow.EventManager))
+                {
+                    uow.Commit();
                     return;
+                }
 
                 repository.Delete(member);
                 uow.Commit();
 
                 var args = new DeleteEventArgs<IMember>(member, false);
-                Deleted.RaiseEvent(args, this);
+                Deleted.RaiseEvent(args, this, uow.EventManager);
 
                 //remove any flagged media files
                 repository.DeleteMediaFiles(args.MediaFilesToDelete);
@@ -977,6 +991,7 @@ namespace Umbraco.Core.Services
                 {
                     if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(entity), this, uow.EventManager))
                     {
+                        uow.Commit();
                         return;
                     }
                 }
@@ -989,10 +1004,11 @@ namespace Umbraco.Core.Services
                 }
 
                 uow.Commit();
-            }
 
-            if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IMember>(entity, false), this);
+                if (raiseEvents)
+                    Saved.RaiseEvent(new SaveEventArgs<IMember>(entity, false), this, uow.EventManager);
+            }
+            
         }
 
         /// <summary>
@@ -1007,13 +1023,16 @@ namespace Umbraco.Core.Services
             
             using (new WriteLock(Locker))
             {
-                using (var uow = UowProvider.GetUnitOfWork())
+                var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateMemberRepository(uow))
                 {
                     if (raiseEvents)
                     {
                         if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(asArray), this, uow.EventManager))
+                        {
+                            uow.Commit();
                             return;
+                        }
                     }
 
                     foreach (var member in asArray)
@@ -1029,10 +1048,12 @@ namespace Umbraco.Core.Services
 
                     //commit the whole lot in one go
                     uow.Commit();
+
+                    if (raiseEvents)
+                        Saved.RaiseEvent(new SaveEventArgs<IMember>(asArray, false), this, uow.EventManager);
                 }
 
-                if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMember>(asArray, false), this);
+                
             }
         }
 
