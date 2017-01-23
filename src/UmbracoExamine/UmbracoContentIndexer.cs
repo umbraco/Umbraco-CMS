@@ -497,7 +497,7 @@ namespace UmbracoExamine
                                 IContent[] descendants;
                                 if (SupportUnpublishedContent)
                                 {
-                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total).ToArray();
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "umbracoNode.id").ToArray();
                                 }
                                 else
                                 {
