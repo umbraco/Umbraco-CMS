@@ -46,15 +46,16 @@ namespace Umbraco.Core.Services
 
                     if (SavingContainer.IsRaisedEventCancelled(
                         new SaveEventArgs<EntityContainer>(container, evtMsgs),
-                        this))
+                        this, uow.EventManager))
                     {
+                        uow.Commit();
                         return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
                     }
 
                     repo.AddOrUpdate(container);
                     uow.Commit();
 
-                    SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
+                    SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this, uow.EventManager);
                     //TODO: Audit trail ?
 
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
@@ -68,7 +69,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContainer(int containerId)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
@@ -78,7 +79,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContainer(Guid containerId)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
@@ -88,7 +89,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 return repo.Get(name, level);
@@ -112,7 +113,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 return repo.GetAll(containerIds);
@@ -137,7 +138,7 @@ namespace Umbraco.Core.Services
 
             if (SavingContainer.IsRaisedEventCancelled(
                         new SaveEventArgs<EntityContainer>(container, evtMsgs),
-                        this))
+                        this, UowProvider))
             {
                 return OperationStatus.Cancelled(evtMsgs);
             }
@@ -147,9 +148,8 @@ namespace Umbraco.Core.Services
             {
                 repo.AddOrUpdate(container);
                 uow.Commit();
+                SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this, uow.EventManager);
             }
-
-            SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
 
             //TODO: Audit trail ?
 
@@ -167,15 +167,16 @@ namespace Umbraco.Core.Services
 
                 if (DeletingContainer.IsRaisedEventCancelled(
                         new DeleteEventArgs<EntityContainer>(container, evtMsgs),
-                        this))
+                        this, uow.EventManager))
                 {
+                    uow.Commit();
                     return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
                 }
 
                 repo.Delete(container);
                 uow.Commit();
 
-                DeletedContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
+                DeletedContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this, uow.EventManager);
 
                 return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
@@ -191,7 +192,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionByName(string name)
         {
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetByQuery(new Query<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
             }
@@ -204,7 +205,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(int id)
         {
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.Get(id);
             }
@@ -217,7 +218,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(Guid id)
         {
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 var query = Query<IDataTypeDefinition>.Builder.Where(x => x.Key == id);
                 var definitions = repository.GetByQuery(query);
@@ -245,7 +246,7 @@ namespace Umbraco.Core.Services
         /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
         public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias)
         {
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 var query = Query<IDataTypeDefinition>.Builder.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
                 var definitions = repository.GetByQuery(query);
@@ -261,7 +262,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDataTypeDefinition"/> objects</returns>
         public IEnumerable<IDataTypeDefinition> GetAllDataTypeDefinitions(params int[] ids)
         {
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetAll(ids);
             }
@@ -274,7 +275,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of string values</returns>
         public IEnumerable<string> GetPreValuesByDataTypeId(int id)
         {
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 var collection = repository.GetPreValuesCollectionByDataTypeId(id);
                 //now convert the collection to a string list
@@ -292,7 +293,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int id)
         {
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetPreValuesCollectionByDataTypeId(id);
             }
@@ -305,7 +306,7 @@ namespace Umbraco.Core.Services
         /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int id)
         {
-            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 return repository.GetPreValueAsString(id);
             }
@@ -317,7 +318,7 @@ namespace Umbraco.Core.Services
 
             if (Moving.IsRaisedEventCancelled(
                   new MoveEventArgs<IDataTypeDefinition>(evtMsgs, new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)),
-                  this))
+                  this, UowProvider))
             {
                 return Attempt.Fail(
                     new OperationStatus<MoveOperationStatusType>(
@@ -346,9 +347,8 @@ namespace Umbraco.Core.Services
                         new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
                 }
                 uow.Commit();
+                Moved.RaiseEvent(new MoveEventArgs<IDataTypeDefinition>(false, evtMsgs, moveInfo.ToArray()), this, uow.EventManager);
             }
-
-            Moved.RaiseEvent(new MoveEventArgs<IDataTypeDefinition>(false, evtMsgs, moveInfo.ToArray()), this);
 
             return Attempt.Succeed(
                 new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
@@ -362,17 +362,18 @@ namespace Umbraco.Core.Services
         public void Save(IDataTypeDefinition dataTypeDefinition, int userId = 0)
         {        
             var uow = UowProvider.GetUnitOfWork();
-
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, uow.EventManager))
-                return;
-
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, uow.EventManager))
+                {
+                    uow.Commit();
+                    return;
+                }
                 dataTypeDefinition.CreatorId = userId;
                 repository.AddOrUpdate(dataTypeDefinition);
                 uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
+                Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this, uow.EventManager);
             }
 
             Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
@@ -396,29 +397,29 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
         public void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId, bool raiseEvents)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
                 if (raiseEvents)
                 {
                     if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions), this, uow.EventManager))
-                        return;
-                }
-
-                using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
-                {
-                    foreach (var dataTypeDefinition in dataTypeDefinitions)
                     {
-                        dataTypeDefinition.CreatorId = userId;
-                        repository.AddOrUpdate(dataTypeDefinition);
+                        uow.Commit();
+                        return;
                     }
-                    uow.Commit();
-
-                    if (raiseEvents)
-                        Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false), this);
                 }
+                foreach (var dataTypeDefinition in dataTypeDefinitions)
+                {
+                    dataTypeDefinition.CreatorId = userId;
+                    repository.AddOrUpdate(dataTypeDefinition);
+                }
+                uow.Commit();
 
-                Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
-            }            
+                if (raiseEvents)
+                    Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false), this, uow.EventManager);
+            }
+
+            Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -433,25 +434,20 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                using (var transaction = uow.Database.GetTransaction())
-                {
-                    var sortOrderObj =
+                var sortOrderObj =
                     uow.Database.ExecuteScalar<object>(
                         "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeId });
-                    int sortOrder;
-                    if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
-                    {
-                        sortOrder = 1;
-                    }
+                int sortOrder;
+                if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
+                {
+                    sortOrder = 1;
+                }
 
-                    foreach (var value in values)
-                    {
-                        var dto = new DataTypePreValueDto { DataTypeNodeId = dataTypeId, Value = value, SortOrder = sortOrder };
-                        uow.Database.Insert(dto);
-                        sortOrder++;
-                    }
-
-                    transaction.Complete();
+                foreach (var value in values)
+                {
+                    var dto = new DataTypePreValueDto { DataTypeNodeId = dataTypeId, Value = value, SortOrder = sortOrder };
+                    uow.Database.Insert(dto);
+                    sortOrder++;
                 }
             }
         }
@@ -504,32 +500,30 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values, int userId = 0)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, UowProvider))
+                return;
+
+            // if preValues contain the data type, override the data type definition accordingly
+            if (values != null && values.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
+                dataTypeDefinition.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, uow.EventManager))
-                    return;
+                dataTypeDefinition.CreatorId = userId;
 
-                // if preValues contain the data type, override the data type definition accordingly
-                if (values != null && values.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
-                    dataTypeDefinition.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
+                //add/update the dtd
+                repository.AddOrUpdate(dataTypeDefinition);
 
-                using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
-                {
-                    dataTypeDefinition.CreatorId = userId;
+                //add/update the prevalues
+                repository.AddOrUpdatePreValues(dataTypeDefinition, values);
 
-                    //add/update the dtd
-                    repository.AddOrUpdate(dataTypeDefinition);
+                uow.Commit();
 
-                    //add/update the prevalues
-                    repository.AddOrUpdatePreValues(dataTypeDefinition, values);
-
-                    uow.Commit();
-
-                    Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
-                }
-
-                Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+                Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this, uow.EventManager);
             }
+
+            Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
@@ -543,22 +537,20 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user issueing the deletion</param>
         public void Delete(IDataTypeDefinition dataTypeDefinition, int userId = 0)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, UowProvider))
+                return;
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
-                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, uow.EventManager))
-                    return;
+                repository.Delete(dataTypeDefinition);
 
-                using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
-                {
-                    repository.Delete(dataTypeDefinition);
+                uow.Commit();
 
-                    uow.Commit();
-
-                    Deleted.RaiseEvent(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
-                }
-
-                Audit(AuditType.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+                Deleted.RaiseEvent(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this, uow.EventManager);
             }
+
+            Audit(AuditType.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
