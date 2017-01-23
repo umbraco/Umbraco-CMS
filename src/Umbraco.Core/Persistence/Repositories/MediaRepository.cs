@@ -76,7 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IMedia>(sqlClause, query);
             var sql = translator.Translate()
-                                .OrderBy<NodeDto>(x => x.SortOrder);
+                                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
             return ProcessQuery(sql);
         }
@@ -89,12 +89,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<ContentVersionDto>()
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .From<ContentVersionDto>(SqlSyntax)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId, SqlSyntax)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId, SqlSyntax);
             return sql;
         }
 
@@ -148,6 +148,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var content = new IMedia[dtos.Count];
             var defs = new List<DocumentDefinition>();
 
+            //track the looked up content types, even though the content types are cached
+            // they still need to be deep cloned out of the cache and we don't want to add
+            // the overhead of deep cloning them on every item in this loop
+            var contentTypes = new Dictionary<int, IMediaType>();
+
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
@@ -165,9 +170,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 // else, need to fetch from the database
                 // content type repository is full-cache so OK to get each one independently
-                var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
-                var factory = new MediaFactory(contentType, NodeObjectTypeId, dto.NodeId);
-                content[i] = factory.BuildEntity(dto);
+
+                IMediaType contentType;
+                if (contentTypes.ContainsKey(dto.ContentDto.ContentTypeId))
+                {
+                    contentType = contentTypes[dto.ContentDto.ContentTypeId];
+                }
+                else
+                {
+                    contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+                    contentTypes[dto.ContentDto.ContentTypeId] = contentType;
+                }
+                
+                content[i] = MediaFactory.BuildEntity(dto, contentType);
 
                 // need properties
                 defs.Add(new DocumentDefinition(
@@ -195,7 +210,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
-                ((Entity) cc).ResetDirtyProperties(false);
+                cc.ResetDirtyProperties(false);
             }
 
             return content;
@@ -205,26 +220,16 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
             var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
 
-            var mediaType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+            var content = CreateMediaFromDto(dto, versionId, sql);
 
-            var factory = new MediaFactory(mediaType, NodeObjectTypeId, dto.NodeId);
-            var media = factory.BuildEntity(dto);
-
-            var properties = GetPropertyCollection(sql, new[] { new DocumentDefinition(dto.NodeId, dto.VersionId, media.UpdateDate, media.CreateDate, mediaType) });
-
-            media.Properties = properties[dto.NodeId];
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)media).ResetDirtyProperties(false);
-            return media;
+            return content;
         }
 
         public void RebuildXmlStructures(Func<IMedia, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null)
@@ -245,7 +250,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     query = query
                         .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
                 query = query
-                    .Where<NodeDto>(x => x.NodeId > baseId)
+                    .Where<NodeDto>(x => x.NodeId > baseId, SqlSyntax)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
                 var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
@@ -512,9 +517,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private IMedia CreateMediaFromDto(ContentVersionDto dto, Guid versionId, Sql docSql)
         {
             var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
-
-            var factory = new MediaFactory(contentType, NodeObjectTypeId, dto.NodeId);
-            var media = factory.BuildEntity(dto);
+            
+            var media = MediaFactory.BuildEntity(dto, contentType);
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
 
