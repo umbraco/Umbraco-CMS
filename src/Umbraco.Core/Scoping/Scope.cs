@@ -368,11 +368,4 @@ namespace Umbraco.Core.Scoping
             return enlistedOfT.Item;
         }
     }
-
-    public enum ActionTime
-    {
-        BeforeCommit,
-        BeforeEvent,
-        BeforeDispose
-    }
 }

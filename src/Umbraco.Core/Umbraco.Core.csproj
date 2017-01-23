@@ -510,6 +510,7 @@
     <Compile Include="Publishing\UnPublishedStatusType.cs" />
     <Compile Include="Publishing\UnPublishStatus.cs" />
     <Compile Include="SafeCallContext.cs" />
+    <Compile Include="Scoping\ActionTime.cs" />
     <Compile Include="Scoping\IScope.cs" />
     <Compile Include="Scoping\IScopeProvider.cs" />
     <Compile Include="Scoping\IScopeProviderInternal.cs" />
