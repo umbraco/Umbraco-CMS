@@ -174,6 +174,7 @@
     <Compile Include="Scoping\ScopedRepositoryTests.cs" />
     <Compile Include="Scoping\NoScopedEventManagerTests.cs" />
     <Compile Include="Scoping\ScopedEventManagerTests.cs" />
+    <Compile Include="Scoping\ScopedXmlTests.cs" />
     <Compile Include="Scoping\ScopeTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TryConvertToTests.cs" />

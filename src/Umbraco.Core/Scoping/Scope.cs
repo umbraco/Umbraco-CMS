@@ -314,5 +314,17 @@ namespace Umbraco.Core.Scoping
         {
             ExitActions[key] = action;
         }
+
+        public T Enlist<T>(string key, Func<T> creator, Action<ActionTime, bool, T> action)
+        {
+            return creator();
+        }
+
+        public enum ActionTime
+        {
+            BeforeCommit,
+            BeforeEvent,
+            BeforeDispose
+        }
     }
 }

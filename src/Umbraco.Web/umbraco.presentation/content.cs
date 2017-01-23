@@ -4,12 +4,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using System.Xml;
-using System.Xml.Linq;
-using System.Xml.XPath;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
@@ -22,12 +18,12 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Scheduling;
 using File = System.IO.File;
 using Node = umbraco.NodeFactory.Node;
-using Task = System.Threading.Tasks.Task;
 
 namespace umbraco
 {
@@ -36,6 +32,7 @@ namespace umbraco
     /// </summary>
     public class content
     {
+        private readonly IScopeProviderInternal _scopeProvider = (IScopeProviderInternal) ApplicationContext.Current.ScopeProvider;
         private XmlCacheFilePersister _persisterTask;
 
         private volatile bool _released;
@@ -84,7 +81,7 @@ namespace umbraco
             }
 
             // initialize content - populate the cache
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
                 bool registerXmlChange;
 
@@ -93,7 +90,7 @@ namespace umbraco
                 LoadXmlLocked(safeXml, out registerXmlChange);
                 // if we use the file and registerXmlChange is true this will
                 // write to file, else it will not
-                safeXml.Commit(registerXmlChange);
+                safeXml.AcceptChanges(registerXmlChange);
             }
         }
 
@@ -120,7 +117,6 @@ namespace umbraco
         private static readonly object DbReadSyncLock = new object();
 
         private const string XmlContextContentItemKey = "UmbracoXmlContextContent";
-        private const string XmlContextClonedContentItemKey = "UmbracoXmlContextContent.cloned";
         private static string _umbracoXmlDiskCacheFileName = string.Empty;
         private volatile XmlDocument _xmlContent;
 
@@ -149,7 +145,11 @@ namespace umbraco
         // not work as expected for a double check lock because properties are treated differently in the clr.
         public virtual bool isInitializing
         {
-            get { return _xmlContent == null; }
+            get
+            {
+                // ok to access _xmlContent here
+                return _xmlContent == null;
+            }
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace umbraco
         /// <param name="parentId">The parent node identifier.</param>
         public void SortNodes(int parentId)
         {
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
                 var parentNode = parentId == -1
                     ? safeXml.Xml.DocumentElement
@@ -266,7 +266,7 @@ namespace umbraco
 
                 if (sorted == false) return;
 
-                safeXml.Commit();
+                safeXml.AcceptChanges();
             }
         }
 
@@ -339,7 +339,7 @@ namespace umbraco
             if (c.HasPublishedVersion == false) return;
             if (c.WasPropertyDirty("SortOrder") == false) return;
 
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
                 //TODO: This can be null: safeXml.Xml!!!!
 
@@ -354,7 +354,7 @@ namespace umbraco
                 // only if node was actually modified
                 attr.Value = sortOrder;
 
-                safeXml.Commit();
+                safeXml.AcceptChanges();
             }
         }
 
@@ -456,7 +456,8 @@ namespace umbraco
                 if (x == null)
                     return;
 
-                safeXml.UpgradeToWriter(false);
+                if (safeXml.IsWriter == false)
+                    safeXml.UpgradeToWriter();
 
                 // Find the document in the xml cache
                 x = safeXml.Xml.GetElementById(id.ToString());
@@ -464,7 +465,7 @@ namespace umbraco
                 {
                     // The document already exists in cache, so repopulate it
                     x.ParentNode.RemoveChild(x);
-                    safeXml.Commit();
+                    safeXml.AcceptChanges();
                 }
             }
         }
@@ -609,6 +610,7 @@ namespace umbraco
         }
 
         // to be used by content.Instance
+        // ok to access _xmlContent here - just capturing
         protected internal virtual XmlDocument XmlContentInternal
         {
             get
@@ -619,6 +621,7 @@ namespace umbraco
         }
 
         // assumes xml lock
+        // ok to access _xmlContent here since this is called from the safe reader/writer
         private void SetXmlLocked(XmlDocument xml, bool registerXmlChange)
         {
             // this is the ONLY place where we write to _xmlContent
@@ -692,66 +695,102 @@ namespace umbraco
         // gets a locked safe read access to the main xml
         private SafeXmlReaderWriter GetSafeXmlReader()
         {
-            var releaser = _xmlLock.Lock();
-            return SafeXmlReaderWriter.GetReader(this, releaser);
+            return SafeXmlReaderWriter.GetReader(_scopeProvider, this);
         }
 
         // gets a locked safe write access to the main xml (cloned)
-        private SafeXmlReaderWriter GetSafeXmlWriter(bool auto = true)
+        private SafeXmlReaderWriter GetSafeXmlWriter()
         {
-            var releaser = _xmlLock.Lock();
-            return SafeXmlReaderWriter.GetWriter(this, releaser, auto);
+            return SafeXmlReaderWriter.GetWriter(_scopeProvider, this);
         }
 
+        // provides safe access to the Xml cache
         private class SafeXmlReaderWriter : IDisposable
         {
             private readonly content _instance;
+            private readonly bool _scoped;
             private IDisposable _releaser;
             private bool _isWriter;
-            private bool _auto;
-            private bool _committed;
+            private bool _applyChanges;
             private XmlDocument _xml;
+            private bool _using;
+            private bool _registerXmlChange;
 
-            private SafeXmlReaderWriter(content instance, IDisposable releaser, bool isWriter, bool auto)
+            private SafeXmlReaderWriter(content instance, IDisposable releaser, bool isWriter, bool scoped)
             {
                 _instance = instance;
                 _releaser = releaser;
                 _isWriter = isWriter;
-                _auto = auto;
+                _scoped = scoped;
 
                 // cloning for writer is not an option anymore (see XmlIsImmutable)
                 _xml = _isWriter ? Clone(instance._xmlContent) : instance._xmlContent;
             }
 
-            public static SafeXmlReaderWriter GetReader(content instance, IDisposable releaser)
+            public static SafeXmlReaderWriter GetReader(IScopeProviderInternal scopeProvider, content instance)
             {
-                return new SafeXmlReaderWriter(instance, releaser, false, false);
+                return GetReaderWriter(scopeProvider, instance, false);
             }
 
-            public static SafeXmlReaderWriter GetWriter(content instance, IDisposable releaser, bool auto)
+            public static SafeXmlReaderWriter GetWriter(IScopeProviderInternal scopeProvider, content instance)
             {
-                return new SafeXmlReaderWriter(instance, releaser, true, auto);
+                return GetReaderWriter(scopeProvider, instance, true);
             }
 
-            public void UpgradeToWriter(bool auto)
+            private static SafeXmlReaderWriter GetReaderWriter(IScopeProviderInternal scopeProvider, content instance, bool writer)
+            {
+                var iscope = scopeProvider.AmbientScope;
+
+                // no real scope = just create a reader/writer instance
+                // not so clean that we have to deal with NoScope/Scope here but... in v8 NoScope will go away
+                if (iscope == null || iscope is NoScope)
+                {
+                    // obtain exclusive access to xml and create reader/writer
+                    var releaser = instance._xmlLock.Lock();
+                    return new SafeXmlReaderWriter(instance, releaser, writer, false);
+                }
+
+                var scope = iscope as Scope;
+
+                // get or create an enlisted reader/writer
+                var rw = scope.Enlist("safeXmlReaderWriter",
+                    () => // creator
+                    {
+                        // obtain exclusive access to xml and create reader/writer
+                        var releaser = instance._xmlLock.Lock();
+                        return new SafeXmlReaderWriter(instance, releaser, writer, true);
+                    },
+                    (actionTime, completed, item) => // action
+                    {
+                        if (actionTime != Scope.ActionTime.BeforeDispose) return;
+                        item.DisposeForReal(completed);
+                    });
+
+                // ensure it's not already in-use - should never happen, just being super safe
+                if (rw._using)
+                    throw new InvalidOperationException();
+                rw._using = true;
+
+                return rw;
+            }
+
+            public bool IsWriter { get { return _isWriter; } }
+
+            public void UpgradeToWriter()
             {
                 if (_isWriter)
-                    throw new InvalidOperationException("Already writing.");
+                    throw new InvalidOperationException("Already a writer.");
                 _isWriter = true;
-                _auto = auto;
                 _xml = Clone(_xml); // cloning for writer is not an option anymore (see XmlIsImmutable)
             }
 
             public XmlDocument Xml
             {
-                get
-                {
-                    return _xml;
-                }
+                get { return _xml; }
                 set
                 {
                     if (_isWriter == false)
-                        throw new InvalidOperationException("Not writing.");
+                        throw new InvalidOperationException("Not a writer.");
                     _xml = value;
                 }
             }
@@ -759,24 +798,33 @@ namespace umbraco
             // registerXmlChange indicates whether to do what should be done when Xml changes,
             // that is, to request that the file be written to disk - something we don't want
             // to do if we're committing Xml precisely after we've read from disk!
-            public void Commit(bool registerXmlChange = true)
+            public void AcceptChanges(bool registerXmlChange = true)
             {
                 if (_isWriter == false)
-                    throw new InvalidOperationException("Not writing.");
-                _instance.SetXmlLocked(Xml, registerXmlChange);
-                _committed = true;
+                    throw new InvalidOperationException("Not a writer.");
+
+                _applyChanges = true;
+                _registerXmlChange |= registerXmlChange;
             }
 
-            public void Dispose()
+            private void DisposeForReal(bool completed)
             {
-                if (_releaser == null)
-                    return;
-                if (_isWriter && _auto && _committed == false)
-                    Commit();
+                // apply changes!
+                if (_isWriter && _applyChanges && completed)
+                    _instance.SetXmlLocked(_xml, _registerXmlChange);
+
+                // release the lock
                 _releaser.Dispose();
                 _releaser = null;
             }
 
+            public void Dispose()
+            {
+                _using = false;
+
+                if (_scoped == false)
+                    DisposeForReal(true);
+            }
         }
 
         private static string ChildNodesXPath
@@ -836,7 +884,8 @@ namespace umbraco
 
             try
             {
-                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
+                // ok to access _xmlContent here - capture (atomic + volatile), immutable anyway
+                var xml = _xmlContent;
                 if (xml == null) return;
 
                 // delete existing file, if any
@@ -950,11 +999,11 @@ namespace umbraco
 
             // time to read
 
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
                 bool registerXmlChange;
                 LoadXmlLocked(safeXml, out registerXmlChange); // updates _lastFileRead
-                safeXml.Commit(registerXmlChange);
+                safeXml.AcceptChanges(registerXmlChange);
             }
         }
 
