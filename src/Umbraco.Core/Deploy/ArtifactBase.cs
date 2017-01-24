@@ -17,7 +17,7 @@ namespace Umbraco.Core.Deploy
                 throw new ArgumentNullException("udi");
             Udi = udi;
 
-            Dependencies = dependencies ?? Enumerable.Empty<ArtifactDependency>();
+            Dependencies = dependencies != null ? dependencies.OrderBy(x => x.Udi) : Enumerable.Empty<ArtifactDependency>();
             _checksum = new Lazy<string>(GetChecksum);
         }
 

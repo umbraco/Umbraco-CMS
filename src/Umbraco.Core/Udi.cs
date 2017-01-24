@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.Metadata.Edm;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core.Deploy;
-using EntityContainer = System.Data.Metadata.Edm.EntityContainer;
 
 namespace Umbraco.Core
 {
@@ -14,7 +10,7 @@ namespace Umbraco.Core
     /// Represents an entity identifier.
     /// </summary>
     /// <remarks>An Udi can be fully qualified or "closed" eg umb://document/{guid} or "open" eg umb://document.</remarks>
-    public abstract class Udi
+    public abstract class Udi : IComparable<Udi>
     {
         private static readonly Dictionary<string, UdiType> UdiTypes = new Dictionary<string, UdiType>();
         private static readonly ConcurrentDictionary<string, Udi> RootUdis = new ConcurrentDictionary<string, Udi>();
@@ -75,6 +71,11 @@ namespace Umbraco.Core
         /// Gets the entity type part of the identifier.
         /// </summary>
         public string EntityType { get; private set; }
+
+        public int CompareTo(Udi other)
+        {
+            return string.Compare(UriValue.ToString(), other.UriValue.ToString(), StringComparison.InvariantCultureIgnoreCase);
+        }
 
         public override string ToString()
         {
