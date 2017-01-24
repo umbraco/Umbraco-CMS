@@ -70,61 +70,88 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IContent> PerformGetAll(params int[] ids)
         {
-            var sql = GetBaseQuery(false);
-            if (ids.Any())
+            Func<Sql, Sql> translate = s =>
             {
-                sql.Where("umbracoNode.id in (@ids)", new { ids });
-            }
+                if (ids.Any())
+                {
+                    s.Where("umbracoNode.id in (@ids)", new { ids });
+                }
+                //we only want the newest ones with this method
+                s.Where<DocumentDto>(x => x.Newest, SqlSyntax);
+                return s;
+            };
+            
+            var sqlBaseFull = GetBaseQuery(BaseQueryType.Full);
+            var sqlBaseIds = GetBaseQuery(BaseQueryType.Ids);
 
-            //we only want the newest ones with this method
-            sql.Where<DocumentDto>(x => x.Newest, SqlSyntax);
-
-            return ProcessQuery(sql);
+            return ProcessQuery(translate(sqlBaseFull), translate(sqlBaseIds));
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
         {
-            var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<IContent>(sqlClause, query);
-            var sql = translator.Translate()
-                                .Where<DocumentDto>(x => x.Newest, SqlSyntax)
-                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax)
-                                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
+            var sqlBaseFull = GetBaseQuery(BaseQueryType.Full);
+            var sqlBaseIds = GetBaseQuery(BaseQueryType.Ids);
 
-            return ProcessQuery(sql);
+            Func<SqlTranslator<IContent>, Sql> translate = (translator) =>
+            {
+                return translator.Translate()
+                    .Where<DocumentDto>(x => x.Newest, SqlSyntax)
+                    .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax)
+                    .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
+            };
+
+            var translatorFull = new SqlTranslator<IContent>(sqlBaseFull, query);
+            var translatorIds = new SqlTranslator<IContent>(sqlBaseIds, query);
+
+            return ProcessQuery(translate(translatorFull), translate(translatorIds));
         }
 
         #endregion        
 
         #region Overrides of PetaPocoRepositoryBase<IContent>
 
-
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql GetBaseQuery(BaseQueryType queryType)
         {
-            var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=1)",
+            var sql = new Sql();
+            sql.Select(queryType == BaseQueryType.Count ? "COUNT(*)" : (queryType == BaseQueryType.Ids ? "cmsDocument.nodeId" : "*"))
+                .From<DocumentDto>(SqlSyntax)
+                .InnerJoin<ContentVersionDto>(SqlSyntax)
+                .On<DocumentDto, ContentVersionDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+
+            if (queryType == BaseQueryType.Full)
+            {
+                //The only reason we apply this left outer join is to be able to pull back the DocumentPublishedReadOnlyDto
+                //information with the entire data set, so basically this will get both the latest document and also it's published
+                //version if it has one. When performing a count or when just retrieving Ids like in paging, this is unecessary 
+                //and causes huge performance overhead for the SQL server, especially when sorting the result. 
+                //To fix this perf overhead we'd need another index on :
+                // CREATE NON CLUSTERED INDEX ON cmsDocument.node + cmsDocument.published
+
+                var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=1)",
                 SqlSyntax.GetQuotedTableName("cmsDocument"),
                 SqlSyntax.GetQuotedTableName("cmsDocument2"),
                 SqlSyntax.GetQuotedColumnName("nodeId"),
                 SqlSyntax.GetQuotedColumnName("published"));
 
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<DocumentDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-
                 // cannot do this because PetaPoco does not know how to alias the table
                 //.LeftOuterJoin<DocumentPublishedReadOnlyDto>()
                 //.On<DocumentDto, DocumentPublishedReadOnlyDto>(left => left.NodeId, right => right.NodeId)
                 // so have to rely on writing our own SQL
-                .Append(sqlx/*, new { @published = true }*/)
+                sql.Append(sqlx /*, new { @published = true }*/);
+            }
 
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId, SqlSyntax);
+
             return sql;
+        }
+
+        protected override Sql GetBaseQuery(bool isCount)
+        {
+            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.Full);
         }
 
         protected override string GetBaseWhereClause()
@@ -173,20 +200,32 @@ namespace Umbraco.Core.Persistence.Repositories
             // not bring much safety - so this reverts to updating each record individually,
             // and it may be slower in the end, but should be more resilient.
 
-            var baseId = 0;
             var contentTypeIdsA = contentTypeIds == null ? new int[0] : contentTypeIds.ToArray();
+
+            Func<int, Sql, Sql> translate = (bId, sql) =>
+            {
+                if (contentTypeIdsA.Length > 0)
+                {
+                    sql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+                }
+
+                sql
+                    .Where<NodeDto>(x => x.NodeId > bId && x.Trashed == false, SqlSyntax)
+                    .Where<DocumentDto>(x => x.Published, SqlSyntax)
+                    .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
+
+                return sql;
+            };
+
+            var baseId = 0;
+            
             while (true)
             {
                 // get the next group of nodes
-                var query = GetBaseQuery(false);
-                if (contentTypeIdsA.Length > 0)
-                    query = query
-                        .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
-                query = query
-                    .Where<NodeDto>(x => x.NodeId > baseId && x.Trashed == false, SqlSyntax)
-                    .Where<DocumentDto>(x => x.Published, SqlSyntax)
-                    .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
-                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
+                var sqlFull = translate(baseId, GetBaseQuery(BaseQueryType.Full));
+                var sqlIds = translate(baseId, GetBaseQuery(BaseQueryType.Ids));
+
+                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(sqlFull, groupSize), SqlSyntax.SelectTop(sqlIds, groupSize))
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
                     .ToList();
 
@@ -212,10 +251,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override IEnumerable<IContent> GetAllVersions(int id)
         {
-            var sql = GetBaseQuery(false)
-                .Where(GetBaseWhereClause(), new { Id = id })
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
-            return ProcessQuery(sql, true);
+            Func<Sql, Sql> translate = s =>
+            {
+                return s.Where(GetBaseWhereClause(), new {Id = id})
+                    .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+            };
+
+            var sqlFull = translate(GetBaseQuery(BaseQueryType.Full));
+            var sqlIds = translate(GetBaseQuery(BaseQueryType.Ids));
+            
+            return ProcessQuery(sqlFull, sqlIds, true);
         }
 
         public override IContent GetByVersion(Guid versionId)
@@ -616,19 +661,25 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query)
         {
+            Func<SqlTranslator<IContent>, Sql> translate = t =>
+            {
+                return t.Translate()
+                    .Where<DocumentDto>(x => x.Published, SqlSyntax)
+                    .OrderBy<NodeDto>(x => x.Level, SqlSyntax)
+                    .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
+            };
+
             // we WANT to return contents in top-down order, ie parents should come before children
             // ideal would be pure xml "document order" which can be achieved with:
             // ORDER BY substring(path, 1, len(path) - charindex(',', reverse(path))), sortOrder
             // but that's probably an overkill - sorting by level,sortOrder should be enough
 
-            var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<IContent>(sqlClause, query);
-            var sql = translator.Translate()
-                                .Where<DocumentDto>(x => x.Published, SqlSyntax)
-                                .OrderBy<NodeDto>(x => x.Level, SqlSyntax)
-                                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
+            var sqlFull = GetBaseQuery(BaseQueryType.Full);
+            var translatorFull = new SqlTranslator<IContent>(sqlFull, query);
+            var sqlIds = GetBaseQuery(BaseQueryType.Ids);
+            var translatorIds = new SqlTranslator<IContent>(sqlIds, query);
 
-            return ProcessQuery(sql, true);
+            return ProcessQuery(translate(translatorFull), translate(translatorIds), true);
         }
         
         /// <summary>
@@ -806,9 +857,9 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             
             Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);
 
-            return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
+            return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsDocument", "nodeId"),
-                sql => ProcessQuery(sql), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }
@@ -839,10 +890,21 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IContent> ProcessQuery(Sql sql, bool withCache = false)
+        /// <summary>
+        /// This is the underlying method that processes most queries for this repository
+        /// </summary>
+        /// <param name="sqlFull">
+        /// The full SQL with the outer join to return all data required to create an IContent
+        /// </param>
+        /// <param name="sqlIds">
+        /// The Id SQL without the outer join to just return all document ids - used to process the properties for the content item
+        /// </param>
+        /// <param name="withCache"></param>
+        /// <returns></returns>
+        private IEnumerable<IContent> ProcessQuery(Sql sqlFull, Sql sqlIds, bool withCache = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sqlFull);
             if (dtos.Count == 0) return Enumerable.Empty<IContent>();
 
             var content = new IContent[dtos.Count];
@@ -905,7 +967,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
                 .ToDictionary(x => x.Id, x => x);
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sql, defs);
+            var propertyData = GetPropertyCollection(sqlIds, defs);
 
             // assign
             var dtoIndex = 0;

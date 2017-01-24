@@ -84,11 +84,11 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Overrides of PetaPocoRepositoryBase<int,IMedia>
-
-        protected override Sql GetBaseQuery(bool isCount)
+        
+        protected override Sql GetBaseQuery(BaseQueryType queryType)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
+            sql.Select(queryType == BaseQueryType.Count ? "COUNT(*)" : (queryType == BaseQueryType.Ids ? "cmsContentVersion.contentId" : "*"))
                 .From<ContentVersionDto>(SqlSyntax)
                 .InnerJoin<ContentDto>(SqlSyntax)
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
@@ -96,6 +96,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId, SqlSyntax)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId, SqlSyntax);
             return sql;
+        }
+
+        protected override Sql GetBaseQuery(bool isCount)
+        {
+            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.Full);
         }
 
         protected override string GetBaseWhereClause()
@@ -500,9 +505,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
             }
 
-            return GetPagedResultsByQuery<ContentVersionDto, Models.Media>(query, pageIndex, pageSize, out totalRecords,
+            return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsContentVersion", "contentId"),
-                sql => ProcessQuery(sql), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }
