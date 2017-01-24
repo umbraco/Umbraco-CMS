@@ -84,19 +84,19 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public void OnExit(string key, Action action)
+        public T Enlist<T>(string key, Func<T> creator)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public void OnExit(string key, Action<bool> action)
+        public T Enlist<T>(string key, Func<T> creator, ActionTime actionTimes, Action<ActionTime, bool, T> action)
         {
             throw new NotImplementedException();
         }
 
-        // fixme
-        public T Enlist<T>(string key, Func<T> creator, Action<ActionTime, bool, T> action)
+        /// <inheritdoc />
+        public void Enlist(string key, ActionTime actionTimes, Action<ActionTime, bool> action)
         {
             throw new NotImplementedException();
         }

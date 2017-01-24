@@ -30,8 +30,9 @@ namespace Umbraco.Core.Cache
         private void RegisterDirty()
         {
             // use unique names to de-duplicate
-            _scope.OnExit("dirty_" + typeof (TEntity).Name, 
-                () => _globalIsolatedCache.ClearAllCache());
+            // enlisting multiple times is not a problem
+            _scope.Enlist("dirty_" + typeof (TEntity).Name, ActionTime.BeforeDispose,
+                (actionTime, completed) => { if (completed) _globalIsolatedCache.ClearAllCache(); });
         }
 
         public TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)

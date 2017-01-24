@@ -421,7 +421,7 @@ namespace Umbraco.Tests.Scoping
 
         [TestCase(true)]
         [TestCase(false)]
-        public void ScopeAction(bool complete)
+        public void ScopeEnlist(bool complete)
         {
             var scopeProvider = DatabaseContext.ScopeProvider;
 
@@ -430,7 +430,7 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
             {
-                ((Scope) scope).OnExit("name", x => completed = x);
+                scope.Enlist("name", ActionTime.BeforeDispose, (a, c) => { completed = c; });
                 if (complete)
                     scope.Complete();
             }

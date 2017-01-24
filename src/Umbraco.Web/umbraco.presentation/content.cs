@@ -759,9 +759,9 @@ namespace umbraco
                         var releaser = instance._xmlLock.Lock();
                         return new SafeXmlReaderWriter(instance, releaser, writer, true);
                     },
+                    ActionTime.BeforeDispose,
                     (actionTime, completed, item) => // action
                     {
-                        if (actionTime != ActionTime.BeforeDispose) return;
                         item.DisposeForReal(completed);
                     });
 

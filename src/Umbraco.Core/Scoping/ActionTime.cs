@@ -1,9 +1,13 @@
-﻿namespace Umbraco.Core.Scoping
+﻿using System;
+
+namespace Umbraco.Core.Scoping
 {
+    [Flags]
     public enum ActionTime
     {
-        BeforeCommit,
-        BeforeEvent,
-        BeforeDispose
+        None = 0,
+        BeforeCommit = 1,
+        BeforeEvent = 2,
+        BeforeDispose = 4
     }
 }

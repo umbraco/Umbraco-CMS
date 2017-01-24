@@ -22,7 +22,7 @@ namespace Umbraco.Core.Scoping
         private IsolatedRuntimeCache _isolatedRuntimeCache;
         private UmbracoDatabase _database;
         private IList<EventMessage> _messages;
-        private IDictionary<string, Action<bool>> _exitActions;
+        private IDictionary<string, IEnlistedObject> _enlisted;
 
         // this is v7, in v8 this has to change to RepeatableRead
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
@@ -258,31 +258,18 @@ namespace Umbraco.Core.Scoping
                 }
             }
 
-            // run everything we need to run when completing
-            List<Exception> exceptions = null;
-            foreach (var action in ExitActions.Values)
-            {
-                try
-                {
-                    action(completed); // fixme try catch and everything
-                }
-                catch (Exception e)
-                {
-                    if (exceptions == null)
-                        exceptions = new List<Exception>();
-                    exceptions.Add(e);
-                }
-            }
-            if (exceptions != null)
-                throw new AggregateException("Exceptions were throws by complete actions.", exceptions);
-
             // run enlisted actions
-            exceptions = null;
+            RunEnlisted(ActionTime.BeforeDispose, completed);
+        }
+
+        private void RunEnlisted(ActionTime actionTime, bool completed)
+        {
+            List<Exception> exceptions = null;
             foreach (var enlisted in Enlisted.Values)
             {
                 try
                 {
-                    enlisted.Execute(ActionTime.BeforeDispose, completed);
+                    enlisted.Execute(actionTime, completed);
                 }
                 catch (Exception e)
                 {
@@ -292,33 +279,8 @@ namespace Umbraco.Core.Scoping
                 }
             }
             if (exceptions != null)
-                throw new AggregateException("Exceptions were thrown by listed actions at ActionTime.BeforeDispose.", exceptions);
+                throw new AggregateException("Exceptions were thrown by listed actions at ActionTime " + actionTime + ".", exceptions);
         }
-
-        private IDictionary<string, Action<bool>> ExitActions
-        {
-            get
-            {
-                if (ParentScope != null) return ParentScope.ExitActions;
-
-                return _exitActions ?? (_exitActions
-                    = new Dictionary<string, Action<bool>>());
-            }
-        }
-
-        /// <inheritdoc />
-        public void OnExit(string key, Action action)
-        {
-            ExitActions[key] = completed => { if (completed) action(); };
-        }
-
-        /// <inheritdoc />
-        public void OnExit(string key, Action<bool> action)
-        {
-            ExitActions[key] = action;
-        }
-
-        private IDictionary<string, IEnlistedObject> _enlisted;
 
         private IDictionary<string, IEnlistedObject> Enlisted
         {
@@ -338,11 +300,19 @@ namespace Umbraco.Core.Scoping
 
         private class EnlistedObject<T> : IEnlistedObject
         {
+            private readonly ActionTime _actionTimes;
             private readonly Action<ActionTime, bool, T> _action;
 
-            public EnlistedObject(T item, Action<ActionTime, bool, T> action)
+            public EnlistedObject(T item)
             {
                 Item = item;
+                _actionTimes = ActionTime.None;
+            }
+
+            public EnlistedObject(T item, ActionTime actionTimes, Action<ActionTime, bool, T> action)
+            {
+                Item = item;
+                _actionTimes = actionTimes;
                 _action = action;
             }
 
@@ -350,11 +320,13 @@ namespace Umbraco.Core.Scoping
 
             public void Execute(ActionTime actionTime, bool completed)
             {
-                _action(actionTime, completed, Item);
+                if (_actionTimes.HasFlag(actionTime))
+                    _action(actionTime, completed, Item);
             }
         }
 
-        public T Enlist<T>(string key, Func<T> creator, Action<ActionTime, bool, T> action)
+        /// <inheritdoc />
+        public T Enlist<T>(string key, Func<T> creator)
         {
             IEnlistedObject enlisted;
             if (Enlisted.TryGetValue(key, out enlisted))
@@ -363,9 +335,38 @@ namespace Umbraco.Core.Scoping
                 if (enlistedAs == null) throw new Exception("An item with a different type has already been enlisted with the same key.");
                 return enlistedAs.Item;
             }
-            var enlistedOfT = new EnlistedObject<T>(creator(), action);
+            var enlistedOfT = new EnlistedObject<T>(creator());
             Enlisted[key] = enlistedOfT;
             return enlistedOfT.Item;
+        }
+
+        /// <inheritdoc />
+        public T Enlist<T>(string key, Func<T> creator, ActionTime actionTimes, Action<ActionTime, bool, T> action)
+        {
+            IEnlistedObject enlisted;
+            if (Enlisted.TryGetValue(key, out enlisted))
+            {
+                var enlistedAs = enlisted as EnlistedObject<T>;
+                if (enlistedAs == null) throw new Exception("An item with a different type has already been enlisted with the same key.");
+                return enlistedAs.Item;
+            }
+            var enlistedOfT = new EnlistedObject<T>(creator(), actionTimes, action);
+            Enlisted[key] = enlistedOfT;
+            return enlistedOfT.Item;
+        }
+
+        /// <inheritdoc />
+        public void Enlist(string key, ActionTime actionTimes, Action<ActionTime, bool> action)
+        {
+            IEnlistedObject enlisted;
+            if (Enlisted.TryGetValue(key, out enlisted))
+            {
+                var enlistedAs = enlisted as EnlistedObject<object>;
+                if (enlistedAs == null) throw new Exception("An item with a different type has already been enlisted with the same key.");
+                return;
+            }
+            var enlistedOfT = new EnlistedObject<object>(null, actionTimes, (actionTime, completed, item) => action(actionTime, completed));
+            Enlisted[key] = enlistedOfT;
         }
     }
 }
