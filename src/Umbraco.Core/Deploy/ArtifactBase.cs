@@ -17,11 +17,12 @@ namespace Umbraco.Core.Deploy
                 throw new ArgumentNullException("udi");
             Udi = udi;
 
-            Dependencies = dependencies != null ? dependencies.OrderBy(x => x.Udi) : Enumerable.Empty<ArtifactDependency>();
+            Dependencies = dependencies ?? Enumerable.Empty<ArtifactDependency>();
             _checksum = new Lazy<string>(GetChecksum);
         }
 
         private readonly Lazy<string> _checksum;
+        private IEnumerable<ArtifactDependency> _dependencies;
 
         protected abstract string GetChecksum();
 
@@ -40,7 +41,11 @@ namespace Umbraco.Core.Deploy
             get { return _checksum.Value; }
         }
 
-        public IEnumerable<ArtifactDependency> Dependencies { get; set; }
+        public IEnumerable<ArtifactDependency> Dependencies
+        {
+            get { return _dependencies; }
+            set { _dependencies = value.OrderBy(x => x.Udi); }
+        }
 
         #endregion
     }
