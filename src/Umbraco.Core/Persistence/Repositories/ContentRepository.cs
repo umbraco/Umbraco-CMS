@@ -625,13 +625,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
-                                .Where<DocumentDto>(x => x.Published)
+                                .Where<DocumentDto>(x => x.Published, SqlSyntax)
                                 .OrderBy<NodeDto>(x => x.Level, SqlSyntax)
                                 .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
             return ProcessQuery(sql, true);
         }
-
+        
         /// <summary>
         /// This builds the Xml document used for the XML cache
         /// </summary>
@@ -663,10 +663,14 @@ namespace Umbraco.Core.Persistence.Repositories
             parent.Attributes.Append(pIdAtt);
             xmlDoc.AppendChild(parent);
 
-            const string sql = @"select umbracoNode.id, umbracoNode.parentID, umbracoNode.sortOrder, cmsContentXml.xml, umbracoNode.level from umbracoNode
+            //Ensure that only nodes that have published versions are selected
+            var sql = string.Format(@"select umbracoNode.id, umbracoNode.parentID, umbracoNode.sortOrder, cmsContentXml.{0}, umbracoNode.{1} from umbracoNode
 inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
 where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1)
-order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
+order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
+                SqlSyntax.GetQuotedColumnName("xml"),
+                SqlSyntax.GetQuotedColumnName("level"),
+                SqlSyntax.GetQuotedColumnName("level"));
 
             XmlElement last = null;
 

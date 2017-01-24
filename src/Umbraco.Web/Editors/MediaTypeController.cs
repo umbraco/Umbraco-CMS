@@ -11,6 +11,8 @@ using System.Net;
 using System.Net.Http;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Services;
+using Umbraco.Core.Models.EntityBase;
+using System;
 
 namespace Umbraco.Web.Editors
 {
@@ -174,7 +176,22 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentId"></param>
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
-        public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
+        public IEnumerable<ContentTypeBasic> GetAllowedChildren(string contentId)
+        {
+            Guid idGuid = Guid.Empty;
+            int idInt;
+            if (Guid.TryParse(contentId, out idGuid)) { 
+                var entity = ApplicationContext.Services.EntityService.GetByKey(idGuid);
+                return GetAllowedChildrenInternal(entity.Id);
+            } else if (int.TryParse(contentId, out idInt))
+            {
+                return GetAllowedChildrenInternal(idInt);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+
+        private IEnumerable<ContentTypeBasic> GetAllowedChildrenInternal(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
                 return Enumerable.Empty<ContentTypeBasic>();

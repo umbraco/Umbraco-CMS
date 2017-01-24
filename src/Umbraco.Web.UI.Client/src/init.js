@@ -1,6 +1,6 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache',
-    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache) {
+app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService',
+    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
@@ -13,6 +13,11 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
 
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function(evt, data) {
+
+            //Removes all stored LocalStorage browser items - that may contain sensitive data
+            //So if a machine or computer is shared and a new user logs in, we clear out the previous persons localStorage items
+            localStorageService.clearAll();
+
             assetsService._loadInitAssets().then(function() {
                 appState.setGlobalState("isReady", true);
 

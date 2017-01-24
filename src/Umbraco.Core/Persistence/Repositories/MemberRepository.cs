@@ -381,7 +381,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
             return ProcessQuery(sql, true);
-        }
+        }        
 
         public void RebuildXmlStructures(Func<IMember, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null)
         {

@@ -503,30 +503,6 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Gets paged media descendants as XML by path
-        /// </summary>
-        /// <param name="path">Path starts with</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records the query would return without paging</param>
-        /// <returns>A paged enumerable of XML entries of media items</returns>
-        public IEnumerable<XElement> GetPagedXmlEntriesByPath(string path, long pageIndex, int pageSize, out long totalRecords)
-        {
-            Sql query;
-            if (path == "-1")
-            {
-                query = new Sql().Select("nodeId, xml").From("cmsContentXml").Where("nodeId IN (SELECT id FROM umbracoNode WHERE nodeObjectType = @0)", Guid.Parse(Constants.ObjectTypes.Media)).OrderBy("nodeId");
-            }
-            else
-            {
-                query = new Sql().Select("nodeId, xml").From("cmsContentXml").Where("nodeId IN (SELECT id FROM umbracoNode WHERE path LIKE @0)", path.EnsureEndsWith(",%")).OrderBy("nodeId");
-            }
-            var pagedResult = Database.Page<ContentXmlDto>(pageIndex+1, pageSize, query);
-            totalRecords = pagedResult.TotalItems;
-            return pagedResult.Items.Select(dto => XElement.Parse(dto.Xml));
-        }
-
-        /// <summary>
         /// Private method to create a media object from a ContentDto
         /// </summary>
         /// <param name="d"></param>

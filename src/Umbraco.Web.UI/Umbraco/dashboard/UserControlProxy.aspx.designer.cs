@@ -49,6 +49,15 @@ namespace Umbraco.Web.UI.Umbraco.Dashboard {
         protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
         
         /// <summary>
+        /// JsInclude4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude4;
+        
+        /// <summary>
         /// JsInclude6 control.
         /// </summary>
         /// <remarks>
