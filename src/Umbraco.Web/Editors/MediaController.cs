@@ -176,7 +176,7 @@ namespace Umbraco.Web.Editors
         /// Returns the child media objects
         /// </summary>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(string id,
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildrenByString(string id,
             int pageNumber = 0,
             int pageSize = 0,
             string orderBy = "SortOrder",

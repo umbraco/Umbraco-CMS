@@ -176,16 +176,16 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentId"></param>
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
-        public IEnumerable<ContentTypeBasic> GetAllowedChildren(string contentId)
+        public IEnumerable<ContentTypeBasic> GetAllowedChildrenByString(string contentId)
         {
             Guid idGuid = Guid.Empty;
             int idInt;
             if (Guid.TryParse(contentId, out idGuid)) { 
                 var entity = ApplicationContext.Services.EntityService.GetByKey(idGuid);
-                return GetAllowedChildrenInternal(entity.Id);
+                return GetAllowedChildren(entity.Id);
             } else if (int.TryParse(contentId, out idInt))
             {
-                return GetAllowedChildrenInternal(idInt);
+                return GetAllowedChildren(idInt);
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -196,7 +196,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentId"></param>
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
-        public IEnumerable<ContentTypeBasic> GetAllowedChildrenInternal(int contentId)
+        public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
                 return Enumerable.Empty<ContentTypeBasic>();
