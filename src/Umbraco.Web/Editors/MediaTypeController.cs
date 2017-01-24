@@ -191,7 +191,12 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
-        private IEnumerable<ContentTypeBasic> GetAllowedChildrenInternal(int contentId)
+        /// <summary>
+        /// Returns the allowed child content type objects for the content item id passed in
+        /// </summary>
+        /// <param name="contentId"></param>
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public IEnumerable<ContentTypeBasic> GetAllowedChildrenInternal(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
                 return Enumerable.Empty<ContentTypeBasic>();

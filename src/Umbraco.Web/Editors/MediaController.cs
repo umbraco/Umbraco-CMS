@@ -206,7 +206,11 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
-        private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
+        /// <summary>
+        /// Returns the child media objects
+        /// </summary>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
             int pageNumber = 0,
             int pageSize = 0,
             string orderBy = "SortOrder",
