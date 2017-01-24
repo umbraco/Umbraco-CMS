@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,6 +50,26 @@ namespace Umbraco.Core.Deploy
         /// <returns>A string containing the file content.</returns>
         /// <remarks>Returns null if no content could be read.</remarks>
         Task<string> GetFileContentAsync(StringUdi udi, CancellationToken token);
+
+        /// <summary>
+        /// Gets the length of a file.
+        /// </summary>
+        /// <param name="udi">A file entity identifier.</param>
+        /// <returns>The length of the file, or -1 if the file does not exist.</returns>
+        long GetFileLength(StringUdi udi);
+
+        /// <summary>
+        /// Gets the length of a file.
+        /// </summary>
+        /// <param name="udi">A file entity identifier.</param>
+        /// <param name="token">A cancellation token.</param>
+        /// <returns>The length of the file, or -1 if the file does not exist.</returns>
+        Task<long> GetFileLengthAsync(StringUdi udi, CancellationToken token);
+
+        // fixme - doc
+        void GetFiles(IEnumerable<StringUdi> udis, IFileStore fileStore);
+
+        Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileStore fileStore, CancellationToken token);
 
         ///// <summary>
         ///// Gets the content of a file as a bytes array.

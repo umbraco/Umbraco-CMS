@@ -312,6 +312,7 @@
     <Compile Include="Deploy\ArtifactSignature.cs" />
     <Compile Include="Deploy\Difference.cs" />
     <Compile Include="Deploy\Direction.cs" />
+    <Compile Include="Deploy\IFileStore.cs" />
     <Compile Include="Models\GridValue.cs" />
     <Compile Include="Deploy\IArtifact.cs" />
     <Compile Include="Deploy\IArtifactSignature.cs" />
