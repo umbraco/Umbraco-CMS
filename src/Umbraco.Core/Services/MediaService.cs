@@ -737,7 +737,7 @@ namespace Umbraco.Core.Services
 
                 if (Moving.IsRaisedEventCancelled(
                     new MoveEventArgs<IMedia>(
-                        new MoveEventInfo<IMedia>(media, originalPath, parentId)), this, UowProvider))
+                        new MoveEventInfo<IMedia>(media, originalPath, parentId)), this, UowProvider, eventName: "Moving"))
                 {
                     return;
                 }
@@ -770,7 +770,7 @@ namespace Umbraco.Core.Services
                         false);
                 }
 
-                Moved.RaiseEvent(new MoveEventArgs<IMedia>(false, moveInfo.ToArray()), this, UowProvider);
+                Moved.RaiseEvent(new MoveEventArgs<IMedia>(false, moveInfo.ToArray()), this, UowProvider, eventName: "Moved");
 
                 Audit(AuditType.Move, "Move Media performed by user", userId, media.Id);
             }
@@ -1050,7 +1050,7 @@ namespace Umbraco.Core.Services
                 var originalPath = media.Path;
 
                 if (Trashing.IsRaisedEventCancelled(
-                    new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), this, UowProvider))
+                    new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), this, UowProvider, eventName: "Trashing"))
                 {
                     return OperationStatus.Cancelled(evtMsgs);
                 }
@@ -1089,7 +1089,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     Trashed.RaiseEvent(
-                    new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo.ToArray()), this, uow.EventManager);
+                        new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo.ToArray()), this, uow.EventManager, eventName: "Trashed");
                 }
                 
                 Audit(AuditType.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);

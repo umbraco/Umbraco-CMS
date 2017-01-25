@@ -37,17 +37,13 @@ namespace Umbraco.Core.Events
         {
             var argsType = args.GetType();
 
-            //there is no way we can find a matching event if the argument type is not generic
-            if (argsType.IsGenericType == false)
-                return Attempt.Fail(new EventNameExtractorResult(EventNameExtractorError.UnsupportedArgType));
-
             var senderType = sender.GetType();
 
             var found = MatchedEventNames.GetOrAdd(new Tuple<Type, Type>(senderType, argsType), tuple =>
             {
                 var events = CandidateEvents.GetOrAdd(senderType, t =>
                 {
-                    return t.GetEvents(BindingFlags.Static | BindingFlags.Public)
+                    return t.GetEvents(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
                         //we can only look for events handlers with generic types because that is the only
                         // way that we can try to find a matching event based on the arg type passed in
                         .Where(x => x.EventHandlerType.IsGenericType)

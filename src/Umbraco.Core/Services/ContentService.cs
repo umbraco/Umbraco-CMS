@@ -1002,7 +1002,7 @@ namespace Umbraco.Core.Services
         Attempt<OperationStatus> IContentServiceOperations.MoveToRecycleBin(IContent content, int userId)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (new WriteLock(Locker))            {                //Hack: this ensures that the entity's path is valid and if not it fixes/persists it                //see: http://issues.umbraco.org/issue/U4-9336                content.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);                var originalPath = content.Path;                if (Trashing.IsRaisedEventCancelled(                  new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),                  this, UowProvider))                {                    return OperationStatus.Cancelled(evtMsgs);                }
+            using (new WriteLock(Locker))            {                //Hack: this ensures that the entity's path is valid and if not it fixes/persists it                //see: http://issues.umbraco.org/issue/U4-9336                content.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);                var originalPath = content.Path;                if (Trashing.IsRaisedEventCancelled(                  new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),                  this, UowProvider, eventName: "Trashing"))                {                    return OperationStatus.Cancelled(evtMsgs);                }
                 var moveInfo = new List<MoveEventInfo<IContent>>                {                    new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)                };
                 //Make sure that published content is unpublished before being moved to the Recycle Bin                if (HasPublishedVersion(content.Id))                {                    //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!                    UnPublish(content, userId);                }
                 //Unpublish descendents of the content item that is being moved to trash                var descendants = GetDescendants(content).OrderBy(x => x.Level).ToList();
@@ -1011,7 +1011,7 @@ namespace Umbraco.Core.Services
                 var uow = UowProvider.GetUnitOfWork();                using (var repository = RepositoryFactory.CreateContentRepository(uow))                {                    content.WriterId = userId;                    content.ChangeTrashedState(true);                    repository.AddOrUpdate(content);
                     //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId                    foreach (var descendant in descendants)                    {                        moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));                        descendant.WriterId = userId;                        descendant.ChangeTrashedState(true, descendant.ParentId);                        repository.AddOrUpdate(descendant);                    }                    uow.Commit();
 
-                    Trashed.RaiseEvent(new MoveEventArgs<IContent>(false, evtMsgs, moveInfo.ToArray()), this, uow.EventManager);                }                               Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);                return OperationStatus.Success(evtMsgs);            }
+                    Trashed.RaiseEvent(new MoveEventArgs<IContent>(false, evtMsgs, moveInfo.ToArray()), this, uow.EventManager, eventName: "Trashed");                }                               Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);                return OperationStatus.Success(evtMsgs);            }
         }
 
         /// <summary>
@@ -1197,7 +1197,7 @@ namespace Umbraco.Core.Services
 
             if (Deleting.IsRaisedEventCancelled(
                   new DeleteEventArgs<IContent>(content, evtMsgs),
-                  this, UowProvider))
+                  this, UowProvider, eventName: "Deleting"))
             {
                 return OperationStatus.Cancelled(evtMsgs);
             }
@@ -1225,7 +1225,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     var args = new DeleteEventArgs<IContent>(content, false, evtMsgs);
-                    Deleted.RaiseEvent(args, this, uow.EventManager);
+                    Deleted.RaiseEvent(args, this, uow.EventManager, eventName: "Deleted");
 
                     //remove any flagged media files
                     repository.DeleteMediaFiles(args.MediaFilesToDelete);
@@ -1301,7 +1301,7 @@ namespace Umbraco.Core.Services
                     var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
                     var contents = repository.GetByQuery(query).ToArray();
 
-                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this, uow.EventManager))
+                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this, uow.EventManager, eventName: "Deleting"))
                     {
                         uow.Commit();
                         return;
@@ -1372,14 +1372,14 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
-                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this, uow.EventManager))
+                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this, uow.EventManager, eventName: "DeletingVersions"))
                 {
                     uow.Commit();
                     return;
                 }
                 repository.DeleteVersions(id, versionDate);
                 uow.Commit();
-                DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this, uow.EventManager);
+                DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this, uow.EventManager, eventName: "DeletedVersions");
             }   
 
             Audit(AuditType.Delete, "Delete Content by version date performed by user", userId, Constants.System.Root);
@@ -1397,7 +1397,7 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this, UowProvider))
+                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this, UowProvider, eventName: "DeletingVersions"))
                     return;
 
                 if (deletePriorVersions)
@@ -1411,7 +1411,7 @@ namespace Umbraco.Core.Services
                 {
                     repository.DeleteVersion(versionId);
                     uow.Commit();
-                    DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this, uow.EventManager);
+                    DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this, uow.EventManager, eventName: "DeletedVersions");
                 }
 
                 Audit(AuditType.Delete, "Delete Content by version performed by user", userId, Constants.System.Root);
@@ -1444,7 +1444,7 @@ namespace Umbraco.Core.Services
         {
             if (Moving.IsRaisedEventCancelled(
                     new MoveEventArgs<IContent>(
-                        new MoveEventInfo<IContent>(content, content.Path, parentId)), this, UowProvider))
+                        new MoveEventInfo<IContent>(content, content.Path, parentId)), this, UowProvider, eventName: "Moving"))
             {
                 return;
             }
@@ -1464,7 +1464,7 @@ namespace Umbraco.Core.Services
                 //call private method that does the recursive moving
                 PerformMove(content, parentId, userId, moveInfo);
 
-                Moved.RaiseEvent(new MoveEventArgs<IContent>(false, moveInfo.ToArray()), this, UowProvider);
+                Moved.RaiseEvent(new MoveEventArgs<IContent>(false, moveInfo.ToArray()), this, UowProvider, eventName: "Moved");
 
                 Audit(AuditType.Move, "Move Content performed by user", userId, content.Id);
             }

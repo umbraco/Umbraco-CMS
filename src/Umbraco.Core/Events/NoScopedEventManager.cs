@@ -9,17 +9,17 @@ namespace Umbraco.Core.Events
     /// </summary>
     internal class NoScopedEventManager : DisposableObject, IEventManager
     {
-        public void TrackEvent(EventHandler e, object sender, EventArgs args)
+        public void TrackEvent(EventHandler e, object sender, EventArgs args, string eventName = null)
         {
             if (e != null) e(sender, args);
         }
 
-        public void TrackEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args)
+        public void TrackEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args, string eventName = null)
         {
             if (e != null) e(sender, args);
         }
 
-        public void TrackEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args)
+        public void TrackEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args, string eventName = null)
         {
             if (e != null) e(sender, args);
         }

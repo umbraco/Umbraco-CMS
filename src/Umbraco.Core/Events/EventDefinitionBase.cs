@@ -1,28 +1,25 @@
 using System;
+using System.Reflection;
 
 namespace Umbraco.Core.Events
 {
     public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDefinitionBase>
     {
-        protected EventDefinitionBase(object sender, object args, string eventName)
-        {
-            if (sender == null) throw new ArgumentNullException("sender");
-            if (eventName == null) throw new ArgumentNullException("eventName");
-            Sender = sender;
-            Args = args;
-            EventName = eventName;
-        }
-
-        protected EventDefinitionBase(object sender, object args)
+        protected EventDefinitionBase(object sender, object args, string eventName = null)
         {
             if (sender == null) throw new ArgumentNullException("sender");
             if (args == null) throw new ArgumentNullException("args");
             Sender = sender;
             Args = args;
-            var findResult = EventNameExtractor.FindEvent(sender, args, EventNameExtractor.MatchIngNames);            
-            if (findResult.Success == false)
-                throw new InvalidOperationException("Could not automatically find the event name, the event name will need to be explicitly registered for this event definition. Error: " + findResult.Result.Error);
-            EventName = findResult.Result.Name;
+            EventName = eventName;
+
+            if (EventName.IsNullOrWhiteSpace())
+            {
+                var findResult = EventNameExtractor.FindEvent(sender, args, EventNameExtractor.MatchIngNames);
+                if (findResult.Success == false)
+                    throw new AmbiguousMatchException("Could not automatically find the event name, the event name will need to be explicitly registered for this event definition. Error: " + findResult.Result.Error);
+                EventName = findResult.Result.Name;
+            }
         }
 
         public object Sender { get; private set; }

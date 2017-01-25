@@ -8,19 +8,19 @@ namespace Umbraco.Core.Events
     /// </summary>
     internal class ScopedEventManager : DisposableObject, IEventManager
     {
-        public void TrackEvent(EventHandler e, object sender, EventArgs args)
+        public void TrackEvent(EventHandler e, object sender, EventArgs args, string eventName = null)
         {
-            _tracked.Add(new EventDefinition(e, sender, args));
+            _tracked.Add(new EventDefinition(e, sender, args, eventName));
         }
 
-        public void TrackEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args)
+        public void TrackEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args, string eventName = null)
         {
-            _tracked.Add(new EventDefinition<TEventArgs>(e, sender, args));
+            _tracked.Add(new EventDefinition<TEventArgs>(e, sender, args, eventName));
         }
 
-        public void TrackEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args)
+        public void TrackEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args, string eventName = null)
         {
-            _tracked.Add(new EventDefinition<TSender, TEventArgs>(e, sender, args));
+            _tracked.Add(new EventDefinition<TSender, TEventArgs>(e, sender, args, eventName));
         }
 
         public IEnumerable<IEventDefinition> GetEvents()

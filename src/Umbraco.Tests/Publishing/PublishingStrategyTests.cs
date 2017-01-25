@@ -29,10 +29,7 @@ namespace Umbraco.Tests.Publishing
         {
             base.Initialize();
 
-            var unitOfWorkMock = new Mock<IScopeUnitOfWork>();
-            unitOfWorkMock.Setup(x => x.Messages).Returns(() => new EventMessages());
-            unitOfWorkMock.Setup(x => x.EventManager).Returns(() => new NoScopedEventManager());
-            _unitOfWork = unitOfWorkMock.Object;
+            _unitOfWork = MockHelper.GetMockedUnitOfWork();
             //LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);              
         }
 

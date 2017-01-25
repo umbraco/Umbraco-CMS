@@ -33,16 +33,28 @@ namespace Umbraco.Core.Events
 			return args.Cancel;
 		}
 
+        /// <summary>
+        /// Raises the event with the event manager and returns a boolean value indicating if the event was cancelled
+        /// </summary>
+        /// <typeparam name="TSender"></typeparam>
+        /// <typeparam name="TArgs"></typeparam>
+        /// <param name="eventHandler"></param>
+        /// <param name="args"></param>
+        /// <param name="sender"></param>
+        /// <param name="eventManager"></param>
+        /// <param name="eventName">Optional explicit event name if the event may not be able to be determined based on it's arguments (it's ambiguous)</param>
+        /// <returns></returns>
         internal static bool IsRaisedEventCancelled<TSender, TArgs>(
             this TypedEventHandler<TSender, TArgs> eventHandler,
             TArgs args,
             TSender sender,
-            IEventManager eventManager)
+            IEventManager eventManager,
+            string eventName = null)
             where TArgs : CancellableEventArgs
         {
             if (eventManager.SupportsEventCancellation)
             {
-                eventManager.TrackEvent(eventHandler, sender, args);
+                eventManager.TrackEvent(eventHandler, sender, args, eventName);
                 return args.Cancel;
             }
 
@@ -58,19 +70,21 @@ namespace Umbraco.Core.Events
         /// <param name="args"></param>
         /// <param name="sender"></param>
         /// <param name="uowProvider"></param>
+        /// <param name="eventName">Optional explicit event name if the event may not be able to be determined based on it's arguments (it's ambiguous)</param>
         /// <returns></returns>
         internal static bool IsRaisedEventCancelled<TSender, TArgs>(
             this TypedEventHandler<TSender, TArgs> eventHandler,
             TArgs args,
             TSender sender,
-            IScopeUnitOfWorkProvider uowProvider)
+            IScopeUnitOfWorkProvider uowProvider,
+            string eventName = null)
             where TArgs : CancellableEventArgs
         {            
             using(var uow = uowProvider.GetReadOnlyUnitOfWork())
             {
                 if (uow.EventManager.SupportsEventCancellation)
                 {
-                    uow.EventManager.TrackEvent(eventHandler, sender, args);
+                    uow.EventManager.TrackEvent(eventHandler, sender, args, eventName);
                     return args.Cancel;
                 }
                 return false;
@@ -105,37 +119,41 @@ namespace Umbraco.Core.Events
         /// <param name="eventManager"></param>
         /// <param name="args"></param>
         /// <param name="sender"></param>
+        /// <param name="eventName">Optional explicit event name if the event may not be able to be determined based on it's arguments (it's ambiguous)</param>
         internal static void RaiseEvent<TSender, TArgs>(
             this TypedEventHandler<TSender, TArgs> eventHandler,            
             TArgs args,
             TSender sender,
-            IEventManager eventManager)
+            IEventManager eventManager,
+            string eventName = null)
             where TArgs : EventArgs
         {
-            eventManager.TrackEvent(eventHandler, sender, args);
+            eventManager.TrackEvent(eventHandler, sender, args, eventName);
         }
 
-        /// <summary>
-        /// Hack: this is used to perform IsRaisedEventCancelled when a uow cannot be reused
-        /// </summary>
-        /// <typeparam name="TSender"></typeparam>
-        /// <typeparam name="TArgs"></typeparam>
-        /// <param name="eventHandler"></param>
-        /// <param name="args"></param>
-        /// <param name="sender"></param>
-        /// <param name="uowProvider"></param>
-        internal static void RaiseEvent<TSender, TArgs>(
+	    /// <summary>
+	    /// Hack: this is used to perform IsRaisedEventCancelled when a uow cannot be reused
+	    /// </summary>
+	    /// <typeparam name="TSender"></typeparam>
+	    /// <typeparam name="TArgs"></typeparam>
+	    /// <param name="eventHandler"></param>
+	    /// <param name="args"></param>
+	    /// <param name="sender"></param>
+	    /// <param name="uowProvider"></param>
+	    /// <param name="eventName">Optional explicit event name if the event may not be able to be determined based on it's arguments (it's ambiguous)</param>
+	    internal static void RaiseEvent<TSender, TArgs>(
             this TypedEventHandler<TSender, TArgs> eventHandler,
             TArgs args,
             TSender sender,
-            IScopeUnitOfWorkProvider uowProvider)
+            IScopeUnitOfWorkProvider uowProvider,
+            string eventName = null)
             where TArgs : EventArgs
         {
             //This UOW is a readonly one but needs to be committed otherwise
             // it will rollback outer scopes
             using (var uow = uowProvider.GetUnitOfWork())
             {
-                uow.EventManager.TrackEvent(eventHandler, sender, args);
+                uow.EventManager.TrackEvent(eventHandler, sender, args, eventName);
                 uow.Commit();
             }
         }
