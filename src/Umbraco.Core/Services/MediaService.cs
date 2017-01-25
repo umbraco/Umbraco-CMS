@@ -72,13 +72,14 @@ namespace Umbraco.Core.Services
             {
                 if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this, uow.EventManager))
                 {
+                    uow.Commit();
                     media.WasCancelled = true;
                     return media;
                 }
 
                 media.CreatorId = userId;
 
-                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
+                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this, uow.EventManager);
 
                 Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
 
@@ -115,13 +116,14 @@ namespace Umbraco.Core.Services
             {
                 if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this, uow.EventManager))
                 {
+                    uow.Commit();
                     media.WasCancelled = true;
                     return media;
                 }
 
                 media.CreatorId = userId;
 
-                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
+                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this, uow.EventManager);
 
                 Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
 
@@ -913,7 +915,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false, evtMsgs), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false, evtMsgs), this, uow.EventManager);
             }
 
             Audit(AuditType.Save, "Save Media items performed by user", userId, -1);
