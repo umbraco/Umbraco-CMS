@@ -19,10 +19,12 @@ namespace Umbraco.Core.Services
 
         public bool Exists(string domainName)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateDomainRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                return repo.Exists(domainName);
+                var repo = RepositoryFactory.CreateDomainRepository(uow);
+                var ret = repo.Exists(domainName);
+                uow.Commit();
+                return ret;
             } 
         }
 
@@ -36,11 +38,11 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Cancelled(evtMsgs);
             }
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateDomainRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateDomainRepository(uow);
                 repository.Delete(domain);
-                uow.Commit();               
+                uow.Commit();
             }
 
             var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
@@ -50,37 +52,45 @@ namespace Umbraco.Core.Services
 
         public IDomain GetByName(string name)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateDomainRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                return repository.GetByName(name);
+                var repository = RepositoryFactory.CreateDomainRepository(uow);
+                var ret = repository.GetByName(name);
+                uow.Commit();
+                return ret;
             }
         }
 
         public IDomain GetById(int id)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateDomainRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                return repo.Get(id);
+	            var repo = RepositoryFactory.CreateDomainRepository(uow);
+	            var ret = repo.Get(id);
+                uow.Commit();
+                return ret;
             }
         }
 
         public IEnumerable<IDomain> GetAll(bool includeWildcards)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateDomainRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                return repo.GetAll(includeWildcards);
+                var repo = RepositoryFactory.CreateDomainRepository(uow);
+                var ret = repo.GetAll(includeWildcards);
+                uow.Commit();
+                return ret;
             }
         }
 
         public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateDomainRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                return repo.GetAssignedDomains(contentId, includeWildcards);
+                var repo = RepositoryFactory.CreateDomainRepository(uow);
+                var ret = repo.GetAssignedDomains(contentId, includeWildcards);
+                uow.Commit();
+                return ret;
             }
         }
 
@@ -94,9 +104,9 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Cancelled(evtMsgs);
             }
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateDomainRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateDomainRepository(uow);
                 repository.AddOrUpdate(domainEntity);
                 uow.Commit();
             }

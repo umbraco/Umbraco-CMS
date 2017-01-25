@@ -793,8 +793,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
-            using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
+            using (var uow = _uowProvider.GetUnitOfWork())
             {
+                var repository = _repositoryFactory.CreateContentTypeRepository(uow);
                 var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
                 var types = repository.GetByQuery(query).ToArray();
 
@@ -808,7 +809,7 @@ namespace Umbraco.Core.Services
                 if (contentType == null)
                     throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
                                                       contentTypeAlias));
-
+                uow.Commit();
                 return contentType;
             }
         }

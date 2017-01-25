@@ -152,9 +152,13 @@ namespace Umbraco.Core.Services
             // this raises a good number of questions, including whether caching anything in
             // repositories works at all in a LB environment - TODO: figure it out
 
-            var uow = UowProvider.GetUnitOfWork();
-            var repo = RepositoryFactory.CreateServerRegistrationRepository(uow);
-            return repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateServerRegistrationRepository(uow);
+                var ret = repository.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
+                uow.Commit();
+                return ret;
+            }
         }
 
         /// <summary>

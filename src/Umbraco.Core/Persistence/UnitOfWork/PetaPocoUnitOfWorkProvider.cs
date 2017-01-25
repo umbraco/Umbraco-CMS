@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 
@@ -16,9 +15,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         [Obsolete("Use the constructor specifying an ILogger instead")]
         public PetaPocoUnitOfWorkProvider()
             : this(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, LoggerResolver.Current.Logger)))
-        {
-
-        }
+        { }
 
         [Obsolete("Use the constructor specifying an ILogger instead")]
         public PetaPocoUnitOfWorkProvider(string connectionString, string providerName)
@@ -30,9 +27,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </summary>
         public PetaPocoUnitOfWorkProvider(ILogger logger)
             : this(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, logger)))
-        {
-
-        }
+        { }
 
         /// <summary>
         /// Constructor accepting custom connectino string and provider name
@@ -76,16 +71,5 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         }
 
         #endregion
-
-        /// <summary>
-        /// Static helper method to return a new unit of work
-        /// </summary>
-        /// <returns></returns>
-        internal static IDatabaseUnitOfWork CreateUnitOfWork(ILogger logger)
-        {
-            // fixme wtf?
-            var provider = new PetaPocoUnitOfWorkProvider(logger);
-            return provider.GetUnitOfWork();
-        }
     }
 }

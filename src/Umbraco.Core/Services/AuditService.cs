@@ -11,14 +11,13 @@ namespace Umbraco.Core.Services
     {
         public AuditService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
-        {
-        }
+        { }
 
         public void Add(AuditType type, string comment, int userId, int objectId)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateAuditRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = RepositoryFactory.CreateAuditRepository(uow);
                 repo.AddOrUpdate(new AuditItem(objectId, comment, type, userId));
                 uow.Commit();
             }
