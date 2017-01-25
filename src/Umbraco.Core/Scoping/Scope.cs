@@ -191,8 +191,14 @@ namespace Umbraco.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                if (ParentScope != null) return ParentScope.Events;
-                return _eventManager ?? (_eventManager = new ScopedEventManager());
+                if (ParentScope != null)
+                {
+                    return _eventManager ?? (_eventManager = new ScopedEventManager(ParentScope.Events));
+                }
+                else
+                {
+                    return _eventManager ?? (_eventManager = new ScopedEventManager(true));
+                }
             }
         }
 
@@ -286,8 +292,7 @@ namespace Umbraco.Core.Scoping
             if (exceptions != null)
                 throw new AggregateException("Exceptions were throws by complete actions.", exceptions);
 
-            // now trigger every events
-            // fixme - should some of them trigger within the transaction?
+            // now trigger all events (if configured that way)
             if (_eventManager != null)
                 _eventManager.Dispose();
         }

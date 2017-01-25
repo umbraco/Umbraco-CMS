@@ -41,9 +41,9 @@ namespace Umbraco.Tests.Scoping
             };
 
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing1, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing2, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing3, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing1, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing2, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing3, this, new EventArgs());
 
             Assert.AreEqual(3, counter);
 
@@ -53,9 +53,9 @@ namespace Umbraco.Tests.Scoping
         public void Can_Not_Raise_Events_Later()
         {
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing1, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing2, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.Events.TrackEvent(DoThing3, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing1, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing2, this, new EventArgs());
+            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing3, this, new EventArgs());
 
             Assert.AreEqual(0, scopeProvider.AmbientOrNoScope.Events.GetEvents().Count());
         }

@@ -52,9 +52,13 @@ namespace Umbraco.Core.Events
             string eventName = null)
             where TArgs : CancellableEventArgs
         {
+            //if the manager supports cancelation then just raise the event,
+            //cancelable events cannot be queued
             if (eventManager.SupportsEventCancellation)
             {
-                eventManager.TrackEvent(eventHandler, sender, args, eventName);
+                if (eventHandler != null)
+                    eventHandler(sender, args);
+
                 return args.Cancel;
             }
 
@@ -82,9 +86,13 @@ namespace Umbraco.Core.Events
         {            
             using(var uow = uowProvider.GetReadOnlyUnitOfWork())
             {
+                //if the manager supports cancelation then just raise the event,
+                //cancelable events cannot be queued
                 if (uow.EventManager.SupportsEventCancellation)
                 {
-                    uow.EventManager.TrackEvent(eventHandler, sender, args, eventName);
+                    if (eventHandler != null)
+                        eventHandler(sender, args);
+                    
                     return args.Cancel;
                 }
                 return false;
@@ -128,7 +136,7 @@ namespace Umbraco.Core.Events
             string eventName = null)
             where TArgs : EventArgs
         {
-            eventManager.TrackEvent(eventHandler, sender, args, eventName);
+            eventManager.QueueEvent(eventHandler, sender, args, eventName);
         }
 
 	    /// <summary>
@@ -153,7 +161,7 @@ namespace Umbraco.Core.Events
             // it will rollback outer scopes
             using (var uow = uowProvider.GetUnitOfWork())
             {
-                uow.EventManager.TrackEvent(eventHandler, sender, args, eventName);
+                uow.EventManager.QueueEvent(eventHandler, sender, args, eventName);
                 uow.Commit();
             }
         }

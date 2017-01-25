@@ -48,9 +48,9 @@ namespace Umbraco.Tests.Scoping
             var provider = new PetaPocoUnitOfWorkProvider(new ScopeProvider(Mock.Of<IDatabaseFactory2>()));
             using (var uow = provider.GetUnitOfWork())
             {
-                uow.EventManager.TrackEvent(DoThing1, this, new SaveEventArgs<string>("test"));
-                uow.EventManager.TrackEvent(DoThing2, this, new SaveEventArgs<int>(0));
-                uow.EventManager.TrackEvent(DoThing3, this, new SaveEventArgs<decimal>(0));
+                uow.EventManager.QueueEvent(DoThing1, this, new SaveEventArgs<string>("test"));
+                uow.EventManager.QueueEvent(DoThing2, this, new SaveEventArgs<int>(0));
+                uow.EventManager.QueueEvent(DoThing3, this, new SaveEventArgs<decimal>(0));
                 
                 var e = uow.EventManager.GetEvents().ToArray();
                 var knownNames = new [] {"DoThing1", "DoThing2", "DoThing3"};
@@ -74,9 +74,9 @@ namespace Umbraco.Tests.Scoping
             var provider = new PetaPocoUnitOfWorkProvider(new ScopeProvider(Mock.Of<IDatabaseFactory2>()));
             using (var uow = provider.GetUnitOfWork())
             {
-                uow.EventManager.TrackEvent(DoThing1, this, new SaveEventArgs<string>("test"));
-                uow.EventManager.TrackEvent(DoThing2, this, new SaveEventArgs<int>(0));
-                uow.EventManager.TrackEvent(DoThing3, this, new SaveEventArgs<decimal>(0));
+                uow.EventManager.QueueEvent(DoThing1, this, new SaveEventArgs<string>("test"));
+                uow.EventManager.QueueEvent(DoThing2, this, new SaveEventArgs<int>(0));
+                uow.EventManager.QueueEvent(DoThing3, this, new SaveEventArgs<decimal>(0));
 
                 Assert.Pass();
             }
@@ -105,9 +105,9 @@ namespace Umbraco.Tests.Scoping
             var provider = new PetaPocoUnitOfWorkProvider(new ScopeProvider(Mock.Of<IDatabaseFactory2>()));
             using (var uow = provider.GetUnitOfWork())
             {
-                uow.EventManager.TrackEvent(DoThing1, this, new SaveEventArgs<string>("test"));
-                uow.EventManager.TrackEvent(DoThing2, this, new SaveEventArgs<int>(0));
-                uow.EventManager.TrackEvent(DoThing3, this, new SaveEventArgs<decimal>(0));
+                uow.EventManager.QueueEvent(DoThing1, this, new SaveEventArgs<string>("test"));
+                uow.EventManager.QueueEvent(DoThing2, this, new SaveEventArgs<int>(0));
+                uow.EventManager.QueueEvent(DoThing3, this, new SaveEventArgs<decimal>(0));
 
                 Assert.AreEqual(0, counter);
 
