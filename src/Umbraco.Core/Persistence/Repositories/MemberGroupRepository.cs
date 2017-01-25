@@ -276,7 +276,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 PersistNewItem(m);
             }
-            SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(missingGroups), this);
+            SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(missingGroups), this, UnitOfWork.EventManager);
 
             //now go get all the dto's for roles with these role names
             var rolesForNames = Database.Fetch<NodeDto>(existingSql).ToArray();

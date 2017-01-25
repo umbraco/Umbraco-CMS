@@ -107,10 +107,11 @@ namespace Umbraco.Core.Services
         /// <param name="permissionSet"></param>
         public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
         {
-            var uow = UowProvider.GetReadOnlyUnitOfWork();
+            var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 repository.ReplaceContentPermissions(permissionSet);
+                uow.Commit();
             }
         }
 
@@ -122,10 +123,11 @@ namespace Umbraco.Core.Services
         /// <param name="userIds"></param>
         public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
-            var uow = UowProvider.GetReadOnlyUnitOfWork();
+            var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 repository.AssignEntityPermission(entity, permission, userIds);
+                uow.Commit();
             }
         }
 
