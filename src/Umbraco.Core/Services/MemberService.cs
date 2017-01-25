@@ -1067,12 +1067,13 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 repository.CreateIfNotExists(roleName);
+                uow.Commit();
             }
         }
 
         public IEnumerable<string> GetAllRoles()
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 var result = repository.GetAll();
@@ -1082,7 +1083,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<string> GetAllRoles(int memberId)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 var result = repository.GetMemberGroupsForMember(memberId);
@@ -1092,7 +1093,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<string> GetAllRoles(string username)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 var result = repository.GetMemberGroupsForMember(username);
@@ -1102,7 +1103,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 return repository.GetByMemberGroup(roleName);
@@ -1111,7 +1112,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            var uow = UowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetReadOnlyUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
                 return repository.FindMembersInRole(roleName, usernameToMatch, matchType);
@@ -1131,18 +1132,20 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                var uow = UowProvider.GetUnitOfWork();
+                List<IMemberGroup> found;
+
+                var uow = UowProvider.GetReadOnlyUnitOfWork();
                 using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
                 {
                     var qry = new Query<IMemberGroup>().Where(g => g.Name == roleName);
-                    var found = repository.GetByQuery(qry).ToArray();
-
-                    foreach (var memberGroup in found)
-                    {
-                        _memberGroupService.Delete(memberGroup);
-                    }
-                    return found.Any();
+                    found = repository.GetByQuery(qry).ToList();
                 }
+
+                foreach (var memberGroup in found)
+                {
+                    _memberGroupService.Delete(memberGroup);
+                }
+                return found.Any();
             }
         }
         public void AssignRole(string username, string roleName)
@@ -1156,6 +1159,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 repository.AssignRoles(usernames, roleNames);
+                uow.Commit();
             }
         }
 
@@ -1170,6 +1174,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 repository.DissociateRoles(usernames, roleNames);
+                uow.Commit();
             }
         }
 
@@ -1184,6 +1189,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 repository.AssignRoles(memberIds, roleNames);
+                uow.Commit();
             }
         }
 
@@ -1198,6 +1204,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 repository.DissociateRoles(memberIds, roleNames);
+                uow.Commit();
             }
         }
 
@@ -1207,7 +1214,7 @@ namespace Umbraco.Core.Services
 
         private IMemberType FindMemberTypeByAlias(string memberTypeAlias)
         {
-            using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetReadOnlyUnitOfWork()))
             {
                 var query = Query<IMemberType>.Builder.Where(x => x.Alias == memberTypeAlias);
                 var types = repository.GetByQuery(query);
