@@ -781,7 +781,7 @@ namespace Umbraco.Core.Services
         {
             var member = new Member(name, email.ToLower().Trim(), username, memberType);
 
-            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this);
+            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this, UowProvider);
 
             return member;
         }
