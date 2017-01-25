@@ -161,6 +161,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             get { return Scope.Events; }
         }
 
+        public EventMessages Messages
+        {
+            get { return Scope.Messages; }
+        }
+
         protected Queue<Operation> Operations
         {
             get { return _operations; }

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Logging;
+﻿using System;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     /// </summary>
     public class FileUnitOfWorkProvider : ScopeUnitOfWorkProvider
     {
+        [Obsolete("Use the ctor specifying a IScopeProvider instead")]
         public FileUnitOfWorkProvider()
             : this(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, LoggerResolver.Current.Logger)))
         {

@@ -16,7 +16,7 @@ namespace Umbraco.Core.Scoping
 
         private UmbracoDatabase _database;
         private IEventManager _eventManager;
-        private IList<EventMessage> _messages;
+        private EventMessages _messages;
 
         public NoScope(ScopeProvider scopeProvider)
         {
@@ -60,16 +60,16 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IList<EventMessage> Messages
+        public EventMessages Messages
         {
             get
             {
                 EnsureNotDisposed();
-                return _messages ?? (_messages = new List<EventMessage>());
+                return _messages ?? (_messages = new EventMessages());
             }
         }
 
-        public IList<EventMessage> MessagesOrNull
+        public EventMessages MessagesOrNull
         {
             get
             {

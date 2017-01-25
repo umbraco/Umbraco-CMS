@@ -21,7 +21,7 @@ namespace Umbraco.Core.Scoping
 
         private IsolatedRuntimeCache _isolatedRuntimeCache;
         private UmbracoDatabase _database;
-        private IList<EventMessage> _messages;
+        private EventMessages _messages;
         private IDictionary<string, Action<bool>> _exitActions;
         private IEventManager _eventManager;
 
@@ -166,13 +166,13 @@ namespace Umbraco.Core.Scoping
         //}
 
         /// <inheritdoc />
-        public IList<EventMessage> Messages
+        public EventMessages Messages
         {
             get
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Messages;
-                return _messages ?? (_messages = new List<EventMessage>());
+                return _messages ?? (_messages = new EventMessages());
             }
         }
 

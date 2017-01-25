@@ -19,7 +19,7 @@ namespace Umbraco.Core.Scoping
         /// <summary>
         /// Gets the scope event messages.
         /// </summary>
-        IList<EventMessage> Messages { get; }
+        EventMessages Messages { get; }
 
         /// <summary>
         /// Gets the event manager

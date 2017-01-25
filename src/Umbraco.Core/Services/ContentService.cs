@@ -31,7 +31,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ContentService : ScopeRepositoryService, IContentService, IContentServiceOperations
     {
-        private readonly IPublishingStrategy _publishingStrategy;
+        private readonly IPublishingStrategy2 _publishingStrategy;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
@@ -44,16 +44,14 @@ namespace Umbraco.Core.Services
             IDatabaseUnitOfWorkProvider provider,
             RepositoryFactory repositoryFactory,
             ILogger logger,
-            IEventMessagesFactory eventMessagesFactory,
-            IPublishingStrategy publishingStrategy,
+            IEventMessagesFactory eventMessagesFactory,            
             IDataTypeService dataTypeService,
             IUserService userService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
-            if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             if (userService == null) throw new ArgumentNullException("userService");
-            _publishingStrategy = publishingStrategy;
+            _publishingStrategy = new PublishingStrategy(logger);
             _dataTypeService = dataTypeService;
             _userService = userService;
         }
@@ -1715,7 +1713,7 @@ namespace Umbraco.Core.Services
                         if (content.Published)
                         {
                             //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
-                            var published = _publishingStrategy.Publish(content, userId);
+                            var published = _publishingStrategy.Publish(uow, content, userId).Success;
                             shouldBePublished.Add(content);
                         }
                         else
@@ -1736,13 +1734,14 @@ namespace Umbraco.Core.Services
 
                     if (raiseEvents)
                         Saved.RaiseEvent(new SaveEventArgs<IContent>(asArray, false), this, uow.EventManager);
-                }
 
-                if (shouldBePublished.Any())
-                {
-                    //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
-                    _publishingStrategy.PublishingFinalized(shouldBePublished, false);
+                    if (shouldBePublished.Any())
+                    {
+                        //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
+                        _publishingStrategy.PublishingFinalized(uow, shouldBePublished, false);
+                    }
                 }
+                
             }
 
             Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
@@ -1973,17 +1972,18 @@ namespace Umbraco.Core.Services
                 list.Add(content); //include parent item
                 list.AddRange(GetDescendants(content));
 
-                var internalStrategy = (PublishingStrategy)_publishingStrategy;
+                var internalStrategy = _publishingStrategy;
+
+                var uow = UowProvider.GetUnitOfWork();
 
                 //Publish and then update the database with new status
-                var publishedOutcome = internalStrategy.PublishWithChildrenInternal(list, userId, includeUnpublished).ToArray();
+                var publishedOutcome = internalStrategy.PublishWithChildren(uow, list, userId, includeUnpublished).ToArray();
                 var published = publishedOutcome
                     .Where(x => x.Success || x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished)
                     // ensure proper order (for events) - cannot publish a child before its parent!
                     .OrderBy(x => x.Result.ContentItem.Level)
                     .ThenBy(x => x.Result.ContentItem.SortOrder);
-
-                var uow = UowProvider.GetUnitOfWork();
+                
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     //NOTE The Publish with subpages-dialog was used more as a republish-type-thing, so we'll have to include PublishStatusType.SuccessAlreadyPublished
@@ -2001,9 +2001,10 @@ namespace Umbraco.Core.Services
 
                     uow.Commit();
 
+                    //Save xml to db and call following method to fire event:
+                    _publishingStrategy.PublishingFinalized(uow, updated, false);
                 }
-                //Save xml to db and call following method to fire event:
-                _publishingStrategy.PublishingFinalized(updated, false);
+                
 
                 Audit(AuditType.Publish, "Publish with Children performed by user", userId, content.Id);
 
@@ -2033,10 +2034,15 @@ namespace Umbraco.Core.Services
                 return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.SuccessAlreadyUnPublished, evtMsgs)); // already unpublished
             }
 
-            var unpublished = _publishingStrategy.UnPublish(content, userId);
-            if (unpublished == false) return Attempt.Fail(new UnPublishStatus(content, UnPublishedStatusType.FailedCancelledByEvent, evtMsgs));
-
             var uow = UowProvider.GetUnitOfWork();
+
+            var unpublished = _publishingStrategy.UnPublish(uow, content, userId);
+            if (unpublished == false)
+            {
+                uow.Commit();
+                return Attempt.Fail(new UnPublishStatus(content, UnPublishedStatusType.FailedCancelledByEvent, evtMsgs));
+            }
+            
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 content.WriterId = userId;
@@ -2047,10 +2053,12 @@ namespace Umbraco.Core.Services
                 repository.DeleteContentXml(content);
 
                 uow.Commit();
+
+                //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
+                if (omitCacheRefresh == false)
+                    _publishingStrategy.UnPublishingFinalized(uow, content);
             }
-            //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
-            if (omitCacheRefresh == false)
-                _publishingStrategy.UnPublishingFinalized(content);
+            
 
             Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
 
@@ -2094,20 +2102,21 @@ namespace Umbraco.Core.Services
                     //set the invalid properties (if there are any)
                     publishStatus.InvalidProperties = ((ContentBase)content).LastInvalidProperties;
                 }
+
+                var uow = UowProvider.GetUnitOfWork();
+
                 //if we're still successful, then publish using the strategy
                 if (publishStatus.StatusType == PublishStatusType.Success)
-                {
-                    var internalStrategy = (PublishingStrategy)_publishingStrategy;
+                {                 
                     //Publish and then update the database with new status
-                    var publishResult = internalStrategy.PublishInternal(content, userId);
+                    var publishResult = _publishingStrategy.Publish(uow, content, userId);
                     //set the status type to the publish result
                     publishStatus.StatusType = publishResult.Result.StatusType;
                 }
 
                 //we are successfully published if our publishStatus is still Successful
                 bool published = publishStatus.StatusType == PublishStatusType.Success;
-
-                var uow = UowProvider.GetUnitOfWork();
+                
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     if (published == false)
@@ -2136,20 +2145,20 @@ namespace Umbraco.Core.Services
 
                     if (raiseEvents)
                         Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this, uow.EventManager);
-                }
 
-                //Save xml to db and call following method to fire event through PublishingStrategy to update cache
-                if (published)
-                {
-                    _publishingStrategy.PublishingFinalized(content);
-                }
+                    //Save xml to db and call following method to fire event through PublishingStrategy to update cache
+                    if (published)
+                    {
+                        _publishingStrategy.PublishingFinalized(uow, content);
+                    }
 
-                //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
-                if (published && previouslyPublished == false && HasChildren(content.Id))
-                {
-                    var descendants = GetPublishedDescendants(content);
+                    //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
+                    if (published && previouslyPublished == false && HasChildren(content.Id))
+                    {
+                        var descendants = GetPublishedDescendants(content);
 
-                    _publishingStrategy.PublishingFinalized(descendants, false);
+                        _publishingStrategy.PublishingFinalized(uow, descendants, false);
+                    }
                 }
 
                 Audit(AuditType.Publish, "Save and Publish performed by user", userId, content.Id);

@@ -15,6 +15,8 @@ using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
 using System.Linq;
+using Moq;
+using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Tests.Publishing
 {
@@ -27,6 +29,10 @@ namespace Umbraco.Tests.Publishing
         {
             base.Initialize();
 
+            var unitOfWorkMock = new Mock<IScopeUnitOfWork>();
+            unitOfWorkMock.Setup(x => x.Messages).Returns(() => new EventMessages());
+            unitOfWorkMock.Setup(x => x.EventManager).Returns(() => new NoScopedEventManager());
+            _unitOfWork = unitOfWorkMock.Object;
             //LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);              
         }
 
@@ -36,10 +42,13 @@ namespace Umbraco.Tests.Publishing
 			base.TearDown();
             
             //ensure event handler is gone
-            PublishingStrategy.Publishing -= PublishingStrategyPublishing;            
+            PublishingStrategy.Publishing -= PublishingStrategyPublishing;
+
+            
         }
 
         private IContent _homePage;
+        private IScopeUnitOfWork _unitOfWork;
 
         /// <summary>
         /// in these tests we have a heirarchy of 
@@ -64,11 +73,11 @@ namespace Umbraco.Tests.Publishing
                 ServiceContext.ContentTypeService.GetContentType("umbTextpage"), "Sub Sub Sub", mandatorContent.Id);
             ServiceContext.ContentService.Save(subContent, 0);
             
-            var strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+            IPublishingStrategy2 strategy = new PublishingStrategy(Logger);
 
             //publish root and nodes at it's children level
             var listToPublish = ServiceContext.ContentService.GetDescendants(_homePage.Id).Concat(new[] { _homePage });
-            var result = strategy.PublishWithChildrenInternal(listToPublish, 0, true);
+            var result = strategy.PublishWithChildren(_unitOfWork, listToPublish, 0, true);
 
             Assert.AreEqual(listToPublish.Count() - 2, result.Count(x => x.Success));
             Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Result.ContentItem.Id)
@@ -91,14 +100,14 @@ namespace Umbraco.Tests.Publishing
         {
             CreateTestData();
 
-            var strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+            IPublishingStrategy2 strategy = new PublishingStrategy( Logger);
 
 
             PublishingStrategy.Publishing +=PublishingStrategyPublishing;
 
             //publish root and nodes at it's children level
             var listToPublish = ServiceContext.ContentService.GetDescendants(_homePage.Id).Concat(new[] {_homePage});
-            var result = strategy.PublishWithChildrenInternal(listToPublish, 0);
+            var result = strategy.PublishWithChildren(_unitOfWork, listToPublish, 0, true);
             
             Assert.AreEqual(listToPublish.Count() - 2, result.Count(x => x.Success));
             Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Result.ContentItem.Id)
@@ -118,22 +127,22 @@ namespace Umbraco.Tests.Publishing
         {
             CreateTestData();
 
-            var strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+            IPublishingStrategy2 strategy = new PublishingStrategy(Logger);
 
             //publish root and nodes at it's children level
-            var result1 = strategy.Publish(_homePage, 0);
+            var result1 = strategy.Publish(_unitOfWork, _homePage, 0);
             Assert.IsTrue(result1);
             Assert.IsTrue(_homePage.Published);
             foreach (var c in ServiceContext.ContentService.GetChildren(_homePage.Id))
             {
-                var r = strategy.Publish(c, 0);    
+                var r = strategy.Publish(_unitOfWork, c, 0);    
                 Assert.IsTrue(r);
                 Assert.IsTrue(c.Published);
             }
 
             //ok, all are published except the deepest descendant, we will pass in a flag to not include it to 
             //be published
-            var result = strategy.PublishWithChildrenInternal(
+            var result = strategy.PublishWithChildren(_unitOfWork,
                 ServiceContext.ContentService.GetDescendants(_homePage).Concat(new[] {_homePage}), 0, false);
             //all of them will be SuccessAlreadyPublished unless the unpublished one gets included, in that case
             //we'll have a 'Success' result which we don't want.
@@ -145,17 +154,17 @@ namespace Umbraco.Tests.Publishing
         {
             CreateTestData();
 
-            var strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+            IPublishingStrategy2 strategy = new PublishingStrategy(Logger);
 
             //publish root and nodes at it's children level
-            var result1 = strategy.Publish(_homePage, 0);
+            var result1 = strategy.Publish(_unitOfWork, _homePage, 0);
             Assert.IsTrue(result1);
             Assert.IsTrue(_homePage.Published);
             
             //NOTE (MCH) This isn't persisted, so not really a good test as it will look like the result should be something else.
             foreach (var c in ServiceContext.ContentService.GetChildren(_homePage.Id))
             {
-                var r = strategy.Publish(c, 0);
+                var r = strategy.Publish(_unitOfWork, c, 0);
                 Assert.IsTrue(r);
                 Assert.IsTrue(c.Published);
             }
@@ -168,7 +177,7 @@ namespace Umbraco.Tests.Publishing
             //with 'SuccessAlreadyPublished'
 
             var descendants = ServiceContext.ContentService.GetDescendants(_homePage).Concat(new[] {_homePage});
-            var result = strategy.PublishWithChildrenInternal(descendants, 0, true);
+            var result = strategy.PublishWithChildren(_unitOfWork, descendants, 0, true);
             
             Assert.AreEqual(3, result.Count(x => x.Result.StatusType == PublishStatusType.Success));
             Assert.AreEqual(1, result.Count(x => x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished));
