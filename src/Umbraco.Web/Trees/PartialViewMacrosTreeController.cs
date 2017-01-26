@@ -50,5 +50,11 @@ namespace Umbraco.Web.Trees
         {
             base.OnRenderFileNode(ref treeNode);
         }
+
+        protected override void OnRenderFolderNode(ref TreeNode treeNode)
+        {
+            //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+            treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
+        }
     }
 }
