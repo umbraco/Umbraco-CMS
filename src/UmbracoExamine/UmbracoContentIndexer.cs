@@ -32,6 +32,7 @@ namespace UmbracoExamine
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
         private readonly IContentTypeService _contentTypeService;
+        private readonly EntityXmlSerializer _serializer = new EntityXmlSerializer();
 
         #region Constructors
 
@@ -145,9 +146,7 @@ namespace UmbracoExamine
 
         #endregion
 
-        #region Constants & Fields
-
-
+        #region Constants & Fields        
 
         /// <summary>
         /// Used to store the path of a content object
@@ -365,7 +364,7 @@ namespace UmbracoExamine
         /// <summary>
         /// This is a static query, it's parameters don't change so store statically
         /// </summary>
-        private static readonly IQuery<IContent> PublishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
+        private IQuery<IContent> _publishedQuery;
 
         protected override void PerformIndexAll(string type)
         {
@@ -382,6 +381,9 @@ namespace UmbracoExamine
                     }
                     IContent[] content;
 
+                    //used to track non-published entities so we can determine what items are implicitly not published
+                    var notPublished = new HashSet<string>();
+
                     do
                     {
                         long total;
@@ -393,8 +395,14 @@ namespace UmbracoExamine
                         }
                         else
                         {
-                            //add the published filter
-                            descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, PublishedQuery);
+                            if (_publishedQuery == null)
+                            {
+                                _publishedQuery = Query<IContent>.Builder.Where(x => x.Published == true);
+                            }
+
+                            //get all paged records but order by level ascending, we need to do this because we need to track which nodes are not published so that we can determine
+                            // which descendent nodes are implicitly not published
+                            descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null);
                         }                        
 
                         //if specific types are declared we need to post filter them
@@ -407,9 +415,11 @@ namespace UmbracoExamine
                         {
                             content = descendants.ToArray();
                         }
-                        AddNodesToIndex(GetSerializedContent(content), type);
+                        AddNodesToIndex(GetSerializedContent(content, notPublished).WhereNotNull(), type);
                         pageIndex++;
                     } while (content.Length == pageSize);
+
+                    notPublished.Clear();
 
                     break;
                 case IndexTypes.Media:
@@ -463,12 +473,28 @@ namespace UmbracoExamine
             }
         }
 
-        private IEnumerable<XElement> GetSerializedContent(IEnumerable<IContent> content)
-        {
-            var serializer = new EntityXmlSerializer();
+        private IEnumerable<XElement> GetSerializedContent(IEnumerable<IContent> content, ISet<string> notPublished)
+        {            
             foreach (var c in content)
             {
-                var xml = serializer.Serialize(
+                if (SupportUnpublishedContent == false)
+                {
+                    //if we don't support published content and this is not published then track it and return null
+                    if (c.Published == false)
+                    {
+                        notPublished.Add(c.Path);
+                        yield return null;
+                    }
+
+                    //if we don't support published content, check if this content item exists underneath any already tracked
+                    //unpublished content and if so return null;
+                    if (notPublished.Any(path => c.Path.StartsWith(string.Format("{0},", path))))
+                    {
+                        yield return null;
+                    }
+                }
+
+                var xml = _serializer.Serialize(
                     _contentService,
                     _dataTypeService,
                     _userService,

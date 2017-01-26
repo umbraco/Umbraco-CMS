@@ -148,7 +148,7 @@ namespace Umbraco.Web.Models.Mapping
             //map the tree node url
             if (HttpContext.Current != null)
             {
-                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+                var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                 var url = urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(display.Key.ToString("N"), null));
                 display.TreeNodeUrl = url;
             }
