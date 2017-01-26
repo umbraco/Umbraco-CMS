@@ -17,6 +17,7 @@ using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
 using UmbracoExamine.Config;
 using Lucene.Net.Analysis;
+using Lucene.Net.Index;
 using Umbraco.Core.Persistence.Querying;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
@@ -138,6 +139,34 @@ namespace UmbracoExamine
             IContentTypeService contentTypeService,
             Analyzer analyzer, bool async)
             : base(indexerData, luceneDirectory, dataService, analyzer, async)
+        {
+            _contentService = contentService;
+            _mediaService = mediaService;
+            _dataTypeService = dataTypeService;
+            _userService = userService;
+            _contentTypeService = contentTypeService;
+        }
+
+        /// <summary>
+        /// Creates an NRT indexer
+        /// </summary>
+        /// <param name="indexerData"></param>
+        /// <param name="writer"></param>
+        /// <param name="dataService"></param>
+        /// <param name="contentTypeService"></param>
+        /// <param name="async"></param>
+        /// <param name="contentService"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        public UmbracoContentIndexer(IIndexCriteria indexerData, IndexWriter writer, IDataService dataService,
+            IContentService contentService,
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
+            IUserService userService,
+            IContentTypeService contentTypeService,
+            bool async) 
+            : base(indexerData, writer, dataService, async)
         {
             _contentService = contentService;
             _mediaService = mediaService;
@@ -399,13 +428,58 @@ namespace UmbracoExamine
                         
                         if (SupportUnpublishedContent == false && DisableXmlDocumentLookup == false)
                         {
+                            //get all node Ids that have a published version - this is a fail safe check, in theory
+                            // only document nodes that have a published version would exist in the cmsContentXml table
+                            var allNodesWithPublishedVersions = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                                "select DISTINCT cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1");
+
+                            XElement last = null;
+                            var trackedIds = new HashSet<string>();
+
                             ReindexWithXmlEntries(type, contentParentId,
                                 () => _contentTypeService.GetAllContentTypes().ToArray(),
                                 (path, pIndex, pSize) =>
                                 {
                                     long totalContent;
+
+                                    //sorted by: umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder
                                     var result = _contentService.GetPagedXmlEntries(path, pIndex, pSize, out totalContent).ToArray();
-                                    return new Tuple<long, XElement[]>(totalContent, result);
+
+                                    //then like we do in the ContentRepository.BuildXmlCache we need to track what Parents have been processed
+                                    // already so that we can then exclude implicitly unpublished content items
+                                    var filtered = new List<XElement>();
+
+                                    foreach (var xml in result)
+                                    {
+                                        var id = xml.AttributeValue<int>("id");
+                                        
+                                        //don't include this if it doesn't have a published version
+                                        if (allNodesWithPublishedVersions.Contains(id) == false)
+                                            continue;
+
+                                        var parentId = xml.AttributeValue<string>("parentID");
+
+                                        if (parentId == null) continue; //this shouldn't happen
+
+                                        //if the parentid is changing
+                                        if (last != null && last.AttributeValue<string>("parentID") != parentId)
+                                        {
+                                            var found = trackedIds.Contains(parentId);
+                                            if (found == false)
+                                            {
+                                                //Need to short circuit here, if the parent is not there it means that the parent is unpublished
+                                                // and therefore the child is not published either so cannot be included in the xml cache
+                                                continue;
+                                            }                                            
+                                        }
+                                        
+                                        last = xml;
+                                        trackedIds.Add(xml.AttributeValue<string>("id"));
+
+                                        filtered.Add(xml);
+                                    }
+
+                                    return new Tuple<long, XElement[]>(totalContent, filtered.ToArray());
                                 },
                                 i => _contentService.GetById(i));
                         }
@@ -415,32 +489,36 @@ namespace UmbracoExamine
                             //currently this is not in use apart form in tests
                             var notPublished = new HashSet<string>();
 
-                            IContent[] content;
+                            int currentPageSize;
                             do
                             {
                                 long total;
 
-                                IEnumerable<IContent> descendants;
+                                IContent[] descendants;
                                 if (SupportUnpublishedContent)
                                 {
-                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "umbracoNode.id").ToArray();
                                 }
                                 else
                                 {
                                     //get all paged records but order by level ascending, we need to do this because we need to track which nodes are not published so that we can determine
                                     // which descendent nodes are implicitly not published
-                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null);
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null).ToArray();
                                 }
+
+                                // need to store decendants count before filtering, in order for loop to work correctly
+                                currentPageSize = descendants.Length;
 
                                 //if specific types are declared we need to post filter them
                                 //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                                IEnumerable<IContent> content;
                                 if (IndexerData.IncludeNodeTypes.Any())
                                 {
-                                    content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
+                                    content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias));
                                 }
                                 else
                                 {
-                                    content = descendants.ToArray();
+                                    content = descendants;
                                 }
 
                                 AddNodesToIndex(GetSerializedContent(
@@ -449,7 +527,7 @@ namespace UmbracoExamine
                                     content, notPublished).WhereNotNull(), type);
 
                                 pageIndex++;
-                            } while (content.Length == pageSize);
+                            } while (currentPageSize == pageSize);
                         }
 
                         break;

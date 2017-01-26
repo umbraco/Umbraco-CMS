@@ -627,7 +627,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
-                var contents = repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, out totalRecords);
+                var contents = repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);
                 return contents;
             }
         }
