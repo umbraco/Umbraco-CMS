@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Events;
 
 namespace Umbraco.Tests.Scoping
 {

@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ICacheProvider _globalCache;
 
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, ICacheProvider globalCache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public ServerRegistrationRepository(IScopeUnitOfWork work, ICacheProvider globalCache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, CacheHelper.NoCache, logger, sqlSyntax)
         {
             // managing the cache our own way (no policy etc)

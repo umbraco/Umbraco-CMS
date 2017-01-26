@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the Macro Service, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
-    public class MacroService : RepositoryService, IMacroService
+    public class MacroService : ScopeRepositoryService, IMacroService
     {
         public MacroService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)

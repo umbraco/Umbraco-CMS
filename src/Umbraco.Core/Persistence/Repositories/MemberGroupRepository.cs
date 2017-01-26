@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
     internal class MemberGroupRepository : PetaPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public MemberGroupRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
@@ -159,15 +159,15 @@ namespace Umbraco.Core.Persistence.Repositories
                     Name = roleName
                 };
                 PersistNewItem(grp);
-
-                if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(grp), this))
+                
+                if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(grp), this, UnitOfWork.Events))
                 {
                     return null;
                 }
 
                 transaction.Complete();
 
-                SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(grp), this);
+                SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(grp), this, UnitOfWork.Events);
 
                 return grp;
             }

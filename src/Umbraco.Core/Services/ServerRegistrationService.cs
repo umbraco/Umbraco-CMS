@@ -15,9 +15,9 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Manages server registrations in the database.
     /// </summary>
-    public sealed class ServerRegistrationService : RepositoryService, IServerRegistrationService
+    public sealed class ServerRegistrationService : ScopeRepositoryService, IServerRegistrationService
     {
-        private readonly static string CurrentServerIdentityValue = NetworkHelper.MachineName // eg DOMAIN\SERVER
+        private static readonly string CurrentServerIdentityValue = NetworkHelper.MachineName // eg DOMAIN\SERVER
                                                             + "/" + HttpRuntime.AppDomainAppId; // eg /LM/S3SVC/11/ROOT
 
         private static readonly int[] LockingRepositoryIds = { Constants.Locks.Servers };
@@ -31,13 +31,13 @@ namespace Umbraco.Core.Services
         /// <param name="repositoryFactory">A repository factory.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory"></param>
-        public ServerRegistrationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public ServerRegistrationService(IScopeUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(uowProvider, repositoryFactory, logger, eventMessagesFactory)
-        {
+        {            
             _lrepo = new LockingRepository<IServerRegistrationRepository>(UowProvider,
                 x => RepositoryFactory.CreateServerRegistrationRepository(x),
                 LockingRepositoryIds, LockingRepositoryIds);
-        }
+        }        
 
         /// <summary>
         /// Touches a server to mark it as active; deactivate stale servers.

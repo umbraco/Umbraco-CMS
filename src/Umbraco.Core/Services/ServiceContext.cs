@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using Umbraco.Core.Logging;
 using System.IO;
 using System.Linq;
@@ -149,6 +150,22 @@ namespace Umbraco.Core.Services
             if (redirectUrlService != null) _redirectUrlService = new Lazy<IRedirectUrlService>(() => redirectUrlService);
         }
 
+        // fixme - but this is obsoleting a new method?!!?!!?
+        [Obsolete("The IPublishingStrategy parameter is no longer required and not used")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public ServiceContext(
+            RepositoryFactory repositoryFactory,
+            IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
+            IScopeUnitOfWorkProvider fileUnitOfWorkProvider,
+            IPublishingStrategy publishingStrategy,
+            CacheHelper cache,
+            ILogger logger,
+            IEventMessagesFactory eventMessagesFactory)
+            : this(repositoryFactory, dbUnitOfWorkProvider, fileUnitOfWorkProvider, cache, logger, eventMessagesFactory)
+        { }
+
+        // fixme CLEAN THIS
+
         /// <summary>
         /// Creates a service context with a RepositoryFactory which is used to construct Services
         /// </summary>
@@ -161,9 +178,9 @@ namespace Umbraco.Core.Services
         /// <param name="eventMessagesFactory"></param>
         public ServiceContext(
             RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
-            IUnitOfWorkProvider fileUnitOfWorkProvider, 
-            BasePublishingStrategy publishingStrategy, 
+            IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
+            IScopeUnitOfWorkProvider fileUnitOfWorkProvider, 
+            //BasePublishingStrategy publishingStrategy, 
             CacheHelper cache, 
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
@@ -171,14 +188,14 @@ namespace Umbraco.Core.Services
             if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
             if (dbUnitOfWorkProvider == null) throw new ArgumentNullException("dbUnitOfWorkProvider");
             if (fileUnitOfWorkProvider == null) throw new ArgumentNullException("fileUnitOfWorkProvider");
-            if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
+            //if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
             if (cache == null) throw new ArgumentNullException("cache");
             if (logger == null) throw new ArgumentNullException("logger");
             if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
 
             EventMessagesFactory = eventMessagesFactory;
 
-            BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
+            BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, /*publishingStrategy,*/ cache,
                               repositoryFactory,
                               logger, eventMessagesFactory);
         }
@@ -187,9 +204,9 @@ namespace Umbraco.Core.Services
         /// Builds the various services
         /// </summary>
         private void BuildServiceCache(
-            IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
-            IUnitOfWorkProvider fileUnitOfWorkProvider,
-            BasePublishingStrategy publishingStrategy,
+            IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
+            IScopeUnitOfWorkProvider fileUnitOfWorkProvider,
+            //BasePublishingStrategy publishingStrategy,
             CacheHelper cache,
             RepositoryFactory repositoryFactory,
             ILogger logger,
@@ -268,7 +285,7 @@ namespace Umbraco.Core.Services
                 _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory, logger, eventMessagesFactory, _memberGroupService.Value, _dataTypeService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, publishingStrategy, _dataTypeService.Value, _userService.Value));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, /*publishingStrategy,*/ _dataTypeService.Value, _userService.Value));
 
             if (_mediaService == null)
                 _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value));

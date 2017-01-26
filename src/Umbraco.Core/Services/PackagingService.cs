@@ -40,7 +40,7 @@ namespace Umbraco.Core.Services
         private readonly ILocalizationService _localizationService;
         private readonly IEntityService _entityService;
         private readonly RepositoryFactory _repositoryFactory;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
         private readonly IUserService _userService;
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
             IEntityService entityService,
             IUserService userService,
             RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider uowProvider)
+            IScopeUnitOfWorkProvider uowProvider)
         {
             _logger = logger;
             _contentService = contentService;

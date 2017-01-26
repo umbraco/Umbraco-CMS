@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class RelationService : RepositoryService, IRelationService
+    public class RelationService : ScopeRepositoryService, IRelationService
     {
         private readonly IEntityService _entityService;
         

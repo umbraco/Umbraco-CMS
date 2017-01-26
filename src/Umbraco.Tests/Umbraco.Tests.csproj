@@ -169,8 +169,11 @@
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Scheduling\DeployTest.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
+    <Compile Include="Scoping\EventNameExtractorTests.cs" />
     <Compile Include="Scoping\LeakTests.cs" />
     <Compile Include="Scoping\ScopedRepositoryTests.cs" />
+    <Compile Include="Scoping\PassThroughEventDispatcherTests.cs" />
+    <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Scoping\ScopedXmlTests.cs" />
     <Compile Include="Scoping\ScopeTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />

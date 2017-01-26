@@ -18,6 +18,12 @@ namespace Umbraco.Core.Publishing
         private readonly IEventMessagesFactory _eventMessagesFactory;
         private readonly ILogger _logger;
 
+        public PublishingStrategy(ILogger logger)
+        {
+            // fixme this whole class is entirely broken at the moment
+            _logger = logger;
+        }
+
         public PublishingStrategy(IEventMessagesFactory eventMessagesFactory, ILogger logger)
         {
             if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");

@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    internal class RedirectUrlService : RepositoryService, IRedirectUrlService
+    internal class RedirectUrlService : ScopeRepositoryService, IRedirectUrlService
     {
         public RedirectUrlService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory) 
             : base(provider, repositoryFactory, logger, eventMessagesFactory)

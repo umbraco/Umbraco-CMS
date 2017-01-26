@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
@@ -15,7 +14,8 @@ namespace Umbraco.Core.Scoping
         private bool _disposed;
 
         private UmbracoDatabase _database;
-        private IList<EventMessage> _messages;
+        private IEventDispatcher _eventDispatcher;
+        private EventMessages _messages;
 
         public NoScope(ScopeProvider scopeProvider)
         {
@@ -59,21 +59,32 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IList<EventMessage> Messages
+        public EventMessages Messages
         {
             get
             {
                 EnsureNotDisposed();
-                return _messages ?? (_messages = new List<EventMessage>());
+                // fixme - should be a 'no scope event messages' of some sort
+                return _messages ?? (_messages = new EventMessages());
             }
         }
 
-        public IList<EventMessage> MessagesOrNull
+        public EventMessages MessagesOrNull
         {
             get
             {
                 EnsureNotDisposed();
                 return _messages;
+            }
+        }
+
+        /// <inheritdoc />
+        public IEventDispatcher Events
+        {
+            get
+            {
+                EnsureNotDisposed();
+                return _eventDispatcher ?? (_eventDispatcher = new PassThroughEventDispatcher());
             }
         }
 

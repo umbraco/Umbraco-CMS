@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private RelationTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private RelationTypeRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             return new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
         }

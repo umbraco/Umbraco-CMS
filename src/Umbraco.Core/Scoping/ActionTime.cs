@@ -7,7 +7,7 @@ namespace Umbraco.Core.Scoping
     {
         None = 0,
         BeforeCommit = 1,
-        BeforeEvent = 2,
+        BeforeEvents = 2,
         BeforeDispose = 4
     }
 }

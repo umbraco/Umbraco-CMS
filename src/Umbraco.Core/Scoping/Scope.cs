@@ -21,8 +21,9 @@ namespace Umbraco.Core.Scoping
 
         private IsolatedRuntimeCache _isolatedRuntimeCache;
         private UmbracoDatabase _database;
-        private IList<EventMessage> _messages;
+        private EventMessages _messages;
         private IDictionary<string, IEnlistedObject> _enlisted;
+        private IEventDispatcher _eventDispatcher;
 
         // this is v7, in v8 this has to change to RepeatableRead
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
@@ -165,24 +166,33 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IList<EventMessage> Messages
+        public EventMessages Messages
         {
             get
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Messages;
-                if (_messages == null)
-                    _messages = new List<EventMessage>();
-                return _messages;
+                return _messages ?? (_messages = new EventMessages());
             }
         }
 
-        public IList<EventMessage> MessagesOrNull
+        public EventMessages MessagesOrNull
         {
             get
             {
                 EnsureNotDisposed();
                 return ParentScope == null ? _messages : ParentScope.MessagesOrNull;
+            }
+        }
+
+        /// <inheritdoc />
+        public IEventDispatcher Events
+        {
+            get
+            {
+                EnsureNotDisposed();
+                if (ParentScope != null) return ParentScope.Events;
+                return _eventDispatcher ?? (_eventDispatcher = new ScopeEventDispatcher());
             }
         }
 
@@ -242,6 +252,8 @@ namespace Umbraco.Core.Scoping
 
             var completed = _completed.HasValue && _completed.Value;
 
+            // fixme missing actions here
+
             if (_database != null)
             {
                 try
@@ -257,6 +269,15 @@ namespace Umbraco.Core.Scoping
                     _database = null;
                 }
             }
+
+            // run enlisted actions
+            RunEnlisted(ActionTime.BeforeEvents, completed);
+
+            // now trigger every events
+            // fixme - should some of them trigger within the transaction?
+            // fixme - this is NOT how we want to do it
+            if (_eventDispatcher != null)
+                _eventDispatcher.Dispose();
 
             // run enlisted actions
             RunEnlisted(ActionTime.BeforeDispose, completed);

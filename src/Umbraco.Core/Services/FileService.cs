@@ -22,15 +22,15 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the File Service, which is an easy access to operations involving <see cref="IFile"/> objects like Scripts, Stylesheets and Templates
     /// </summary>
-    public class FileService : RepositoryService, IFileService
+    public class FileService : ScopeRepositoryService, IFileService
     {
-        private readonly IUnitOfWorkProvider _fileUowProvider;
+        private readonly IScopeUnitOfWorkProvider _fileUowProvider;
 
         private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoTemplatePage";
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
 
         public FileService(
-            IUnitOfWorkProvider fileProvider, 
+            IScopeUnitOfWorkProvider fileProvider, 
             IDatabaseUnitOfWorkProvider dataProvider, 
             RepositoryFactory repositoryFactory,
             ILogger logger,

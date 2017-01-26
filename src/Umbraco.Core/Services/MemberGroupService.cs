@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class MemberGroupService : RepositoryService, IMemberGroupService
+    public class MemberGroupService : ScopeRepositoryService, IMemberGroupService
     {
 
         public MemberGroupService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)

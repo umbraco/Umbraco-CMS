@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     [TestFixture]
     public class LockedRepositoryTests : BaseDatabaseFactoryTest
     {
-        private static IServerRegistrationRepository CreateRepository(IDatabaseUnitOfWork uow, ILogger logger, CacheHelper cacheHelper, ISqlSyntaxProvider sqlSyntax)
+        private static IServerRegistrationRepository CreateRepository(IScopeUnitOfWork uow, ILogger logger, CacheHelper cacheHelper, ISqlSyntaxProvider sqlSyntax)
         {
             return new ServerRegistrationRepository(
                 uow,

@@ -14,7 +14,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class EntityService : RepositoryService, IEntityService
+    public class EntityService : ScopeRepositoryService, IEntityService
     {
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;

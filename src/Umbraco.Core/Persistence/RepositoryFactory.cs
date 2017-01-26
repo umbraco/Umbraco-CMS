@@ -1,5 +1,6 @@
 using Umbraco.Core.Configuration;
 using System;
+using System.ComponentModel;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -88,42 +89,42 @@ namespace Umbraco.Core.Persistence
      
         #endregion
 
-        public virtual IExternalLoginRepository CreateExternalLoginRepository(IDatabaseUnitOfWork uow)
+        public virtual IExternalLoginRepository CreateExternalLoginRepository(IScopeUnitOfWork uow)
         {
             return new ExternalLoginRepository(uow,
                 _cacheHelper,
                 _logger, _sqlSyntax);
         }
 
-        public virtual IPublicAccessRepository CreatePublicAccessRepository(IDatabaseUnitOfWork uow)
+        public virtual IPublicAccessRepository CreatePublicAccessRepository(IScopeUnitOfWork uow)
         {
             return new PublicAccessRepository(uow,
                 _cacheHelper,
                 _logger, _sqlSyntax);
         }
 
-        public virtual ITaskRepository CreateTaskRepository(IDatabaseUnitOfWork uow)
+        public virtual ITaskRepository CreateTaskRepository(IScopeUnitOfWork uow)
         {
             return new TaskRepository(uow,
                 _nullCache, //never cache
                 _logger, _sqlSyntax);
         }
 
-        public virtual IAuditRepository CreateAuditRepository(IDatabaseUnitOfWork uow)
+        public virtual IAuditRepository CreateAuditRepository(IScopeUnitOfWork uow)
         {
             return new AuditRepository(uow,
                 _nullCache, //never cache
                 _logger, _sqlSyntax);
         }
 
-        public virtual ITagRepository CreateTagRepository(IDatabaseUnitOfWork uow)
+        public virtual ITagRepository CreateTagRepository(IScopeUnitOfWork uow)
         {
             return new TagRepository(
                 uow,
                 _cacheHelper, _logger, _sqlSyntax);
         }
 
-        public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
+        public virtual IContentRepository CreateContentRepository(IScopeUnitOfWork uow)
         {
             return new ContentRepository(
                 uow,
@@ -139,7 +140,7 @@ namespace Umbraco.Core.Persistence
             };
         }
 
-        public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
+        public virtual IContentTypeRepository CreateContentTypeRepository(IScopeUnitOfWork uow)
         {
             return new ContentTypeRepository(
                 uow,
@@ -148,7 +149,7 @@ namespace Umbraco.Core.Persistence
                 CreateTemplateRepository(uow));
         }
 
-        public virtual IDataTypeDefinitionRepository CreateDataTypeDefinitionRepository(IDatabaseUnitOfWork uow)
+        public virtual IDataTypeDefinitionRepository CreateDataTypeDefinitionRepository(IScopeUnitOfWork uow)
         {
             return new DataTypeDefinitionRepository(
                 uow,
@@ -157,7 +158,7 @@ namespace Umbraco.Core.Persistence
                 CreateContentTypeRepository(uow));
         }
 
-        public virtual IDictionaryRepository CreateDictionaryRepository(IDatabaseUnitOfWork uow)
+        public virtual IDictionaryRepository CreateDictionaryRepository(IScopeUnitOfWork uow)
         {
             return new DictionaryRepository(
                 uow,
@@ -166,7 +167,7 @@ namespace Umbraco.Core.Persistence
                 _sqlSyntax);
         }
 
-        public virtual ILanguageRepository CreateLanguageRepository(IDatabaseUnitOfWork uow)
+        public virtual ILanguageRepository CreateLanguageRepository(IScopeUnitOfWork uow)
         {
             return new LanguageRepository(
                 uow,
@@ -174,7 +175,7 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
-        public virtual IMediaRepository CreateMediaRepository(IDatabaseUnitOfWork uow)
+        public virtual IMediaRepository CreateMediaRepository(IScopeUnitOfWork uow)
         {
             return new MediaRepository(
                 uow,
@@ -185,7 +186,7 @@ namespace Umbraco.Core.Persistence
                 _settings.Content);
         }
 
-        public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
+        public virtual IMediaTypeRepository CreateMediaTypeRepository(IScopeUnitOfWork uow)
         {
             return new MediaTypeRepository(
                 uow,
@@ -193,7 +194,7 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
-        public virtual IRelationRepository CreateRelationRepository(IDatabaseUnitOfWork uow)
+        public virtual IRelationRepository CreateRelationRepository(IScopeUnitOfWork uow)
         {
             return new RelationRepository(
                 uow,
@@ -202,7 +203,7 @@ namespace Umbraco.Core.Persistence
                 CreateRelationTypeRepository(uow));
         }
 
-        public virtual IRelationTypeRepository CreateRelationTypeRepository(IDatabaseUnitOfWork uow)
+        public virtual IRelationTypeRepository CreateRelationTypeRepository(IScopeUnitOfWork uow)
         {
             return new RelationTypeRepository(
                 uow,
@@ -225,12 +226,18 @@ namespace Umbraco.Core.Persistence
             return new PartialViewMacroRepository(uow, FileSystemProviderManager.Current.MacroPartialsFileSystem);
         }
 
+        public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow)
+        {
+            return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
+        }
+        [Obsolete("Do not use this method, use the method with only the single unit of work parameter")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow, IDatabaseUnitOfWork db)
         {
             return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
         }
 
-        public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
+        public virtual ITemplateRepository CreateTemplateRepository(IScopeUnitOfWork uow)
         {
             return new TemplateRepository(uow, 
                 _cacheHelper,
@@ -245,7 +252,7 @@ namespace Umbraco.Core.Persistence
             return new XsltFileRepository(uow, FileSystemProviderManager.Current.XsltFileSystem);
         }
 
-        public virtual IMigrationEntryRepository CreateMigrationEntryRepository(IDatabaseUnitOfWork uow)
+        public virtual IMigrationEntryRepository CreateMigrationEntryRepository(IScopeUnitOfWork uow)
         {
             return new MigrationEntryRepository(
                 uow,
@@ -253,7 +260,7 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
-        public virtual IServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
+        public virtual IServerRegistrationRepository CreateServerRegistrationRepository(IScopeUnitOfWork uow)
         {
             return new ServerRegistrationRepository(
                 uow,
@@ -261,7 +268,7 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
-        public virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
+        public virtual IUserTypeRepository CreateUserTypeRepository(IScopeUnitOfWork uow)
         {
             return new UserTypeRepository(
                 uow,
@@ -270,7 +277,7 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
-        public virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
+        public virtual IUserRepository CreateUserRepository(IScopeUnitOfWork uow)
         {            
             return new UserRepository(
                 uow,
@@ -280,14 +287,14 @@ namespace Umbraco.Core.Persistence
                 CreateUserTypeRepository(uow));
         }
 
-        internal virtual IMacroRepository CreateMacroRepository(IDatabaseUnitOfWork uow)
+        internal virtual IMacroRepository CreateMacroRepository(IScopeUnitOfWork uow)
         {
             return new MacroRepository(uow,
                 _cacheHelper,
                 _logger, _sqlSyntax);
         }
 
-        public virtual IMemberRepository CreateMemberRepository(IDatabaseUnitOfWork uow)
+        public virtual IMemberRepository CreateMemberRepository(IScopeUnitOfWork uow)
         {
             return new MemberRepository(
                 uow,
@@ -299,38 +306,38 @@ namespace Umbraco.Core.Persistence
                 _settings.Content);
         }
 
-        public virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)
+        public virtual IMemberTypeRepository CreateMemberTypeRepository(IScopeUnitOfWork uow)
         {
             return new MemberTypeRepository(uow,
                 _cacheHelper,
                 _logger, _sqlSyntax);
         }
 
-        public virtual IMemberGroupRepository CreateMemberGroupRepository(IDatabaseUnitOfWork uow)
+        public virtual IMemberGroupRepository CreateMemberGroupRepository(IScopeUnitOfWork uow)
         {
             return new MemberGroupRepository(uow,
                 _cacheHelper,
                 _logger, _sqlSyntax);
         }
 
-        public virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
+        public virtual IEntityRepository CreateEntityRepository(IScopeUnitOfWork uow)
         {
             return new EntityRepository(uow);
         }
 
-        public virtual IDomainRepository CreateDomainRepository(IDatabaseUnitOfWork uow)
+        public virtual IDomainRepository CreateDomainRepository(IScopeUnitOfWork uow)
         {
             return new DomainRepository(uow, _cacheHelper, _logger, _sqlSyntax);
         }
 
-        public ITaskTypeRepository CreateTaskTypeRepository(IDatabaseUnitOfWork uow)
+        public ITaskTypeRepository CreateTaskTypeRepository(IScopeUnitOfWork uow)
         {
             return new TaskTypeRepository(uow,
                 _nullCache, //never cache
                 _logger, _sqlSyntax);
         }
 
-        internal virtual EntityContainerRepository CreateEntityContainerRepository(IDatabaseUnitOfWork uow, Guid containerObjectType)
+        internal virtual EntityContainerRepository CreateEntityContainerRepository(IScopeUnitOfWork uow, Guid containerObjectType)
         {
             return new EntityContainerRepository(
                 uow,
@@ -339,18 +346,13 @@ namespace Umbraco.Core.Persistence
                 containerObjectType);
         }
 
-        public IRedirectUrlRepository CreateRedirectUrlRepository(IDatabaseUnitOfWork uow)
+        public IRedirectUrlRepository CreateRedirectUrlRepository(IScopeUnitOfWork uow)
         {
             return new RedirectUrlRepository(
                 uow,
                 _cacheHelper,
                 _logger,
                 _sqlSyntax);
-        }
-
-        internal IStylesheetRepository CreateStylesheetRepository(IDatabaseUnitOfWork uow)
-        {
-            return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
         }
     }
 }

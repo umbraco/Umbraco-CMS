@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/>
     /// </summary>
-    public class DataTypeService : RepositoryService, IDataTypeService
+    public class DataTypeService : ScopeRepositoryService, IDataTypeService
     {
 
         public DataTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)

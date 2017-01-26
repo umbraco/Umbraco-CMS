@@ -164,7 +164,7 @@ namespace Umbraco.Core
     	public static ApplicationContext Current { get; internal set; }
 
         // fixme
-        public IScopeProvider ScopeProvider { get { return DatabaseContext.ScopeProvider; } }
+        internal IScopeProvider ScopeProvider { get { return DatabaseContext.ScopeProvider; } }
 
 		/// <summary>
 		/// Returns the application wide cache accessor

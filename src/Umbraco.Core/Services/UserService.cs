@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the UserService, which is an easy access to operations involving <see cref="IProfile"/>, <see cref="IMembershipUser"/> and eventually Backoffice Users.
     /// </summary>
-    public class UserService : RepositoryService, IUserService
+    public class UserService : ScopeRepositoryService, IUserService
     {
 
         //TODO: We need to change the isUpgrading flag to use an app state enum as described here: http://issues.umbraco.org/issue/U4-6816

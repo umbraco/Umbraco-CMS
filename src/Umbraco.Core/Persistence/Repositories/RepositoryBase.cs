@@ -102,7 +102,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (_isolatedCache != null) return _isolatedCache;
 
-                var scope = ((PetaPocoUnitOfWork) UnitOfWork).Scope; // fixme cast!
+                var scope = ((ScopeUnitOfWork) UnitOfWork).Scope; // fixme cast!
                 IsolatedRuntimeCache provider;
                 switch (scope.RepositoryCacheMode)
                 {
@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     return _cachePolicy = NoRepositoryCachePolicy<TEntity, TId>.Instance;
                 
                 _cachePolicy = CreateCachePolicy(IsolatedCache);
-                var scope = ((PetaPocoUnitOfWork) UnitOfWork).Scope; // fixme cast!
+                var scope = ((ScopeUnitOfWork) UnitOfWork).Scope; // fixme cast!
                 switch (scope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
