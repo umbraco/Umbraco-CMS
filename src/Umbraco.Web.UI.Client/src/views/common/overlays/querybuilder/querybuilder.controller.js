@@ -1,8 +1,14 @@
 (function () {
     "use strict";
 
-    function QueryBuilderOverlayController($scope, templateQueryResource) {
+    function QueryBuilderOverlayController($scope, templateQueryResource, localizationService) {
 
+        var everything = localizationService.localize("template_allContent");
+        var myWebsite = localizationService.localize("template_websiteRoot");
+
+        var ascendingTranslation = localizationService.localize("template_ascending");
+        var descendingTranslation = localizationService.localize("template_descending");
+    
         var vm = this;
 
         vm.properties = [];
@@ -17,10 +23,10 @@
 
         vm.query = {
             contentType: {
-                name: "Everything"
+                name: everything
             },
             source: {
-                name: "My website"
+                name: myWebsite
             },
             filters: [
                 {
@@ -33,7 +39,13 @@
                     alias: "",
                     name: "",
                 },
-                direction: "ascending"
+                direction: "ascending", //This is the value for sorting sent to server
+                translation: {
+                    currentLabel: ascendingTranslation, //This is the localized UI value in the the dialog
+                    ascending: ascendingTranslation,
+                    descending: descendingTranslation
+                }
+
             }
         };
 
@@ -74,7 +86,6 @@
             vm.contentPickerOverlay = {
                 view: "contentpicker",
                 show: true,
-                submitButtonLabel: "Insert",
                 submit: function(model) {
 
                     var selectedNodeId = model.selection[0].id;
@@ -83,7 +94,7 @@
                     if (selectedNodeId > 0) {
                         query.source = { id: selectedNodeId, name: selectedNodeName };
                     } else {
-                        query.source.name = "My website";
+                        query.source.name = myWebsite;
                         delete query.source.id;
                     }
 
@@ -113,13 +124,21 @@
 
         function trashFilter(query) {
             query.filters.splice(query, 1);
+
+            //if we remove the last one, add a new one to generate ui for it.
+            if (query.filters.length == 0) {
+                query.filters.push({});
+            }
+
         }
 
         function changeSortOrder(query) {
             if (query.sort.direction === "ascending") {
                 query.sort.direction = "descending";
+                query.sort.translation.currentLabel = query.sort.translation.descending;
             } else {
                 query.sort.direction = "ascending";
+                query.sort.translation.currentLabel = query.sort.translation.ascending;
             }
             throttledFunc();
         }
@@ -128,8 +147,10 @@
             query.sort.property = property;
             if (property.type === "datetime") {
                 query.sort.direction = "descending";
+                query.sort.translation.currentLabel = query.sort.translation.descending;
             } else {
                 query.sort.direction = "ascending";
+                query.sort.translation.currentLabel = query.sort.translation.ascending;
             }
             throttledFunc();
         }

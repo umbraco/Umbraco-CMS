@@ -291,6 +291,7 @@
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
+    <key alias="noMacros">Der er ikke tilføjet nogen makroer</key>
     <key alias="linkYour">Link dit</key>
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
@@ -1004,17 +1005,117 @@ Mange hilsner fra Umbraco robotten
     <key alias="preview">Vis prøve</key>
     <key alias="styles">Styles</key>
   </area>
+
   <area alias="template">
     <key alias="edittemplate">Rediger skabelon</key>
+
+    <key alias="insertSections">Sektioner</key>
     <key alias="insertContentArea">Indsæt indholdsområde</key>
-    <key alias="insertContentAreaPlaceHolder">Indsæt indholdsområdemarkering</key>
-    <key alias="insertDictionaryItem">Indsæt ordbogselement</key>
-    <key alias="insertMacro">Indsæt makro</key>
-    <key alias="insertPageField">Indsæt Umbraco sidefelt</key>
+    <key alias="insertContentAreaPlaceHolder">Indsæt pladsholder for indholdsområde</key>
+
+    <key alias="insert">Indsæt</key>
+    <key alias="insertDesc">Hvad vil du indsætte ?</key>
+
+    <key alias="insertDictionaryItem">Oversættelse</key>
+    <key alias="insertDictionaryItemDesc">Indsætter en oversætbar tekst, som skifter efter det sprog, som websitet vises i.</key>
+
+    <key alias="insertMacro">Makro</key>
+    <key alias="insertMacroDesc">
+      En makro er et element, som kan have forskellige indstillinger, når det indsættes. 
+      Brug det som en genbrugelig del af dit design såsom gallerier, formularer og lister.
+    </key>
+
+    <key alias="insertPageField">Sideværdi</key>
+    <key alias="insertPageFieldDesc">
+      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller 
+      vise en standardværdi i tilfælde af, at feltet er tomt.
+    </key>
+
+    <key alias="insertPartialView">Partial view</key>
+    <key alias="insertPartialViewDesc">
+      Et Partial View er et skabelonelement, som kan indsættes i andre skabeloner og derved 
+      genbruges og deles på tværs af sideskabelonerne.
+    </key>
+
     <key alias="mastertemplate">Master skabelon</key>
-    <key alias="quickGuide">Lynguide til Umbracos skabelontags</key>
+    <key alias="noMastertemplate">Ingen masterskabelon</key>
+    <key alias="noMaster">Ingen master</key>
+
+    <key alias="renderBody">Indsæt en underliggende skabelon</key>
+    <key alias="renderBodyDesc">
+      <![CDATA[
+      Henter indholdet af en underliggende skabelon ind, ved at 
+      indsætte et <code>@RenderBody()</code> element.
+      ]]>
+    </key>
+
+
+    <key alias="defineSection">Definer en sektion</key>
+    <key alias="defineSectionDesc">
+      <![CDATA[
+         Definerer en del af din skabelon som en navngivet sektion, ved at 
+         omkranse den i <code>@section { ... }</code>. Herefter kan denne sektion flettes ind i 
+         overliggende skabelon ved at indsætte et <code>@RenderSection</code> element.
+      ]]>
+    </key>
+
+    <key alias="renderSection">Indsæt en sektion</key>
+    <key alias="renderSectionDesc">
+      <![CDATA[
+      Henter indholdet af en sektion fra den underliggende skabelon ind, ved at indsætte et 
+      <code>@RenderSection(name)</code> element. Den underliggende skabelon skal have 
+      defineret en sektion via et <code>@section [name]{ ... }</code> element.
+      ]]>
+    </key>
+
+    <key alias="sectionName">Sektionsnavn</key>
+    <key alias="sectionMandatory">Sektionen er obligatorisk</key>
+    
+    <key alias="sectionMandatoryDesc">
+      Hvis obligatorisk, skal underskabelonen indeholde en <code>@section</code> -definition.
+    </key>
+
+
+    <key alias="queryBuilder">Query builder</key>
+    <key alias="itemsReturned">sider returneret, på</key>
+
+    <key alias="iWant">Returner</key>
+    <key alias="allContent">alt indhold</key>
+    <key alias="contentOfType">indhold af typen &quot;%0%&quot;</key>
+    
+    <key alias="from">fra</key>
+    <key alias="websiteRoot">mit website</key>
+    <key alias="where">filtre</key>
+    <key alias="and">og</key>
+
+    <key alias="is">is</key>
+    <key alias="isNot">is not</key>
+    <key alias="before">before</key>
+    <key alias="beforeIncDate">before (including selected date)</key>
+    <key alias="after">after</key>
+    <key alias="afterIncDate">after (including selected date)</key>
+    <key alias="equals">equals</key>
+    <key alias="doesNotEqual">does not equal</key>
+    <key alias="contains">contains</key>
+    <key alias="doesNotContain">does not contain</key>
+    <key alias="greaterThan">greater than</key>
+    <key alias="greaterThanEqual">greater than or equal to</key>
+    <key alias="lessThan">less than</key>
+    <key alias="lessThanEqual">less than or equal to</key>
+
+    <key alias="id">Id</key>
+    <key alias="name">Name</key>
+    <key alias="createdDate">Created Date</key>
+    <key alias="lastUpdatedDate">Last Updated Date</key>
+
+    <key alias="orderBy">order by</key>
+    <key alias="ascending">ascending</key>
+    <key alias="descending">descending</key>
+
     <key alias="template">Skabelon</key>
   </area>
+  
+ 
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>
     <key alias="alternativeText">Alternativ tekst</key>
