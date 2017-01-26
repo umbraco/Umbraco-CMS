@@ -294,6 +294,9 @@ namespace Umbraco.Core
             var relationType = entity as IRelationType;
             if (relationType != null) return relationType.GetUdi();
 
+            var dictionaryItem = entity as IDictionaryItem;
+            if (dictionaryItem != null) return dictionaryItem.GetUdi();
+
             throw new NotSupportedException(string.Format("Entity type {0} is not supported.", entity.GetType().FullName));
         }
     }
