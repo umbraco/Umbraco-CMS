@@ -1085,32 +1085,32 @@ Mange hilsner fra Umbraco robotten
     
     <key alias="from">fra</key>
     <key alias="websiteRoot">mit website</key>
-    <key alias="where">filtre</key>
+    <key alias="where">hvor</key>
     <key alias="and">og</key>
 
-    <key alias="is">is</key>
-    <key alias="isNot">is not</key>
-    <key alias="before">before</key>
-    <key alias="beforeIncDate">before (including selected date)</key>
-    <key alias="after">after</key>
-    <key alias="afterIncDate">after (including selected date)</key>
-    <key alias="equals">equals</key>
-    <key alias="doesNotEqual">does not equal</key>
-    <key alias="contains">contains</key>
-    <key alias="doesNotContain">does not contain</key>
-    <key alias="greaterThan">greater than</key>
-    <key alias="greaterThanEqual">greater than or equal to</key>
-    <key alias="lessThan">less than</key>
-    <key alias="lessThanEqual">less than or equal to</key>
+    <key alias="is">er</key>
+    <key alias="isNot">ikke er</key>
+    <key alias="before">er før</key>
+    <key alias="beforeIncDate">er før (inkl. valgte dato)</key>
+    <key alias="after">er efter</key>
+    <key alias="afterIncDate">er efter (inkl. valgte dato)</key>
+    <key alias="equals">er</key>
+    <key alias="doesNotEqual">ikke er</key>
+    <key alias="contains">indeholder</key>
+    <key alias="doesNotContain">ikke indeholder</key>
+    <key alias="greaterThan">er større end</key>
+    <key alias="greaterThanEqual">er større end eller det samme som</key>
+    <key alias="lessThan">er mindre end</key>
+    <key alias="lessThanEqual">er mindre end eller det samme som</key>
 
     <key alias="id">Id</key>
-    <key alias="name">Name</key>
-    <key alias="createdDate">Created Date</key>
-    <key alias="lastUpdatedDate">Last Updated Date</key>
+    <key alias="name">Navn</key>
+    <key alias="createdDate">Oprettelsesdato</key>
+    <key alias="lastUpdatedDate">Sidste opdatering</key>
 
-    <key alias="orderBy">order by</key>
-    <key alias="ascending">ascending</key>
-    <key alias="descending">descending</key>
+    <key alias="orderBy">Sortér efter</key>
+    <key alias="ascending">stigende rækkefølge</key>
+    <key alias="descending">faldende rækkefølge</key>
 
     <key alias="template">Skabelon</key>
   </area>
