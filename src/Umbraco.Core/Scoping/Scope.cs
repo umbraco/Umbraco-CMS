@@ -276,6 +276,7 @@ namespace Umbraco.Core.Scoping
             // now trigger every events
             // fixme - should some of them trigger within the transaction?
             // fixme - this is NOT how we want to do it
+            // fixme - should we trigger all events even when NOT completing?!
             if (_eventDispatcher != null)
                 _eventDispatcher.Dispose();
 

@@ -68,7 +68,8 @@ namespace Umbraco.Core.Services
             media.Path = string.Concat(parent.IfNotNull(x => x.Path, media.ParentId.ToString()), ",", media.Id);
 
             //we are using GetReadOnlyUnitOfWork because this actually doesn't write anything!
-            using (var uow = UowProvider.GetReadOnlyUnitOfWork())
+            // fixme - IS IT EVEN DOING ANYTHING WITH REPO? NO! SO USE A SCOPE INSTEAD!
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this, uow.Events))
                 {
@@ -112,7 +113,8 @@ namespace Umbraco.Core.Services
             media.Path = string.Concat(parent.Path, ",", media.Id);
 
             //we are using GetReadOnlyUnitOfWork because this actually doesn't write anything!
-            using (var uow = UowProvider.GetReadOnlyUnitOfWork())
+            // fixme 
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this, uow.Events))
                 {
@@ -645,7 +647,7 @@ namespace Umbraco.Core.Services
 
             var sql = createSql(umbracoFileValue);
 
-            using (var uow = UowProvider.GetReadOnlyUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
 
@@ -722,46 +724,51 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
-                var originalPath = media.Path;
-
-                if (Moving.IsRaisedEventCancelled(
-                    new MoveEventArgs<IMedia>(
-                        new MoveEventInfo<IMedia>(media, originalPath, parentId)), this, UowProvider, eventName: "Moving"))
+                using (var scope = UowProvider.ScopeProvider.CreateScope())
                 {
-                    return;
-                }
+                    scope.Complete(); // always complete
 
-                media.ParentId = parentId;
-                if (media.Trashed)
-                {
-                    media.ChangeTrashedState(false, parentId);
-                }
-                Save(media, userId,
-                    //no events!
-                    false);
+                    var originalPath = media.Path;
 
-                //used to track all the moved entities to be given to the event
-                var moveInfo = new List<MoveEventInfo<IMedia>>
+                    if (Moving.IsRaisedEventCancelled(
+                        new MoveEventArgs<IMedia>(
+                            new MoveEventInfo<IMedia>(media, originalPath, parentId)), this, scope.Events, eventName: "Moving"))
+                    {
+                        return;
+                    }
+
+                    media.ParentId = parentId;
+                    if (media.Trashed)
+                    {
+                        media.ChangeTrashedState(false, parentId);
+                    }
+                    Save(media, userId,
+                        //no events!
+                        false);
+
+                    //used to track all the moved entities to be given to the event
+                    var moveInfo = new List<MoveEventInfo<IMedia>>
                 {
                     new MoveEventInfo<IMedia>(media, originalPath, parentId)
                 };
 
-                //Ensure that relevant properties are updated on children
-                var children = GetChildren(media.Id).ToArray();
-                if (children.Any())
-                {
-                    var parentPath = media.Path;
-                    var parentLevel = media.Level;
-                    var parentTrashed = media.Trashed;
-                    var updatedDescendants = UpdatePropertiesOnChildren(children, parentPath, parentLevel, parentTrashed, moveInfo);
-                    Save(updatedDescendants, userId,
-                        //no events!
-                        false);
+                    //Ensure that relevant properties are updated on children
+                    var children = GetChildren(media.Id).ToArray();
+                    if (children.Any())
+                    {
+                        var parentPath = media.Path;
+                        var parentLevel = media.Level;
+                        var parentTrashed = media.Trashed;
+                        var updatedDescendants = UpdatePropertiesOnChildren(children, parentPath, parentLevel, parentTrashed, moveInfo);
+                        Save(updatedDescendants, userId,
+                            //no events!
+                            false);
+                    }
+
+                    Moved.RaiseEvent(new MoveEventArgs<IMedia>(false, moveInfo.ToArray()), this, scope.Events, eventName: "Moved");
+
+                    Audit(AuditType.Move, "Move Media performed by user", userId, media.Id);
                 }
-
-                Moved.RaiseEvent(new MoveEventArgs<IMedia>(false, moveInfo.ToArray()), this, UowProvider, eventName: "Moved");
-
-                Audit(AuditType.Move, "Move Media performed by user", userId, media.Id);
             }
         }
 

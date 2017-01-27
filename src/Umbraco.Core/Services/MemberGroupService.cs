@@ -33,7 +33,11 @@ namespace Umbraco.Core.Services
 
         void MemberGroupRepository_SavedMemberGroup(IMemberGroupRepository sender, SaveEventArgs<IMemberGroup> e)
         {
-            Saved.RaiseEvent(new SaveEventArgs<IMemberGroup>(e.SavedEntities, false), this, UowProvider);
+            using (var scope = UowProvider.ScopeProvider.CreateScope())
+            {
+                scope.Complete(); // always complete
+                Saved.RaiseEvent(new SaveEventArgs<IMemberGroup>(e.SavedEntities, false), this, scope.Events);
+            }
         } 
         #endregion
 

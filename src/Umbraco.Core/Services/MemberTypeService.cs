@@ -92,10 +92,12 @@ namespace Umbraco.Core.Services
                     memberType.CreatorId = userId;
                     repository.AddOrUpdate(memberType);
 
+                    uow.Commit(); // fixme double?
+                    UpdateContentXmlStructure(memberType);
                     uow.Commit();
+
+                    Saved.RaiseEvent(new SaveEventArgs<IMemberType>(memberType, false), this, uow.Events);
                 }
-                UpdateContentXmlStructure(memberType);
-                Saved.RaiseEvent(new SaveEventArgs<IMemberType>(memberType, false), this, UowProvider);
             }
         }
 
@@ -119,12 +121,15 @@ namespace Umbraco.Core.Services
                         repository.AddOrUpdate(memberType);
                     }
 
+                    uow.Commit(); // fixme double?
+
+                    UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
+
                     //save it all in one go
                     uow.Commit();
-                }
 
-                UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
-                Saved.RaiseEvent(new SaveEventArgs<IMemberType>(asArray, false), this, UowProvider);
+                    Saved.RaiseEvent(new SaveEventArgs<IMemberType>(asArray, false), this, uow.Events);
+                }
             }
             
         }

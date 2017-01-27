@@ -92,10 +92,10 @@ namespace Umbraco.Tests.Services
             mediaService.Save(media);
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var uow = provider.GetUnitOfWork();
-
-            Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
-
+            using (var uow = provider.GetUnitOfWork())
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
+            }
         }
 
         [Test]

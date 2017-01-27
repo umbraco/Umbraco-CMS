@@ -13,7 +13,6 @@ namespace Umbraco.Core.Events
     {
         private readonly List<EventDefinitionBase> _events = new List<EventDefinitionBase>();
 
-
         // fixme - this is completely broken
         // rename ScopeEventDispatcher
         // needs to have MODES to indicate whether it is
@@ -25,13 +24,15 @@ namespace Umbraco.Core.Events
         // we have to refactor the decision-making and it should take place HERE
         // and NOT in EventExtensions! in fact EventExtensions should be obsoleted!
 
-        public bool PassThrough; // fixme temp
-        public bool RaiseEvents; // fixme temp
+        // fixme temp
+        public bool PassThroughCancelable = true;
+        public bool PassThrough = true; 
+        public bool RaiseEvents = true; // fixme temp
 
         public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args)
         {
             if (eventHandler == null) return args.Cancel;
-            if (PassThrough == false) return args.Cancel;
+            if (PassThroughCancelable == false) return args.Cancel;
             eventHandler(sender, args);
             return args.Cancel;
         }
@@ -40,7 +41,7 @@ namespace Umbraco.Core.Events
             where TArgs : CancellableEventArgs
         {
             if (eventHandler == null) return args.Cancel;
-            if (PassThrough == false) return args.Cancel;
+            if (PassThroughCancelable == false) return args.Cancel;
             eventHandler(sender, args);
             return args.Cancel;
         }
@@ -49,7 +50,7 @@ namespace Umbraco.Core.Events
             where TArgs : CancellableEventArgs
         {
             if (eventHandler == null) return args.Cancel;
-            if (PassThrough == false) return args.Cancel;
+            if (PassThroughCancelable == false) return args.Cancel;
             eventHandler(sender, args);
             return args.Cancel;
         }
@@ -60,7 +61,7 @@ namespace Umbraco.Core.Events
             if (PassThrough)
                 eventHandler(sender, args);
             else
-                _events.Add(new EventDefinition(eventHandler, sender, args, "wtf"));
+                _events.Add(new EventDefinition(eventHandler, sender, args));
         }
 
         public void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args)
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Events
             if (PassThrough)
                 eventHandler(sender, args);
             else
-                _events.Add(new EventDefinition<TArgs>(eventHandler, sender, args, "wtf"));
+                _events.Add(new EventDefinition<TArgs>(eventHandler, sender, args));
         }
 
         public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args)
@@ -78,7 +79,7 @@ namespace Umbraco.Core.Events
             if (PassThrough)
                 eventHandler(sender, args);
             else
-                _events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args, "wtf"));
+                _events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args));
         }
 
         public void QueueEvent(EventHandler e, object sender, EventArgs args, string eventName = null)
@@ -92,6 +93,7 @@ namespace Umbraco.Core.Events
 
         public void QueueEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args, string eventName = null)
         {
+            if (e == null) return;
             if (PassThrough)
                 e(sender, args);
             else
@@ -100,6 +102,7 @@ namespace Umbraco.Core.Events
 
         public void QueueEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args, string eventName = null)
         {
+            if (e == null) return;
             if (PassThrough)
                 e(sender, args);
             else

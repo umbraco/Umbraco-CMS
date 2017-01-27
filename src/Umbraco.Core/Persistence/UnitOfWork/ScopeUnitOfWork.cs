@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         private readonly Queue<Operation> _operations = new Queue<Operation>();
 	    private readonly IsolationLevel _isolationLevel;
         private readonly IScopeProvider _scopeProvider;
-        private bool _completeScope = true; // scope is completed by default -- FIXME why?
+        private bool _completeScope;
         private IScope _scope;
         private Guid _key;
 
@@ -40,10 +40,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 			_key = Guid.NewGuid();
 			InstanceId = Guid.NewGuid();
 
-            // fixme - massive FIXME
-            // why is _completeScope true by default?
-            // should be only set to true if commit == true?!?
-		}
+            // be false by default
+            // if set to true... the UnitOfWork is "auto-commit" which means that even in the case of
+            // an exception, the scope would still be completed - ppl should use it with great care!
+            _completeScope = commit;
+        }
 
 		/// <summary>
 		/// Registers an <see cref="IEntity" /> instance to be added through this <see cref="UnitOfWork" />

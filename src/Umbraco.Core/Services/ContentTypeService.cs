@@ -157,15 +157,15 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Exception(evtMsgs, ex);
             }
 
-            if (savingEvent.IsRaisedEventCancelled(
-                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
-                        this, UowProvider))
-            {
-                return OperationStatus.Cancelled(evtMsgs);
-            }
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                // fixme - how does it work w/name?!
+                if (uow.Events.DispatchCancelable(savingEvent, this, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                //if (savingEvent.IsRaisedEventCancelled(new SaveEventArgs<EntityContainer>(container, evtMsgs), this, UowProvider))
+                {
+                    return OperationStatus.Cancelled(evtMsgs);
+                }
+
                 var repo = RepositoryFactory.CreateEntityContainerRepository(uow, containerObjectType);
                 repo.AddOrUpdate(container);
                 uow.Commit();
@@ -754,10 +754,13 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                UpdateContentXmlStructure(contentType);
+                UpdateContentXmlStructure(contentType); // fixme wtf here?
             }
-            SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this, UowProvider);
-	        Audit(AuditType.Save, string.Format("Save ContentType performed by user"), userId, contentType.Id);
+            using (var scope = UowProvider.ScopeProvider.CreateScope()) // fixme what a mess
+            {
+                SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this, scope.Events);
+            }
+	        Audit(AuditType.Save, "Save ContentType performed by user", userId, contentType.Id);
         }
 
         /// <summary>
@@ -795,10 +798,13 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
+                UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray()); // fixme wtf
             }
-            SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(asArray, false), this, UowProvider);
-	        Audit(AuditType.Save, string.Format("Save ContentTypes performed by user"), userId, -1);
+            using (var scope = UowProvider.ScopeProvider.CreateScope()) // fixme what a mess
+            {
+                SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(asArray, false), this, scope.Events);
+            }
+	        Audit(AuditType.Save, "Save ContentTypes performed by user", userId, -1);
         }
 
         /// <summary>
@@ -1220,10 +1226,13 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                UpdateContentXmlStructure(mediaType);
+                UpdateContentXmlStructure(mediaType); // fixme wtf
 
-                SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this, UowProvider);
-                Audit(AuditType.Save, string.Format("Save MediaType performed by user"), userId, mediaType.Id);
+                using (var scope = UowProvider.ScopeProvider.CreateScope()) // fixme what a mess
+                {
+                    SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this, scope.Events);
+                }
+                Audit(AuditType.Save, "Save MediaType performed by user", userId, mediaType.Id);
             }
         }
 
@@ -1262,9 +1271,12 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
-                SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(asArray, false), this, UowProvider);
-                Audit(AuditType.Save, string.Format("Save MediaTypes performed by user"), userId, -1);
+                UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray()); // fixme wtf
+                using (var scope = UowProvider.ScopeProvider.CreateScope()) // fixme what a mess
+                {
+                    SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(asArray, false), this, scope.Events);
+                }
+                Audit(AuditType.Save, "Save MediaTypes performed by user", userId, -1);
             }
         }
 

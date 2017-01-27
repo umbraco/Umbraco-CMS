@@ -31,14 +31,14 @@ namespace Umbraco.Core.Services
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
 
         public FileService(
-            IScopeUnitOfWorkProvider fileProvider, 
-            IDatabaseUnitOfWorkProvider dataProvider, 
+            IScopeUnitOfWorkProvider fileProvider,
+            IDatabaseUnitOfWorkProvider dataProvider,
             RepositoryFactory repositoryFactory,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
             : base(dataProvider, repositoryFactory, logger, eventMessagesFactory)
         {
-            _fileUowProvider = fileProvider;         
+            _fileUowProvider = fileProvider;
         }
 
 
@@ -136,7 +136,6 @@ namespace Umbraco.Core.Services
         /// <returns>True if Stylesheet is valid, otherwise false</returns>
         public bool ValidateStylesheet(Stylesheet stylesheet)
         {
-
             using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateStylesheetRepository(uow, uow);
@@ -153,8 +152,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Script"/> objects</returns>
         public IEnumerable<Script> GetScripts(params string[] names)
         {
-            using (var repository = RepositoryFactory.CreateScriptRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreateScriptRepository(uow);
                 return repository.GetAll(names);
             }
         }
@@ -166,8 +166,9 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Script"/> object</returns>
         public Script GetScriptByName(string name)
         {
-            using (var repository = RepositoryFactory.CreateScriptRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreateScriptRepository(uow);
                 return repository.Get(name);
             }
         }
@@ -179,8 +180,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveScript(Script script, int userId = 0)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
                 if (SavingScript.IsRaisedEventCancelled(new SaveEventArgs<Script>(script), this, uow.Events))
                 {
@@ -188,13 +188,14 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
+                var repository = RepositoryFactory.CreateScriptRepository(uow);
                 repository.AddOrUpdate(script);
                 uow.Commit();
 
                 SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this, uow.Events);
             }
 
-            Audit(AuditType.Save, string.Format("Save Script performed by user"), userId, -1);
+            Audit(AuditType.Save, "Save Script performed by user", userId, -1);
         }
 
         /// <summary>
@@ -204,9 +205,9 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteScript(string path, int userId = 0)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateScriptRepository(uow);
                 var script = repository.Get(path);
                 if (script == null)
                 {
@@ -236,18 +237,18 @@ namespace Umbraco.Core.Services
         /// <returns>True if Script is valid, otherwise false</returns>
         public bool ValidateScript(Script script)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateScriptRepository(uow);
                 return repository.ValidateScript(script);
             }
         }
 
         public void CreateScriptFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateScriptRepository(uow);
                 ((ScriptRepository)repository).AddFolder(folderPath);
                 uow.Commit();
             }
@@ -255,9 +256,9 @@ namespace Umbraco.Core.Services
 
         public void DeleteScriptFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateScriptRepository(uow);
                 ((ScriptRepository)repository).DeleteFolder(folderPath);
                 uow.Commit();
             }
@@ -295,7 +296,7 @@ namespace Umbraco.Core.Services
             {
                 {"CreateTemplateForContentType", true},
                 {"ContentTypeAlias", contentTypeAlias},
-            };            
+            };
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
@@ -500,7 +501,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                     return;
                 }
-                
+
                 var repository = RepositoryFactory.CreateTemplateRepository(uow);
                 repository.AddOrUpdate(template);
                 uow.Commit();
@@ -539,16 +540,16 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
-        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already
+        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate
         /// rendering engine to use.
-        /// </summary> 
+        /// </summary>
         /// <returns></returns>
         /// <remarks>
         /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
-        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
-        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
-        /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml
+        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page.
+        /// This is mostly related to installing packages since packages install file templates to the file system and then create the
         /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
         /// </remarks>
         public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
@@ -575,7 +576,7 @@ namespace Umbraco.Core.Services
             }
 
             using (var uow = UowProvider.GetUnitOfWork())
-            {                
+            {
                 var repository = RepositoryFactory.CreateTemplateRepository(uow);
 
                 if (DeletingTemplate.IsRaisedEventCancelled(new DeleteEventArgs<ITemplate>(template), this, uow.Events))
@@ -734,13 +735,13 @@ namespace Umbraco.Core.Services
                 .ToArray();
 
             return empty.Union(files.Except(empty));
-        } 
+        }
 
         public void DeletePartialViewFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreatePartialViewRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreatePartialViewRepository(uow);
                 ((PartialViewRepository)repository).DeleteFolder(folderPath);
                 uow.Commit();
             }
@@ -748,9 +749,9 @@ namespace Umbraco.Core.Services
 
         public void DeletePartialViewMacroFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow);
                 ((PartialViewMacroRepository)repository).DeleteFolder(folderPath);
                 uow.Commit();
             }
@@ -758,40 +759,45 @@ namespace Umbraco.Core.Services
 
         public IPartialView GetPartialView(string path)
         {
-            using (var repository = RepositoryFactory.CreatePartialViewRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreatePartialViewRepository(uow);
                 return repository.Get(path);
             }
         }
 
         public IPartialView GetPartialViewMacro(string path)
         {
-            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow);
                 return repository.Get(path);
             }
         }
 
         public IEnumerable<IPartialView> GetPartialViewMacros(params string[] names)
         {
-            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow);
                 return repository.GetAll(names).OrderBy(x => x.Name);
             }
         }
 
         public IXsltFile GetXsltFile(string path)
         {
-            using (var repository = RepositoryFactory.CreateXsltFileRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreateXsltFileRepository(uow);
                 return repository.Get(path);
             }
         }
 
         public IEnumerable<IXsltFile> GetXsltFiles(params string[] names)
         {
-            using (var repository = RepositoryFactory.CreateXsltFileRepository(_fileUowProvider.GetReadOnlyUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreateXsltFileRepository(uow);
                 return repository.GetAll(names).OrderBy(x => x.Name);
             }
         }
@@ -839,17 +845,17 @@ namespace Umbraco.Core.Services
 
                     //strip the @inherits if it's there
                     snippetContent = StripPartialViewHeader(snippetContent);
-                    
+
                     var content = string.Format("{0}{1}{2}",
-                        partialViewHeader, 
+                        partialViewHeader,
                         Environment.NewLine, snippetContent);
                     partialView.Content = content;
                 }
             }
 
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = GetPartialViewRepository(partialViewType, uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = GetPartialViewRepository(partialViewType, uow);
                 repository.AddOrUpdate(partialView);
                 uow.Commit();
 
@@ -873,9 +879,9 @@ namespace Umbraco.Core.Services
 
         private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = 0)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = GetPartialViewRepository(partialViewType, uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = GetPartialViewRepository(partialViewType, uow);
                 var partialView = repository.Get(path);
                 if (partialView == null)
                 {
@@ -913,8 +919,7 @@ namespace Umbraco.Core.Services
 
         private Attempt<IPartialView> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = 0)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = GetPartialViewRepository(partialViewType, uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
                 if (SavingPartialView.IsRaisedEventCancelled(new SaveEventArgs<IPartialView>(partialView), this, uow.Events))
                 {
@@ -922,6 +927,7 @@ namespace Umbraco.Core.Services
                     return Attempt<IPartialView>.Fail();
                 }
 
+                var repository = GetPartialViewRepository(partialViewType, uow);
                 repository.AddOrUpdate(partialView);
                 uow.Commit();
                 SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView, false), this, uow.Events);
@@ -1055,7 +1061,7 @@ namespace Umbraco.Core.Services
         #region Event Handlers
         /// <summary>
         /// Occurs before Delete
-        /// </summary>        
+        /// </summary>
         public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletingTemplate;
 
         /// <summary>
@@ -1065,7 +1071,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Occurs before Delete
-        /// </summary>        
+        /// </summary>
         public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletingScript;
 
         /// <summary>
@@ -1075,7 +1081,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Occurs before Delete
-        /// </summary>        
+        /// </summary>
         public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletingStylesheet;
 
         /// <summary>
@@ -1122,7 +1128,7 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IFileService, SaveEventArgs<IPartialView>> SavedPartialView;
-        
+
         /// <summary>
         /// Occurs before Create
         /// </summary>

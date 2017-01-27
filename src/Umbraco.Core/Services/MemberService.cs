@@ -738,8 +738,11 @@ namespace Umbraco.Core.Services
         {
             var member = new Member(name, email.ToLower().Trim(), username, memberType);
 
-            // fixme fuck
-            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this, UowProvider);
+            using (var scope = UowProvider.ScopeProvider.CreateScope())
+            {
+                scope.Complete(); // always complete
+                Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this, scope.Events);
+            }
 
             return member;
         }
@@ -1017,9 +1020,9 @@ namespace Umbraco.Core.Services
 
         public void AddRole(string roleName)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 repository.CreateIfNotExists(roleName);
                 uow.Commit();
             }
@@ -1027,9 +1030,9 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<string> GetAllRoles()
         {
-            var uow = UowProvider.GetReadOnlyUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 var result = repository.GetAll();
                 return result.Select(x => x.Name).Distinct();
             }
@@ -1037,9 +1040,9 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<string> GetAllRoles(int memberId)
         {
-            var uow = UowProvider.GetReadOnlyUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 var result = repository.GetMemberGroupsForMember(memberId);
                 return result.Select(x => x.Name).Distinct();
             }
@@ -1047,9 +1050,9 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<string> GetAllRoles(string username)
         {
-            var uow = UowProvider.GetReadOnlyUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 var result = repository.GetMemberGroupsForMember(username);
                 return result.Select(x => x.Name).Distinct();
             }
@@ -1057,18 +1060,18 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
-            var uow = UowProvider.GetReadOnlyUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreateMemberRepository(uow);
                 return repository.GetByMemberGroup(roleName);
             }
         }
 
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            var uow = UowProvider.GetReadOnlyUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
+                var repository = RepositoryFactory.CreateMemberRepository(uow);
                 return repository.FindMembersInRole(roleName, usernameToMatch, matchType);
             }
         }
@@ -1088,9 +1091,9 @@ namespace Umbraco.Core.Services
 
                 List<IMemberGroup> found;
 
-                var uow = UowProvider.GetReadOnlyUnitOfWork();
-                using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+                using (var uow = UowProvider.GetUnitOfWork(commit: true))
                 {
+                    var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                     var qry = new Query<IMemberGroup>().Where(g => g.Name == roleName);
                     found = repository.GetByQuery(qry).ToList();
                 }
@@ -1109,9 +1112,9 @@ namespace Umbraco.Core.Services
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 repository.AssignRoles(usernames, roleNames);
                 uow.Commit();
             }
@@ -1124,9 +1127,9 @@ namespace Umbraco.Core.Services
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 repository.DissociateRoles(usernames, roleNames);
                 uow.Commit();
             }
@@ -1139,9 +1142,9 @@ namespace Umbraco.Core.Services
 
         public void AssignRoles(int[] memberIds, string[] roleNames)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 repository.AssignRoles(memberIds, roleNames);
                 uow.Commit();
             }
@@ -1154,9 +1157,9 @@ namespace Umbraco.Core.Services
 
         public void DissociateRoles(int[] memberIds, string[] roleNames)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 repository.DissociateRoles(memberIds, roleNames);
                 uow.Commit();
             }

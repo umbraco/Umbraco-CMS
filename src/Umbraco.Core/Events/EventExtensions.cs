@@ -94,7 +94,7 @@ namespace Umbraco.Core.Events
         /// <param name="uowProvider"></param>
         /// <param name="eventName">Optional explicit event name if the event may not be able to be determined based on it's arguments (it's ambiguous)</param>
         /// <returns></returns>
-        internal static bool IsRaisedEventCancelled<TSender, TArgs>(
+        internal static bool IsRaisedEventCancelled<TSender, TArgs>( // fixme used 29 times...
             this TypedEventHandler<TSender, TArgs> eventHandler,
             TArgs args,
             TSender sender,
@@ -138,33 +138,6 @@ namespace Umbraco.Core.Events
             where TArgs : EventArgs
         {
             eventDispatcher.QueueEvent(eventHandler, sender, args, eventName);
-        }
-
-	    /// <summary>
-	    /// Hack: this is used to perform IsRaisedEventCancelled when a uow cannot be reused
-	    /// </summary>
-	    /// <typeparam name="TSender"></typeparam>
-	    /// <typeparam name="TArgs"></typeparam>
-	    /// <param name="eventHandler"></param>
-	    /// <param name="args"></param>
-	    /// <param name="sender"></param>
-	    /// <param name="uowProvider"></param>
-	    /// <param name="eventName">Optional explicit event name if the event may not be able to be determined based on it's arguments (it's ambiguous)</param>
-	    internal static void RaiseEvent<TSender, TArgs>(
-            this TypedEventHandler<TSender, TArgs> eventHandler,
-            TArgs args,
-            TSender sender,
-            IScopeUnitOfWorkProvider uowProvider,
-            string eventName = null)
-            where TArgs : EventArgs
-        {
-            //This UOW is a readonly one but needs to be committed otherwise
-            // it will rollback outer scopes
-            using (var uow = uowProvider.GetUnitOfWork())
-            {
-                uow.Events.QueueEvent(eventHandler, sender, args, eventName);
-                uow.Commit();
-            }
         }
     }
 }

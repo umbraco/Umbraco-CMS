@@ -239,7 +239,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(/*commit: true*/)) // FIXME + we are WRITING audit info FFS!
             {
                 // fixme
-                if (uow.Events.DispatchCancelable(Creating, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId)))
+                if (uow.Events.DispatchCancelable(Creating, this, new NewEventArgs<IContent>(content, contentTypeAlias, parentId)))
                 //if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this, uow.Events))
                 {
                     content.WasCancelled = true;
@@ -298,7 +298,7 @@ namespace Umbraco.Core.Services
                 content.CreatorId = userId;
                 content.WriterId = userId;
                 
-                Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this, uow.Events);
+                uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parent));
             }
 
             // MOVE into the UOW + COMMIT the f*cking thing
@@ -1425,9 +1425,9 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-                var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateContentRepository(uow))
-                { 
+                using (var uow = UowProvider.GetUnitOfWork())
+                {
+                    var repository = RepositoryFactory.CreateContentRepository(uow);
                     //NOTE What about content that has the contenttype as part of its composition?
                     var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
                     var contents = repository.GetByQuery(query).ToArray();
@@ -1454,28 +1454,51 @@ namespace Umbraco.Core.Services
                         //track content for deletion
                         contentList.Add(content);
                     }
+
+                    // do it INSIDE the UOW because nested UOW kinda should work
+                    // fixme - and then we probably don't need the whole mess?
+                    // nesting UOW works, it's just that the outer one NEEDS to be flushed beforehand
+                    // nevertheless, it would be nicer to create a global scope and inner uow
+
+                    foreach (var child in childList)
+                    {
+                        if (child.ContentType.Id != contentTypeId)
+                            MoveToRecycleBin(child, userId);
+                    }
+                    foreach (var content in contentList)
+                    {
+                        //Permantly delete the content
+                        Delete(content, userId);
+                    }
+
+                    uow.Commit();
+
+                    Audit(AuditType.Delete,
+                              string.Format("Delete Content of Type {0} performed by user", contentTypeId),
+                              userId, Constants.System.Root);
+
                 }
-                
+
                 // FIXME this is borked I don't even...
 
                 //We need to do this outside of the uow because otherwise we'll have nested uow's
                 //TODO: this is a problem because we are doing all of this logic in the Service when it should
                 //all be happening in the repository
 
-                foreach (var child in childList)
-                {
-                    if (child.ContentType.Id != contentTypeId)
-                        MoveToRecycleBin(child, userId);
-                }
-                foreach (var content in contentList)
-                {
-                    //Permantly delete the content
-                    Delete(content, userId);
-                }
+                //foreach (var child in childList)
+                //{
+                //    if (child.ContentType.Id != contentTypeId)
+                //        MoveToRecycleBin(child, userId);
+                //}
+                //foreach (var content in contentList)
+                //{
+                //    //Permantly delete the content
+                //    Delete(content, userId);
+                //}
 
-                Audit(AuditType.Delete,
-                          string.Format("Delete Content of Type {0} performed by user", contentTypeId),
-                          userId, Constants.System.Root);
+                //Audit(AuditType.Delete,
+                //          string.Format("Delete Content of Type {0} performed by user", contentTypeId),
+                //          userId, Constants.System.Root);
             }
         }
 
@@ -1934,14 +1957,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public XmlDocument BuildXmlCache()
         {
-            // FIXME WTF would Shan use ReadOnly here!
-            // we CANNOT auto-commit as SOON as we write ! anything could happen (exception) !
-            var uow = UowProvider.GetUnitOfWork();
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-
                 var result = repository.BuildXmlCache();
-
                 uow.Commit();
                 return result;
             }

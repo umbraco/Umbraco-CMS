@@ -513,7 +513,6 @@
     <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWorkProvider.cs" />
-    <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWorkProviderExtensions.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueTypes.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
