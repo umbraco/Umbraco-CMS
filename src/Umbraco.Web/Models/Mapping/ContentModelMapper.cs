@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDisplay
             config.CreateMap<IContent, ContentItemDisplay>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(display => display.Updater, expression => expression.ResolveUsing(new CreatorResolver()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -58,6 +59,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(dto => dto.Updater, expression => expression.ResolveUsing(new CreatorResolver()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -68,6 +70,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDto<IContent>
             config.CreateMap<IContent, ContentItemDto<IContent>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())

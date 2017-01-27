@@ -17,11 +17,13 @@ namespace Umbraco.Web.Models.Mapping
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<UmbracoEntity, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectTypeId), x.Key))) 
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore());
 
             config.CreateMap<PropertyType, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.Ignore())
                 .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-box"))
                 .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
@@ -29,6 +31,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<PropertyGroup, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.Ignore())
                 .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-tab"))
                 .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
@@ -38,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<IUser, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.Ignore())
                 .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-user"))
                 .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
@@ -46,6 +50,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<ITemplate, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(x => Udi.Create(Constants.UdiEntityType.Template, x.Key)))
                .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-layout"))
                .ForMember(basic => basic.Path, expression => expression.MapFrom(template => template.Path))
                .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
@@ -70,6 +75,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.SortOrder, expression => expression.Ignore());
 
             config.CreateMap<IContentTypeComposition, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.ResolveUsing(new ContentTypeUdiResolver()))
                 .ForMember(basic => basic.Path, expression => expression.MapFrom(x => x.Path))
                 .ForMember(basic => basic.ParentId, expression => expression.MapFrom(x => x.ParentId))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
@@ -77,6 +83,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<SearchResult, EntityBasic>()
                 //default to document icon
+                  .ForMember(x => x.Udi, expression => expression.Ignore())
                   .ForMember(x => x.Icon, expression => expression.Ignore())
                   .ForMember(x => x.Id, expression => expression.MapFrom(result => result.Id))
                   .ForMember(x => x.Name, expression => expression.Ignore())

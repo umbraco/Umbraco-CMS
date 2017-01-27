@@ -40,12 +40,12 @@ namespace Umbraco.Core
         static Udi()
         {
             // for tests etc.
-            UdiTypes[Constants.DeployEntityType.AnyGuid] = UdiType.GuidUdi;
-            UdiTypes[Constants.DeployEntityType.AnyString] = UdiType.StringUdi;
+            UdiTypes[Constants.UdiEntityType.AnyGuid] = UdiType.GuidUdi;
+            UdiTypes[Constants.UdiEntityType.AnyString] = UdiType.StringUdi;
 
             // we don't have connectors for these...
-            UdiTypes[Constants.DeployEntityType.Member] = UdiType.GuidUdi;
-            UdiTypes[Constants.DeployEntityType.MemberGroup] = UdiType.GuidUdi;
+            UdiTypes[Constants.UdiEntityType.Member] = UdiType.GuidUdi;
+            UdiTypes[Constants.UdiEntityType.MemberGroup] = UdiType.GuidUdi;
 
             // fixme - or inject from...?
             // there is no way we can get the "registered" service connectors, as registration

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -25,7 +26,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
         public object Id { get; set; }
-        
+
+        [DataMember(Name = "udi")]
+        [ReadOnly(true)]
+        public Udi Udi { get; set; }
+
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 

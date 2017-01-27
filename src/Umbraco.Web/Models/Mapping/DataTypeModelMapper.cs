@@ -35,6 +35,7 @@ namespace Umbraco.Web.Models.Mapping
             };
 
             config.CreateMap<PropertyEditor, DataTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.Ignore())
                 .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.IsSystemDataType, expression => expression.Ignore())
                 .ForMember(x => x.Id, expression => expression.Ignore())
@@ -45,6 +46,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<IDataTypeDefinition, DataTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DataType, content.Key)))
                 .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
@@ -62,6 +64,7 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DataType, content.Key)))
                 .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing(new AvailablePropertyEditorsResolver(UmbracoConfig.For.UmbracoSettings().Content)))
                 .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
                     new PreValueDisplayResolver(lazyDataTypeService)))

@@ -342,6 +342,7 @@
     <Compile Include="Models\LocalPackageInstallModel.cs" />
     <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
+    <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\Mapping\TemplateModelMapper.cs" />
