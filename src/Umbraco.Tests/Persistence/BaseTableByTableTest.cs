@@ -50,19 +50,20 @@ namespace Umbraco.Tests.Persistence
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
-
+            var dbFactory = new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, _logger);
+            var scopeProvider = new ScopeProvider(dbFactory);
             var dbContext = new DatabaseContext(
-                new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, _logger)),
+                scopeProvider,
                 _logger, SqlSyntaxProvider, Constants.DatabaseProviders.SqlCe);
 
-            var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());
+            var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());            
 
             var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 dbContext,
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, _logger), cacheHelper, _logger, evtMsgs),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), new FileUnitOfWorkProvider(scopeProvider), cacheHelper, _logger, evtMsgs),
                 cacheHelper,
                 new ProfilingLogger(_logger, Mock.Of<IProfiler>()))
                 {

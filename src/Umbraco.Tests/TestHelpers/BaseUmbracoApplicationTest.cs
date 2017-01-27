@@ -162,12 +162,14 @@ namespace Umbraco.Tests.TestHelpers
             var sqlSyntax = new SqlCeSyntaxProvider();
             var repoFactory = new RepositoryFactory(CacheHelper, Logger, sqlSyntax, SettingsForTests.GenerateMockSettings());
 
+            var dbFactory = new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, Logger);
+            var scopeProvider = new ScopeProvider(dbFactory);
             var evtMsgs = new TransientMessagesFactory();
             var applicationContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, Logger)), Logger, sqlSyntax, Constants.DatabaseProviders.SqlCe),
+                new DatabaseContext(scopeProvider, Logger, sqlSyntax, Constants.DatabaseProviders.SqlCe),
                 //assign the service context
-                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
+                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), new FileUnitOfWorkProvider(scopeProvider), CacheHelper, Logger, evtMsgs),
                 CacheHelper,
                 ProfilingLogger)
             {

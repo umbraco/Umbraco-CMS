@@ -72,7 +72,7 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbProviderName(),
                 Logger);
 
-            // fixme - bah
+            // fixme - bah - this is needed to reset static properties? Stephen to update this note
             var scopeProvider = new ScopeProvider(null);
             if (scopeProvider.AmbientScope != null)
                 scopeProvider.AmbientScope.Dispose();
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the db context
                 new DatabaseContext(scopeProvider, Logger, SqlSyntax, GetDbProviderName()),
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), new FileUnitOfWorkProvider(scopeProvider), CacheHelper, Logger, evtMsgs),
                 CacheHelper,
                 ProfilingLogger)
             {

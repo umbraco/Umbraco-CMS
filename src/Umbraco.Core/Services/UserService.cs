@@ -43,12 +43,11 @@ namespace Umbraco.Core.Services
         /// <returns>Alias of the default MemberType</returns>
         public string GetDefaultMemberType()
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserTypeRepository(uow);
 
                 var types = repository.GetAll().Select(x => x.Alias).ToArray();
-                uow.Commit();
 
                 if (types.Any() == false)
                 {
@@ -77,12 +76,10 @@ namespace Umbraco.Core.Services
         /// <returns><c>True</c> if the User exists otherwise <c>False</c></returns>
         public bool Exists(string username)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                var ret = repository.Exists(username);
-                uow.Commit();
-                return ret;
+                return repository.Exists(username);
             }
         }
 
@@ -149,13 +146,16 @@ namespace Umbraco.Core.Services
                 user.AddAllowedSection("content");
                 user.AddAllowedSection("media");
 
-                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
+                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this, uow.Events))
+                {
+                    uow.Commit();
                     return user;
+                }
 
                 repository.AddOrUpdate(user);
                 uow.Commit();
 
-                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
+                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(user, false), this ,uow.Events);
 
                 return user;
 }
@@ -168,12 +168,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                var user = repository.Get(id);
-                uow.Commit();
-                return user;
+                return repository.Get(id);
             }
         }
 
@@ -200,13 +198,11 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetByEmail(string email)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 var query = Query<IUser>.Builder.Where(x => x.Email.Equals(email));
-                var user = repository.GetByQuery(query).FirstOrDefault();
-                uow.Commit();
-                return user;
+                return repository.GetByQuery(query).FirstOrDefault();
             }
         }
         
@@ -217,13 +213,11 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetByUsername(string username)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 var query = Query<IUser>.Builder.Where(x => x.Username.Equals(username));
-                var user = repository.GetByQuery(query).FirstOrDefault();
-                uow.Commit();
-                return user;
+                return repository.GetByQuery(query).FirstOrDefault();
             }
         }
 
@@ -286,17 +280,20 @@ namespace Umbraco.Core.Services
             }
             else
             {
-                if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(user), this))
-                    return;
-
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
+                    if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(user), this, uow.Events))
+                    {
+                        uow.Commit();
+                        return;
+                    }
                     var repository = RepositoryFactory.CreateUserRepository(uow);
                     repository.Delete(user);
                     uow.Commit();
+                    DeletedUser.RaiseEvent(new DeleteEventArgs<IUser>(user, false), this, uow.Events);
+
                 }
 
-                DeletedUser.RaiseEvent(new DeleteEventArgs<IUser>(user, false), this);
             }
         }
 
@@ -308,19 +305,25 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IUser entity, bool raiseEvents = true)
         {
-            if (raiseEvents)
-            {
-                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(entity), this))
-                    return;
-            }
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (raiseEvents)
+                {
+                    if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(entity), this, uow.Events))
+                    {
+                        uow.Commit();
+                        return;
+                    }
+
+                }
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 repository.AddOrUpdate(entity);
                 try
                 {
                     uow.Commit(); // fixme? would throw on dispose not here
+
+                    if (raiseEvents)
+                        SavedUser.RaiseEvent(new SaveEventArgs<IUser>(entity, false), this, uow.Events);
                 }
                 catch (DbException ex)
                 {
@@ -332,8 +335,7 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            if (raiseEvents)
-                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(entity, false), this);
+            
         }
 
         /// <summary>
@@ -344,25 +346,30 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IEnumerable<IUser> entities, bool raiseEvents = true)
         {
-            if (raiseEvents)
-            {
-                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(entities), this))
-                    return;
-            }
-
+            var asArray = entities.ToArray();
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (raiseEvents)
+                {
+                    if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(asArray), this, uow.Events))
+                    {
+                        uow.Commit();
+                        return;
+                    }
+                }
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                foreach (var member in entities)
+                foreach (var member in asArray)
                 {
                     repository.AddOrUpdate(member);
                 }
                 //commit the whole lot in one go
                 uow.Commit();
+
+                if (raiseEvents)
+                    SavedUser.RaiseEvent(new SaveEventArgs<IUser>(asArray, false), this, uow.Events);
             }
 
-            if (raiseEvents)
-                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(entities, false), this);
+            
         }
 
         /// <summary>
@@ -376,7 +383,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 var query = new Query<IUser>();
@@ -402,9 +409,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                var ret = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Email);
-                uow.Commit();
-                return ret;
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Email);
             }
         }
 
@@ -419,7 +424,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 var query = new Query<IUser>();
@@ -445,9 +450,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                var ret = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Username);
-                uow.Commit();
-                return ret;
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Username);
             }
         }
 
@@ -463,7 +466,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="System.int"/> with number of Users for passed in type</returns>
         public int GetCount(MemberCountType countType)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
 
@@ -495,7 +498,7 @@ namespace Umbraco.Core.Services
                     default:
                         throw new ArgumentOutOfRangeException("countType");
                 }
-                uow.Commit();
+
                 return ret;
             }
         }
@@ -509,23 +512,19 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IUser> GetAll(int pageIndex, int pageSize, out int totalRecords)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                var ret = repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
-                uow.Commit();
-                return ret;
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
             }
         }
 
         internal IEnumerable<IUser> GetNextUsers(int id, int count)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = (UserRepository) RepositoryFactory.CreateUserRepository(uow);
-                var ret = repository.GetNextUsers(id, count);
-                uow.Commit();
-                return ret;
+                return repository.GetNextUsers(id, count);
             }
         }
 
@@ -562,12 +561,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetUserById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                var ret = repository.Get(id);
-                uow.Commit();
-                return ret;
+                return repository.Get(id);
             }
         }
 
@@ -611,12 +608,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUserType"/></returns>
         public IEnumerable<IUserType> GetAllUserTypes(params int[] ids)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserTypeRepository(uow);
-                var ret = repository.GetAll(ids);
-                uow.Commit();
-                return ret;
+                return repository.GetAll(ids);
             }
         }
 
@@ -627,13 +622,11 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUserType"/></returns>
         public IUserType GetUserTypeByAlias(string alias)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserTypeRepository(uow);
                 var query = Query<IUserType>.Builder.Where(x => x.Alias == alias);
-                var content = repository.GetByQuery(query).SingleOrDefault();
-                uow.Commit();
-                return content;
+                return repository.GetByQuery(query).SingleOrDefault();
             }
         }
 
@@ -644,12 +637,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUserType"/></returns>
         public IUserType GetUserTypeById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserTypeRepository(uow);
-                var ret = repository.Get(id);
-                uow.Commit();
-                return ret;
+                return repository.Get(id);
             }
         }
 
@@ -660,13 +651,11 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUserType"/></returns>
         public IUserType GetUserTypeByName(string name)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserTypeRepository(uow);
                 var query = Query<IUserType>.Builder.Where(x => x.Name == name);
-                var content = repository.GetByQuery(query).SingleOrDefault();
-                uow.Commit();
-                return content;
+                return repository.GetByQuery(query).SingleOrDefault();
             }
         }
 
@@ -678,21 +667,24 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void SaveUserType(IUserType userType, bool raiseEvents = true)
         {
-            if (raiseEvents)
-            {
-                if (SavingUserType.IsRaisedEventCancelled(new SaveEventArgs<IUserType>(userType), this))
-                    return;
-            }
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (raiseEvents)
+                {
+                    if (SavingUserType.IsRaisedEventCancelled(new SaveEventArgs<IUserType>(userType), this, uow.Events))
+                    {
+                        uow.Commit();
+                        return;
+                    }
+                }
                 var repository = RepositoryFactory.CreateUserTypeRepository(uow);
                 repository.AddOrUpdate(userType);
                 uow.Commit();
+                if (raiseEvents)
+                    SavedUserType.RaiseEvent(new SaveEventArgs<IUserType>(userType, false), this, uow.Events);
             }
 
-            if (raiseEvents)
-                SavedUserType.RaiseEvent(new SaveEventArgs<IUserType>(userType, false), this);
+            
         }
 
         /// <summary>
@@ -701,17 +693,20 @@ namespace Umbraco.Core.Services
         /// <param name="userType">UserType to delete</param>
         public void DeleteUserType(IUserType userType)
         {
-            if (DeletingUserType.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this))
-                return;
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (DeletingUserType.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this, uow.Events))
+                {
+                    uow.Commit();
+                    return;
+                }
                 var repository = RepositoryFactory.CreateUserTypeRepository(uow);
                 repository.Delete(userType);
                 uow.Commit();
+                DeletedUserType.RaiseEvent(new DeleteEventArgs<IUserType>(userType, false), this, uow.Events);
+
             }
 
-            DeletedUserType.RaiseEvent(new DeleteEventArgs<IUserType>(userType, false), this);
         }
 
         /// <summary>
@@ -732,6 +727,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(user);
                 }
                 uow.Commit();
+                //TODO: Events?
             }
         }
         
@@ -755,13 +751,14 @@ namespace Umbraco.Core.Services
                 {
                     users = repository.GetAll();
                 }
-                foreach (var user in users.Where(u => !u.AllowedSections.InvariantContains(sectionAlias)))
+                foreach (var user in users.Where(u => u.AllowedSections.InvariantContains(sectionAlias) == false))
                 {
                     //now add the section for each user and commit
                     user.AddAllowedSection(sectionAlias);
                     repository.AddOrUpdate(user);
                 }
                 uow.Commit();
+                //TODO: Events?
             }
         }    
 
@@ -774,7 +771,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 var explicitPermissions = repository.GetUserPermissionsForEntities(user.Id, nodeIds);
@@ -787,7 +784,6 @@ namespace Umbraco.Core.Services
                     result.Add(new EntityPermission(user.Id, id, user.DefaultPermissions.ToArray()));
                 }
 
-                uow.Commit();
                 return result;
             }
         }

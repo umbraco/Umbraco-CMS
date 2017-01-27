@@ -284,6 +284,7 @@ namespace Umbraco.Core.Persistence
 
                 if (commitTrans)
                 {
+                    if (tr == null) throw new ArgumentNullException("The transaction cannot be null if commitTrans is true");
                     tr.Complete();
                 }
                 return processed;
@@ -292,6 +293,7 @@ namespace Umbraco.Core.Persistence
             {
                 if (commitTrans)
                 {
+                    if (tr == null) throw new ArgumentNullException("The transaction cannot be null if commitTrans is true");
                     tr.Dispose();
                 }
                 throw;

@@ -33,6 +33,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
         /// and we Dispose of this Database object when the UOW is disposed.
         /// fixme NO we dispose of it when the transaction completes
+        /// fixme just inheritdoc!
         /// </remarks>
         public virtual IScopeUnitOfWork GetUnitOfWork()
         {
@@ -48,10 +49,23 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
         /// and we Dispose of this Database object when the UOW is disposed.
         /// fixme NO
+        /// fixme just inheritdoc!
         /// </remarks>
         public IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel)
         {
             return new ScopeUnitOfWork(ScopeProvider, isolationLevel);
+        }
+
+        /// <inheritdoc />
+        public IScopeUnitOfWork GetUnitOfWork(bool commit)
+        {
+            return new ScopeUnitOfWork(ScopeProvider, commit: commit);
+        }
+
+        /// <inheritdoc />
+        public IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel, bool commit)
+        {
+            return new ScopeUnitOfWork(ScopeProvider, isolationLevel, commit: commit);
         }
     }
 }

@@ -117,7 +117,6 @@ namespace Umbraco.Core.Events
                 }
                 return false;
             }
-
         }
 
         /// <summary>

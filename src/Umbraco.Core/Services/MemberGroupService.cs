@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
         #region Proxied event handlers
         void MemberGroupRepository_SavingMemberGroup(IMemberGroupRepository sender, SaveEventArgs<IMemberGroup> e)
         {
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(e.SavedEntities), this))
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(e.SavedEntities), this, UowProvider))
             {
                 e.Cancel = true;
             }
@@ -33,77 +33,71 @@ namespace Umbraco.Core.Services
 
         void MemberGroupRepository_SavedMemberGroup(IMemberGroupRepository sender, SaveEventArgs<IMemberGroup> e)
         {
-            Saved.RaiseEvent(new SaveEventArgs<IMemberGroup>(e.SavedEntities, false), this);
+            Saved.RaiseEvent(new SaveEventArgs<IMemberGroup>(e.SavedEntities, false), this, UowProvider);
         } 
         #endregion
 
         public IEnumerable<IMemberGroup> GetAll()
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                var ret = repository.GetAll();
-                uow.Commit();
-                return ret;
+                return repository.GetAll();
             }
         }
 
         public IMemberGroup GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                var ret = repository.Get(id);
-                uow.Commit();
-                return ret;
+                return repository.Get(id);
             }
         }
 
         public IMemberGroup GetByName(string name)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                var ret = repository.GetByName(name);
-                uow.Commit();
-                return ret;
+                return repository.GetByName(name);
             }
         }
 
         public void Save(IMemberGroup memberGroup, bool raiseEvents = true)
         {
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(memberGroup), this))
-                {
-                    return;
-                }
-            }
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (raiseEvents)
+                {
+                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(memberGroup), this, uow.Events))
+                    {
+                        uow.Commit();
+                        return;
+                    }
+                }
+
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 repository.AddOrUpdate(memberGroup);
                 uow.Commit();
+                if (raiseEvents)
+                    Saved.RaiseEvent(new SaveEventArgs<IMemberGroup>(memberGroup, false), this, uow.Events);
             }
 
-            if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IMemberGroup>(memberGroup, false), this);
+            
         }
 
         public void Delete(IMemberGroup memberGroup)
         {
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberGroup>(memberGroup), this))
-                return;
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberGroup>(memberGroup), this, uow.Events))
+                    return; // FIXME COMMIT
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 repository.Delete(memberGroup);
                 uow.Commit();
+                Deleted.RaiseEvent(new DeleteEventArgs<IMemberGroup>(memberGroup, false), this, uow.Events);
             }
-
-            Deleted.RaiseEvent(new DeleteEventArgs<IMemberGroup>(memberGroup, false), this);
         }
 
         /// <summary>

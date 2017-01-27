@@ -19,12 +19,10 @@ namespace Umbraco.Core.Services
 
         public bool Exists(string domainName)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repo = RepositoryFactory.CreateDomainRepository(uow);
-                var ret = repo.Exists(domainName);
-                uow.Commit();
-                return ret;
+                return repo.Exists(domainName);
             } 
         }
 
@@ -33,7 +31,7 @@ namespace Umbraco.Core.Services
             var evtMsgs = EventMessagesFactory.Get();
             if (Deleting.IsRaisedEventCancelled(
                    new DeleteEventArgs<IDomain>(domain, evtMsgs),
-                   this))
+                   this, UowProvider))
             {
                 return OperationStatus.Cancelled(evtMsgs);
             }
@@ -43,54 +41,48 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateDomainRepository(uow);
                 repository.Delete(domain);
                 uow.Commit();
+
+                var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
+                Deleted.RaiseEvent(args, this, uow.Events);
+                return OperationStatus.Success(evtMsgs);
             }
 
-            var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
-            Deleted.RaiseEvent(args, this);
-            return OperationStatus.Success(evtMsgs);
+            
         }
 
         public IDomain GetByName(string name)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateDomainRepository(uow);
-                var ret = repository.GetByName(name);
-                uow.Commit();
-                return ret;
+                return repository.GetByName(name);
             }
         }
 
         public IDomain GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
 	            var repo = RepositoryFactory.CreateDomainRepository(uow);
-	            var ret = repo.Get(id);
-                uow.Commit();
-                return ret;
+	            return repo.Get(id);
             }
         }
 
         public IEnumerable<IDomain> GetAll(bool includeWildcards)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repo = RepositoryFactory.CreateDomainRepository(uow);
-                var ret = repo.GetAll(includeWildcards);
-                uow.Commit();
-                return ret;
+                return repo.GetAll(includeWildcards);
             }
         }
 
         public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repo = RepositoryFactory.CreateDomainRepository(uow);
-                var ret = repo.GetAssignedDomains(contentId, includeWildcards);
-                uow.Commit();
-                return ret;
+                return repo.GetAssignedDomains(contentId, includeWildcards);
             }
         }
 
@@ -99,7 +91,7 @@ namespace Umbraco.Core.Services
             var evtMsgs = EventMessagesFactory.Get();
             if (Saving.IsRaisedEventCancelled(
                     new SaveEventArgs<IDomain>(domainEntity, evtMsgs),
-                    this))
+                    this, UowProvider))
             {
                 return OperationStatus.Cancelled(evtMsgs);
             }
@@ -109,10 +101,11 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateDomainRepository(uow);
                 repository.AddOrUpdate(domainEntity);
                 uow.Commit();
+                Saved.RaiseEvent(new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs), this, uow.Events);
+                return OperationStatus.Success(evtMsgs);
             }
 
-            Saved.RaiseEvent(new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            
         }
 
         #region Event Handlers

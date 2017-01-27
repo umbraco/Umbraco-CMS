@@ -230,6 +230,7 @@ namespace Umbraco.Core.Persistence
         {
             return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
         }
+
         [Obsolete("Do not use this method, use the method with only the single unit of work parameter")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow, IDatabaseUnitOfWork db)

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         private readonly Queue<Operation> _operations = new Queue<Operation>();
 	    private readonly IsolationLevel _isolationLevel;
         private readonly IScopeProvider _scopeProvider;
-        private bool _completeScope = true; // scope is completed by default
+        private bool _completeScope = true; // scope is completed by default -- FIXME why?
         private IScope _scope;
         private Guid _key;
 
@@ -29,15 +29,20 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </summary>
         /// <param name="scopeProvider"></param>
         /// <param name="isolationLevel"></param>
+        /// <param name="commit"></param>
         /// <remarks>
         /// This should normally not be used directly and should be created with the UnitOfWorkProvider
         /// </remarks>
-        internal ScopeUnitOfWork(IScopeProvider scopeProvider, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
+        internal ScopeUnitOfWork(IScopeProvider scopeProvider, IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool commit = false)
         {
             _scopeProvider = scopeProvider;
             _isolationLevel = isolationLevel;
 			_key = Guid.NewGuid();
 			InstanceId = Guid.NewGuid();
+
+            // fixme - massive FIXME
+            // why is _completeScope true by default?
+            // should be only set to true if commit == true?!?
 		}
 
 		/// <summary>
