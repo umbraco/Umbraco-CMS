@@ -1,12 +1,20 @@
-﻿using Umbraco.Core;
+﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultipleMediaPickerAlias, "Media Picker", "mediapicker", Group = "media", Icon = "icon-pictures-alt-2", IsDeprecated = true)]
+    [Obsolete("This editor is obsolete, use MultipleMediaPickerPropertyEditor2 instead which stores UDI")]
+    [PropertyEditor(Constants.PropertyEditors.MultipleMediaPickerAlias, "(Obsolete) Media Picker", "mediapicker", Group = "media", Icon = "icon-pictures-alt-2", IsDeprecated = true)]
     public class MultipleMediaPickerPropertyEditor : MediaPickerPropertyEditor
     {
-        public MultipleMediaPickerPropertyEditor()
+        
+    }
+
+    [PropertyEditor(Constants.PropertyEditors.MultipleMediaPicker2Alias, "Media Picker", PropertyEditorValueTypes.Text, "mediapicker", Group = "media", Icon = "icon-pictures-alt-2", IsDeprecated = true)]
+    public class MultipleMediaPickerPropertyEditor2 : MediaPickerPropertyEditor2
+    {
+        public MultipleMediaPickerPropertyEditor2()
         {
             //clear the pre-values so it defaults to a multiple picker.
             InternalPreValues.Clear();

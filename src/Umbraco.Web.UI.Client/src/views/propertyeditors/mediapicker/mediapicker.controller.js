@@ -80,6 +80,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                        }
 
                        $scope.images.push(media);
+
+                       //TODO: Determine if we are storing UDI vs INT
+
                        $scope.ids.push(media.id);
                    });
 

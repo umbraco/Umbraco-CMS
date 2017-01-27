@@ -1,14 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePickerAlias, "Multinode Treepicker", "contentpicker", Group="pickers", Icon="icon-page-add", IsDeprecated = true)]
-    public class MultiNodeTreePickerPropertyEditor : PropertyEditor
+    [Obsolete("This editor is obsolete, use MultiNodeTreePickerPropertyEditor2 instead which stores UDI")]
+    [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePickerAlias, "(Obsolete) Multinode Treepicker", "contentpicker", Group = "pickers", Icon = "icon-page-add", IsDeprecated = true)]
+    public class MultiNodeTreePickerPropertyEditor : MultiNodeTreePickerPropertyEditor2
     {
-        public MultiNodeTreePickerPropertyEditor()
+        
+    }
+
+    [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePicker2Alias, "Multinode Treepicker", PropertyEditorValueTypes.Text, "contentpicker", Group="pickers", Icon="icon-page-add")]
+    public class MultiNodeTreePickerPropertyEditor2 : PropertyEditor
+    {
+        public MultiNodeTreePickerPropertyEditor2()
         {
             _internalPreValues = new Dictionary<string, object>
             {

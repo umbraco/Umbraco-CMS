@@ -1,14 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ContentPickerAlias, "[Legacy] Content Picker", PropertyEditorValueTypes.Integer, "contentpicker", IsParameterEditor = true, Group = "Pickers", IsDeprecated = true)]
-    public class ContentPickerPropertyEditor : PropertyEditor
+
+    /// <summary>
+    /// Legacy content property editor that stores Integer Ids
+    /// </summary>
+    [Obsolete("This editor is obsolete, use ContentPickerPropertyEditor2 instead which stores UDI")]
+    [PropertyEditor(Constants.PropertyEditors.ContentPickerAlias, "(Obsolete) Content Picker", PropertyEditorValueTypes.Integer, "contentpicker", IsParameterEditor = true, Group = "Pickers", IsDeprecated = true)]
+    public class ContentPickerPropertyEditor : ContentPickerPropertyEditor2
+    {
+        
+    }
+
+    /// <summary>
+    /// Content property editor that stores UDI
+    /// </summary>
+    [PropertyEditor(Constants.PropertyEditors.ContentPicker2Alias, "Content Picker", PropertyEditorValueTypes.String, "contentpicker", IsParameterEditor = true, Group = "Pickers")]
+    public class ContentPickerPropertyEditor2 : PropertyEditor
     {
 
-        public ContentPickerPropertyEditor()
+        public ContentPickerPropertyEditor2()
         {
             _internalPreValues = new Dictionary<string, object>
             {
