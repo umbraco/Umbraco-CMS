@@ -563,13 +563,6 @@
     <Compile Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx.designer.cs">
       <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Settings\Views\EditView.aspx.cs">
-      <DependentUpon>EditView.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Views\EditView.aspx.designer.cs">
-      <DependentUpon>EditView.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\TreeInit.aspx.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -752,7 +745,6 @@
     <Content Include="Umbraco\Images\thumbs_med.png" />
     <Content Include="Umbraco\Images\thumbs_smll.png" />
     <Content Include="Umbraco\Images\Umbraco\settingView.gif" />
-    <Content Include="Umbraco\Settings\Views\EditView.aspx" />
     <Content Include="Umbraco_Client\Application\Extensions.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.unobtrusive.min.js" />
