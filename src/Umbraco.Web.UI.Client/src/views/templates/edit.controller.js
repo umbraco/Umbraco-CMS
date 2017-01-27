@@ -229,7 +229,7 @@
                 view: "macropicker",
                 dialogData: {},
                 show: true,
-                title: "Insert macro",
+                title: localizationService.localize("template_insertMacro"),
                 submit: function (model) {
 
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
@@ -256,6 +256,7 @@
                 closeButtonlabel: "Cancel",
                 view: "insertfield",
                 show: true,
+                title: localizationService.localize("template_insertPageField"),
                 submit: function (model) {
                     insert(model.umbracoField);
                     vm.pageFieldOverlay.show = false;
@@ -280,7 +281,7 @@
                 entityType: "dictionary",
                 multiPicker: false,
                 show: true,
-                title: "Insert dictionary item",
+                title: localizationService.localize("template_insertDictionaryItem"),
                 select: function(node){
                     var code = templateHelper.getInsertDictionarySnippet(node.name);
                 	insert(code);
@@ -306,7 +307,7 @@
                 entityType: "partialView",
                 multiPicker: false,
                 show: true,
-                title: "Insert Partial view",
+                title: localizationService.localize("template_insertPartialView"),
                 select: function(node){
 
                     var code = templateHelper.getInsertPartialSnippet(node.name);
@@ -329,7 +330,7 @@
             vm.queryBuilderOverlay = {
                 view: "querybuilder",
                 show: true,
-                title: "Query for content",
+                title: localizationService.localize("template_queryBuilder"),
                 submit: function (model) {
 
                     var code = templateHelper.getQuerySnippet(model.result.queryExpression);
@@ -354,7 +355,7 @@
 
             vm.sectionsOverlay = {
                 view: "templatesections",
-                hasMaster: vm.template.masterTemplateAlias,
+                isMaster: vm.template.isMasterTemplate,
                 submitButtonLabel: "Insert",
                 show: true,
                 submit: function(model) {
@@ -402,7 +403,7 @@
 
             vm.masterTemplateOverlay = {
                 view: "itempicker",
-                title: "Choose master template",
+                title: localizationService.localize("template_mastertemplate"),
                 availableItems: availableMasterTemplates,
                 show: true,
                 submit: function(model) {
@@ -444,23 +445,15 @@
         }
 
         function getMasterTemplateName(masterTemplateAlias, templates) {
-
             if(masterTemplateAlias) {
-
                 var templateName = "";
-
                 angular.forEach(templates, function(template){
                     if(template.alias === masterTemplateAlias) {
                         templateName = template.name;
                     }
                 });
-
                 return templateName;
-
-            } else {
-                return "No master";
             }
-            
         }
 
         function removeMasterTemplate() {

@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Overlays.MediaPickerController",
-        function($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, mediaTypeHelper, eventsService, treeService, $element, $timeout, $cookies, $cookieStore, localizationService) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, mediaTypeHelper, eventsService, treeService, $element, $timeout, $cookies, localStorageService, localizationService) {
 
             if (!$scope.model.title) {
                 $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
@@ -15,7 +15,7 @@ angular.module("umbraco")
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
-            $scope.lastOpenedNode = $cookieStore.get("umbLastOpenedMediaNodeId");
+            $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             if ($scope.onlyImages) {
                 $scope.acceptedFileTypes = mediaHelper
                     .formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
@@ -133,8 +133,7 @@ angular.module("umbraco")
                     });
                 $scope.currentFolder = folder;
 
-                // for some reason i cannot set cookies with cookieStore
-                document.cookie = "umbLastOpenedMediaNodeId=" + folder.id;
+                localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
 
             };
 

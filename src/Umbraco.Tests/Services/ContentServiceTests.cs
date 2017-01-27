@@ -669,6 +669,17 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Cannot_Save_Content_With_Empty_Name()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = new Content(string.Empty, -1, ServiceContext.ContentTypeService.GetContentType("umbTextpage"));
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => contentService.Save(content));
+        }
+
+        [Test]
         public void Can_Get_Content_By_Id()
         {
             // Arrange

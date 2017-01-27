@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using Umbraco.Web.Dynamics;
 using Umbraco.Web.Models.TemplateQuery;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -29,33 +30,44 @@ namespace Umbraco.Web.Editors
         { }
 
 
-        private static readonly IEnumerable<OperathorTerm> Terms = new List<OperathorTerm>()
+        private IEnumerable<OperathorTerm> Terms
+        {
+            get
             {
-                new OperathorTerm("is", Operathor.Equals, new [] {"string"}),
-                new OperathorTerm("is not", Operathor.NotEquals, new [] {"string"}),
-                new OperathorTerm("before", Operathor.LessThan, new [] {"datetime"}),
-                new OperathorTerm("before (including selected date)", Operathor.LessThanEqualTo, new [] {"datetime"}),
-                new OperathorTerm("after", Operathor.GreaterThan, new [] {"datetime"}),
-                new OperathorTerm("after (including selected date)", Operathor.GreaterThanEqualTo, new [] {"datetime"}),
-                new OperathorTerm("equals", Operathor.Equals, new [] {"int"}),
-                new OperathorTerm("does not equal", Operathor.NotEquals, new [] {"int"}),
-                new OperathorTerm("contains", Operathor.Contains, new [] {"string"}),
-                new OperathorTerm("does not contain", Operathor.NotContains, new [] {"string"}),
-                new OperathorTerm("greater than", Operathor.GreaterThan, new [] {"int"}),
-                new OperathorTerm("greater than or equal to", Operathor.GreaterThanEqualTo, new [] {"int"}),
-                new OperathorTerm("less than", Operathor.LessThan, new [] {"int"}),
-                new OperathorTerm("less than or equal to", Operathor.LessThanEqualTo, new [] {"int"})
-            };
+                return new List<OperathorTerm>()
+                {
+                    new OperathorTerm(Services.TextService.Localize("template/is"), Operathor.Equals, new [] {"string"}),
+                    new OperathorTerm(Services.TextService.Localize("template/isNot"), Operathor.NotEquals, new [] {"string"}),
+                    new OperathorTerm(Services.TextService.Localize("template/before"), Operathor.LessThan, new [] {"datetime"}),
+                    new OperathorTerm(Services.TextService.Localize("template/beforeIncDate"), Operathor.LessThanEqualTo, new [] {"datetime"}),
+                    new OperathorTerm(Services.TextService.Localize("template/after"), Operathor.GreaterThan, new [] {"datetime"}),
+                    new OperathorTerm(Services.TextService.Localize("template/afterIncDate"), Operathor.GreaterThanEqualTo, new [] {"datetime"}),
+                    new OperathorTerm(Services.TextService.Localize("template/equals"), Operathor.Equals, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/doesNotEqual"), Operathor.NotEquals, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/contains"), Operathor.Contains, new [] {"string"}),
+                    new OperathorTerm(Services.TextService.Localize("template/doesNotContain"), Operathor.NotContains, new [] {"string"}),
+                    new OperathorTerm(Services.TextService.Localize("template/greaterThan"), Operathor.GreaterThan, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/greaterThanEqual"), Operathor.GreaterThanEqualTo, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/lessThan"), Operathor.LessThan, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/lessThanEqual"), Operathor.LessThanEqualTo, new [] {"int"})
+                };
+            }
+        }
 
-        private static readonly IEnumerable<PropertyModel> Properties = new List<PropertyModel>()
+        private IEnumerable<PropertyModel> Properties
+        {
+            get
             {
-                new PropertyModel() { Name = "Id", Alias = "Id", Type = "int"  },
-                new PropertyModel() { Name = "Name", Alias = "Name", Type = "string"  },
-                //new PropertyModel() { Name = "Url", Alias = "url", Type = "string"  },
-                new PropertyModel() { Name = "Created Date", Alias = "CreateDate", Type = "datetime"  },
-                new PropertyModel() { Name = "Last Updated Date", Alias = "UpdateDate", Type = "datetime"  }
-
-            };
+                return new List<PropertyModel>()
+                {
+                    new PropertyModel() {Name = Services.TextService.Localize("template/id"), Alias = "Id", Type = "int"},
+                    new PropertyModel() {Name = Services.TextService.Localize("template/name"), Alias = "Name", Type = "string"},
+                    //new PropertyModel() { Name = "Url", Alias = "url", Type = "string"  },
+                    new PropertyModel() {Name = Services.TextService.Localize("template/createdDate"), Alias = "CreateDate", Type = "datetime"},
+                    new PropertyModel() {Name = Services.TextService.Localize("template/lastUpdatedDate"), Alias = "UpdateDate", Type = "datetime"}
+                };
+            }
+        }
 
         public QueryResultModel PostTemplateQuery(QueryModel model)
         {
@@ -297,9 +309,10 @@ namespace Umbraco.Web.Editors
         {
             var contentTypes =
                 ApplicationContext.Services.ContentTypeService.GetAllContentTypes()
-                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = x.Name })
+                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name } ) })
                     .OrderBy(x => x.Name).ToList();
-            contentTypes.Insert(0, new ContentTypeModel() { Alias = string.Empty, Name = "Everything" });
+
+            contentTypes.Insert(0, new ContentTypeModel() { Alias = string.Empty, Name = Services.TextService.Localize("template/allContent") });
 
             return contentTypes;
         }

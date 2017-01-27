@@ -38,15 +38,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "");
-
-        /// <summary>
-        /// Gets paged media descendants as XML by path
-        /// </summary>
-        /// <param name="path">Path starts with</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records the query would return without paging</param>
-        /// <returns>A paged enumerable of XML entries of media items</returns>
-        IEnumerable<XElement> GetPagedXmlEntriesByPath(string path, long pageIndex, int pageSize, out long totalRecords);
+        
     }
 }

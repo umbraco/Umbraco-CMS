@@ -585,7 +585,7 @@ namespace Umbraco.Core.Services
 
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        public IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
             long total;
             var result = GetPagedDescendants(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
@@ -604,7 +604,7 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns> 
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
             return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
         }
@@ -1765,6 +1765,31 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets paged content descendants as XML by path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>
+        public IEnumerable<XElement> GetPagedXmlEntries(string path, long pageIndex, int pageSize, out long totalRecords)
+        {
+            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                var contents = repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize,
+                    //This order by is VERY important! This allows us to figure out what is implicitly not published, see ContentRepository.BuildXmlCache and
+                    // UmbracoContentIndexer.PerformIndexAll which uses the logic based on this sort order
+                    new[] {"level", "parentID", "sortOrder"},
+                    out totalRecords);
+                return contents;
+            }
+        }
+
+        /// <summary>
         /// This builds the Xml document used for the XML cache
         /// </summary>
         /// <returns></returns>
@@ -2190,6 +2215,11 @@ namespace Umbraco.Core.Services
                 {
                     return OperationStatus.Cancelled(evtMsgs);
                 }
+            }
+
+            if (string.IsNullOrWhiteSpace(content.Name))
+            {
+                throw new ArgumentException("Cannot save content with empty name.");
             }
 
             using (new WriteLock(Locker))

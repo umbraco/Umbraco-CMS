@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -95,6 +96,19 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
+        /// <summary>
+        /// Gets all XML entries found in the cmsContentXml table based on the given path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>
+        /// <remarks>
+        /// If -1 is passed, then this will return all content xml entries, otherwise will return all descendents from the path
+        /// </remarks>
+        IEnumerable<XElement> GetPagedXmlEntries(string path, long pageIndex, int pageSize, out long totalRecords);
+
         /// <summary>
         /// This builds the Xml document used for the XML cache
         /// </summary>
@@ -245,7 +259,7 @@ namespace Umbraco.Core.Services
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
@@ -259,7 +273,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id

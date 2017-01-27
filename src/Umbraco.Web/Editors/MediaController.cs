@@ -36,6 +36,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Web.UI;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Web.Editors
 {
@@ -175,7 +176,37 @@ namespace Umbraco.Web.Editors
         /// Returns the child media objects
         /// </summary>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(string id,
+            int pageNumber = 0,
+            int pageSize = 0,
+            string orderBy = "SortOrder",
+            Direction orderDirection = Direction.Ascending,
+            bool orderBySystemField = true,
+            string filter = "")
+        {
+            int idInt; Guid idGuid;
+
+            if (Guid.TryParse(id, out idGuid))
+            {
+                var entity = Services.EntityService.GetByKey(idGuid);
+                if (entity != null)
+                {
+                    return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+                }
+                else
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+            }
+            else if (int.TryParse(id, out idInt))
+            {
+                return GetChildren(idInt, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+
+        private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
             int pageNumber = 0,
             int pageSize = 0,
             string orderBy = "SortOrder",
@@ -448,11 +479,36 @@ namespace Umbraco.Web.Editors
             }
 
             //get the string json from the request
-            int parentId;
-            if (int.TryParse(result.FormData["currentFolder"], out parentId) == false)
+            int parentId; bool entityFound;
+            string currentFolderId = result.FormData["currentFolder"];
+            if (int.TryParse(currentFolderId, out parentId) == false)
             {
-                return Request.CreateValidationErrorResponse("The request was not formatted correctly, the currentFolder is not an integer");
+                // if a guid then try to look up the entity
+                Guid idGuid;
+                if (Guid.TryParse(currentFolderId, out idGuid))
+                {
+                    var entity = Services.EntityService.GetByKey(idGuid);
+                    if (entity != null)
+                    {
+                        entityFound = true;
+                        parentId = entity.Id;
+                    }
+                    else
+                    {
+                        throw new EntityNotFoundException(currentFolderId, "The passed id doesn't exist");
+                    }
+                }
+                else
+                {
+                    return Request.CreateValidationErrorResponse("The request was not formatted correctly, the currentFolder is not an integer or Guid");
+                }
+
+                if (entityFound == false)
+                {
+                    return Request.CreateValidationErrorResponse("The request was not formatted correctly, the currentFolder is not an integer or Guid");
+                }
             }
+
 
             //ensure the user has access to this folder by parent id!
             if (CheckPermissions(

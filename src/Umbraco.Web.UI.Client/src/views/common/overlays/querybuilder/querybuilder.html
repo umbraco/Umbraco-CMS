@@ -5,7 +5,7 @@
         <div class="row">
 			<div class="query-items">
 				
-				<span><localize key="template_iWant">I Want</localize></span>
+				<span><localize key="template_iWant">I want</localize></span>
 
 				<div class="btn-group">
 
@@ -22,7 +22,7 @@
 
 				</div>
 
-				<span><localize key="template_fromt">from</localize></span>
+				<span><localize key="template_from">from</localize></span>
 
 				<a href class="btn btn-link" ng-click="vm.chooseSource(vm.query)">
 					{{vm.query.source.name}}
@@ -91,7 +91,7 @@
 					<i class="icon-add"></i>
 				</a>
 
-				<a href ng-if="vm.query.filters.length > 1" ng-click="vm.trashFilter(vm.query)">
+				<a href ng-click="vm.trashFilter(vm.query)">
 					<i class="icon-trash"></i>
 				</a>
 
@@ -100,7 +100,7 @@
 
 			<div class="query-items">
 
-				<span<localize key="template_orderBy">order by</localize></span>
+				<span><localize key="template_orderBy">order by</localize></span>
 
 				<div class="btn-group">
 					<a class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">
@@ -119,7 +119,7 @@
 				</div>
 
 				<a href class="btn" ng-click="vm.changeSortOrder(vm.query)">
-					{{vm.query.sort.direction}}
+					{{vm.query.sort.translation.currentLabel}}
 				</a>
 
 			</div>

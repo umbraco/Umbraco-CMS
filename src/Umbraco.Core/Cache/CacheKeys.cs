@@ -64,7 +64,8 @@ namespace Umbraco.Core.Cache
         [UmbracoWillObsolete("This cache key is only used for legacy business logic caching, remove in v8")]
         public const string ContentTypePropertiesCacheKey = "ContentType_PropertyTypes_Content:";
         
-        [UmbracoWillObsolete("This cache key is only used for legacy business logic caching, remove in v8")]
+        [Obsolete("No longer used and will be removed in v8")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public const string PropertyTypeCacheKey = "UmbracoPropertyTypeCache";
 
         [Obsolete("This is no longer used and will be removed from the codebase in the future")]

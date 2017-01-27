@@ -29,7 +29,7 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("umbraco.datalayer")]
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
-
+[assembly: InternalsVisibleTo("umbraco.providers")]
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
@@ -42,7 +42,10 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
-[assembly: InternalsVisibleTo("umbraco.providers")]
+
+[assembly: InternalsVisibleTo("Umbraco.Deploy")]
+[assembly: InternalsVisibleTo("Umbraco.Deploy.UI")]
+[assembly: InternalsVisibleTo("Umbraco.Deploy.Cloud")]
 
 //allow this to be mocked in our unit tests
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
