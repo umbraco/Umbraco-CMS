@@ -64,7 +64,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
-                       "GetAllowedChildren",
+                       "GetAllowedChildrenByString",
                        [{ contentId: mediaId }])),
                'Failed to retrieve allowed types for media id ' + mediaId);
         },

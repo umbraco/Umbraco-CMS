@@ -341,7 +341,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                   $http.get(
                         umbRequestHelper.getApiUrl(
                               "mediaApiBaseUrl",
-                              "GetChildren",
+                              "GetChildrenByString",
                               [
                                     { id: parentId },
                                     { pageNumber: options.pageNumber },

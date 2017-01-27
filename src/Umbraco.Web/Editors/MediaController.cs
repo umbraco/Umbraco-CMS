@@ -176,7 +176,7 @@ namespace Umbraco.Web.Editors
         /// Returns the child media objects
         /// </summary>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(string id,
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildrenByString(string id,
             int pageNumber = 0,
             int pageSize = 0,
             string orderBy = "SortOrder",
@@ -206,7 +206,41 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
-        private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
+        /// <summary>
+        /// Returns the child media objects
+        /// </summary>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(string id,
+            int pageNumber = 0,
+            int pageSize = 0,
+            string orderBy = "SortOrder",
+            Direction orderDirection = Direction.Ascending,
+            bool orderBySystemField = true,
+            string filter = "")
+        {
+            return GetChildrenByString(id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+        }
+
+        /// <summary>
+        /// Returns the child media objects
+        /// </summary>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
+            int pageNumber = 0,
+            int pageSize = 0,
+            string orderBy = "SortOrder",
+            Direction orderDirection = Direction.Ascending,
+            bool orderBySystemField = true,
+            string filter = "")
+        {
+            return GetChildrenByInt(id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+        }
+
+        /// <summary>
+        /// Returns the child media objects
+        /// </summary>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
+        private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildrenByInt(int id,
             int pageNumber = 0,
             int pageSize = 0,
             string orderBy = "SortOrder",
