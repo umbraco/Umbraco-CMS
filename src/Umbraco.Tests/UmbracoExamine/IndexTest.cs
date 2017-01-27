@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
+using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
@@ -15,7 +15,6 @@ using UmbracoExamine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
-
     /// <summary>
     /// Tests the standard indexing capabilities
     /// </summary>
@@ -30,9 +29,10 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Protected_Content_Not_Indexed()
         {
 
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir))
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
                 indexer.RebuildIndex();
 
@@ -59,9 +59,10 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
         {
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir))
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
                 indexer.RebuildIndex();
 
@@ -77,7 +78,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 //ensure that node 2112 doesn't exist
                 var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
-                Assert.AreEqual(0, results.Count());
+                Assert.AreEqual(0, results.TotalItemCount);
 
                 //get a node from the data repo (this one exists underneath 2222)
                 var node = mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
@@ -103,19 +104,19 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 //now ensure it's deleted
                 var newResults = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
-                Assert.AreEqual(1, newResults.Count());
+                Assert.AreEqual(1, newResults.TotalItemCount);
             }
 
             
         }
 
         [Test]
-        [Ignore]
         public void Index_Move_Media_To_Non_Indexable_ParentID()
         {
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir))
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
                 indexer.RebuildIndex();
 
@@ -152,7 +153,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 //now ensure it's deleted
                 var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
-                Assert.AreEqual(0, results.Count());
+                Assert.AreEqual(0, results.TotalItemCount);
             }
         }
 
@@ -164,9 +165,10 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Reindex_Content()
         {
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir, supportUnpublishedContent:true))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir))
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer, supportUnpublishedContent: true))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
                 indexer.RebuildIndex();
 
@@ -175,10 +177,9 @@ namespace Umbraco.Tests.UmbracoExamine
                 //first delete all 'Content' (not media). This is done by directly manipulating the index with the Lucene API, not examine!
 
                 var contentTerm = new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content);
-                var writer = indexer.GetIndexWriter();
                 writer.DeleteDocuments(contentTerm);
                 writer.Commit();
-                
+
                 //make sure the content is gone. This is done with lucene APIs, not examine!
                 var collector = new AllHitsCollector(false, true);
                 var query = new TermQuery(contentTerm);
@@ -205,13 +206,13 @@ namespace Umbraco.Tests.UmbracoExamine
         /// This will delete an item from the index and ensure that all children of the node are deleted too!
         /// </summary>
         [Test]
-        [Ignore]
         public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
         {
 
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir))
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
                 indexer.RebuildIndex();
 
@@ -221,10 +222,10 @@ namespace Umbraco.Tests.UmbracoExamine
                 //this node had children: 1141 & 1142, let's ensure they are also removed
 
                 var results = searcher.Search(searcher.CreateSearchCriteria().Id(1141).Compile());
-                Assert.AreEqual(0, results.Count());
+                Assert.AreEqual(0, results.TotalItemCount);
 
                 results = searcher.Search(searcher.CreateSearchCriteria().Id(1142).Compile());
-                Assert.AreEqual(0, results.Count());
+                Assert.AreEqual(0, results.TotalItemCount);
             }
         }
         

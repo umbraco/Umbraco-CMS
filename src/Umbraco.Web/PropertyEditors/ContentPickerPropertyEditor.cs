@@ -33,17 +33,12 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ContentPickerPreValueEditor : PreValueEditor
         {
-            [PreValueField("showOpenButton", "Show open button", "boolean")]
+            [PreValueField("showOpenButton", "Show open button (this feature is in preview!)", "boolean", Description = " Opens the node in a dialog")]
             public string ShowOpenButton { get; set; }
-
-            [PreValueField("showEditButton", "Show edit button (this feature is in preview!)", "boolean")]
-            public string ShowEditButton { get; set; }
             
             [PreValueField("startNodeId", "Start node", "treepicker")]
             public int StartNodeId { get; set; }
 
-            [PreValueField("showPathOnHover", "Show path when hovering items", "boolean")]
-            public bool ShowPathOnHover { get; set; }
         }
     }
 }

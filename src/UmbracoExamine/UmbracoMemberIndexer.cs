@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using UmbracoExamine.Config;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using Examine;
 using System.IO;
@@ -25,6 +26,7 @@ namespace UmbracoExamine
     {
 
         private readonly IMemberService _memberService;
+        private readonly IMemberTypeService _memberTypeService;
         private readonly IDataTypeService _dataTypeService;
 
         /// <summary>
@@ -34,6 +36,7 @@ namespace UmbracoExamine
         {
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
             _memberService = ApplicationContext.Current.Services.MemberService;
+            _memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
         }
 
         /// <summary>
@@ -49,6 +52,7 @@ namespace UmbracoExamine
         {
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
             _memberService = ApplicationContext.Current.Services.MemberService;
+            _memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
         }
 
         /// <summary>
@@ -61,6 +65,8 @@ namespace UmbracoExamine
         /// <param name="memberService"></param>
         /// <param name="analyzer"></param>
         /// <param name="async"></param>
+        [Obsolete("Use the ctor specifying all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService,
               IDataTypeService dataTypeService,
               IMemberService memberService,
@@ -69,9 +75,31 @@ namespace UmbracoExamine
         {
             _dataTypeService = dataTypeService;
             _memberService = memberService;
+            _memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
         }
 
-
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="indexerData"></param>
+        /// <param name="indexPath"></param>
+        /// <param name="dataService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="memberService"></param>
+        /// <param name="memberTypeService"></param>
+        /// <param name="analyzer"></param>
+        /// <param name="async"></param>
+        public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService,
+              IDataTypeService dataTypeService,
+              IMemberService memberService,
+              IMemberTypeService memberTypeService,
+              Analyzer analyzer, bool async)
+            : base(indexerData, indexPath, dataService, analyzer, async)
+        {
+            _dataTypeService = dataTypeService;
+            _memberService = memberService;
+            _memberTypeService = memberTypeService;
+        }
 
         /// <summary>
         /// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
@@ -130,46 +158,67 @@ namespace UmbracoExamine
             if (SupportedTypes.Contains(type) == false)
                 return;
 
-            const int pageSize = 1000;
-            var pageIndex = 0;
-
             DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            IMember[] members;
-
-            if (IndexerData.IncludeNodeTypes.Any())
+            try
             {
-                //if there are specific node types then just index those
-                foreach (var nodeType in IndexerData.IncludeNodeTypes)
+                if (DisableXmlDocumentLookup == false)
                 {
-                    do
+                    ReindexWithXmlEntries(type, -1,
+                        () => _memberTypeService.GetAll().ToArray(),
+                        (path, pIndex, pSize) =>
+                        {
+                            long totalContent;
+                            var result = _memberService.GetPagedXmlEntries(pIndex, pSize, out totalContent).ToArray();
+                            return new Tuple<long, XElement[]>(totalContent, result);
+                        },
+                        i => _memberService.GetById(i));
+                }
+                else
+                {
+                    const int pageSize = 1000;
+                    var pageIndex = 0;
+
+                    IMember[] members;
+
+                    if (IndexerData.IncludeNodeTypes.Any())
                     {
-                        long total;
-                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
+                        //if there are specific node types then just index those
+                        foreach (var nodeType in IndexerData.IncludeNodeTypes)
+                        {
+                            do
+                            {
+                                long total;
+                                members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
 
-                        AddNodesToIndex(GetSerializedMembers(members), type);
+                                AddNodesToIndex(GetSerializedMembers(members), type);
 
-                        pageIndex++;
-                    } while (members.Length == pageSize);
+                                pageIndex++;
+                            } while (members.Length == pageSize);
+                        }
+                    }
+                    else
+                    {
+                        //no node types specified, do all members
+                        do
+                        {
+                            int total;
+                            members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
+
+                            AddNodesToIndex(GetSerializedMembers(members), type);
+
+                            pageIndex++;
+                        } while (members.Length == pageSize);
+                    }
                 }
             }
-            else
+            finally
             {
-                //no node types specified, do all members
-                do
-                {
-                    int total;
-                    members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
-
-                    AddNodesToIndex(GetSerializedMembers(members), type);
-
-                    pageIndex++;
-                } while (members.Length == pageSize);
+                stopwatch.Stop();
             }
-
-            stopwatch.Stop();
+            
             DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}, took {1}ms", type, stopwatch.ElapsedMilliseconds));
         }
 
@@ -189,7 +238,9 @@ namespace UmbracoExamine
             var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
 
             //adds the special path property to the index
-            fields.Add("__key", allValuesForIndexing["__key"]);
+            string valuesForIndexing;
+            if (allValuesForIndexing.TryGetValue("__key", out valuesForIndexing))
+                fields.Add("__key", valuesForIndexing);
 
             return fields;
 

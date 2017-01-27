@@ -17,6 +17,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
+using System.Net.Http;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Web.WebApi.Filters;
@@ -142,6 +143,47 @@ namespace Umbraco.Web.Editors
             var foundContent = GetResultForId(id, type);
 
             return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+        }
+
+
+
+        /// <summary>
+        /// Gets the url of an entity
+        /// </summary>
+        /// <param name="id">Int id of the entity to fetch URL for</param>
+        /// <param name="type">The tpye of entity such as Document, Media, Member</param>
+        /// <returns>The URL or path to the item</returns>
+        public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type)
+        {
+            var returnUrl = string.Empty;
+
+            if (type == UmbracoEntityTypes.Document)
+            {
+                var foundUrl = Umbraco.Url(id);
+                if (string.IsNullOrEmpty(foundUrl) == false && foundUrl != "#")
+                {
+                    returnUrl = foundUrl;
+
+                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(returnUrl)
+                    };
+                }   
+            }
+
+            var ancestors = GetAncestors(id, type);
+
+            //if content, skip the first node for replicating NiceUrl defaults
+            if(type == UmbracoEntityTypes.Document) {
+                ancestors = ancestors.Skip(1);
+            }
+
+            returnUrl = "/" + string.Join("/", ancestors.Select(x => x.Name));
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(returnUrl)
+            };
         }
 
         /// <summary>
@@ -614,7 +656,7 @@ namespace Umbraco.Web.Editors
                     .Select(Mapper.Map<EntityBasic>);
 
                 // entities are in "some" order, put them back in order
-                var xref = entities.ToDictionary(x => x.Id);
+                var xref = entities.ToDictionary(x => x.Key);
                 var result = keysArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;

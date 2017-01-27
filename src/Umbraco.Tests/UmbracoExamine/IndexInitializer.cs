@@ -7,6 +7,7 @@ using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Moq;
 using Umbraco.Core;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.UmbracoExamine
     internal static class IndexInitializer
     {
         public static UmbracoContentIndexer GetUmbracoIndexer(
-                Directory luceneDir,
+                IndexWriter writer,
                 Analyzer analyzer = null,
                 IDataService dataService = null,
                 IContentService contentService = null,
@@ -178,15 +179,14 @@ namespace Umbraco.Tests.UmbracoExamine
             var indexCriteria = indexSet.ToIndexCriteria(dataService, UmbracoContentIndexer.IndexFieldPolicies);
 
             var i = new UmbracoContentIndexer(indexCriteria,
-                                              luceneDir, //custom lucene directory
-                                                  dataService,
-                                                  contentService,
-                                                  mediaService,
-                                                  dataTypeService,
-                                                  userService,
-                                                  contentTypeService,
-                                              analyzer,
-                                              false)
+                writer, 
+                dataService,
+                contentService,
+                mediaService,
+                dataTypeService,
+                userService,
+                contentTypeService,
+                false)
             {
                 SupportUnpublishedContent = supportUnpublishedContent
             };
@@ -197,13 +197,14 @@ namespace Umbraco.Tests.UmbracoExamine
 
             return i;
         }
-        public static UmbracoExamineSearcher GetUmbracoSearcher(Directory luceneDir, Analyzer analyzer = null)
+
+        public static UmbracoExamineSearcher GetUmbracoSearcher(IndexWriter writer, Analyzer analyzer = null)
         {
             if (analyzer == null)
             {
                 analyzer = new StandardAnalyzer(Version.LUCENE_29);
             }
-            return new UmbracoExamineSearcher(luceneDir, analyzer);
+            return new UmbracoExamineSearcher(writer, analyzer);
         }
 
         public static LuceneSearcher GetLuceneSearcher(Directory luceneDir)
