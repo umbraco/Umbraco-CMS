@@ -171,6 +171,21 @@ namespace Umbraco.Web.Editors
             return Services.MediaService.GetRootMedia()
                            .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
+        
+        /// <summary>
+        /// Returns the child media objects
+        /// </summary>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
+            int pageNumber = 0,
+            int pageSize = 0,
+            string orderBy = "SortOrder",
+            Direction orderDirection = Direction.Ascending,
+            bool orderBySystemField = true,
+            string filter = "")
+        {
+            return GetChildren(id.ToString(), pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+        }
 
         /// <summary>
         /// Returns the child media objects
@@ -191,7 +206,7 @@ namespace Umbraco.Web.Editors
                 var entity = Services.EntityService.GetByKey(idGuid);
                 if (entity != null)
                 {
-                    return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+                    return GetChildrenById(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
                 }
                 else
                 {
@@ -200,13 +215,13 @@ namespace Umbraco.Web.Editors
             }
             else if (int.TryParse(id, out idInt))
             {
-                return GetChildren(idInt, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+                return GetChildrenById(idInt, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
-        private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
+        private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildrenById(int id,
             int pageNumber = 0,
             int pageSize = 0,
             string orderBy = "SortOrder",
