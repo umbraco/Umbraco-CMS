@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -27,6 +28,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Web.Http.Controllers;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
@@ -45,9 +47,22 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the media application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Media)]
+    [UmbracoApplicationAuthorize(Constants.Applications.Media)]
+    [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class MediaControllerControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetChildren", "id", typeof(int), typeof(Guid), typeof(string))));
+            }
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -173,40 +188,10 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns the child media objects
+        /// Returns the child media objects - using the entity INT id
         /// </summary>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(string id,
-            int pageNumber = 0,
-            int pageSize = 0,
-            string orderBy = "SortOrder",
-            Direction orderDirection = Direction.Ascending,
-            bool orderBySystemField = true,
-            string filter = "")
-        {
-            int idInt; Guid idGuid;
-
-            if (Guid.TryParse(id, out idGuid))
-            {
-                var entity = Services.EntityService.GetByKey(idGuid);
-                if (entity != null)
-                {
-                    return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
-                }
-                else
-                {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-            }
-            else if (int.TryParse(id, out idInt))
-            {
-                return GetChildren(idInt, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
-            }
-
-            throw new HttpResponseException(HttpStatusCode.NotFound);
-        }
-
-        private PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
             int pageNumber = 0,
             int pageSize = 0,
             string orderBy = "SortOrder",
@@ -238,6 +223,58 @@ namespace Umbraco.Web.Editors
                 .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
 
             return pagedResult;
+        }
+
+        /// <summary>
+        /// Returns the child media objects - using the entity GUID id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="orderBySystemField"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Guid id,
+           int pageNumber = 0,
+           int pageSize = 0,
+           string orderBy = "SortOrder",
+           Direction orderDirection = Direction.Ascending,
+           bool orderBySystemField = true,
+           string filter = "")
+        {            
+            var entity = Services.EntityService.GetByKey(id);
+            if (entity != null)
+            {
+                return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+
+        [Obsolete("Do not use this method, use either the overload with INT or GUID instead, this will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(string id,
+           int pageNumber = 0,
+           int pageSize = 0,
+           string orderBy = "SortOrder",
+           Direction orderDirection = Direction.Ascending,
+           bool orderBySystemField = true,
+           string filter = "")
+        {
+            foreach (var type in new[] { typeof(int), typeof(Guid) })
+            {
+                var parsed = id.TryConvertTo(type);
+                if (parsed)
+                {
+                    //oooh magic! will auto select the right overload
+                    return GetChildren((dynamic)parsed.Result);
+                }
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         /// <summary>
