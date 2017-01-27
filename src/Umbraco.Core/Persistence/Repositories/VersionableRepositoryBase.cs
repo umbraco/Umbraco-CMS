@@ -163,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //each order by param needs to be in a bracket! see: https://github.com/toptensoftware/PetaPoco/issues/177
             query.OrderBy(orderBy == null
-                ? "(umbracoNode.id)"                
+                ? "(umbracoNode.id)"
                 : string.Join(",", orderBy.Select(x => string.Format("({0})", SqlSyntax.GetQuotedColumnName(x)))));
 
             var pagedResult = Database.Page<ContentXmlDto>(pageIndex + 1, pageSize, query);
@@ -461,14 +461,14 @@ namespace Umbraco.Core.Persistence.Repositories
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
 
             //NOTE: We need to check the actual items returned, not the 'totalRecords', that is because if you request a page number
-            // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in 
+            // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in
             // the pageResult, then the GetAll will actually return ALL records in the db.
             if (pagedResult.Items.Any())
             {
                 //Crete the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
                 var args = sqlNodeIdsWithSort.Arguments;
                 string sqlStringCount, sqlStringPage;
-                Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);               
+                Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
 
                 //We need to make this FULL query an inner join on the paged ID query
                 var splitQuery = sqlQueryFull.SQL.Split(new[] { "WHERE " }, StringSplitOptions.None);
@@ -502,7 +502,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (documentDefs.Count == 0) return new Dictionary<int, PropertyCollection>();
 
-            //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use 
+            //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use
             // the statement to go get the property data for all of the items by using an inner join
             var parsedOriginalSql = "SELECT {0} " + docSql.SQL.Substring(docSql.SQL.IndexOf("FROM", StringComparison.Ordinal));
             //now remove everything from an Orderby clause and beyond
@@ -513,7 +513,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //This retrieves all pre-values for all data types that are referenced for all property types
             // that exist in the data set.
-            //Benchmarks show that eagerly loading these so that we can lazily read the property data 
+            //Benchmarks show that eagerly loading these so that we can lazily read the property data
             // below (with the use of Query intead of Fetch) go about 30% faster, so we'll eagerly load
             // this now since we cannot execute another reader inside of reading the property data.
             var preValsSql = new Sql(@"SELECT a.id, a.value, a.sortorder, a.alias, a.datatypeNodeId
@@ -532,11 +532,11 @@ WHERE EXISTS(
 
             //It's Important with the sort order here! We require this to be sorted by node id,
             // this is required because this data set can be huge depending on the page size. Due
-            // to it's size we need to be smart about iterating over the property values to build 
-            // the document. Before we used to use Linq to get the property data for a given content node 
+            // to it's size we need to be smart about iterating over the property values to build
+            // the document. Before we used to use Linq to get the property data for a given content node
             // and perform a Distinct() call. This kills performance because that would mean if we had 7000 nodes
             // and on each iteration we will perform a lookup on potentially 100,000 property rows against the node
-            // id which turns out to be a crazy amount of iterations. Instead we know it's sorted by this value we'll 
+            // id which turns out to be a crazy amount of iterations. Instead we know it's sorted by this value we'll
             // keep an index stored of the rows being read so we never have to re-iterate the entire data set
             // on each document iteration.
             var propSql = new Sql(@"SELECT cmsPropertyData.*
@@ -562,6 +562,7 @@ ORDER BY contentNodeId, propertytypeid
 
             //keep track of the current property data item being enumerated
             var propertyDataSetEnumerator = allPropertyData.GetEnumerator();
+            var hasCurrent = false; // initially there is no enumerator.Current
 
             try
             {
@@ -569,7 +570,7 @@ ORDER BY contentNodeId, propertytypeid
                 // which allows us to more efficiently iterate over the large data set of property values
                 foreach (var def in documentDefs.OrderBy(x => x.Id))
                 {
-                    //get the resolved proeprties from our local cache, or resolve them and put them in cache
+                    // get the resolved properties from our local cache, or resolve them and put them in cache
                     PropertyType[] compositionProperties;
                     if (resolvedCompositionProperties.ContainsKey(def.Composition.Id))
                     {
@@ -581,28 +582,20 @@ ORDER BY contentNodeId, propertytypeid
                         resolvedCompositionProperties[def.Composition.Id] = compositionProperties;
                     }
 
+                    // assemble the dtos for this def
+                    // use the available enumerator.Current if any else move to next
                     var propertyDataDtos = new List<PropertyDataDto>();
-
-                    //Check if there is a current enumerated item and check if we match and add it
-                    if (propertyDataSetEnumerator.Current != null)
+                    while (hasCurrent || propertyDataSetEnumerator.MoveNext())
                     {
                         if (propertyDataSetEnumerator.Current.NodeId == def.Id)
                         {
-                            propertyDataDtos.Add(propertyDataSetEnumerator.Current);
-                        }
-                    }
-                    //Move to the next position, see if we match and add it, if not exit
-                    while (propertyDataSetEnumerator.MoveNext())
-                    {
-                        if (propertyDataSetEnumerator.Current.NodeId == def.Id)
-                        {
+                            hasCurrent = false; // enumerator.Current is not available
                             propertyDataDtos.Add(propertyDataSetEnumerator.Current);
                         }
                         else
                         {
-                            //the node id has changed so we need to exit the loop,
-                            //the enumerator position will be maintained
-                            break;
+                            hasCurrent = true; // enumerator.Current is available for another def
+                            break; // no more propertyDataDto for this def
                         }
                     }
 
