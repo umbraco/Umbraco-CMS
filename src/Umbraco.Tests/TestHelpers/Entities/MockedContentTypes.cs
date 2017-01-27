@@ -7,6 +7,13 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContentTypes
     {
+        /// <summary>
+        /// Creates a content type without any properties
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <param name="name"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
         public static ContentType CreateBasicContentType(string alias = "basePage", string name = "Base Page",
             ContentType parent = null)
         {
