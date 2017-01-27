@@ -1382,6 +1382,7 @@ namespace Umbraco.Core.Services
                 _mediaFileSystem.GenerateThumbnails(filestream, filepath, propertyType);
             }
         }
+        
 
         #region Event Handlers
 

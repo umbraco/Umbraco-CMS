@@ -287,6 +287,7 @@
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Editors\GravatarController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
+    <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\AcceptableConfiguration.cs" />
     <Compile Include="HealthCheck\Checks\Config\ConfigurationService.cs" />
@@ -339,11 +340,13 @@
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
+    <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\Mapping\TemplateModelMapper.cs" />
     <Compile Include="Models\PackageInstallResult.cs" />
+    <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
     <Compile Include="Models\SetPasswordModel.cs" />
     <Compile Include="Models\RequestPasswordResetModel.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
@@ -392,6 +395,7 @@
     <Compile Include="Trees\MemberTypeTreeController.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
+    <Compile Include="Trees\ScriptTreeController.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
@@ -1046,8 +1050,8 @@
     <Compile Include="Strategies\ServerRegistrationEventHandler.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
-    <Compile Include="Trees\PartialViewMacrosTree.cs" />
-    <Compile Include="Trees\PartialViewsTree.cs" />
+    <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
+    <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
     <Compile Include="UI\LegacyDialogHandler.cs" />

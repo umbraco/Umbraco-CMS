@@ -11,12 +11,12 @@ namespace Umbraco.Core.Deploy
     public interface IGridCellValueConnector
     {
         /// <summary>
-        /// Gets a value indicating whether the connector supports a specified grid editor alias.
+        /// Gets a value indicating whether the connector supports a specified grid editor view.
         /// </summary>
-        /// <param name="alias">The grid editor alias.</param>
-        /// <remarks>A value indicating whether the connector supports the grid editor alias.</remarks>
-        /// <remarks>Note that <paramref name="alias" /> can be string.Empty to indicate the "default" connector.</remarks>
-        bool IsConnector(string alias);
+        /// <param name="view">The grid editor view. It needs to be the view instead of the alias as the view is really what identifies what kind of connector should be used. Alias can be anything and you can have multiple different aliases using the same kind of view.</param>
+        /// <remarks>A value indicating whether the connector supports the grid editor view.</remarks>
+        /// <remarks>Note that <paramref name="view" /> can be string.Empty to indicate the "default" connector.</remarks>
+        bool IsConnector(string view);
 
         /// <summary>
         /// Gets the value to be deployed from the control value as a string.
