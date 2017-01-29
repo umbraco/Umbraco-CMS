@@ -224,18 +224,14 @@
                 theme: "chrome",
                 showPrintMargin: false,
                 advanced: {
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
+                    enableBasicAutocompletion: true,
+                    enableLiveAutocompletion: false
                 },
                 onLoad: function(_editor) {
                     vm.editor = _editor;
                     
-                    //Enable simple/basic auto complete
-                    _editor.setOptions({
-                        enableBasicAutocompletion: true,
-                        enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
-                        enableLiveAutocompletion: true
-                    });
-
                     //Update the auto-complete method to use ctrl+alt+space
                     _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
                     
