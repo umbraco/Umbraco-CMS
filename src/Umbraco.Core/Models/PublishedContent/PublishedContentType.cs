@@ -187,7 +187,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         // for unit tests - changing the callback must reset the cache obviously
         private static Func<string, PublishedContentType> _getPublishedContentTypeCallBack;
-        internal static Func<string, PublishedContentType> GetPublishedContentTypeCallback
+        public static Func<string, PublishedContentType> GetPublishedContentTypeCallback
         {
             get { return _getPublishedContentTypeCallBack; }
             set
