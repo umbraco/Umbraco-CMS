@@ -107,24 +107,29 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of PetaPocoRepositoryBase<int,IMembershipUser>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql GetBaseQuery(BaseQueryType queryType)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<MemberDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<ContentVersionDto, MemberDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+            sql.Select(queryType == BaseQueryType.Count ? "COUNT(*)" : (queryType == BaseQueryType.Ids ? "cmsMember.nodeId" : "*"))
+                .From<MemberDto>(SqlSyntax)
+                .InnerJoin<ContentVersionDto>(SqlSyntax)
+                .On<ContentVersionDto, MemberDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 //We're joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
                 // the execution plan says it doesn't so we'll go with that and in that case, it might be worth joining the content
                 // types by default on the document and media repo's so we can query by content type there too.
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .InnerJoin<ContentTypeDto>(SqlSyntax)
+                .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId, SqlSyntax);
             return sql;
+        }
 
+        protected override Sql GetBaseQuery(bool isCount)
+        {
+            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.Full);
         }
 
         protected override string GetBaseWhereClause()
@@ -617,9 +622,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
             }
 
-            return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
+            return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsMember", "nodeId"),
-                sql => ProcessQuery(sql), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
         }
 

@@ -367,6 +367,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "templateQueryApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
                                     controller => controller.PostTemplateQuery(null))
+                            },
+                            {
+                                "codeFileApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CodeFileController>(
+                                    controller => controller.GetByPath("", ""))
                             }
                         }
                     },

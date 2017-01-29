@@ -290,15 +290,42 @@
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Attempt.cs" />
+    <Compile Include="Constants-DeployEntityType.cs" />
+    <Compile Include="Constants-DeploySelector.cs" />
     <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
+    <Compile Include="Constants-Security.cs" />
     <Compile Include="ControlExtensions.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DatabaseContext.cs" />
+    <Compile Include="Constants-DatabaseProviders.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
+    <Compile Include="Deploy\ArtifactBase.cs" />
+    <Compile Include="Deploy\ArtifactDependency.cs" />
+    <Compile Include="Deploy\ArtifactDependencyCollection.cs" />
+    <Compile Include="Deploy\ArtifactDependencyMode.cs" />
+    <Compile Include="Deploy\ArtifactDeployState.cs" />
+    <Compile Include="Deploy\ArtifactDeployStateOfTArtifactTEntity.cs" />
+    <Compile Include="Deploy\ArtifactSignature.cs" />
+    <Compile Include="Deploy\Difference.cs" />
+    <Compile Include="Deploy\Direction.cs" />
+    <Compile Include="Deploy\IFileStore.cs" />
+    <Compile Include="Models\GridValue.cs" />
+    <Compile Include="Deploy\IArtifact.cs" />
+    <Compile Include="Deploy\IArtifactSignature.cs" />
+    <Compile Include="Deploy\IDeployContext.cs" />
+    <Compile Include="Deploy\IFileSource.cs" />
+    <Compile Include="Deploy\IGridCellValueConnector.cs" />
+    <Compile Include="Deploy\IImageSourceParser.cs" />
+    <Compile Include="Deploy\ILocalLinkParser.cs" />
+    <Compile Include="Deploy\IMacroParser.cs" />
+    <Compile Include="Deploy\IPrettyArtifact.cs" />
+    <Compile Include="Deploy\IPreValueConnector.cs" />
+    <Compile Include="Deploy\IServiceConnector.cs" />
+    <Compile Include="Deploy\IValueConnector.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
@@ -340,6 +367,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Files.resx</DependentUpon>
     </Compile>
+    <Compile Include="GuidUdi.cs" />
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
@@ -410,6 +438,7 @@
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
+    <Compile Include="NamedUdiRange.cs" />
     <Compile Include="Persistence\BulkDataReader.cs" />
     <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
@@ -482,6 +511,7 @@
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
+    <Compile Include="Persistence\Repositories\BaseQueryType.cs" />
     <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
@@ -527,6 +557,9 @@
     <Compile Include="Security\OwinExtensions.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
+    <Compile Include="Serialization\StreamResultExtensions.cs" />
+    <Compile Include="Serialization\UdiJsonConverter.cs" />
+    <Compile Include="Serialization\UdiRangeJsonConverter.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
@@ -1326,6 +1359,7 @@
     <Compile Include="Strategies\RelateOnTrashHandler.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Diff.cs" />
+    <Compile Include="StringUdi.cs" />
     <Compile Include="Sync\BatchedWebServiceServerMessenger.cs" />
     <Compile Include="Sync\IServerRegistrar2.cs" />
     <Compile Include="Sync\ServerRole.cs" />
@@ -1370,6 +1404,11 @@
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />
     <Compile Include="TypeHelper.cs" />
+    <Compile Include="Udi.cs" />
+    <Compile Include="UdiDefinitionAttribute.cs" />
+    <Compile Include="UdiGetterExtensions.cs" />
+    <Compile Include="UdiRange.cs" />
+    <Compile Include="UdiType.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Constants-Applications.cs">

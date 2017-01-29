@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Profiling;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.IO
@@ -18,6 +18,9 @@ namespace Umbraco.Tests.IO
             //init the config singleton
             var config = SettingsForTests.GetDefault();
             SettingsForTests.ConfigureSettings(config);
+
+            // media fs wants this
+            ApplicationContext.Current = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
         }
 
         [Test]
@@ -41,7 +44,6 @@ namespace Umbraco.Tests.IO
 		{
 			Assert.Throws<InvalidOperationException>(() => FileSystemProviderManager.Current.GetFileSystemProvider<InvalidTypedFileSystem>());
 		}
-
 
 	    /// <summary>
 	    /// Used in unit tests, for a typed file system we need to inherit from FileSystemWrapper and they MUST have a ctor

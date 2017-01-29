@@ -100,7 +100,7 @@
 
 			<div class="query-items">
 
-				<span<localize key="template_orderBy">order by</localize></span>
+				<span><localize key="template_orderBy">order by</localize></span>
 
 				<div class="btn-group">
 					<a class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">
@@ -119,7 +119,7 @@
 				</div>
 
 				<a href class="btn" ng-click="vm.changeSortOrder(vm.query)">
-					{{vm.query.sort.direction}}
+					{{vm.query.sort.translation.currentLabel}}
 				</a>
 
 			</div>
