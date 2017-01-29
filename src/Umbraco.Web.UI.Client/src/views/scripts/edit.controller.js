@@ -93,10 +93,10 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-                localizationService.localize("speechBubbles_fileSavedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_fileSavedText").then(function(msgValue) {
-                        notificationsService.success(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_fileSavedHeader", "speechBubbles_fileSavedText"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.success(header, message);
                 });
 
                 vm.page.saveButtonState = "success";
@@ -114,10 +114,10 @@
 
                 vm.page.saveButtonState = "error";
                 
-                localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
-                        notificationsService.error(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.error(header, message);
                 });
 
             });
