@@ -122,10 +122,10 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-                localizationService.localize("speechBubbles_templateSavedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_templateSavedText").then(function(msgValue) {
-                        notificationsService.success(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_templateSavedHeader", "speechBubbles_templateSavedText"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.success(header, message);
                 });
 
 
@@ -167,10 +167,10 @@
 
                 vm.page.saveButtonState = "error";
                 
-                localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
-                        notificationsService.error(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.error(header, message);
                 });
 
             });
