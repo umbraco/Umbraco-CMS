@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// Initializes a new instance of the <see cref="PublishedContentModelFactoryResolver"/>.
         /// </summary>
         /// <remarks>The resolver is created by the <c>WebBootManager</c> and thus the constructor remains internal.</remarks>
-        internal PublishedContentModelFactoryResolver()
+        public PublishedContentModelFactoryResolver()
             : base()
         { }
 
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         /// <param name="factory">The factory.</param>
         /// <remarks>The resolver is created by the <c>WebBootManager</c> and thus the constructor remains internal.</remarks>
-        internal PublishedContentModelFactoryResolver(IPublishedContentModelFactory factory)
+        public PublishedContentModelFactoryResolver(IPublishedContentModelFactory factory)
             : base(factory)
         { }
 
