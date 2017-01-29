@@ -23,7 +23,7 @@
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [
 			{
-			    "name": "General - FooBar", 
+			    "name": localizationService.localize("shortcuts_generalHeader"), 
 			    "shortcuts": [
                     {
 				        "description": localizationService.localize("buttons_undo"),
@@ -40,7 +40,7 @@
 			    ]
 			},
 			{
-			    "name": "Editor",
+			    "name": localizationService.localize("shortcuts_editorHeader"),
 			    "shortcuts": [
                     {
 				        "description": localizationService.localize("shortcuts_commentLine"),
@@ -72,19 +72,19 @@
 			    "name": "Umbraco", //No need to localise Umbraco is the same in all languages :)
 			    "shortcuts": [
                     {
-                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertPageField"),
+                        "description": localizationService.format(["template_insert", "template_insertPageField"], "%0% %1%"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "v" }]
                     },
                     {
-                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertPartialView"),
+                        "description": localizationService.format(["template_insert", "template_insertPartialView"], "%0% %1%"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
                     },
                     {
-                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertDictionaryItem"),
+                        "description": localizationService.format(["template_insert", "template_insertDictionaryItem"], "%0% %1%"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
                     },
                     {
-                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertMacro"),
+                        "description": localizationService.format(["template_insert", "template_insertMacro"], "%0% %1%"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "m" }]
                     },
                     {
@@ -92,7 +92,7 @@
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "q" }]
                     },
                     {
-                        "description": localizationService.localize("template_insert") + localizationService.localize("template_insertSections"),
+                        "description": localizationService.format(["template_insert", "template_insertSections"], "%0% %1%"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "s" }]
                     },
                     {
