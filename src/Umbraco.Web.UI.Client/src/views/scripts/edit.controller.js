@@ -14,6 +14,60 @@
         vm.page.menu.currentNode = null;
         vm.page.saveButtonState = "init";
 
+         //Used to toggle the keyboard shortcut modal
+        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
+        vm.showKeyboardShortcut = false;
+
+        //Keyboard shortcuts for help dialog
+        vm.page.keyboardShortcutsOverview = [
+			{
+			    "name": localizationService.localize("shortcuts_generalHeader"), 
+			    "shortcuts": [
+                    {
+				        "description": localizationService.localize("buttons_undo"),
+				        "keys": [{ "key": "ctrl" }, { "key": "z" }]
+				    },
+                    {
+				        "description": localizationService.localize("buttons_redo"),
+				        "keys": [{ "key": "ctrl" }, { "key": "y" }]
+				    },
+                    {
+				        "description": localizationService.localize("buttons_save"),
+				        "keys": [{ "key": "ctrl" }, { "key": "s" }]
+				    }
+			    ]
+			},
+			{
+			    "name": localizationService.localize("shortcuts_editorHeader"),
+			    "shortcuts": [
+                    {
+				        "description": localizationService.localize("shortcuts_commentLine"),
+				        "keys": [{ "key": "ctrl" }, { "key": "/" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_removeLine"),
+				        "keys": [{ "key": "ctrl" }, { "key": "d" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_copyLineUp"),
+				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "up" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_copyLineDown"),
+				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "down" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_moveLineUp"),
+				        "keys": [{ "key": "alt" }, { "key": "up" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_moveLineDown"),
+				        "keys": [{ "key": "alt" }, { "key": "down" }]
+				    }
+                ]
+			}
+        ];
+
         vm.script = {};
 
         // bind functions to view model
@@ -123,6 +177,26 @@
                     //Unassigns the keybinding (That was previously auto-complete)
                     //As conflicts with our own tree search shortcut
                     _editor.commands.bindKey("ctrl-space", null);
+
+                    //TODO: Move all these keybinding config out into some helper/service
+                    _editor.commands.addCommands([
+                        //Disable (alt+shift+K)
+                        //Conflicts with our own show shortcuts dialog - this overrides it
+                        {
+                            name: 'unSelectOrFindPrevious',
+                            bindKey: {
+                                win: 'Alt-Shift-K'
+                            },
+                            exec: function() {
+                                //Toggle the show keyboard shortcuts overlay
+                                $scope.$apply(function(){
+                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
+                                });
+                                
+                            },
+                            readOnly: true
+                        },
+                    ]);
                     
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new script
