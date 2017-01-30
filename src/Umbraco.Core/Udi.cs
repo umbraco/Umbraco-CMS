@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Deploy;
@@ -11,6 +12,7 @@ namespace Umbraco.Core
     /// Represents an entity identifier.
     /// </summary>
     /// <remarks>An Udi can be fully qualified or "closed" eg umb://document/{guid} or "open" eg umb://document.</remarks>
+    [TypeConverter(typeof(UdiTypeConverter))]
     public abstract class Udi : IComparable<Udi>
     {
         private static readonly Lazy<Dictionary<string, UdiType>> UdiTypes;

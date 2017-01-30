@@ -1,7 +1,15 @@
 using System;
+using System.Collections;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Web;
+using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.Validation;
+using System.Web.Http.ValueProviders;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Editors
@@ -12,6 +20,8 @@ namespace Umbraco.Web.Editors
     /// <remarks>
     /// As an example, lets say we have 2 methods: GetChildren(int id) and GetChildren(Guid id), by default Web Api won't allow this since
     /// it won't know what to select, but if this Tuple is passed in new Tuple{string, string}("GetChildren", "id")
+    /// 
+    /// This supports POST values too however only for JSON values
     /// </remarks>
     internal class ParameterSwapControllerActionSelector : ApiControllerActionSelector
     {
@@ -25,28 +35,68 @@ namespace Umbraco.Web.Editors
         {
             _actions = actions;
         }
+
         public override HttpActionDescriptor SelectAction(HttpControllerContext controllerContext)
         {
             var found = _actions.FirstOrDefault(x => controllerContext.Request.RequestUri.GetLeftPart(UriPartial.Path).InvariantEndsWith(x.ActionName));
 
             if (found != null)
             {
-                var id = HttpUtility.ParseQueryString(controllerContext.Request.RequestUri.Query).Get(found.ParamName);
-
-                if (id != null)
+                if (controllerContext.Request.Method == HttpMethod.Get)
                 {
-                    var idTypes = found.SupportedTypes;
+                    var requestParam = HttpUtility.ParseQueryString(controllerContext.Request.RequestUri.Query).Get(found.ParamName);
 
-                    foreach (var idType in idTypes)
+                    if (requestParam != null)
                     {
-                        var converted = id.TryConvertTo(idType);
-                        if (converted)
+                        var paramTypes = found.SupportedTypes;
+
+                        foreach (var paramType in paramTypes)
                         {
-                            var method = MatchByType(idType, controllerContext, found);
-                            if (method != null)
-                                return method;
+                            var converted = requestParam.TryConvertTo(paramType);
+                            if (converted)
+                            {
+                                var method = MatchByType(paramType, controllerContext, found);
+                                if (method != null)
+                                    return method;
+                            }
                         }
-                    }                   
+                    }
+                }
+                else if (controllerContext.Request.Method == HttpMethod.Post)
+                {
+
+                    var requestContent = new HttpMessageContent(controllerContext.Request);
+                    var strJson = requestContent.HttpRequestMessage.Content.ReadAsStringAsync().Result;
+                    var json = JsonConvert.DeserializeObject<JObject>(strJson);
+
+                    var requestParam = json[found.ParamName];
+
+                    if (requestParam != null)
+                    {
+                        var paramTypes = found.SupportedTypes;
+
+                        foreach (var paramType in paramTypes)
+                        {
+                            try
+                            {
+                                var converted = requestParam.ToObject(paramType);
+                                if (converted != null)
+                                {
+                                    var method = MatchByType(paramType, controllerContext, found);
+                                    if (method != null)
+                                        return method;
+                                }
+                            }
+                            catch (JsonReaderException)
+                            {
+                                //can't convert
+                            }
+                            catch (JsonSerializationException)
+                            {
+                                //can't convert
+                            }
+                        }
+                    }
                 }
             }
             return base.SelectAction(controllerContext);

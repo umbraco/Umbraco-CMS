@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Net;
 using System.Text;
@@ -29,6 +30,7 @@ using Examine.SearchCriteria;
 using Umbraco.Web.Dynamics;
 using umbraco;
 using System.Text.RegularExpressions;
+using System.Web.Http.Controllers;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Editors
@@ -43,6 +45,20 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class EntityControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                //we are not also including the Udi[] overload because that is HttpPost only so there won't be any ambiguity
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]) )));
+            }
+        }
+
         /// <summary>
         /// Returns an Umbraco alias given a string
         /// </summary>
@@ -241,6 +257,13 @@ namespace Umbraco.Web.Editors
             return GetResultForId(id, type);
         }
 
+        /// <summary>
+        /// Get entities by integer ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpGet]
         public IEnumerable<EntityBasic> GetByIds([FromUri]int[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
@@ -250,6 +273,58 @@ namespace Umbraco.Web.Editors
             return GetResultForIds(ids, type);
         }
 
+        /// <summary>
+        /// Get entities by GUID ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public IEnumerable<EntityBasic> GetByIds([FromUri]Guid[] ids, UmbracoEntityTypes type)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return GetResultForKeys(ids, type);
+        }
+        
+        /// <summary>
+        /// Get entities by string ids - will try to convert to the correct id type (int, guid, udi)
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We only allow for POST because there could be quite a lot of Ids
+        /// </remarks>
+        [HttpPost]
+        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]Udi[] ids, [FromUri]UmbracoEntityTypes type)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (ids.Length == 0)
+            {
+                return Enumerable.Empty<EntityBasic>();
+            }
+
+            //all udi types will need to be the same in this list so we'll determine by the first
+            //currently we only support GuidIdi for this method
+
+            var guidUdi = ids[0] as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetResultForKeys(ids.Select(x => ((GuidUdi)x).Guid), type);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }      
+
+        [Obsolete("Use GetyByIds instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<EntityBasic> GetByKeys([FromUri]Guid[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
