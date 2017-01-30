@@ -14,6 +14,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "virtualPath", IsRequired = true)]
         public string VirtualPath { get; set; }
 
+        [DataMember(Name = "path", IsRequired = true)]
+        public string Path { get; set; }
+
         [DataMember(Name = "name", IsRequired = true)]
         public string Name { get; set; }
 
