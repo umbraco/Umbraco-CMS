@@ -66,8 +66,8 @@ namespace Umbraco.Web.Models.Mapping
 
         private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, ILogger logger)
         {
-			// Adapted from ContentModelMapper
-			//map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            // Adapted from ContentModelMapper
+            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             //TODO: Fix this shorthand .Ancestors() lookup, at least have an overload to use the current
             if (media.HasIdentity)
             {
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Models.Mapping
                     display.IsChildOfListView = ancesctorListView != null;
                 }
             }
-			
+
             //map the tree node url
             if (HttpContext.Current != null)
             {
@@ -100,12 +100,12 @@ namespace Umbraco.Web.Models.Mapping
                 var url = urlHelper.GetUmbracoApiService<MediaTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
                 display.TreeNodeUrl = url;
             }
-            
+
             if (media.ContentType.IsContainer)
             {
                 TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, localizedText);
             }
-            
+
             var genericProperties = new List<ContentPropertyDisplay>
             {
                 new ContentPropertyDisplay
@@ -116,20 +116,6 @@ namespace Umbraco.Web.Models.Mapping
                     View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
                 }
             };
-
-            var links = media.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger);
-
-            if (links.Any())
-            {
-                var link = new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("media/urls"),
-                    Value = string.Join(",", links),
-                    View = "urllist"
-                };
-                genericProperties.Add(link);
-            }
 
             TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText, genericProperties, properties =>
             {
@@ -151,6 +137,20 @@ namespace Umbraco.Web.Models.Mapping
                         }
                     };
                     docTypeProperty.View = "urllist";
+                }
+
+                // inject 'Link to media' as the first generic property
+                var links = media.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger);
+                if (links.Any())
+                {
+                    var link = new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = localizedText.Localize("media/urls"),
+                        Value = string.Join(",", links),
+                        View = "urllist"
+                    };
+                    properties.Insert(0, link);
                 }
             });
         }
