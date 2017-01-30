@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -98,6 +101,39 @@ namespace Umbraco.Web.Editors
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+
+        /// <summary>
+        /// Used to get a list of available templates/snippets to base a new Partial View og Partial View Macro from
+        /// </summary>
+        /// <param name="type">This is a string but will be 'partialViews', 'partialViewMacros'</param>
+        /// <returns>Returns a list of <see cref="SnippetDisplay"/> if a correct type is sent</returns>
+        public IEnumerable<SnippetDisplay> GetSnippets(string type)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+
+            IEnumerable<string> snippets;
+            switch (type)
+            {
+                case Core.Constants.Trees.PartialViews:
+                    snippets = Services.FileService.GetPartialViewSnippetNames(
+                        //ignore these - (this is taken from the logic in "PartialView.ascx.cs")
+                        "Gallery",
+                        "ListChildPagesFromChangeableSource",
+                        "ListChildPagesOrderedByProperty",
+                        "ListImagesFromMediaFolder");
+                    break;
+                case Core.Constants.Trees.PartialViewMacros:
+                    snippets = Services.FileService.GetPartialViewSnippetNames();
+                    break;
+                default:
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return snippets.Select(snippet => new SnippetDisplay() {Name = snippet.SplitPascalCasing().ToFirstUpperInvariant(), FileName = snippet});
         }
 
         /// <summary>
