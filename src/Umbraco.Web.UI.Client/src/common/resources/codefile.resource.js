@@ -127,13 +127,13 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * </pre>
          * 
          * <pre>
-         * codefileResource.deleteByPath('partialView', 'Grid%2fEditors%2fBase.cshtml')
+         * codefileResource.deleteByPath('partialViews', 'Grid%2fEditors%2fBase.cshtml')
          *    .then(function() {
          *        alert('its gone!');
          *    });
          * </pre>
          *
-         * @param {type} the type of script (partialView, partialViewMacro, script)
+         * @param {type} the type of script (partialViews, partialViewMacros, scripts)
          * @param {virtualpath} the virtual path of the script
          * @returns {Promise} resourcePromise object.
          *
@@ -145,7 +145,7 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "codeFileApiBaseUrl",
                         "Delete",
                         [{ type: type }, { virtualPath: virtualpath}])),
-                "Failed to delete item " + id);
+                "Failed to delete item: " + virtualpath);
         },
 
         /**
