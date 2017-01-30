@@ -1,35 +1,116 @@
 <div ng-controller="Umbraco.Overlays.TreePickerController">
 
-   <div class="umb-control-group">
-      <umb-tree-search-box
-         ng-if="enableSearh"
-         hide-search-callback="hideSearch"
-         search-callback="onSearchResults"
-         search-from-id="{{searchInfo.searchFromId}}"
-         search-from-name="{{searchInfo.searchFromName}}"
-         show-search="{{searchInfo.showSearch}}"
-         section="{{section}}">
-      </umb-tree-search-box>
-   </div>
+    <div ng-hide="showMiniListView">
+        <div class="umb-control-group">
+            <umb-tree-search-box
+                ng-if="enableSearh"
+                hide-search-callback="hideSearch"
+                search-callback="onSearchResults"
+                search-from-id="{{searchInfo.searchFromId}}"
+                search-from-name="{{searchInfo.searchFromName}}"
+                show-search="{{searchInfo.showSearch}}"
+                section="{{section}}">
+            </umb-tree-search-box>
+        </div>
 
-   <umb-tree-search-results
-      ng-if="searchInfo.showSearch"
-      results="searchInfo.results"
-      select-result-callback="selectResult">
-   </umb-tree-search-results>
+        <umb-tree-search-results
+            ng-if="searchInfo.showSearch"
+            results="searchInfo.results"
+            select-result-callback="selectResult">
+        </umb-tree-search-results>
 
-   <div ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
-      <umb-tree
-         section="{{section}}"
-         treealias="{{treeAlias}}"
-         hideheader="{{hideHeader}}"
-         hideoptions="true"
-         isdialog="true"
-         customtreeparams="{{customTreeParams}}"
-         eventhandler="dialogTreeEventHandler"
-         enablelistviewsearch="true"
-         enablecheckboxes="{{multiPicker}}">
-      </umb-tree>
-   </div>
+        <div ng-hide="searchInfo.showSearch || showMiniListView" ng-animate="'tree-fade-out'">
+            <umb-tree
+                section="{{section}}"
+                treealias="{{treeAlias}}"
+                hideheader="{{hideHeader}}"
+                hideoptions="true"
+                isdialog="true"
+                customtreeparams="{{customTreeParams}}"
+                eventhandler="dialogTreeEventHandler"
+                enablelistviewsearch="true"
+                enablecheckboxes="{{multiPicker}}">
+            </umb-tree>
+        </div>
+    </div>
+
+    <div ng-if="showMiniListView">
+
+        <div class="umb-control-group">
+            <div class="flex items-center">
+                <a href="" ng-click="exitMiniListView()">
+                    <i class="icon-arrow-left" style="margin-right: 10px; opacity: 0.8;"></i>
+                </a>
+                <h4>{{ miniListView.nodeName }}</h4>
+            </div>
+        </div>
+        
+        <div class="umb-table umb-table--condensed" style="min-width: auto;">
+
+            <!-- Head -->
+            <div class="umb-table-head">
+                <div class="umb-table-row">
+                    <div class="umb-table-cell"></div>
+                    <!-- umb-table__name -->
+                    <div class="umb-table-cell">
+                        <localize key="general_name">Name</localize>
+                    </div>
+                    <div class="umb-table-cell">
+                        <form class="form-search -no-margin-bottom pull-right" novalidate>
+                            <div class="inner-addon left-addon">
+                                <i class="icon icon-search" style="font-size: 14px;"></i>
+                                <input
+                                    class="form-control search-input"
+                                    type="text"
+                                    localize="placeholder"
+                                    placeholder="@general_typeToSearch"
+                                    ng-model="pagination.filter"
+                                    ng-change="searchMiniListView()"
+                                    prevent-enter-submit
+                                    no-dirty-check>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="umb-table-body">
+
+                <!-- Items -->
+                <div class="umb-table-row"
+                    ng-repeat="child in miniListView.children"
+                    ng-click="selectListViewItem(child)"
+                    ng-class="{
+                        '-selected':child.selected
+                    }">
+                    <div class="umb-table-cell">
+                        <i class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></i>
+                        <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                    </div>
+                    <div class="umb-table-cell">{{ child.name }}</div>
+                </div>
+
+                <!-- Loading -->
+                <div ng-if="miniListView.loading" class="umb-table-row" style="height: 40px; position: relative;">
+                    <umb-load-indicator></umb-load-indicator>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="flex justify-center">
+            <umb-pagination
+                ng-if="pagination.totalPages > 0"
+                page-number="pagination.pageNumber"
+                total-pages="pagination.totalPages"
+                on-next="nextPage"
+                on-prev="prevPage"
+                on-go-to-page="goToPage">
+            </umb-pagination>
+        </div>
+
+    </div>
 
 </div>

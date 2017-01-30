@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
-	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService) {
+	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService, contentResource) {
 
 	    var tree = null;
 	    var dialogOptions = $scope.model;
@@ -106,13 +106,16 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 //iterate children
 	            _.each(args.children, function (child) {
 
+					console.log("child", child);
+
 	                //check if any of the items are list views, if so we need to add some custom
 	                // children: A node to activate the search, any nodes that have already been
 	                // selected in the search
 	                if (child.metaData.isContainer) {
 	                    child.hasChildren = true;
 	                    child.children = [
-	                        {
+	                        {	
+								id: child.id,
                                 level: child.level + 1,
                                 hasChildren: false,
                                 parent: function () {
@@ -177,13 +180,26 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	        if (args.node.metaData.listViewNode) {
 	            //check if list view 'search' node was selected
 
-                $scope.searchInfo.showSearch = true;
-                $scope.searchInfo.searchFromId = args.node.metaData.listViewNode.id;
-                $scope.searchInfo.searchFromName = args.node.metaData.listViewNode.name;
+				//alert("list view");
 
-                //add transition classes
-	            var listViewNode = args.node.parent();
-	            listViewNode.cssClasses.push('tree-node-slide-up-hide-active');
+				$scope.showMiniListView = true;
+
+				console.log(args);
+
+				$scope.pagination = {
+                    pageSize: 10,
+                    pageNumber: 1,
+                    filter: '',
+                    orderDirection: "Ascending",
+                    orderBy: "SortOrder",
+                    orderBySystemField: true
+                };
+
+				getPagedChildren(args.node);
+
+				$scope.miniListView.nodeName = args.node.metaData.listViewNode.name;
+				$scope.miniListView.nodeId = args.node.metaData.listViewNode.id;
+
 	        }
             else if (args.node.metaData.isSearchResult) {
                 //check if the item selected was a search result from a list view
@@ -504,4 +520,72 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
 	    });
+
+		/* Mini List View */
+		$scope.miniListView = {};
+
+		$scope.nextPage = function(pageNumber) {
+			$scope.pagination.pageNumber = pageNumber;
+			getPagedChildren($scope.miniListView.node);
+		};
+
+		$scope.prevPage = function(pageNumber) {
+			$scope.pagination.pageNumber = pageNumber;
+			getPagedChildren($scope.miniListView.node);		
+		};
+
+		$scope.goToPage = function(pageNumber) {
+			$scope.pagination.pageNumber = pageNumber;
+			getPagedChildren($scope.miniListView.node);		
+		};
+
+		$scope.selectListViewItem = function(item) {
+			select(item.name, item.id);
+            //toggle checked state
+            item.selected = item.selected === true ? false : true;
+		};
+
+		$scope.exitMiniListView = function() {
+			console.log($scope.miniListView);
+			$scope.showMiniListView = false;
+		};
+
+		$scope.searchMiniListView = function() {
+			searchMiniListView();
+		};
+
+		function getPagedChildren(node) {
+
+			// start load indicator
+			$scope.miniListView.loading = true;
+
+			contentResource.getChildren(node.id, $scope.pagination)
+				.then(function (data) {
+
+					// update children
+					$scope.miniListView.node = node;
+					$scope.miniListView.children = data.items;
+
+					// update pagination
+					$scope.pagination.totalItems = data.totalItems;
+					$scope.pagination.totalPages = data.totalPages;
+
+					// stop load indicator
+					$scope.miniListView.loading = false;
+
+				});
+
+		}
+
+		var searchMiniListView = _.debounce(function () {
+			
+			$scope.$apply(function () {
+				if ($scope.pagination.filter !== null && $scope.pagination.filter !== undefined) {
+					$scope.pagination.pageNumber = 1;
+					getPagedChildren($scope.miniListView.node, $scope.pagination);
+				}
+			});
+
+		}, 500);
+
 	});
