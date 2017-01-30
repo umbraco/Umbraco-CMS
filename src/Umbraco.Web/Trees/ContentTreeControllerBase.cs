@@ -125,19 +125,16 @@ namespace Umbraco.Web.Trees
             // use helper method to ensure we support both integer and guid lookups
             int iid;
 
-            // if it's the root node, we won't use the look up
-            if (id != "-1")
+            // look up from GUID if it's not an integer
+            if (int.TryParse(id, out iid) == false)
             {
+
                 var idEntity = GetEntityFromId(id);
                 if (idEntity == null)
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
                 iid = idEntity.Id;
-            }
-            else
-            {
-                iid = int.Parse(id);
             }
 
 
