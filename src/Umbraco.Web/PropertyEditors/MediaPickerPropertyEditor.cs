@@ -16,6 +16,26 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "(Obsolete) Media Picker", PropertyEditorValueTypes.Integer, "mediapicker", Group = "media", Icon = "icon-picture", IsDeprecated = true)]
     public class MediaPickerPropertyEditor : MediaPickerPropertyEditor2
     {
+        public MediaPickerPropertyEditor()
+        {
+            InternalPreValues = new Dictionary<string, object>
+                {
+                    {"multiPicker", "0"},
+                    {"onlyImages", "0"},
+                    {"idType", "id"}
+                };
+        }
+
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new SingleMediaPickerPreValueEditor();
+        }
+
+        internal class SingleMediaPickerPreValueEditor : PreValueEditor
+        {
+            [PreValueField("startNodeId", "Start node", "mediapicker")]
+            public int StartNodeId { get; set; }
+        }
     }
 
     /// <summary>
@@ -28,18 +48,12 @@ namespace Umbraco.Web.PropertyEditors
         {
             InternalPreValues = new Dictionary<string, object>
                 {
-                    {"multiPicker", "0"},
-                    {"onlyImages", "0"}
+                    {"idType", "udi"}
                 };
         }
 
         protected IDictionary<string, object> InternalPreValues;
-
-        protected override PropertyValueEditor CreateValueEditor()
-        {
-            return new SingleMediaPickerValueEditor();
-        }
-
+        
         public override IDictionary<string, object> DefaultPreValues
         {
             get { return InternalPreValues; }
@@ -48,16 +62,20 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new SingleMediaPickerPreValueEditor();
+            return new MediaPickerPreValueEditor();
         }
 
-        internal class SingleMediaPickerValueEditor : PropertyValueEditor
+        internal class MediaPickerPreValueEditor : PreValueEditor
         {
-            override 
-        }
+            [PreValueField("multiPicker", "Pick multiple items", "boolean")]
+            public bool MultiPicker { get; set; }
 
-        internal class SingleMediaPickerPreValueEditor : PreValueEditor
-        {
+            [PreValueField("onlyImages", "Pick only images", "boolean", Description = "Only let the editor choose images from media.")]
+            public bool OnlyImages { get; set; }
+
+            [PreValueField("disableFolderSelect", "Disable folder select", "boolean", Description = "Do not allow folders to be picked.")]
+            public bool DisableFolderSelect { get; set; }
+
             [PreValueField("startNodeId", "Start node", "mediapicker")]
             public int StartNodeId { get; set; }
         }
