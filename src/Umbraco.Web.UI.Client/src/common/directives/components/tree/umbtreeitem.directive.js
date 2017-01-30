@@ -74,11 +74,14 @@ angular.module("umbraco.directives")
 
                 //toggle visibility of last 'ins' depending on children
                 //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
-                if (!node.hasChildren) {
-                    element.find("ins").last().css("visibility", "hidden");
+
+                console.log(node);
+                
+                if (node.hasChildren || node.metaData.isContainer) {
+                    element.find("ins").last().css("visibility", "visible");
                 }
                 else {
-                    element.find("ins").last().css("visibility", "visible");
+                    element.find("ins").last().css("visibility", "hidden");
                 }
 
                 var icon = element.find("i:first");
