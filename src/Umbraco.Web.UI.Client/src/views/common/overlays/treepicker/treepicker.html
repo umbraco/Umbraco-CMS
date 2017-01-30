@@ -1,6 +1,7 @@
 <div ng-controller="Umbraco.Overlays.TreePickerController">
 
     <div ng-hide="showMiniListView">
+
         <div class="umb-control-group">
             <umb-tree-search-box
                 ng-if="enableSearh"
@@ -19,7 +20,7 @@
             select-result-callback="selectResult">
         </umb-tree-search-results>
 
-        <div ng-hide="searchInfo.showSearch || showMiniListView" ng-animate="'tree-fade-out'">
+        <div ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
             <umb-tree
                 section="{{section}}"
                 treealias="{{treeAlias}}"
@@ -32,16 +33,20 @@
                 enablecheckboxes="{{multiPicker}}">
             </umb-tree>
         </div>
+
     </div>
 
-    <div ng-if="showMiniListView">
+    <div ng-show="showMiniListView">
 
         <div class="umb-control-group">
             <div class="flex items-center">
-                <a href="" ng-click="exitMiniListView()">
-                    <i class="icon-arrow-left" style="margin-right: 10px; opacity: 0.8;"></i>
+                <a href="" ng-click="exitMiniListView()" style="margin-right: 10px; border-right: 1px solid #cccccc; padding-right: 10px; opacity: 0.8">
+                    <i class="icon-arrow-left" style="margin-right: 5px; opacity: 0.8;"></i>Back
                 </a>
-                <h4>{{ miniListView.nodeName }}</h4>
+                <h4>
+                    <i class="{{ miniListView.node.icon }}"></i>
+                    {{ miniListView.node.name }}
+                </h4>
             </div>
         </div>
         

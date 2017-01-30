@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
-	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService, contentResource) {
+	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService, contentResource, mediaResource, memberResource) {
 
 	    var tree = null;
 	    var dialogOptions = $scope.model;
@@ -101,6 +101,13 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    }
 
 	    function nodeExpandedHandler(ev, args) {
+
+			console.log("args", args);
+
+			if (args.node.metaData.isContainer) {
+				openMiniListView(args.node);
+			}
+			
 	        if (angular.isArray(args.children)) {
 
                 //iterate children
@@ -111,6 +118,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	                //check if any of the items are list views, if so we need to add some custom
 	                // children: A node to activate the search, any nodes that have already been
 	                // selected in the search
+					/*
 	                if (child.metaData.isContainer) {
 	                    child.hasChildren = true;
 	                    child.children = [
@@ -151,6 +159,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	                        });
 	                    });
 	                }
+					*/
 
 	                //now we need to look in the already selected search results and
 	                // toggle the check boxes for those ones that are listed
@@ -554,16 +563,43 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 			searchMiniListView();
 		};
 
+		function openMiniListView(node) {
+
+			$scope.showMiniListView = true;
+
+			$scope.pagination = {
+				pageSize: 10,
+				pageNumber: 1,
+				filter: '',
+				orderDirection: "Ascending",
+				orderBy: "SortOrder",
+				orderBySystemField: true
+			};
+
+			getPagedChildren(node);
+
+		}
+
 		function getPagedChildren(node) {
 
 			// start load indicator
+			$scope.miniListView.node = node;
 			$scope.miniListView.loading = true;
+			
+			var promise = "";
 
-			contentResource.getChildren(node.id, $scope.pagination)
+			if(node.nodeType === "content") {
+				promise = contentResource.getChildren(node.id, $scope.pagination);
+			} else if( node.nodeType === "member") {
+				promise = memberResource.getPagedResults(node.id, $scope.pagination);
+			} else if(node.nodeType === "media") {
+				promise = mediaResource.getChildren(node.id, $scope.pagination);
+			}
+
+			promise
 				.then(function (data) {
-
+					
 					// update children
-					$scope.miniListView.node = node;
 					$scope.miniListView.children = data.items;
 
 					// update pagination
