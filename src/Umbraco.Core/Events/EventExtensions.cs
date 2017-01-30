@@ -70,17 +70,7 @@ namespace Umbraco.Core.Events
             string eventName = null)
             where TArgs : CancellableEventArgs
         {
-            //if the manager supports cancelation then just raise the event,
-            //cancelable events cannot be queued
-            if (eventDispatcher.SupportsEventCancellation)
-            {
-                if (eventHandler != null)
-                    eventHandler(sender, args);
-
-                return args.Cancel;
-            }
-
-            return false;
+            return eventDispatcher.DispatchCancelable(eventHandler, sender, args);
         }
 
         /// <summary>
@@ -94,7 +84,7 @@ namespace Umbraco.Core.Events
         /// <param name="uowProvider"></param>
         /// <param name="eventName">Optional explicit event name if the event may not be able to be determined based on it's arguments (it's ambiguous)</param>
         /// <returns></returns>
-        internal static bool IsRaisedEventCancelled<TSender, TArgs>( // fixme used 29 times...
+        internal static bool IsRaisedEventCancelled<TSender, TArgs>( // fixme kill.kill.kill used 29 times...
             this TypedEventHandler<TSender, TArgs> eventHandler,
             TArgs args,
             TSender sender,
@@ -102,21 +92,26 @@ namespace Umbraco.Core.Events
             string eventName = null)
             where TArgs : CancellableEventArgs
         {
-            using(var uow = uowProvider.GetUnitOfWork())
+            using (var scope = uowProvider.ScopeProvider.CreateScope())
             {
-                uow.Commit(); // readonly
-
-                //if the manager supports cancelation then just raise the event,
-                //cancelable events cannot be queued
-                if (uow.Events.SupportsEventCancellation)
-                {
-                    if (eventHandler != null)
-                        eventHandler(sender, args);
-
-                    return args.Cancel;
-                }
-                return false;
+                scope.Complete(); // readonly! wtf wtf!
+                return scope.Events.DispatchCancelable(eventHandler, sender, args); // fixme name!!
             }
+            //using (var uow = uowProvider.GetUnitOfWork())
+            //{
+            //    uow.Commit(); // readonly ---- wtf wtf wtf?
+
+            //    //if the manager supports cancelation then just raise the event,
+            //    //cancelable events cannot be queued
+            //    if (uow.Events.SupportsEventCancellation)
+            //    {
+            //        if (eventHandler != null)
+            //            eventHandler(sender, args);
+
+            //        return args.Cancel;
+            //    }
+            //    return false;
+            //}
         }
 
         /// <summary>
@@ -137,7 +132,8 @@ namespace Umbraco.Core.Events
             string eventName = null)
             where TArgs : EventArgs
         {
-            eventDispatcher.QueueEvent(eventHandler, sender, args, eventName);
+            eventDispatcher.Dispatch(eventHandler, sender, args); // fixme name!!
+            //eventDispatcher.QueueEvent(eventHandler, sender, args, eventName);
         }
     }
 }

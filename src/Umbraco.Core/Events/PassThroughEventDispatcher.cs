@@ -7,7 +7,7 @@ namespace Umbraco.Core.Events
     /// <summary>
     /// This event manager supports event cancellation and will raise the events as soon as they are tracked, it does not store tracked events
     /// </summary>
-    internal class PassThroughEventDispatcher : DisposableObject, IEventDispatcher
+    internal class PassThroughEventDispatcher : IEventDispatcher
     {
         public void QueueEvent(EventHandler e, object sender, EventArgs args, string eventName = null)
         {
@@ -73,14 +73,7 @@ namespace Umbraco.Core.Events
             return Enumerable.Empty<IEventDefinition>();
         }
 
-        public bool SupportsEventCancellation
-        {
-            get { return true; }
-        }
-
-        protected override void DisposeResources()
-        {
-            //noop
-        }
+        public void Complete(bool completed)
+        { }
     }
 }

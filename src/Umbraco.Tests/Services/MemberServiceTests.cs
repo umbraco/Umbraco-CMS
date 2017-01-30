@@ -220,6 +220,10 @@ namespace Umbraco.Tests.Services
             var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             ServiceContext.MemberService.Save(member2);
 
+            // temp make sure they exist
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member1.Id));
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member2.Id));
+
             ServiceContext.MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1" });
 
             var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");

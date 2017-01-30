@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Events
 {
-    public interface IEventDispatcher : IDisposable
+    public interface IEventDispatcher
     {
         // fixme - refactor it all!
 
@@ -25,14 +25,14 @@ namespace Umbraco.Core.Events
         void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args);
         void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args);
 
+        void Complete(bool completed);
         IEnumerable<IEventDefinition> GetEvents();
-        void QueueEvent(EventHandler e, object sender, EventArgs args, string eventName = null);
-        void QueueEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args, string eventName = null);
-        void QueueEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args, string eventName = null);
 
-        /// <summary>
-        /// True or false depending on if the event manager supports event cancellation
-        /// </summary>
-        bool SupportsEventCancellation { get; }
+        [Obsolete]
+        void QueueEvent(EventHandler e, object sender, EventArgs args, string eventName = null);
+        [Obsolete]
+        void QueueEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args, string eventName = null);
+        [Obsolete]
+        void QueueEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args, string eventName = null);
     }
 }

@@ -1,10 +1,8 @@
 using System;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Scoping
@@ -12,52 +10,48 @@ namespace Umbraco.Tests.Scoping
     [TestFixture]
     public class PassThroughEventDispatcherTests
     {
-
         [Test]
-        public void Does_Support_Event_Cancellation()
-        {
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            Assert.IsTrue(scopeProvider.AmbientOrNoScope.Events.SupportsEventCancellation);
-        }
-
-        [Test]
-        public void Does_Immediately_Raise_Events()
+        public void TriggersCancelableEvents()
         {
             var counter = 0;
 
-            this.DoThing1 += (sender, args) =>
-            {
-                counter++;
-            };
-
-            this.DoThing2 += (sender, args) =>
-            {
-                counter++;
-            };
-
-            this.DoThing3 += (sender, args) =>
-            {
-                counter++;
-            };
+            DoThing1 += (sender, args) => { counter++; };
 
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing1, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing2, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing3, this, new EventArgs());
+            var events = scopeProvider.AmbientOrNoScope.Events;
+            events.DispatchCancelable(DoThing1, this, new CancellableEventArgs());
 
-            Assert.AreEqual(3, counter);
-
+            Assert.AreEqual(1, counter);
         }
 
         [Test]
-        public void Can_Not_Raise_Events_Later()
+        public void TriggersEvents()
+        {
+            var counter = 0;
+
+            DoThing1 += (sender, args) => { counter++; };
+            DoThing2 += (sender, args) => { counter++; };
+            DoThing3 += (sender, args) => { counter++; };
+
+            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            var events = scopeProvider.AmbientOrNoScope.Events;
+            events.Dispatch(DoThing1, this, new EventArgs());
+            events.Dispatch(DoThing2, this, new EventArgs());
+            events.Dispatch(DoThing3, this, new EventArgs());
+
+            Assert.AreEqual(3, counter);
+        }
+
+        [Test]
+        public void DoesNotQueueEvents()
         {
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing1, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing2, this, new EventArgs());
-            scopeProvider.AmbientOrNoScope.Events.QueueEvent(DoThing3, this, new EventArgs());
+            var events = scopeProvider.AmbientOrNoScope.Events;
+            events.Dispatch(DoThing1, this, new EventArgs());
+            events.Dispatch(DoThing2, this, new EventArgs());
+            events.Dispatch(DoThing3, this, new EventArgs());
 
-            Assert.AreEqual(0, scopeProvider.AmbientOrNoScope.Events.GetEvents().Count());
+            Assert.IsEmpty(events.GetEvents());
         }
 
         public event EventHandler DoThing1;

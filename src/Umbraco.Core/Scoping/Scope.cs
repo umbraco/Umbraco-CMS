@@ -16,6 +16,7 @@ namespace Umbraco.Core.Scoping
         private readonly ScopeProvider _scopeProvider;
         private readonly IsolationLevel _isolationLevel;
         private readonly RepositoryCacheMode _repositoryCacheMode;
+        private readonly EventsDispatchMode _dispatchMode;
         private bool _disposed;
         private bool? _completed;
 
@@ -23,17 +24,22 @@ namespace Umbraco.Core.Scoping
         private UmbracoDatabase _database;
         private EventMessages _messages;
         private IDictionary<string, IEnlistedObject> _enlisted;
-        private IEventDispatcher _eventDispatcher;
+        private IEventDispatcher _eventDispatcher;        
 
         // this is v7, in v8 this has to change to RepeatableRead
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
 
         // initializes a new scope
-        public Scope(ScopeProvider scopeProvider, IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool detachable = false)
+        public Scope(ScopeProvider scopeProvider,
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified,
+            RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            bool detachable = false)
         {
             _scopeProvider = scopeProvider;
             _isolationLevel = isolationLevel;
             _repositoryCacheMode = repositoryCacheMode;
+            _dispatchMode = dispatchMode;
             Detachable = detachable;
 #if DEBUG_SCOPES
             _scopeProvider.Register(this);
@@ -41,19 +47,29 @@ namespace Umbraco.Core.Scoping
         }
 
         // initializes a new scope in a nested scopes chain, with its parent
-        public Scope(ScopeProvider scopeProvider, Scope parent, IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
-            : this(scopeProvider, isolationLevel, repositoryCacheMode)
+        public Scope(ScopeProvider scopeProvider, Scope parent,
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified, 
+            RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified)
+            : this(scopeProvider, isolationLevel, repositoryCacheMode, dispatchMode)
         {
             ParentScope = parent;
 
             // cannot specify a different mode!
             if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode != repositoryCacheMode)
                 throw new ArgumentException("Cannot be different from parent.", "repositoryCacheMode");
+
+            // cannot specify a different mode!
+            if (_dispatchMode != EventsDispatchMode.Unspecified && parent._dispatchMode != dispatchMode)
+                throw new ArgumentException("Cannot be different from parent.", "dispatchMode");
         }
 
         // initializes a new scope, replacing a NoScope instance
-        public Scope(ScopeProvider scopeProvider, NoScope noScope, IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
-            : this(scopeProvider, isolationLevel, repositoryCacheMode)
+        public Scope(ScopeProvider scopeProvider, NoScope noScope, 
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified, 
+            RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified)
+            : this(scopeProvider, isolationLevel, repositoryCacheMode, dispatchMode)
         {
             // steal everything from NoScope
             _database = noScope.DatabaseOrNull;
@@ -68,6 +84,16 @@ namespace Umbraco.Core.Scoping
         private readonly Guid _instanceId = Guid.NewGuid();
         public Guid InstanceId { get { return _instanceId; } }
 #endif
+
+        private EventsDispatchMode DispatchMode
+        {
+            get
+            {
+                if (_dispatchMode != EventsDispatchMode.Unspecified) return _dispatchMode;
+                if (ParentScope != null) return ParentScope.DispatchMode;
+                return EventsDispatchMode.PassThrough;
+            }
+        }
 
         /// <inheritdoc />
         public RepositoryCacheMode RepositoryCacheMode
@@ -192,7 +218,7 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Events;
-                return _eventDispatcher ?? (_eventDispatcher = new ScopeEventDispatcher());
+                return _eventDispatcher ?? (_eventDispatcher = new ScopeEventDispatcher(DispatchMode));
             }
         }
 
@@ -273,12 +299,9 @@ namespace Umbraco.Core.Scoping
             // run enlisted actions
             RunEnlisted(ActionTime.BeforeEvents, completed);
 
-            // now trigger every events
-            // fixme - should some of them trigger within the transaction?
-            // fixme - this is NOT how we want to do it
-            // fixme - should we trigger all events even when NOT completing?!
+            // deal with events
             if (_eventDispatcher != null)
-                _eventDispatcher.Dispose();
+                _eventDispatcher.Complete(completed);
 
             // run enlisted actions
             RunEnlisted(ActionTime.BeforeDispose, completed);

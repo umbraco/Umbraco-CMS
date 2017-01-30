@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Web;
+using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Scoping
@@ -114,9 +115,12 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IScope CreateDetachedScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
+        public IScope CreateDetachedScope(
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified, 
+            RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified)
         {
-            return new Scope(this, isolationLevel, repositoryCacheMode, true);
+            return new Scope(this, isolationLevel, repositoryCacheMode, dispatchMode, true);
         }
 
         /// <inheritdoc />
@@ -157,11 +161,14 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IScope CreateScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
+        public IScope CreateScope(
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified, 
+            RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified)
         {
             var ambient = AmbientScope;
             if (ambient == null)
-                return AmbientScope = new Scope(this, isolationLevel, repositoryCacheMode);
+                return AmbientScope = new Scope(this, isolationLevel, repositoryCacheMode, dispatchMode);
 
             // replace noScope with a real one
             var noScope = ambient as NoScope;
@@ -174,13 +181,13 @@ namespace Umbraco.Core.Scoping
                 var database = noScope.DatabaseOrNull;
                 if (database != null && database.InTransaction)
                     throw new Exception("NoScope is in a transaction.");
-                return AmbientScope = new Scope(this, noScope, isolationLevel, repositoryCacheMode);
+                return AmbientScope = new Scope(this, noScope, isolationLevel, repositoryCacheMode, dispatchMode);
             }
 
             var scope = ambient as Scope;
             if (scope == null) throw new Exception("Ambient scope is not a Scope instance.");
 
-            return AmbientScope = new Scope(this, scope, isolationLevel, repositoryCacheMode);
+            return AmbientScope = new Scope(this, scope, isolationLevel, repositoryCacheMode, dispatchMode);
         }
 
         /// <inheritdoc />

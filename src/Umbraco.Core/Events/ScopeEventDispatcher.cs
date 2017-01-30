@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Events
 {
@@ -9,25 +10,23 @@ namespace Umbraco.Core.Events
     /// <remarks>
     /// The outer scope is the only scope that can raise events, the inner scope's will defer to the outer scope
     /// </remarks>
-    internal class ScopeEventDispatcher : DisposableObject, IEventDispatcher
+    internal class ScopeEventDispatcher : IEventDispatcher
     {
-        private readonly List<EventDefinitionBase> _events = new List<EventDefinitionBase>();
+        private readonly EventsDispatchMode _mode;
+        private List<EventDefinitionBase> _events;
 
-        // fixme - this is completely broken
-        // rename ScopeEventDispatcher
-        // needs to have MODES to indicate whether it is
-        // - pass-through (just execute immediately) = default, same as today
-        // - scoped (execute when scope disposes) = for deploy
-        // + in scoped mode, shall we pass-through cancellable events or not?
-        // + *which* events should execute and which should not
-        //
-        // we have to refactor the decision-making and it should take place HERE
-        // and NOT in EventExtensions! in fact EventExtensions should be obsoleted!
+        public ScopeEventDispatcher(EventsDispatchMode mode)
+        {
+            _mode = mode;
+        }
 
-        // fixme temp
-        public bool PassThroughCancelable = true;
-        public bool PassThrough = true; 
-        public bool RaiseEvents = true; // fixme temp
+        private List<EventDefinitionBase> Events { get { return _events ?? (_events = new List<EventDefinitionBase>()); } }
+
+        private bool PassThroughCancelable { get { return _mode == EventsDispatchMode.PassThrough || _mode == EventsDispatchMode.Scope; } }
+
+        private bool PassThrough { get { return _mode == EventsDispatchMode.PassThrough; } }
+
+        private bool RaiseEvents { get { return _mode == EventsDispatchMode.Scope; } }
 
         public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args)
         {
@@ -61,7 +60,7 @@ namespace Umbraco.Core.Events
             if (PassThrough)
                 eventHandler(sender, args);
             else
-                _events.Add(new EventDefinition(eventHandler, sender, args));
+                Events.Add(new EventDefinition(eventHandler, sender, args));
         }
 
         public void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args)
@@ -70,7 +69,7 @@ namespace Umbraco.Core.Events
             if (PassThrough)
                 eventHandler(sender, args);
             else
-                _events.Add(new EventDefinition<TArgs>(eventHandler, sender, args));
+                Events.Add(new EventDefinition<TArgs>(eventHandler, sender, args));
         }
 
         public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args)
@@ -79,7 +78,7 @@ namespace Umbraco.Core.Events
             if (PassThrough)
                 eventHandler(sender, args);
             else
-                _events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args));
+                Events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args));
         }
 
         public void QueueEvent(EventHandler e, object sender, EventArgs args, string eventName = null)
@@ -88,7 +87,7 @@ namespace Umbraco.Core.Events
             if (PassThrough)
                 e(sender, args);
             else
-                _events.Add(new EventDefinition(e, sender, args, eventName));
+                Events.Add(new EventDefinition(e, sender, args, eventName));
         }
 
         public void QueueEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args, string eventName = null)
@@ -97,7 +96,7 @@ namespace Umbraco.Core.Events
             if (PassThrough)
                 e(sender, args);
             else
-                _events.Add(new EventDefinition<TEventArgs>(e, sender, args, eventName));
+                Events.Add(new EventDefinition<TEventArgs>(e, sender, args, eventName));
         }
 
         public void QueueEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args, string eventName = null)
@@ -106,42 +105,23 @@ namespace Umbraco.Core.Events
             if (PassThrough)
                 e(sender, args);
             else
-                _events.Add(new EventDefinition<TSender, TEventArgs>(e, sender, args, eventName));
+                Events.Add(new EventDefinition<TSender, TEventArgs>(e, sender, args, eventName));
         }
 
         public IEnumerable<IEventDefinition> GetEvents()
         {
-            return _events;
+            return _events ?? Enumerable.Empty<IEventDefinition>();
         }
 
-        // fixme - this makes no sense at all
-        // used by EventExtensions to determine whether the cancel event should trigger
-        // because... these events are immediate or nothing, they cannot be queued
-        public bool SupportsEventCancellation
+        public void Complete(bool completed)
         {
-            get
-            {
-                return PassThrough;
+            // fixme - we'd need to de-duplicate events somehow, etc
 
-                ////if there is no outer scope then this is the 'root' scope, in which case
-                //// event cancelation is supported since events are not queued.
-                //return _outerScope == null;
-            }
-        }
+            if (_events == null) return;
 
-        /// <summary>
-        /// When the outer scope is disposed, events will be raised if configured to do so
-        /// </summary>
-        protected override void DisposeResources()
-        {
-            // fixme
-            // still, we need to de-duplicate events somehow, etc
-            // lots to do!!
-
-            if (RaiseEvents)
+            if (RaiseEvents && completed)
                 foreach (var e in _events)
                     e.RaiseEvent();
-
             _events.Clear();
         }
     }
