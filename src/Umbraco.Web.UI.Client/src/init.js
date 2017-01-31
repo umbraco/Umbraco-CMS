@@ -13,11 +13,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
 
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function(evt, data) {
-
-            //Removes all stored LocalStorage browser items - that may contain sensitive data
-            //So if a machine or computer is shared and a new user logs in, we clear out the previous persons localStorage items
-            localStorageService.clearAll();
-
+            
             assetsService._loadInitAssets().then(function() {
                 appState.setGlobalState("isReady", true);
 
