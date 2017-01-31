@@ -34,7 +34,7 @@ namespace Umbraco.Web.Trees
         }
 
 
-        public static string GetTreePathFromFilePath(this UrlHelper urlHelper, string virtualPath, string basePath = "")
+        internal static string GetTreePathFromFilePath(this UrlHelper urlHelper, string virtualPath, string basePath = "")
         {
             //This reuses the Logic from umbraco.cms.helpers.DeepLink class
             //to convert a filepath to a tree syncing path string. 
