@@ -465,7 +465,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // the pageResult, then the GetAll will actually return ALL records in the db.
             if (pagedResult.Items.Any())
             {
-                //Crete the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
+                //Create the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
                 var args = sqlNodeIdsWithSort.Arguments;
                 string sqlStringCount, sqlStringPage;
                 Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
@@ -486,7 +486,10 @@ namespace Umbraco.Core.Persistence.Repositories
                     GetFilteredSqlForPagedResults(fullQueryWithPagedInnerJoin, defaultFilter),
                     orderDirection, orderBy, orderBySystemField, nodeIdSelect);
 
-                return processQuery(fullQuery, sqlNodeIdsWithSort);
+                //get the id query in the paged format
+                var idPagedQuery = new Sql(sqlStringPage, args);
+
+                return processQuery(fullQuery, idPagedQuery);
             }
             else
             {
@@ -498,15 +501,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected IDictionary<int, PropertyCollection> GetPropertyCollection(
             Sql docSql,
-            IReadOnlyCollection<DocumentDefinition> documentDefs)
+            IReadOnlyCollection<DocumentDefinition> documentDefs,
+            bool isPaged)
         {
             if (documentDefs.Count == 0) return new Dictionary<int, PropertyCollection>();
 
             //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use
             // the statement to go get the property data for all of the items by using an inner join
             var parsedOriginalSql = "SELECT {0} " + docSql.SQL.Substring(docSql.SQL.IndexOf("FROM", StringComparison.Ordinal));
-            //now remove everything from an Orderby clause and beyond
-            if (parsedOriginalSql.InvariantContains("ORDER BY "))
+
+            //now remove everything from an Orderby clause and beyond if this is unpaged data
+            if (isPaged == false && parsedOriginalSql.InvariantContains("ORDER BY "))
             {
                 parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.LastIndexOf("ORDER BY ", StringComparison.Ordinal));
             }
@@ -524,7 +529,7 @@ WHERE EXISTS(
 	INNER JOIN cmsPropertyType
 	ON b.datatypeNodeId = cmsPropertyType.dataTypeId
     INNER JOIN 
-	    (" + string.Format(parsedOriginalSql, "DISTINCT cmsContent.contentType") + @") as docData
+	    (" + string.Format(parsedOriginalSql, "cmsContent.contentType") + @") as docData
     ON cmsPropertyType.contentTypeId = docData.contentType
     WHERE a.id = b.id)", docSql.Arguments);
 

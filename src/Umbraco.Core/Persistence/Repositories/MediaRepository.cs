@@ -146,7 +146,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return ProcessQuery(sql, true);
         }
 
-        private IEnumerable<IMedia> ProcessQuery(Sql sql, bool withCache = false)
+        private IEnumerable<IMedia> ProcessQuery(Sql sql, bool withCache = false, bool isPaged = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sql, defs);
+            var propertyData = GetPropertyCollection(sql, defs, isPaged);
 
             // assign
             var dtoIndex = 0;
@@ -507,7 +507,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsContentVersion", "contentId"),
-                (sqlFull, sqlIds) => ProcessQuery(sqlFull), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull, isPaged:true), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }
@@ -515,7 +515,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a media object from a ContentDto
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>
@@ -527,7 +527,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(docSql, new[] { docDef }, false);
 
             media.Properties = properties[dto.NodeId];
 

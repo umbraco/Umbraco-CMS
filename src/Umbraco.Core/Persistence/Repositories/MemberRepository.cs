@@ -449,7 +449,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.NodeId);
             var media = factory.BuildEntity(dto);
 
-            var properties = GetPropertyCollection(sql, new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) });
+            var properties = GetPropertyCollection(sql, new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) }, false);
 
             media.Properties = properties[dto.NodeId];
 
@@ -624,7 +624,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsMember", "nodeId"),
-                (sqlFull, sqlIds) => ProcessQuery(sqlFull), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull, isPaged:true), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
         }
 
@@ -664,7 +664,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetEntityPropertyNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IMember> ProcessQuery(Sql sql, bool withCache = false)
+        private IEnumerable<IMember> ProcessQuery(Sql sql, bool withCache = false, bool isPaged = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
@@ -704,7 +704,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sql, defs);
+            var propertyData = GetPropertyCollection(sql, defs, isPaged);
 
             // assign
             var dtoIndex = 0;
@@ -741,7 +741,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.ContentVersionDto.NodeId, versionId, member.UpdateDate, member.CreateDate, memberType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(docSql, new[] { docDef }, false);
 
             member.Properties = properties[dto.ContentVersionDto.NodeId];
 

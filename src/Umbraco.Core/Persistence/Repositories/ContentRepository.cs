@@ -859,7 +859,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsDocument", "nodeId"),
-                (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds, isPaged:true), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }
@@ -899,9 +899,10 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         /// <param name="sqlIds">
         /// The Id SQL without the outer join to just return all document ids - used to process the properties for the content item
         /// </param>
+        /// <param name="isPaged">True if this is a paged query</param>
         /// <param name="withCache"></param>
         /// <returns></returns>
-        private IEnumerable<IContent> ProcessQuery(Sql sqlFull, Sql sqlIds, bool withCache = false)
+        private IEnumerable<IContent> ProcessQuery(Sql sqlFull, Sql sqlIds, bool withCache = false, bool isPaged = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sqlFull);
@@ -967,7 +968,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
                 .ToDictionary(x => x.Id, x => x);
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sqlIds, defs);
+            var propertyData = GetPropertyCollection(sqlIds, defs, isPaged);
 
             // assign
             var dtoIndex = 0;
@@ -1014,7 +1015,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, content.UpdateDate, content.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(docSql, new[] { docDef }, false);
 
             content.Properties = properties[dto.NodeId];
 
