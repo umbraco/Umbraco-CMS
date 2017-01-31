@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Scoping
 
         [TestCase(true)]
         [TestCase(false)]
-        public void TriggerEvents(bool complete)
+        public void EventsDispatchmode_PassThrough(bool complete)
         {
             var counter = 0;
 
@@ -125,7 +125,7 @@ namespace Umbraco.Tests.Scoping
 
         [TestCase(true)]
         [TestCase(false)]
-        public void QueueAndDiscardEvents(bool complete)
+        public void EventsDispatchMode_Passive(bool complete)
         {
             DoThing1 += OnDoThingFail;
             DoThing2 += OnDoThingFail;
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.Scoping
 
         [TestCase(true)]
         [TestCase(false)]
-        public void QueueAndRaiseEvents(bool complete)
+        public void EventsDispatchMode_Scope(bool complete)
         {
             var counter = 0;
             IScope ambientScope = null;

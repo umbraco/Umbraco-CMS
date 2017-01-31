@@ -78,7 +78,6 @@ namespace Umbraco.Core.Scoping
         {
             // steal everything from NoScope
             _database = noScope.DatabaseOrNull;
-            _messages = noScope.MessagesOrNull;
 
             // make sure the NoScope can be replaced ie not in a transaction
             if (_database != null && _database.InTransaction)
@@ -203,7 +202,11 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Messages;
-                return _messages ?? (_messages = new EventMessages());
+                //return _messages ?? (_messages = new EventMessages());
+
+                // ok, this isn't pretty, but it works
+                // TODO kill the message factory and let the scope manage it all
+                return ApplicationContext.Current.Services.EventMessagesFactory.Get();
             }
         }
 

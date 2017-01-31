@@ -14,8 +14,6 @@ namespace Umbraco.Core.Scoping
         private bool _disposed;
 
         private UmbracoDatabase _database;
-        private IEventDispatcher _eventDispatcher;
-        private EventMessages _messages;
 
         public NoScope(ScopeProvider scopeProvider)
         {
@@ -37,7 +35,7 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IsolatedRuntimeCache IsolatedRuntimeCache { get { throw new NotImplementedException(); } }
+        public IsolatedRuntimeCache IsolatedRuntimeCache { get { throw new NotSupportedException(); } }
 
         /// <inheritdoc />
         public UmbracoDatabase Database
@@ -61,55 +59,42 @@ namespace Umbraco.Core.Scoping
         /// <inheritdoc />
         public EventMessages Messages
         {
-            get
-            {
-                EnsureNotDisposed();
-                // fixme - should be a 'no scope event messages' of some sort
-                return _messages ?? (_messages = new EventMessages());
-            }
+            get { throw new NotSupportedException(); }
         }
 
         public EventMessages MessagesOrNull
         {
-            get
-            {
-                EnsureNotDisposed();
-                return _messages;
-            }
+            get { throw new NotSupportedException(); }
         }
 
         /// <inheritdoc />
         public IEventDispatcher Events
         {
-            get
-            {
-                EnsureNotDisposed();
-                return _eventDispatcher ?? (_eventDispatcher = new PassThroughEventDispatcher());
-            }
+            get { throw new NotSupportedException(); }
         }
 
         /// <inheritdoc />
         public void Complete()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <inheritdoc />
         public T Enlist<T>(string key, Func<T> creator)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <inheritdoc />
         public T Enlist<T>(string key, Func<T> creator, ActionTime actionTimes, Action<ActionTime, bool, T> action)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <inheritdoc />
         public void Enlist(string key, ActionTime actionTimes, Action<ActionTime, bool> action)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         private void EnsureNotDisposed()

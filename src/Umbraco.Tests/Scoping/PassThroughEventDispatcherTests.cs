@@ -8,6 +8,7 @@ using Umbraco.Core.Scoping;
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
+    [NUnit.Framework.Ignore("Cannot dispatch events on NoScope!")]
     public class PassThroughEventDispatcherTests
     {
         [Test]

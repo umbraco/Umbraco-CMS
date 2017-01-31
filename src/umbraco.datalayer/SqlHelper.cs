@@ -363,7 +363,7 @@ namespace umbraco.DataLayer
         //private static MethodInfo CloseMethod { get; set; }
 
         private static readonly object ScopeProvider;
-        private static readonly PropertyInfo ScopeProviderAmbientOrNoScopeProperty;
+        private static readonly MethodInfo ScopeProviderAmbientOrNoScopeMethod;
         private static readonly PropertyInfo ScopeDatabaseProperty;
         private static readonly PropertyInfo ConnectionProperty;
         private static readonly FieldInfo TransactionField;
@@ -396,8 +396,8 @@ namespace umbraco.DataLayer
             if (databaseContextScopeProviderField == null) throw new Exception("oops: databaseContextScopeProviderField.");
             ScopeProvider = databaseContextScopeProviderField.GetValue(databaseContext);
 
-            ScopeProviderAmbientOrNoScopeProperty = scopeProviderType.GetProperty("AmbientOrNoScope", BindingFlags.Instance | BindingFlags.Public);
-            if (ScopeProviderAmbientOrNoScopeProperty == null) throw new Exception("oops: ScopeProviderAmbientOrNoScopeProperty.");
+            ScopeProviderAmbientOrNoScopeMethod = scopeProviderType.GetMethod("GetAmbientOrNoScope", BindingFlags.Instance | BindingFlags.Public);
+            if (ScopeProviderAmbientOrNoScopeMethod == null) throw new Exception("oops: ScopeProviderAmbientOrNoScopeMethod.");
             ScopeDatabaseProperty = scopeType.GetProperty("Database", BindingFlags.Instance | BindingFlags.Public);
             if (ScopeDatabaseProperty == null) throw new Exception("oops: ScopeDatabaseProperty.");
 
@@ -416,7 +416,7 @@ namespace umbraco.DataLayer
 
         public CurrentConnectionUsing()
         {
-            var scope = ScopeProviderAmbientOrNoScopeProperty.GetValue(ScopeProvider);
+            var scope = ScopeProviderAmbientOrNoScopeMethod.Invoke(ScopeProvider, NoArgs);
             _database = ScopeDatabaseProperty.GetValue(scope);
 
             var connection = ConnectionProperty.GetValue(_database, NoArgs);
