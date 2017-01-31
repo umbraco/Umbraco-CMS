@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.TreePickerController">
 
-    <div ng-hide="showMiniListView">
+    <div ng-hide="miniListViews.length > 0">
 
         <div class="umb-control-group">
             <umb-tree-search-box
@@ -36,87 +36,90 @@
 
     </div>
 
-    <div ng-show="showMiniListView">
+    <div ng-repeat="miniListView in miniListViews" ng-animate="animationTest()">
 
         <div>
 
-            <div ng-if="!model.startNodeId" href="" ng-click="exitMiniListView()" style="font-size: 12px;/* font-weight: bold; */margin-right: 5px; opacity: 0.5;">
-                <i class="icon-arrow-left" style="margin-right: 5px;"></i>Back
+            <div>
+
+                <div ng-if="!model.startNodeId" href="" ng-click="exitMiniListView(miniListView.node)" style="font-size: 12px;/* font-weight: bold; */margin-right: 5px; opacity: 0.5;">
+                    <i class="icon-arrow-left" style="margin-right: 5px;"></i>Back
+                </div>
+
+                <div class="flex items-center" style="margin-bottom: 10px;">
+                    <i class="{{ miniListView.node.icon }}" style="font-size: 20px; margin-right: 5px;"></i>
+                    <h4 style="font-weight: bold; font-size: 16px;">{{ miniListView.node.name }}</h4>
+                </div>
+
             </div>
 
-            <div class="flex items-center" style="margin-bottom: 10px;">
-                <i class="{{ miniListView.node.icon }}" style="font-size: 22px; margin-right: 5px;"></i>
-                <h4 style="font-weight: bold;">{{ miniListView.node.name }}</h4>
-            </div>
+            <div class="umb-table umb-table--condensed" style="min-width: auto;">
 
-        </div>
-
-        <div class="umb-table umb-table--condensed" style="min-width: auto;">
-
-            <!-- Head -->
-            <div class="umb-table-head">
-                <div class="umb-table-row">
-                    <div class="umb-table-cell" style="display: none;"></div>
-                    <div class="umb-table-cell" style="padding-top: 8px; padding-bottom: 8px;">
-                        <form class="form-search -no-margin-bottom" style="width: 100%; margin-right: 0;" novalidate>
-                            <div class="inner-addon left-addon">
-                                <i class="icon icon-search" style="font-size: 14px;"></i>
-                                <input
-                                    style="width: 100%;"
-                                    class="form-control search-input"
-                                    type="text"
-                                    localize="placeholder"
-                                    placeholder="@general_typeToSearch"
-                                    ng-model="pagination.filter"
-                                    ng-change="searchMiniListView()"
-                                    prevent-enter-submit
-                                    no-dirty-check>
-                            </div>
-                        </form>
+                <!-- Head -->
+                <div class="umb-table-head">
+                    <div class="umb-table-row">
+                        <div class="umb-table-cell" style="display: none;"></div>
+                        <div class="umb-table-cell" style="padding-top: 8px; padding-bottom: 8px;">
+                            <form class="form-search -no-margin-bottom" style="width: 100%; margin-right: 0;" novalidate>
+                                <div class="inner-addon left-addon">
+                                    <i class="icon icon-search" style="font-size: 14px;"></i>
+                                    <input
+                                        style="width: 100%;"
+                                        class="form-control search-input"
+                                        type="text"
+                                        localize="placeholder"
+                                        placeholder="@general_typeToSearch"
+                                        ng-model="pagination.filter"
+                                        ng-change="searchMiniListView()"
+                                        prevent-enter-submit
+                                        no-dirty-check>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Body -->
-            <div class="umb-table-body" style="position: relative;">
+                <!-- Body -->
+                <div class="umb-table-body" style="position: relative;">
 
-                <!-- Load indicator when the list has items -->
-                <div ng-if="miniListView.loading && miniListView.children.length > 0" style="position: absolute; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.7); z-index: 1;">
-                    <umb-load-indicator></umb-load-indicator>
-                </div>
-
-                <!-- Items -->
-                <div class="umb-table-row"
-                    ng-repeat="child in miniListView.children"
-                    ng-click="selectListViewItem(child)"
-                    ng-class="{
-                        '-selected':child.selected
-                    }">
-                    <div class="umb-table-cell">
-                        <i class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></i>
-                        <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                    <!-- Load indicator when the list has items -->
+                    <div ng-if="miniListView.loading && miniListView.children.length > 0" style="position: absolute; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.7); z-index: 1;">
+                        <umb-load-indicator></umb-load-indicator>
                     </div>
-                    <div class="umb-table-cell">{{ child.name }}</div>
-                </div>
 
-                <!-- Load indicator when the list doesn't have items' -->
-                <div ng-if="miniListView.loading && !miniListView.children" class="umb-table-row" style="height: 40px; position: relative;">
-                    <umb-load-indicator></umb-load-indicator>
+                    <!-- Items -->
+                    <div class="umb-table-row"
+                        ng-repeat="child in miniListView.children"
+                        ng-click="selectListViewItem(child)"
+                        ng-class="{
+                            '-selected':child.selected
+                        }">
+                        <div class="umb-table-cell">
+                            <i class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></i>
+                            <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                        </div>
+                        <div class="umb-table-cell">{{ child.name }}</div>
+                        <div class="umb-table-cell"><a href="" ng-click="test(child)">LIST VIEW</a></div>
+                    </div>
+
+                    <!-- Load indicator when the list doesn't have items' -->
+                    <div ng-if="miniListView.loading && !miniListView.children" class="umb-table-row" style="height: 40px; position: relative;">
+                        <umb-load-indicator></umb-load-indicator>
+                    </div>
+
                 </div>
 
             </div>
 
-        </div>
+            <div class="flex justify-center">
+                <umb-pagination
+                    ng-if="miniListView.pagination.totalPages > 0"
+                    page-number="miniListView.pagination.pageNumber"
+                    total-pages="miniListView.pagination.totalPages"
+                    on-change="goToPage(pageNumber, miniListView)">
+                </umb-pagination>
+            </div>
 
-        <div class="flex justify-center">
-            <umb-pagination
-                ng-if="pagination.totalPages > 0"
-                page-number="pagination.pageNumber"
-                total-pages="pagination.totalPages"
-                on-next="nextPage"
-                on-prev="prevPage"
-                on-go-to-page="goToPage">
-            </umb-pagination>
         </div>
 
     </div>

@@ -543,19 +543,28 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		/* Mini List View */
 		$scope.miniListView = {};
 
-		$scope.nextPage = function(pageNumber) {
-			$scope.pagination.pageNumber = pageNumber;
-			getPagedChildren($scope.miniListView.node);
-		};
+		$scope.goToPage = function(pageNumber, miniListView) {
 
-		$scope.prevPage = function(pageNumber) {
-			$scope.pagination.pageNumber = pageNumber;
-			getPagedChildren($scope.miniListView.node);		
-		};
+			// set new page number
+			miniListView.pagination.pageNumber = pageNumber;
 
-		$scope.goToPage = function(pageNumber) {
-			$scope.pagination.pageNumber = pageNumber;
-			getPagedChildren($scope.miniListView.node);		
+			// start loading animation list view
+			miniListView.loading = true;
+
+			resource(miniListView.node.id, miniListView.pagination)
+				.then(function (data) {
+
+					// update children
+					miniListView.children = data.items;
+
+					// update pagination
+					miniListView.pagination.totalItems = data.totalItems;
+					miniListView.pagination.totalPages = data.totalPages;
+
+					// stop load indicator
+					miniListView.loading = false;
+
+				});
 		};
 
 		$scope.selectListViewItem = function(item) {
@@ -564,65 +573,100 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             item.selected = item.selected === true ? false : true;
 		};
 
-		$scope.exitMiniListView = function() {
-			console.log($scope.miniListView);
-			$scope.showMiniListView = false;
-			$scope.miniListView = {};
+		$scope.exitMiniListView = function(node) {
+
+			goingForward = false;
+
+			if(miniListViewsHistory.length > 1) {
+				var prevMiniListViewIndex = miniListViewsHistory.length - 2;
+				var prevMiniListView = miniListViewsHistory[prevMiniListViewIndex];
+				$scope.miniListViews = [];
+				$scope.miniListViews.push(prevMiniListView);
+				miniListViewsHistory.splice(-1,1);
+			} else {
+				miniListViewsHistory = [];
+				$scope.miniListViews = [];
+			}
+
 		};
 
 		$scope.searchMiniListView = function() {
 			searchMiniListView();
 		};
 
+		$scope.test = function(node) {
+			openMiniListView(node);
+		};
+
+		$scope.miniListViews = [];
+
+		var miniListViewsHistory = [];
+		var resource = "";
+		var goingForward = true;
+
+		if (entityType === "Document") {
+			resource = contentResource.getChildren;
+		} else if (entityType === "Member") {
+			resource = memberResource.getPagedResults;
+		} else if (entityType === "Media") {
+			resource = mediaResource.getChildren;
+		}
+
 		function openMiniListView(node) {
 
-			$scope.showMiniListView = true;
+			goingForward = true;
 
-			$scope.pagination = {
-				pageSize: 10,
-				pageNumber: 1,
-				filter: '',
-				orderDirection: "Ascending",
-				orderBy: "SortOrder",
-				orderBySystemField: true
+			var miniListView = {
+				node: node,
+				loading: true,
+				pagination: {
+					pageSize: 10,
+					pageNumber: 1,
+					filter: '',
+					orderDirection: "Ascending",
+					orderBy: "SortOrder",
+					orderBySystemField: true
+				}
 			};
+			
+			// start loading animation on node
+			node.loading = true;
 
-			getPagedChildren(node);
+			resource(node.id, miniListView.pagination)
+				.then(function (data) {
+
+					console.log("data data data", data);
+
+					// update children
+					miniListView.children = data.items;
+
+					// update pagination
+					miniListView.pagination.totalItems = data.totalItems;
+					miniListView.pagination.totalPages = data.totalPages;
+
+					// stop load indicator
+					miniListView.loading = false;
+
+					// stop loading animation on node
+					node.loading = false;
+
+					$scope.miniListViews = [];
+					$scope.miniListViews.push(miniListView);
+					miniListViewsHistory.push(miniListView);
+
+					console.log("history", miniListViewsHistory);
+
+				});
 
 		}
 
-		function getPagedChildren(node) {
+		$scope.animationTest = function() {
 
-			// start load indicator
-			$scope.miniListView.node = node;
-			$scope.miniListView.loading = true;
-			
-			var promise = "";
-
-			console.log(entityType);
-
-			if (entityType === "Document") {
-				promise = contentResource.getChildren(node.id, $scope.pagination);
-			} else if (entityType === "Member") {
-				promise = memberResource.getPagedResults(node.id, $scope.pagination);
-			} else if (entityType === "Media") {
-				promise = mediaResource.getChildren(node.id, $scope.pagination);
+			if(goingForward) {
+				return 'animate';
+			} else {
+				return 'animate-reverse';
 			}
-
-			promise
-				.then(function (data) {
-					
-					// update children
-					$scope.miniListView.children = data.items;
-
-					// update pagination
-					$scope.pagination.totalItems = data.totalItems;
-					$scope.pagination.totalPages = data.totalPages;
-
-					// stop load indicator
-					$scope.miniListView.loading = false;
-
-				});
 
 		}
 
