@@ -567,6 +567,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		$scope.exitMiniListView = function() {
 			console.log($scope.miniListView);
 			$scope.showMiniListView = false;
+			$scope.miniListView = {};
 		};
 
 		$scope.searchMiniListView = function() {
