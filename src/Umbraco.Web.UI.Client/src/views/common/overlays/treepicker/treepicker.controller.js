@@ -38,11 +38,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 				  }
 			  }
 		  }
-		
-		// Search is only working for content, media and member section so we will remove it from everything else
-		if($scope.section === "content" || $scope.section === "media" || $scope.section === "member" ) {
-			$scope.enableSearh = true;
-		}
 
 	    //create the custom query string param for this tree
 	    $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
@@ -70,6 +65,21 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    }
 	    else if (dialogOptions.section === "media") {
 	        entityType = "Media";
+	    }
+
+		// Search and listviews is only working for content, media and member section so we will remove it from everything else
+	    if ($scope.section === "content" || $scope.section === "media" || $scope.section === "member") {
+	        $scope.enableSearh = true;
+
+	        //if a alternative startnode is used, we need to check if it is a container
+	        if (dialogOptions.startNodeId) {
+
+	            entityResource.getById(dialogOptions.startNodeId, entityType).then(function (node) {
+	                if (node.metaData.IsContainer) {
+						openMiniListView(node);
+	                }
+	            });
+	        }
 	    }
 
 	    //Configures filtering
@@ -588,11 +598,13 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 			
 			var promise = "";
 
-			if(node.nodeType === "content") {
+			console.log(entityType);
+
+			if (entityType === "Document") {
 				promise = contentResource.getChildren(node.id, $scope.pagination);
-			} else if( node.nodeType === "member") {
+			} else if (entityType === "Member") {
 				promise = memberResource.getPagedResults(node.id, $scope.pagination);
-			} else if(node.nodeType === "media") {
+			} else if (entityType === "Media") {
 				promise = mediaResource.getChildren(node.id, $scope.pagination);
 			}
 
