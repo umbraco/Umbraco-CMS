@@ -84,7 +84,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlBaseFull = GetBaseQuery(BaseQueryType.Full);
             var sqlBaseIds = GetBaseQuery(BaseQueryType.Ids);
 
-            return ProcessQuery(translate(sqlBaseFull), translate(sqlBaseIds));
+            return ProcessQuery(translate(sqlBaseFull), new PagingSqlQuery(translate(sqlBaseIds)));
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translatorFull = new SqlTranslator<IContent>(sqlBaseFull, query);
             var translatorIds = new SqlTranslator<IContent>(sqlBaseIds, query);
 
-            return ProcessQuery(translate(translatorFull), translate(translatorIds));
+            return ProcessQuery(translate(translatorFull), new PagingSqlQuery(translate(translatorIds)));
         }
 
         #endregion        
@@ -225,7 +225,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sqlFull = translate(baseId, GetBaseQuery(BaseQueryType.Full));
                 var sqlIds = translate(baseId, GetBaseQuery(BaseQueryType.Ids));
 
-                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(sqlFull, groupSize), SqlSyntax.SelectTop(sqlIds, groupSize))
+                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(sqlFull, groupSize), new PagingSqlQuery(SqlSyntax.SelectTop(sqlIds, groupSize)))
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
                     .ToList();
 
@@ -260,7 +260,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlFull = translate(GetBaseQuery(BaseQueryType.Full));
             var sqlIds = translate(GetBaseQuery(BaseQueryType.Ids));
             
-            return ProcessQuery(sqlFull, sqlIds, true);
+            return ProcessQuery(sqlFull, new PagingSqlQuery(sqlIds), true);
         }
 
         public override IContent GetByVersion(Guid versionId)
@@ -679,7 +679,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlIds = GetBaseQuery(BaseQueryType.Ids);
             var translatorIds = new SqlTranslator<IContent>(sqlIds, query);
 
-            return ProcessQuery(translate(translatorFull), translate(translatorIds), true);
+            return ProcessQuery(translate(translatorFull), new PagingSqlQuery(translate(translatorIds)), true);
         }
         
         /// <summary>
@@ -859,7 +859,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsDocument", "nodeId"),
-                (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds, isPaged:true), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, pagingSqlQuery) => ProcessQuery(sqlFull, pagingSqlQuery), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }
@@ -896,13 +896,12 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         /// <param name="sqlFull">
         /// The full SQL with the outer join to return all data required to create an IContent
         /// </param>
-        /// <param name="sqlIds">
+        /// <param name="pagingSqlQuery">
         /// The Id SQL without the outer join to just return all document ids - used to process the properties for the content item
         /// </param>
-        /// <param name="isPaged">True if this is a paged query</param>
         /// <param name="withCache"></param>
         /// <returns></returns>
-        private IEnumerable<IContent> ProcessQuery(Sql sqlFull, Sql sqlIds, bool withCache = false, bool isPaged = false)
+        private IEnumerable<IContent> ProcessQuery(Sql sqlFull, PagingSqlQuery pagingSqlQuery, bool withCache = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sqlFull);
@@ -968,7 +967,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
                 .ToDictionary(x => x.Id, x => x);
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sqlIds, defs, isPaged);
+            var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
             // assign
             var dtoIndex = 0;
@@ -1015,7 +1014,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, content.UpdateDate, content.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef }, false);
+            var properties = GetPropertyCollection(docSql, new[] { docDef });
 
             content.Properties = properties[dto.NodeId];
 
