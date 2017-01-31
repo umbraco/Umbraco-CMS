@@ -78,7 +78,12 @@
             </div>
 
             <!-- Body -->
-            <div class="umb-table-body">
+            <div class="umb-table-body" style="position: relative;">
+
+                <!-- Load indicator when the list has items -->
+                <div ng-if="miniListView.loading && miniListView.children.length > 0" style="position: absolute; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.7); z-index: 1;">
+                    <umb-load-indicator></umb-load-indicator>
+                </div>
 
                 <!-- Items -->
                 <div class="umb-table-row"
@@ -94,8 +99,8 @@
                     <div class="umb-table-cell">{{ child.name }}</div>
                 </div>
 
-                <!-- Loading -->
-                <div ng-if="miniListView.loading" class="umb-table-row" style="height: 40px; position: relative;">
+                <!-- Load indicator when the list doesn't have items' -->
+                <div ng-if="miniListView.loading && !miniListView.children" class="umb-table-row" style="height: 40px; position: relative;">
                     <umb-load-indicator></umb-load-indicator>
                 </div>
 
