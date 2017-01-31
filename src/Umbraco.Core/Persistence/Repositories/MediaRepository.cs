@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, sql);
         }
 
         protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                                 .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, sql);
         }
 
         #endregion
@@ -143,13 +143,25 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
-            return ProcessQuery(sql, true);
+            return ProcessQuery(sql, sql, true);
         }
 
-        private IEnumerable<IMedia> ProcessQuery(Sql sql, bool withCache = false, bool isPaged = false)
+        /// <summary>
+        /// This is the underlying method that processes most queries for this repository
+        /// </summary>
+        /// <param name="sqlFull">
+        /// The full SQL to select all media data 
+        /// </param>
+        /// <param name="sqlIds">
+        /// The Id SQL to just return all media ids - used to process the properties for the media item
+        /// </param>
+        /// <param name="isPaged">True if this is a paged query</param>
+        /// <param name="withCache"></param>
+        /// <returns></returns>
+        private IEnumerable<IMedia> ProcessQuery(Sql sqlFull, Sql sqlIds, bool withCache = false, bool isPaged = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sqlFull);
             var content = new IMedia[dtos.Count];
             var defs = new List<DocumentDefinition>();
 
@@ -200,7 +212,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sql, defs, isPaged);
+            var propertyData = GetPropertyCollection(sqlIds, defs, isPaged);
 
             // assign
             var dtoIndex = 0;
@@ -257,7 +269,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 query = query
                     .Where<NodeDto>(x => x.NodeId > baseId, SqlSyntax)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
-                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
+                var sql = SqlSyntax.SelectTop(query, groupSize);
+                var xmlItems = ProcessQuery(sql, sql)
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
                     .ToList();
 
@@ -507,7 +520,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsContentVersion", "contentId"),
-                (sqlFull, sqlIds) => ProcessQuery(sqlFull, isPaged:true), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds, isPaged: true), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }

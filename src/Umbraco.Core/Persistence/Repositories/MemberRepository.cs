@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, sql);
 
         }
 
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 baseQuery.Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments))
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return ProcessQuery(baseQuery);
+                return ProcessQuery(baseQuery, baseQuery);
             }
             else
             {
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sql = translator.Translate()
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return ProcessQuery(sql);
+                return ProcessQuery(sql, sql);
             }
 
         }
@@ -385,7 +385,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
-            return ProcessQuery(sql, true);
+            return ProcessQuery(sql, sql, true);
         }        
 
         public void RebuildXmlStructures(Func<IMember, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null)
@@ -408,7 +408,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 query = query
                     .Where<NodeDto>(x => x.NodeId > baseId)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
-                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
+                var sql = SqlSyntax.SelectTop(query, groupSize);
+                var xmlItems = ProcessQuery(sql, sql)
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
                     .ToList();
 
@@ -540,7 +541,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, sql);
 
         }
 
@@ -624,7 +625,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsMember", "nodeId"),
-                (sqlFull, sqlIds) => ProcessQuery(sqlFull, isPaged:true), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds, isPaged:true), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
         }
 
@@ -664,10 +665,22 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetEntityPropertyNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IMember> ProcessQuery(Sql sql, bool withCache = false, bool isPaged = false)
+        /// <summary>
+        /// This is the underlying method that processes most queries for this repository
+        /// </summary>
+        /// <param name="sqlFull">
+        /// The full SQL to select all member data 
+        /// </param>
+        /// <param name="sqlIds">
+        /// The Id SQL to just return all member ids - used to process the properties for the member item
+        /// </param>
+        /// <param name="isPaged">True if this is a paged query</param>
+        /// <param name="withCache"></param>
+        /// <returns></returns>
+        private IEnumerable<IMember> ProcessQuery(Sql sqlFull, Sql sqlIds, bool withCache = false, bool isPaged = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
-            var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sqlFull);
 
             var content = new IMember[dtos.Count];
             var defs = new List<DocumentDefinition>();
@@ -704,7 +717,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sql, defs, isPaged);
+            var propertyData = GetPropertyCollection(sqlIds, defs, isPaged);
 
             // assign
             var dtoIndex = 0;
