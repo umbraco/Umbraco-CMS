@@ -55,7 +55,7 @@ namespace Umbraco.Web.Editors
             {
                 //we are not also including the Udi[] overload because that is HttpPost only so there won't be any ambiguity
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]) )));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]) )));
             }
         }
 
@@ -263,8 +263,12 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <param name="type"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids
+        /// </remarks>
         [HttpGet]
-        public IEnumerable<EntityBasic> GetByIds([FromUri]int[] ids, UmbracoEntityTypes type)
+        [HttpPost]
+        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]int[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
             {
@@ -279,8 +283,12 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <param name="type"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids
+        /// </remarks>
         [HttpGet]
-        public IEnumerable<EntityBasic> GetByIds([FromUri]Guid[] ids, UmbracoEntityTypes type)
+        [HttpPost]
+        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]Guid[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
             {
@@ -288,7 +296,7 @@ namespace Umbraco.Web.Editors
             }
             return GetResultForKeys(ids, type);
         }
-        
+
         /// <summary>
         /// Get entities by string ids - will try to convert to the correct id type (int, guid, udi)
         /// </summary>
@@ -296,8 +304,9 @@ namespace Umbraco.Web.Editors
         /// <param name="type"></param>
         /// <returns></returns>
         /// <remarks>
-        /// We only allow for POST because there could be quite a lot of Ids
+        /// We allow for POST because there could be quite a lot of Ids
         /// </remarks>
+        [HttpGet]
         [HttpPost]
         public IEnumerable<EntityBasic> GetByIds([FromJsonPath]Udi[] ids, [FromUri]UmbracoEntityTypes type)
         {

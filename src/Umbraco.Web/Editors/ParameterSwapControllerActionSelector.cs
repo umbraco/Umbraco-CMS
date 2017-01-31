@@ -42,32 +42,23 @@ namespace Umbraco.Web.Editors
 
             if (found != null)
             {
-                if (controllerContext.Request.Method == HttpMethod.Get)
+                HttpActionDescriptor method;
+                if (TryBindFromUri(controllerContext, found, out method))
                 {
-                    var requestParam = HttpUtility.ParseQueryString(controllerContext.Request.RequestUri.Query).Get(found.ParamName);
-
-                    if (requestParam != null)
-                    {
-                        var paramTypes = found.SupportedTypes;
-
-                        foreach (var paramType in paramTypes)
-                        {
-                            var converted = requestParam.TryConvertTo(paramType);
-                            if (converted)
-                            {
-                                var method = MatchByType(paramType, controllerContext, found);
-                                if (method != null)
-                                    return method;
-                            }
-                        }
-                    }
+                    return method;
                 }
-                else if (controllerContext.Request.Method == HttpMethod.Post)
-                {
 
+                //if it's a post we can try to read from the body and bind from th
+                if (controllerContext.Request.Method == HttpMethod.Post)
+                {
                     var requestContent = new HttpMessageContent(controllerContext.Request);
                     var strJson = requestContent.HttpRequestMessage.Content.ReadAsStringAsync().Result;
                     var json = JsonConvert.DeserializeObject<JObject>(strJson);
+
+                    if (json == null)
+                    {
+                        return base.SelectAction(controllerContext);
+                    }
 
                     var requestParam = json[found.ParamName];
 
@@ -82,7 +73,7 @@ namespace Umbraco.Web.Editors
                                 var converted = requestParam.ToObject(paramType);
                                 if (converted != null)
                                 {
-                                    var method = MatchByType(paramType, controllerContext, found);
+                                    method = MatchByType(paramType, controllerContext, found);
                                     if (method != null)
                                         return method;
                                 }
@@ -100,6 +91,34 @@ namespace Umbraco.Web.Editors
                 }
             }
             return base.SelectAction(controllerContext);
+        }
+
+        private bool TryBindFromUri(HttpControllerContext controllerContext, ParameterSwapInfo found, out HttpActionDescriptor method)
+        {
+            var requestParam = HttpUtility.ParseQueryString(controllerContext.Request.RequestUri.Query).Get(found.ParamName);
+
+            if (requestParam != null)
+            {
+                var paramTypes = found.SupportedTypes;
+                
+                foreach (var paramType in paramTypes)
+                {
+                    //check if this is IEnumerable and if so this will get it's type
+                    //we need to know this since the requestParam will always just be a string
+                    var enumType = paramType.GetEnumeratedType();
+
+                    var converted = requestParam.TryConvertTo(enumType ?? paramType);
+                    if (converted)
+                    {
+                        method = MatchByType(paramType, controllerContext, found);
+                        if (method != null)
+                            return true;
+                    }
+                }
+            }
+
+            method = null;
+            return false;
         }
 
         private static ReflectedHttpActionDescriptor MatchByType(Type idType, HttpControllerContext controllerContext, ParameterSwapInfo found)
