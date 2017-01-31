@@ -9,7 +9,7 @@ namespace Umbraco.Web.Media.EmbedProviders
             get { return false; }
         }
 
-        public override string GetMarkup(string url, int maxWidth, int maxHeight)
+        public override string GetMarkup(string url, string userAgent, int maxWidth, int maxHeight)
         {
             var web = new HtmlWeb();
             var doc = web.Load(url);

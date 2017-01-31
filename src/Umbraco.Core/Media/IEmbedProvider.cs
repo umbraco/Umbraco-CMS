@@ -4,6 +4,6 @@
     {
         bool SupportsDimensions { get; }
 
-        string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
+        string GetMarkup(string url, string userAgent, int maxWidth = 0, int maxHeight = 0);
     }
 }

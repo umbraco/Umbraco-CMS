@@ -8,10 +8,10 @@ namespace Umbraco.Web.Media.EmbedProviders
     [Obsolete("This is no longer used and will be removed from the codebase in the future, for Flickr, use the Umbraco.Web.Media.EmbedProviders.OEmbedPhoto provider")]
     public class Flickr : AbstractOEmbedProvider
     {
-        public override string GetMarkup(string url, int maxWidth, int maxHeight)
+        public override string GetMarkup(string url, string userAgent, int maxWidth, int maxHeight)
         {
             var flickrUrl = BuildFullUrl(url, maxWidth, maxHeight);
-            var doc = GetXmlResponse(flickrUrl);
+            var doc = GetXmlResponse(flickrUrl, userAgent);
 
             string imageUrl = doc.SelectSingleNode("/oembed/url").InnerText;
             string imageWidth = doc.SelectSingleNode("/oembed/width").InnerText;

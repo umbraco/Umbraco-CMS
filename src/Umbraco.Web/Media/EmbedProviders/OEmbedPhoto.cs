@@ -5,11 +5,11 @@ namespace Umbraco.Web.Media.EmbedProviders
 {
     public class OEmbedPhoto : AbstractOEmbedProvider
     {
-        public override string GetMarkup(string url, int maxWidth, int maxHeight)
+        public override string GetMarkup(string url, string userAgent, int maxWidth, int maxHeight)
         {
             string requestUrl = BuildFullUrl(url, maxWidth, maxHeight);
 
-            XmlDocument doc = GetXmlResponse(requestUrl);
+            XmlDocument doc = GetXmlResponse(requestUrl, userAgent);
             string imageUrl = GetXmlProperty(doc, "/oembed/url");
             string imageWidth = GetXmlProperty(doc, "/oembed/width");
             string imageHeight = GetXmlProperty(doc, "/oembed/height");

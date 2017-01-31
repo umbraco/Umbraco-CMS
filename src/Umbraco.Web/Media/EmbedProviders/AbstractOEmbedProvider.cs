@@ -25,7 +25,7 @@ namespace Umbraco.Web.Media.EmbedProviders
         [ProviderSetting]
         public Dictionary<string, string> RequestParams{ get;set; }
 
-        public abstract string GetMarkup(string url, int maxWidth, int maxHeight);
+        public abstract string GetMarkup(string url, string userAgent, int maxWidth, int maxHeight);
 
         public virtual string BuildFullUrl(string url, int maxWidth, int maxHeight)
         {
@@ -49,23 +49,25 @@ namespace Umbraco.Web.Media.EmbedProviders
             return fullUrl.ToString();
         }
 
-        public virtual string DownloadResponse(string url)
+        public virtual string DownloadResponse(string url, string userAgent)
         {
             using (var webClient = new WebClient())
             {
+                webClient.Headers.Add("User-Agent", userAgent);
+
                 return webClient.DownloadString(url);
             }
         }
 
-        public virtual T GetJsonResponse<T>(string url) where T : class
+        public virtual T GetJsonResponse<T>(string url, string userAgent) where T : class
         {
-            var response = DownloadResponse(url);
+            var response = DownloadResponse(url, userAgent);
             return JsonConvert.DeserializeObject<T>(response);
         }
 
-        public virtual XmlDocument GetXmlResponse(string url)
+        public virtual XmlDocument GetXmlResponse(string url, string userAgent)
         {
-            var response = DownloadResponse(url);
+            var response = DownloadResponse(url, userAgent);
             var doc = new XmlDocument();
             doc.LoadXml(response);
 

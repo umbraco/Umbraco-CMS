@@ -2,11 +2,11 @@
 {
     public class OEmbedJson : AbstractOEmbedProvider
     {
-        public override string GetMarkup(string url, int maxWidth, int maxHeight)
+        public override string GetMarkup(string url, string userAgent, int maxWidth, int maxHeight)
         {
             string requestUrl = BuildFullUrl(url, maxWidth, maxHeight);
 
-            var jsonResponse = GetJsonResponse<OEmbedResponse>(requestUrl);
+            var jsonResponse = GetJsonResponse<OEmbedResponse>(requestUrl, userAgent);
             return jsonResponse.GetHtml();
         }
     }

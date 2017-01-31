@@ -9,6 +9,6 @@ namespace Umbraco.Web.Media.EmbedProviders
             get { return true; }
         }
 
-        public abstract string GetMarkup(string url, int maxWidth, int maxHeight);
+        public abstract string GetMarkup(string url, string userAgent, int maxWidth, int maxHeight);
     }
 }

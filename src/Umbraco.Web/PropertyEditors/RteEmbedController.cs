@@ -27,6 +27,7 @@ namespace Umbraco.Web.PropertyEditors
         public Result GetEmbed(string url, int width, int height)
         {
             var result = new Result();
+            var userAgent = Request.Headers.UserAgent.ToString();
 
             //todo cache embed doc
             var xmlConfig = new XmlDocument();
@@ -64,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                     try
                     {
-                        result.Markup = prov.GetMarkup(url, width, height);
+                        result.Markup = prov.GetMarkup(url, userAgent, width, height);
                         result.Status = Status.Success;
                     }
                     catch(Exception ex)

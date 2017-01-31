@@ -24,6 +24,7 @@ namespace Umbraco.Web.WebServices
                 throw new UnauthorizedAccessException("You must be logged in to use this service");
             
             var url = HttpContext.Current.Request.Form["url"];
+            var userAgent = HttpContext.Current.Request.UserAgent;
             var width = int.Parse(HttpContext.Current.Request.Form["width"]);
             var height = int.Parse(HttpContext.Current.Request.Form["height"]);
 
@@ -65,7 +66,7 @@ namespace Umbraco.Web.WebServices
                     }
                     try
                     {
-                        result.Markup = prov.GetMarkup(url, width, height);
+                        result.Markup = prov.GetMarkup(url, userAgent, width, height);
                         result.Status = Status.Success;
                     }
                     catch
