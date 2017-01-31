@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
@@ -42,9 +38,9 @@ namespace Umbraco.Tests.Scoping
             _database.BeginTransaction(); // opens and maintains a connection
 
             // the test is leaking a scope with a non-null database
-            var contextScope = CallContext.LogicalGetData("Umbraco.Core.Scoping.IScope");
+            var contextScope = CallContext.LogicalGetData(ScopeProvider.ScopeItemKey);
             Assert.IsNotNull(contextScope);
-            Assert.IsInstanceOf<NoScope>(CallContext.LogicalGetData("Umbraco.Core.Scoping.IScope"));
+            Assert.IsInstanceOf<NoScope>(CallContext.LogicalGetData(ScopeProvider.ScopeItemKey));
             Assert.IsNotNull(((NoScope) contextScope).DatabaseOrNull);
             Assert.AreSame(_database, ((NoScope)contextScope).DatabaseOrNull);
 
@@ -63,7 +59,7 @@ namespace Umbraco.Tests.Scoping
 
         private static void AssertSafeCallContext()
         {
-            var scope = CallContext.LogicalGetData("Umbraco.Core.Scoping.IScope");
+            var scope = CallContext.LogicalGetData(ScopeProvider.ScopeItemKey);
             if (scope != null) throw new Exception("Leaked call context scope.");
         }
 

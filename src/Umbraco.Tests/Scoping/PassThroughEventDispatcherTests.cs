@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Scoping
             DoThing1 += (sender, args) => { counter++; };
 
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            var events = scopeProvider.AmbientOrNoScope.Events;
+            var events = scopeProvider.GetAmbientOrNoScope().Events;
             events.DispatchCancelable(DoThing1, this, new CancellableEventArgs());
 
             Assert.AreEqual(1, counter);
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Scoping
             DoThing3 += (sender, args) => { counter++; };
 
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            var events = scopeProvider.AmbientOrNoScope.Events;
+            var events = scopeProvider.GetAmbientOrNoScope().Events;
             events.Dispatch(DoThing1, this, new EventArgs());
             events.Dispatch(DoThing2, this, new EventArgs());
             events.Dispatch(DoThing3, this, new EventArgs());
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Scoping
         public void DoesNotQueueEvents()
         {
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            var events = scopeProvider.AmbientOrNoScope.Events;
+            var events = scopeProvider.GetAmbientOrNoScope().Events;
             events.Dispatch(DoThing1, this, new EventArgs());
             events.Dispatch(DoThing2, this, new EventArgs());
             events.Dispatch(DoThing3, this, new EventArgs());

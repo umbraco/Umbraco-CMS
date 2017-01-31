@@ -39,49 +39,98 @@ namespace Umbraco.Core.Scoping
 
         public IDatabaseFactory2 DatabaseFactory { get; private set; }
 
-        private const string ItemKey = "Umbraco.Core.Scoping.IScope";
-        private const string ItemRefKey = "Umbraco.Core.Scoping.ScopeReference";
+        #region Ambient Context
+
+        internal const string ContextItemKey = "Umbraco.Core.Scoping.ScopeContext";
+
+        private static ScopeContext CallContextContextValue
+        {
+            get { return (ScopeContext)CallContext.LogicalGetData(ContextItemKey); }
+            set
+            {
+                if (value == null) CallContext.FreeNamedDataSlot(ContextItemKey);
+                else CallContext.LogicalSetData(ContextItemKey, value);
+            }
+        }
+
+        private static ScopeContext HttpContextContextValue
+        {
+            get { return (ScopeContext)HttpContext.Current.Items[ContextItemKey]; }
+            set
+            {
+                if (value == null)
+                    HttpContext.Current.Items.Remove(ContextItemKey);
+                else
+                    HttpContext.Current.Items[ContextItemKey] = value;
+            }
+        }
+
+        private static ScopeContext StaticAmbientContext
+        {
+            get { return HttpContext.Current == null ? CallContextContextValue : HttpContextContextValue; }
+            set
+            {
+                if (HttpContext.Current == null)
+                    CallContextContextValue = value;
+                else
+                    HttpContextContextValue = value;
+            }
+        }
+
+        /// <inheritdoc />
+        public ScopeContext AmbientContext
+        {
+            get { return StaticAmbientContext; }
+            set { StaticAmbientContext = value; }
+        }
+
+        #endregion
+
+        #region Ambient Scope
+
+        internal const string ScopeItemKey = "Umbraco.Core.Scoping.Scope";
+        internal const string ScopeRefItemKey = "Umbraco.Core.Scoping.ScopeReference";
 
         // only 1 instance which can be disposed and disposed again
         private static readonly ScopeReference StaticScopeReference = new ScopeReference(new ScopeProvider(null));
 
         private static IScope CallContextValue
         {
-            get { return (IScope) CallContext.LogicalGetData(ItemKey); }
+            get { return (IScope) CallContext.LogicalGetData(ScopeItemKey); }
             set
             {
 #if DEBUG_SCOPES
-                var ambient = (IScope)CallContext.LogicalGetData(ItemKey);
+                var ambient = (IScope)CallContext.LogicalGetData(ScopeItemKey);
                 if (ambient != null) RegisterContext(ambient, null);
                 if (value != null)
                     RegisterContext(value, "lcc");
 #endif
-                if (value == null) CallContext.FreeNamedDataSlot(ItemKey);
-                else CallContext.LogicalSetData(ItemKey, value);
+                if (value == null) CallContext.FreeNamedDataSlot(ScopeItemKey);
+                else CallContext.LogicalSetData(ScopeItemKey, value);
             }
         }
 
         private static IScope HttpContextValue
         {
-            get { return (IScope) HttpContext.Current.Items[ItemKey]; }
+            get { return (IScope) HttpContext.Current.Items[ScopeItemKey]; }
             set
             {
 #if DEBUG_SCOPES
-                var ambient = (IScope) HttpContext.Current.Items[ItemKey];
+                var ambient = (IScope) HttpContext.Current.Items[ScopeItemKey];
                 if (ambient != null) RegisterContext(ambient, null);
                 if (value != null)
                     RegisterContext(value, "http");
 #endif
                 if (value == null)
                 {
-                    HttpContext.Current.Items.Remove(ItemKey);
-                    HttpContext.Current.Items.Remove(ItemRefKey);
+                    HttpContext.Current.Items.Remove(ScopeItemKey);
+                    HttpContext.Current.Items.Remove(ScopeRefItemKey);
                 }
                 else
                 {
-                    HttpContext.Current.Items[ItemKey] = value;
-                    if (HttpContext.Current.Items[ItemRefKey] == null)
-                        HttpContext.Current.Items[ItemRefKey] = StaticScopeReference;
+                    HttpContext.Current.Items[ScopeItemKey] = value;
+                    if (HttpContext.Current.Items[ScopeRefItemKey] == null)
+                        HttpContext.Current.Items[ScopeRefItemKey] = StaticScopeReference;
                 }
             }
         }
@@ -106,13 +155,12 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IScope AmbientOrNoScope
+        public IScope GetAmbientOrNoScope()
         {
-            get
-            {
                 return AmbientScope ?? (AmbientScope = new NoScope(this));
-            }
         }
+
+        #endregion
 
         /// <inheritdoc />
         public IScope CreateDetachedScope(
@@ -120,7 +168,8 @@ namespace Umbraco.Core.Scoping
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified)
         {
-            return new Scope(this, isolationLevel, repositoryCacheMode, dispatchMode, true);
+            // fixme - what about scope context when attaching & detaching?
+            return new Scope(this, (ScopeContext) null, isolationLevel, repositoryCacheMode, dispatchMode, true);
         }
 
         /// <inheritdoc />
@@ -168,7 +217,9 @@ namespace Umbraco.Core.Scoping
         {
             var ambient = AmbientScope;
             if (ambient == null)
-                return AmbientScope = new Scope(this, isolationLevel, repositoryCacheMode, dispatchMode);
+            {
+                return AmbientScope = new Scope(this, GetNewContext(), isolationLevel, repositoryCacheMode, dispatchMode);
+            }
 
             // replace noScope with a real one
             var noScope = ambient as NoScope;
@@ -181,13 +232,20 @@ namespace Umbraco.Core.Scoping
                 var database = noScope.DatabaseOrNull;
                 if (database != null && database.InTransaction)
                     throw new Exception("NoScope is in a transaction.");
-                return AmbientScope = new Scope(this, noScope, isolationLevel, repositoryCacheMode, dispatchMode);
+                return AmbientScope = new Scope(this, noScope, GetNewContext(), isolationLevel, repositoryCacheMode, dispatchMode);
             }
 
             var scope = ambient as Scope;
             if (scope == null) throw new Exception("Ambient scope is not a Scope instance.");
 
             return AmbientScope = new Scope(this, scope, isolationLevel, repositoryCacheMode, dispatchMode);
+        }
+
+        private ScopeContext GetNewContext()
+        {
+            return AmbientContext == null
+                ? AmbientContext = new ScopeContext()
+                : null;
         }
 
         /// <inheritdoc />
@@ -198,6 +256,12 @@ namespace Umbraco.Core.Scoping
                 scope.Reset();
 
             StaticScopeReference.Dispose();
+        }
+
+        /// <inheritdoc />
+        public ScopeContext Context
+        {
+            get { return AmbientContext; }
         }
 
 #if DEBUG_SCOPES

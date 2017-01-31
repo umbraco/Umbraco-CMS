@@ -57,5 +57,10 @@ namespace Umbraco.Core.Scoping
 #if DEBUG_SCOPES
         IEnumerable<ScopeInfo> ScopeInfos { get; }
 #endif
+
+        /// <summary>
+        /// Gets the scope context.
+        /// </summary>
+        ScopeContext Context { get; }
     }
 }

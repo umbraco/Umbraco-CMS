@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence
 
 		public UmbracoDatabase CreateDatabase()
 		{
-		    return ScopeProvider.AmbientOrNoScope.Database;
+		    return ScopeProvider.GetAmbientOrNoScope().Database;
 		}
 
 	    public UmbracoDatabase CreateNewDatabase()

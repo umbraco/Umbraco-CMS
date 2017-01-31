@@ -118,7 +118,8 @@ namespace umbraco
 
         private const string XmlContextContentItemKey = "UmbracoXmlContextContent";
         private static string _umbracoXmlDiskCacheFileName = string.Empty;
-        private volatile XmlDocument _xmlContent;
+        // internal for SafeXmlReaderWriter
+        internal volatile XmlDocument _xmlContent;
 
         /// <summary>
         /// Gets the path of the umbraco XML disk cache file.
@@ -484,10 +485,9 @@ namespace umbraco
 
         #region Protected & Private methods
 
-        /// <summary>
-        /// Clear HTTPContext cache if any
-        /// </summary>
-        private void ClearContextCache()
+        // Clear HTTPContext cache if any
+        // internal for SafeXmlReaderWriter
+        internal void ClearContextCache()
         {
             // If running in a context very important to reset context cache or else new nodes are missing
             if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null && UmbracoContext.Current.HttpContext.Items.Contains(XmlContextContentItemKey))
@@ -579,7 +579,8 @@ namespace umbraco
 
         #region Xml
 
-        private readonly AsyncLock _xmlLock = new AsyncLock(); // protects _xml
+        // internal for SafeXmlReaderWriter
+        internal readonly AsyncLock _xmlLock = new AsyncLock(); // protects _xml
 
         /// <remarks>
         /// Get content. First call to this property will initialize xmldoc
@@ -622,7 +623,8 @@ namespace umbraco
 
         // assumes xml lock
         // ok to access _xmlContent here since this is called from the safe reader/writer
-        private void SetXmlLocked(XmlDocument xml, bool registerXmlChange)
+        // internal for SafeXmlReaderWriter
+        internal void SetXmlLocked(XmlDocument xml, bool registerXmlChange)
         {
             // this is the ONLY place where we write to _xmlContent
             _xmlContent = xml;
@@ -632,11 +634,6 @@ namespace umbraco
 
             //_lastXmlChange = DateTime.UtcNow;
             _persisterTask = _persisterTask.Touch(); // _persisterTask != null because SyncToXmlFile == true
-        }
-
-        private static XmlDocument Clone(XmlDocument xmlDoc)
-        {
-            return xmlDoc == null ? null : (XmlDocument)xmlDoc.CloneNode(true);
         }
 
         private static XmlDocument EnsureSchema(string contentTypeAlias, XmlDocument xml)
@@ -695,148 +692,21 @@ namespace umbraco
         // gets a locked safe read access to the main xml
         private SafeXmlReaderWriter GetSafeXmlReader()
         {
-            return SafeXmlReaderWriter.GetReader(_scopeProvider, this);
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlContent, (xml, registerXmlChange) =>
+            {
+                SetXmlLocked(xml, registerXmlChange);
+                ClearContextCache();
+            }, false);
         }
 
         // gets a locked safe write access to the main xml (cloned)
         private SafeXmlReaderWriter GetSafeXmlWriter()
         {
-            return SafeXmlReaderWriter.GetWriter(_scopeProvider, this);
-        }
-
-        // provides safe access to the Xml cache
-        private class SafeXmlReaderWriter : IDisposable
-        {
-            private readonly content _instance;
-            private readonly bool _scoped;
-            private IDisposable _releaser;
-            private bool _isWriter;
-            private bool _applyChanges;
-            private XmlDocument _xml;
-            private bool _using;
-            private bool _registerXmlChange;
-
-            private SafeXmlReaderWriter(content instance, IDisposable releaser, bool isWriter, bool scoped)
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlContent, (xml, registerXmlChange) =>
             {
-                _instance = instance;
-                _releaser = releaser;
-                _isWriter = isWriter;
-                _scoped = scoped;
-
-                // cloning for writer is not an option anymore (see XmlIsImmutable)
-                _xml = _isWriter ? Clone(instance._xmlContent) : instance._xmlContent;
-            }
-
-            public static SafeXmlReaderWriter GetReader(IScopeProviderInternal scopeProvider, content instance)
-            {
-                return GetReaderWriter(scopeProvider, instance, false);
-            }
-
-            public static SafeXmlReaderWriter GetWriter(IScopeProviderInternal scopeProvider, content instance)
-            {
-                return GetReaderWriter(scopeProvider, instance, true);
-            }
-
-            private static SafeXmlReaderWriter GetReaderWriter(IScopeProviderInternal scopeProvider, content instance, bool writer)
-            {
-                var scope = scopeProvider.AmbientScope;
-
-                // no real scope = just create a reader/writer instance
-                // not so clean that we have to deal with NoScope/Scope here but... in v8 NoScope will go away
-                // oh and we don't want to create a noScope here
-                if (scope == null || scope is NoScope)
-                {
-                    // obtain exclusive access to xml and create reader/writer
-                    var releaser = instance._xmlLock.Lock();
-                    return new SafeXmlReaderWriter(instance, releaser, writer, false);
-                }
-
-                // get or create an enlisted reader/writer
-                var rw = scope.Enlist("safeXmlReaderWriter",
-                    () => // creator
-                    {
-                        // obtain exclusive access to xml and create reader/writer
-                        var releaser = instance._xmlLock.Lock();
-                        return new SafeXmlReaderWriter(instance, releaser, writer, true);
-                    },
-                    ActionTime.BeforeDispose,
-                    (actionTime, completed, item) => // action
-                    {
-                        item.DisposeForReal(completed);
-                    });
-
-                // ensure it's not already in-use - should never happen, just being super safe
-                if (rw._using)
-                    throw new InvalidOperationException();
-                rw._using = true;
-
-                return rw;
-            }
-
-            public bool IsWriter { get { return _isWriter; } }
-
-            public void UpgradeToWriter()
-            {
-                if (_isWriter)
-                    throw new InvalidOperationException("Already a writer.");
-                _isWriter = true;
-                _xml = Clone(_xml); // cloning for writer is not an option anymore (see XmlIsImmutable)
-            }
-
-            public XmlDocument Xml
-            {
-                get { return _xml; }
-                set
-                {
-                    if (_isWriter == false)
-                        throw new InvalidOperationException("Not a writer.");
-                    _xml = value;
-                }
-            }
-
-            // registerXmlChange indicates whether to do what should be done when Xml changes,
-            // that is, to request that the file be written to disk - something we don't want
-            // to do if we're committing Xml precisely after we've read from disk!
-            public void AcceptChanges(bool registerXmlChange = true)
-            {
-                if (_isWriter == false)
-                    throw new InvalidOperationException("Not a writer.");
-
-                _applyChanges = true;
-                _registerXmlChange |= registerXmlChange;
-
-                // fixme - what about context cache?
-                // just 'clearing' here is not enough because it would be re-assigned to the
-                // un-modified _xmlContent, so we'd need to *change* it somehow to point to
-                // our temp _xml (and then maybe restore if the scope does not complete).
-                // not doing it means that the 'current' xml cache does *not* update during the
-                // scope but only once the scope has completed... might be an issue with
-                // GetUrl... would that impact Deploy? don't think so - so for the time being
-                // we do nothing *but* we need to deal with it at some point!
-            }
-
-            private void DisposeForReal(bool completed)
-            {
-                // apply changes!
-                if (_isWriter && _applyChanges && completed)
-                    _instance.SetXmlLocked(_xml, _registerXmlChange);
-
-                // clear the current context cache so it gets updated
-                // now that we have set the new _xmlContent value
-                _instance.ClearContextCache();
-
-                // release the lock
-                _releaser.Dispose();
-                _releaser = null;
-            }
-
-            public void Dispose()
-            {
-                _using = false;
-
-                if (_scoped == false)
-                    DisposeForReal(true);
-            }
+                SetXmlLocked(xml, registerXmlChange);
+                ClearContextCache();
+            }, true);
         }
 
         private static string ChildNodesXPath

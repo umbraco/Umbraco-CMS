@@ -101,7 +101,7 @@ namespace Umbraco.Core
         {
             get
             {
-                return ScopeProvider.AmbientOrNoScope.Database;
+                return ScopeProvider.GetAmbientOrNoScope().Database;
                 //var scope = ScopeProvider.AmbientScope;
                 //return scope != null ? scope.Database : ScopeProvider.CreateNoScope().Database;
             }

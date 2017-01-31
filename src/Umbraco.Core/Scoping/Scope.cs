@@ -17,6 +17,7 @@ namespace Umbraco.Core.Scoping
         private readonly IsolationLevel _isolationLevel;
         private readonly RepositoryCacheMode _repositoryCacheMode;
         private readonly EventsDispatchMode _dispatchMode;
+        private readonly ScopeContext _scopeContext;
         private bool _disposed;
         private bool? _completed;
 
@@ -31,18 +32,21 @@ namespace Umbraco.Core.Scoping
 
         // initializes a new scope
         public Scope(ScopeProvider scopeProvider,
+            ScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
             bool detachable = false)
         {
             _scopeProvider = scopeProvider;
+            _scopeContext = scopeContext;
             _isolationLevel = isolationLevel;
             _repositoryCacheMode = repositoryCacheMode;
             _dispatchMode = dispatchMode;
             Detachable = detachable;
 #if DEBUG_SCOPES
             _scopeProvider.Register(this);
+            Console.WriteLine("create " + _instanceId.ToString("N").Substring(0, 8));
 #endif
         }
 
@@ -51,7 +55,7 @@ namespace Umbraco.Core.Scoping
             IsolationLevel isolationLevel = IsolationLevel.Unspecified, 
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified)
-            : this(scopeProvider, isolationLevel, repositoryCacheMode, dispatchMode)
+            : this(scopeProvider, (ScopeContext) null, isolationLevel, repositoryCacheMode, dispatchMode)
         {
             ParentScope = parent;
 
@@ -65,11 +69,12 @@ namespace Umbraco.Core.Scoping
         }
 
         // initializes a new scope, replacing a NoScope instance
-        public Scope(ScopeProvider scopeProvider, NoScope noScope, 
+        public Scope(ScopeProvider scopeProvider, NoScope noScope,
+            ScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified, 
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified)
-            : this(scopeProvider, isolationLevel, repositoryCacheMode, dispatchMode)
+            : this(scopeProvider, scopeContext, isolationLevel, repositoryCacheMode, dispatchMode)
         {
             // steal everything from NoScope
             _database = noScope.DatabaseOrNull;
@@ -91,7 +96,7 @@ namespace Umbraco.Core.Scoping
             {
                 if (_dispatchMode != EventsDispatchMode.Unspecified) return _dispatchMode;
                 if (ParentScope != null) return ParentScope.DispatchMode;
-                return EventsDispatchMode.PassThrough;
+                return EventsDispatchMode.Scope;
             }
         }
 
@@ -276,9 +281,17 @@ namespace Umbraco.Core.Scoping
             // at the moment we are totally not filtering the messages based on completion
             // status, so whether the scope is committed or rolled back makes no difference
 
+            // note - scope
+            // at that point, there is *no* ambient scope anymore, which means that every
+            // enlisted action, triggered event, *anything*, is not scoped and is free to
+            // do whatever needed.
+            //
+            // fixme - what does this mean for XML scope?!
+
             var completed = _completed.HasValue && _completed.Value;
 
-            // fixme missing actions here
+            // run enlisted actions
+            RunEnlisted(ActionTime.BeforeCommit, completed);
 
             if (_database != null)
             {
@@ -305,6 +318,19 @@ namespace Umbraco.Core.Scoping
 
             // run enlisted actions
             RunEnlisted(ActionTime.BeforeDispose, completed);
+
+            // if *we* created it, then get rid of it
+            if (_scopeProvider.AmbientContext == _scopeContext)
+            {
+                try
+                {
+                    _scopeProvider.AmbientContext.ScopeExit(completed);
+                }
+                finally
+                {
+                    _scopeProvider.AmbientContext = null;
+                }
+            }
         }
 
         private void RunEnlisted(ActionTime actionTime, bool completed)

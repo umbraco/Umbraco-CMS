@@ -31,6 +31,7 @@ namespace Umbraco.Core.Cache
         {
             // use unique names to de-duplicate
             // enlisting multiple times is not a problem
+            // fixme - when should we do it? BeforeEvents or BeforeDispose? + aren't the events going to do it anyways?
             _scope.Enlist("dirty_" + typeof (TEntity).Name, ActionTime.BeforeDispose,
                 (actionTime, completed) => { if (completed) _globalIsolatedCache.ClearAllCache(); });
         }

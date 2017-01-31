@@ -133,6 +133,7 @@ namespace Umbraco.Core.Scoping
                 _database.Dispose();
 
             _scopeProvider.AmbientScope = null;
+            _scopeProvider.AmbientContext = null;
 
             _disposed = true;
             GC.SuppressFinalize(this);

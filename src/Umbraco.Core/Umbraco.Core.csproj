@@ -529,6 +529,7 @@
     <Compile Include="Scoping\IScopeProviderInternal.cs" />
     <Compile Include="Scoping\NoScope.cs" />
     <Compile Include="Scoping\Scope.cs" />
+    <Compile Include="Scoping\ScopeContext.cs" />
     <Compile Include="Scoping\ScopeProvider.cs" />
     <Compile Include="Scoping\ScopeReference.cs" />
     <Compile Include="Scoping\RepositoryCacheMode.cs" />

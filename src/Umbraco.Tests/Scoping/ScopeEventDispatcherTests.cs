@@ -153,14 +153,28 @@ namespace Umbraco.Tests.Scoping
         public void QueueAndRaiseEvents(bool complete)
         {
             var counter = 0;
+            IScope ambientScope = null;
+            ScopeContext ambientContext = null;
+            Guid value = Guid.Empty;
+
+            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
 
             DoThing1 += (sender, args) => { counter++; };
             DoThing2 += (sender, args) => { counter++; };
-            DoThing3 += (sender, args) => { counter++; };
+            DoThing3 += (sender, args) =>
+            {
+                ambientScope = scopeProvider.AmbientScope;
+                ambientContext = scopeProvider.AmbientContext;
+                value = scopeProvider.Context.Enlist("value", Guid.NewGuid, (c, o) => { });
+                counter++;
+            };
 
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            Guid guid;
             using (var scope = scopeProvider.CreateScope(dispatchMode: EventsDispatchMode.Scope))
             {
+                Assert.IsNotNull(scopeProvider.AmbientContext);
+                guid = scopeProvider.Context.Enlist("value", Guid.NewGuid, (c, o) => { });
+
                 scope.Events.Dispatch(DoThing1, this, new SaveEventArgs<string>("test"));
                 scope.Events.Dispatch(DoThing2, this, new SaveEventArgs<int>(0));
                 scope.Events.Dispatch(DoThing3, this, new SaveEventArgs<decimal>(0));
@@ -176,13 +190,19 @@ namespace Umbraco.Tests.Scoping
             {
                 // events have been raised
                 Assert.AreEqual(3, counter);
+                Assert.IsNull(ambientScope); // scope was gone
+                Assert.IsNotNull(ambientContext); // but not context
+                Assert.AreEqual(guid, value); // so we got the same value!
             }
             else
             {
                 // else, no event has been raised
-                // fixme - fails at the moment because ... we always trigger events?
                 Assert.AreEqual(0, counter);
             }
+
+            // everything's gone
+            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.IsNull(scopeProvider.AmbientContext);
         }
 
         private static void OnDoThingFail(object sender, EventArgs eventArgs)
