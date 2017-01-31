@@ -1,12 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Sync;
+using Umbraco.Tests.Cache.DistributedCache;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -14,12 +19,47 @@ namespace Umbraco.Tests.Scoping
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     public class ScopedRepositoryTests : BaseDatabaseFactoryTest
     {
+        private CacheRefresherEventHandler _cacheHandler;
+
         // setup
         public override void Initialize()
         {
             base.Initialize();
 
             Assert.IsNull(DatabaseContext.ScopeProvider.AmbientScope); // gone
+        }
+
+        protected override void FreezeResolution()
+        {
+            ServerRegistrarResolver.Current = new ServerRegistrarResolver(
+                new DistributedCacheTests.TestServerRegistrar());
+            ServerMessengerResolver.Current = new ServerMessengerResolver(
+                new DatabaseServerMessenger(ApplicationContext, false, new DatabaseServerMessengerOptions()));
+            CacheRefreshersResolver.Current = new CacheRefreshersResolver(
+                new ActivatorServiceProvider(), Mock.Of<ILogger>(), () => new[]
+                {
+                    typeof(PageCacheRefresher),
+                    typeof(UnpublishedPageCacheRefresher),
+                    typeof(DomainCacheRefresher),
+                    typeof(MacroCacheRefresher),
+                    typeof(UserCacheRefresher),
+                    typeof(LanguageCacheRefresher),
+                    typeof(DictionaryCacheRefresher)
+                });
+
+            base.FreezeResolution();
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            if (_cacheHandler != null)
+                _cacheHandler.Destroy();
+            _cacheHandler = null;
+
+            ServerRegistrarResolver.Reset();
+            ServerMessengerResolver.Reset();
+            CacheRefreshersResolver.Reset();
         }
 
         protected override CacheHelper CreateCacheHelper()
@@ -49,6 +89,9 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(user.Id, globalCached.Id);
             Assert.AreEqual("name", globalCached.Name);
+
+            _cacheHandler = new CacheRefresherEventHandler();
+            _cacheHandler.OnApplicationStarted(null, ApplicationContext);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
@@ -127,6 +170,9 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(lang.Id, globalCached.Id);
             Assert.AreEqual("fr-FR", globalCached.IsoCode);
+
+            _cacheHandler = new CacheRefresherEventHandler();
+            _cacheHandler.OnApplicationStarted(null, ApplicationContext);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
@@ -216,6 +262,9 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual("item-key", globalCached.ItemKey);
+
+            _cacheHandler = new CacheRefresherEventHandler();
+            _cacheHandler.OnApplicationStarted(null, ApplicationContext);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))

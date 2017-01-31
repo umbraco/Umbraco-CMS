@@ -24,18 +24,6 @@ namespace Umbraco.Core.Cache
             throw new InvalidOperationException(); // obviously
         }
 
-        // when the scope completes we need to clear the global isolated cache
-        // for now, we are not doing it selectively at all - just kill everything
-        // later on we might want to be more clever
-        private void RegisterDirty()
-        {
-            // use unique names to de-duplicate
-            // enlisting multiple times is not a problem
-            // fixme - when should we do it? BeforeEvents or BeforeDispose? + aren't the events going to do it anyways?
-            _scope.Enlist("dirty_" + typeof (TEntity).Name, ActionTime.BeforeDispose,
-                (actionTime, completed) => { if (completed) _globalIsolatedCache.ClearAllCache(); });
-        }
-
         public TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
             // loads into the local cache only, ok for now
@@ -58,21 +46,18 @@ namespace Umbraco.Core.Cache
         {
             // writes into the local cache
             _cachePolicy.Create(entity, persistNew);
-            RegisterDirty();
         }
 
         public void Update(TEntity entity, Action<TEntity> persistUpdated)
         {
             // writes into the local cache
             _cachePolicy.Update(entity, persistUpdated);
-            RegisterDirty();
         }
 
         public void Delete(TEntity entity, Action<TEntity> persistDeleted)
         {
             // deletes the local cache
             _cachePolicy.Delete(entity, persistDeleted);
-            RegisterDirty();
         }
 
         public TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
@@ -85,7 +70,6 @@ namespace Umbraco.Core.Cache
         {
             // clears the local cache
             _cachePolicy.ClearAll();
-            RegisterDirty();
         }
     }
 }

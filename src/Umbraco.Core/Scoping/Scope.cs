@@ -23,8 +23,6 @@ namespace Umbraco.Core.Scoping
 
         private IsolatedRuntimeCache _isolatedRuntimeCache;
         private UmbracoDatabase _database;
-        private EventMessages _messages;
-        private IDictionary<string, IEnlistedObject> _enlisted;
         private IEventDispatcher _eventDispatcher;        
 
         // this is v7, in v8 this has to change to RepeatableRead
@@ -215,7 +213,7 @@ namespace Umbraco.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                return ParentScope == null ? _messages : ParentScope.MessagesOrNull;
+                return ParentScope == null ? null : ParentScope.MessagesOrNull;
             }
         }
 
@@ -280,21 +278,7 @@ namespace Umbraco.Core.Scoping
 
         private void DisposeLastScope()
         {
-            // note - messages
-            // at the moment we are totally not filtering the messages based on completion
-            // status, so whether the scope is committed or rolled back makes no difference
-
-            // note - scope
-            // at that point, there is *no* ambient scope anymore, which means that every
-            // enlisted action, triggered event, *anything*, is not scoped and is free to
-            // do whatever needed.
-            //
-            // fixme - what does this mean for XML scope?!
-
             var completed = _completed.HasValue && _completed.Value;
-
-            // run enlisted actions
-            RunEnlisted(ActionTime.BeforeCommit, completed);
 
             if (_database != null)
             {
@@ -312,15 +296,9 @@ namespace Umbraco.Core.Scoping
                 }
             }
 
-            // run enlisted actions
-            RunEnlisted(ActionTime.BeforeEvents, completed);
-
             // deal with events
             if (_eventDispatcher != null)
                 _eventDispatcher.ScopeExit(completed);
-
-            // run enlisted actions
-            RunEnlisted(ActionTime.BeforeDispose, completed);
 
             // if *we* created it, then get rid of it
             if (_scopeProvider.AmbientContext == _scopeContext)
@@ -334,113 +312,6 @@ namespace Umbraco.Core.Scoping
                     _scopeProvider.AmbientContext = null;
                 }
             }
-        }
-
-        private void RunEnlisted(ActionTime actionTime, bool completed)
-        {
-            List<Exception> exceptions = null;
-            foreach (var enlisted in Enlisted.Values)
-            {
-                try
-                {
-                    enlisted.Execute(actionTime, completed);
-                }
-                catch (Exception e)
-                {
-                    if (exceptions == null)
-                        exceptions = new List<Exception>();
-                    exceptions.Add(e);
-                }
-            }
-            if (exceptions != null)
-                throw new AggregateException("Exceptions were thrown by listed actions at ActionTime " + actionTime + ".", exceptions);
-        }
-
-        private IDictionary<string, IEnlistedObject> Enlisted
-        {
-            get
-            {
-                if (ParentScope != null) return ParentScope.Enlisted;
-
-                return _enlisted ?? (_enlisted
-                    = new Dictionary<string, IEnlistedObject>());
-            }
-        }
-
-        private interface IEnlistedObject
-        {
-            void Execute(ActionTime actionTime, bool completed);
-        }
-
-        private class EnlistedObject<T> : IEnlistedObject
-        {
-            private readonly ActionTime _actionTimes;
-            private readonly Action<ActionTime, bool, T> _action;
-
-            public EnlistedObject(T item)
-            {
-                Item = item;
-                _actionTimes = ActionTime.None;
-            }
-
-            public EnlistedObject(T item, ActionTime actionTimes, Action<ActionTime, bool, T> action)
-            {
-                Item = item;
-                _actionTimes = actionTimes;
-                _action = action;
-            }
-
-            public T Item { get; private set; }
-
-            public void Execute(ActionTime actionTime, bool completed)
-            {
-                if (_actionTimes.HasFlag(actionTime))
-                    _action(actionTime, completed, Item);
-            }
-        }
-
-        /// <inheritdoc />
-        public T Enlist<T>(string key, Func<T> creator)
-        {
-            IEnlistedObject enlisted;
-            if (Enlisted.TryGetValue(key, out enlisted))
-            {
-                var enlistedAs = enlisted as EnlistedObject<T>;
-                if (enlistedAs == null) throw new Exception("An item with a different type has already been enlisted with the same key.");
-                return enlistedAs.Item;
-            }
-            var enlistedOfT = new EnlistedObject<T>(creator());
-            Enlisted[key] = enlistedOfT;
-            return enlistedOfT.Item;
-        }
-
-        /// <inheritdoc />
-        public T Enlist<T>(string key, Func<T> creator, ActionTime actionTimes, Action<ActionTime, bool, T> action)
-        {
-            IEnlistedObject enlisted;
-            if (Enlisted.TryGetValue(key, out enlisted))
-            {
-                var enlistedAs = enlisted as EnlistedObject<T>;
-                if (enlistedAs == null) throw new Exception("An item with a different type has already been enlisted with the same key.");
-                return enlistedAs.Item;
-            }
-            var enlistedOfT = new EnlistedObject<T>(creator(), actionTimes, action);
-            Enlisted[key] = enlistedOfT;
-            return enlistedOfT.Item;
-        }
-
-        /// <inheritdoc />
-        public void Enlist(string key, ActionTime actionTimes, Action<ActionTime, bool> action)
-        {
-            IEnlistedObject enlisted;
-            if (Enlisted.TryGetValue(key, out enlisted))
-            {
-                var enlistedAs = enlisted as EnlistedObject<object>;
-                if (enlistedAs == null) throw new Exception("An item with a different type has already been enlisted with the same key.");
-                return;
-            }
-            var enlistedOfT = new EnlistedObject<object>(null, actionTimes, (actionTime, completed, item) => action(actionTime, completed));
-            Enlisted[key] = enlistedOfT;
         }
     }
 }

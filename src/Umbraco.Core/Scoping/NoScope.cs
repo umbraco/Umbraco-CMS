@@ -79,24 +79,6 @@ namespace Umbraco.Core.Scoping
             throw new NotSupportedException();
         }
 
-        /// <inheritdoc />
-        public T Enlist<T>(string key, Func<T> creator)
-        {
-            throw new NotSupportedException();
-        }
-
-        /// <inheritdoc />
-        public T Enlist<T>(string key, Func<T> creator, ActionTime actionTimes, Action<ActionTime, bool, T> action)
-        {
-            throw new NotSupportedException();
-        }
-
-        /// <inheritdoc />
-        public void Enlist(string key, ActionTime actionTimes, Action<ActionTime, bool> action)
-        {
-            throw new NotSupportedException();
-        }
-
         private void EnsureNotDisposed()
         {
             if (_disposed)

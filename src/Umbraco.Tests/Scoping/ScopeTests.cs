@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Scoping
             {
                 using (var scope = scopeProvider.CreateScope())
                 {
-                    scope.Enlist("test", ActionTime.BeforeDispose, (actionTime, completed) => scopeCompleted = completed);
+                    scopeProvider.Context.Enlist("test", completed => scopeCompleted = completed);
 
                     Assert.IsInstanceOf<Scope>(scope);
                     Assert.IsNotNull(scopeProvider.AmbientScope);
@@ -509,26 +509,6 @@ namespace Umbraco.Tests.Scoping
             {
                 var db = nested.Database;
             });
-        }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void ScopeEnlist(bool complete)
-        {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-
-            bool? completed = null;
-
-            Assert.IsNull(scopeProvider.AmbientScope);
-            using (var scope = scopeProvider.CreateScope())
-            {
-                scope.Enlist("name", ActionTime.BeforeDispose, (a, c) => { completed = c; });
-                if (complete)
-                    scope.Complete();
-            }
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNotNull(completed);
-            Assert.AreEqual(complete, completed.Value);
         }
 
         [TestCase(true)]
