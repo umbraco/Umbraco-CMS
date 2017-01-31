@@ -25,9 +25,11 @@ namespace Umbraco.Core.Services
         #region Proxied event handlers
         void MemberGroupRepository_SavingMemberGroup(IMemberGroupRepository sender, SaveEventArgs<IMemberGroup> e)
         {
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(e.SavedEntities), this, UowProvider))
+            using (var scope = UowProvider.ScopeProvider.CreateScope())
             {
-                e.Cancel = true;
+                scope.Complete(); // always
+                if (scope.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberGroup>(e.SavedEntities)))
+                    e.Cancel = true;
             }
         }
 
@@ -36,7 +38,7 @@ namespace Umbraco.Core.Services
             using (var scope = UowProvider.ScopeProvider.CreateScope())
             {
                 scope.Complete(); // always complete
-                Saved.RaiseEvent(new SaveEventArgs<IMemberGroup>(e.SavedEntities, false), this, scope.Events);
+                scope.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberGroup>(e.SavedEntities, false));
             }
         } 
         #endregion
@@ -74,7 +76,7 @@ namespace Umbraco.Core.Services
             {
                 if (raiseEvents)
                 {
-                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(memberGroup), this, uow.Events))
+                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberGroup>(memberGroup)))
                     {
                         uow.Commit();
                         return;
@@ -85,7 +87,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(memberGroup);
                 uow.Commit();
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMemberGroup>(memberGroup, false), this, uow.Events);
+                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberGroup>(memberGroup, false));
             }
 
             
@@ -95,12 +97,12 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberGroup>(memberGroup), this, uow.Events))
+                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMemberGroup>(memberGroup)))
                     return; // FIXME COMMIT
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 repository.Delete(memberGroup);
                 uow.Commit();
-                Deleted.RaiseEvent(new DeleteEventArgs<IMemberGroup>(memberGroup, false), this, uow.Events);
+                uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<IMemberGroup>(memberGroup, false));
             }
         }
 

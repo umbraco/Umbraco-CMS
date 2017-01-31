@@ -28,7 +28,7 @@ namespace Umbraco.Core.Events
 
         private bool RaiseEvents { get { return _mode == EventsDispatchMode.Scope; } }
 
-        public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args)
+        public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args, string eventName = null)
         {
             if (eventHandler == null) return args.Cancel;
             if (PassThroughCancelable == false) return args.Cancel;
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Events
             return args.Cancel;
         }
 
-        public bool DispatchCancelable<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args) 
+        public bool DispatchCancelable<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string eventName = null) 
             where TArgs : CancellableEventArgs
         {
             if (eventHandler == null) return args.Cancel;
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Events
             return args.Cancel;
         }
 
-        public bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args) 
+        public bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string eventName = null) 
             where TArgs : CancellableEventArgs
         {
             if (eventHandler == null) return args.Cancel;
@@ -54,58 +54,31 @@ namespace Umbraco.Core.Events
             return args.Cancel;
         }
 
-        public void Dispatch(EventHandler eventHandler, object sender, EventArgs args)
+        public void Dispatch(EventHandler eventHandler, object sender, EventArgs args, string eventName = null)
         {
             if (eventHandler == null) return;
             if (PassThrough)
                 eventHandler(sender, args);
             else
-                Events.Add(new EventDefinition(eventHandler, sender, args));
+                Events.Add(new EventDefinition(eventHandler, sender, args, eventName));
         }
 
-        public void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args)
+        public void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string eventName = null)
         {
             if (eventHandler == null) return;
             if (PassThrough)
                 eventHandler(sender, args);
             else
-                Events.Add(new EventDefinition<TArgs>(eventHandler, sender, args));
+                Events.Add(new EventDefinition<TArgs>(eventHandler, sender, args, eventName));
         }
 
-        public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args)
+        public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string eventName = null)
         {
             if (eventHandler == null) return;
             if (PassThrough)
                 eventHandler(sender, args);
             else
-                Events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args));
-        }
-
-        public void QueueEvent(EventHandler e, object sender, EventArgs args, string eventName = null)
-        {
-            if (e == null) return;
-            if (PassThrough)
-                e(sender, args);
-            else
-                Events.Add(new EventDefinition(e, sender, args, eventName));
-        }
-
-        public void QueueEvent<TEventArgs>(EventHandler<TEventArgs> e, object sender, TEventArgs args, string eventName = null)
-        {
-            if (e == null) return;
-            if (PassThrough)
-                e(sender, args);
-            else
-                Events.Add(new EventDefinition<TEventArgs>(e, sender, args, eventName));
-        }
-
-        public void QueueEvent<TSender, TEventArgs>(TypedEventHandler<TSender, TEventArgs> e, TSender sender, TEventArgs args, string eventName = null)
-        {
-            if (e == null) return;
-            if (PassThrough)
-                e(sender, args);
-            else
-                Events.Add(new EventDefinition<TSender, TEventArgs>(e, sender, args, eventName));
+                Events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args, eventName));
         }
 
         public IEnumerable<IEventDefinition> GetEvents()
@@ -113,7 +86,7 @@ namespace Umbraco.Core.Events
             return _events ?? Enumerable.Empty<IEventDefinition>();
         }
 
-        public void Complete(bool completed)
+        public void ScopeExit(bool completed)
         {
             // fixme - we'd need to de-duplicate events somehow, etc
 

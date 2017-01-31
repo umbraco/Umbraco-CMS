@@ -151,8 +151,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork.Database.BulkInsertRecords(toInsert, _sqlSyntax);
             
             //Raise the event
-            AssignedPermissions.RaiseEvent(
-                new SaveEventArgs<EntityPermission>(ConvertToPermissionList(toInsert), false), this, _unitOfWork.Events);
+            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(toInsert), false));
         }
 
         /// <summary>
@@ -182,8 +181,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork.Database.BulkInsertRecords(actions, _sqlSyntax);
             
             //Raise the event
-            AssignedPermissions.RaiseEvent(
-                new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this, _unitOfWork.Events);
+            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false));
         } 
 
         /// <summary>
@@ -213,8 +211,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork.Database.BulkInsertRecords(actions, _sqlSyntax);
 
             //Raise the event
-            AssignedPermissions.RaiseEvent(
-                new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this, _unitOfWork.Events);
+            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false));
         }
 
         /// <summary>
@@ -240,8 +237,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork.Database.BulkInsertRecords(actions, _sqlSyntax);
             
             //Raise the event
-            AssignedPermissions.RaiseEvent(
-                new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this, _unitOfWork.Events);
+            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false));
         }
 
         private static IEnumerable<EntityPermission> ConvertToPermissionList(IEnumerable<User2NodePermissionDto> result)

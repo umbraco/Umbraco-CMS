@@ -71,7 +71,7 @@ namespace Umbraco.Core.Services
             // fixme - IS IT EVEN DOING ANYTHING WITH REPO? NO! SO USE A SCOPE INSTEAD!
             using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
-                if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this, uow.Events))
+                if (uow.Events.DispatchCancelable(Creating, this, new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId)))
                 {
                     uow.Commit();
                     media.WasCancelled = true;
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
 
                 media.CreatorId = userId;
 
-                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this, uow.Events);
+                uow.Events.Dispatch(Created, this, new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId));
 
                 Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
 
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Services
             // fixme 
             using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
-                if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this, uow.Events))
+                if (uow.Events.DispatchCancelable(Creating, this, new NewEventArgs<IMedia>(media, mediaTypeAlias, parent)))
                 {
                     uow.Commit();
                     media.WasCancelled = true;
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Services
 
                 media.CreatorId = userId;
 
-                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this, uow.Events);
+                uow.Events.Dispatch(Created, this, new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent));
 
                 Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
 
@@ -151,22 +151,22 @@ namespace Umbraco.Core.Services
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parentId, mediaType);
             
-            //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
-            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this, UowProvider))
-            {
-                media.WasCancelled = true;
-                return media;
-            }
-
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this, UowProvider))
-            {
-                media.WasCancelled = true;
-                return media;
-            }
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
+                // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
+                if (uow.Events.DispatchCancelable(Creating, this, new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId)))
+                {
+                    media.WasCancelled = true;
+                    return media;
+                }
+
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(media)))
+                {
+                    media.WasCancelled = true;
+                    return media;
+                }
+
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
                 media.CreatorId = userId;
                 repository.AddOrUpdate(media);
@@ -180,9 +180,8 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this, uow.Events);
-
-                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this, uow.Events);
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMedia>(media, false));
+                uow.Events.Dispatch(Created, this, new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId));
             }
 
             Audit(AuditType.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
@@ -210,22 +209,23 @@ namespace Umbraco.Core.Services
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parent, mediaType);
 
-            //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
-            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this, UowProvider))
-            {
-                media.WasCancelled = true;
-                return media;
-            }
-
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this, UowProvider))
-            {
-                media.WasCancelled = true;
-                return media;
-            }
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
+                // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
+                if (uow.Events.DispatchCancelable(Creating, this, new NewEventArgs<IMedia>(media, mediaTypeAlias, parent)))
+                {
+                    media.WasCancelled = true;
+                    return media;
+                }
+
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(media)))
+                {
+                    media.WasCancelled = true;
+                    return media;
+                }
+
+
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
                 media.CreatorId = userId;
                 repository.AddOrUpdate(media);
@@ -238,9 +238,8 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this, uow.Events);
-
-                Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this, uow.Events);
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMedia>(media, false));
+                uow.Events.Dispatch(Created, this, new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent));
             }
 
             Audit(AuditType.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
@@ -730,9 +729,7 @@ namespace Umbraco.Core.Services
 
                     var originalPath = media.Path;
 
-                    if (Moving.IsRaisedEventCancelled(
-                        new MoveEventArgs<IMedia>(
-                            new MoveEventInfo<IMedia>(media, originalPath, parentId)), this, scope.Events, eventName: "Moving"))
+                    if (scope.Events.DispatchCancelable(Moving, this, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, parentId)), "Moving"))
                     {
                         return;
                     }
@@ -765,7 +762,7 @@ namespace Umbraco.Core.Services
                             false);
                     }
 
-                    Moved.RaiseEvent(new MoveEventArgs<IMedia>(false, moveInfo.ToArray()), this, scope.Events, eventName: "Moved");
+                    scope.Events.Dispatch(Moved, this, new MoveEventArgs<IMedia>(false, moveInfo.ToArray()), "Moved");
 
                     Audit(AuditType.Move, "Move Media performed by user", userId, media.Id);
                 }
@@ -796,10 +793,11 @@ namespace Umbraco.Core.Services
             //TODO: IT would be much nicer to mass delete all in one trans in the repo level!
             var evtMsgs = EventMessagesFactory.Get();
 
-            if (Deleting.IsRaisedEventCancelled(
-                new DeleteEventArgs<IMedia>(media, evtMsgs), this, UowProvider))
+            using (var scope = UowProvider.ScopeProvider.CreateScope())
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                scope.Complete(); // always
+                if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMedia>(media, evtMsgs)))
+                    return OperationStatus.Cancelled(evtMsgs);
             }
 
             //Delete children before deleting the 'possible parent'
@@ -816,7 +814,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 var args = new DeleteEventArgs<IMedia>(media, false, evtMsgs);
-                Deleted.RaiseEvent(args, this, uow.Events);
+                uow.Events.Dispatch(Deleted, this, args);
 
                 //remove any flagged media files
                 repository.DeleteMediaFiles(args.MediaFilesToDelete);
@@ -837,19 +835,14 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<IMedia>(media, evtMsgs),
-                    this, UowProvider))
-                {
-                    return OperationStatus.Cancelled(evtMsgs);
-                }
-
-            }
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (raiseEvents)
+                {
+                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(media, evtMsgs)))
+                        return OperationStatus.Cancelled(evtMsgs);
+                }
+
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
                 media.CreatorId = userId;
                 repository.AddOrUpdate(media);
@@ -863,7 +856,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false, evtMsgs), this, uow.Events);
+                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMedia>(media, false, evtMsgs));
             }
 
             Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
@@ -882,18 +875,14 @@ namespace Umbraco.Core.Services
             var asArray = medias.ToArray();
             var evtMsgs = EventMessagesFactory.Get();
 
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<IMedia>(asArray, evtMsgs),
-                    this, UowProvider))
-                {
-                    return OperationStatus.Cancelled(evtMsgs);
-                }
-            }
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (raiseEvents)
+                {
+                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(asArray, evtMsgs)))
+                        return OperationStatus.Cancelled(evtMsgs);
+                }
+
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
                 foreach (var media in asArray)
                 {
@@ -911,7 +900,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false, evtMsgs), this, uow.Events);
+                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMedia>(asArray, false, evtMsgs));
             }
 
             Audit(AuditType.Save, "Save Media items performed by user", userId, -1);
@@ -939,7 +928,7 @@ namespace Umbraco.Core.Services
                     files = ((MediaRepository) repository).GetFilesInRecycleBinForUploadField();
                     uow.Commit();
 
-                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, entities, files), this, uow.Events))
+                    if (uow.Events.DispatchCancelable(EmptyingRecycleBin, this, new RecycleBinEventArgs(nodeObjectType, entities, files)))
                     {
                         uow.Commit();
                         return;
@@ -947,7 +936,7 @@ namespace Umbraco.Core.Services
 
                     success = repository.EmptyRecycleBin();
                     // FIXME shouldn't we commit here?!
-                    EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, entities, files, success), this, uow.Events);
+                    uow.Events.Dispatch(EmptiedRecycleBin, this, new RecycleBinEventArgs(nodeObjectType, entities, files, success));
 
                     if (success)
                         repository.DeleteMediaFiles(files);
@@ -977,7 +966,7 @@ namespace Umbraco.Core.Services
                     var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
                     var contents = repository.GetByQuery(query).ToArray();
                     // fixme commit if cancel?
-                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(contents), this, uow.Events))
+                    if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMedia>(contents)))
                     {
                         uow.Commit();
                         return;
@@ -1043,10 +1032,11 @@ namespace Umbraco.Core.Services
 
                 var originalPath = media.Path;
 
-                if (Trashing.IsRaisedEventCancelled(
-                    new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), this, UowProvider, eventName: "Trashing"))
+                using (var scope = UowProvider.ScopeProvider.CreateScope())
                 {
-                    return OperationStatus.Cancelled(evtMsgs);
+                    scope.Complete(); // always
+                    if (scope.Events.DispatchCancelable(Trashing, this, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), "Trashing"))
+                        return OperationStatus.Cancelled(evtMsgs);
                 }
 
                 var moveInfo = new List<MoveEventInfo<IMedia>>
@@ -1079,8 +1069,7 @@ namespace Umbraco.Core.Services
 
                     uow.Commit();
 
-                    Trashed.RaiseEvent(
-                        new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo.ToArray()), this, uow.Events, eventName: "Trashed");
+                    uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo.ToArray()), "Trashed");
                 }
                 
                 Audit(AuditType.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
@@ -1112,15 +1101,16 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
         {
-            if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this, UowProvider))
-                return;
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (uow.Events.DispatchCancelable(DeletingVersions, this, new DeleteRevisionsEventArgs(id, dateToRetain: versionDate)))
+                    return;
+
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
                 repository.DeleteVersions(id, versionDate);
                 uow.Commit();
-                DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this, uow.Events);
+                uow.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate));
             }
 
             Audit(AuditType.Delete, "Delete Media by version date performed by user", userId, -1);
@@ -1136,8 +1126,12 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
         {
-            if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this, UowProvider))
-                return;
+            using (var scope = UowProvider.ScopeProvider.CreateScope())
+            {
+                scope.Complete(); // always
+                if (scope.Events.DispatchCancelable(DeletingVersions, this, new DeleteRevisionsEventArgs(id, specificVersion: versionId)))
+                    return;
+            }
 
             if (deletePriorVersions)
             {
@@ -1150,7 +1144,7 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
                 repository.DeleteVersion(versionId);
                 uow.Commit();
-                DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this, uow.Events);
+                uow.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false, specificVersion: versionId));
             }
 
             Audit(AuditType.Delete, "Delete Media by version performed by user", userId, -1);
@@ -1194,7 +1188,7 @@ namespace Umbraco.Core.Services
             {
                 if (raiseEvents)
                 {
-                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(asArray), this, uow.Events))
+                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(asArray)))
                     {
                         uow.Commit();
                         return false;
@@ -1229,7 +1223,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false), this, uow.Events);
+                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMedia>(asArray, false));
             }
 
             Audit(AuditType.Sort, "Sorting Media performed by user", userId, 0);

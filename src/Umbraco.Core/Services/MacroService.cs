@@ -144,7 +144,7 @@ namespace Umbraco.Core.Services
         {
 			using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMacro>(macro), this, uow.Events))
+                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMacro>(macro)))
                 {
                     uow.Commit();
                     return;
@@ -153,7 +153,7 @@ namespace Umbraco.Core.Services
 				repository.Delete(macro);
 				uow.Commit();
 
-                Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this, uow.Events);
+                uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<IMacro>(macro, false));
             }
 
 			Audit(AuditType.Delete, "Delete Macro performed by user", userId, -1);
@@ -168,7 +168,7 @@ namespace Umbraco.Core.Services
         {
 			using (var uow = UowProvider.GetUnitOfWork())
 	        {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this, uow.Events))
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMacro>(macro)))
                 {
                     uow.Commit();
                     return;
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Services
 		        repository.AddOrUpdate(macro);
 		        uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this, uow.Events);
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMacro>(macro, false));
 	        }
 
 	        Audit(AuditType.Save, "Save Macro performed by user", userId, -1);

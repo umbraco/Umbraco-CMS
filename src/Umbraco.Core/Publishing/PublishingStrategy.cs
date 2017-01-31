@@ -50,8 +50,7 @@ namespace Umbraco.Core.Publishing
 
             var evtMsgs = uow.Messages;
 
-            if (Publishing.IsRaisedEventCancelled(
-                new PublishEventArgs<IContent>(content, evtMsgs), this, uow.Events, eventName: "Publishing"))
+            if (uow.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs), "Publishing"))
             {
                 _logger.Info<PublishingStrategy>(
                         string.Format("Content '{0}' with Id '{1}' will not be published, the event was cancelled.", content.Name, content.Id));
@@ -200,8 +199,7 @@ namespace Umbraco.Core.Publishing
                     }
 
                     //Fire Publishing event
-                    if (Publishing.IsRaisedEventCancelled(
-                        new PublishEventArgs<IContent>(item, evtMsgs), this, uow.Events, eventName: "Publishing"))
+                    if (uow.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(item, evtMsgs), "Publishing"))
                     {
                         //the publishing has been cancelled.
                         _logger.Info<PublishingStrategy>(
@@ -376,8 +374,7 @@ namespace Umbraco.Core.Publishing
             var evtMsgs = uow.Messages;
 
             //Fire UnPublishing event
-            if (UnPublishing.IsRaisedEventCancelled(                
-                new PublishEventArgs<IContent>(content, evtMsgs), this, uow.Events, eventName: "UnPublishing"))
+            if (uow.Events.DispatchCancelable(UnPublishing, this, new PublishEventArgs<IContent>(content, evtMsgs), "UnPublishing"))
             {
                 _logger.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' will not be unpublished, the event was cancelled.", content.Name, content.Id));
@@ -520,29 +517,25 @@ namespace Umbraco.Core.Publishing
         void IPublishingStrategy2.PublishingFinalized(IScopeUnitOfWork uow, IContent content)
         {
             var evtMsgs = uow.Messages;
-            Published.RaiseEvent(
-                new PublishEventArgs<IContent>(content, false, false, evtMsgs), this, uow.Events, eventName:"Published");
+            uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false, evtMsgs), "Published");
         }
 
         void IPublishingStrategy2.PublishingFinalized(IScopeUnitOfWork uow, IEnumerable<IContent> content, bool isAllRepublished)
         {
             var evtMsgs = uow.Messages;
-            Published.RaiseEvent(
-                new PublishEventArgs<IContent>(content, false, isAllRepublished, evtMsgs), this, uow.Events, eventName: "Published");
+            uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, isAllRepublished, evtMsgs), "Published");
         }
 
         void IPublishingStrategy2.UnPublishingFinalized(IScopeUnitOfWork uow, IContent content)
         {
             var evtMsgs = uow.Messages;
-            UnPublished.RaiseEvent(
-                new PublishEventArgs<IContent>(content, false, false, evtMsgs), this, uow.Events, eventName: "UnPublished");
+            uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false, evtMsgs), "UnPublished");
         }
 
         void IPublishingStrategy2.UnPublishingFinalized(IScopeUnitOfWork uow, IEnumerable<IContent> content)
         {
             var evtMsgs = uow.Messages;
-            UnPublished.RaiseEvent(
-                new PublishEventArgs<IContent>(content, false, false, evtMsgs), this, uow.Events, eventName: "UnPublished");
+            uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false, evtMsgs), "UnPublished");
         }
         
     }

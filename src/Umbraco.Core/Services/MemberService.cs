@@ -239,7 +239,7 @@ namespace Umbraco.Core.Services
                     var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
                     var members = repository.GetByQuery(query).ToArray();
 
-                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(members), this, uow.Events))
+                    if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMember>(members)))
                     {
                         uow.Commit();
                         return;
@@ -741,7 +741,7 @@ namespace Umbraco.Core.Services
             using (var scope = UowProvider.ScopeProvider.CreateScope())
             {
                 scope.Complete(); // always complete
-                Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this, scope.Events);
+                scope.Events.Dispatch(Created, this, new NewEventArgs<IMember>(member, false, memberType.Alias, -1));
             }
 
             return member;
@@ -826,7 +826,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this, uow.Events))
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(member)))
                 {
                     uow.Commit();
                     member.WasCancelled = true;
@@ -845,8 +845,8 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this, uow.Events);
-                Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this, uow.Events);
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(member, false));
+                uow.Events.Dispatch(Created, this, new NewEventArgs<IMember>(member, false, memberType.Alias, -1));
             }
 
             return member;
@@ -915,7 +915,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(member), this, uow.Events))
+                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMember>(member)))
                 {
                     uow.Commit();
                     return;
@@ -926,7 +926,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 var args = new DeleteEventArgs<IMember>(member, false);
-                Deleted.RaiseEvent(args, this, uow.Events);
+                uow.Events.Dispatch(Deleted, this, args);
 
                 //remove any flagged media files
                 repository.DeleteMediaFiles(args.MediaFilesToDelete);
@@ -945,7 +945,7 @@ namespace Umbraco.Core.Services
             {
                 if (raiseEvents)
                 {
-                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(entity), this, uow.Events))
+                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(entity)))
                     {
                         uow.Commit();
                         return;
@@ -964,7 +964,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMember>(entity, false), this, uow.Events);
+                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(entity, false));
             }
             
         }
@@ -985,7 +985,7 @@ namespace Umbraco.Core.Services
                 {
                     if (raiseEvents)
                     {
-                        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(asArray), this, uow.Events))
+                        if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(asArray)))
                         {
                             uow.Commit();
                             return;
@@ -1007,7 +1007,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     if (raiseEvents)
-                        Saved.RaiseEvent(new SaveEventArgs<IMember>(asArray, false), this, uow.Events);
+                        uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(asArray, false));
                 }
 
                 

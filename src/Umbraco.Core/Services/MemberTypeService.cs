@@ -83,7 +83,7 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(memberType), this, uow.Events))
+                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberType>(memberType)))
                     {
                         uow.Commit();
                         return;
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Services
                     UpdateContentXmlStructure(memberType);
                     uow.Commit();
 
-                    Saved.RaiseEvent(new SaveEventArgs<IMemberType>(memberType, false), this, uow.Events);
+                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberType>(memberType, false));
                 }
             }
         }
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(asArray), this, uow.Events))
+                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberType>(asArray)))
                     {
                         uow.Commit();
                         return;
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Services
                     //save it all in one go
                     uow.Commit();
 
-                    Saved.RaiseEvent(new SaveEventArgs<IMemberType>(asArray, false), this, uow.Events);
+                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberType>(asArray, false));
                 }
             }
             
@@ -138,8 +138,12 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(memberType), this, UowProvider))
-                    return;
+                using (var scope = UowProvider.ScopeProvider.CreateScope())
+                {
+                    scope.Complete(); // always
+                    if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMemberType>(memberType)))
+                        return;
+                }
 
                 _memberService.DeleteMembersOfType(memberType.Id);
 
@@ -149,7 +153,7 @@ namespace Umbraco.Core.Services
                     repository.Delete(memberType);
                     uow.Commit();
 
-                    Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(memberType, false), this, uow.Events);
+                    uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<IMemberType>(memberType, false));
                 }
             }
         }
@@ -160,8 +164,12 @@ namespace Umbraco.Core.Services
             
             using (new WriteLock(Locker))
             {
-                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(asArray), this, UowProvider))
-                    return;
+                using (var scope = UowProvider.ScopeProvider.CreateScope())
+                {
+                    scope.Complete(); // always
+                    if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMemberType>(asArray)))
+                        return;
+                }
 
                 foreach (var contentType in asArray)
                 {
@@ -178,7 +186,7 @@ namespace Umbraco.Core.Services
 
                     uow.Commit();
 
-                    Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(asArray, false), this, uow.Events);
+                    uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<IMemberType>(asArray, false));
                 }
             }
         }

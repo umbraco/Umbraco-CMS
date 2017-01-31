@@ -29,21 +29,18 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus> Delete(IDomain domain)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            if (Deleting.IsRaisedEventCancelled(
-                   new DeleteEventArgs<IDomain>(domain, evtMsgs),
-                   this, UowProvider))
-            {
-                return OperationStatus.Cancelled(evtMsgs);
-            }
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IDomain>(domain, evtMsgs)))
+                    return OperationStatus.Cancelled(evtMsgs);
+
                 var repository = RepositoryFactory.CreateDomainRepository(uow);
                 repository.Delete(domain);
                 uow.Commit();
 
                 var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
-                Deleted.RaiseEvent(args, this, uow.Events);
+                uow.Events.Dispatch(Deleted, this, args);
                 return OperationStatus.Success(evtMsgs);
             }
 
@@ -89,19 +86,16 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus> Save(IDomain domainEntity)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<IDomain>(domainEntity, evtMsgs),
-                    this, UowProvider))
-            {
-                return OperationStatus.Cancelled(evtMsgs);
-            }
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDomain>(domainEntity, evtMsgs)))
+                    return OperationStatus.Cancelled(evtMsgs);
+
                 var repository = RepositoryFactory.CreateDomainRepository(uow);
                 repository.AddOrUpdate(domainEntity);
                 uow.Commit();
-                Saved.RaiseEvent(new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs), this, uow.Events);
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs));
                 return OperationStatus.Success(evtMsgs);
             }
 

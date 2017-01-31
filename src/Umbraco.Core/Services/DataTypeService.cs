@@ -43,9 +43,7 @@ namespace Umbraco.Core.Services
                         CreatorId = userId
                     };
 
-                    if (SavingContainer.IsRaisedEventCancelled(
-                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
-                        this, uow.Events))
+                    if (uow.Events.DispatchCancelable(SavingContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
                     {
                         uow.Commit();
                         return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -54,7 +52,7 @@ namespace Umbraco.Core.Services
                     repo.AddOrUpdate(container);
                     uow.Commit();
 
-                    SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this, uow.Events);
+                    uow.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
                     //TODO: Audit trail ?
 
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
@@ -133,19 +131,15 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Exception(evtMsgs, ex);
             }
 
-            if (SavingContainer.IsRaisedEventCancelled(
-                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
-                        this, UowProvider))
-            {
-                return OperationStatus.Cancelled(evtMsgs);
-            }
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (uow.Events.DispatchCancelable(SavingContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                    return OperationStatus.Cancelled(evtMsgs);
+
                 var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid);
                 repo.AddOrUpdate(container);
                 uow.Commit();
-                SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this, uow.Events);
+                uow.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
             }
 
             //TODO: Audit trail ?
@@ -162,9 +156,7 @@ namespace Umbraco.Core.Services
                 var container = repo.Get(containerId);
                 if (container == null) return OperationStatus.NoOperation(evtMsgs);
 
-                if (DeletingContainer.IsRaisedEventCancelled(
-                        new DeleteEventArgs<EntityContainer>(container, evtMsgs),
-                        this, uow.Events))
+                if (uow.Events.DispatchCancelable(DeletingContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs)))
                 {
                     uow.Commit();
                     return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -173,7 +165,7 @@ namespace Umbraco.Core.Services
                 repo.Delete(container);
                 uow.Commit();
 
-                DeletedContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this, uow.Events);
+                uow.Events.Dispatch(DeletedContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs));
 
                 return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
@@ -317,19 +309,12 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            // FIXME DON'T USE THAT CODE, CREATE A SCOPE!
-            if (Moving.IsRaisedEventCancelled(
-                  new MoveEventArgs<IDataTypeDefinition>(evtMsgs, new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)),
-                  this, UowProvider))
-            {
-                return Attempt.Fail(
-                    new OperationStatus<MoveOperationStatusType>(
-                        MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
-            }
-
             var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (uow.Events.DispatchCancelable(Moving, this, new MoveEventArgs<IDataTypeDefinition>(evtMsgs, new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId))))
+                    return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
+
                 var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid);
                 var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow);
 
@@ -350,7 +335,7 @@ namespace Umbraco.Core.Services
                         new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
                 }
                 uow.Commit();
-                Moved.RaiseEvent(new MoveEventArgs<IDataTypeDefinition>(false, evtMsgs, moveInfo.ToArray()), this, uow.Events);
+                uow.Events.Dispatch(Moved, this, new MoveEventArgs<IDataTypeDefinition>(false, evtMsgs, moveInfo.ToArray()));
             }
 
             return Attempt.Succeed(
@@ -366,7 +351,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, uow.Events))
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition)))
                 {
                     uow.Commit();
                     return;
@@ -378,7 +363,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(dataTypeDefinition);
                 uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this, uow.Events);
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false));
             }
 
             // FIXME transaction!
@@ -407,7 +392,7 @@ namespace Umbraco.Core.Services
             {
                 if (raiseEvents)
                 {
-                    if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions), this, uow.Events))
+                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions)))
                     {
                         uow.Commit();
                         return;
@@ -424,7 +409,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false), this, uow.Events);
+                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false));
             }
 
             Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
@@ -511,15 +496,15 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values, int userId = 0)
         {
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, UowProvider))
-                return;
-
-            // if preValues contain the data type, override the data type definition accordingly
-            if (values != null && values.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
-                dataTypeDefinition.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
-
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition)))
+                    return;
+
+                // if preValues contain the data type, override the data type definition accordingly
+                if (values != null && values.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
+                    dataTypeDefinition.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
+
                 var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow);
 
                 dataTypeDefinition.CreatorId = userId;
@@ -532,7 +517,7 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this, uow.Events);
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false));
             }
 
             Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
@@ -549,19 +534,18 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user issueing the deletion</param>
         public void Delete(IDataTypeDefinition dataTypeDefinition, int userId = 0)
         {
-            // fixme FUCK! INSIDE THE UOW!
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition), this, UowProvider))
-                return;
-
 			using (var uow = UowProvider.GetUnitOfWork())
             {
-			    var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow);
+                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition)))
+                    return;
+
+                var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow);
 
 			    repository.Delete(dataTypeDefinition);
 
                 uow.Commit();
 
-                Deleted.RaiseEvent(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this, uow.Events);
+                uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false));
             }
 
 	        Audit(AuditType.Delete, "Delete DataTypeDefinition performed by user", userId, dataTypeDefinition.Id);

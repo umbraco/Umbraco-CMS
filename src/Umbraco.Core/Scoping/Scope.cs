@@ -301,7 +301,7 @@ namespace Umbraco.Core.Scoping
 
             // deal with events
             if (_eventDispatcher != null)
-                _eventDispatcher.Complete(completed);
+                _eventDispatcher.ScopeExit(completed);
 
             // run enlisted actions
             RunEnlisted(ActionTime.BeforeDispose, completed);

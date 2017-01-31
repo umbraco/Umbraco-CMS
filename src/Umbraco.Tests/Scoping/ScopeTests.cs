@@ -79,6 +79,45 @@ namespace Umbraco.Tests.Scoping
         }
 
         [Test]
+        public void NestedCreateScopeInnerException()
+        {
+            var scopeProvider = DatabaseContext.ScopeProvider;
+            bool? scopeCompleted = null;
+
+            Assert.IsNull(scopeProvider.AmbientScope);
+            try
+            {
+                using (var scope = scopeProvider.CreateScope())
+                {
+                    scope.Enlist("test", ActionTime.BeforeDispose, (actionTime, completed) => scopeCompleted = completed);
+
+                    Assert.IsInstanceOf<Scope>(scope);
+                    Assert.IsNotNull(scopeProvider.AmbientScope);
+                    Assert.AreSame(scope, scopeProvider.AmbientScope);
+                    using (var nested = scopeProvider.CreateScope())
+                    {
+                        Assert.IsInstanceOf<Scope>(nested);
+                        Assert.IsNotNull(scopeProvider.AmbientScope);
+                        Assert.AreSame(nested, scopeProvider.AmbientScope);
+                        Assert.AreSame(scope, ((Scope) nested).ParentScope);
+                        nested.Complete();
+                        throw new Exception("bang!");
+                    }
+                    scope.Complete();
+                }
+                Assert.Fail("Expected exception.");
+            }
+            catch (Exception e)
+            {
+                if (e.Message != "bang!")
+                    Assert.Fail("Wrong exception.");
+            }
+            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.IsNotNull(scopeCompleted);
+            Assert.IsFalse(scopeCompleted.Value);
+        }
+
+        [Test]
         public void NestedCreateScopeDatabase()
         {
             var scopeProvider = DatabaseContext.ScopeProvider;
