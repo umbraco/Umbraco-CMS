@@ -176,7 +176,37 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                          "PostSave"),
                          codeFile),
                 "Failed to save data for code file " + codeFile.virtualPath);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.codefileResource#getSnippets
+         * @methodOf umbraco.resources.codefileResource
+         *
+         * @description
+         * Gets code snippets for a given file type
+         * 
+         * ##usage
+         * <pre>
+         * codefileResource.getSnippets(fileType)
+         *    .then(function(snippets) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         *
+         * @param {string} file type: (partialViews, partialViewMacros)
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getSnippets: function (fileType) {
+            return umbRequestHelper.resourcePromise(
+                 $http.get(
+                     umbRequestHelper.getApiUrl(
+                         "codeFileApiBaseUrl",
+                         "GetSnippets?type=" + fileType )),
+                "Failed to get snippet for" + fileType);
         }
+
     };
 }
 
