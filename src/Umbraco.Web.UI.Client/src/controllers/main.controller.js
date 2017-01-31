@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService) {
 
     //the null is important because we do an explicit bool check on this in the view
     //the avatar is by default the umbraco logo    
@@ -81,6 +81,14 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             $location.path("/").search("");
             historyService.removeAll();
             treeService.clearCache();
+
+            //if the user changed, clearout local storage too - could contain sensitive data
+            localStorageService.clearAll();
+        }
+
+        //if this is a new login (i.e. the user entered credentials), then clear out local storage - could contain sensitive data
+        if (data.loginType === "credentials") {            
+            localStorageService.clearAll();
         }
 
         //Load locale file
