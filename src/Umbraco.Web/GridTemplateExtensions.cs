@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,14 +11,28 @@ using Umbraco.Web.Templates;
 using System.IO;
 using System.Web.Routing;
 using Umbraco.Web.Mvc;
+using System.Web.Configuration;
 
 namespace Umbraco.Web
 {
     
     public static class GridTemplateExtensions
     {
+        static string defaulttemplatekey;
+        static GridTemplateExtensions()
+        {
+            defaulttemplatekey = WebConfigurationManager.AppSettings["umbracoDefaultGridFramework"] ?? "bootstrap3";
+        }
+
+
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
         {
+
+            if (framework == "bootstrap3")
+            {
+                framework = defaulttemplatekey;
+            }
+
             var asString = property.Value as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
@@ -55,6 +69,11 @@ namespace Umbraco.Web
 
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, HtmlHelper html, string framework = "bootstrap3")
         {
+            if (framework == "bootstrap3")
+            {
+                framework = defaulttemplatekey;
+            }
+
             var asString = property.Value as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
@@ -62,14 +81,14 @@ namespace Umbraco.Web
             return html.Partial(view, property.Value);
         }
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html)
-        {
-            return GetGridHtml(contentItem, html, "bodyText", "bootstrap3");
+        { 
+            return GetGridHtml(contentItem, html, "bodyText", defaulttemplatekey);
         }
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias)
         {
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
 
-            return GetGridHtml(contentItem, html, propertyAlias, "bootstrap3");
+            return GetGridHtml(contentItem, html, propertyAlias, defaulttemplatekey);
         }
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias, string framework)
         {
@@ -100,7 +119,7 @@ namespace Umbraco.Web
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem)
         {
-            return GetGridHtml(contentItem, "bodyText", "bootstrap3");
+            return GetGridHtml(contentItem, "bodyText", defaulttemplatekey);
         }
 
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
@@ -108,7 +127,7 @@ namespace Umbraco.Web
         {
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
 
-            return GetGridHtml(contentItem, propertyAlias, "bootstrap3");    
+            return GetGridHtml(contentItem, propertyAlias, defaulttemplatekey);    
         }
 
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
