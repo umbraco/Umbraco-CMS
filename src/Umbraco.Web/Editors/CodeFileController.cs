@@ -33,11 +33,13 @@ namespace Umbraco.Web.Editors
             {
                 case Core.Constants.Trees.PartialViews:
                     var view = new PartialView(display.VirtualPath);
+                    view.Content = display.Content;
                     var result = Services.FileService.CreatePartialView(view, display.Snippet, Security.CurrentUser.Id);
                     return result.Success == true ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
 
                 case Core.Constants.Trees.PartialViewMacros:
                     var viewMacro = new PartialView(display.VirtualPath);
+                    viewMacro.Content = display.Content;
                     var resultMacro = Services.FileService.CreatePartialViewMacro(viewMacro, display.Snippet, Security.CurrentUser.Id);
                     return resultMacro.Success == true ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateNotificationValidationErrorResponse(resultMacro.Exception.Message);
 
@@ -134,6 +136,46 @@ namespace Umbraco.Web.Editors
             }
 
             return snippets.Select(snippet => new SnippetDisplay() {Name = snippet.SplitPascalCasing().ToFirstUpperInvariant(), FileName = snippet});
+        }
+
+        /// <summary>
+        /// Used to scaffold the json object for the editors for 'scripts', 'partialViews', 'partialViewMacros'
+        /// </summary>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="snippetName"></param>
+        /// <returns></returns>
+        public CodeFileDisplay GetScaffold(string type, string snippetName = null)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+
+            CodeFileDisplay codeFileDisplay;
+
+            switch (type)
+            {
+                case Core.Constants.Trees.PartialViews:
+                    codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(string.Empty));
+                    if (snippetName.IsNullOrWhiteSpace() == false)
+                        codeFileDisplay.Content = Services.FileService.GetPartialViewSnippetContent(snippetName);
+                    break;
+                case Core.Constants.Trees.PartialViewMacros:
+                    codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(string.Empty));
+                    if (snippetName.IsNullOrWhiteSpace() == false)
+                        codeFileDisplay.Content = Services.FileService.GetPartialViewMacroSnippetContent(snippetName);
+                    break;
+                case Core.Constants.Trees.Scripts:
+                    codeFileDisplay = Mapper.Map<Script, CodeFileDisplay>(new Script(string.Empty));
+                    break;
+                default:
+                    throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Unsupported editortype"));
+            }
+
+            codeFileDisplay.FileType = type;
+            codeFileDisplay.VirtualPath = "-1";
+
+            return codeFileDisplay;
         }
 
         /// <summary>

@@ -332,6 +332,13 @@ namespace Umbraco.Core.Services
         Stream GetPartialViewMacroFileContentStream(string filepath);
 
         /// <summary>
+        /// Gets the content of a macro partial view snippet as a string
+        /// </summary>
+        /// <param name="snippetName">The name of the snippet</param>
+        /// <returns></returns>
+        string GetPartialViewMacroSnippetContent(string snippetName);
+
+        /// <summary>
         /// Sets the content of a macro partial view.
         /// </summary>
         /// <param name="filepath">The filesystem path to the macro partial view.</param>
@@ -351,6 +358,13 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the partial view.</param>
         /// <returns>The content of the partial view.</returns>
         Stream GetPartialViewFileContentStream(string filepath);
+
+        /// <summary>
+        /// Gets the content of a partial view snippet as a string.
+        /// </summary>
+        /// <param name="snippetName">The name of the snippet</param>
+        /// <returns>The content of the partial view.</returns>
+        string GetPartialViewSnippetContent(string snippetName);
 
         /// <summary>
         /// Sets the content of a partial view.
