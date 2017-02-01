@@ -231,20 +231,7 @@ namespace UmbracoExamine
         protected override XDocument GetXDocument(string xPath, string type)
         {
             throw new NotSupportedException();
-        }
-
-        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
-        {
-            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
-
-            //adds the special path property to the index
-            string valuesForIndexing;
-            if (allValuesForIndexing.TryGetValue("__key", out valuesForIndexing))
-                fields.Add("__key", valuesForIndexing);
-
-            return fields;
-
-        }
+        }       
 
         /// <summary>
         /// Add the special __key and _searchEmail fields
@@ -256,8 +243,8 @@ namespace UmbracoExamine
 
             if (e.Node.Attribute("key") != null)
             {
-                if (e.Fields.ContainsKey("__key") == false)
-                    e.Fields.Add("__key", e.Node.Attribute("key").Value);
+                if (e.Fields.ContainsKey(NodeKeyFieldName) == false)
+                    e.Fields.Add(NodeKeyFieldName, e.Node.Attribute("key").Value);
             }
 
             if (e.Node.Attribute("email") != null)

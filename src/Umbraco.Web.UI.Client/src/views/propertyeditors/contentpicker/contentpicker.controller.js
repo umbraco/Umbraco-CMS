@@ -17,21 +17,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.$watch(function () {
             //return the joined Ids as a string to watch
             return _.map($scope.renderModel, function (i) {
-                if ($scope.model.config.idType === "udi") {
-                    return i.udi;
-                }
-                else {
-                    return i.id;
-                }
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;                 
             }).join();
         }, function (newVal) {
             var currIds = _.map($scope.renderModel, function (i) {
-                if ($scope.model.config.idType === "udi") {
-                    return i.udi;
-                }
-                else {
-                    return i.id;
-                }
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;                
             });
             $scope.model.value = trim(currIds.join(), ",");
 
@@ -210,15 +200,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     $scope.add = function (item) {
         var currIds = _.map($scope.renderModel, function (i) {
-            if ($scope.model.config.idType === "udi") {
-                return i.udi;
-            }
-            else {
-                return i.id;
-            }
+            return $scope.model.config.idType === "udi" ? i.udi : i.id;
         });
 
-        if (currIds.indexOf(item.id) < 0) {
+        var itemId = $scope.model.config.idType === "udi" ? item.udi : item.id;
+
+        if (currIds.indexOf(itemId) < 0) {
             setEntityUrl(item);
         }
     };
@@ -242,12 +229,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         var currIds = _.map($scope.renderModel, function (i) {
-            if ($scope.model.config.idType === "udi") {
-                return i.udi;
-            }
-            else {
-                return i.id;
-            }
+            return $scope.model.config.idType === "udi" ? i.udi : i.id;
         });
         $scope.model.value = trim(currIds.join(), ",");
     });
@@ -264,12 +246,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
         _.each(modelIds, function (id, i) {
             var entity = _.find(data, function (d) {                
-                if ($scope.model.config.idType === "udi") {
-                    return d.udi == id;
-                }
-                else {
-                    return d.id == id;
-                }                
+                return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
             });
         
             if (entity) {

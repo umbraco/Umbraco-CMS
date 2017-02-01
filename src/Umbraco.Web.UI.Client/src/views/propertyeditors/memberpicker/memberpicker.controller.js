@@ -68,12 +68,19 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
 
     $scope.add = function (item) {
         var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
+            if ($scope.model.config.idType === "udi") {
+                return i.udi;
+            }
+            else {
+                return i.id;
+            }            
         });
 
-        if (currIds.indexOf(item.id) < 0) {
+        var itemId = $scope.model.config.idType === "udi" ? item.udi : item.id;
+
+        if (currIds.indexOf(itemId) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
+            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon});
         }
     };
 
@@ -83,7 +90,12 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
 
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
+            if ($scope.model.config.idType === "udi") {
+                return i.udi;
+            }
+            else {
+                return i.id;
+            }   
         });
         $scope.model.value = trim(currIds.join(), ",");
     });
@@ -99,7 +111,7 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
         _.each(data, function (item, i) {
             // set default icon if it's missing
             item.icon = (item.icon) ? iconHelper.convertFromLegacyIcon(item.icon) : "icon-user";
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
+            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon });
         });
     });
 }

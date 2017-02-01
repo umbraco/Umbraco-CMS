@@ -183,6 +183,7 @@ namespace UmbracoExamine
         /// Used to store the path of a content object
         /// </summary>
         public const string IndexPathFieldName = "__Path";
+        public const string NodeKeyFieldName = "__Key";
         public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
         public const string IconFieldName = "__Icon";
 
@@ -726,18 +727,23 @@ namespace UmbracoExamine
 
             //ensure the special path and node type alias fields is added to the dictionary to be saved to file
             var path = e.Node.Attribute("path").Value;
-            if (!e.Fields.ContainsKey(IndexPathFieldName))
+            if (e.Fields.ContainsKey(IndexPathFieldName) == false)
                 e.Fields.Add(IndexPathFieldName, path);
 
             //this needs to support both schema's so get the nodeTypeAlias if it exists, otherwise the name
             var nodeTypeAlias = e.Node.Attribute("nodeTypeAlias") == null ? e.Node.Name.LocalName : e.Node.Attribute("nodeTypeAlias").Value;
-            if (!e.Fields.ContainsKey(NodeTypeAliasFieldName))
+            if (e.Fields.ContainsKey(NodeTypeAliasFieldName) == false)
                 e.Fields.Add(NodeTypeAliasFieldName, nodeTypeAlias);
 
             //add icon 
             var icon = (string)e.Node.Attribute("icon");
-            if (!e.Fields.ContainsKey(IconFieldName))
-                e.Fields.Add(IconFieldName, icon);  
+            if (e.Fields.ContainsKey(IconFieldName) == false)
+                e.Fields.Add(IconFieldName, icon);
+
+            //add guid 
+            var guid = (string)e.Node.Attribute("key");
+            if (e.Fields.ContainsKey(NodeKeyFieldName) == false)
+                e.Fields.Add(NodeKeyFieldName, guid);
         }
 
         /// <summary>
@@ -767,6 +773,12 @@ namespace UmbracoExamine
 
             //adds the special node type alias property to the index
             fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
+
+            //guid
+            if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
+            {
+                fields.Add(NodeKeyFieldName, allValuesForIndexing[NodeKeyFieldName]);
+            }
 
             //icon
             if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)

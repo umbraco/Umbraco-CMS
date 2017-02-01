@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Examine;
+using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -94,21 +95,40 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                   .ForMember(x => x.AdditionalData, expression => expression.Ignore())
                   .AfterMap((result, basic) =>
-                      {
+                      {   
+
                           //get the icon if there is one
                           basic.Icon = result.Fields.ContainsKey(UmbracoContentIndexer.IconFieldName) 
                               ? result.Fields[UmbracoContentIndexer.IconFieldName] 
                               : "icon-document";
 
                           basic.Name = result.Fields.ContainsKey("nodeName") ? result.Fields["nodeName"] : "[no name]";
-                          if (result.Fields.ContainsKey("__NodeKey"))
+                          if (result.Fields.ContainsKey(UmbracoContentIndexer.NodeKeyFieldName))
                           {
                               Guid key;
-                              if (Guid.TryParse(result.Fields["__NodeKey"], out key))
+                              if (Guid.TryParse(result.Fields[UmbracoContentIndexer.NodeKeyFieldName], out key))
                               {
                                   basic.Key = key;
+
+                                  //need to set the UDI
+                                  if (result.Fields.ContainsKey(LuceneIndexer.IndexTypeFieldName))
+                                  {
+                                      switch (result.Fields[LuceneIndexer.IndexTypeFieldName])
+                                      {
+                                          case IndexTypes.Member:
+                                              basic.Udi = new GuidUdi(Constants.UdiEntityType.Member, basic.Key);
+                                              break;
+                                          case IndexTypes.Content:
+                                              basic.Udi = new GuidUdi(Constants.UdiEntityType.Document, basic.Key);
+                                              break;
+                                          case IndexTypes.Media:
+                                              basic.Udi = new GuidUdi(Constants.UdiEntityType.Media, basic.Key);
+                                              break;
+                                      }
+                                  }
                               }
                           }
+
                           if (result.Fields.ContainsKey("parentID"))
                           {
                               int parentId;
@@ -121,7 +141,7 @@ namespace Umbraco.Web.Models.Mapping
                                   basic.ParentId = -1;
                               }
                           }
-                          basic.Path = result.Fields.ContainsKey("__Path") ? result.Fields["__Path"] : "";
+                          basic.Path = result.Fields.ContainsKey(UmbracoContentIndexer.IndexPathFieldName) ? result.Fields[UmbracoContentIndexer.IndexPathFieldName] : "";
                           
                           if (result.Fields.ContainsKey(UmbracoContentIndexer.NodeTypeAliasFieldName))
                           {
