@@ -590,8 +590,25 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 		};
 
-		$scope.searchMiniListView = function() {
-			searchMiniListView();
+		$scope.searchMiniListView = function(search, miniListView) {
+
+			miniListView.pagination.filter = search;	
+			miniListView.loading = true;
+
+			resource(miniListView.node.id, miniListView.pagination)
+				.then(function (data) {
+
+					// update children
+					miniListView.children = data.items;
+
+					// update pagination
+					miniListView.pagination.totalItems = data.totalItems;
+					miniListView.pagination.totalPages = data.totalPages;
+
+					// stop load indicator
+					miniListView.loading = false;
+
+				});
 		};
 
 		$scope.test = function(node) {
@@ -661,24 +678,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		}
 
 		$scope.animationTest = function() {
-
 			if(goingForward) {
 				return 'animate';
 			} else {
 				return 'animate-reverse';
 			}
-
 		}
-
-		var searchMiniListView = _.debounce(function () {
-			
-			$scope.$apply(function () {
-				if ($scope.pagination.filter !== null && $scope.pagination.filter !== undefined) {
-					$scope.pagination.pageNumber = 1;
-					getPagedChildren($scope.miniListView.node, $scope.pagination);
-				}
-			});
-
-		}, 500);
 
 	});

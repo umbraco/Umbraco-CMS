@@ -1,0 +1,68 @@
+<div>
+
+    <div class="umb-mini-list-view__title">
+        <i class="umb-mini-list-view__title-icon {{ node.icon }}"></i>
+        <h4 class="umb-mini-list-view__title-text">{{ node.name }}</h4>
+    </div>
+
+    <div class="umb-table umb-table--condensed">
+
+        <!-- Head -->
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell" style="display: none;"></div>
+                <div class="umb-table-cell" style="padding-top: 8px; padding-bottom: 8px;">
+                    <form class="form-search -no-margin-bottom" style="width: 100%; margin-right: 0;" novalidate>
+                        <div class="inner-addon left-addon">
+                            <i class="icon icon-search" style="font-size: 14px;"></i>
+                            <input
+                                style="width: 100%;"
+                                class="form-control search-input"
+                                type="text"
+                                localize="placeholder"
+                                placeholder="@general_typeToSearch"
+                                ng-model="search"
+                                ng-change="searchMiniListView(search)"
+                                prevent-enter-submit
+                                no-dirty-check>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="umb-table-body">
+
+            <!-- Load indicator when the list has items -->
+            <div class="umb-table__loading-overlay" ng-if="loadingChildren && children.length > 0">
+                <umb-load-indicator></umb-load-indicator>
+            </div>
+
+            <!-- Items -->
+            <div class="umb-table-row"
+                ng-repeat="child in children"
+                ng-click="selectChild(child)"
+                ng-class="{
+                    '-selected':child.selected
+                }">
+                <div class="umb-table-cell umb-table-cell--auto-width">
+                    <div class="flex items-center">
+                        <ins class="icon-navigation-right umb-table__row-expand" ng-click="openChild($event, child)">&nbsp;</ins>
+                        <i class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></i>
+                        <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                    </div>
+                </div>
+                <div class="umb-table-cell">{{ child.name }}</div>
+            </div>
+
+            <!-- Load indicator when the list doesn't have items -->
+            <div ng-if="loadingChildren && !children" class="umb-table-row">
+                <umb-load-indicator></umb-load-indicator>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
