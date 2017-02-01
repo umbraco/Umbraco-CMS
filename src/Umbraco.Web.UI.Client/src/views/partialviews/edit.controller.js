@@ -245,7 +245,8 @@
 
             //sync state
             editorState.set(vm.partialView);
-            navigationService.syncTree({ tree: "partialViews", path: vm.partialView.virtualPath, forceReload: true }).then(function (syncArgs) {
+
+            navigationService.syncTree({ tree: "partialViews", path: vm.partialView.path, forceReload: true }).then(function (syncArgs) {
                 vm.page.menu.currentNode = syncArgs.node;
             });
 
