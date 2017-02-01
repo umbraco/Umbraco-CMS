@@ -47,25 +47,21 @@ namespace Umbraco.Web.Trees
             virtualPath = virtualPath.Replace('\\', '/');
 
             //-1 is the default root id for trees
-            var sb = new StringBuilder();
-            sb.Append("-1");
+            var sb = new StringBuilder("-1");
             
             //split the virtual path and iterate through it
-            string[] pathPaths = virtualPath.Split('/');
+            var pathPaths = virtualPath.Split('/');
             
-            for (int p = 0; p < pathPaths.Length; p++)
+            for (var p = 0; p < pathPaths.Length; p++)
             {
                 var path = HttpUtility.UrlEncode(string.Join("/", pathPaths.Take(p + 1)));
                 if (string.IsNullOrEmpty(path) == false)
                 {
                     sb.Append(",");
-                    sb.Append(path); 
+                    sb.Append(path);
                 }
             }
-
-            return sb.ToString().Trim(",");
-
+            return sb.ToString().TrimEnd(",");
         }
-
     }
 }
