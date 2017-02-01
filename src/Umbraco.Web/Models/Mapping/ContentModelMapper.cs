@@ -181,15 +181,9 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         {"items", templateItemConfig}
                     }
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/urls"),
-                    Value = string.Join(",", display.Urls),
-                    View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                 }
             };
+
 
             TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText, properties.ToArray(),
                 genericProperties =>
@@ -222,6 +216,15 @@ namespace Umbraco.Web.Models.Mapping
                         //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                         docTypeProperty.View = "urllist";
                     }
+
+                    // inject 'Link to document' as the first generic property
+                    genericProperties.Insert(0, new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = localizedText.Localize("content/urls"),
+                        Value = string.Join(",", display.Urls),
+                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    });
                 });
         }
 

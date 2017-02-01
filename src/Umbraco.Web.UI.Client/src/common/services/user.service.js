@@ -204,7 +204,7 @@ angular.module('umbraco.services')
                         //when it's successful, return the user data
                         setCurrentUser(data);
 
-                        var result = { user: data, authenticated: true, lastUserId: lastUserId };
+                        var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "credentials" };
 
                         //broadcast a global event
                         eventsService.emit("app.authenticated", result);
@@ -232,7 +232,7 @@ angular.module('umbraco.services')
                     authResource.getCurrentUser()
                         .then(function (data) {
 
-                            var result = { user: data, authenticated: true, lastUserId: lastUserId };
+                            var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "implicit" };
 
                             //TODO: This is a mega backwards compatibility hack... These variables SHOULD NOT exist in the server variables
                             // since they are not supposed to be dynamic but I accidentally added them there in 7.1.5 IIRC so some people might
