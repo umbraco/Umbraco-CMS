@@ -77,39 +77,6 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                "Failed to retrieve data for template with alias: " + alias);
         },
 
-
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.codefileResource#getScaffold
-         * @methodOf umbraco.resources.codefileResource
-         *
-         * @description
-         * Returns a scaffold of an empty codefile item
-         *
-         * The scaffold is used to build editors for code file editors that has not yet been populated with data.
-         *
-         * ##usage
-         * <pre>
-         * codefileResource.getScaffold()
-         *    .then(function(template) {
-         *        alert('its here!');
-         *    });
-         * </pre>
-         *
-         * @returns {Promise} resourcePromise object containing the codefile scaffold.
-         *
-         */
-        getScaffold: function (id) {
-
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "templateApiBaseUrl",
-                       "GetScaffold",
-                        [{ id: id }])),
-               "Failed to retrieve data for empty template");
-        },
-
         /**
          * @ngdoc method
          * @name umbraco.resources.codefileResource#deleteByPath
@@ -188,7 +155,7 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * 
          * ##usage
          * <pre>
-         * codefileResource.getSnippets(fileType)
+         * codefileResource.getSnippets("partialViews")
          *    .then(function(snippets) {
          *        alert('its here!');
          *    });
@@ -205,6 +172,39 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                          "codeFileApiBaseUrl",
                          "GetSnippets?type=" + fileType )),
                 "Failed to get snippet for" + fileType);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.codefileResource#getScaffold
+         * @methodOf umbraco.resources.codefileResource
+         *
+         * @description
+         * Returns a scaffold of an empty codefile item.
+         * 
+         * The scaffold is used to build editors for code file editors that has not yet been populated with data.
+         * 
+         * ##usage
+         * <pre>
+         * codefileResource.getScaffold("partialViews", "Breadcrumb")
+         *    .then(function(data) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         *
+         * @param {string} File type: (scripts, partialViews, partialViewMacros).
+         * @param {string} Snippet name (Ex. Breadcrumb).
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+
+        getScaffold: function (type, snippetName) {
+            return umbRequestHelper.resourcePromise(
+                 $http.get(
+                     umbRequestHelper.getApiUrl(
+                         "codeFileApiBaseUrl",
+                         "GetScaffold?type=" + type + "&snippetName=" + snippetName)),
+                "Failed to get scaffold for" + type);
         }
 
     };
