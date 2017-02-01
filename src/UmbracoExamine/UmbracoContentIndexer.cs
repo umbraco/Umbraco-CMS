@@ -709,15 +709,16 @@ namespace UmbracoExamine
             // Get all user data that we want to index and store into a dictionary 
             foreach (var field in IndexerData.UserFields)
             {
-                if (e.Fields.ContainsKey(field.Name))
+                string fieldVal;
+                if (e.Fields.TryGetValue(field.Name, out fieldVal))
                 {
                     //check if the field value has html
-                    if (XmlHelper.CouldItBeXml(e.Fields[field.Name]))
+                    if (XmlHelper.CouldItBeXml(fieldVal))
                     {
                         //First save the raw value to a raw field, we will change the policy of this field by detecting the prefix later
-                        e.Fields[RawFieldPrefix + field.Name] = e.Fields[field.Name];
+                        e.Fields[RawFieldPrefix + field.Name] = fieldVal;
                         //now replace the original value with the stripped html
-                        e.Fields[field.Name] = DataService.ContentService.StripHtml(e.Fields[field.Name]);
+                        e.Fields[field.Name] = DataService.ContentService.StripHtml(fieldVal);
                     }
                 }
             }
