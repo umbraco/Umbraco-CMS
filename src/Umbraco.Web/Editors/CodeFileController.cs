@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -223,7 +224,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used to save/update an existing file after its initial creation
+        /// Used to create or update a 'partialview', 'partialviewmacro' or 'script' file
         /// </summary>
         /// <param name="display"></param>
         /// <returns>The updated CodeFileDisplay model</returns>
@@ -239,67 +240,43 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-
             switch (display.FileType)
             {
                 case Core.Constants.Trees.PartialViews:
-                    var view = Services.FileService.GetPartialView(display.VirtualPath);
-                    if (view != null)
-                    {
-                        // might need to find the path
-                        var orgPath = view.OriginalPath.Substring(0, view.OriginalPath.IndexOf(view.Name));
-                        view.Path = orgPath + display.Name;
 
-                        view.Content = display.Content;
-                        var result = Services.FileService.SavePartialView(view, Security.CurrentUser.Id);
-                        if (result.Success == true)
-                        {
-                            return Mapper.Map(view, display);
-                        }
+                    var partialViewResult = CreateOrUpdatePartialView(display);
+                    if (partialViewResult.Success)
+                        return Mapper.Map(partialViewResult.Result, display);
 
-                        display.AddErrorNotification(
-                            Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
-                            Services.TextService.Localize("speechBubbles/partialViewErrorText"));
-                    }
-                    else
-                    {
-                        throw new HttpResponseException(HttpStatusCode.NotFound);
-                    }
+                    display.AddErrorNotification(
+                        Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
+                        Services.TextService.Localize("speechBubbles/partialViewErrorText"));
                     break;
 
                 case Core.Constants.Trees.PartialViewMacros:
-                    var viewMacro = Services.FileService.GetPartialViewMacro(display.VirtualPath);
-                    if (viewMacro != null)
-                    {
-                        viewMacro.Content = display.Content;
-                        viewMacro.Path = display.Name;
-                        var result = Services.FileService.SavePartialViewMacro(viewMacro, Security.CurrentUser.Id);
-                        if (result.Success == false)
-                        {
-                            display.AddErrorNotification(
+                    var partialViewMacroResult = CreateOrUpdatePartialViewMacro(display);
+                    if (partialViewMacroResult.Success)
+                        return Mapper.Map(partialViewMacroResult.Result, display);
+
+                    display.AddErrorNotification(
                                 Services.TextService.Localize("speechBubbles/macroPartialViewErrorHeader"),
                                 Services.TextService.Localize("speechBubbles/macroPartialViewErrorText"));
-                        }
-                    }
-                    else
-                    {
-                        throw new HttpResponseException(HttpStatusCode.NotFound);
-                    }
                     break;
 
                 case Core.Constants.Trees.Scripts:
                     var script = Services.FileService.GetScriptByName(display.VirtualPath);
                     if (script != null)
                     {
-                        script.Content = display.Content;
                         script.Path = display.Name;
-                        Services.FileService.SaveScript(script, Security.CurrentUser.Id);
-
                     }
                     else
                     {
-                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                        script = new Script(display.Name);
                     }
+
+                    script.Content = display.Content;
+
+                    Services.FileService.SaveScript(script, Security.CurrentUser.Id);
                     break;
 
                 default:
@@ -307,6 +284,59 @@ namespace Umbraco.Web.Editors
             }
 
             return display;
+        }
+
+        private Attempt<IPartialView> CreateOrUpdatePartialView(CodeFileDisplay display)
+        {
+            Attempt<IPartialView> partialViewResult;
+            var view = Services.FileService.GetPartialView(display.VirtualPath ?? string.Empty);
+            if (view != null)
+            {
+                // might need to find the path
+                var orgPath = view.OriginalPath.Substring(0, view.OriginalPath.IndexOf(view.Name));
+                view.Path = orgPath + display.Name;
+
+                view.Content = display.Content;
+                partialViewResult = Services.FileService.SavePartialView(view, Security.CurrentUser.Id);
+            }
+            else
+            {
+                var fileName = EnsurePartialViewExtension(display.Name);
+                view = new PartialView(fileName);
+                view.Content = display.Content;
+                partialViewResult = Services.FileService.CreatePartialView(view, display.Snippet, Security.CurrentUser.Id);
+            }
+
+            return partialViewResult;
+        }
+
+        private Attempt<IPartialView> CreateOrUpdatePartialViewMacro(CodeFileDisplay display)
+        {
+            Attempt<IPartialView> partialViewMacroResult;
+            var viewMacro = Services.FileService.GetPartialViewMacro(display.VirtualPath);
+            if (viewMacro != null)
+            {
+                viewMacro.Content = display.Content;
+                viewMacro.Path = display.Name;
+                partialViewMacroResult = Services.FileService.SavePartialViewMacro(viewMacro, Security.CurrentUser.Id);
+            }
+            else
+            {
+                var fileName = EnsurePartialViewExtension(display.Name);
+                viewMacro = new PartialView(fileName);
+                viewMacro.Content = display.Content;
+                partialViewMacroResult = Services.FileService.CreatePartialViewMacro(viewMacro, display.Snippet, Security.CurrentUser.Id);
+            }
+
+            return partialViewMacroResult;
+        }
+
+        private string EnsurePartialViewExtension(string value)
+        {
+            if (value.EndsWith(".cshtml") == false)
+                value += ".cshtml";
+
+            return value;
         }
     }
 }
