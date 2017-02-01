@@ -117,8 +117,9 @@ namespace UmbracoExamine
                 if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
                 {
                     var field = new IndexField { Name = "_searchEmail" };
-                    var policy = IndexFieldPolicies.FirstOrDefault(x => x.Name == "_searchEmail");
-                    if (policy != null)
+                    
+                    StaticField policy;
+                    if (IndexFieldPolicies.TryGetValue("_searchEmail", out policy))
                     {
                         field.Type = policy.Type;
                         field.EnableSorting = policy.EnableSorting;
@@ -237,10 +238,16 @@ namespace UmbracoExamine
         {
             var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
 
-            //adds the special path property to the index
+            //adds the special key property to the index
             string valuesForIndexing;
             if (allValuesForIndexing.TryGetValue("__key", out valuesForIndexing))
-                fields.Add("__key", valuesForIndexing);
+            {
+                if (fields.ContainsKey("__key") == false)
+                {
+                    fields.Add("__key", valuesForIndexing);
+                }
+            }
+                
 
             return fields;
 
