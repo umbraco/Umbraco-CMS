@@ -38,7 +38,7 @@ namespace Umbraco.Web.PropertyEditors
             };
         }
 
-        protected IDictionary<string, object> InternalPreValues;
+        internal IDictionary<string, object> InternalPreValues;
         public override IDictionary<string, object> DefaultPreValues
         {
             get { return InternalPreValues; }

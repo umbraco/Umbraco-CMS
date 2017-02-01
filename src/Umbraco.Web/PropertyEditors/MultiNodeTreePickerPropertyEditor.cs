@@ -10,7 +10,10 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePickerAlias, "(Obsolete) Multinode Treepicker", "contentpicker", Group = "pickers", Icon = "icon-page-add", IsDeprecated = true)]
     public class MultiNodeTreePickerPropertyEditor : MultiNodeTreePickerPropertyEditor2
     {
-        
+        public MultiNodeTreePickerPropertyEditor()
+        {
+            InternalPreValues["idType"] = "int";
+        }
     }
 
     [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePicker2Alias, "Multinode Treepicker", PropertyEditorValueTypes.Text, "contentpicker", Group="pickers", Icon="icon-page-add")]
@@ -18,12 +21,13 @@ namespace Umbraco.Web.PropertyEditors
     {
         public MultiNodeTreePickerPropertyEditor2()
         {
-            _internalPreValues = new Dictionary<string, object>
+            InternalPreValues = new Dictionary<string, object>
             {
                 {"multiPicker", "1"},
                 {"showOpenButton", "0"},
                 {"showEditButton", "0"},
-                {"showPathOnHover", "0"}
+                {"showPathOnHover", "0"},
+                {"idType", "udi"}
             };
         }
         
@@ -32,11 +36,11 @@ namespace Umbraco.Web.PropertyEditors
             return new MultiNodePickerPreValueEditor();
         }
 
-        private IDictionary<string, object> _internalPreValues;
+        internal IDictionary<string, object> InternalPreValues;
         public override IDictionary<string, object> DefaultPreValues
         {
-            get { return _internalPreValues; }
-            set { _internalPreValues = value; }
+            get { return InternalPreValues; }
+            set { InternalPreValues = value; }
         }
 
         internal class MultiNodePickerPreValueEditor : PreValueEditor

@@ -53,9 +53,9 @@ namespace Umbraco.Web.Editors
         {
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
-                //we are not also including the Udi[] overload because that is HttpPost only so there won't be any ambiguity
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]) )));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
         }
 
@@ -160,9 +160,7 @@ namespace Umbraco.Web.Editors
 
             return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
-
-
-
+        
         /// <summary>
         /// Gets the url of an entity
         /// </summary>
@@ -201,13 +199,9 @@ namespace Umbraco.Web.Editors
                 Content = new StringContent(returnUrl)
             };
         }
-
-        /// <summary>
-        /// Gets an entity by it's unique id if the entity supports that
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        
+        [Obsolete("Use GetyById instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public EntityBasic GetByKey(Guid id, UmbracoEntityTypes type)
         {
             return GetResultForKey(id, type);
@@ -251,12 +245,49 @@ namespace Umbraco.Web.Editors
                 },
                 publishedContentExists: i => Umbraco.TypedContent(i) != null);
         }
-        
+
+        #region GetById
+
+        /// <summary>
+        /// Gets an entity by it's id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
         {
             return GetResultForId(id, type);
         }
 
+        /// <summary>
+        /// Gets an entity by it's key
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public EntityBasic GetById(Guid id, UmbracoEntityTypes type)
+        {
+            return GetResultForKey(id, type);
+        }
+
+        /// <summary>
+        /// Gets an entity by it's UDI
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public EntityBasic GetById(Udi id, UmbracoEntityTypes type)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetResultForKey(guidUdi.Guid, type);
+            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        } 
+        #endregion
+
+        #region GetByIds
         /// <summary>
         /// Get entities by integer ids
         /// </summary>
@@ -330,7 +361,8 @@ namespace Umbraco.Web.Editors
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        }      
+        }       
+        #endregion
 
         [Obsolete("Use GetyByIds instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
