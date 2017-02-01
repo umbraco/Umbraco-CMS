@@ -13,7 +13,10 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.ContentPickerAlias, "(Obsolete) Content Picker", PropertyEditorValueTypes.Integer, "contentpicker", IsParameterEditor = true, Group = "Pickers", IsDeprecated = true)]
     public class ContentPickerPropertyEditor : ContentPickerPropertyEditor2
     {
-        
+        public ContentPickerPropertyEditor()
+        {
+            InternalPreValues["idType"] = "int";
+        }   
     }
 
     /// <summary>
@@ -25,20 +28,21 @@ namespace Umbraco.Web.PropertyEditors
 
         public ContentPickerPropertyEditor2()
         {
-            _internalPreValues = new Dictionary<string, object>
+            InternalPreValues = new Dictionary<string, object>
             {
                 {"startNodeId", "-1"},
                 {"showOpenButton", "0"},
                 {"showEditButton", "0"},
-                {"showPathOnHover", "0"}
+                {"showPathOnHover", "0"},
+                {"idType", "udi"}
             };
         }
 
-        private IDictionary<string, object> _internalPreValues;
+        protected IDictionary<string, object> InternalPreValues;
         public override IDictionary<string, object> DefaultPreValues
         {
-            get { return _internalPreValues; }
-            set { _internalPreValues = value; }
+            get { return InternalPreValues; }
+            set { InternalPreValues = value; }
         }
 
         protected override PreValueEditor CreatePreValueEditor()

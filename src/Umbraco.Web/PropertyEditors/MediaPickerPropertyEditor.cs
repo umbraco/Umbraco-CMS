@@ -22,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     {"multiPicker", "0"},
                     {"onlyImages", "0"},
-                    {"idType", "id"}
+                    {"idType", "int"}
                 };
         }
 

@@ -17,11 +17,21 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.$watch(function () {
             //return the joined Ids as a string to watch
             return _.map($scope.renderModel, function (i) {
-                return i.id;
+                if ($scope.model.config.idType === "udi") {
+                    return i.udi;
+                }
+                else {
+                    return i.id;
+                }
             }).join();
         }, function (newVal) {
             var currIds = _.map($scope.renderModel, function (i) {
-                return i.id;
+                if ($scope.model.config.idType === "udi") {
+                    return i.udi;
+                }
+                else {
+                    return i.id;
+                }
             });
             $scope.model.value = trim(currIds.join(), ",");
 
@@ -200,7 +210,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     $scope.add = function (item) {
         var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
+            if ($scope.model.config.idType === "udi") {
+                return i.udi;
+            }
+            else {
+                return i.id;
+            }
         });
 
         if (currIds.indexOf(item.id) < 0) {
@@ -227,7 +242,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
+            if ($scope.model.config.idType === "udi") {
+                return i.udi;
+            }
+            else {
+                return i.id;
+            }
         });
         $scope.model.value = trim(currIds.join(), ",");
     });
@@ -244,7 +264,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
         _.each(modelIds, function (id, i) {
             var entity = _.find(data, function (d) {                
-                return d.id == id;
+                if ($scope.model.config.idType === "udi") {
+                    return d.udi == id;
+                }
+                else {
+                    return d.id == id;
+                }                
             });
         
             if (entity) {
@@ -304,6 +329,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.renderModel.push({ 
             "name": item.name,
             "id": item.id,
+            "udi": item.udi,
             "icon": item.icon,
             "path": item.path,
             "url": item.url,
