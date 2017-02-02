@@ -1,4 +1,4 @@
-function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeout) {
+function ExamineMgmtController($scope, umbRequestHelper, notificationsService, $log, $http, $q, $timeout) {
 
     $scope.indexerDetails = [];
     $scope.searcherDetails = [];
@@ -22,13 +22,14 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
                 } else {
                     $timeout(function() {
                             //don't continue if we've tried 100 times
-                            if (indexer.processingAttempts < 100) {
+                        if (indexer.processingAttempts < 100) {
                                 checkProcessing(indexer, checkActionName);
                                 //add an attempt
                                 indexer.processingAttempts++;
                             } else {
-                                //we've exceeded 100 attempts, stop processing
+                                //we've exceeded 100 attempts, stop processing and notify
                                 indexer.isProcessing = false;
+                                notificationsService.warning("Warning", "The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation");
                             }
                         },
                         1000);
@@ -56,13 +57,22 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
             });
     }
 
-    $scope.toggle = function(provider, propName) {
-        if (provider[propName] !== undefined) {
-            provider[propName] = !provider[propName];
+    $scope.toggleDetails = function (provider) {
+        if (provider['showProperties'] !== undefined) {
+            provider['showProperties'] = !provider['showProperties'];
         } else {
-            provider[propName] = true;
+            provider['showProperties'] = true;
+            provider["activeTab"] = 'showTools';
         }
     }
+
+    $scope.setTab = function (provider, propName) {
+        provider["activeTab"] = propName;
+    };
+
+    $scope.isTabSet = function (provider, propName) {
+        return provider["activeTab"] === propName;
+    };
 
     $scope.rebuildIndex = function(indexer) {
         if (confirm("This will cause the index to be rebuilt. " +
@@ -72,7 +82,6 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
 
             indexer.isProcessing = true;
             indexer.processingAttempts = 0;
-
             umbRequestHelper.resourcePromise(
                     $http.post(umbRequestHelper.getApiUrl("examineMgmtBaseUrl",
                         "PostRebuildIndex",
