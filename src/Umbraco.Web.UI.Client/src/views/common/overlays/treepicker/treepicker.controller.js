@@ -628,11 +628,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 		}
 
-		$scope.animationTest = function() {
+		$scope.getMiniListViewAnimation = function() {
 			if(goingForward) {
-				return 'animate';
+				return 'umb-mini-list-view--forward';
 			} else {
-				return 'animate-reverse';
+				return 'umb-mini-list-view--backwards';
 			}
 		}
 
