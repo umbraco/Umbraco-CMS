@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core.Scoping
@@ -21,7 +20,8 @@ namespace Umbraco.Core.Scoping
         IScope CreateScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified);
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            bool scopeFileSystems = false);
 
         /// <summary>
         /// Creates a detached scope.
@@ -34,7 +34,8 @@ namespace Umbraco.Core.Scoping
         IScope CreateDetachedScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified);
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            bool scopeFileSystems = false);
 
         /// <summary>
         /// Attaches a scope.

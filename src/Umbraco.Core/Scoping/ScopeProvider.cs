@@ -164,12 +164,13 @@ namespace Umbraco.Core.Scoping
 
         /// <inheritdoc />
         public IScope CreateDetachedScope(
-            IsolationLevel isolationLevel = IsolationLevel.Unspecified, 
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified)
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            bool? scopeFileSystems = null)
         {
             // fixme - what about scope context when attaching & detaching?
-            return new Scope(this, (ScopeContext) null, isolationLevel, repositoryCacheMode, dispatchMode, true);
+            return new Scope(this, true, (ScopeContext) null, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
         }
 
         /// <inheritdoc />
@@ -211,14 +212,15 @@ namespace Umbraco.Core.Scoping
 
         /// <inheritdoc />
         public IScope CreateScope(
-            IsolationLevel isolationLevel = IsolationLevel.Unspecified, 
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified)
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            bool? scopeFileSystems = null)
         {
             var ambient = AmbientScope;
             if (ambient == null)
             {
-                return AmbientScope = new Scope(this, GetNewContext(), isolationLevel, repositoryCacheMode, dispatchMode);
+                return AmbientScope = new Scope(this, false, GetNewContext(), isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
             }
 
             // replace noScope with a real one
@@ -232,13 +234,13 @@ namespace Umbraco.Core.Scoping
                 var database = noScope.DatabaseOrNull;
                 if (database != null && database.InTransaction)
                     throw new Exception("NoScope is in a transaction.");
-                return AmbientScope = new Scope(this, noScope, GetNewContext(), isolationLevel, repositoryCacheMode, dispatchMode);
+                return AmbientScope = new Scope(this, noScope, GetNewContext(), isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
             }
 
             var scope = ambient as Scope;
             if (scope == null) throw new Exception("Ambient scope is not a Scope instance.");
 
-            return AmbientScope = new Scope(this, scope, isolationLevel, repositoryCacheMode, dispatchMode);
+            return AmbientScope = new Scope(this, scope, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
         }
 
         private ScopeContext GetNewContext()
