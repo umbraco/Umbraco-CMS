@@ -14,10 +14,9 @@
         vm.showCreateFolder = showCreateFolder;
         vm.createFolder = createFolder;
 
-        function createFile(fileExtension) {
+        function createFile() {
             $location.search('create', null);
-            $location.search('fileExtension', null);
-            $location.path("/settings/scripts/edit/" + node.id).search("create", "true").search("fileExtension", fileExtension);
+            $location.path("/settings/scripts/edit/" + node.id).search("create", "true");
             navigationService.hideMenu();
         }
 
