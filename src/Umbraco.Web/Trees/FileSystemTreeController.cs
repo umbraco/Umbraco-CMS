@@ -33,7 +33,7 @@ namespace Umbraco.Web.Trees
             string path = "";
             if (!string.IsNullOrEmpty(id) && id != "-1")
             {
-                orgPath = id;
+                orgPath = System.Web.HttpUtility.UrlDecode(id);
                 path = IOHelper.MapPath(FilePath + "/" + orgPath);
                 orgPath += "/";
             }
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Trees
                 if ((dir.Attributes & FileAttributes.Hidden) == 0)
                 {
                     var HasChildren = dir.GetFiles().Length > 0 || dir.GetDirectories().Length > 0;
-                    var node = CreateTreeNode(orgPath + dir.Name, orgPath, queryStrings, dir.Name, "icon-folder", HasChildren);
+                    var node = CreateTreeNode(System.Web.HttpUtility.UrlEncode(orgPath + dir.Name), orgPath, queryStrings, dir.Name, "icon-folder", HasChildren);
 
                     OnRenderFolderNode(ref node);
                     if(node != null)

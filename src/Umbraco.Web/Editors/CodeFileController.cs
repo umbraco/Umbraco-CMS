@@ -12,6 +12,8 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.Trees;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
@@ -68,7 +70,7 @@ namespace Umbraco.Web.Editors
             }
 
             virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
-
+            
 
             switch (type)
             {
@@ -78,6 +80,7 @@ namespace Umbraco.Web.Editors
                     {
                         var display = Mapper.Map<IPartialView, CodeFileDisplay>(view);
                         display.FileType = Core.Constants.Trees.PartialViews;
+                        display.Path = Url.GetTreePathFromFilePath(view.Path);
                         return display;
                     }
                     return null;
@@ -88,6 +91,7 @@ namespace Umbraco.Web.Editors
                     {
                         var display = Mapper.Map<IPartialView, CodeFileDisplay>(viewMacro);
                         display.FileType = Core.Constants.Trees.PartialViewMacros;
+                        display.Path = Url.GetTreePathFromFilePath(viewMacro.Path);
                         return display;
                     }
                     return null;
@@ -98,6 +102,7 @@ namespace Umbraco.Web.Editors
                     {
                         var display = Mapper.Map<Script, CodeFileDisplay>(script);
                         display.FileType = Core.Constants.Trees.Scripts;
+                        display.Path = Url.GetTreePathFromFilePath(script.Path);
                         return display;
                     }
                     return null;
@@ -243,10 +248,13 @@ namespace Umbraco.Web.Editors
             switch (display.FileType)
             {
                 case Core.Constants.Trees.PartialViews:
-
                     var partialViewResult = CreateOrUpdatePartialView(display);
                     if (partialViewResult.Success)
-                        return Mapper.Map(partialViewResult.Result, display);
+                    {
+                        display = Mapper.Map(partialViewResult.Result, display);
+                        display.Path = Url.GetTreePathFromFilePath(partialViewResult.Result.Path);
+                        return display;
+                    }
 
                     display.AddErrorNotification(
                         Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
@@ -256,11 +264,15 @@ namespace Umbraco.Web.Editors
                 case Core.Constants.Trees.PartialViewMacros:
                     var partialViewMacroResult = CreateOrUpdatePartialViewMacro(display);
                     if (partialViewMacroResult.Success)
-                        return Mapper.Map(partialViewMacroResult.Result, display);
-
+                    {
+                        display = Mapper.Map(partialViewMacroResult.Result, display);
+                        display.Path = Url.GetTreePathFromFilePath(partialViewMacroResult.Result.Path);
+                        return display;
+                    }
+                        
                     display.AddErrorNotification(
-                                Services.TextService.Localize("speechBubbles/macroPartialViewErrorHeader"),
-                                Services.TextService.Localize("speechBubbles/macroPartialViewErrorText"));
+                        Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
+                        Services.TextService.Localize("speechBubbles/partialViewErrorText"));
                     break;
 
                 case Core.Constants.Trees.Scripts:
@@ -268,6 +280,11 @@ namespace Umbraco.Web.Editors
                     if (script != null)
                     {
                         script.Path = display.Name;
+                        
+                        display = Mapper.Map(script, display);
+                        display.Path = Url.GetTreePathFromFilePath(script.Path);
+                        return display;
+                        
                     }
                     else
                     {

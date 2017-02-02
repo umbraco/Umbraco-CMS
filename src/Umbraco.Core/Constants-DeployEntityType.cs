@@ -4,7 +4,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core
 {
-    
+
     public static partial class Constants
     {
 
@@ -37,6 +37,11 @@ namespace Umbraco.Core
             public const string MemberGroup = "member-group";
 
             public const string RelationType = "relation-type";
+            
+            // forms
+            public const string FormsForm = "forms-form";
+            public const string FormsWorkflow = "forms-workflow";
+            public const string FormsRecord = "forms-record";
 
             // string entity types
 
@@ -82,6 +87,12 @@ namespace Umbraco.Core
                         return Stylesheet;
                     case UmbracoObjectTypes.RelationType:
                         return RelationType;
+                    case UmbracoObjectTypes.FormsForm:
+                        return FormsForm;
+                    case UmbracoObjectTypes.FormsWorkflow:
+                        return FormsWorkflow;
+                    case UmbracoObjectTypes.FormsRecord:
+                        return FormsRecord;
                 }
                 throw new NotSupportedException(string.Format("UmbracoObjectType \"{0}\" does not have a matching EntityType.", umbracoObjectType));
             }
@@ -118,6 +129,12 @@ namespace Umbraco.Core
                         return UmbracoObjectTypes.Stylesheet;
                     case RelationType:
                         return UmbracoObjectTypes.RelationType;
+                    case FormsForm:
+                        return UmbracoObjectTypes.FormsForm;
+                    case FormsWorkflow:
+                        return UmbracoObjectTypes.FormsWorkflow;
+                    case FormsRecord:
+                        return UmbracoObjectTypes.FormsRecord;
                 }
                 throw new NotSupportedException(
                     string.Format("EntityType \"{0}\" does not have a matching UmbracoObjectType.", entityType));

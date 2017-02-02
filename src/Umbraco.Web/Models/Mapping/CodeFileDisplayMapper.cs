@@ -18,11 +18,13 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IPartialView, CodeFileDisplay>()
                 .ForMember(x => x.FileType, exp => exp.Ignore())
                 .ForMember(x => x.Notifications, exp => exp.Ignore())
+                .ForMember(x => x.Path, exp => exp.Ignore())
                 .ForMember(x => x.Snippet, exp => exp.Ignore());
 
             config.CreateMap<Script, CodeFileDisplay>()
                 .ForMember(x => x.FileType, exp => exp.Ignore())
                 .ForMember(x => x.Notifications, exp => exp.Ignore())
+                .ForMember(x => x.Path, exp => exp.Ignore())
                 .ForMember(x => x.Snippet, exp => exp.Ignore());
 
             config.CreateMap<CodeFileDisplay, IPartialView>()
