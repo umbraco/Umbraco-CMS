@@ -13,6 +13,42 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
 
     return {
 
+        get2FAProviders: function () {
+            
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "authenticationApiBaseUrl",
+                        "Get2FAProviders")),
+                'Could not retrive two factor provider info');
+        },
+
+        send2FACode: function (provider) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "authenticationApiBaseUrl",
+                        "PostSend2FACode"),
+                    {
+                        provider: provider
+                    }),
+                'Could not send code');
+        },
+
+        verify2FACode: function (code) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "authenticationApiBaseUrl",
+                        "PostVerify2FACode"),
+                    {
+                        code: code
+                    }),
+                'Could not verify code');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.authResource#performLogin
