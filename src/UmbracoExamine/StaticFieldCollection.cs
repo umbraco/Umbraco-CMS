@@ -17,6 +17,11 @@ namespace UmbracoExamine
         /// <returns></returns>
         public bool TryGetValue(string key, out StaticField field)
         {
+            if (Dictionary == null)
+            {
+                field = null;
+                return false;
+            }
             return Dictionary.TryGetValue(key, out field);
         }
     }
