@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
-	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService, contentResource, mediaResource, memberResource) {
+	function ($scope, $q, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService, contentResource, mediaResource, memberResource) {
 
 	    var tree = null;
 	    var dialogOptions = $scope.model;
@@ -492,30 +492,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    });
 
 		/* Mini List View */
-		$scope.miniListView = {};
 
 		$scope.goToPage = function(pageNumber, miniListView) {
-
 			// set new page number
 			miniListView.pagination.pageNumber = pageNumber;
-
-			// start loading animation list view
-			miniListView.loading = true;
-
-			resource(miniListView.node.id, miniListView.pagination)
-				.then(function (data) {
-
-					// update children
-					miniListView.children = data.items;
-
-					// update pagination
-					miniListView.pagination.totalItems = data.totalItems;
-					miniListView.pagination.totalPages = data.totalPages;
-
-					// stop load indicator
-					miniListView.loading = false;
-
-				});
+			// get children
+			getChildrenForMiniListView(miniListView);
 		};
 
 		$scope.selectListViewItem = function(item) {
@@ -542,24 +524,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		};
 
 		$scope.searchMiniListView = function(search, miniListView) {
-
+			// set search value
 			miniListView.pagination.filter = search;	
-			miniListView.loading = true;
-
-			resource(miniListView.node.id, miniListView.pagination)
-				.then(function (data) {
-
-					// update children
-					miniListView.children = data.items;
-
-					// update pagination
-					miniListView.pagination.totalItems = data.totalItems;
-					miniListView.pagination.totalPages = data.totalPages;
-
-					// stop load indicator
-					miniListView.loading = false;
-
-				});
+			// get children
+			getChildrenForMiniListView(miniListView);
 		};
 
 		$scope.test = function(node) {
@@ -567,18 +535,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		};
 
 		$scope.miniListViews = [];
-
 		var miniListViewsHistory = [];
-		var resource = "";
 		var goingForward = true;
-
-		if (entityType === "Document") {
-			resource = contentResource.getChildren;
-		} else if (entityType === "Member") {
-			resource = memberResource.getPagedResults;
-		} else if (entityType === "Media") {
-			resource = mediaResource.getChildren;
-		}
 
 		function openMiniListView(node) {
 
@@ -600,10 +558,44 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 			// start loading animation on node
 			node.loading = true;
 
-			resource(node.id, miniListView.pagination)
-				.then(function (data) {
+			getChildrenForMiniListView(miniListView)
+				.then(function(data){
 
-					console.log("data data data", data);
+					// stop loading animation on node
+					node.loading = false;
+
+					// clear and push mini list view in dom so we only render 1 view
+					$scope.miniListViews = [];
+					$scope.miniListViews.push(miniListView);
+
+					// store in history so we quickly can navigate back
+					miniListViewsHistory.push(miniListView);
+
+				});
+
+		}
+
+		function getChildrenForMiniListView(miniListView) {
+
+			// setup promise
+			var deferred = $q.defer();
+
+			// start loading animation list view
+			miniListView.loading = true;
+
+			// setup the correct resource depending on section
+			var resource = "";
+
+			if (entityType === "Document") {
+				resource = contentResource.getChildren;
+			} else if (entityType === "Member") {
+				resource = memberResource.getPagedResults;
+			} else if (entityType === "Media") {
+				resource = mediaResource.getChildren;
+			}
+
+			resource(miniListView.node.id, miniListView.pagination)
+				.then(function (data) {
 
 					// update children
 					miniListView.children = data.items;
@@ -615,16 +607,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 					// stop load indicator
 					miniListView.loading = false;
 
-					// stop loading animation on node
-					node.loading = false;
-
-					$scope.miniListViews = [];
-					$scope.miniListViews.push(miniListView);
-					miniListViewsHistory.push(miniListView);
-
-					console.log("history", miniListViewsHistory);
+					deferred.resolve(data);
 
 				});
+			
+			return deferred.promise;
 
 		}
 
