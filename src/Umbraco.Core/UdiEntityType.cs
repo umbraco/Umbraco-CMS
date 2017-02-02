@@ -55,10 +55,14 @@ namespace Umbraco.Core
 
             [UdiType(UdiType.GuidUdi)]
             public const string RelationType = "relation-type";
-            
+
             // forms
+
+            [UdiType(UdiType.GuidUdi)]
             public const string FormsForm = "forms-form";
+            [UdiType(UdiType.GuidUdi)]
             public const string FormsWorkflow = "forms-workflow";
+            [UdiType(UdiType.GuidUdi)]
             public const string FormsRecord = "forms-record";
 
             // string entity types

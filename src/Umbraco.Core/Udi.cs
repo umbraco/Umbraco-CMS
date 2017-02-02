@@ -58,6 +58,9 @@ namespace Umbraco.Core
                     if (fi.IsLiteral && fi.IsInitOnly == false)
                     {
                         var udiType = fi.GetCustomAttribute<Constants.UdiTypeAttribute>();
+
+                        if (udiType == null) 
+                            throw new InvalidOperationException("All Constants listed in UdiEntityType must be attributed with " + typeof(Constants.UdiTypeAttribute));
                         result[fi.GetValue(null).ToString()] = udiType.UdiType;
                     }                        
                 }
