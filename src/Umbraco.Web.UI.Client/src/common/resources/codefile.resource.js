@@ -198,12 +198,12 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          */
 
-        getScaffold: function (type, snippetName) {
+        getScaffold: function (type, id, snippetName) {
             return umbRequestHelper.resourcePromise(
                  $http.get(
                      umbRequestHelper.getApiUrl(
                          "codeFileApiBaseUrl",
-                         "GetScaffold?type=" + type + "&snippetName=" + snippetName)),
+                         "GetScaffold?type=" + type + "&id=" + id + "&snippetName=" + snippetName)),
                 "Failed to get scaffold for" + type);
         }
 

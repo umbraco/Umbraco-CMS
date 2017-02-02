@@ -236,7 +236,7 @@
                     snippet = $routeParams.snippet;
                 }
 
-                codefileResource.getScaffold("partialViewMacros", snippet).then(function (partialViewMacro) {
+                codefileResource.getScaffold("partialViewMacros", $routeParams.id, snippet).then(function (partialViewMacro) {
                     ready(partialViewMacro);
                 });
 

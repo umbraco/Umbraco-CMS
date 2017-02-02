@@ -79,7 +79,7 @@
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
 
             if ($routeParams.create) {
-                codefileResource.getScaffold("scripts").then(function(script) {
+                codefileResource.getScaffold("scripts", $routeParams.id).then(function (script) {
                     ready(script);
                 });
             } else {
