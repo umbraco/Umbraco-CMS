@@ -38,9 +38,10 @@
 
     <div ng-repeat="miniListView in miniListViews" ng-animate="animationTest()">
 
-        <div ng-if="!model.startNodeId" href="" ng-click="exitMiniListView(miniListView.node)" style="font-size: 12px;/* font-weight: bold; */margin-right: 5px; opacity: 0.5;">
+
+        <a ng-if="!model.startNodeId" href="" class="umb-mini-list-view__back" ng-click="exitMiniListView(miniListView.node)">
             <i class="icon-arrow-left" style="margin-right: 5px;"></i>Back
-        </div>
+        </a>
 
         <umb-mini-list-view
             node="miniListView.node"
