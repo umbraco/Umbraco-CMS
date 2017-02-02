@@ -72,8 +72,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	        $scope.enableSearh = true;
 
 	        //if a alternative startnode is used, we need to check if it is a container
-	        if (dialogOptions.startNodeId) {
-
+	        if (dialogOptions.startNodeId !== "-1") {
 	            entityResource.getById(dialogOptions.startNodeId, entityType).then(function (node) {
 	                if (node.metaData.IsContainer) {
 						openMiniListView(node);
