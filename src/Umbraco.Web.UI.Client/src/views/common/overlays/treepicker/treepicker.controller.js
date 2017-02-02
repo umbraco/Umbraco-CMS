@@ -146,31 +146,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	        args.event.preventDefault();
 	        args.event.stopPropagation();
 
-	        if (args.node.metaData.listViewNode) {
-	            //check if list view 'search' node was selected
-
-				//alert("list view");
-
-				$scope.showMiniListView = true;
-
-				console.log(args);
-
-				$scope.pagination = {
-                    pageSize: 10,
-                    pageNumber: 1,
-                    filter: '',
-                    orderDirection: "Ascending",
-                    orderBy: "SortOrder",
-                    orderBySystemField: true
-                };
-
-				getPagedChildren(args.node);
-
-				$scope.miniListView.nodeName = args.node.metaData.listViewNode.name;
-				$scope.miniListView.nodeId = args.node.metaData.listViewNode.id;
-
-	        }
-            else if (args.node.metaData.isSearchResult) {
+            if (args.node.metaData.isSearchResult) {
                 //check if the item selected was a search result from a list view
 
                 //unselect
@@ -595,6 +571,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 			resource(miniListView.node.id, miniListView.pagination)
 				.then(function (data) {
+
+					console.log("data, data, data", data);
 
 					// update children
 					miniListView.children = data.items;
