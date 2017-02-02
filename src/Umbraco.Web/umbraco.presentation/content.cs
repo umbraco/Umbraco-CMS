@@ -424,10 +424,7 @@ namespace umbraco
             if (!e.Cancel)
             {
                 XmlNode x;
-
-                // remove from xml db cache
-                doc.XmlRemoveFromDB();
-
+                
                 // clear xml cache
                 ClearDocumentXmlCache(doc.Id);
 
