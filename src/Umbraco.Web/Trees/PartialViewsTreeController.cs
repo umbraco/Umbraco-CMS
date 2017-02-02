@@ -43,6 +43,16 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
+            if (id.EndsWith(FileSearchPattern.TrimStart("*")) == false)
+            {
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                //create action
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                //refresh action
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+            }
+
             // TODO: Wire up new delete dialog
             menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
             return menu;
