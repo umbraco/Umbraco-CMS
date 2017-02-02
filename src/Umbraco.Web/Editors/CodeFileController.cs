@@ -8,6 +8,8 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.Trees;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
@@ -62,7 +64,7 @@ namespace Umbraco.Web.Editors
             }
 
             virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
-
+            
 
             switch (type)
             {
@@ -72,6 +74,7 @@ namespace Umbraco.Web.Editors
                     {
                         var display = Mapper.Map<IPartialView, CodeFileDisplay>(view);
                         display.FileType = Core.Constants.Trees.PartialViews;
+                        display.Path = Url.GetTreePathFromFilePath(view.Path);
                         return display;
                     }
                     return null;
@@ -82,6 +85,7 @@ namespace Umbraco.Web.Editors
                     {
                         var display = Mapper.Map<IPartialView, CodeFileDisplay>(viewMacro);
                         display.FileType = Core.Constants.Trees.PartialViewMacros;
+                        display.Path = Url.GetTreePathFromFilePath(viewMacro.Path);
                         return display;
                     }
                     return null;
@@ -92,6 +96,7 @@ namespace Umbraco.Web.Editors
                     {
                         var display = Mapper.Map<Script, CodeFileDisplay>(script);
                         display.FileType = Core.Constants.Trees.Scripts;
+                        display.Path = Url.GetTreePathFromFilePath(script.Path);
                         return display;
                     }
                     return null;
@@ -171,12 +176,15 @@ namespace Umbraco.Web.Editors
                         // might need to find the path
                         var orgPath = view.OriginalPath.Substring(0, view.OriginalPath.IndexOf(view.Name));
                         view.Path = orgPath + display.Name;
-
                         view.Content = display.Content;
+
+                        //Save the file and update the response to reflect any name and path changes
                         var result = Services.FileService.SavePartialView(view, Security.CurrentUser.Id);
                         if (result.Success == true)
                         {
-                            return Mapper.Map(view, display);
+                            display = Mapper.Map(result.Result, display);
+                            display.Path = Url.GetTreePathFromFilePath(view.Path);
+                            return display;
                         }
 
                         display.AddErrorNotification(
@@ -195,13 +203,19 @@ namespace Umbraco.Web.Editors
                     {
                         viewMacro.Content = display.Content;
                         viewMacro.Path = display.Name;
+
+                        //save the file and update the display to reflect any path and name changes
                         var result = Services.FileService.SavePartialViewMacro(viewMacro, Security.CurrentUser.Id);
-                        if (result.Success == false)
+                        if (result.Success == true)
                         {
-                            display.AddErrorNotification(
-                                Services.TextService.Localize("speechBubbles/macroPartialViewErrorHeader"),
-                                Services.TextService.Localize("speechBubbles/macroPartialViewErrorText"));
+                            display = Mapper.Map(result.Result, display);
+                            display.Path = Url.GetTreePathFromFilePath(result.Result.Path);
+                            return display;
                         }
+
+                        display.AddErrorNotification(
+                            Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
+                            Services.TextService.Localize("speechBubbles/partialViewErrorText"));
                     }
                     else
                     {
@@ -215,7 +229,12 @@ namespace Umbraco.Web.Editors
                     {
                         script.Content = display.Content;
                         script.Path = display.Name;
+                        
                         Services.FileService.SaveScript(script, Security.CurrentUser.Id);
+                        display = Mapper.Map(script, display);
+                        display.Path = Url.GetTreePathFromFilePath(script.Path);
+                        return display;
+                        
 
                     }
                     else
