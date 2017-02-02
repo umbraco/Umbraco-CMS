@@ -111,9 +111,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    }
 
 	    function nodeExpandedHandler(ev, args) {
-
-			console.log("args", args);
-
+			
+			// open mini list view for list views
 			if (args.node.metaData.isContainer) {
 				openMiniListView(args.node);
 			}
@@ -122,54 +121,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
                 //iterate children
 	            _.each(args.children, function (child) {
-
-					console.log("child", child);
-
-	                //check if any of the items are list views, if so we need to add some custom
-	                // children: A node to activate the search, any nodes that have already been
-	                // selected in the search
-					/*
-	                if (child.metaData.isContainer) {
-	                    child.hasChildren = true;
-	                    child.children = [
-	                        {	
-								id: child.id,
-                                level: child.level + 1,
-                                hasChildren: false,
-                                parent: function () {
-                                    return child;
-                                },
-	                            name: searchText,
-	                            metaData: {
-	                                listViewNode: child,
-	                            },
-	                            cssClass: "icon-search",
-	                            cssClasses: ["not-published"]
-	                        }
-	                    ];
-                        //add base transition classes to this node
-	                    child.cssClasses.push("tree-node-slide-up");
-
-	                    var listViewResults = _.filter($scope.searchInfo.selectedSearchResults, function(i) {
-	                        return i.parentId == child.id;
-	                    });
-	                    _.each(listViewResults, function(item) {
-	                        child.children.unshift({
-	                            id: item.id,
-	                            name: item.name,
-	                            cssClass: "icon umb-tree-icon sprTree " + item.icon,
-	                            level: child.level + 1,
-	                            metaData: {
-	                                isSearchResult: true
-	                            },
-	                            hasChildren: false,
-	                            parent: function () {
-	                                return child;
-	                            }
-	                        });
-	                    });
-	                }
-					*/
 
 	                //now we need to look in the already selected search results and
 	                // toggle the check boxes for those ones that are listed
