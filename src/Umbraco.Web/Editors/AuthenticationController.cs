@@ -139,18 +139,7 @@ namespace Umbraco.Web.Editors
 
                     //get the user
                     var user = Security.GetBackOfficeUser(loginModel.Username);
-                    var userDetail = Mapper.Map<UserDetail>(user);
-                    //update the userDetail and set their remaining seconds
-                    userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
-                    
-                    //create a response with the userDetail object
-                    var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
-
-                    //ensure the user is set for the current request
-                    Request.SetPrincipalForRequest(user);
-
-                    return response;
-
+                    return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
 
                     var twofactorOptions = UserManager as IUmbracoBackOfficeTwoFactorOptions;
@@ -246,9 +235,8 @@ namespace Umbraco.Web.Editors
             var userId = await SignInManager.GetVerifiedUserIdAsync();
             if (userId < 0)
             {
-                //TODO: Or just return not found?
-                throw new HttpResponseException(
-                    Request.CreateValidationErrorResponse("No verified user found"));
+                Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
             return userFactors;
@@ -257,25 +245,52 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public async Task<IHttpActionResult> PostSend2FACode([FromBody]string provider)
         {
+            if (provider.IsNullOrWhiteSpace())
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var userId = await SignInManager.GetVerifiedUserIdAsync();
+            if (userId < 0)
+            {
+                Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
             // Generate the token and send it
             if (await SignInManager.SendTwoFactorCodeAsync(provider) == false)
             {
-                throw new HttpResponseException(
-                   Request.CreateValidationErrorResponse("Invalid code"));
+                return BadRequest("Invalid code");
             }
             return Ok();
         }
 
         [SetAngularAntiForgeryTokens]
-        public async Task<IHttpActionResult> PostVerify2FACode([FromBody]string code)
+        public async Task<HttpResponseMessage> PostVerify2FACode(Verify2FACodeModel model)
         {
-            // Generate the token and send it
-            if (await SignInManager.SendTwoFactorCodeAsync(code) == false)
+            if (ModelState.IsValid == false)
             {
-                throw new HttpResponseException(
-                   Request.CreateValidationErrorResponse("Invalid code"));
+                return Request.CreateValidationErrorResponse(ModelState);
             }
-            return Ok();
+
+            var userName = await SignInManager.GetVerifiedUserNameAsync();
+            if (userName == null)
+            {
+                Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: true, rememberBrowser: false);
+            switch (result)
+            {
+                case SignInStatus.Success:
+                    //get the user
+                    var user = Security.GetBackOfficeUser(userName);
+                    return SetPrincipalAndReturnUserDetail(user);
+                case SignInStatus.LockedOut:
+                    return Request.CreateValidationErrorResponse("User is locked out");                    
+                case SignInStatus.Failure:
+                default:
+                    return Request.CreateValidationErrorResponse("Invalid code");
+            }
         }
 
         /// <summary>
@@ -314,6 +329,30 @@ namespace Umbraco.Web.Editors
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
+
+        /// <summary>
+        /// This is used when the user is auth'd successfully and we need to return an OK with user details along with setting the current Principal in the request
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        private HttpResponseMessage SetPrincipalAndReturnUserDetail(IUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+
+            var userDetail = Mapper.Map<UserDetail>(user);
+            //update the userDetail and set their remaining seconds
+            userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
+
+            //create a response with the userDetail object
+            var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
+
+            //ensure the user is set for the current request
+            Request.SetPrincipalForRequest(user);
+
+            return response;
+        }
+
         private string ConstructCallbackUrl(int userId, string code)
         {
             // Get an mvc helper to get the url

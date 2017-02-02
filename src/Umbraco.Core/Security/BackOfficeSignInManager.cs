@@ -137,11 +137,11 @@ namespace Umbraco.Core.Security
         {
             var id = Convert.ToString(user.Id);
             if (await UserManager.GetTwoFactorEnabledAsync(user.Id)
-                && (await UserManager.GetValidTwoFactorProvidersAsync(user.Id)).Count > 0
-                && await AuthenticationManager.TwoFactorBrowserRememberedAsync(id) == false)
+                && (await UserManager.GetValidTwoFactorProvidersAsync(user.Id)).Count > 0)
             {
                 var identity = new ClaimsIdentity(Constants.Security.BackOfficeTwoFactorAuthenticationType);
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id));
+                identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName));
                 AuthenticationManager.SignIn(identity);
                 return SignInStatus.RequiresVerification;
             }
@@ -197,7 +197,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Get the user id that has been verified already or null.
+        /// Get the user id that has been verified already or -1.
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -211,6 +211,20 @@ namespace Umbraco.Core.Security
                 return ConvertIdFromString(result.Identity.GetUserId());
             }
             return -1;
+        }
+
+        /// <summary>
+        /// Get the username that has been verified already or null.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> GetVerifiedUserNameAsync()
+        {
+            var result = await AuthenticationManager.AuthenticateAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
+            if (result != null && result.Identity != null && string.IsNullOrEmpty(result.Identity.GetUserName()) == false)
+            {
+                return result.Identity.GetUserName();
+            }
+            return null;
         }
     }
 }

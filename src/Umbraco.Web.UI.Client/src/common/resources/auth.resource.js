@@ -30,13 +30,11 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
                         "PostSend2FACode"),
-                    {
-                        provider: provider
-                    }),
+                    angular.toJson(provider)),
                 'Could not send code');
         },
 
-        verify2FACode: function (code) {
+        verify2FACode: function (provider, code) {
 
             return umbRequestHelper.resourcePromise(
                 $http.post(
@@ -44,7 +42,8 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                         "authenticationApiBaseUrl",
                         "PostVerify2FACode"),
                     {
-                        code: code
+                        code: code,
+                        provider: provider
                     }),
                 'Could not verify code');
         },
