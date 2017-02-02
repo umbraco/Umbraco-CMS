@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
@@ -53,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IContent PerformGet(int id)
         {
-            var sql = GetBaseQuery(false)
+            var sql = GetBaseQuery(BaseQueryType.FullSingle)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .Where<DocumentDto>(x => x.Newest, SqlSyntax)
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
@@ -81,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 return s;
             };
             
-            var sqlBaseFull = GetBaseQuery(BaseQueryType.Full);
+            var sqlBaseFull = GetBaseQuery(BaseQueryType.FullMultiple);
             var sqlBaseIds = GetBaseQuery(BaseQueryType.Ids);
 
             return ProcessQuery(translate(sqlBaseFull), new PagingSqlQuery(translate(sqlBaseIds)));
@@ -89,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
         {
-            var sqlBaseFull = GetBaseQuery(BaseQueryType.Full);
+            var sqlBaseFull = GetBaseQuery(BaseQueryType.FullMultiple);
             var sqlBaseIds = GetBaseQuery(BaseQueryType.Ids);
 
             Func<SqlTranslator<IContent>, Sql> translate = (translator) =>
@@ -110,6 +111,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of PetaPocoRepositoryBase<IContent>
 
+        /// <summary>
+        /// Returns the base query to return Content
+        /// </summary>
+        /// <param name="queryType"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Content queries will differ depending on what needs to be returned:
+        /// * FullSingle: When querying for a single document, this will include the Outer join to fetch the content item's published version info
+        /// * FullMultiple: When querying for multiple documents, this will exclude the Outer join to fetch the content item's published version info - this info would need to be fetched separately
+        /// * Ids: This would essentially be the same as FullMultiple however the columns specified will only return the Ids for the documents
+        /// * Count: A query to return the count for documents
+        /// </remarks>
         protected override Sql GetBaseQuery(BaseQueryType queryType)
         {
             var sql = new Sql();
@@ -122,14 +135,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
 
-            if (queryType == BaseQueryType.Full)
+            if (queryType == BaseQueryType.FullSingle)
             {
                 //The only reason we apply this left outer join is to be able to pull back the DocumentPublishedReadOnlyDto
                 //information with the entire data set, so basically this will get both the latest document and also it's published
-                //version if it has one. When performing a count or when just retrieving Ids like in paging, this is unecessary 
+                //version if it has one. When performing a count or when retrieving Ids like in paging, this is unecessary 
                 //and causes huge performance overhead for the SQL server, especially when sorting the result. 
-                //To fix this perf overhead we'd need another index on :
-                // CREATE NON CLUSTERED INDEX ON cmsDocument.node + cmsDocument.published
+                //We also don't include this outer join when querying for multiple entities since it is much faster to fetch this information
+                //in a separate query. For a single entity this is ok.
 
                 var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=1)",
                 SqlSyntax.GetQuotedTableName("cmsDocument"),
@@ -151,7 +164,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.Full);
+            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.FullSingle);
         }
 
         protected override string GetBaseWhereClause()
@@ -222,7 +235,7 @@ namespace Umbraco.Core.Persistence.Repositories
             while (true)
             {
                 // get the next group of nodes
-                var sqlFull = translate(baseId, GetBaseQuery(BaseQueryType.Full));
+                var sqlFull = translate(baseId, GetBaseQuery(BaseQueryType.FullMultiple));
                 var sqlIds = translate(baseId, GetBaseQuery(BaseQueryType.Ids));
 
                 var xmlItems = ProcessQuery(SqlSyntax.SelectTop(sqlFull, groupSize), new PagingSqlQuery(SqlSyntax.SelectTop(sqlIds, groupSize)))
@@ -245,7 +258,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         Logger.Error<MediaRepository>("Could not rebuild XML for nodeId=" + xmlItem.NodeId, e);
                     }
                 }
-                baseId = xmlItems.Last().NodeId;
+                baseId = xmlItems[xmlItems.Count - 1].NodeId;
             }
         }
 
@@ -257,7 +270,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
             };
 
-            var sqlFull = translate(GetBaseQuery(BaseQueryType.Full));
+            var sqlFull = translate(GetBaseQuery(BaseQueryType.FullMultiple));
             var sqlIds = translate(GetBaseQuery(BaseQueryType.Ids));
             
             return ProcessQuery(sqlFull, new PagingSqlQuery(sqlIds), true);
@@ -265,7 +278,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override IContent GetByVersion(Guid versionId)
         {
-            var sql = GetBaseQuery(false);
+            var sql = GetBaseQuery(BaseQueryType.FullSingle);
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
@@ -674,7 +687,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // ORDER BY substring(path, 1, len(path) - charindex(',', reverse(path))), sortOrder
             // but that's probably an overkill - sorting by level,sortOrder should be enough
 
-            var sqlFull = GetBaseQuery(BaseQueryType.Full);
+            var sqlFull = GetBaseQuery(BaseQueryType.FullMultiple);
             var translatorFull = new SqlTranslator<IContent>(sqlFull, query);
             var sqlIds = GetBaseQuery(BaseQueryType.Ids);
             var translatorIds = new SqlTranslator<IContent>(sqlIds, query);
@@ -889,12 +902,12 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
-
+        
         /// <summary>
         /// This is the underlying method that processes most queries for this repository
         /// </summary>
         /// <param name="sqlFull">
-        /// The full SQL with the outer join to return all data required to create an IContent
+        /// The FullMultiple SQL without the outer join to return all data required to create an IContent excluding it's published state data which this will query separately
         /// </param>
         /// <param name="pagingSqlQuery">
         /// The Id SQL without the outer join to just return all document ids - used to process the properties for the content item
@@ -904,8 +917,43 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         private IEnumerable<IContent> ProcessQuery(Sql sqlFull, PagingSqlQuery pagingSqlQuery, bool withCache = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sqlFull);
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sqlFull);
             if (dtos.Count == 0) return Enumerable.Empty<IContent>();
+            
+            //Go and get all of the published version data separately for this data, this is because when we are querying
+            //for multiple content items we don't include the outer join to fetch this data in the same query because
+            //it is insanely slow. Instead we just fetch the published version data separately in one query.
+
+            //we need to parse the original SQL statement and reduce the columns to just cmsDocument.nodeId so that we can use
+            // the statement to go get the published data for all of the items by using an inner join
+            var parsedOriginalSql = "SELECT cmsDocument.nodeId " + sqlFull.SQL.Substring(sqlFull.SQL.IndexOf("FROM", StringComparison.Ordinal));
+            //now remove everything from an Orderby clause and beyond
+            if (parsedOriginalSql.InvariantContains("ORDER BY "))
+            {
+                parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.LastIndexOf("ORDER BY ", StringComparison.Ordinal));
+            }            
+
+            var publishedSql = new Sql(@"SELECT *
+FROM cmsDocument AS doc2
+INNER JOIN 
+	(" + parsedOriginalSql + @") as docData
+ON doc2.nodeId = docData.nodeId
+WHERE doc2.published = 1
+ORDER BY doc2.nodeId
+", sqlFull.Arguments);
+
+            //go and get the published version data, we do a Query here and not a Fetch so we are
+            //not allocating a whole list to memory just to allocate another list in memory since
+            //we are assigning this data to a keyed collection for fast lookup below
+            var publishedData = Database.Query<DocumentPublishedReadOnlyDto>(publishedSql);
+            var publishedDataCollection = new DocumentPublishedReadOnlyDtoCollection();
+            foreach (var publishedDto in publishedData)
+            {
+                //double check that there's no corrupt db data, there should only be a single published item
+                if (publishedDataCollection.Contains(publishedDto.NodeId) == false)
+                    publishedDataCollection.Add(publishedDto);
+            }
+
 
             var content = new IContent[dtos.Count];
             var defs = new List<DocumentDefinition>();
@@ -919,6 +967,8 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
+                DocumentPublishedReadOnlyDto publishedDto;
+                publishedDataCollection.TryGetValue(dto.NodeId, out publishedDto);
 
                 // if the cache contains the published version, use it
                 if (withCache)
@@ -946,7 +996,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
                     contentTypes[dto.ContentVersionDto.ContentDto.ContentTypeId] = contentType;
                 }
                 
-                content[i] = ContentFactory.BuildEntity(dto, contentType);
+                content[i] = ContentFactory.BuildEntity(dto, contentType, publishedDto);
 
                 // need template
                 if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
@@ -1055,7 +1105,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             return currentName;
         }
-
+        
         /// <summary>
         /// Dispose disposable properties
         /// </summary>
@@ -1069,6 +1119,27 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             _tagRepository.Dispose();
             _contentPreviewRepository.Dispose();
             _contentXmlRepository.Dispose();
+        }
+
+        /// <summary>
+        /// A keyed collection for fast lookup when retrieving a separate list of published version data
+        /// </summary>
+        private class DocumentPublishedReadOnlyDtoCollection : KeyedCollection<int, DocumentPublishedReadOnlyDto>
+        {
+            protected override int GetKeyForItem(DocumentPublishedReadOnlyDto item)
+            {
+                return item.NodeId;
+            }
+
+            public bool TryGetValue(int key, out DocumentPublishedReadOnlyDto val)
+            {
+                if (Dictionary == null)
+                {
+                    val = null;
+                    return false;
+                }
+                return Dictionary.TryGetValue(key, out val);
+            }
         }
     }
 }

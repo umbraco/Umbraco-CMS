@@ -442,7 +442,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // Get base query for returning IDs
             var sqlBaseIds = GetBaseQuery(BaseQueryType.Ids);
             // Get base query for returning all data
-            var sqlBaseFull = GetBaseQuery(BaseQueryType.Full);
+            var sqlBaseFull = GetBaseQuery(BaseQueryType.FullMultiple);
 
             if (query == null) query = new Query<TEntity>();
             var translatorIds = new SqlTranslator<TEntity>(sqlBaseIds, query);
@@ -772,7 +772,6 @@ ORDER BY contentNodeId, propertytypeid
         /// <param name="queryType"></param>
         /// <returns></returns>
         protected abstract Sql GetBaseQuery(BaseQueryType queryType);
-
 
         internal class DocumentDefinition
         {
