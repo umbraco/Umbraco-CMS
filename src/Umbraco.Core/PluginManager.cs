@@ -697,7 +697,8 @@ namespace Umbraco.Core
             //we don't have a cache for this so proceed to look them up by scanning
             foreach (var t in finder())
             {
-                typeList.AddType(t);
+                if (!typeList.GetTypes().Contains(t))
+                    typeList.AddType(t);
             }
             UpdateCachedPluginsFile<T>(typeList.GetTypes(), resolutionKind);
         }
