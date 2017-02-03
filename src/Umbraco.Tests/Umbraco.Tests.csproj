@@ -177,6 +177,7 @@
     <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Scoping\ScopedXmlTests.cs" />
     <Compile Include="Scoping\ScopeTests.cs" />
+    <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TryConvertToTests.cs" />
     <Compile Include="UdiTests.cs" />

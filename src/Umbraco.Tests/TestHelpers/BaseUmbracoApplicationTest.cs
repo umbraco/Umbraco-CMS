@@ -43,7 +43,7 @@ namespace Umbraco.Tests.TestHelpers
 
             TestHelper.InitializeContentDirectories();
 
-            SetupCacheHelper();
+            CacheHelper = CreateCacheHelper();
 
             InitializeLegacyMappingsForCoreEditors();
 
@@ -136,12 +136,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 PluginManager.Current = null;
             }
-        }
-
-        protected virtual void SetupCacheHelper()
-        {
-            CacheHelper = CreateCacheHelper();
-        }
+        }        
 
         protected virtual CacheHelper CreateCacheHelper()
         {
