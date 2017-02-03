@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web;
 using System.Web.Http;
+using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -14,7 +14,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Trees;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
@@ -159,6 +158,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
 
+            if (id.IsNullOrWhiteSpace())
+                id = string.Empty;
+
             CodeFileDisplay codeFileDisplay;
 
             switch (type)
@@ -186,13 +188,13 @@ namespace Umbraco.Web.Editors
             // Make sure that the root virtual path ends with '/'
             codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.EnsureEndsWith("/");
 
-            if (id != Core.Constants.System.Root.ToInvariantString())
+            if (id.IsNullOrWhiteSpace() == false && id != Core.Constants.System.Root.ToInvariantString())
             {
                 codeFileDisplay.VirtualPath += id.TrimStart("/").EnsureEndsWith("/");
             }
 
             codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.TrimStart("~");
-            codeFileDisplay.Path = Url.GetTreePathFromFilePath(codeFileDisplay.VirtualPath);
+            codeFileDisplay.Path = Url.GetTreePathFromFilePath(id);
             codeFileDisplay.FileType = type;
 
             return codeFileDisplay;
@@ -302,7 +304,8 @@ namespace Umbraco.Web.Editors
                     }
                     else
                     {
-                        script = new Script(virtualPath + display.Name);
+                        var fileName = EnsurePartialViewExtension(display.Name, ".js");
+                        script = new Script(virtualPath + fileName);
                     }
 
                     script.Content = display.Content;
@@ -320,7 +323,7 @@ namespace Umbraco.Web.Editors
         private Attempt<IPartialView> CreateOrUpdatePartialView(CodeFileDisplay display)
         {
             Attempt<IPartialView> partialViewResult;
-            var virtualPath = display.VirtualPath ?? string.Empty;
+            string virtualPath = NormalizeVirtualPath(display.VirtualPath, SystemDirectories.PartialViews);
             var view = Services.FileService.GetPartialView(virtualPath);
             if (view != null)
             {
@@ -333,13 +336,27 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var fileName = EnsurePartialViewExtension(display.Name);
+                var fileName = EnsurePartialViewExtension(display.Name, ".cshtml");
                 view = new PartialView(virtualPath + fileName);
                 view.Content = display.Content;
                 partialViewResult = Services.FileService.CreatePartialView(view, display.Snippet, Security.CurrentUser.Id);
             }
 
             return partialViewResult;
+        }
+
+        private string NormalizeVirtualPath(string virtualPath, string systemDirectory)
+        {
+            if (virtualPath.IsNullOrWhiteSpace())
+                return string.Empty;
+
+            systemDirectory = systemDirectory.TrimStart("~");
+            systemDirectory = systemDirectory.Replace('\\', '/');
+            virtualPath = virtualPath.TrimStart("~");
+            virtualPath = virtualPath.Replace('\\', '/');
+            virtualPath = virtualPath.ReplaceFirst(systemDirectory, string.Empty);
+
+            return virtualPath;
         }
 
         private Attempt<IPartialView> CreateOrUpdatePartialViewMacro(CodeFileDisplay display)
@@ -355,7 +372,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var fileName = EnsurePartialViewExtension(display.Name);
+                var fileName = EnsurePartialViewExtension(display.Name, ".cshtml");
                 viewMacro = new PartialView(virtualPath + fileName);
                 viewMacro.Content = display.Content;
                 partialViewMacroResult = Services.FileService.CreatePartialViewMacro(viewMacro, display.Snippet, Security.CurrentUser.Id);
@@ -364,10 +381,10 @@ namespace Umbraco.Web.Editors
             return partialViewMacroResult;
         }
 
-        private string EnsurePartialViewExtension(string value)
+        private string EnsurePartialViewExtension(string value, string extension)
         {
-            if (value.EndsWith(".cshtml") == false)
-                value += ".cshtml";
+            if (value.EndsWith(extension) == false)
+                value += extension;
 
             return value;
         }
