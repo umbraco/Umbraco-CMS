@@ -375,8 +375,26 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
 		    // load data
-            var dataXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
-		    var nodes = _xmlNode.SelectNodes(dataXPath);
+            //var dataXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
+		    //var nodes = _xmlNode.SelectNodes(dataXPath);
+		    var nodes = new List<XmlNode>();
+
+		    var legacy = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
+            foreach (XmlNode n in _xmlNode.ChildNodes)
+            {
+                var e = n as XmlElement;
+                if (e == null) continue;
+		        if (legacy)
+		        {
+		            if (n.Name == "data") nodes.Add(n);
+		            else break;
+		        }
+		        else
+		        {
+		            if (e.HasAttribute("isDoc") == false) nodes.Add(n);
+		            else break;
+		        }
+		    }
 
 		    _contentType = PublishedContentType.Get(PublishedItemType.Content, _docTypeAlias);
 
