@@ -239,7 +239,9 @@
                     //As conflicts with our own tree search shortcut
                     _editor.commands.bindKey("ctrl-space", null);
 
-
+                    
+                    //Push our custom code completor in
+                    _editor.completers.push(umbracoCompletor);
 
                     //TODO: Move all these keybinding config out into some helper/service
                     _editor.commands.addCommands([
@@ -743,6 +745,130 @@
     
         vm.init();
 
+
+
+        //Code Completer
+        var umbracoCompletor = {
+
+            // Used as the main API entrypoint for ACE editor to invoke
+            // What completions are available in the dropdown list
+            getCompletions: function(editor, session, pos, prefix, callback) {
+
+                //It may been triggered by mistake on a space so no word/prefix is passed in
+                if (prefix.length === 0) {
+                    callback(null, []);
+                    return
+                }
+
+                console.log("v3");
+      
+                //Switch case to determine what trigger keyword is being used
+                switch (prefix.toLowerCase()) {
+                    case 'macro':
+                    //Invoke the code for inserting Macros
+                    umbracoCompletor.getMacroCompletions(callback);
+                    break;
+                    
+                    case 'partial':
+                    //Invoke the code for inserting Partials
+                    umbracoCompletor.getPartialCompletions(callback);
+                    break;
+                    
+                    case 'field':
+                    //Invoke the code for inserting Umbraco Field/Property
+                    break;
+                    
+                    default:
+                    //Did not match our keywords to invoke the completer
+                    //So just set the callback function to an empty array of items
+                    callback(null, []);
+                    return
+                    
+                }
+            },
+
+            // ACE editor API entrypoint for overriding what is displayed in the tooltip
+            // From the code completion JSON object we can combine properties to set a value in a new prop docHTML
+            getDocTooltip: function(item) {
+        
+                //Used to override display of the tooltip
+                //With the properties docHTML or docText set on the completion items
+                //So can ammend here what gets displayed in the tooltip output
+                console.log('Get Tooltip');
+
+                if (item.snippet && !item.docHTML) {
+                    console.log('Display Tooltip');
+
+                    var lang = ace.require("ace/lib/lang");
+
+                    item.docHTML = [
+                        "<b>", item.caption, "</b><br/>",
+                        "<em>", item.alias ? item.alias : "", "</em>",
+                        "<hr></hr>",
+                        lang.escapeHTML(item.snippet)
+                    ].join("");
+                }
+            },
+
+            //This is our own custom function - where we are getting Macros from the server to populate the list
+            getMacroCompletions: function(callback){
+      
+                //This is where we would call an API endpoint or Angular Resource to get our macros
+                //For now a hardcoded list to show implementation ideas
+
+                //IMPORTANT NOTE
+                //Our trigger keyword of 'macro' must be contained in the caption otherwise it does not match & gets filtered out of the results
+
+                var macros = [];
+                macros.push({
+                    caption: "Macro - Insert Form",
+                    alias: "insertUmbracoForm",
+                    meta: "Macro",
+                    snippet: "@Umbraco.RenderMacro('insertUmbracoForm', new { formId = '${1:GUID-TO-FORM-HERE}' });"
+                });
+      
+                macros.push({
+                    caption: "Macro - Insert Quote",
+                    alias: "insertQuote",
+                    meta: "Macro",
+                    snippet: "@Umbraco.RenderMacro('insertQuote', new { name = '${1:Warren}', age = ${2:31} });"
+                });
+                
+                macros.push({
+                    caption: "Macro - Render Footer",
+                    alias: "renderFooter",
+                    meta: "Macro",
+                    snippet: "@Umbraco.RenderMacro('renderFooter');"
+                });
+      
+                return callback(null, macros);
+            },
+
+            getPartialCompletions: function(callback){
+      
+                //This is where we would call an API endpoint or Angular Resource to get partials
+                //For now a hardcoded list to show implementation ideas
+
+                //IMPORTANT NOTE
+                //Our trigger keyword of 'partial' must be contained in the caption otherwise it does not match & gets filtered out of the results
+
+                var partials = [];
+                partials.push({
+                    caption: "[Partial] MainNavigation",
+                    meta: "Partial",
+                    snippet: "@Html.RenderPartial('MainNavigation')",
+                });
+      
+                partials.push({
+                    caption: "[Partial] BottomNavigation",
+                    alias: "insertQuote",
+                    meta: "Partial",
+                    snippet: "@Html.RenderPartial('BottomNavigation')"
+                });
+      
+                return callback(null, partials);
+            },
+        }
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Templates.EditController", TemplatesEditController);
