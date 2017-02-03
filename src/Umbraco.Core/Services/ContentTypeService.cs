@@ -736,7 +736,12 @@ namespace Umbraco.Core.Services
                         uow.Commit();
                         return;
                     }
-                    
+
+                    if (string.IsNullOrWhiteSpace(contentType.Name))
+                    {
+                        throw new ArgumentException("Cannot save content type with empty name.");
+                    }
+
                     var repository = RepositoryFactory.CreateContentTypeRepository(uow);
 
                     ValidateLocked(contentType); // throws if invalid

@@ -162,6 +162,36 @@ namespace Umbraco.Core
             /// Guid for a relation type.
             /// </summary>
             public static readonly Guid RelationTypeGuid = new Guid(RelationType);
+
+            /// <summary>
+            /// Guid for a Forms Form.
+            /// </summary>
+            public const string FormsForm = "F5A9F787-6593-46F0-B8FF-BFD9BCA9F6BB";
+
+            /// <summary>
+            /// Guid for a Forms Form.
+            /// </summary>
+            public static readonly Guid FormsFormGuid = new Guid(FormsForm);
+
+            /// <summary>
+            /// Guid for a Forms Workflow.
+            /// </summary>
+            public const string FormsWorkflow = "42D7BF9B-A362-4FEE-B45A-674D5C064B70";
+
+            /// <summary>
+            /// Guid for a Forms Workflow.
+            /// </summary>
+            public static readonly Guid FormsWorkflowGuid = new Guid(FormsWorkflow);
+
+            /// <summary>
+            /// Guid for a Forms Record.
+            /// </summary>
+            public const string FormsRecord = "CFED6CE4-9359-443E-9977-9956FEB1D867";
+
+            /// <summary>
+            /// Guid for a Forms Record.
+            /// </summary>
+            public static readonly Guid FormsRecordGuid = new Guid(FormsRecord);
         }
     }
 }

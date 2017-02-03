@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Scoping
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
             SettingsForTests.ConfigureSettings(settings);
 
-            var contentType = new ContentType(-1) { Alias = "contenttype" };
+            var contentType = new ContentType(-1) { Alias = "contenttype", Name = "test"};
             ApplicationContext.Services.ContentTypeService.Save(contentType);
 
             _cacheHandler = new CacheRefresherEventHandler();
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Scoping
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
             SettingsForTests.ConfigureSettings(settings);
 
-            var contentType = new ContentType(-1) { Alias = "contenttype" };
+            var contentType = new ContentType(-1) { Alias = "contenttype", Name = "test"};
             ApplicationContext.Services.ContentTypeService.Save(contentType);
 
             _cacheHandler = new CacheRefresherEventHandler();
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Scoping
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
             SettingsForTests.ConfigureSettings(settings);
 
-            var contentType = new ContentType(-1) { Alias = "contenttype" };
+            var contentType = new ContentType(-1) { Alias = "contenttype", Name = "test" };
             ApplicationContext.Services.ContentTypeService.Save(contentType);
 
             _cacheHandler = new CacheRefresherEventHandler();

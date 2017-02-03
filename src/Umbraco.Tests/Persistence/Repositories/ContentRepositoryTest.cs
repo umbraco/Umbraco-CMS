@@ -67,6 +67,66 @@ namespace Umbraco.Tests.Persistence.Repositories
             return repository;
         }
 
+        /// <summary>
+        /// This tests the regression issue of U4-9438
+        /// </summary>
+        /// <remarks>
+        /// The problem was the iteration of the property data in VersionableRepositoryBase when a content item
+        /// in the list actually doesn't have any property types, it would still skip over a property row.
+        /// To test, we have 3 content items, the first has properties, the second doesn't and the third does.
+        /// </remarks>
+        [Test]
+        public void Property_Data_Assigned_Correctly()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+
+            var allContent = new List<IContent>();
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var emptyContentType = MockedContentTypes.CreateBasicContentType();
+                var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                var content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
+                var content2 = MockedContent.CreateBasicContent(emptyContentType);
+                var content3 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
+
+                // Act
+                contentTypeRepository.AddOrUpdate(emptyContentType);
+                contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
+                repository.AddOrUpdate(content1);
+                repository.AddOrUpdate(content2);
+                repository.AddOrUpdate(content3);
+                unitOfWork.Commit();
+
+                allContent.Add(content1);
+                allContent.Add(content2);
+                allContent.Add(content3);
+            }
+
+            // Assert
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                //this will cause the GetPropertyCollection to execute and we need to ensure that 
+                // all of the properties and property types are all correct
+                var result = repository.GetAll(allContent.Select(x => x.Id).ToArray()).ToArray();
+
+                foreach (var content in result)
+                {
+                    foreach (var contentProperty in content.Properties)
+                    {
+                        //prior to the fix, the 2nd document iteration in the GetPropertyCollection would have caused
+                        //the enumerator to move forward past the first property of the 3rd document which would have 
+                        //ended up not assiging a property to the 3rd document. This would have ended up with the 3rd
+                        //document still having 3 properties but the last one would not have been assigned an identity
+                        //because the property data would not have been assigned.
+                        Assert.IsTrue(contentProperty.HasIdentity);
+                    }
+                }
+            }
+        }
+
         [Test]
         public void Rebuild_Xml_Structures_With_Non_Latest_Version()
         {

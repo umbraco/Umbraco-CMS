@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Mvc
 {
@@ -93,6 +95,13 @@ namespace Umbraco.Web.Mvc
                 }
                 //look in this namespace to create the controller
                 controllerPluginRoute.DataTokens.Add("Namespaces", new[] {controllerType.Namespace});
+
+                //Special case! Check if the controller type implements IRequiresSessionState and if so use our
+                //custom webapi session handler
+                if (typeof(IRequiresSessionState).IsAssignableFrom(controllerType))
+                {
+                    controllerPluginRoute.RouteHandler = new SessionHttpControllerRouteHandler();
+                }
             }
 
             //Don't look anywhere else except this namespace!
@@ -100,9 +109,9 @@ namespace Umbraco.Web.Mvc
 
             //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route            
             if (controllerSuffixName.IsNullOrWhiteSpace() == false)
-            {                
-            controllerPluginRoute.Constraints = new RouteValueDictionary(
-                new Dictionary<string, object>
+            {
+                controllerPluginRoute.Constraints = new RouteValueDictionary(
+                    new Dictionary<string, object>
                     {
                         {"controller", @"(\w+)" + controllerSuffixName}
                     });

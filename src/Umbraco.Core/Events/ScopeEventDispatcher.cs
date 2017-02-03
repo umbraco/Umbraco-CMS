@@ -88,7 +88,7 @@ namespace Umbraco.Core.Events
 
         public void ScopeExit(bool completed)
         {
-            // fixme - we'd need to de-duplicate events somehow, etc
+            // fixme - we'd need to de-duplicate events somehow, etc - and the deduplication should be last in wins
 
             if (_events == null) return;
 

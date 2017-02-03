@@ -185,6 +185,18 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, membersInRole.Count());
         }
 
+        [Test]
+        public void Cannot_Save_Member_With_Empty_Name()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, string.Empty, "test@test.com", "pass", "test");
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => ServiceContext.MemberService.Save(member));
+            
+        }
+
         [TestCase("MyTestRole1", "test1", StringPropertyMatchType.StartsWith, 1)]
         [TestCase("MyTestRole1", "test", StringPropertyMatchType.StartsWith, 3)]
         [TestCase("MyTestRole1", "test1", StringPropertyMatchType.Exact, 1)]

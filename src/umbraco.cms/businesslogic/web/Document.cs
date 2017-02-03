@@ -433,21 +433,20 @@ namespace umbraco.cms.businesslogic.web
         {
             XmlDocument xd = new XmlDocument();
 
-            using (var sqlHelper = Application.SqlHelper)
-            using (IRecordsReader dr = sqlHelper.ExecuteReader("select nodeId from cmsDocument"))
+            var nodeIds = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                "select nodeId from cmsDocument");
+
+            foreach (var nodeId in nodeIds)
             {
-                while (dr.Read())
+                try
                 {
-                    try
-                    {
-                        new Document(dr.GetInt("nodeId")).SaveXmlPreview(xd);
-                    }
-                    catch (Exception ee)
-                    {
-                        LogHelper.Error<Document>("Error generating preview xml", ee);
-                    }
+                    new Document(nodeId).SaveXmlPreview(xd);
                 }
-            }
+                catch (Exception ee)
+                {
+                    LogHelper.Error<Document>("Error generating preview xml", ee);
+                }
+            }            
         }
 
         /// <summary>

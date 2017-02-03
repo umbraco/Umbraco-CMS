@@ -251,6 +251,17 @@ namespace Umbraco.Tests.Services
 
         }
 
+        [Test]
+        public void Cannot_Save_Macro_With_Empty_Name()
+        {
+            // Arrange
+            var macroService = ServiceContext.MacroService;
+            var macro = new Macro("test", string.Empty, scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => macroService.Save(macro));
+        }
+
         //[Test]
         //public void Can_Get_Many_By_Alias()
         //{

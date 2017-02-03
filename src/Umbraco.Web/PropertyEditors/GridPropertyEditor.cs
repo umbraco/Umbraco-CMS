@@ -31,6 +31,8 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         try
                         {
+                            //TODO: We should deserialize this to Umbraco.Core.Models.GridValue instead of doing the below
+
                             var json = JsonConvert.DeserializeObject<JObject>(e.Fields[field.Name]);
 
                             //check if this is formatted for grid json
@@ -92,7 +94,12 @@ namespace Umbraco.Web.PropertyEditors
                             //swallow...on purpose, there's a chance that this isn't json and we don't want that to affect 
                             // the website. 
                         }
+                        catch (ArgumentException)
+                        {
+                            //swallow on purpose to prevent this error:
+                            // Can not add Newtonsoft.Json.Linq.JValue to Newtonsoft.Json.Linq.JObject.
 
+                        }
                     }
                 }
             }

@@ -165,7 +165,7 @@ namespace Umbraco.Core.Services
         /// <param name="macro"><see cref="IMacro"/> to save</param>
         /// <param name="userId">Optional Id of the user deleting the macro</param>
         public void Save(IMacro macro, int userId = 0)
-        {
+        {            
 			using (var uow = UowProvider.GetUnitOfWork())
 	        {
                 if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMacro>(macro)))
@@ -173,7 +173,13 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                     return;
                 }
-			    var repository = RepositoryFactory.CreateMacroRepository(uow);
+
+                if (string.IsNullOrWhiteSpace(macro.Name))
+                {
+                    throw new ArgumentException("Cannot save macro with empty name.");
+                }
+
+                var repository = RepositoryFactory.CreateMacroRepository(uow);
 		        repository.AddOrUpdate(macro);
 		        uow.Commit();
 

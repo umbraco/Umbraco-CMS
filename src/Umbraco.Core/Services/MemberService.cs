@@ -234,7 +234,7 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
                     var repository = RepositoryFactory.CreateMemberRepository(uow);
-                    
+
                     //TODO: What about content that has the contenttype as part of its composition?
                     var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
                     var members = repository.GetByQuery(query).ToArray();
@@ -427,28 +427,28 @@ namespace Umbraco.Core.Services
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query = Query<IMember>.Builder.Where(x => 
-                            ((Member) x).PropertyTypeAlias == propertyTypeAlias 
-                            && (((Member) x).LongStringPropertyValue.SqlEquals(value, TextColumnType.NText) 
-                                || ((Member) x).ShortStringPropertyValue.SqlEquals(value, TextColumnType.NVarchar)));
+                        query = Query<IMember>.Builder.Where(x =>
+                            ((Member)x).PropertyTypeAlias == propertyTypeAlias
+                            && (((Member)x).LongStringPropertyValue.SqlEquals(value, TextColumnType.NText)
+                                || ((Member)x).ShortStringPropertyValue.SqlEquals(value, TextColumnType.NVarchar)));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query = Query<IMember>.Builder.Where(x => 
-                            ((Member) x).PropertyTypeAlias == propertyTypeAlias 
-                            && (((Member) x).LongStringPropertyValue.SqlContains(value, TextColumnType.NText) 
-                                || ((Member) x).ShortStringPropertyValue.SqlContains(value, TextColumnType.NVarchar)));
+                        query = Query<IMember>.Builder.Where(x =>
+                            ((Member)x).PropertyTypeAlias == propertyTypeAlias
+                            && (((Member)x).LongStringPropertyValue.SqlContains(value, TextColumnType.NText)
+                                || ((Member)x).ShortStringPropertyValue.SqlContains(value, TextColumnType.NVarchar)));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query = Query<IMember>.Builder.Where(x => 
-                            ((Member) x).PropertyTypeAlias == propertyTypeAlias 
-                            && (((Member) x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText) 
-                                || ((Member) x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
+                        query = Query<IMember>.Builder.Where(x =>
+                            ((Member)x).PropertyTypeAlias == propertyTypeAlias
+                            && (((Member)x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText)
+                                || ((Member)x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query = Query<IMember>.Builder.Where(x => 
-                            ((Member) x).PropertyTypeAlias == propertyTypeAlias 
-                            && (((Member) x).LongStringPropertyValue.SqlEndsWith(value, TextColumnType.NText) 
-                                || ((Member) x).ShortStringPropertyValue.SqlEndsWith(value, TextColumnType.NVarchar)));
+                        query = Query<IMember>.Builder.Where(x =>
+                            ((Member)x).PropertyTypeAlias == propertyTypeAlias
+                            && (((Member)x).LongStringPropertyValue.SqlEndsWith(value, TextColumnType.NText)
+                                || ((Member)x).ShortStringPropertyValue.SqlEndsWith(value, TextColumnType.NVarchar)));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("matchType");
@@ -476,19 +476,19 @@ namespace Umbraco.Core.Services
                 switch (matchType)
                 {
                     case ValuePropertyMatchType.Exact:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue == value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue == value);
                         break;
                     case ValuePropertyMatchType.GreaterThan:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue > value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue > value);
                         break;
                     case ValuePropertyMatchType.LessThan:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue < value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue < value);
                         break;
                     case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue >= value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue >= value);
                         break;
                     case ValuePropertyMatchType.LessThanOrEqualTo:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue <= value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).IntegerPropertyValue <= value);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("matchType");
@@ -510,7 +510,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
 
-                var query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).BoolPropertyValue == value);
+                var query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).BoolPropertyValue == value);
                 return repository.GetByQuery(query);
             }
         }
@@ -534,19 +534,19 @@ namespace Umbraco.Core.Services
                 switch (matchType)
                 {
                     case ValuePropertyMatchType.Exact:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue == value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue == value);
                         break;
                     case ValuePropertyMatchType.GreaterThan:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue > value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue > value);
                         break;
                     case ValuePropertyMatchType.LessThan:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue < value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue < value);
                         break;
                     case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue >= value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue >= value);
                         break;
                     case ValuePropertyMatchType.LessThanOrEqualTo:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue <= value);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == propertyTypeAlias && ((Member)x).DateTimePropertyValue <= value);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("matchType");
@@ -570,12 +570,32 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
-                repository.RebuildXmlStructures(member => _entitySerializer.Serialize(_dataTypeService, member), 
+                repository.RebuildXmlStructures(member => _entitySerializer.Serialize(_dataTypeService, member),
                     contentTypeIds: memberTypeIds.Length == 0 ? null : memberTypeIds);
                 uow.Commit();
             }
 
             Audit(AuditType.Publish, "MemberService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
+        }
+
+        /// <summary>
+        /// Gets paged member descendants as XML by path
+        /// </summary>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of member items</returns>
+        public IEnumerable<XElement> GetPagedXmlEntries(long pageIndex, int pageSize, out long totalRecords)
+        {
+            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateMemberRepository(uow))
+            {
+                var contents = repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);
+                return contents;
+            }
         }
 
         #endregion
@@ -608,21 +628,21 @@ namespace Umbraco.Core.Services
                         break;
                     case MemberCountType.Online:
                         var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate && ((Member) x).DateTimePropertyValue > fromDate);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate && ((Member)x).DateTimePropertyValue > fromDate);
                         ret = repository.GetCountByQuery(query);
                         break;
                     case MemberCountType.LockedOut:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == Constants.Conventions.Member.IsLockedOut && ((Member) x).BoolPropertyValue == true);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.IsLockedOut && ((Member)x).BoolPropertyValue == true);
                         ret = repository.GetCountByQuery(query);
                         break;
                     case MemberCountType.Approved:
-                        query = Query<IMember>.Builder.Where(x => ((Member) x).PropertyTypeAlias == Constants.Conventions.Member.IsApproved && ((Member) x).BoolPropertyValue == true);
+                        query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.IsApproved && ((Member)x).BoolPropertyValue == true);
                         ret = repository.GetCountByQuery(query);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("countType");
                 }
-                
+
                 return ret;
             }
         }
@@ -920,7 +940,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                     return;
                 }
-                
+
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
                 repository.Delete(member);
                 uow.Commit();
@@ -952,6 +972,11 @@ namespace Umbraco.Core.Services
                     }
                 }
 
+                if (string.IsNullOrWhiteSpace(entity.Name))
+                {
+                    throw new ArgumentException("Cannot save member with empty name.");
+                }
+
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
                 repository.AddOrUpdate(entity);
                 repository.AddOrUpdateContentXml(entity, m => _entitySerializer.Serialize(_dataTypeService, m));
@@ -966,7 +991,7 @@ namespace Umbraco.Core.Services
                 if (raiseEvents)
                     uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(entity, false));
             }
-            
+
         }
 
         /// <summary>
@@ -978,7 +1003,7 @@ namespace Umbraco.Core.Services
         public void Save(IEnumerable<IMember> entities, bool raiseEvents = true)
         {
             var asArray = entities.ToArray();
-            
+
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())
@@ -1010,7 +1035,7 @@ namespace Umbraco.Core.Services
                         uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(asArray, false));
                 }
 
-                
+
             }
         }
 
