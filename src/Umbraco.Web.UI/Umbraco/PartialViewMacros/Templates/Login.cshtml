@@ -8,7 +8,8 @@
 
 @{
     var loginModel = new LoginModel();
-    
+    loginModel.RedirectUrl = HttpContext.Current.Request.Url.AbsolutePath;
+
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
     Html.RequiresJs("/umbraco_client/ui/jquery.js");
@@ -21,6 +22,8 @@
 
 @using (Html.BeginUmbracoForm<UmbLoginController>("HandleLogin"))
 {
+	
+    @Html.HiddenFor(m => loginModel.RedirectUrl)
     <fieldset>
         <legend>Login</legend>
         
@@ -37,5 +40,5 @@
         <br />
 
         <button>Login</button>
-    </fieldset>  
+    </fieldset>
 }
