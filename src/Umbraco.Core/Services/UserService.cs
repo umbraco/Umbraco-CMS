@@ -129,6 +129,11 @@ namespace Umbraco.Core.Services
         {
             if (userType == null) throw new ArgumentNullException("userType");
 
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentException("Cannot create user with empty username.");
+            }
+
             //TODO: PUT lock here!!
 
             using (var uow = UowProvider.GetUnitOfWork())
@@ -316,6 +321,16 @@ namespace Umbraco.Core.Services
                     }
 
                 }
+                
+                if (string.IsNullOrWhiteSpace(entity.Username))
+            {
+                throw new ArgumentException("Cannot save user with empty username.");
+            }
+            if (string.IsNullOrWhiteSpace(entity.Name))
+            {
+                throw new ArgumentException("Cannot save user with empty name.");
+            }
+                
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 repository.AddOrUpdate(entity);
                 try
@@ -360,6 +375,14 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 foreach (var member in asArray)
                 {
+                    if (string.IsNullOrWhiteSpace(member.Username))
+                    {
+                        throw new ArgumentException("Cannot save user with empty username.");
+                    }
+                    if (string.IsNullOrWhiteSpace(member.Name))
+                    {
+                        throw new ArgumentException("Cannot save user with empty name.");
+                    }
                     repository.AddOrUpdate(member);
                 }
                 //commit the whole lot in one go

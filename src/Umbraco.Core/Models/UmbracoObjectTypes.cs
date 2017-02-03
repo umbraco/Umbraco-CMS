@@ -143,6 +143,27 @@ namespace Umbraco.Core.Models
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.RelationType)]
         [FriendlyName("Relation Type")]
-        RelationType
+        RelationType,
+
+        /// <summary>
+        /// Forms Form
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.FormsForm)]
+        [FriendlyName("Form")]
+        FormsForm,
+
+        /// <summary>
+        /// Forms Workflow
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.FormsWorkflow)]
+        [FriendlyName("Workflow")]
+        FormsWorkflow,
+
+        /// <summary>
+        /// Forms Record
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.FormsRecord)]
+        [FriendlyName("Record")]
+        FormsRecord
     }
 }

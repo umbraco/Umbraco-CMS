@@ -13,6 +13,7 @@ namespace Umbraco.Web.Trees
     {
         protected abstract string FilePath { get; }
         protected abstract string FileSearchPattern { get; }
+        protected abstract string FileIcon { get; }
 
         /// <summary>
         /// Inheritors can override this method to modify the file node that is created.
@@ -32,7 +33,7 @@ namespace Umbraco.Web.Trees
             string path = "";
             if (!string.IsNullOrEmpty(id) && id != "-1")
             {
-                orgPath = id;
+                orgPath = System.Web.HttpUtility.UrlDecode(id);
                 path = IOHelper.MapPath(FilePath + "/" + orgPath);
                 orgPath += "/";
             }
@@ -50,7 +51,7 @@ namespace Umbraco.Web.Trees
                 if ((dir.Attributes & FileAttributes.Hidden) == 0)
                 {
                     var HasChildren = dir.GetFiles().Length > 0 || dir.GetDirectories().Length > 0;
-                    var node = CreateTreeNode(orgPath + dir.Name, orgPath, queryStrings, dir.Name, "icon-folder", HasChildren);
+                    var node = CreateTreeNode(System.Web.HttpUtility.UrlEncode(orgPath + dir.Name), orgPath, queryStrings, dir.Name, "icon-folder", HasChildren);
 
                     OnRenderFolderNode(ref node);
                     if(node != null)
@@ -79,7 +80,7 @@ namespace Umbraco.Web.Trees
                     if (filterByMultipleExtensions && Array.IndexOf<string>(allowedExtensions, file.Extension.ToLower().Trim('.')) < 0)
                         continue;
 
-                    var node = CreateTreeNode(orgPath + file.Name, orgPath, queryStrings, file.Name, "icon-file", false);
+                    var node = CreateTreeNode(System.Web.HttpUtility.UrlEncode(orgPath + file.Name), orgPath, queryStrings, file.Name, FileIcon, false);
 
                     OnRenderFileNode(ref node);
 

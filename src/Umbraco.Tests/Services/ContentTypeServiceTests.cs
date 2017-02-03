@@ -305,6 +305,42 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Create_Container()
+        {
+            // Arrange
+            var cts = ServiceContext.ContentTypeService;
+
+            // Act
+            var container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid);
+            container.Name = "container1";
+            cts.SaveContentTypeContainer(container);
+
+            // Assert
+            var createdContainer = cts.GetContentTypeContainer(container.Id);
+            Assert.IsNotNull(createdContainer);
+        }
+
+        [Test]
+        public void Can_Get_All_Containers()
+        {
+            // Arrange
+            var cts = ServiceContext.ContentTypeService;
+
+            // Act
+            var container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid);
+            container1.Name = "container1";
+            cts.SaveContentTypeContainer(container1);
+
+            var container2 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid);
+            container2.Name = "container2";
+            cts.SaveContentTypeContainer(container2);
+
+            // Assert
+            var containers = cts.GetContentTypeContainers(new int[0]);
+            Assert.AreEqual(2, containers.Count());
+        }
+
+        [Test]
         public void Deleting_ContentType_Sends_Correct_Number_Of_DeletedEntities_In_Events()
         {
             var cts = ServiceContext.ContentTypeService;
@@ -715,6 +751,16 @@ namespace Umbraco.Tests.Services
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+        }
+
+        [Test]
+        public void Cannot_Save_ContentType_With_Empty_Name()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateSimpleContentType("contentType", string.Empty);
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => ServiceContext.ContentTypeService.Save(contentType));
         }
 
         [Test]

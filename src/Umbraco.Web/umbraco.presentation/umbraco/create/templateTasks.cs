@@ -13,8 +13,7 @@ using umbraco.cms.businesslogic.member;
 namespace umbraco
 {
     public class templateTasks : LegacyDialogTask
-    {
-       
+    {  
         public override bool PerformSave()
         {
             var masterId = ParentID;

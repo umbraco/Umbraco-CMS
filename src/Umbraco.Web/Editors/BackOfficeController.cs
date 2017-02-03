@@ -333,6 +333,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetAllTags(null))
                             },
                             {
+                                "templateApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateController>(
+                                    controller => controller.GetById(0))
+                            },
+                            {
                                 "memberTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
                                     controller => controller.GetNodes("-1", null))
                             },
@@ -359,6 +363,14 @@ namespace Umbraco.Web.Editors
                             {
                                 "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                     controller => controller.GetAllHealthChecks())
+                            },
+                            {
+                                "templateQueryApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
+                                    controller => controller.PostTemplateQuery(null))
+                            },
+                            {
+                                "codeFileApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CodeFileController>(
+                                    controller => controller.GetByPath("", ""))
                             }
                         }
                     },

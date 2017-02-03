@@ -27,15 +27,15 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<IContent,DocumentDto>
 
-        public IContent BuildEntity(DocumentDto dto)
+        public static IContent BuildEntity(DocumentDto dto, IContentType contentType)
         {
-            var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType);
+            var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, contentType);
 
             try
             {
                 content.DisableChangeTracking();
 
-                content.Id = _id;
+                content.Id = dto.NodeId;
                 content.Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId;
                 content.Name = dto.Text;
                 content.NodeName = dto.ContentVersionDto.ContentDto.NodeDto.Text;
@@ -49,8 +49,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Published = dto.Published;
                 content.CreateDate = dto.ContentVersionDto.ContentDto.NodeDto.CreateDate;
                 content.UpdateDate = dto.ContentVersionDto.VersionDate;
-                content.ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?) null;
-                content.ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?) null;
+                content.ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?)null;
+                content.ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?)null;
                 content.Version = dto.ContentVersionDto.VersionId;
                 content.PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished;
                 content.PublishedVersionGuid = dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId;
@@ -64,6 +64,13 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 content.EnableChangeTracking();
             }
+
+        }
+
+        [Obsolete("Use the static BuildEntity instead so we don't have to allocate one of these objects everytime we want to map values")]
+        public IContent BuildEntity(DocumentDto dto)
+        {
+            return BuildEntity(dto, _contentType);
         }
 
         public DocumentDto BuildDto(IContent entity)

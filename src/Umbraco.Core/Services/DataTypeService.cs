@@ -349,6 +349,11 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the user issueing the save</param>
         public void Save(IDataTypeDefinition dataTypeDefinition, int userId = 0)
         {
+            if (string.IsNullOrWhiteSpace(dataTypeDefinition.Name))
+            {
+                throw new ArgumentException("Cannot save datatype with empty name.");
+            }
+        
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition)))

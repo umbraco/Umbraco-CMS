@@ -394,7 +394,7 @@ module.exports = function (grunt) {
             tutorials: {
                 src: [],
                 title: ''
-            }            
+            }
         },
 
         eslint:{
@@ -524,7 +524,10 @@ module.exports = function (grunt) {
                                 'addon/selection/*',
                                 'addon/dialog/*'
                             ]
-                        }
+                        },
+                        'ace-builds': {
+                           files: ['src-min-noconflict/**']
+                       }
                     }
                 }
             },

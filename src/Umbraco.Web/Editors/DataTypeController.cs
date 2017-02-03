@@ -33,7 +33,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     [EnableOverrideAuthorization]
-    public class DataTypeController : UmbracoAuthorizedJsonController
+    public class DataTypeController : BackOfficeNotificationsController
     {
         /// <summary>
         /// Gets data type by name
