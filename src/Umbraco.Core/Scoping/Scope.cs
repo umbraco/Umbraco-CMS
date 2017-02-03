@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Scoping
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Scoping
     /// Implements <see cref="IScope"/>.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope : IScope
+    internal class Scope : IScopeInternal
     {
         private readonly ScopeProvider _scopeProvider;
         private readonly IsolationLevel _isolationLevel;
@@ -24,14 +24,15 @@ namespace Umbraco.Core.Scoping
 
         private IsolatedRuntimeCache _isolatedRuntimeCache;
         private UmbracoDatabase _database;
-        private IEventDispatcher _eventDispatcher;        
+        private ICompletable _fscope;
+        private IEventDispatcher _eventDispatcher;
 
         // this is v7, in v8 this has to change to RepeatableRead
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
 
         // initializes a new scope
-        public Scope(ScopeProvider scopeProvider, bool detachable,
-            ScopeContext scopeContext,
+        private Scope(ScopeProvider scopeProvider,
+            Scope parent, ScopeContext scopeContext, bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
@@ -44,10 +45,62 @@ namespace Umbraco.Core.Scoping
             _dispatchMode = dispatchMode;
             _scopeFileSystem = scopeFileSystems;
             Detachable = detachable;
+
 #if DEBUG_SCOPES
             _scopeProvider.Register(this);
             Console.WriteLine("create " + _instanceId.ToString("N").Substring(0, 8));
 #endif
+
+            if (detachable)
+            {
+                if (parent != null) throw new ArgumentException("Cannot set parent on detachable scope.", "parent");
+                if (scopeContext != null) throw new ArgumentException("Cannot set context on detachable scope.", "scopeContext");
+
+                // detachable creates its own scope context
+                _scopeContext = new ScopeContext();
+
+                // see note below
+                if (scopeFileSystems == true)
+                    _fscope = FileSystemProviderManager.Current.Shadow(Guid.NewGuid());
+
+                return;
+            }
+
+            if (parent != null)
+            {
+                ParentScope = parent;
+
+                // cannot specify a different mode!
+                if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode != repositoryCacheMode)
+                    throw new ArgumentException("Cannot be different from parent.", "repositoryCacheMode");
+
+                // cannot specify a different mode!
+                if (_dispatchMode != EventsDispatchMode.Unspecified && parent._dispatchMode != dispatchMode)
+                    throw new ArgumentException("Cannot be different from parent.", "dispatchMode");
+
+                // cannot specify a different fs scope!
+                if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
+                    throw new ArgumentException("Cannot be different from parent.", "scopeFileSystems");
+            }
+            else
+            {
+                // the FS scope cannot be "on demand" like the rest, because we would need to hook into
+                // every scoped FS to trigger the creation of shadow FS "on demand", and that would be
+                // pretty pointless since if scopeFileSystems is true, we *know* we want to shadow
+                if (scopeFileSystems == true)
+                    _fscope = FileSystemProviderManager.Current.Shadow(Guid.NewGuid());
+            }
+        }
+
+        // initializes a new scope
+        public Scope(ScopeProvider scopeProvider, bool detachable,
+            ScopeContext scopeContext,
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified,
+            RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            bool? scopeFileSystems = null)
+            : this(scopeProvider, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems)
+        {
         }
 
         // initializes a new scope in a nested scopes chain, with its parent
@@ -56,38 +109,25 @@ namespace Umbraco.Core.Scoping
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
             bool? scopeFileSystems = null)
-            : this(scopeProvider, false, null, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems)
+            : this(scopeProvider, parent, null, false, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems)
         {
-            ParentScope = parent;
-
-            // cannot specify a different mode!
-            if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode != repositoryCacheMode)
-                throw new ArgumentException("Cannot be different from parent.", "repositoryCacheMode");
-
-            // cannot specify a different mode!
-            if (_dispatchMode != EventsDispatchMode.Unspecified && parent._dispatchMode != dispatchMode)
-                throw new ArgumentException("Cannot be different from parent.", "dispatchMode");
-
-            // cannot specify a different fs scope!
-            if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
-                throw new ArgumentException("Cannot be different from parent.", "scopeFileSystems");
         }
 
         // initializes a new scope, replacing a NoScope instance
         public Scope(ScopeProvider scopeProvider, NoScope noScope,
             ScopeContext scopeContext,
-            IsolationLevel isolationLevel = IsolationLevel.Unspecified, 
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
             bool? scopeFileSystems = null)
-            : this(scopeProvider, false, scopeContext, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems)
+            : this(scopeProvider, null, scopeContext, false, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems)
         {
             // steal everything from NoScope
             _database = noScope.DatabaseOrNull;
 
             // make sure the NoScope can be replaced ie not in a transaction
             if (_database != null && _database.InTransaction)
-                    throw new Exception("NoScope instance is not free.");
+                throw new Exception("NoScope instance is not free.");
         }
 
 #if DEBUG_SCOPES
@@ -95,7 +135,16 @@ namespace Umbraco.Core.Scoping
         public Guid InstanceId { get { return _instanceId; } }
 #endif
 
-        private EventsDispatchMode DispatchMode
+        public bool ScopedFileSystems
+        {
+            get
+            {
+                if (ParentScope != null) return ParentScope.ScopedFileSystems;
+                return _fscope != null;
+            }
+        }
+
+        public EventsDispatchMode DispatchMode
         {
             get
             {
@@ -124,7 +173,7 @@ namespace Umbraco.Core.Scoping
                 if (ParentScope != null) return ParentScope.IsolatedRuntimeCache;
 
                 return _isolatedRuntimeCache ?? (_isolatedRuntimeCache
-                    = new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+                           = new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
             }
         }
 
@@ -133,12 +182,21 @@ namespace Umbraco.Core.Scoping
         public bool Detachable { get; private set; }
 
         // the parent scope (in a nested scopes chain)
-        public Scope ParentScope { get; set; }
+        public IScopeInternal ParentScope { get; set; }
 
         // the original scope (when attaching a detachable scope)
-        public IScope OrigScope { get; set; }
+        public IScopeInternal OrigScope { get; set; }
 
-        private IsolationLevel IsolationLevel
+        // the original context (when attaching a detachable scope)
+        public ScopeContext OrigContext { get; set; }
+
+        // the context (for attaching & detaching only)
+        public ScopeContext Context
+        {
+            get { return _scopeContext; }
+        }
+
+        public IsolationLevel IsolationLevel
         {
             get
             {
@@ -286,8 +344,11 @@ namespace Umbraco.Core.Scoping
 
         private void DisposeLastScope()
         {
+            // figure out completed
             var completed = _completed.HasValue && _completed.Value;
 
+            // deal with database
+            bool ex = false;
             if (_database != null)
             {
                 try
@@ -297,28 +358,82 @@ namespace Umbraco.Core.Scoping
                     else
                         _database.AbortTransaction();
                 }
+                catch
+                {
+                    ex = true;
+                    throw;
+                }
                 finally
                 {
                     _database.Dispose();
                     _database = null;
+
+                    if (ex)
+                        RobustExit(false, true);
                 }
             }
 
-            // deal with events
-            if (_eventDispatcher != null)
-                _eventDispatcher.ScopeExit(completed);
+            RobustExit(completed, false);
+        }
 
-            // if *we* created it, then get rid of it
-            if (_scopeProvider.AmbientContext == _scopeContext)
+        private void RobustExit(bool completed, bool kabum)
+        {
+            if (kabum) completed = false;
+
+            TryFinally(() =>
             {
-                try
+                if (_scopeFileSystem == true)
                 {
-                    _scopeProvider.AmbientContext.ScopeExit(completed);
+                    if (completed)
+                        _fscope.Complete();
+                    _fscope.Dispose();
+                    _fscope = null;
                 }
-                finally
+            }, () =>
+            {
+                // deal with events
+                if (kabum == false && _eventDispatcher != null)
+                    _eventDispatcher.ScopeExit(completed);
+            }, () =>
+            {
+                // if *we* created it, then get rid of it
+                if (_scopeProvider.AmbientContext == _scopeContext)
                 {
-                    _scopeProvider.AmbientContext = null;
+                    try
+                    {
+                        _scopeProvider.AmbientContext.ScopeExit(completed);
+                    }
+                    finally
+                    {
+                        _scopeProvider.AmbientContext = null;
+                    }
                 }
+            }, () =>
+            {
+                if (Detachable)
+                {
+                    // get out of the way, restore original
+                    _scopeProvider.AmbientScope = OrigScope;
+                    _scopeProvider.AmbientContext = OrigContext;
+                }
+            });
+        }
+
+        private static void TryFinally(params Action[] actions)
+        {
+            TryFinally(0, actions);
+        }
+
+        private static void TryFinally(int index, Action[] actions)
+        {
+            if (index == actions.Length) return;
+            try
+            {
+                actions[index]();
+            }
+            finally
+            {
+                TryFinally(index + 1, actions);
             }
         }
     }

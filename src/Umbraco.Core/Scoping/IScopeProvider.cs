@@ -21,7 +21,7 @@ namespace Umbraco.Core.Scoping
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
-            bool scopeFileSystems = false);
+            bool? scopeFileSystems = null);
 
         /// <summary>
         /// Creates a detached scope.
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Scoping
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
-            bool scopeFileSystems = false);
+            bool? scopeFileSystems = null);
 
         /// <summary>
         /// Attaches a scope.

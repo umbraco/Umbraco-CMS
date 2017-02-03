@@ -25,15 +25,20 @@ namespace Umbraco.Core.Scoping
                 () =>
                 {
                     var scope = StaticAmbientScope;
+                    var context = StaticAmbientContext;
                     StaticAmbientScope = null;
-                    return scope;
+                    StaticAmbientContext = null;
+                    return Tuple.Create(scope, context);
                 },
-                scope =>
+                o =>
                 {
-                    var ambient = StaticAmbientScope;
-                    if (ambient != null)
-                        ambient.Dispose();
-                    StaticAmbientScope = (IScope)scope;
+                    // cannot re-attached over leaked scope/context
+                    if (StaticAmbientScope != null) throw new Exception("Found leaked scope when restoring call context.");
+                    if (StaticAmbientContext != null) throw new Exception("Found leaked context when restoring call context.");
+
+                    var t = (Tuple<IScopeInternal, ScopeContext>)o;
+                    StaticAmbientScope = t.Item1;
+                    StaticAmbientContext = t.Item2;
                 });
         }
 
@@ -94,9 +99,9 @@ namespace Umbraco.Core.Scoping
         // only 1 instance which can be disposed and disposed again
         private static readonly ScopeReference StaticScopeReference = new ScopeReference(new ScopeProvider(null));
 
-        private static IScope CallContextValue
+        private static IScopeInternal CallContextValue
         {
-            get { return (IScope) CallContext.LogicalGetData(ScopeItemKey); }
+            get { return (IScopeInternal) CallContext.LogicalGetData(ScopeItemKey); }
             set
             {
 #if DEBUG_SCOPES
@@ -110,9 +115,9 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        private static IScope HttpContextValue
+        private static IScopeInternal HttpContextValue
         {
-            get { return (IScope) HttpContext.Current.Items[ScopeItemKey]; }
+            get { return (IScopeInternal) HttpContext.Current.Items[ScopeItemKey]; }
             set
             {
 #if DEBUG_SCOPES
@@ -135,7 +140,7 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        private static IScope StaticAmbientScope
+        private static IScopeInternal StaticAmbientScope
         {
             get { return HttpContext.Current == null ? CallContextValue : HttpContextValue; }
             set
@@ -148,14 +153,14 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IScope AmbientScope
+        public IScopeInternal AmbientScope
         {
             get { return StaticAmbientScope; }
             set { StaticAmbientScope = value; }
         }
 
         /// <inheritdoc />
-        public IScope GetAmbientOrNoScope()
+        public IScopeInternal GetAmbientOrNoScope()
         {
                 return AmbientScope ?? (AmbientScope = new NoScope(this));
         }
@@ -184,7 +189,9 @@ namespace Umbraco.Core.Scoping
                 throw new ArgumentException("Not a detachable scope.");
 
             otherScope.OrigScope = AmbientScope;
+            otherScope.OrigContext = AmbientContext;
             AmbientScope = otherScope;
+            AmbientContext = otherScope.Context;
         }
 
         /// <inheritdoc />
@@ -206,7 +213,9 @@ namespace Umbraco.Core.Scoping
                 throw new InvalidOperationException("Ambient scope is not detachable.");
 
             AmbientScope = scope.OrigScope;
+            AmbientContext = scope.OrigContext;
             scope.OrigScope = null;
+            scope.OrigContext = null;
             return scope;
         }
 
@@ -220,7 +229,10 @@ namespace Umbraco.Core.Scoping
             var ambient = AmbientScope;
             if (ambient == null)
             {
-                return AmbientScope = new Scope(this, false, GetNewContext(), isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
+                var context = AmbientContext == null ? new ScopeContext() : null;
+                var scope = new Scope(this, false, context, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
+                if (AmbientContext == null) AmbientContext = context; // assign only if scope creation did not throw!
+                return AmbientScope = scope;
             }
 
             // replace noScope with a real one
@@ -234,20 +246,16 @@ namespace Umbraco.Core.Scoping
                 var database = noScope.DatabaseOrNull;
                 if (database != null && database.InTransaction)
                     throw new Exception("NoScope is in a transaction.");
-                return AmbientScope = new Scope(this, noScope, GetNewContext(), isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
+                var context = AmbientContext == null ? new ScopeContext() : null;
+                var scope = new Scope(this, noScope, context, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
+                if (AmbientContext == null) AmbientContext = context; // assign only if scope creation did not throw!
+                return AmbientScope = scope;
             }
 
-            var scope = ambient as Scope;
-            if (scope == null) throw new Exception("Ambient scope is not a Scope instance.");
+            var ambientScope = ambient as Scope;
+            if (ambientScope == null) throw new Exception("Ambient scope is not a Scope instance.");
 
-            return AmbientScope = new Scope(this, scope, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
-        }
-
-        private ScopeContext GetNewContext()
-        {
-            return AmbientContext == null
-                ? AmbientContext = new ScopeContext()
-                : null;
+            return AmbientScope = new Scope(this, ambientScope, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
         }
 
         /// <inheritdoc />

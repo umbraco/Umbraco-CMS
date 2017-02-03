@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
@@ -8,7 +9,7 @@ namespace Umbraco.Core.Scoping
     /// <summary>
     /// Implements <see cref="IScope"/> when there is no scope.
     /// </summary>
-    internal class NoScope : IScope
+    internal class NoScope : IScopeInternal
     {
         private readonly ScopeProvider _scopeProvider;
         private bool _disposed;
@@ -105,5 +106,12 @@ namespace Umbraco.Core.Scoping
             _disposed = true;
             GC.SuppressFinalize(this);
         }
+
+        public IScopeInternal ParentScope { get { return null; } }
+        public EventsDispatchMode DispatchMode { get {return EventsDispatchMode.Unspecified; } }
+        public IsolationLevel IsolationLevel { get {return IsolationLevel.Unspecified; } }
+        public bool ScopedFileSystems { get { return false; } }
+        public void ChildCompleted(bool? completed) { }
+        public void Reset() { }
     }
 }

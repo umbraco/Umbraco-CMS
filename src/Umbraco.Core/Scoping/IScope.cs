@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;

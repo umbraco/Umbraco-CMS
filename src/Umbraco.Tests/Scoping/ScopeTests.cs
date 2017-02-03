@@ -540,5 +540,108 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNull(ambientScope); // the scope is gone
             Assert.IsNotNull(ambientContext); // the context is still there
         }
+
+        [Test]
+        public void ScopeContextException()
+        {
+            var scopeProvider = DatabaseContext.ScopeProvider;
+
+            bool? completed = null;
+
+            Assert.IsNull(scopeProvider.AmbientScope);
+            using (var scope = scopeProvider.CreateScope())
+            {
+                var detached = scopeProvider.CreateDetachedScope();
+                scopeProvider.AttachScope(detached);
+                // the exception does not prevent other enlisted items to run
+                // *and* it does not prevent the scope from properly going down
+                scopeProvider.Context.Enlist("name", c =>
+                {
+                    throw new Exception("bang");
+                });
+                scopeProvider.Context.Enlist("other", c =>
+                {
+                    completed = c;
+                });
+                detached.Complete();
+                Assert.Throws<AggregateException>(() =>
+                {
+                    detached.Dispose();
+                });
+
+                // even though disposing of the scope has thrown, it has exited
+                // properly ie it has removed itself, and the app remains clean
+
+                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                scope.Complete();
+            }
+            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.IsNull(scopeProvider.AmbientContext);
+
+            Assert.IsNotNull(completed);
+            Assert.AreEqual(true, completed);
+        }
+
+        [Test]
+        public void DetachableScope()
+        {
+            var scopeProvider = DatabaseContext.ScopeProvider;
+
+            Assert.IsNull(scopeProvider.AmbientScope);
+            using (var scope = scopeProvider.CreateScope())
+            {
+                Assert.IsInstanceOf<Scope>(scope);
+                Assert.IsNotNull(scopeProvider.AmbientScope);
+                Assert.AreSame(scope, scopeProvider.AmbientScope);
+
+                Assert.IsNotNull(scopeProvider.AmbientContext); // the ambient context
+                Assert.IsNotNull(scopeProvider.Context); // the ambient context too (getter only)
+                var context = scopeProvider.Context;
+
+                var detached = scopeProvider.CreateDetachedScope();
+                scopeProvider.AttachScope(detached);
+
+                Assert.AreEqual(detached, scopeProvider.AmbientScope);
+                Assert.AreNotSame(context, scopeProvider.Context);
+
+                // nesting under detached!
+                using (var nested = scopeProvider.CreateScope())
+                {
+                    Assert.Throws<InvalidOperationException>(() =>
+                    {
+                        // cannot detach a non-detachable scope
+                        scopeProvider.DetachScope();
+                    });
+                    nested.Complete();
+                }
+
+                Assert.AreEqual(detached, scopeProvider.AmbientScope);
+                Assert.AreNotSame(context, scopeProvider.Context);
+
+                // can detach
+                Assert.AreSame(detached, scopeProvider.DetachScope());
+
+                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.AreSame(context, scopeProvider.AmbientContext);
+
+                Assert.Throws<InvalidOperationException>(() =>
+                {
+                    // cannot disposed a non-attached scope
+                    // in fact, only the ambient scope can be disposed
+                    detached.Dispose();
+                });
+
+                scopeProvider.AttachScope(detached);
+                detached.Complete();
+                detached.Dispose();
+
+                // has self-detached, and is gone!
+
+                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.AreSame(context, scopeProvider.AmbientContext);
+            }
+            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.IsNull(scopeProvider.AmbientContext);
+        }
     }
 }

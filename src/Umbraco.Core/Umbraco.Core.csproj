@@ -354,7 +354,7 @@
     <Compile Include="ICompletable.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="IO\ShadowFileSystem.cs" />
-    <Compile Include="IO\ShadowFileSystemsScope.cs" />
+    <Compile Include="IO\ShadowFileSystems.cs" />
     <Compile Include="IO\ShadowWrapper.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
     <Compile Include="Logging\ImageProcessorLogger.cs" />
@@ -525,6 +525,7 @@
     <Compile Include="SafeCallContext.cs" />
     <Compile Include="Scoping\ActionTime.cs" />
     <Compile Include="Scoping\IScope.cs" />
+    <Compile Include="Scoping\IScopeInternal.cs" />
     <Compile Include="Scoping\IScopeProvider.cs" />
     <Compile Include="Scoping\IScopeProviderInternal.cs" />
     <Compile Include="Scoping\NoScope.cs" />

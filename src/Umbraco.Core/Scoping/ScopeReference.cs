@@ -19,11 +19,10 @@
         {
             // dispose the entire chain (if any)
             // reset (don't commit by default)
-            IScope scope;
+            IScopeInternal scope;
             while ((scope = _scopeProvider.AmbientScope) != null)
             {
-                if (scope is Scope)
-                    ((Scope) scope).Reset();
+                scope.Reset();
                 scope.Dispose();
             }
         }

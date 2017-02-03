@@ -14,12 +14,12 @@
         /// <summary>
         /// Gets the ambient scope.
         /// </summary>
-        IScope AmbientScope { get; }
+        IScopeInternal AmbientScope { get; }
 
         /// <summary>
         /// Gets the ambient scope if any, else creates and returns a <see cref="NoScope"/>.
         /// </summary>
-        IScope GetAmbientOrNoScope();
+        IScopeInternal GetAmbientOrNoScope();
 
         /// <summary>
         /// Resets the ambient scope.
