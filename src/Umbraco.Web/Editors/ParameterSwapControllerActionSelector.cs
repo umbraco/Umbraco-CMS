@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
                     return method;
                 }
 
-                //if it's a post we can try to read from the body and bind from th
+                //if it's a post we can try to read from the body and bind from the json value
                 if (controllerContext.Request.Method == HttpMethod.Post)
                 {
                     var requestContent = new HttpMessageContent(controllerContext.Request);

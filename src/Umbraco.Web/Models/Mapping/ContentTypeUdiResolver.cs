@@ -11,6 +11,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         protected override Udi ResolveCore(IContentTypeComposition source)
         {
+            if (source == null) return null;
+
             return Udi.Create(
                 source.GetType() == typeof(IMemberType)
                     ? Constants.UdiEntityType.MemberType

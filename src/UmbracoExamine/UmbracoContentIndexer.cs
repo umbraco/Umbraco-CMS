@@ -775,7 +775,7 @@ namespace UmbracoExamine
             fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
 
             //guid
-            if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
+            if (allValuesForIndexing[NodeKeyFieldName].IsNullOrWhiteSpace() == false)
             {
                 fields.Add(NodeKeyFieldName, allValuesForIndexing[NodeKeyFieldName]);
             }
