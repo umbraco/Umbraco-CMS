@@ -145,7 +145,16 @@ namespace Umbraco.Core.Services
 
                 var user = new User(userType)
                 {
-                    DefaultToLiveEditing = false, Email = email, Language = GlobalSettings.DefaultUILanguage, Name = username, RawPasswordValue = passwordValue, Username = username, StartContentId = -1, StartMediaId = -1, IsLockedOut = false, IsApproved = true
+                    DefaultToLiveEditing = false,
+                    Email = email,
+                    Language = GlobalSettings.DefaultUILanguage,
+                    Name = username,
+                    RawPasswordValue = passwordValue,
+                    Username = username,
+                    StartContentId = -1,
+                    StartMediaId = -1,
+                    IsLockedOut = false,
+                    IsApproved = true
                 };
                 //adding default sections content and media
                 user.AddAllowedSection("content");
@@ -160,10 +169,10 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(user);
                 uow.Commit();
 
-                uow.Events.Dispatch(SavedUser, this ,new SaveEventArgs<IUser>(user, false));
+                uow.Events.Dispatch(SavedUser, this, new SaveEventArgs<IUser>(user, false));
 
                 return user;
-}
+            }
         }
 
         /// <summary>
@@ -210,7 +219,7 @@ namespace Umbraco.Core.Services
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }
-        
+
         /// <summary>
         /// Get an <see cref="IUser"/> by username
         /// </summary>
@@ -231,9 +240,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="membershipUser"><see cref="IUser"/> to Delete</param>
         public void Delete(IUser membershipUser)
-        {            
+        {
             //disable
-            membershipUser.IsApproved = false;            
+            membershipUser.IsApproved = false;
             //can't rename if it's going to take up too many chars
             if (membershipUser.Username.Length + 9 <= 125)
             {
@@ -321,16 +330,17 @@ namespace Umbraco.Core.Services
                     }
 
                 }
-                
+
                 if (string.IsNullOrWhiteSpace(entity.Username))
-            {
-                throw new ArgumentException("Cannot save user with empty username.");
-            }
-            if (string.IsNullOrWhiteSpace(entity.Name))
-            {
-                throw new ArgumentException("Cannot save user with empty name.");
-            }
-                
+                {
+                    throw new ArgumentException("Cannot save user with empty username.");
+                }
+
+                if (string.IsNullOrWhiteSpace(entity.Name))
+                {
+                    throw new ArgumentException("Cannot save user with empty name.");
+                }
+
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 repository.AddOrUpdate(entity);
                 try
@@ -350,7 +360,7 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            
+
         }
 
         /// <summary>
@@ -392,7 +402,7 @@ namespace Umbraco.Core.Services
                     uow.Events.Dispatch(SavedUser, this, new SaveEventArgs<IUser>(asArray, false));
             }
 
-            
+
         }
 
         /// <summary>
@@ -546,7 +556,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
-                var repository = (UserRepository) RepositoryFactory.CreateUserRepository(uow);
+                var repository = (UserRepository)RepositoryFactory.CreateUserRepository(uow);
                 return repository.GetNextUsers(id, count);
             }
         }
@@ -707,7 +717,7 @@ namespace Umbraco.Core.Services
                     uow.Events.Dispatch(SavedUserType, this, new SaveEventArgs<IUserType>(userType, false));
             }
 
-            
+
         }
 
         /// <summary>
@@ -753,7 +763,7 @@ namespace Umbraco.Core.Services
                 //TODO: Events?
             }
         }
-        
+
         /// <summary>
         /// Add a specific section to all users or those specified as parameters
         /// </summary>
@@ -783,7 +793,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
                 //TODO: Events?
             }
-        }    
+        }
 
         /// <summary>
         /// Get permissions set for a user and optional node ids
@@ -812,7 +822,7 @@ namespace Umbraco.Core.Services
         }
 
         #endregion
-        
+
         /// <summary>
         /// Occurs before Save
         /// </summary>

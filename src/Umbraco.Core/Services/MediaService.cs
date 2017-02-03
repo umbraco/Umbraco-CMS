@@ -833,12 +833,6 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         Attempt<OperationStatus> IMediaServiceOperations.Save(IMedia media, int userId, bool raiseEvents)
         {
-        
-            if (string.IsNullOrWhiteSpace(media.Name))
-            {
-                throw new ArgumentException("Cannot save media with empty name.");
-            }
-            
             var evtMsgs = EventMessagesFactory.Get();
 
             using (var uow = UowProvider.GetUnitOfWork())
@@ -847,6 +841,11 @@ namespace Umbraco.Core.Services
                 {
                     if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(media, evtMsgs)))
                         return OperationStatus.Cancelled(evtMsgs);
+                }
+
+                if (string.IsNullOrWhiteSpace(media.Name))
+                {
+                    throw new ArgumentException("Cannot save media with empty name.");
                 }
 
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
@@ -1253,7 +1252,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
-                return repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize, out totalRecords);
+                return repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize, null, out totalRecords);
             }
         }
 

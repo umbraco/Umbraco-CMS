@@ -79,11 +79,6 @@ namespace Umbraco.Core.Services
 
         public void Save(IMemberType memberType, int userId = 0)
         {
-            if (string.IsNullOrWhiteSpace(memberType.Name))
-            {
-                throw new ArgumentException("Cannot save MemberType with empty name.");
-            }
-
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())
@@ -93,6 +88,12 @@ namespace Umbraco.Core.Services
                         uow.Commit();
                         return;
                     }
+
+                    if (string.IsNullOrWhiteSpace(memberType.Name))
+                    {
+                        throw new ArgumentException("Cannot save MemberType with empty name.");
+                    }
+
                     var repository = RepositoryFactory.CreateMemberTypeRepository(uow);
                     memberType.CreatorId = userId;
                     repository.AddOrUpdate(memberType);

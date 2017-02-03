@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Services
     public class SomeService : ScopeRepositoryService
     {
         // fixme the eventMessagesFactory should die, event messages are scoped!
-        public SomeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory) 
+        public SomeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         { }
 
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Services
         {
             private readonly IContent _content;
 
-            public DeletingEvent(TypedEventHandler<SomeService, DeleteEventArgs<IContent>> eventHandler, SomeService sender, IContent content) 
+            public DeletingEvent(TypedEventHandler<SomeService, DeleteEventArgs<IContent>> eventHandler, SomeService sender, IContent content)
                 : base(eventHandler, sender)
             {
                 _content = content;
@@ -258,7 +259,7 @@ namespace Umbraco.Core.Services
                 auditRepo.AddOrUpdate(new AuditItem(content.Id, string.Format("Content '{0}' was created", name), AuditType.New, content.CreatorId));
                 uow.Commit();
             }
-            
+
             // fixme duplicate + NOOOOO not another UOW!
             //Audit(AuditType.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
 
@@ -297,7 +298,7 @@ namespace Umbraco.Core.Services
 
                 content.CreatorId = userId;
                 content.WriterId = userId;
-                
+
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parent));
             }
 
@@ -1132,7 +1133,7 @@ namespace Umbraco.Core.Services
 
                     uow.Commit();
                 }
-               
+
                 // fixme the WHOLE thing should move to the UOW!
                 //Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
@@ -1563,7 +1564,7 @@ namespace Umbraco.Core.Services
                     var repository = RepositoryFactory.CreateContentRepository(uow);
                     repository.DeleteVersion(versionId);
                     uow.Commit();
-                    
+
                     uow.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), "DeletedVersions");
 
                     Audit(AuditType.Delete, "Delete Content by version performed by user", userId, Constants.System.Root);
@@ -1739,7 +1740,7 @@ namespace Umbraco.Core.Services
                             uow.Commit();
                             return null;
                         }
-                
+
                         var repository = RepositoryFactory.CreateContentRepository(uow);
 
                         // Update the create author and last edit author
@@ -1886,7 +1887,7 @@ namespace Umbraco.Core.Services
                             return false;
                         }
                     }
-                    
+
                     var repository = RepositoryFactory.CreateContentRepository(uow);
 
                     int i = 0;
@@ -1936,9 +1937,9 @@ namespace Umbraco.Core.Services
                         //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
                         _publishingStrategy.PublishingFinalized(uow, shouldBePublished, false);
                     }
-                }                
+                }
             }
-            
+
             // fixme - out of uow?
             Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
 
@@ -1964,7 +1965,7 @@ namespace Umbraco.Core.Services
                 var contents = repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize,
                     //This order by is VERY important! This allows us to figure out what is implicitly not published, see ContentRepository.BuildXmlCache and
                     // UmbracoContentIndexer.PerformIndexAll which uses the logic based on this sort order
-                    new[] {"level", "parentID", "sortOrder"},
+                    new[] { "level", "parentID", "sortOrder" },
                     out totalRecords);
                 return contents;
             }
@@ -2207,7 +2208,7 @@ namespace Umbraco.Core.Services
                         // ensure proper order (for events) - cannot publish a child before its parent!
                         .OrderBy(x => x.Result.ContentItem.Level)
                         .ThenBy(x => x.Result.ContentItem.SortOrder);
-                
+
                     var repository = RepositoryFactory.CreateContentRepository(uow);
 
                     //NOTE The Publish with subpages-dialog was used more as a republish-type-thing, so we'll have to include PublishStatusType.SuccessAlreadyPublished
@@ -2263,7 +2264,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                     return Attempt.Fail(new UnPublishStatus(content, UnPublishedStatusType.FailedCancelledByEvent, evtMsgs));
                 }
-            
+
                 var repository = RepositoryFactory.CreateContentRepository(uow);
 
                 content.WriterId = userId;
@@ -2279,7 +2280,7 @@ namespace Umbraco.Core.Services
                 if (omitCacheRefresh == false)
                     _publishingStrategy.UnPublishingFinalized(uow, content);
             }
-            
+
 
             Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
 
@@ -2316,12 +2317,12 @@ namespace Umbraco.Core.Services
                     //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
                     publishStatus.StatusType = CheckAndLogIsPublishable(content);
                     //if it is not successful, then check if the props are valid
-                    if ((int) publishStatus.StatusType < 10)
+                    if ((int)publishStatus.StatusType < 10)
                     {
                         //Content contains invalid property values and can therefore not be published - fire event?
                         publishStatus.StatusType = CheckAndLogIsValid(content);
                         //set the invalid properties (if there are any)
-                        publishStatus.InvalidProperties = ((ContentBase) content).LastInvalidProperties;
+                        publishStatus.InvalidProperties = ((ContentBase)content).LastInvalidProperties;
                     }
                     //if we're still successful, then publish using the strategy
                     if (publishStatus.StatusType == PublishStatusType.Success)
@@ -2406,11 +2407,11 @@ namespace Umbraco.Core.Services
                         {
                             return OperationStatus.Cancelled(evtMsgs);
                         }
-            }
+                    }
 
-            if (string.IsNullOrWhiteSpace(content.Name))
-            {
-                throw new ArgumentException("Cannot save content with empty name.");
+                    if (string.IsNullOrWhiteSpace(content.Name))
+                    {
+                        throw new ArgumentException("Cannot save content with empty name.");
                     }
 
                     var repository = RepositoryFactory.CreateContentRepository(uow);

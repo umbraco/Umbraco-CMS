@@ -727,11 +727,6 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the ContentType</param>
         public void Save(IContentType contentType, int userId = 0)
         {
-
-            if (string.IsNullOrWhiteSpace(contentType.Name))
-            {
-                throw new ArgumentException("Cannot save content type with empty name.");
-            }
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())
@@ -741,7 +736,12 @@ namespace Umbraco.Core.Services
                         uow.Commit();
                         return;
                     }
-                    
+
+                    if (string.IsNullOrWhiteSpace(contentType.Name))
+                    {
+                        throw new ArgumentException("Cannot save content type with empty name.");
+                    }
+
                     var repository = RepositoryFactory.CreateContentTypeRepository(uow);
 
                     ValidateLocked(contentType); // throws if invalid
