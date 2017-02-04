@@ -125,19 +125,35 @@ namespace Umbraco.Core.Persistence.Repositories
             return provider.GetOrCreateCache<TEntity>();
         }
 
-        private static RepositoryCachePolicyOptions _defaultOptions;
+        // this is a *bad* idea because PerformCount captures the current repository and its UOW
+        //
+        //private static RepositoryCachePolicyOptions _defaultOptions;
+        //protected virtual RepositoryCachePolicyOptions DefaultOptions
+        //{
+        //    get
+        //    {
+        //        return _defaultOptions ?? (_defaultOptions
+        //            = new RepositoryCachePolicyOptions(() =>
+        //            {
+        //                // get count of all entities of current type (TEntity) to ensure cached result is correct
+        //                // create query once if it is needed (no need for locking here) - query is static!
+        //                var query = _hasIdQuery ?? (_hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0));
+        //                return PerformCount(query);
+        //            }));
+        //    }
+        //}
+
         protected virtual RepositoryCachePolicyOptions DefaultOptions
         {
             get
             {
-                return _defaultOptions ?? (_defaultOptions
-                    = new RepositoryCachePolicyOptions(() =>
+                return new RepositoryCachePolicyOptions(() =>
                     {
                         // get count of all entities of current type (TEntity) to ensure cached result is correct
                         // create query once if it is needed (no need for locking here) - query is static!
                         var query = _hasIdQuery ?? (_hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0));
                         return PerformCount(query);
-                    }));
+                    });
             }
         }
 

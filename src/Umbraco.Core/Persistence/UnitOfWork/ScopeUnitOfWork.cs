@@ -154,6 +154,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
 	    public IScope Scope
 	    {
+            // TODO
+            // once we are absolutely sure that our UOW cannot be disposed more than once,
+            // this should throw if the UOW has already been disposed, NOT recreate a scope!
 	        get { return _scope ?? (_scope = _scopeProvider.CreateScope(_isolationLevel)); }
 	    }
 

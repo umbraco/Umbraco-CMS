@@ -33,7 +33,17 @@ namespace Umbraco.Core.Scoping
                 o =>
                 {
                     // cannot re-attached over leaked scope/context
-                    if (StaticAmbientScope != null) throw new Exception("Found leaked scope when restoring call context.");
+                    // except of course over NoScope (which leaks)
+                    var ambientScope = StaticAmbientScope;
+                    if (ambientScope != null)
+                    {
+                        var ambientNoScope = ambientScope as NoScope;
+                        if (ambientNoScope == null)
+                            throw new Exception("Found leaked scope when restoring call context.");
+
+                        // this should rollback any pending transaction
+                        ambientNoScope.Dispose();
+                    }
                     if (StaticAmbientContext != null) throw new Exception("Found leaked context when restoring call context.");
 
                     var t = (Tuple<IScopeInternal, ScopeContext>)o;
