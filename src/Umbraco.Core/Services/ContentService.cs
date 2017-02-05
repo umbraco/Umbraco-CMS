@@ -1642,6 +1642,31 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Sends an <see cref="IContent"/> to Publication, which executes handlers and events for the 'Send to Publication' action.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to send to publication</param>
+        /// <param name="userId">Optional Id of the User issueing the send to publication</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        /// <returns>True if sending publication was succesfull otherwise false</returns>
+        public bool SendToPublication(IContent content, bool raiseEvents, int userId = 0)
+        {
+            if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this))
+                return false;
+
+            //Save before raising event
+            Save(content, userId, raiseEvents);
+
+            if (raiseEvents)
+            {
+                SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this);
+            }
+
+            Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+
+            return true;
+        }
+
+        /// <summary>
         /// Rollback an <see cref="IContent"/> object to a previous version.
         /// This will create a new version, which is a copy of all the old data.
         /// </summary>
