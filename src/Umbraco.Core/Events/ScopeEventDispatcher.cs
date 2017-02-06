@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Umbraco.Core.Events
-{
+{   
+
     /// <summary>
     /// This event manager is created for each scope and is aware of if it is nested in an outer scope
     /// </summary>
@@ -13,14 +15,14 @@ namespace Umbraco.Core.Events
     internal class ScopeEventDispatcher : IEventDispatcher
     {
         private readonly EventsDispatchMode _mode;
-        private List<EventDefinitionBase> _events;
+        private List<IEventDefinition> _events;
 
         public ScopeEventDispatcher(EventsDispatchMode mode)
         {
             _mode = mode;
         }
 
-        private List<EventDefinitionBase> Events { get { return _events ?? (_events = new List<EventDefinitionBase>()); } }
+        private List<IEventDefinition> Events { get { return _events ?? (_events = new List<IEventDefinition>()); } }
 
         private bool PassThroughCancelable { get { return _mode == EventsDispatchMode.PassThrough || _mode == EventsDispatchMode.Scope; } }
 
@@ -81,9 +83,32 @@ namespace Umbraco.Core.Events
                 Events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args, eventName));
         }
 
-        public IEnumerable<IEventDefinition> GetEvents()
+        public IEnumerable<IEventDefinition> GetEvents(EventDefinitionFilter filter)
         {
-            return _events ?? Enumerable.Empty<IEventDefinition>();
+            if (_events == null)
+                return Enumerable.Empty<IEventDefinition>();
+
+            switch (filter)
+            {
+                case EventDefinitionFilter.All:
+                    return _events;
+                case EventDefinitionFilter.FirstIn:
+                    var l1 = new OrderedHashSet<IEventDefinition>();
+                    foreach (var e in _events)
+                    {
+                        l1.Add(e);
+                    }
+                    return l1;
+                case EventDefinitionFilter.LastIn:
+                    var l2 = new OrderedHashSet<IEventDefinition>(keepOldest:false);
+                    foreach (var e in _events)
+                    {
+                        l2.Add(e);
+                    }
+                    return l2;
+                default:
+                    throw new ArgumentOutOfRangeException("filter", filter, null);
+            }
         }
 
         public void ScopeExit(bool completed)

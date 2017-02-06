@@ -93,6 +93,6 @@ namespace Umbraco.Core.Events
         /// Gets the collected events.
         /// </summary>
         /// <returns>The collected events.</returns>
-        IEnumerable<IEventDefinition> GetEvents();
+        IEnumerable<IEventDefinition> GetEvents(EventDefinitionFilter filter);
     }
 }

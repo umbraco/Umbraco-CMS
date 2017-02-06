@@ -50,7 +50,7 @@ namespace Umbraco.Core.Events
             eventHandler(sender, args);
         }
 
-        public IEnumerable<IEventDefinition> GetEvents()
+        public IEnumerable<IEventDefinition> GetEvents(EventDefinitionFilter filter)
         {
             return Enumerable.Empty<IEventDefinition>();
         }

@@ -22,23 +22,20 @@ namespace Umbraco.Core.Events
     /// </summary>
     internal class EventNameExtractor
     {
+
         /// <summary>
         /// Finds the event name on the sender that matches the args type
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param name="senderType"></param>
+        /// <param name="argsType"></param>
         /// <param name="exclude">
         /// A filter to exclude matched event names, this filter should return true to exclude the event name from being matched
         /// </param>
         /// <returns>
         /// null if not found or an ambiguous match
         /// </returns>
-        public static Attempt<EventNameExtractorResult> FindEvent(object sender, object args, Func<string, bool> exclude)
-        {
-            var argsType = args.GetType();
-
-            var senderType = sender.GetType();
-
+        public static Attempt<EventNameExtractorResult> FindEvent(Type senderType, Type argsType, Func<string, bool> exclude)
+        {   
             var found = MatchedEventNames.GetOrAdd(new Tuple<Type, Type>(senderType, argsType), tuple =>
             {
                 var events = CandidateEvents.GetOrAdd(senderType, t =>
@@ -70,14 +67,14 @@ namespace Umbraco.Core.Events
                         return true;
 
                     //special case for our own TypedEventHandler
-                    if (x.EventInfo.EventHandlerType.GetGenericTypeDefinition() == typeof(TypedEventHandler<,>) 
+                    if (x.EventInfo.EventHandlerType.GetGenericTypeDefinition() == typeof(TypedEventHandler<,>)
                         && x.GenericArgs.Length == 2
                         && x.GenericArgs[1] == tuple.Item2)
                     {
                         return true;
                     }
 
-                    return false;                    
+                    return false;
                 }).Select(x => x.EventInfo.Name).ToArray();
             });
 
@@ -91,6 +88,22 @@ namespace Umbraco.Core.Events
 
             //there's more than one left so it's ambiguous!
             return Attempt.Fail(new EventNameExtractorResult(EventNameExtractorError.Ambiguous));
+        }
+
+        /// <summary>
+        /// Finds the event name on the sender that matches the args type
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        /// <param name="exclude">
+        /// A filter to exclude matched event names, this filter should return true to exclude the event name from being matched
+        /// </param>
+        /// <returns>
+        /// null if not found or an ambiguous match
+        /// </returns>
+        public static Attempt<EventNameExtractorResult> FindEvent(object sender, object args, Func<string, bool> exclude)
+        {
+            return FindEvent(sender.GetType(), args.GetType(), exclude);
         }
 
         /// <summary>

@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Scoping
             events.Dispatch(DoThing2, this, new EventArgs());
             events.Dispatch(DoThing3, this, new EventArgs());
 
-            Assert.IsEmpty(events.GetEvents());
+            Assert.IsEmpty(events.GetEvents(EventDefinitionFilter.All));
         }
 
         public event EventHandler DoThing1;

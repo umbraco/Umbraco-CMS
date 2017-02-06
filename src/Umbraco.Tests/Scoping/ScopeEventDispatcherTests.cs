@@ -77,9 +77,9 @@ namespace Umbraco.Tests.Scoping
                 scope.Events.Dispatch(DoThing3, this, new SaveEventArgs<decimal>(0));
 
                 // events have been queued
-                Assert.AreEqual(3, scope.Events.GetEvents().Count());
+                Assert.AreEqual(3, scope.Events.GetEvents(EventDefinitionFilter.All).Count());
 
-                var events = scope.Events.GetEvents().ToArray();
+                var events = scope.Events.GetEvents(EventDefinitionFilter.All).ToArray();
 
                 var knownNames = new[] { "DoThing1", "DoThing2", "DoThing3" };
                 var knownArgTypes = new[] { typeof (SaveEventArgs<string>), typeof (SaveEventArgs<int>), typeof (SaveEventArgs<decimal>) };
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Scoping
                 scope.Events.Dispatch(DoThing3, this, new SaveEventArgs<decimal>(0));
 
                 // events have not been queued
-                Assert.IsEmpty(scope.Events.GetEvents());
+                Assert.IsEmpty(scope.Events.GetEvents(EventDefinitionFilter.All));
 
                 // events have been raised
                 Assert.AreEqual(3, counter);
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Scoping
                 scope.Events.Dispatch(DoThing3, this, new SaveEventArgs<decimal>(0));
 
                 // events have been queued
-                Assert.AreEqual(3, scope.Events.GetEvents().Count());
+                Assert.AreEqual(3, scope.Events.GetEvents(EventDefinitionFilter.All).Count());
 
                 if (complete)
                     scope.Complete();
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Scoping
                 scope.Events.Dispatch(DoThing3, this, new SaveEventArgs<decimal>(0));
 
                 // events have been queued
-                Assert.AreEqual(3, scope.Events.GetEvents().Count());
+                Assert.AreEqual(3, scope.Events.GetEvents(EventDefinitionFilter.All).Count());
 
                 if (complete)
                     scope.Complete();
