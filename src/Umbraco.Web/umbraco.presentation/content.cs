@@ -562,7 +562,8 @@ namespace umbraco
         {
             get { return XmlFileEnabled && UmbracoConfig.For.UmbracoSettings().Content.XmlContentCheckForDiskChanges; }
         }
-
+        
+        //fixme: this is not used?
         // whether _xml is immutable or not (achieved by cloning before changing anything)
         private static bool XmlIsImmutable
         {

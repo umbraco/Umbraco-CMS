@@ -69,7 +69,10 @@ namespace umbraco
             if (_isWriter)
                 throw new InvalidOperationException("Already a writer.");
             _isWriter = true;
-            _xml = Clone(_xml); // cloning for writer is not an option anymore (see XmlIsImmutable)
+
+            // cloning for writer is not an option anymore (see XmlIsImmutable)
+            //fixme: But XmlIsImmutable is not actually used!
+            _xml = Clone(_xml); 
         }
 
         internal static Action Cloning { get; set; }
