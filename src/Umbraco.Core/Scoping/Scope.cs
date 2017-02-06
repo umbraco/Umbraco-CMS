@@ -47,7 +47,7 @@ namespace Umbraco.Core.Scoping
             Detachable = detachable;
 
 #if DEBUG_SCOPES
-            _scopeProvider.Register(this);
+            _scopeProvider.RegisterScope(this);
             Console.WriteLine("create " + _instanceId.ToString("N").Substring(0, 8));
 #endif
 

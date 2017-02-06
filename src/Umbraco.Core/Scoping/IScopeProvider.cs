@@ -1,5 +1,8 @@
 ﻿using System.Data;
 using Umbraco.Core.Events;
+#if DEBUG_SCOPES
+using System.Collections.Generic;
+#endif
 
 namespace Umbraco.Core.Scoping
 {
@@ -55,13 +58,13 @@ namespace Umbraco.Core.Scoping
         /// </remarks>
         IScope DetachScope();
 
-#if DEBUG_SCOPES
-        IEnumerable<ScopeInfo> ScopeInfos { get; }
-#endif
-
         /// <summary>
         /// Gets the scope context.
         /// </summary>
         ScopeContext Context { get; }
+
+#if DEBUG_SCOPES
+        IEnumerable<ScopeInfo> ScopeInfos { get; }
+#endif
     }
 }

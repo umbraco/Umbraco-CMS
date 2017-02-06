@@ -115,10 +115,10 @@ namespace Umbraco.Core.Scoping
             set
             {
 #if DEBUG_SCOPES
-                var ambient = (IScope)CallContext.LogicalGetData(ScopeItemKey);
-                if (ambient != null) RegisterContext(ambient, null);
-                if (value != null)
-                    RegisterContext(value, "lcc");
+                // manage the 'context' that contains the scope (null, "http" or "lcc")
+                var ambientScope = (IScope) CallContext.LogicalGetData(ScopeItemKey);
+                if (ambientScope != null) RegisterContext(ambientScope, null);
+                if (value != null) RegisterContext(value, "lcc");
 #endif
                 if (value == null) CallContext.FreeNamedDataSlot(ScopeItemKey);
                 else CallContext.LogicalSetData(ScopeItemKey, value);
@@ -131,10 +131,10 @@ namespace Umbraco.Core.Scoping
             set
             {
 #if DEBUG_SCOPES
-                var ambient = (IScope) HttpContext.Current.Items[ScopeItemKey];
-                if (ambient != null) RegisterContext(ambient, null);
-                if (value != null)
-                    RegisterContext(value, "http");
+                // manage the 'context' that contains the scope (null, "http" or "lcc")
+                var ambientScope = (IScope) HttpContext.Current.Items[ScopeItemKey];
+                if (ambientScope != null) RegisterContext(ambientScope, null);
+                if (value != null) RegisterContext(value, "http");
 #endif
                 if (value == null)
                 {
@@ -184,8 +184,7 @@ namespace Umbraco.Core.Scoping
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
             bool? scopeFileSystems = null)
         {
-            // fixme - what about scope context when attaching & detaching?
-            return new Scope(this, true, (ScopeContext) null, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
+            return new Scope(this, true, null, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
         }
 
         /// <inheritdoc />
@@ -286,9 +285,13 @@ namespace Umbraco.Core.Scoping
 
 #if DEBUG_SCOPES
         // this code needs TLC
-        // the idea is to keep in a list all the scopes that have been created
-        // and remove them when they are disposed
-        // so we can track leaks
+        //
+        // the idea here is to keep in a list all the scopes that have been created, and to remove them
+        // when they are disposed, so we can track leaks, ie scopes that would not be properly taken
+        // care of by our code
+        //
+        // note: the code could probably be optimized... but this is NOT supposed to go into any real
+        // live build, either production or debug - it's just a debugging tool for the time being
 
         // helps identifying when non-httpContext scopes are created by logging the stack trace
         //private void LogCallContextStack()
@@ -304,46 +307,66 @@ namespace Umbraco.Core.Scoping
         //        LogHelper.Debug<ScopeProvider>("CallContext: " + Environment.StackTrace);
         //}
 
-        // helps identifying scope leaks by keeping track of all instances
-        public static readonly List<ScopeInfo> StaticScopeInfos = new List<ScopeInfo>();
+        // all scope instances that are currently beeing tracked
+        private static readonly object StaticScopeInfosLock = new object();
+        private static readonly List<ScopeInfo> StaticScopeInfos = new List<ScopeInfo>();
 
-        public IEnumerable<ScopeInfo> ScopeInfos { get { return StaticScopeInfos; } }
+        public IEnumerable<ScopeInfo> ScopeInfos
+        {
+            get
+            {
+                lock (StaticScopeInfosLock)
+                {
+                    return StaticScopeInfos.ToArray(); // capture in an array
+                }
+            }
+        }
 
         //private static void Log(string message, UmbracoDatabase database)
         //{
         //    LogHelper.Debug<ScopeProvider>(message + " (" + (database == null ? "" : database.InstanceSid) + ").");
         //}
 
-        public void Register(IScope scope)
+        public void RegisterScope(IScope scope)
         {
-            if (StaticScopeInfos.Any(x => x.Scope == scope)) throw new Exception();
-            StaticScopeInfos.Add(new ScopeInfo(scope, Environment.StackTrace));
+            lock (StaticScopeInfosLock)
+            {
+                if (StaticScopeInfos.Any(x => x.Scope == scope)) throw new Exception("oops: already registered.");
+                StaticScopeInfos.Add(new ScopeInfo(scope, Environment.StackTrace));
+            }
         }
 
+        // 'context' that contains the scope (null, "http" or "lcc")
         public static void RegisterContext(IScope scope, string context)
         {
-            var info = StaticScopeInfos.FirstOrDefault(x => x.Scope == scope);
-            if (info == null)
+            lock (StaticScopeInfosLock)
             {
-                if (context == null) return;
-                throw new Exception();
+                var info = StaticScopeInfos.FirstOrDefault(x => x.Scope == scope);
+                if (info == null)
+                {
+                    if (context == null) return;
+                    throw new Exception("oops: unregistered scope.");
+                }
+                if (context == null) info.NullStack = Environment.StackTrace;
+                info.Context = context;
             }
-            if (context == null) info.NullStack = Environment.StackTrace;
-            info.Context = context;
         }
 
         public void Disposed(IScope scope)
         {
-            var info = StaticScopeInfos.FirstOrDefault(x => x.Scope == scope);
-            if (info != null)
+            lock (StaticScopeInfosLock)
             {
-                // enable this by default
-                StaticScopeInfos.Remove(info);
+                var info = StaticScopeInfos.FirstOrDefault(x => x.Scope == scope);
+                if (info != null)
+                {
+                    // enable this by default
+                    StaticScopeInfos.Remove(info);
 
-                // instead, enable this to keep *all* scopes
-                // beware, there can be a lot of scopes!
-                //info.Disposed = true;
-                //info.DisposedStack = Environment.StackTrace;
+                    // instead, enable this to keep *all* scopes
+                    // beware, there can be a lot of scopes!
+                    //info.Disposed = true;
+                    //info.DisposedStack = Environment.StackTrace;
+                }
             }
         }
 #endif
@@ -359,14 +382,18 @@ namespace Umbraco.Core.Scoping
             CtorStack = ctorStack;
         }
 
-        public IScope Scope { get; private set; }
+        public IScope Scope { get; private set; } // the scope itself
+
+        // the scope's parent identifier
         public Guid Parent { get { return (Scope is NoScope || ((Scope) Scope).ParentScope == null) ? Guid.Empty : ((Scope) Scope).ParentScope.InstanceId; } }
-        public DateTime Created { get; private set; }
-        public bool Disposed { get; set; }
-        public string Context { get; set; }
+
+        public DateTime Created { get; private set; } // the date time the scope was created
+        public bool Disposed { get; set; } // whether the scope has been disposed already
+        public string Context { get; set; } // the current 'context' that contains the scope (null, "http" or "lcc")
+
         public string CtorStack { get; private set; } // the stacktrace of the scope ctor
         public string DisposedStack { get; set; } // the stacktrace when disposed
-        public string NullStack { get; set; } // the stacktrace when context went null
+        public string NullStack { get; set; } // the stacktrace when the 'context' that contains the scope went null
     }
 #endif
 }

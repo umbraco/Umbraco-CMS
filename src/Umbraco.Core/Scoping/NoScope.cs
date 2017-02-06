@@ -20,7 +20,7 @@ namespace Umbraco.Core.Scoping
         {
             _scopeProvider = scopeProvider;
 #if DEBUG_SCOPES
-            _scopeProvider.Register(this);
+            _scopeProvider.RegisterScope(this);
 #endif
         }
 
