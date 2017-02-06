@@ -31,7 +31,6 @@
       <dependency id="xmlrpcnet" version="[2.5.0, 3.0.0)" />
       <dependency id="ClientDependency" version="[1.9.2, 2.0.0)" />
       <dependency id="ClientDependency-Mvc5" version="[1.8.0, 2.0.0)" />
-	  <!-- AutoMapper can not be updated due to: https://github.com/AutoMapper/AutoMapper/issues/373#issuecomment-127644405 -->
       <dependency id="AutoMapper" version="[3.3.1, 4.0.0)" />
       <dependency id="Newtonsoft.Json" version="[6.0.8, 10.0.0)" />
       <dependency id="Examine" version="[0.1.80, 1.0.0)" />
