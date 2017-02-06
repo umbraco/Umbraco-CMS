@@ -72,6 +72,7 @@ namespace umbraco.cms.businesslogic.propertytype
                 _tabId = _propertyTypeGroup;
             }
 
+            //Fixed issue U4-9493 Case issues
             _sortOrder = found.sortOrder;
             _alias = found.Alias;
             _name = found.Name;
