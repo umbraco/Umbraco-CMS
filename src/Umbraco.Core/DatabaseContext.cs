@@ -41,6 +41,90 @@ namespace Umbraco.Core
         /// </summary>
         private const int ConnectionCheckMinutes = 1;
 
+        #region Compatibility with 7.5
+
+        // note: the ctors accepting IDatabaseFactory are here only for backward compatibility purpose
+        //
+        // problem: IDatabaseFactory2 adds the CreateNewDatabase() method which creates a new database
+        // 'cos IDatabaseFactory CreateDatabase() is supposed to also manage the ambient thing. We
+        // want to keep these ctors for backward compatibility reasons (in case ppl use them in tests)
+        // so we need to create a scope provider (else nothing would work) and so we need a IDatabaseFactory2,
+        // so...?
+        // solution: wrap IDatabaseFactory and pretend we have a IDatabaseFactory2, it *should* work in most
+        // cases but really, it depends on what ppl are doing in their tests... yet, cannot really see any
+        // other way to do it?
+
+        [Obsolete("Use the constructor specifying all dependencies instead")]
+        public DatabaseContext(IDatabaseFactory factory)
+            : this(factory, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
+            {
+                new MySqlSyntaxProvider(LoggerResolver.Current.Logger),
+                new SqlCeSyntaxProvider(),
+                new SqlServerSyntaxProvider()
+            }))
+        { }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="logger"></param>
+        /// <param name="syntaxProviders"></param>
+        public DatabaseContext(IDatabaseFactory factory, ILogger logger, SqlSyntaxProviders syntaxProviders)
+        {
+            if (factory == null) throw new ArgumentNullException("factory");
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (syntaxProviders == null) throw new ArgumentNullException("syntaxProviders");
+
+            ScopeProvider = new ScopeProvider(new DatabaseFactoryWrapper(factory));
+            _logger = logger;
+            _syntaxProviders = syntaxProviders;
+        }
+
+        /// <summary>
+        /// Create a configured DatabaseContext
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="logger"></param>
+        /// <param name="sqlSyntax"></param>
+        /// <param name="providerName"></param>
+        public DatabaseContext(IDatabaseFactory factory, ILogger logger, ISqlSyntaxProvider sqlSyntax, string providerName)
+        {
+            _providerName = providerName;
+            SqlSyntax = sqlSyntax;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
+            ScopeProvider = new ScopeProvider(new DatabaseFactoryWrapper(factory));
+            _logger = logger;
+            _configured = true;
+        }
+
+        private class DatabaseFactoryWrapper : IDatabaseFactory2
+        {
+            private readonly IDatabaseFactory _factory;
+
+            public DatabaseFactoryWrapper(IDatabaseFactory factory)
+            {
+                _factory = factory;
+            }
+
+            public UmbracoDatabase CreateDatabase()
+            {
+                return _factory.CreateDatabase();
+            }
+
+            public UmbracoDatabase CreateNewDatabase()
+            {
+                return CreateDatabase();
+            }
+
+            public void Dispose()
+            {
+                _factory.Dispose();
+            }
+        }
+
+        #endregion
+
         [Obsolete("Use the constructor specifying all dependencies instead")]
         internal DatabaseContext(IScopeProviderInternal scopeProvider)
             : this(scopeProvider, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
@@ -49,8 +133,7 @@ namespace Umbraco.Core
                 new SqlCeSyntaxProvider(),
                 new SqlServerSyntaxProvider()
             }))
-        {
-        }
+        { }
 
         /// <summary>
         /// Default constructor
