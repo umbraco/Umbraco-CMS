@@ -208,6 +208,11 @@ namespace Umbraco.Tests.TestHelpers
             Resolution.Freeze();
         }
 
+        protected ServiceContext ServiceContext
+        {
+            get { return ApplicationContext.Services; }
+        }
+
         protected ApplicationContext ApplicationContext
         {
             get { return ApplicationContext.Current; }

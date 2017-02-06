@@ -352,12 +352,7 @@ namespace Umbraco.Tests.TestHelpers
                     onFail(ex);
             }
         }
-
-        protected ServiceContext ServiceContext
-        {
-            get { return ApplicationContext.Services; }
-        }
-
+        
         protected DatabaseContext DatabaseContext
         {
             get { return ApplicationContext.DatabaseContext; }

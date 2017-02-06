@@ -15,7 +15,10 @@ namespace Umbraco.Core.Events
 
             if (EventName.IsNullOrWhiteSpace())
             {
-                var findResult = EventNameExtractor.FindEvent(sender, args, EventNameExtractor.MatchIngNames);
+                var findResult = EventNameExtractor.FindEvent(sender, args, 
+                    //don't match "Ing" suffixed names
+                    exclude:EventNameExtractor.MatchIngNames);
+
                 if (findResult.Success == false)
                     throw new AmbiguousMatchException("Could not automatically find the event name, the event name will need to be explicitly registered for this event definition. Error: " + findResult.Result.Error);
                 EventName = findResult.Result.Name;
