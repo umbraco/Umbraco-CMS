@@ -158,6 +158,7 @@
   <ItemGroup>
     <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
     <Compile Include="CallContextTests.cs" />
+    <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Migrations\CreateTableMigrationTests.cs" />

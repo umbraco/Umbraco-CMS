@@ -35,7 +35,7 @@ namespace Umbraco.Core.Events
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Sender.Equals(other.Sender) && string.Equals(EventName, other.EventName);
+            return Args.Equals(other.Args) && string.Equals(EventName, other.EventName) && Sender.Equals(other.Sender);
         }
 
         public override bool Equals(object obj)
@@ -50,7 +50,10 @@ namespace Umbraco.Core.Events
         {
             unchecked
             {
-                return (Sender.GetHashCode() * 397) ^ EventName.GetHashCode();
+                var hashCode = Args.GetHashCode();
+                hashCode = (hashCode * 397) ^ EventName.GetHashCode();
+                hashCode = (hashCode * 397) ^ Sender.GetHashCode();
+                return hashCode;
             }
         }
 
@@ -61,7 +64,7 @@ namespace Umbraco.Core.Events
 
         public static bool operator !=(EventDefinitionBase left, EventDefinitionBase right)
         {
-            return !Equals(left, right);
+            return Equals(left, right) == false;
         }
     }
 }
