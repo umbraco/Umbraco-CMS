@@ -205,6 +205,38 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                          "codeFileApiBaseUrl",
                          "GetScaffold?type=" + type + "&id=" + id + "&snippetName=" + snippetName)),
                 "Failed to get scaffold for" + type);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.codefileResource#createContainer
+         * @methodOf umbraco.resources.codefileResource
+         *
+         * @description
+         * Creates a container/folder
+         * 
+         * ##usage
+         * <pre>
+         * codefileResource.createContainer("partialViews", "folder%2ffolder", "folder")
+         *    .then(function(data) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         *
+         * @param {string} File type: (scripts, partialViews, partialViewMacros).
+         * @param {string} Parent Id: url encoded path
+         * @param {string} Container name
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+
+        createContainer: function(type, parentId, name) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl(
+                    "codeFileApiBaseUrl", 
+                    "PostCreateContainer", 
+                    { type: type, parentId: parentId, name: name })),
+                'Failed to create a folder under parent id ' + parentId);
         }
 
     };
