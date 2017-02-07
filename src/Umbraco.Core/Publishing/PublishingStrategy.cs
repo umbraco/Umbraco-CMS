@@ -22,20 +22,17 @@ namespace Umbraco.Core.Publishing
     public class PublishingStrategy : BasePublishingStrategy, IPublishingStrategy2
     {
         private readonly IScopeProvider _scopeProvider;
+        private readonly IEventMessagesFactory _eventMessagesFactory;
         private readonly ILogger _logger;
 
         [Obsolete("This class is not intended to be used, it will be removed in future versions")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public PublishingStrategy(IEventMessagesFactory eventMessagesFactory, ILogger logger)
         {
+            if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
             if (logger == null) throw new ArgumentNullException("logger");
             _scopeProvider = new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, LoggerResolver.Current.Logger));
-            _logger = logger;
-        }
-
-        public PublishingStrategy(ILogger logger)
-        {           
-            if (logger == null) throw new ArgumentNullException("logger");
+            _eventMessagesFactory = eventMessagesFactory;
             _logger = logger;
         }
 
@@ -47,8 +44,7 @@ namespace Umbraco.Core.Publishing
         /// <param name="userId">Id of the User issueing the publish operation</param>        
         Attempt<PublishStatus> IPublishingStrategy2.Publish(IScopeUnitOfWork uow, IContent content, int userId)
         {
-
-            var evtMsgs = uow.Messages;
+            var evtMsgs = _eventMessagesFactory.Get();
 
             if (uow.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs), "Publishing"))
             {
@@ -155,7 +151,7 @@ namespace Umbraco.Core.Publishing
             // Because we're grouping I think this will execute all the queries anyways so need to fetch it all first.
             var fetchedContent = content.ToArray();
 
-            var evtMsgs = uow.Messages;
+            var evtMsgs = _eventMessagesFactory.Get();
 
             //We're going to populate the statuses with all content that is already published because below we are only going to iterate over
             // content that is not published. We'll set the status to "AlreadyPublished"
@@ -371,7 +367,7 @@ namespace Umbraco.Core.Publishing
             // if published != newest, then the published flags need to be reseted by whoever is calling that method
             // at the moment it's done by the content service
 
-            var evtMsgs = uow.Messages;
+            var evtMsgs = _eventMessagesFactory.Get();
 
             //Fire UnPublishing event
             if (uow.Events.DispatchCancelable(UnPublishing, this, new PublishEventArgs<IContent>(content, evtMsgs), "UnPublishing"))
@@ -516,25 +512,25 @@ namespace Umbraco.Core.Publishing
         
         void IPublishingStrategy2.PublishingFinalized(IScopeUnitOfWork uow, IContent content)
         {
-            var evtMsgs = uow.Messages;
+            var evtMsgs = _eventMessagesFactory.Get();
             uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false, evtMsgs), "Published");
         }
 
         void IPublishingStrategy2.PublishingFinalized(IScopeUnitOfWork uow, IEnumerable<IContent> content, bool isAllRepublished)
         {
-            var evtMsgs = uow.Messages;
+            var evtMsgs = _eventMessagesFactory.Get();
             uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, isAllRepublished, evtMsgs), "Published");
         }
 
         void IPublishingStrategy2.UnPublishingFinalized(IScopeUnitOfWork uow, IContent content)
         {
-            var evtMsgs = uow.Messages;
+            var evtMsgs = _eventMessagesFactory.Get();
             uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false, evtMsgs), "UnPublished");
         }
 
         void IPublishingStrategy2.UnPublishingFinalized(IScopeUnitOfWork uow, IEnumerable<IContent> content)
         {
-            var evtMsgs = uow.Messages;
+            var evtMsgs = _eventMessagesFactory.Get();
             uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false, evtMsgs), "UnPublished");
         }
         
