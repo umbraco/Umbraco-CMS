@@ -204,7 +204,7 @@ namespace Umbraco.Core
             /// </summary>
             public const string MediaPicker2Alias = "Umbraco.MediaPicker2";
 
-            [Obsolete("This is an obsoleted picker, use MemberPicker2Alias instead")]
+            [Obsolete("This is an obsoleted picker, use MediaPicker2Alias instead")]
             public const string MultipleMediaPickerAlias = "Umbraco.MultipleMediaPicker";
 
             /// <summary>
