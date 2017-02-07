@@ -348,7 +348,7 @@ namespace Umbraco.Core.Scoping
             var completed = _completed.HasValue && _completed.Value;
 
             // deal with database
-            bool ex = false;
+            var databaseException = false;
             if (_database != null)
             {
                 try
@@ -360,7 +360,7 @@ namespace Umbraco.Core.Scoping
                 }
                 catch
                 {
-                    ex = true;
+                    databaseException = true;
                     throw;
                 }
                 finally
@@ -368,7 +368,7 @@ namespace Umbraco.Core.Scoping
                     _database.Dispose();
                     _database = null;
 
-                    if (ex)
+                    if (databaseException)
                         RobustExit(false, true);
                 }
             }
@@ -376,9 +376,22 @@ namespace Umbraco.Core.Scoping
             RobustExit(completed, false);
         }
 
-        private void RobustExit(bool completed, bool kabum)
+        // this chains some try/finally blocks to
+        // - complete and dispose the scoped filesystems
+        // - deal with events if appropriate
+        // - remove the scope context if it belongs to this scope
+        // - deal with detachable scopes
+        // here,
+        // - completed indicates whether the scope has been completed
+        //    can be true or false, but in both cases the scope is exiting
+        //    in a normal way
+        // - onException indicates whether completing/aborting the database
+        //    transaction threw an exception, in which case 'completed' has
+        //    to be false + events don't trigger and we just to some cleanup
+        //    to ensure we don't leave a scope around, etc
+        private void RobustExit(bool completed, bool onException)
         {
-            if (kabum) completed = false;
+            if (onException) completed = false;
 
             TryFinally(() =>
             {
@@ -392,7 +405,7 @@ namespace Umbraco.Core.Scoping
             }, () =>
             {
                 // deal with events
-                if (kabum == false && _eventDispatcher != null)
+                if (onException == false && _eventDispatcher != null)
                     _eventDispatcher.ScopeExit(completed);
             }, () =>
             {
