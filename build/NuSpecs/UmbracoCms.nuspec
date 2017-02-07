@@ -45,6 +45,7 @@
     <file src="tools\umbracoSettings.config.install.xdt" target="Content\config\umbracoSettings.config.install.xdt" />
     <file src="tools\Views.Web.config.install.xdt" target="Views\Web.config.install.xdt" />
     <file src="tools\processing.config.install.xdt" target="Content\Config\imageprocessor\processing.config.install.xdt" />
+    <file src="tools\cache.config.install.xdt" target="Content\Config\imageprocessor\cache.config.install.xdt" />
     <file src="build\**" target="build" />
   </files>
 </package>
