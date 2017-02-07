@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Web.Models.Trees;
@@ -30,11 +31,24 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                //create action
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
                 //refresh action
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
                 return menu;
+            }
+
+            if (id.EndsWith(FileSearchPattern.TrimStart("*")) == false)
+            {
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                //create action
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                //refresh action
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
             }
 
             // TODO: Wire up new delete dialog
