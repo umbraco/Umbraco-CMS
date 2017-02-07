@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -29,6 +30,58 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        [Test]
+        public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items()
+        {
+            ContentService.Trashed += ContentServiceOnTrashed;
+
+            try
+            {
+                IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
+                ServiceContext.ContentTypeService.Save(contentType1);
+                IContentType contentType2 = MockedContentTypes.CreateSimpleContentType("test2", "Test2");
+                ServiceContext.ContentTypeService.Save(contentType2);
+                IContentType contentType3 = MockedContentTypes.CreateSimpleContentType("test3", "Test3");
+                ServiceContext.ContentTypeService.Save(contentType3);
+
+                var contentTypes = new[] { contentType1, contentType2, contentType3 };
+                var parentId = -1;
+
+                for (int i = 0; i < 2; i++)
+                {
+                    for (var index = 0; index < contentTypes.Length; index++)
+                    {
+                        var contentType = contentTypes[index];
+                        var contentItem = MockedContent.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
+                        ServiceContext.ContentService.Save(contentItem);
+                        parentId = contentItem.Id;
+                    }
+                }
+
+                
+
+                foreach (var contentType in contentTypes.Reverse())
+                {
+                    ServiceContext.ContentTypeService.Delete(contentType);
+                }
+            }
+            finally
+            {
+                ContentService.Trashed -= ContentServiceOnTrashed;
+            }
+        }
+
+        private void ContentServiceOnTrashed(IContentService sender, MoveEventArgs<IContent> e)
+        {
+            foreach (var item in e.MoveInfoCollection)
+            {
+                //if this item doesn't exist then Fail!
+                var exists = ServiceContext.ContentService.GetById(item.Entity.Id);
+                if (exists == null)
+                    Assert.Fail("The item doesn't exist");
+            }
         }
 
         [Test]
