@@ -23,81 +23,6 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
-    // fixme this is some test code, get rid of it all of course
-    public class SomeService : ScopeRepositoryService
-    {
-        // fixme the eventMessagesFactory should die, event messages are scoped!
-        public SomeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
-        { }
-
-        public static event TypedEventHandler<SomeService, DeleteEventArgs<IContent>> StaticDeleting;
-
-        public event TypedEventHandler<SomeService, DeleteEventArgs<IContent>> InstanceDeleting;
-
-        public void OnStaticDeleting(SomeService sender, DeleteEventArgs<IContent> args)
-        {
-            if (StaticDeleting == null) return;
-            StaticDeleting(sender, args);
-        }
-
-        public void OnInstanceDeleting(SomeService sender, DeleteEventArgs<IContent> args)
-        {
-            if (sender.InstanceDeleting == null) return;
-            sender.InstanceDeleting(sender, args);
-        }
-
-        public abstract class EventData<TSender, TArgs>
-        {
-            private readonly TypedEventHandler<TSender, TArgs> _eventHandler;
-            private readonly TSender _sender;
-
-            protected EventData(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender)
-            {
-                _eventHandler = eventHandler;
-                _sender = sender;
-            }
-
-            protected abstract TArgs GetArgs();
-
-            public void Raise()
-            {
-                _eventHandler(_sender, GetArgs());
-            }
-        }
-
-        public class DeletingEvent : EventData<SomeService, DeleteEventArgs<IContent>>
-        {
-            private readonly IContent _content;
-
-            public DeletingEvent(TypedEventHandler<SomeService, DeleteEventArgs<IContent>> eventHandler, SomeService sender, IContent content)
-                : base(eventHandler, sender)
-            {
-                _content = content;
-            }
-
-            protected override DeleteEventArgs<IContent> GetArgs()
-            {
-                return new DeleteEventArgs<IContent>(_content);
-            }
-
-            // and *there* we could implement some sort of proper comparison between events!
-            // Shan's EventDefinition only works on names and that's a true mess
-        }
-
-        public void Dispatch<TSender, TArgs>(EventData<TSender, TArgs> eventData)
-        {
-            eventData.Raise();
-        }
-
-        public void DoSomething()
-        {
-            IContent content = null;
-            Dispatch(new DeletingEvent(StaticDeleting, this, content));
-            Dispatch(new DeletingEvent(InstanceDeleting, this, content));
-        }
-    }
-
     /// <summary>
     /// Represents the Content Service, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
@@ -123,7 +48,7 @@ namespace Umbraco.Core.Services
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             if (userService == null) throw new ArgumentNullException("userService");
-            _publishingStrategy = new PublishingStrategy(logger);
+            _publishingStrategy = new PublishingStrategy(eventMessagesFactory, logger);
             _dataTypeService = dataTypeService;
             _userService = userService;
         }
@@ -1088,7 +1013,7 @@ namespace Umbraco.Core.Services
                     //see: http://issues.umbraco.org/issue/U4-9336
                     content.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);
                     var originalPath = content.Path;
-                    if (uow.Events.DispatchCancelable(Trashing, this, new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent))))
+                    if (uow.Events.DispatchCancelable(Trashing, this, new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)), "Trashing"))
                     {
                         return OperationStatus.Cancelled(evtMsgs);
                     }
@@ -1123,15 +1048,13 @@ namespace Umbraco.Core.Services
                         descendant.ChangeTrashedState(true, descendant.ParentId);
                         repository.AddOrUpdate(descendant);
                     }
-                    // fixme NEED to happen within the transaction = this is a DISPATCHED event!
-                    //uow.Events.Dispatch(Trashed, Event.User|Event.Commit, this, new MoveEventArgs<IContent>(false, uow.Messages, moveInfo.ToArray()));
-                    uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, uow.Messages, moveInfo.ToArray()));
-                    uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, evtMsgs, moveInfo.ToArray()), "Trashed"); // fixme WHY the event name?!
+                    
+                    uow.Commit();
+
+                    uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, evtMsgs, moveInfo.ToArray()), "Trashed");
 
                     // fixme just writing to DB, no need for an event, ok here
                     Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
-
-                    uow.Commit();
                 }
 
                 // fixme the WHOLE thing should move to the UOW!
@@ -1610,7 +1533,7 @@ namespace Umbraco.Core.Services
                 // what a spectacular mess
                 using (IScope scope = UowProvider.ScopeProvider.CreateScope())
                 {
-                    if (scope.Events.DispatchCancelable(Moving, this, new MoveEventArgs<IContent>(new MoveEventInfo<IContent>(content, content.Path, parentId))))
+                    if (scope.Events.DispatchCancelable(Moving, this, new MoveEventArgs<IContent>(new MoveEventInfo<IContent>(content, content.Path, parentId)), "Moving"))
                         return;
 
                     //used to track all the moved entities to be given to the event
@@ -1619,31 +1542,10 @@ namespace Umbraco.Core.Services
                     //call private method that does the recursive moving
                     PerformMove(content, parentId, userId, moveInfo);
 
-                    scope.Events.Dispatch(Moved, this, new MoveEventArgs<IContent>(false, moveInfo.ToArray()));
+                    scope.Events.Dispatch(Moved, this, new MoveEventArgs<IContent>(false, moveInfo.ToArray()), "Moved");
 
                     scope.Complete();
                 }
-
-                // fixme kill this
-                /*
-                using (var uow = UowProvider.GetUnitOfWork())
-                {
-                    if (Moving.IsRaisedEventCancelled(
-                        new MoveEventArgs<IContent>(
-                            new MoveEventInfo<IContent>(content, content.Path, parentId)), this, uow.Events))
-                    {
-                            return;
-                        }
-
-                    //used to track all the moved entities to be given to the event
-                    var moveInfo = new List<MoveEventInfo<IContent>>();
-
-                    //call private method that does the recursive moving
-                    PerformMove(content, parentId, userId, moveInfo);
-
-                    Moved.RaiseEvent(new MoveEventArgs<IContent>(false, moveInfo.ToArray()), this, uow.Events);
-                }
-                */
 
                 Audit(AuditType.Move, "Move Content performed by user", userId, content.Id);
             }
