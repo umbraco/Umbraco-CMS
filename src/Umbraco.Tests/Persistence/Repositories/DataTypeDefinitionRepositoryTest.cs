@@ -441,7 +441,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var exists = repository.Exists(1034); //Content picker
+                var exists = repository.Exists(1046); //Content picker
                 var doesntExist = repository.Exists(-80);
 
                 // Assert
