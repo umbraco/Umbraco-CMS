@@ -14,7 +14,7 @@ namespace UmbracoExamine.Config
     public static class IndexSetExtensions
     {
         internal static IIndexCriteria ToIndexCriteria(this IndexSet set, IDataService svc,
-            IEnumerable<StaticField> indexFieldPolicies)
+            StaticFieldCollection indexFieldPolicies)
         {
             return new LazyIndexCriteria(set, svc, indexFieldPolicies);
         }
@@ -29,7 +29,7 @@ namespace UmbracoExamine.Config
         /// <returns></returns>
         public static IIndexCriteria ToIndexCriteria(this IndexSet set, IDataService svc)
         {
-            return set.ToIndexCriteria(svc, Enumerable.Empty<StaticField>());
+            return set.ToIndexCriteria(svc, new StaticFieldCollection());
         }      
       
     }
