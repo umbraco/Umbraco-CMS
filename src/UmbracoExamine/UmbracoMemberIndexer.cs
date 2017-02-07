@@ -117,8 +117,9 @@ namespace UmbracoExamine
                 if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
                 {
                     var field = new IndexField { Name = "_searchEmail" };
-                    var policy = IndexFieldPolicies.FirstOrDefault(x => x.Name == "_searchEmail");
-                    if (policy != null)
+                    
+                    StaticField policy;
+                    if (IndexFieldPolicies.TryGetValue("_searchEmail", out policy))
                     {
                         field.Type = policy.Type;
                         field.EnableSorting = policy.EnableSorting;
@@ -232,7 +233,7 @@ namespace UmbracoExamine
         {
             throw new NotSupportedException();
         }       
-
+        
         /// <summary>
         /// Add the special __key and _searchEmail fields
         /// </summary>

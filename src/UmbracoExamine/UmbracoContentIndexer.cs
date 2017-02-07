@@ -197,27 +197,27 @@ namespace UmbracoExamine
         /// Alot of standard umbraco fields shouldn't be tokenized or even indexed, just stored into lucene
         /// for retreival after searching.
         /// </summary>
-        internal static readonly List<StaticField> IndexFieldPolicies
-            = new List<StaticField>
+        internal static readonly StaticFieldCollection IndexFieldPolicies
+            = new StaticFieldCollection
             {
                 new StaticField("id", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
                 new StaticField("key", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "version", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "parentID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "level", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),
-                new StaticField( "writerID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "creatorID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "nodeType", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "template", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "sortOrder", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),
-                new StaticField( "createDate", FieldIndexTypes.NOT_ANALYZED, false, "DATETIME"),
-                new StaticField( "updateDate", FieldIndexTypes.NOT_ANALYZED, false, "DATETIME"),
-                new StaticField( "nodeName", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField( "urlName", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "writerName", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField( "creatorName", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField( "nodeTypeAlias", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField( "path", FieldIndexTypes.NOT_ANALYZED, false, string.Empty)
+                new StaticField("version", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("parentID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("level", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),
+                new StaticField("writerID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("creatorID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("nodeType", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("template", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("sortOrder", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),
+                new StaticField("createDate", FieldIndexTypes.NOT_ANALYZED, false, "DATETIME"),
+                new StaticField("updateDate", FieldIndexTypes.NOT_ANALYZED, false, "DATETIME"),
+                new StaticField("nodeName", FieldIndexTypes.ANALYZED, false, string.Empty),
+                new StaticField("urlName", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("writerName", FieldIndexTypes.ANALYZED, false, string.Empty),
+                new StaticField("creatorName", FieldIndexTypes.ANALYZED, false, string.Empty),
+                new StaticField("nodeTypeAlias", FieldIndexTypes.ANALYZED, false, string.Empty),
+                new StaticField("path", FieldIndexTypes.NOT_ANALYZED, false, string.Empty)
             };
 
         #endregion
@@ -776,15 +776,17 @@ namespace UmbracoExamine
             fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
 
             //guid
-            if (allValuesForIndexing[NodeKeyFieldName].IsNullOrWhiteSpace() == false)
+            string guidVal;
+            if (allValuesForIndexing.TryGetValue(NodeKeyFieldName, out guidVal) && guidVal.IsNullOrWhiteSpace() == false)
             {
-                fields.Add(NodeKeyFieldName, allValuesForIndexing[NodeKeyFieldName]);
+                fields.Add(NodeKeyFieldName, guidVal);
             }
 
             //icon
-            if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
+            string iconVal;
+            if (allValuesForIndexing.TryGetValue(IconFieldName, out iconVal) && iconVal.IsNullOrWhiteSpace() == false)
             {
-                fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);    
+                fields.Add(IconFieldName, iconVal);    
             }
 
             return fields;
@@ -816,9 +818,13 @@ namespace UmbracoExamine
         /// <param name="fieldName"></param>
         /// <returns></returns>
         protected override FieldIndexTypes GetPolicy(string fieldName)
-        {
-            var def = IndexFieldPolicies.Where(x => x.Name == fieldName).ToArray();
-            return (def.Any() == false ? FieldIndexTypes.ANALYZED : def.Single().IndexType);
+        {            
+            StaticField def;
+            if (IndexFieldPolicies.TryGetValue(fieldName, out def))
+            {
+                return def.IndexType;
+            }
+            return FieldIndexTypes.ANALYZED;
         }
 
         /// <summary>
@@ -828,14 +834,18 @@ namespace UmbracoExamine
         /// </summary>
         protected override bool ValidateDocument(XElement node)
         {
-            var nodeId = int.Parse(node.Attribute("id").Value);
             // Test for access if we're only indexing published content
             // return nothing if we're not supporting protected content and it is protected, and we're not supporting unpublished content
-            if (!SupportUnpublishedContent
-                && (!SupportProtectedContent
-                && DataService.ContentService.IsProtected(nodeId, node.Attribute("path").Value)))
+            if (SupportUnpublishedContent == false
+                && SupportProtectedContent == false)
             {
-                return false;
+
+                var nodeId = int.Parse(node.Attribute("id").Value);
+
+                if (DataService.ContentService.IsProtected(nodeId, node.Attribute("path").Value))
+                {
+                    return false;
+                }               
             }
             return base.ValidateDocument(node);
         }
