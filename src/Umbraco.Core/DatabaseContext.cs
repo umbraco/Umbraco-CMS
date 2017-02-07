@@ -110,7 +110,14 @@ namespace Umbraco.Core
         /// </remarks>
         public virtual UmbracoDatabase Database
         {
-            get { return _factory.CreateDatabase(); }
+            get
+            {
+                if (IsDatabaseConfigured == false)
+                {
+                    throw new InvalidOperationException("Cannot create a database instance, there is no available connection string");
+                }
+                return _factory.CreateDatabase();
+            }
         }
 
         /// <summary>
@@ -202,7 +209,7 @@ namespace Umbraco.Core
                 }
                 else
                 {
-                    throw new InvalidOperationException("Can't find a connection string with the name '" + Constants.System.UmbracoConnectionName + "'");
+                    throw new NullReferenceException("Can't find a connection string with the name '" + Constants.System.UmbracoConnectionName + "'");
                 }
                 return _providerName;
             }
