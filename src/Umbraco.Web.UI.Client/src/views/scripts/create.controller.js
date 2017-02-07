@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ScriptsCreateController($scope, $location, navigationService, formHelper, codefileResource, localizationService) {
+    function ScriptsCreateController($scope, $location, navigationService, formHelper, codefileResource, localizationService, appState) {
 
         var vm = this;
         var node = $scope.dialogOptions.currentNode;
@@ -29,13 +29,13 @@
 
             if (formHelper.submitForm({scope: $scope, formCtrl: form, statusMessage: localizeCreateFolder})) {
 
-                codefileResource.createContainer("scripts", node.id, vm.folderName).then(function(path) {
+                codefileResource.createContainer("scripts", node.id, vm.folderName).then(function (saved) {
 
                     navigationService.hideMenu();
 
                     navigationService.syncTree({
                         tree: "scripts",
-                        path: path,
+                        path: saved.path,
                         forceReload: true,
                         activate: true
                     });

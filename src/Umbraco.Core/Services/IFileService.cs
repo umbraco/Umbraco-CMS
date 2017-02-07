@@ -11,6 +11,8 @@ namespace Umbraco.Core.Services
     public interface IFileService : IService
     {
         IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
+        void CreatePartialViewFolder(string folderPath);
+        void CreatePartialViewMacroFolder(string folderPath);
         void DeletePartialViewFolder(string folderPath);
         void DeletePartialViewMacroFolder(string folderPath);
         IPartialView GetPartialView(string path);

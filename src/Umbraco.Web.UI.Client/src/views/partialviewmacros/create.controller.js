@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PartialViewMacrosCreateController($scope, codefileResource, $location, navigationService, formHelper, localizationService) {
+    function PartialViewMacrosCreateController($scope, codefileResource, $location, navigationService, formHelper, localizationService, appState) {
 
         var vm = this;
         var node = $scope.dialogOptions.currentNode;
@@ -45,13 +45,13 @@
         function createFolder(form) {
             if (formHelper.submitForm({scope: $scope, formCtrl: form, statusMessage: localizeCreateFolder})) {
 
-                codefileResource.createContainer("partialViewMacros", node.id, vm.folderName).then(function(path) {
+                codefileResource.createContainer("partialViewMacros", node.id, vm.folderName).then(function (saved) {
 
                     navigationService.hideMenu();
 
                     navigationService.syncTree({
                         tree: "partialViewMacros",
-                        path: path,
+                        path: saved.path,
                         forceReload: true,
                         activate: true
                     });

@@ -235,7 +235,7 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.post(umbRequestHelper.getApiUrl(
                     "codeFileApiBaseUrl", 
                     "PostCreateContainer", 
-                    { type: type, parentId: parentId, name: name })),
+                    { type: type, parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
         }
 
