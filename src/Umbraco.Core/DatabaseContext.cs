@@ -193,6 +193,11 @@ namespace Umbraco.Core
         {
             get
             {
+            	if (IsDatabaseConfigured == false)
+                {
+                    throw new InvalidOperationException("Cannot create a database instance, there is no available connection string");
+                }
+            
                 return ScopeProvider.GetAmbientOrNoScope().Database;
                 //var scope = ScopeProvider.AmbientScope;
                 //return scope != null ? scope.Database : ScopeProvider.CreateNoScope().Database;
@@ -291,7 +296,7 @@ namespace Umbraco.Core
                 }
                 else
                 {
-                    throw new InvalidOperationException("Can't find a connection string with the name '" + Constants.System.UmbracoConnectionName + "'");
+                    throw new NullReferenceException("Can't find a connection string with the name '" + Constants.System.UmbracoConnectionName + "'");
                 }
                 return _providerName;
             }
