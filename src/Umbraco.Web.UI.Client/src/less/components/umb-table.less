@@ -204,29 +204,32 @@ input.umb-table__input {
     }
 }
 
-
-
-
-
-
 // Table Row Styles
 .umb-table-row {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
-
     user-select: none;
 }
 
+.umb-table-body .umb-table-row--empty {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    padding: 5px 0;
+    cursor: auto;
+    user-select: auto;
+}
 
+.umb-table-body .umb-table-row--empty:hover {
+    background-color: transparent;
+    cursor: auto;
+}
 
 .umb-table-row.-selected,
 .umb-table-row.-selected:hover {
     background-color: fade(@blueDark, 4%);
 }
-
-
-
 
 // Table Cell Styles
 .umb-table-cell {

@@ -55,7 +55,13 @@
             </div>
 
             <!-- Load indicator when the list doesn't have items -->
-            <div ng-if="loadingChildren && !children" class="umb-table-row">
+            <div ng-if="!loadingChildren && !children" class="umb-table-row umb-table-row--empty">
+                <span ng-if="search === ''"><localize key="general_noItemsInList"></localize></span>
+                <span ng-if="search !== ''"><localize key="general_searchNoResult"></localize></span>
+            </div>
+
+            <!-- Load indicator when the list doesn't have items -->
+            <div ng-if="loadingChildren && !children" class="umb-table-row umb-table-row--empty">
                 <umb-load-indicator></umb-load-indicator>
             </div>
 

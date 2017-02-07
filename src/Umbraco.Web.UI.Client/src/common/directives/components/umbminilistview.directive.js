@@ -21,20 +21,12 @@
             };
 
             scope.searchMiniListView = function() {
-                searchMiniListView();
-            };
-
-            var searchMiniListView = _.debounce(function () {
-			
-                scope.$apply(function () {
-                    if (scope.search !== null && scope.search !== undefined) {
-                        if(scope.onSearch) {
-                            scope.onSearch({"search": scope.search});
-                        }
+                if (scope.search !== null && scope.search !== undefined) {
+                    if(scope.onSearch) {
+                        scope.onSearch({"search": scope.search});
                     }
-                });
-
-		    }, 500);
+                }
+            };
 
         }
 

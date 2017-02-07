@@ -499,10 +499,14 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		};
 
 		$scope.searchMiniListView = function(search, miniListView) {
+
 			// set search value
-			miniListView.pagination.filter = search;	
-			// get children
-			getChildrenForMiniListView(miniListView);
+			miniListView.pagination.filter = search;
+			// start loading animation list view
+			miniListView.loading = true;
+
+			searchMiniListView(miniListView);
+
 		};
 
 		$scope.test = function(node) {
@@ -512,6 +516,14 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		$scope.miniListViews = [];
 		var miniListViewsHistory = [];
 		var goingForward = true;
+
+
+		var searchMiniListView = _.debounce(function (miniListView) {
+			$scope.$apply(function () {
+				// get children
+				getChildrenForMiniListView(miniListView);
+			});
+		}, 500);
 
 		function openMiniListView(node) {
 
