@@ -63,9 +63,12 @@ namespace Umbraco.Core
             // after Umbraco has started there is a database in "context" and that context is
             // going to stay there and never get destroyed nor reused, so we have to ensure that
             // the database is disposed (which will auto-remove it from context).
-            var database = ApplicationContext.Current.DatabaseContext.Database;
-            if (database != null) // never to happen... unless in weird tests
-                ApplicationContext.Current.DatabaseContext.Database.Dispose();
+            if (ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
+            {
+                var database = ApplicationContext.Current.DatabaseContext.Database;
+                if (database != null) // never to happen... unless in weird tests
+                    ApplicationContext.Current.DatabaseContext.Database.Dispose();
+            }
         }
 
         /// <summary>
