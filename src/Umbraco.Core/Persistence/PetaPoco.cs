@@ -167,12 +167,12 @@ namespace Umbraco.Core.Persistence
 			var providerName = Constants.DatabaseProviders.SqlServer;
 			if (ConfigurationManager.ConnectionStrings[connectionStringName] != null)
 			{
-				if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName) == false)
+				if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName))
 					providerName = ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName;
 			}
 			else
 			{
-				throw new NullReferenceException("Can't find a connection string with the name '" + connectionStringName + "'");
+				throw new InvalidOperationException("Can't find a connection string with the name '" + connectionStringName + "'");
 			}
 
 			// Store factory and connection string
