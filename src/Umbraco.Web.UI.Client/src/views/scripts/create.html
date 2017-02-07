@@ -1,13 +1,13 @@
 <div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Scripts.CreateController as vm" ng-cloak>
 
     <div class="umb-pane" ng-if="!vm.creatingFolder">
-        <h5><localize key="create_createUnder">Create new partial view under</localize> {{currentNode.name}}</h5>
+        <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
         <ul class="umb-actions umb-actions-child">
             <li>
                 <a href="" umb-auto-focus ng-click="vm.createFile()">
                     <i class="large icon-script"></i>
-                    <span class="menu-label">Javascript file</span>
+                    <span class="menu-label"><localize key="create_newJavascriptFile">New javascript file</localize></span>
                 </a>
             </li>
             <li>
