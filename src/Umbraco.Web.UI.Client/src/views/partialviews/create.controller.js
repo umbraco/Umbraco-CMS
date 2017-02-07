@@ -30,8 +30,6 @@
                 snippet = selectedSnippet.fileName;
             }
 
-            $location.search('create', null);
-            $location.search('snippet', null);
             $location.path("/settings/partialviews/edit/" + node.id).search("create", "true").search("snippet", snippet);
             navigationService.hideMenu();
 

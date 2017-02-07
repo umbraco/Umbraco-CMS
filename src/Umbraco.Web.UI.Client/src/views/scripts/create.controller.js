@@ -15,7 +15,6 @@
         vm.createFolder = createFolder;
 
         function createFile() {
-            $location.search('create', null);
             $location.path("/settings/scripts/edit/" + node.id).search("create", "true");
             navigationService.hideMenu();
         }
