@@ -35,12 +35,21 @@
         </div>
 
     </div>
-
+    
     <div ng-repeat="miniListView in miniListViews" ng-animate="getMiniListViewAnimation()">
 
-        <a ng-if="!model.startNodeId" href="" class="umb-mini-list-view__back" ng-click="exitMiniListView(miniListView.node)">
-            <i class="icon-arrow-left" style="margin-right: 5px;"></i>Back
-        </a>
+        <div class="umb-mini-list-view__title">
+            <i class="umb-mini-list-view__title-icon {{ miniListView.node.icon }}"></i>
+            <h4 class="umb-mini-list-view__title-text">{{ miniListView.node.name }}</h4>
+        </div>
+
+        <umb-breadcrumbs
+            style="margin-bottom: 10px;"
+            ng-if="breadcrumb && breadcrumb.length > 0"
+            ancestors="breadcrumb"
+            entity-type="content"
+            on-open="clickBreadcrumb(ancestor)">
+        </umb-breadcrumbs>
 
         <umb-mini-list-view
             node="miniListView.node"

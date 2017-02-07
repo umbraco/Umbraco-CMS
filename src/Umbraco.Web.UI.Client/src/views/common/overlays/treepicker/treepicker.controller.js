@@ -466,7 +466,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
 	    });
 
-		/* Mini List View */
+		/* --- Mini List View --- */
+		$scope.miniListViews = [];
+		$scope.breadcrumb = [];
+		var miniListViewsHistory = [];
+		var goingForward = true;
 
 		$scope.goToPage = function(pageNumber, miniListView) {
 			// set new page number
@@ -481,17 +485,31 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             item.selected = item.selected === true ? false : true;
 		};
 
-		$scope.exitMiniListView = function(node) {
+		$scope.clickBreadcrumb = function(ancestor) {
 
+			var found = false;
 			goingForward = false;
 
-			if(miniListViewsHistory.length > 1) {
-				var prevMiniListViewIndex = miniListViewsHistory.length - 2;
-				var prevMiniListView = miniListViewsHistory[prevMiniListViewIndex];
-				$scope.miniListViews = [];
-				$scope.miniListViews.push(prevMiniListView);
-				miniListViewsHistory.splice(-1,1);
-			} else {
+			angular.forEach(miniListViewsHistory, function(historyItem, index){
+				if(parseInt(historyItem.node.id) === parseInt(ancestor.id)) {
+
+					// load the list view from history
+					$scope.miniListViews = [];
+					$scope.miniListViews.push(historyItem);
+					// remove from history
+					miniListViewsHistory.splice(index, miniListViewsHistory.length - index);
+					found = true;
+
+					// get ancestors
+					entityResource.getAncestors(historyItem.node.id, entityType)
+						.then(function (ancestors) {
+							$scope.breadcrumb = ancestors;
+						});
+				}
+			});
+
+			if(!found) {
+				// if we can't find the view in the history 
 				miniListViewsHistory = [];
 				$scope.miniListViews = [];
 			}
@@ -499,28 +517,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		};
 
 		$scope.searchMiniListView = function(search, miniListView) {
-
 			// set search value
 			miniListView.pagination.filter = search;
 			// start loading animation list view
 			miniListView.loading = true;
-
 			searchMiniListView(miniListView);
-
 		};
 
 		$scope.test = function(node) {
 			openMiniListView(node);
 		};
 
-		$scope.miniListViews = [];
-		var miniListViewsHistory = [];
-		var goingForward = true;
-
-
 		var searchMiniListView = _.debounce(function (miniListView) {
 			$scope.$apply(function () {
-				// get children
 				getChildrenForMiniListView(miniListView);
 			});
 		}, 500);
@@ -557,8 +566,14 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 					// store in history so we quickly can navigate back
 					miniListViewsHistory.push(miniListView);
-
+					
 				});
+			
+			// get ancestors
+			entityResource.getAncestors(node.id, entityType)
+               .then(function (ancestors) {
+                   $scope.breadcrumb = ancestors;
+               });
 
 		}
 
