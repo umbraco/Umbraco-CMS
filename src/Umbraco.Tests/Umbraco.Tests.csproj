@@ -154,6 +154,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
