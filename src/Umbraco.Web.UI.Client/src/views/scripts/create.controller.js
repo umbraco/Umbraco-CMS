@@ -25,7 +25,7 @@
         }
 
         function createFolder() {
-            alert("create folder");
+            
         }
 
     }

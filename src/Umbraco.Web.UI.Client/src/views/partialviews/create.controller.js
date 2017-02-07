@@ -42,7 +42,7 @@
         }
 
         function createFolder() {
-            alert("create folder");
+
         }
         
         function showCreateFromSnippet() {
