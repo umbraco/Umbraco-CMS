@@ -350,6 +350,7 @@
     <Compile Include="Models\Mapping\TemplateModelMapper.cs" />
     <Compile Include="Models\PackageInstallResult.cs" />
     <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
+    <Compile Include="Models\SendCodeViewModel.cs" />
     <Compile Include="Models\SetPasswordModel.cs" />
     <Compile Include="Models\RequestPasswordResetModel.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
