@@ -15,9 +15,11 @@ using umbraco.cms.presentation.Trees;
 using umbraco.presentation.developer.packages;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -81,7 +83,14 @@ namespace Umbraco.Web.Editors
             if (pack == null) throw new ArgumentNullException("pack");
 
             var refreshCache = false;
-            
+
+            var removedTemplates = new List<ITemplate>();
+            var removedMacros = new List<IMacro>();
+            var removedContentTypes = new List<IContentType>();
+            var removedDictionaryItems = new List<IDictionaryItem>();
+            var removedDataTypes = new List<IDataTypeDefinition>();
+            var removedFiles = new List<string>();
+
             //Uninstall templates
             foreach (var item in pack.Data.Templates.ToArray())
             {
@@ -90,6 +99,9 @@ namespace Umbraco.Web.Editors
                 var found = Services.FileService.GetTemplate(nId);
                 if (found != null)
                 {
+                    removedTemplates.Add(found);
+                    // add the actual file here, since deleting the template cause a file delete
+                    removedFiles.Add(found.VirtualPath);
                     ApplicationContext.Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId());
                 }
                 pack.Data.Templates.Remove(nId.ToString());
@@ -103,6 +115,7 @@ namespace Umbraco.Web.Editors
                 var macro = Services.MacroService.GetById(nId);
                 if (macro != null)
                 {
+                    removedMacros.Add(macro);
                     Services.MacroService.Delete(macro);
                 }                    
                 pack.Data.Macros.Remove(nId.ToString());
@@ -131,6 +144,7 @@ namespace Umbraco.Web.Editors
                     select contentType;
                 foreach (var contentType in orderedTypes)
                 {
+                    removedContentTypes.Add(contentType);
                     contentTypeService.Delete(contentType);
                 }
             }
@@ -143,6 +157,7 @@ namespace Umbraco.Web.Editors
                 var di = Services.LocalizationService.GetDictionaryItemById(nId);
                 if (di != null)
                 {
+                    removedDictionaryItems.Add(di);
                     Services.LocalizationService.Delete(di);
                 }                    
                 pack.Data.DictionaryItems.Remove(nId.ToString());
@@ -156,6 +171,7 @@ namespace Umbraco.Web.Editors
                 var dtd = Services.DataTypeService.GetDataTypeDefinitionById(nId);
                 if (dtd != null)
                 {
+                    removedDataTypes.Add(dtd);
                     Services.DataTypeService.Delete(dtd);
                 }                    
                 pack.Data.DataTypes.Remove(nId.ToString());
@@ -208,15 +224,31 @@ namespace Umbraco.Web.Editors
                     var filePath = IOHelper.MapPath(file);
                     if (File.Exists(filePath))
                     {
+                        removedFiles.Add(filePath);
                         File.Delete(filePath);
-                        
                     }
                 }
                 pack.Data.Files.Remove(file);
             }
             pack.Save();
             pack.Delete(Security.GetUserId());
-            
+
+            // create a summary of what was actually removed, for PackagingService.UninstalledPackage
+            var summary = new UninstallationSummary
+            {
+                MetaData = pack.GetMetaData(),
+                TemplatesUninstalled = removedTemplates,
+                MacrosUninstalled = removedMacros,
+                ContentTypesUninstalled = removedContentTypes,
+                DictionaryItemsUninstalled = removedDictionaryItems,
+                DataTypesUninstalled = removedDataTypes,
+                FilesUninstalled = removedFiles,
+                PackageUninstalled = true
+            };
+
+            // trigger the UninstalledPackage event
+            PackagingService.OnUninstalledPackage(new UninstallPackageEventArgs<UninstallationSummary>(summary, false));
+
             //TODO: Legacy - probably not needed
             if (refreshCache)
             {
