@@ -17,6 +17,7 @@ using umbraco.interfaces;
 using System.Linq;
 using Moq;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Publishing
 {
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.Publishing
                 ServiceContext.ContentTypeService.GetContentType("umbTextpage"), "Sub Sub Sub", mandatorContent.Id);
             ServiceContext.ContentService.Save(subContent, 0);
             
-            IPublishingStrategy2 strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+            IPublishingStrategy2 strategy = new PublishingStrategy(DatabaseContext.ScopeProvider, new TransientMessagesFactory(), Logger);
 
             //publish root and nodes at it's children level
             var listToPublish = ServiceContext.ContentService.GetDescendants(_homePage.Id).Concat(new[] { _homePage });
@@ -97,7 +98,7 @@ namespace Umbraco.Tests.Publishing
         {
             CreateTestData();
 
-            IPublishingStrategy2 strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+            IPublishingStrategy2 strategy = new PublishingStrategy(DatabaseContext.ScopeProvider, new TransientMessagesFactory(), Logger);
 
 
             PublishingStrategy.Publishing +=PublishingStrategyPublishing;
@@ -124,7 +125,7 @@ namespace Umbraco.Tests.Publishing
         {
             CreateTestData();
 
-            IPublishingStrategy2 strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+            IPublishingStrategy2 strategy = new PublishingStrategy(DatabaseContext.ScopeProvider, new TransientMessagesFactory(), Logger);
 
             //publish root and nodes at it's children level
             var result1 = strategy.Publish(_unitOfWork, _homePage, 0);
@@ -151,7 +152,7 @@ namespace Umbraco.Tests.Publishing
         {
             CreateTestData();
 
-            IPublishingStrategy2 strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+            IPublishingStrategy2 strategy = new PublishingStrategy(DatabaseContext.ScopeProvider, new TransientMessagesFactory(), Logger);
 
             //publish root and nodes at it's children level
             var result1 = strategy.Publish(_unitOfWork, _homePage, 0);

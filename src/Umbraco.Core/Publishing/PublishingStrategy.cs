@@ -31,7 +31,17 @@ namespace Umbraco.Core.Publishing
         {
             if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
             if (logger == null) throw new ArgumentNullException("logger");
-            _scopeProvider = new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, LoggerResolver.Current.Logger));
+            _scopeProvider = new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, logger));
+            _eventMessagesFactory = eventMessagesFactory;
+            _logger = logger;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public PublishingStrategy(IScopeProvider scopeProvider, IEventMessagesFactory eventMessagesFactory, ILogger logger)
+        {
+            if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
+            if (logger == null) throw new ArgumentNullException("logger");
+            _scopeProvider = scopeProvider;
             _eventMessagesFactory = eventMessagesFactory;
             _logger = logger;
         }

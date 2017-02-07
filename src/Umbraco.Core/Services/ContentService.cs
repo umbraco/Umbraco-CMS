@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             if (userService == null) throw new ArgumentNullException("userService");
-            _publishingStrategy = new PublishingStrategy(eventMessagesFactory, logger);
+            _publishingStrategy = new PublishingStrategy(UowProvider.ScopeProvider, eventMessagesFactory, logger);
             _dataTypeService = dataTypeService;
             _userService = userService;
         }
