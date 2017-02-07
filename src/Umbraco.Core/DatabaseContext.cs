@@ -76,7 +76,11 @@ namespace Umbraco.Core
             if (logger == null) throw new ArgumentNullException("logger");
             if (syntaxProviders == null) throw new ArgumentNullException("syntaxProviders");
 
-            ScopeProvider = new ScopeProvider(new DatabaseFactoryWrapper(factory));
+            var asDbFactory2 = factory as IDatabaseFactory2;
+            ScopeProvider = asDbFactory2 == null
+                ? new ScopeProvider(new DatabaseFactoryWrapper(factory))
+                : new ScopeProvider(asDbFactory2);
+
             _logger = logger;
             _syntaxProviders = syntaxProviders;
         }
@@ -93,7 +97,12 @@ namespace Umbraco.Core
             _providerName = providerName;
             SqlSyntax = sqlSyntax;
             SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
-            ScopeProvider = new ScopeProvider(new DatabaseFactoryWrapper(factory));
+
+            var asDbFactory2 = factory as IDatabaseFactory2;
+            ScopeProvider = asDbFactory2 == null 
+                ? new ScopeProvider(new DatabaseFactoryWrapper(factory)) 
+                : new ScopeProvider(asDbFactory2);
+            
             _logger = logger;
             _configured = true;
         }
