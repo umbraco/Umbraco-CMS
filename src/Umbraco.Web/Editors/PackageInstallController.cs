@@ -100,8 +100,6 @@ namespace Umbraco.Web.Editors
                 if (found != null)
                 {
                     removedTemplates.Add(found);
-                    // add the actual file here, since deleting the template cause a file delete
-                    removedFiles.Add(found.VirtualPath);
                     ApplicationContext.Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId());
                 }
                 pack.Data.Templates.Remove(nId.ToString());
@@ -117,7 +115,7 @@ namespace Umbraco.Web.Editors
                 {
                     removedMacros.Add(macro);
                     Services.MacroService.Delete(macro);
-                }                    
+                }
                 pack.Data.Macros.Remove(nId.ToString());
             }
 
@@ -140,8 +138,8 @@ namespace Umbraco.Web.Editors
             if (contentTypes.Any())
             {
                 var orderedTypes = from contentType in contentTypes
-                    orderby contentType.ParentId descending, contentType.Id descending
-                    select contentType;
+                                   orderby contentType.ParentId descending, contentType.Id descending
+                                   select contentType;
                 foreach (var contentType in orderedTypes)
                 {
                     removedContentTypes.Add(contentType);
@@ -159,7 +157,7 @@ namespace Umbraco.Web.Editors
                 {
                     removedDictionaryItems.Add(di);
                     Services.LocalizationService.Delete(di);
-                }                    
+                }
                 pack.Data.DictionaryItems.Remove(nId.ToString());
             }
 
@@ -173,7 +171,7 @@ namespace Umbraco.Web.Editors
                 {
                     removedDataTypes.Add(dtd);
                     Services.DataTypeService.Delete(dtd);
-                }                    
+                }
                 pack.Data.DataTypes.Remove(nId.ToString());
             }
 
@@ -214,15 +212,15 @@ namespace Umbraco.Web.Editors
             //Remove files
             foreach (var item in pack.Data.Files.ToArray())
             {
+                removedFiles.Add(item.GetRelativePath());
+
                 //here we need to try to find the file in question as most packages does not support the tilde char
                 var file = IOHelper.FindFile(item);
                 if (file != null)
                 {
                     if (file.StartsWith("/") == false)
                         file = string.Format("/{0}", file);
-
                     var filePath = IOHelper.MapPath(file);
-                    removedFiles.Add(filePath);
 
                     if (File.Exists(filePath))
                         File.Delete(filePath);
@@ -252,7 +250,7 @@ namespace Umbraco.Web.Editors
             if (refreshCache)
             {
                 library.RefreshContent();
-            }            
+            }
             TreeDefinitionCollection.Instance.ReRegisterTrees();
             global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
         }
@@ -272,8 +270,8 @@ namespace Umbraco.Web.Editors
                     {
                         Version pckVersion;
                         return Version.TryParse(pck.Data.Version, out pckVersion)
-                            ? new {package = pck, version = pckVersion}
-                            : new {package = pck, version = new Version(0, 0, 0)};
+                            ? new { package = pck, version = pckVersion }
+                            : new { package = pck, version = new Version(0, 0, 0) };
                     })
                 .Select(grouping =>
                 {
@@ -344,7 +342,7 @@ namespace Umbraco.Web.Editors
             model.UmbracoVersion = ins.RequirementsType == RequirementsType.Strict
                 ? string.Format("{0}.{1}.{2}", ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch)
                 : string.Empty;
-            
+
             //now we need to check for version comparison
             model.IsCompatible = true;
             if (ins.RequirementsType == RequirementsType.Strict)
@@ -424,7 +422,7 @@ namespace Umbraco.Web.Editors
                 {
                     //TODO: Currently it has to be here, it's not ideal but that's the way it is right now
                     var packageTempDir = IOHelper.MapPath(SystemDirectories.Data);
-                    
+
                     //ensure it's there
                     Directory.CreateDirectory(packageTempDir);
 
@@ -440,14 +438,14 @@ namespace Umbraco.Web.Editors
                     PopulateFromPackageData(model);
 
                     var validate = ValidateInstalledInternal(model.Name, model.Version);
-                    
+
                     if (validate == false)
                     {
                         //this package is already installed
                         throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                            Services.TextService.Localize("packager/packageAlreadyInstalled")));                        
+                            Services.TextService.Localize("packager/packageAlreadyInstalled")));
                     }
-                    
+
                 }
                 else
                 {
@@ -456,7 +454,7 @@ namespace Umbraco.Web.Editors
                         Services.TextService.Localize("media/disallowedFileType"),
                         SpeechBubbleIcon.Warning));
                 }
-                
+
             }
 
             return model;
@@ -478,7 +476,7 @@ namespace Umbraco.Web.Editors
                 //our repo guid
                 using (var our = Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66"))
                 {
-                    path = our.fetch(packageGuid, Security.CurrentUser.Id);    
+                    path = our.fetch(packageGuid, Security.CurrentUser.Id);
                 }
             }
 
@@ -522,12 +520,12 @@ namespace Umbraco.Web.Editors
                 if (UmbracoVersion.Current < packageMinVersion)
                 {
                     throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                        Services.TextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()})));
+                        Services.TextService.Localize("packager/targetVersionMismatch", new[] { packageMinVersion.ToString() })));
                 }
             }
 
             model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, tempPath);
-            model.Id = ins.CreateManifest( IOHelper.MapPath(model.TemporaryDirectoryPath), model.PackageGuid.ToString(), model.RepositoryGuid.ToString());
+            model.Id = ins.CreateManifest(IOHelper.MapPath(model.TemporaryDirectoryPath), model.PackageGuid.ToString(), model.RepositoryGuid.ToString());
 
             return model;
         }

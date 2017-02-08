@@ -367,5 +367,36 @@ namespace Umbraco.Core.IO
                 && Path.IsPathRooted(path)
                 && Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
         }
+
+        /// <summary>
+        /// Get properly formatted relative path from an existing absolute or relative path
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        internal static string GetRelativePath(this string path)
+        {
+            if (path.IsFullPath())
+            {
+                var rootDirectory = GetRootDirectorySafe();
+                var relativePath = path.ToLowerInvariant().Replace(rootDirectory.ToLowerInvariant(), string.Empty);
+                path = relativePath;
+            }
+
+            return path.EnsurePathIsPrefixed();
+        }
+
+        /// <summary>
+        /// Ensures that a path has `~/` as prefix
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        internal static string EnsurePathIsPrefixed(this string path)
+        {
+            if (path.StartsWith("/") == false && path.StartsWith("\\") == false)
+                path = string.Format("/{0}", path);
+            if (path.StartsWith("~") == false)
+                path = string.Format("~{0}", path);
+            return path;
+        }
     }
 }

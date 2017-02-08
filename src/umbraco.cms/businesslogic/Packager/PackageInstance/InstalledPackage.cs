@@ -149,13 +149,7 @@ namespace umbraco.cms.businesslogic.packager {
             for (var i = 0; i < Data.Files.Count; i++)
             {
                 var filePath = Data.Files[i];
-                if (filePath.IsFullPath())
-                    continue;
-
-                filePath = filePath.TrimStart('~');
-                if (filePath.StartsWith("/") == false)
-                    filePath = string.Format("/{0}", filePath);
-                Data.Files[i] = IOHelper.MapPath(filePath);
+                Data.Files[i] = filePath.GetRelativePath();
             }
 
             return new InstallationSummary
