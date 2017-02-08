@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MiniListViewDirective($q, contentResource, memberResource, mediaResource, entityResource) {
+    function MiniListViewDirective(contentResource, memberResource, mediaResource, entityResource) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -33,23 +33,15 @@
                     }
                 };
 
-                // start loading animation on node
-                node.loading = true;
+                // clear and push mini list view in dom so we only render 1 view
+                scope.miniListViews = [];
+                scope.miniListViews.push(miniListView);
 
-                getChildrenForMiniListView(miniListView)
-                    .then(function (data) {
+                // store in history so we quickly can navigate back
+                miniListViewsHistory.push(miniListView);
 
-                        // stop loading animation on node
-                        node.loading = false;
-
-                        // clear and push mini list view in dom so we only render 1 view
-                        scope.miniListViews = [];
-                        scope.miniListViews.push(miniListView);
-
-                        // store in history so we quickly can navigate back
-                        miniListViewsHistory.push(miniListView);
-
-                    });
+                // get children
+                getChildrenForMiniListView(miniListView);
 
                 // get ancestors
                 getAncestors(node);
@@ -57,9 +49,6 @@
             }
 
             function getChildrenForMiniListView(miniListView) {
-
-                // setup promise
-                var deferred = $q.defer();
 
                 // start loading animation list view
                 miniListView.loading = true;
@@ -77,22 +66,14 @@
 
                 resource(miniListView.node.id, miniListView.pagination)
                     .then(function (data) {
-
                         // update children
                         miniListView.children = data.items;
-
                         // update pagination
                         miniListView.pagination.totalItems = data.totalItems;
                         miniListView.pagination.totalPages = data.totalPages;
-
                         // stop load indicator
                         miniListView.loading = false;
-
-                        deferred.resolve(data);
                     });
-
-                return deferred.promise;
-
             }
 
             scope.openNode = function(event, node) {
