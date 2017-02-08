@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services
                     {
                         //if a property was deleted or alias changed, then update all content of the current content type
                         // and all of it's desscendant doc types.     
-                        toUpdate.AddRange(contentType.DescendantsAndSelf());
+                        toUpdate.AddRange(contentType.DescendantsAndSelf(this));
                     }
                 }
             }

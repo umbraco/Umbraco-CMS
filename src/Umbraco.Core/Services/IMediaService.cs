@@ -256,6 +256,14 @@ namespace Umbraco.Core.Services
         void DeleteMediaOfType(int mediaTypeId, int userId = 0);
 
         /// <summary>
+        /// Deletes all media of the specified types. All Descendants of deleted media that is not of these types is moved to Recycle Bin.
+        /// </summary>
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="mediaTypeIds">Ids of the <see cref="IMediaType"/>s</param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0);
+
+        /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
         /// <remarks>

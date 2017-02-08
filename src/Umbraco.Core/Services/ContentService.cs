@@ -679,6 +679,7 @@ namespace Umbraco.Core.Services
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
+                    //TODO: Wouldn't this be faster doing a starts with than a contains??
                     query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
@@ -1318,6 +1319,121 @@ namespace Umbraco.Core.Services
         public void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true)
         {
             ((IContentServiceOperations)this).Save(contents, userId, raiseEvents);
+        }
+
+        /// <summary>
+        /// Deletes all content of the specified types. All Descendants of deleted content that is not of these types is moved to Recycle Bin.
+        /// </summary>        
+        /// <param name="contentTypeIds">Id of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        public void DeleteContentOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
+        {
+            var contentToRecycle = new List<IContent>();
+            var contentToDelete = new List<IContent>();
+
+            using (new WriteLock(Locker))
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateContentRepository(uow);
+
+                //TODO: What about content that has the contenttype as part of its composition?
+                
+                //track the 'root' items of the collection of nodes discovered to delete, we need to use
+                //these items to lookup descendants that are not of this doc type so they can be transfered
+                //to the recycle bin
+                var rootItems = new Dictionary<int, IContent>();
+
+                var query = Query<IContent>.Builder.Where(x => contentTypeIds.Contains(x.ContentTypeId));
+                
+                long pageIndex = 0;
+                var pageSize = 10000;
+                int currentPageSize;
+                do
+                {
+                    long total;
+
+                    //start at the highest level
+                    var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "umbracoNode.level", Direction.Ascending, true).ToArray();
+
+                    // need to store decendants count before filtering, in order for loop to work correctly
+                    currentPageSize = contents.Length;
+
+                    //loop through the items, check if if the item exists already in the hierarchy of items tracked
+                    //and if not, we need to add it as a 'root' item to be used to lookup later
+                    foreach (var content in contents)
+                    {                        
+                        if (rootItems.ContainsKey(content.ParentId) == false)
+                        {
+                            //this item's parent doesn't exist so we need to track it
+                            rootItems[content.Id] = content;
+                        }
+
+                        //track content for deletion
+                        contentToDelete.Add(content);
+                    }
+
+                    pageIndex++;
+                } while (currentPageSize == pageSize);
+
+                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IContent>(contentToDelete), "Deleting"))
+                {
+                    uow.Commit();
+                    return;
+                }
+
+                //iterate over the root items found in the collection to be deleted, then discover which descendant items
+                //need to be moved to the recycle bin
+                foreach (var content in rootItems)
+                {
+                    //Look for children of current content and move that to trash before the current content is deleted
+                    var c = content;
+                    var pathMatch = string.Format("{0},", c.Value.Path);
+                    var descendantQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(pathMatch));
+
+                    do
+                    {
+                        long total;
+                        
+                        var descendants = repository.GetPagedResultsByQuery(descendantQuery, pageIndex, pageSize, out total, "umbracoNode.id", Direction.Ascending, true).ToArray();
+                        
+                        foreach (var d in descendants)
+                        {
+                            //track for recycling if this item is not of a contenttype that is being deleted
+                            if (contentTypeIds.Contains(d.ContentTypeId) == false)
+                            {                                
+                                contentToRecycle.Add(d);
+                            }
+                        }
+
+                        // need to store decendants count before filtering, in order for loop to work correctly
+                        currentPageSize = descendants.Length;
+
+                        pageIndex++;
+                    } while (currentPageSize == pageSize);
+                }
+
+                // do it INSIDE the UOW because nested UOW kinda should work
+                // fixme - and then we probably don't need the whole mess?
+                // nesting UOW works, it's just that the outer one NEEDS to be flushed beforehand
+                // nevertheless, it would be nicer to create a global scope and inner uow
+
+                foreach (var child in contentToRecycle)
+                {
+                    MoveToRecycleBin(child, userId);
+                }
+
+                foreach (var content in contentToDelete)
+                {
+                    Delete(content, userId);
+                }
+
+                uow.Commit();
+
+                Audit(AuditType.Delete,
+                    string.Format("Delete Content of Types {0} performed by user", string.Join(",", contentTypeIds)),
+                    userId, Constants.System.Root);
+
+            }
         }
 
         /// <summary>

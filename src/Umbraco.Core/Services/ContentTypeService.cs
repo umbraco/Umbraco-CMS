@@ -817,23 +817,19 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
                     if (uow.Events.DispatchCancelable(DeletingContentType, this, new DeleteEventArgs<IContentType>(contentType)))
-                        return;
-                    var repository = RepositoryFactory.CreateContentTypeRepository(uow);
-                    
-                    //TODO: This needs to change, if we are deleting a content type, we should just delete the data,
-                    // this method will recursively go lookup every content item, check if any of it's descendants are
-                    // of a different type, move them to the recycle bin, then permanently delete the content items.
-                    // The main problem with this is that for every content item being deleted, events are raised...
-                    // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
-
-                    var deletedContentTypes = new List<IContentType>() {contentType};
-                    deletedContentTypes.AddRange(contentType.Descendants().OfType<IContentType>());
-
-                    foreach (var deletedContentType in deletedContentTypes)
                     {
-                        _contentService.DeleteContentOfType(deletedContentType.Id);
+                        uow.Commit();
+                        return;
                     }
 
+                    var repository = RepositoryFactory.CreateContentTypeRepository(uow);
+                    
+                    //If we are deleting this content type, we are also deleting it's descendents!
+                    var deletedContentTypes = new List<IContentType>() {contentType};
+                    deletedContentTypes.AddRange(contentType.Descendants((IContentTypeService)this).OfType<IContentType>());
+
+                    _contentService.DeleteContentOfTypes(deletedContentTypes.Select(x => x.Id), userId);
+                    
                     repository.Delete(contentType);
                     uow.Commit();
 
@@ -855,32 +851,27 @@ namespace Umbraco.Core.Services
         public void Delete(IEnumerable<IContentType> contentTypes, int userId = 0)
         {
             var asArray = contentTypes.ToArray();
-
-            using (var scope = UowProvider.ScopeProvider.CreateScope())
-            {
-                scope.Complete(); // always complete
-                if (scope.Events.DispatchCancelable(DeletingContentType, this, new DeleteEventArgs<IContentType>(asArray)))
-                    return;
-            }
-
+            
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
+                    if (uow.Events.DispatchCancelable(DeletingContentType, this, new DeleteEventArgs<IContentType>(asArray)))
+                    {
+                        uow.Commit();
+                        return;
+                    }
+
                     var repository = RepositoryFactory.CreateContentTypeRepository(uow);
 
-                    var deletedContentTypes = new List<IContentType>();
-                    deletedContentTypes.AddRange(asArray);
-
+                    //If we are deleting this content type, we are also deleting it's descendents!
+                    var deletedContentTypes = new List<IContentType>(asArray);
                     foreach (var contentType in asArray)
                     {
-                        deletedContentTypes.AddRange(contentType.Descendants().OfType<IContentType>());
+                        deletedContentTypes.AddRange(contentType.Descendants((IContentTypeService)this).OfType<IContentType>());
                     }
 
-                    foreach (var deletedContentType in deletedContentTypes)
-                    {
-                        _contentService.DeleteContentOfType(deletedContentType.Id);
-                    }
+                    _contentService.DeleteContentOfTypes(deletedContentTypes.Select(x => x.Id), userId);                    
 
                     foreach (var contentType in asArray)
                     {
@@ -1277,23 +1268,25 @@ namespace Umbraco.Core.Services
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IMediaType mediaType, int userId = 0)
         {
-            using (var scope = UowProvider.ScopeProvider.CreateScope())
-            {
-                scope.Complete(); // always
-                if (scope.Events.DispatchCancelable(DeletingMediaType, this, new DeleteEventArgs<IMediaType>(mediaType)))
-                    return;
-            }
+            //TODO: Share all of this logic with the Delete IContentType methods, no need for code duplication
 
             using (new WriteLock(Locker))
             {
-                _mediaService.DeleteMediaOfType(mediaType.Id, userId);
-
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
+                    if (uow.Events.DispatchCancelable(DeletingMediaType, this, new DeleteEventArgs<IMediaType>(mediaType)))
+                    {
+                        uow.Commit();
+                        return;
+                    }
+
                     var repository = RepositoryFactory.CreateMediaTypeRepository(uow);
 
+                    //If we are deleting this content type, we are also deleting it's descendents!
                     var deletedMediaTypes = new List<IMediaType> { mediaType };
-                    deletedMediaTypes.AddRange(mediaType.Descendants().OfType<IMediaType>());
+                    deletedMediaTypes.AddRange(mediaType.Descendants((IContentTypeService)this).OfType<IMediaType>());
+
+                    _mediaService.DeleteMediaOfTypes(deletedMediaTypes.Select(x => x.Id), userId);
 
                     repository.Delete(mediaType);
                     uow.Commit();
@@ -1313,34 +1306,36 @@ namespace Umbraco.Core.Services
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IEnumerable<IMediaType> mediaTypes, int userId = 0)
         {
+            //TODO: Share all of this logic with the Delete IContentType methods, no need for code duplication
+
             var asArray = mediaTypes.ToArray();
-
-            using (var scope = UowProvider.ScopeProvider.CreateScope())
-            {
-                scope.Complete(); // always
-                if (scope.Events.DispatchCancelable(DeletingMediaType, this, new DeleteEventArgs<IMediaType>(asArray)))
-                    return;
-            }
-
+            
             using (new WriteLock(Locker))
             {
-                foreach (var mediaType in asArray)
-                {
-                    _mediaService.DeleteMediaOfType(mediaType.Id);
-                }
-
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    var repository = RepositoryFactory.CreateMediaTypeRepository(uow);
+                    if (uow.Events.DispatchCancelable(DeletingMediaType, this, new DeleteEventArgs<IMediaType>(asArray)))
+                    {
+                        uow.Commit();
+                        return;
+                    }
 
-                    var deletedMediaTypes = new List<IMediaType>();
-                    deletedMediaTypes.AddRange(asArray);
+                    var repository = RepositoryFactory.CreateMediaTypeRepository(uow);
+                    
+                    //If we are deleting this content type, we are also deleting it's descendents!
+                    var deletedMediaTypes = new List<IMediaType>(asArray);
+                    foreach (var mediaType in asArray)
+                    {
+                        deletedMediaTypes.AddRange(mediaType.Descendants((IContentTypeService)this).OfType<IMediaType>());                        
+                    }
+
+                    _mediaService.DeleteMediaOfTypes(deletedMediaTypes.Select(x => x.Id), userId);
 
                     foreach (var mediaType in asArray)
                     {
-                        deletedMediaTypes.AddRange(mediaType.Descendants().OfType<IMediaType>());
                         repository.Delete(mediaType);
                     }
+
                     uow.Commit();
 
                     uow.Events.Dispatch(DeletedMediaType, this, new DeleteEventArgs<IMediaType>(deletedMediaTypes.DistinctBy(x => x.Id), false));

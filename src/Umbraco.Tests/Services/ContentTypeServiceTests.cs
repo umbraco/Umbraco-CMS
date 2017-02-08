@@ -177,7 +177,7 @@ namespace Umbraco.Tests.Services
             var master = hierarchy.First();
 
             //Act
-            var descendants = master.Descendants();
+            var descendants = master.Descendants(contentTypeService);
 
             //Assert
             Assert.AreEqual(10, descendants.Count());
@@ -193,7 +193,7 @@ namespace Umbraco.Tests.Services
             var master = hierarchy.First();
 
             //Act
-            var descendants = master.DescendantsAndSelf();
+            var descendants = master.DescendantsAndSelf(contentTypeService);
 
             //Assert
             Assert.AreEqual(11, descendants.Count());

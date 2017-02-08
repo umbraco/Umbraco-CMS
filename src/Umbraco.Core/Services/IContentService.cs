@@ -369,6 +369,14 @@ namespace Umbraco.Core.Services
         void DeleteContentOfType(int contentTypeId, int userId = 0);
 
         /// <summary>
+        /// Deletes all content of the specified types. All Descendants of deleted content that is not of these types is moved to Recycle Bin.
+        /// </summary>
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="contentTypeIds">Ids of the <see cref="IContentType"/>s</param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteContentOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
+
+        /// <summary>
         /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
