@@ -586,41 +586,18 @@ namespace Umbraco.Core.Persistence.Repositories
         /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using PetaPoco paging (SQL paging)
         /// </remarks>
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMember> filter = null)
         {
-            var args = new List<object>();
-            var sbWhere = new StringBuilder();
-            Func<Tuple<string, object[]>> filterCallback = null;
-            if (filter.IsNullOrWhiteSpace() == false)
+            var filterSql = new Sql();
+            if (filter != null)
             {
-                //This will build up the where clause - even though the same 'filter' is being
-                //applied to both columns, the parameters values passed to PetaPoco need to be 
-                //duplicated, otherwise it gets confused :/ 
-                var columnFilters = new List<Tuple<string, string>>
+                foreach (var filterClaus in filter.GetWhereClauses())
                 {
-                    new Tuple<string, string>("umbracoNode", "text"),
-                    new Tuple<string, string>("cmsMember", "LoginName")
-                };
-                sbWhere.Append("AND (");
-                for (int i = 0; i < columnFilters.Count; i++)
-                {
-                    sbWhere
-                        .Append("(")
-                        .Append(SqlSyntax.GetQuotedTableName(columnFilters[i].Item1))
-                        .Append(".")
-                        .Append(SqlSyntax.GetQuotedColumnName(columnFilters[i].Item2))
-                        .Append(" LIKE @")
-                        .Append(args.Count)
-                        .Append(") ");
-                    args.Add(string.Format("%{0}%", filter));
-                    if (i < (columnFilters.Count - 1))
-                    {
-                        sbWhere.Append("OR ");
-                    }
+                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
                 }
-                sbWhere.Append(")");
-                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
             }
+
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);            
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsMember", "nodeId"),

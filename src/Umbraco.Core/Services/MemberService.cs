@@ -695,16 +695,22 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
+                IQuery<IMember> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IMember>.Builder.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                }
+
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
                 IEnumerable<IMember> ret;
                 if (memberTypeAlias == null)
                 {
-                    ret = repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, filter);
+                    ret = repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, filterQuery);
                 }
                 else
                 {
                     var query = new Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
-                    ret = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, filter);
+                    ret = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, filterQuery);
                 }
 
                 return ret;

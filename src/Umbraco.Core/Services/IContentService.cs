@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public interface IContentService : IService
+    public interface IContentService : IContentServiceBase
     {
         /// <summary>
         /// Gets all XML entries found in the cmsContentXml table based on the given path

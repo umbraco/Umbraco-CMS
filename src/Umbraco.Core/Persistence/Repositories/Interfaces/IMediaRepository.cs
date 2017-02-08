@@ -28,22 +28,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="content"></param>
         /// <param name="xml"></param>
-        void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml);
-
-        /// <summary>
-        /// Gets paged media results
-        /// </summary>
-        /// <param name="query">Query to excute</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search text filter</param>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "");
-        
+        void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml);        
     }
 }

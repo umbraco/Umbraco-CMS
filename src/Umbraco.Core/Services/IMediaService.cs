@@ -57,7 +57,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public interface IMediaService : IService
+    public interface IMediaService : IContentServiceBase
     {
         /// <summary>
         /// Gets all XML entries found in the cmsContentXml table based on the given path

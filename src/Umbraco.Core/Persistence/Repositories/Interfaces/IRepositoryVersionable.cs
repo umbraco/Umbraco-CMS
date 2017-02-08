@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -78,5 +81,20 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records the query would return without paging</param>
         /// <returns>A paged enumerable of XML entries of content items</returns>
         IEnumerable<XElement> GetPagedXmlEntriesByPath(string path, long pageIndex, int pageSize, string[] orderBy, out long totalRecords);
+
+        /// <summary>
+        /// Gets paged content results
+        /// </summary>
+        /// <param name="query">Query to excute</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter"></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<TEntity> GetPagedResultsByQuery(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<TEntity> filter = null);
     }
 }

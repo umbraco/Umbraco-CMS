@@ -500,6 +500,29 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Get_All_Paged_Members_With_Filter()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10);
+            ServiceContext.MemberService.Save(members);
+
+            long totalRecs;
+            var found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-");
+
+            Assert.AreEqual(2, found.Count());
+            Assert.AreEqual(10, totalRecs);
+            Assert.AreEqual("test0", found.First().Username);
+            Assert.AreEqual("test1", found.Last().Username);
+            
+            found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-5");
+
+            Assert.AreEqual(1, found.Count());
+            Assert.AreEqual(1, totalRecs);
+            Assert.AreEqual("test5", found.First().Username);
+        }
+
+        [Test]
         public void Find_By_Name_Starts_With()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();

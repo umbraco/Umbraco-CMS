@@ -451,11 +451,23 @@ namespace Umbraco.Core.Services
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
+
             using (var uow = UowProvider.GetUnitOfWork(commit: true))
             {
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
-                var query = Query<IMedia>.Builder.Where(x => x.ParentId == id);
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+
+                var query = Query<IMedia>.Builder;
+                //if the id is System Root, then just get all
+                if (id != Constants.System.Root)
+                {
+                    query.Where(x => x.ParentId == id);
+                }
+                IQuery<IMedia> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IMedia>.Builder.Where(x => x.Name.Contains(filter));
+                }
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filterQuery);
             }
         }
 
@@ -505,13 +517,17 @@ namespace Umbraco.Core.Services
             {
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
                 var query = Query<IMedia>.Builder;
-                //if the id is -1, then just get all
-
-                if (id != -1)
+                //if the id is System Root, then just get all
+                if (id != Constants.System.Root)
                 {
                     query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                IQuery<IMedia> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IMedia>.Builder.Where(x => x.Name.Contains(filter));
+                }
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filterQuery);
             }
         }
 
@@ -957,67 +973,16 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         public void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0)
         {
-            //TODO: put this duplicate logic in a base class between media/content/(member) services
-
-            var mediaToRecycle = new List<IMedia>();
-            var mediaToDelete = new List<IMedia>();
-
             using (new WriteLock(Locker))
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
 
-                //TODO: What about content that has the contenttype as part of its composition?
-
                 //track the 'root' items of the collection of nodes discovered to delete, we need to use
                 //these items to lookup descendants that are not of this doc type so they can be transfered
                 //to the recycle bin
-                var rootItems = new Dictionary<string, IMedia>();
-
-                var query = Query<IMedia>.Builder.Where(x => mediaTypeIds.Contains(x.ContentTypeId));
-
-                long pageIndex = 0;
-                var pageSize = 10000;
-                int currentPageSize;
-                do
-                {
-                    long total;
-
-                    //start at the highest level
-                    var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "umbracoNode.level", Direction.Ascending, true).ToArray();
-
-                    // need to store decendants count before filtering, in order for loop to work correctly
-                    currentPageSize = contents.Length;
-
-                    //loop through the items, check if if the item exists already in the hierarchy of items tracked
-                    //and if not, we need to add it as a 'root' item to be used to lookup later
-                    foreach (var content in contents)
-                    {
-                        var pathParts = content.Path.Split(',');
-                        var found = false;
-
-                        for (int i = 1; i < pathParts.Length; i++)
-                        {
-                            var currPath = "-1," + string.Join(",", Enumerable.Range(1, i).Select(x => pathParts[x]));
-                            if (rootItems.Keys.Contains(currPath))
-                            {
-                                //this content item's ancestor already exists in the root collection
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (found == false)
-                        {
-                            rootItems[content.Path] = content;
-                        }
-                        
-                        //track content for deletion
-                        mediaToDelete.Add(content);
-                    }
-
-                    pageIndex++;
-                } while (currentPageSize == pageSize);
+                IDictionary<string, IMedia> rootItems;
+                var mediaToDelete = this.TrackDeletionsForDeleteContentOfTypes(mediaTypeIds, repository, out rootItems).ToArray();
 
                 if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMedia>(mediaToDelete), "Deleting"))
                 {
@@ -1025,38 +990,8 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
-                //iterate over the root items found in the collection to be deleted, then discover which descendant items
-                //need to be moved to the recycle bin
-                foreach (var content in rootItems)
-                {
-                    //Look for children of current content and move that to trash before the current content is deleted
-                    var c = content;
-                    var pathMatch = string.Format("{0},", c.Value.Path);
-                    var descendantQuery = Query<IMedia>.Builder.Where(x => x.Path.StartsWith(pathMatch));
-
-                    pageIndex = 0;
-
-                    do
-                    {
-                        long total;
-
-                        var descendants = repository.GetPagedResultsByQuery(descendantQuery, pageIndex, pageSize, out total, "umbracoNode.id", Direction.Ascending, true).ToArray();
-
-                        foreach (var d in descendants)
-                        {
-                            //track for recycling if this item is not of a contenttype that is being deleted
-                            if (mediaTypeIds.Contains(d.ContentTypeId) == false)
-                            {
-                                mediaToRecycle.Add(d);
-                            }
-                        }
-
-                        // need to store decendants count before filtering, in order for loop to work correctly
-                        currentPageSize = descendants.Length;
-
-                        pageIndex++;
-                    } while (currentPageSize == pageSize);
-                }
+                //Determine the items that will need to be recycled (that are children of these content items but not of these content types)
+                var mediaToRecycle = this.TrackTrashedForDeleteContentOfTypes(mediaTypeIds, rootItems, repository);
 
                 // do it INSIDE the UOW because nested UOW kinda should work
                 // fixme - and then we probably don't need the whole mess?
@@ -1093,64 +1028,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user deleting the media</param>
         public void DeleteMediaOfType(int mediaTypeId, int userId = 0)
         {
-            //TODO: This all needs to be done on the repo level in one trans
-
-            var childList = new List<IMedia>();
-            var contentList = new List<IMedia>();
-
-            using (new WriteLock(Locker))
-            {
-                using (var uow = UowProvider.GetUnitOfWork())
-                {
-                    var repository = RepositoryFactory.CreateMediaRepository(uow);
-                    var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
-                    var contents = repository.GetByQuery(query).ToArray();
-                    // fixme commit if cancel?
-                    if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMedia>(contents)))
-                    {
-                        uow.Commit();
-                        return;
-                    }
-
-                    foreach (var content in contents.OrderByDescending(x => x.ParentId))
-                    {
-                        //Look for children of current content and move that to trash before the current content is deleted
-                        var c = content;
-                        var childQuery = Query<IMedia>.Builder.Where(x => x.Path.StartsWith(c.Path));
-                        var children = repository.GetByQuery(childQuery);
-
-                        foreach (var child in children)
-                        {
-                            //track children for moving to the bin
-                            childList.Add(child);
-                        }
-
-                        //track content for deletion
-                        contentList.Add(content);
-                    }
-                    //} // fixme - just so it builds
-
-                    // FIXME WHAT THE MASSIVE FUCK
-                    //We need to do this outside of the uow because otherwise we'll have nested uow's
-                    //TODO: this is a problem because we are doing all of this logic in the Service when it should
-                    //all be happening in the repository
-
-                    foreach (var child in childList)
-                    {
-                        if (child.ContentType.Id != mediaTypeId)
-                            MoveToRecycleBin(child, userId);
-                    }
-                    foreach (var content in contentList)
-                    {
-                        //Permanently delete the content
-                        Delete(content, userId);
-
-                        uow.Commit();
-                    }
-
-                    Audit(AuditType.Delete, "Delete Media items by Type performed by user", userId, -1);
-                } // fixme
-            }
+            DeleteMediaOfTypes(new[] {mediaTypeId}, userId);
         }
 
         /// <summary>
