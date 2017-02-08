@@ -22,17 +22,17 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		  $scope.init = function(contentType) {
 
 			  if(contentType === "content") {
-				  entityType = "Document";
+				  $scope.entityType = "Document";
 				  if(!$scope.model.title) {
 					  $scope.model.title = localizationService.localize("defaultdialogs_selectContent");
 				  }
 			  } else if(contentType === "member") {
-				  entityType = "Member";
+				  $scope.entityType = "Member";
 				  if(!$scope.model.title) {
 					  $scope.model.title = localizationService.localize("defaultdialogs_selectMember");
 				  }
 			  } else if(contentType === "media") {
-				  entityType = "Media";
+				  $scope.entityType = "Media";
 				  if(!$scope.model.title) {
 					  $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
 				  }
@@ -49,7 +49,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    });
 
         // Allow the entity type to be passed in but defaults to Document for backwards compatibility.
-	    var entityType = dialogOptions.entityType ? dialogOptions.entityType : "Document";
+	    $scope.entityType = dialogOptions.entityType ? dialogOptions.entityType : "Document";
 
 
 	    //min / max values
@@ -61,10 +61,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    }
 
 	    if (dialogOptions.section === "member") {
-	        entityType = "Member";
+	        $scope.entityType = "Member";
 	    }
 	    else if (dialogOptions.section === "media") {
-	        entityType = "Media";
+	        $scope.entityType = "Media";
 	    }
 
 		// Search and listviews is only working for content, media and member section so we will remove it from everything else
@@ -73,7 +73,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 	        //if a alternative startnode is used, we need to check if it is a container
 	        if (dialogOptions.startNodeId && dialogOptions.startNodeId !== -1) {
-	            entityResource.getById(dialogOptions.startNodeId, entityType).then(function (node) {
+	            entityResource.getById(dialogOptions.startNodeId, $scope.entityType).then(function (node) {
 	                if (node.metaData.IsContainer) {
 						openMiniListView(node);
 	                }
@@ -193,7 +193,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 							 multiSelectItem(entity);
 						} else {
 							 //otherwise we have to get it from the server
-							 entityResource.getById(id, entityType).then(function (ent) {
+							 entityResource.getById(id, $scope.entityType).then(function (ent) {
 								 multiSelectItem(ent);
 							 });
 						}
@@ -218,7 +218,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 							 multiSelectItem(entity);
 						} else {
 							 //otherwise we have to get it from the server
-							 entityResource.getById(id, entityType).then(function (ent) {
+							 entityResource.getById(id, $scope.entityType).then(function (ent) {
 								 multiSelectItem(ent);
 							 });
 						}
@@ -235,7 +235,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 							  $scope.model.submit($scope.model);
 	                } else {
 	                    //otherwise we have to get it from the server
-	                    entityResource.getById(id, entityType).then(function (ent) {
+	                    entityResource.getById(id, $scope.entityType).then(function (ent) {
 								   $scope.model.selection.push(ent);
 	                        $scope.model.submit($scope.model);
 	                    });
@@ -316,7 +316,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    }
 
 	    $scope.multiSubmit = function (result) {
-	        entityResource.getByIds(result, entityType).then(function (ents) {
+	        entityResource.getByIds(result, $scope.entityType).then(function (ents) {
 	            $scope.submit(ents);
 	        });
 	    };
@@ -466,179 +466,14 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
 	    });
 
-		/* --- Mini List View --- */
-		$scope.miniListViews = [];
-		$scope.breadcrumb = [];
-		var miniListViewsHistory = [];
-		var goingForward = true;
-
-		$scope.goToPage = function(pageNumber, miniListView) {
-			// set new page number
-			miniListView.pagination.pageNumber = pageNumber;
-			// get children
-			getChildrenForMiniListView(miniListView);
-		};
-
-		$scope.selectListViewItem = function(item) {
-			select(item.name, item.id);
+		$scope.selectListViewNode = function(node) {
+			select(node.name, node.id);
             //toggle checked state
-            item.selected = item.selected === true ? false : true;
+            node.selected = node.selected === true ? false : true;
 		};
-
-		$scope.clickBreadcrumb = function(ancestor) {
-
-			var found = false;
-			goingForward = false;
-
-			angular.forEach(miniListViewsHistory, function(historyItem, index){
-				if(parseInt(historyItem.node.id) === parseInt(ancestor.id)) {
-					// load the list view from history
-					$scope.miniListViews = [];
-					$scope.miniListViews.push(historyItem);
-					// get ancestors
-					getAncestors(historyItem.node);
-					found = true;
-				}
-			});
-
-			if(!found) {
-				// if we can't find the view in the history 
-				miniListViewsHistory = [];
-				$scope.miniListViews = [];
-			}
-
-		};
-
-		$scope.searchMiniListView = function(search, miniListView) {
-			// set search value
-			miniListView.pagination.filter = search;
-			// start loading animation list view
-			miniListView.loading = true;
-			searchMiniListView(miniListView);
-		};
-
-		$scope.test = function(node) {
-			openMiniListView(node);
-		};
-
-		var searchMiniListView = _.debounce(function (miniListView) {
-			$scope.$apply(function () {
-				getChildrenForMiniListView(miniListView);
-			});
-		}, 500);
 
 		function openMiniListView(node) {
-
-			goingForward = true;
-
-			var miniListView = {
-				node: node,
-				loading: true,
-				pagination: {
-					pageSize: 10,
-					pageNumber: 1,
-					filter: '',
-					orderDirection: "Ascending",
-					orderBy: "SortOrder",
-					orderBySystemField: true
-				}
-			};
-			
-			// start loading animation on node
-			node.loading = true;
-
-			getChildrenForMiniListView(miniListView)
-				.then(function(data){
-
-					// stop loading animation on node
-					node.loading = false;
-
-					// clear and push mini list view in dom so we only render 1 view
-					$scope.miniListViews = [];
-					$scope.miniListViews.push(miniListView);
-
-					// store in history so we quickly can navigate back
-					miniListViewsHistory.push(miniListView);
-					
-				});
-			
-			// get ancestors
-			getAncestors(node);
-
-		}
-
-		function getChildrenForMiniListView(miniListView) {
-
-			// setup promise
-			var deferred = $q.defer();
-
-			// start loading animation list view
-			miniListView.loading = true;
-
-			// setup the correct resource depending on section
-			var resource = "";
-
-			if (entityType === "Document") {
-				resource = contentResource.getChildren;
-			} else if (entityType === "Member") {
-				resource = memberResource.getPagedResults;
-			} else if (entityType === "Media") {
-				resource = mediaResource.getChildren;
-			}
-
-			resource(miniListView.node.id, miniListView.pagination)
-				.then(function (data) {
-
-					console.log("data, data, data", data);
-
-					// update children
-					miniListView.children = data.items;
-
-					// update pagination
-					miniListView.pagination.totalItems = data.totalItems;
-					miniListView.pagination.totalPages = data.totalPages;
-
-					// stop load indicator
-					miniListView.loading = false;
-
-					deferred.resolve(data);
-
-				});
-			
-			return deferred.promise;
-
-		}
-
-		function getAncestors(node) {
-			entityResource.getAncestors(node.id, entityType)
-				.then(function (ancestors) {
-
-					// if there is a start node remove all ancestors before that one
-					if(dialogOptions.startNodeId && dialogOptions.startNodeId !== -1) {
-						var found = false;
-						$scope.breadcrumb = [];
-						angular.forEach(ancestors, function(ancestor){
-							if(parseInt(ancestor.id) === parseInt(dialogOptions.startNodeId)) {
-								found = true;
-							}
-							if(found) {
-								$scope.breadcrumb.push(ancestor);
-							}
-						});
-
-					} else {
-						$scope.breadcrumb = ancestors;
-					}
-
-				});
-		}
-
-		$scope.getMiniListViewAnimation = function() {
-			if(goingForward) {
-				return 'umb-mini-list-view--forward';
-			} else {
-				return 'umb-mini-list-view--backwards';
-			}
+			$scope.miniListView = node;
 		}
 
 	});
