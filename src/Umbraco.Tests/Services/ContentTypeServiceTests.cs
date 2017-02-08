@@ -33,6 +33,141 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Deleting_Media_Type_With_Hierarchy_Of_Media_Items_Moves_Orphaned_Media_To_Recycle_Bin()
+        {
+            IMediaType contentType1 = MockedContentTypes.CreateSimpleMediaType("test1", "Test1");
+            ServiceContext.ContentTypeService.Save(contentType1);
+            IMediaType contentType2 = MockedContentTypes.CreateSimpleMediaType("test2", "Test2");
+            ServiceContext.ContentTypeService.Save(contentType2);
+            IMediaType contentType3 = MockedContentTypes.CreateSimpleMediaType("test3", "Test3");
+            ServiceContext.ContentTypeService.Save(contentType3);
+
+            var contentTypes = new[] { contentType1, contentType2, contentType3 };
+            var parentId = -1;
+
+            var ids = new List<int>();
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (var index = 0; index < contentTypes.Length; index++)
+                {
+                    var contentType = contentTypes[index];
+                    var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
+                    ServiceContext.MediaService.Save(contentItem);
+                    parentId = contentItem.Id;
+
+                    ids.Add(contentItem.Id);
+                }
+            }
+
+            //delete the first content type, all other content of different content types should be in the recycle bin
+            ServiceContext.ContentTypeService.Delete(contentTypes[0]);
+
+            var found = ServiceContext.MediaService.GetByIds(ids);
+
+            Assert.AreEqual(4, found.Count());
+            foreach (var content in found)
+            {
+                Assert.IsTrue(content.Trashed);
+            }
+        }
+
+        [Test]
+        public void Deleting_Content_Type_With_Hierarchy_Of_Content_Items_Moves_Orphaned_Content_To_Recycle_Bin()
+        {
+            IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
+            ServiceContext.ContentTypeService.Save(contentType1);
+            IContentType contentType2 = MockedContentTypes.CreateSimpleContentType("test2", "Test2");
+            ServiceContext.ContentTypeService.Save(contentType2);
+            IContentType contentType3 = MockedContentTypes.CreateSimpleContentType("test3", "Test3");
+            ServiceContext.ContentTypeService.Save(contentType3);
+
+            var contentTypes = new[] { contentType1, contentType2, contentType3 };
+            var parentId = -1;
+
+            var ids = new List<int>();
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (var index = 0; index < contentTypes.Length; index++)
+                {
+                    var contentType = contentTypes[index];
+                    var contentItem = MockedContent.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
+                    ServiceContext.ContentService.Save(contentItem);
+                    ServiceContext.ContentService.Publish(contentItem);
+                    parentId = contentItem.Id;
+
+                    ids.Add(contentItem.Id);
+                }
+            }
+
+            //delete the first content type, all other content of different content types should be in the recycle bin
+            ServiceContext.ContentTypeService.Delete(contentTypes[0]);
+
+            var found = ServiceContext.ContentService.GetByIds(ids);
+
+            Assert.AreEqual(4, found.Count());
+            foreach (var content in found)
+            {
+                Assert.IsTrue(content.Trashed);
+            }
+        }
+
+        [Test]
+        public void Deleting_Media_Types_With_Hierarchy_Of_Media_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items()
+        {
+            MediaService.Trashed += MediaServiceOnTrashed;
+
+            try
+            {
+                IMediaType contentType1 = MockedContentTypes.CreateSimpleMediaType("test1", "Test1");
+                ServiceContext.ContentTypeService.Save(contentType1);
+                IMediaType contentType2 = MockedContentTypes.CreateSimpleMediaType("test2", "Test2");
+                ServiceContext.ContentTypeService.Save(contentType2);
+                IMediaType contentType3 = MockedContentTypes.CreateSimpleMediaType("test3", "Test3");
+                ServiceContext.ContentTypeService.Save(contentType3);
+
+                var contentTypes = new[] { contentType1, contentType2, contentType3 };
+                var parentId = -1;
+
+                var ids = new List<int>();
+
+                for (int i = 0; i < 2; i++)
+                {
+                    for (var index = 0; index < contentTypes.Length; index++)
+                    {
+                        var contentType = contentTypes[index];
+                        var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
+                        ServiceContext.MediaService.Save(contentItem);
+                        parentId = contentItem.Id;
+
+                        ids.Add(contentItem.Id);
+                    }
+                }
+
+                foreach (var contentType in contentTypes.Reverse())
+                {
+                    ServiceContext.ContentTypeService.Delete(contentType);
+                }
+            }
+            finally
+            {
+                MediaService.Trashed -= MediaServiceOnTrashed;
+            }
+        }
+
+        private void MediaServiceOnTrashed(IMediaService sender, MoveEventArgs<IMedia> e)
+        {
+            foreach (var item in e.MoveInfoCollection)
+            {
+                //if this item doesn't exist then Fail!
+                var exists = ServiceContext.MediaService.GetById(item.Entity.Id);
+                if (exists == null)
+                    Assert.Fail("The item doesn't exist");
+            }
+        }
+
+        [Test]
         public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items()
         {
             ContentService.Trashed += ContentServiceOnTrashed;
@@ -59,8 +194,6 @@ namespace Umbraco.Tests.Services
                         parentId = contentItem.Id;
                     }
                 }
-
-                
 
                 foreach (var contentType in contentTypes.Reverse())
                 {

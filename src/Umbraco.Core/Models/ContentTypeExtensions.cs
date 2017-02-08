@@ -41,9 +41,9 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public static IEnumerable<IContentTypeBase> Descendants(this IContentTypeBase contentType, ContentTypeServiceBase contentTypeService)
         {
-            var cService = (IContentTypeService)contentTypeService;
+            var cService = contentTypeService as IContentTypeService;
 
-            return contentType.Descendants(cService);
+            return cService == null ? Enumerable.Empty<IContentTypeBase>() : contentType.Descendants(cService);
         }
 
         /// <summary>

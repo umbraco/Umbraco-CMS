@@ -287,6 +287,11 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(content, xml));
         }
 
+        public void DeleteContentXml(IMedia content)
+        {
+            _contentXmlRepository.Delete(new ContentXmlEntity<IMedia>(content));
+        }
+
         public void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml)
         {
             _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMedia>(content, xml));

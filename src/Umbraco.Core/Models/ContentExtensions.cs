@@ -400,7 +400,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Set property values by alias with an annonymous object
         /// </summary>
-        public static void PropertyValues(this IContent content, object value)
+        public static void PropertyValues(this IContentBase content, object value)
         {
             if (value == null)
                 throw new Exception("No properties has been passed in");

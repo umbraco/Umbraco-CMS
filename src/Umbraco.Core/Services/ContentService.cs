@@ -679,7 +679,6 @@ namespace Umbraco.Core.Services
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
-                    //TODO: Wouldn't this be faster doing a starts with than a contains??
                     query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
@@ -1005,6 +1004,24 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         Attempt<OperationStatus> IContentServiceOperations.MoveToRecycleBin(IContent content, int userId)
         {
+            return MoveToRecycleBinDo(content, userId, null);
+        }
+
+        /// <summary>
+        /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
+        /// </summary>
+        /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        /// <param name="ignoreDescendantIds">
+        /// Hack: A list of content ids to ignore for processing for the descendants of this content item. This is required 
+        /// for when a content type is deleted, we already know what content items will be deleted so we don't want to run 
+        /// any of the recycle bin logic and don't want to raise trashed events for them either since they are actually
+        /// going to be removed.
+        /// TODO: Fix all of this, it will require a reasonable refactor and most of this stuff should be done at the repo level instead of service sub operations
+        /// </param>
+        private Attempt<OperationStatus> MoveToRecycleBinDo(IContent content, int userId, int[] ignoreDescendantIds)
+        {
             var evtMsgs = EventMessagesFactory.Get();
             using (new WriteLock(Locker))
             {
@@ -1022,44 +1039,44 @@ namespace Umbraco.Core.Services
                     {
                         new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)
                     };
+
+                    //get descendents to process of the content item that is being moved to trash - must be done before changing the state below
+                    var descendants = GetDescendants(content).OrderBy(x => x.Level);
+
+                    //Do the updates for this item
+                    var repository = RepositoryFactory.CreateContentRepository(uow);
                     //Make sure that published content is unpublished before being moved to the Recycle Bin
                     if (HasPublishedVersion(content.Id))
                     {
                         //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
                         UnPublish(content, userId);
                     }
-                    //Unpublish descendents of the content item that is being moved to trash
-                    var descendants = GetDescendants(content).OrderBy(x => x.Level).ToList();
-                    foreach (var descendant in descendants)
-                    {
-                        //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
-                        UnPublish(descendant, userId);
-                    }
-
-                    var repository = RepositoryFactory.CreateContentRepository(uow);
-
                     content.WriterId = userId;
-                    content.ChangeTrashedState(true);
+                    content.ChangeTrashedState(true);                    
                     repository.AddOrUpdate(content);
+                    
                     //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
                     foreach (var descendant in descendants)
                     {
-                        moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));
-                        descendant.WriterId = userId;
-                        descendant.ChangeTrashedState(true, descendant.ParentId);
-                        repository.AddOrUpdate(descendant);
+                        //don't perform processing on any of the ignored ids
+                        if (ignoreDescendantIds == null || ignoreDescendantIds.Contains(descendant.Id) == false)
+                        {
+                            //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
+                            UnPublish(descendant, userId);
+                            descendant.WriterId = userId;
+                            descendant.ChangeTrashedState(true, descendant.ParentId);
+                            repository.AddOrUpdate(descendant);
+
+                            moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));
+                        }
                     }
-                    
+
                     uow.Commit();
 
                     uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, evtMsgs, moveInfo.ToArray()), "Trashed");
-
-                    // fixme just writing to DB, no need for an event, ok here
-                    Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
                 }
-
-                // fixme the WHOLE thing should move to the UOW!
-                //Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
+                
+                Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
                 return OperationStatus.Success(evtMsgs);
             }
@@ -1341,12 +1358,12 @@ namespace Umbraco.Core.Services
                 //track the 'root' items of the collection of nodes discovered to delete, we need to use
                 //these items to lookup descendants that are not of this doc type so they can be transfered
                 //to the recycle bin
-                var rootItems = new Dictionary<int, IContent>();
+                var rootItems = new Dictionary<string, IContent>();
 
                 var query = Query<IContent>.Builder.Where(x => contentTypeIds.Contains(x.ContentTypeId));
                 
                 long pageIndex = 0;
-                var pageSize = 10000;
+                const int pageSize = 10000;
                 int currentPageSize;
                 do
                 {
@@ -1361,11 +1378,24 @@ namespace Umbraco.Core.Services
                     //loop through the items, check if if the item exists already in the hierarchy of items tracked
                     //and if not, we need to add it as a 'root' item to be used to lookup later
                     foreach (var content in contents)
-                    {                        
-                        if (rootItems.ContainsKey(content.ParentId) == false)
+                    {
+                        var pathParts = content.Path.Split(',');
+                        var found = false;
+
+                        for (int i = 1; i < pathParts.Length; i++)
                         {
-                            //this item's parent doesn't exist so we need to track it
-                            rootItems[content.Id] = content;
+                            var currPath = "-1," + string.Join(",", Enumerable.Range(1, i).Select(x => pathParts[x]));
+                            if (rootItems.Keys.Contains(currPath))
+                            {
+                                //this content item's ancestor already exists in the root collection
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (found == false)
+                        {
+                            rootItems[content.Path] = content;
                         }
 
                         //track content for deletion
@@ -1389,6 +1419,8 @@ namespace Umbraco.Core.Services
                     var c = content;
                     var pathMatch = string.Format("{0},", c.Value.Path);
                     var descendantQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(pathMatch));
+
+                    pageIndex = 0;
 
                     do
                     {
@@ -1417,9 +1449,11 @@ namespace Umbraco.Core.Services
                 // nesting UOW works, it's just that the outer one NEEDS to be flushed beforehand
                 // nevertheless, it would be nicer to create a global scope and inner uow
 
+                //get the ids that are going to be deleted and ensure these are ignored for the recycle bin processing
+                var toDeleteIds = contentToDelete.Select(x => x.Id).ToArray();
                 foreach (var child in contentToRecycle)
                 {
-                    MoveToRecycleBin(child, userId);
+                    MoveToRecycleBinDo(child, userId, toDeleteIds);
                 }
 
                 foreach (var content in contentToDelete)

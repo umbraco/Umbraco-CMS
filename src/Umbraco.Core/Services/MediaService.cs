@@ -87,7 +87,7 @@ namespace Umbraco.Core.Services
                 return media;
             }
 
-               
+
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace Umbraco.Core.Services
         {
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parentId, mediaType);
-            
+
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
@@ -928,9 +928,9 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
                     var repository = RepositoryFactory.CreateMediaRepository(uow);
-                    entities = repository.GetEntitiesInRecycleBin().ToDictionary(key => key.Id, val => (IEnumerable<Property>) val.Properties);
+                    entities = repository.GetEntitiesInRecycleBin().ToDictionary(key => key.Id, val => (IEnumerable<Property>)val.Properties);
 
-                    files = ((MediaRepository) repository).GetFilesInRecycleBinForUploadField();
+                    files = ((MediaRepository)repository).GetFilesInRecycleBinForUploadField();
                     uow.Commit();
 
                     if (uow.Events.DispatchCancelable(EmptyingRecycleBin, this, new RecycleBinEventArgs(nodeObjectType, entities, files)))
@@ -972,7 +972,7 @@ namespace Umbraco.Core.Services
                 //track the 'root' items of the collection of nodes discovered to delete, we need to use
                 //these items to lookup descendants that are not of this doc type so they can be transfered
                 //to the recycle bin
-                var rootItems = new Dictionary<int, IMedia>();
+                var rootItems = new Dictionary<string, IMedia>();
 
                 var query = Query<IMedia>.Builder.Where(x => mediaTypeIds.Contains(x.ContentTypeId));
 
@@ -993,12 +993,25 @@ namespace Umbraco.Core.Services
                     //and if not, we need to add it as a 'root' item to be used to lookup later
                     foreach (var content in contents)
                     {
-                        if (rootItems.ContainsKey(content.ParentId) == false)
+                        var pathParts = content.Path.Split(',');
+                        var found = false;
+
+                        for (int i = 1; i < pathParts.Length; i++)
                         {
-                            //this item's parent doesn't exist so we need to track it
-                            rootItems[content.Id] = content;
+                            var currPath = "-1," + string.Join(",", Enumerable.Range(1, i).Select(x => pathParts[x]));
+                            if (rootItems.Keys.Contains(currPath))
+                            {
+                                //this content item's ancestor already exists in the root collection
+                                found = true;
+                                break;
+                            }
                         }
 
+                        if (found == false)
+                        {
+                            rootItems[content.Path] = content;
+                        }
+                        
                         //track content for deletion
                         mediaToDelete.Add(content);
                     }
@@ -1020,6 +1033,8 @@ namespace Umbraco.Core.Services
                     var c = content;
                     var pathMatch = string.Format("{0},", c.Value.Path);
                     var descendantQuery = Query<IMedia>.Builder.Where(x => x.Path.StartsWith(pathMatch));
+
+                    pageIndex = 0;
 
                     do
                     {
@@ -1048,9 +1063,11 @@ namespace Umbraco.Core.Services
                 // nesting UOW works, it's just that the outer one NEEDS to be flushed beforehand
                 // nevertheless, it would be nicer to create a global scope and inner uow
 
+                //get the ids that are going to be deleted and ensure these are ignored for the recycle bin processing
+                var toDeleteIds = mediaToDelete.Select(x => x.Id).ToArray();
                 foreach (var child in mediaToRecycle)
                 {
-                    MoveToRecycleBin(child, userId);
+                    MoveToRecycleBinDo(child, userId, toDeleteIds);
                 }
 
                 foreach (var content in mediaToDelete)
@@ -1143,63 +1160,77 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the User deleting the Media</param>
         Attempt<OperationStatus> IMediaServiceOperations.MoveToRecycleBin(IMedia media, int userId)
         {
+            return MoveToRecycleBinDo(media, userId, null);
+        }
+
+        /// <summary>
+        /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
+        /// </summary>
+        /// <param name="media">The <see cref="IMedia"/> to delete</param>
+        /// <param name="userId">Id of the User deleting the Media</param>
+        /// <param name="ignoreDescendantIds">
+        /// Hack: A list of content ids to ignore for processing for the descendants of this content item. This is required 
+        /// for when a content type is deleted, we already know what content items will be deleted so we don't want to run 
+        /// any of the recycle bin logic and don't want to raise trashed events for them either since they are actually
+        /// going to be removed.
+        /// TODO: Fix all of this, it will require a reasonable refactor and most of this stuff should be done at the repo level instead of service sub operations
+        /// </param>
+        private Attempt<OperationStatus> MoveToRecycleBinDo(IMedia media, int userId, int[] ignoreDescendantIds)
+        {
             if (media == null) throw new ArgumentNullException("media");
-
             var evtMsgs = EventMessagesFactory.Get();
-
             using (new WriteLock(Locker))
             {
-                //Hack: this ensures that the entity's path is valid and if not it fixes/persists it
-                //see: http://issues.umbraco.org/issue/U4-9336
-                media.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);
-
-                var originalPath = media.Path;
-
-                using (var scope = UowProvider.ScopeProvider.CreateScope())
-                {
-                    scope.Complete(); // always
-                    if (scope.Events.DispatchCancelable(Trashing, this, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), "Trashing"))
-                        return OperationStatus.Cancelled(evtMsgs);
-                }
-
-                var moveInfo = new List<MoveEventInfo<IMedia>>
-                {
-                    new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)
-                };
-
-                //Find Descendants, which will be moved to the recycle bin along with the parent/grandparent.
-                var descendants = GetDescendants(media).OrderBy(x => x.Level).ToList();
-
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    var repository = RepositoryFactory.CreateMediaRepository(uow);
-                    uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = media.Id });
+                    //Hack: this ensures that the entity's path is valid and if not it fixes/persists it
+                    //see: http://issues.umbraco.org/issue/U4-9336
+                    media.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);
+                    var originalPath = media.Path;
+                    if (uow.Events.DispatchCancelable(Trashing, this, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), "Trashing"))
+                    {
+                        uow.Commit();
+                        return OperationStatus.Cancelled(evtMsgs);
+                    }                    
+                    var moveInfo = new List<MoveEventInfo<IMedia>>
+                    {
+                        new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)
+                    };
 
+                    //get descendents to process of the content item that is being moved to trash - must be done before changing the state below
+                    var descendants = GetDescendants(media).OrderBy(x => x.Level);
+
+                    //Do the updates for this item
+                    var repository = RepositoryFactory.CreateMediaRepository(uow);
+                    repository.DeleteContentXml(media);
                     media.ChangeTrashedState(true, Constants.System.RecycleBinMedia);
                     repository.AddOrUpdate(media);
-
+                    
                     //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
                     foreach (var descendant in descendants)
                     {
-                        //Remove 'published' xml from the cmsContentXml table for the unpublished media
-                        uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = descendant.Id });
+                        //don't perform processing on any of the ignored ids
+                        if (ignoreDescendantIds == null || ignoreDescendantIds.Contains(descendant.Id) == false)
+                        {
+                            repository.DeleteContentXml(descendant);
+                            descendant.ChangeTrashedState(true, descendant.ParentId);
+                            repository.AddOrUpdate(descendant);
 
-                        descendant.ChangeTrashedState(true, descendant.ParentId);
-                        repository.AddOrUpdate(descendant);
-
-                        moveInfo.Add(new MoveEventInfo<IMedia>(descendant, descendant.Path, descendant.ParentId));
+                            moveInfo.Add(new MoveEventInfo<IMedia>(descendant, descendant.Path, descendant.ParentId));
+                        }
                     }
 
                     uow.Commit();
 
                     uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo.ToArray()), "Trashed");
                 }
-                
+
                 Audit(AuditType.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
 
                 return OperationStatus.Success(evtMsgs);
             }
         }
+
 
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object as well as all of its Children.
@@ -1483,7 +1514,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
         }
-        
+
         public Stream GetMediaFileContentStream(string filepath)
         {
             if (_mediaFileSystem.FileExists(filepath) == false)
@@ -1520,7 +1551,7 @@ namespace Umbraco.Core.Services
                 _mediaFileSystem.GenerateThumbnails(filestream, filepath, propertyType);
             }
         }
-        
+
 
         #region Event Handlers
 
