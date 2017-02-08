@@ -22,5 +22,10 @@ namespace Umbraco.Core.Events
         {
             get { return _packageMetaData; }
         }
+
+        public IEnumerable<TEntity> UninstallationSummary
+        {
+            get { return EventObject; }
+        }
     }
 }
