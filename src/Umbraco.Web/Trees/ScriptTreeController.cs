@@ -1,10 +1,6 @@
-﻿using System.Linq;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Web.Models.Trees;
-using System.Net.Http.Formatting;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -23,37 +19,6 @@ namespace Umbraco.Web.Trees
         protected override string FileIcon
         {
             get { return "icon-script"; }
-        }
-
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
-        {
-            var menu = new MenuItemCollection();
-
-            if (id == Constants.System.Root.ToInvariantString())
-            {
-                //set the default to create
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
-                //create action
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
-
-                return menu;
-            }
-
-            if (id.EndsWith(FileSearchPattern.TrimStart("*")) == false)
-            {
-                //set the default to create
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
-                //create action
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
-            }
-
-            // TODO: Wire up new delete dialog
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
-            return menu;
         }
 
         protected override void OnRenderFolderNode(ref TreeNode treeNode)
