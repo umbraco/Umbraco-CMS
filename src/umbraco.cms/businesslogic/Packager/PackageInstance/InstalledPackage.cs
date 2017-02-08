@@ -145,6 +145,18 @@ namespace umbraco.cms.businesslogic.packager {
             var dataTypes = TryGetIntegerIds(Data.DataTypes).Select(dataTypeService.GetDataTypeDefinitionById).ToList();
             var dictionaryItems = TryGetIntegerIds(Data.DictionaryItems).Select(localizationService.GetDictionaryItemById).ToList();
             var languages = TryGetIntegerIds(Data.Languages).Select(localizationService.GetLanguageById).ToList();
+            
+            for (var i = 0; i < Data.Files.Count; i++)
+            {
+                var filePath = Data.Files[i];
+                if (filePath.IsFullPath())
+                    continue;
+
+                filePath = filePath.TrimStart('~');
+                if (filePath.StartsWith("/") == false)
+                    filePath = string.Format("/{0}", filePath);
+                Data.Files[i] = IOHelper.MapPath(filePath);
+            }
 
             return new InstallationSummary
             {
