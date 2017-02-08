@@ -67,17 +67,40 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class MediaPickerPreValueEditor : PreValueEditor
         {
-            [PreValueField("multiPicker", "Pick multiple items", "boolean")]
-            public bool MultiPicker { get; set; }
-
-            [PreValueField("onlyImages", "Pick only images", "boolean", Description = "Only let the editor choose images from media.")]
-            public bool OnlyImages { get; set; }
-
-            [PreValueField("disableFolderSelect", "Disable folder select", "boolean", Description = "Do not allow folders to be picked.")]
-            public bool DisableFolderSelect { get; set; }
-
-            [PreValueField("startNodeId", "Start node", "mediapicker")]
-            public int StartNodeId { get; set; }
+            public MediaPickerPreValueEditor()
+            {
+                //create the fields
+                Fields.Add(new PreValueField()
+                {
+                    Key = "multiPicker",
+                    View = "boolean",
+                    Name = "Pick multiple items"
+                });
+                Fields.Add(new PreValueField()
+                {
+                    Key = "onlyImages",
+                    View = "boolean",
+                    Name = "Pick only images",
+                    Description = "Only let the editor choose images from media."
+                });
+                Fields.Add(new PreValueField()
+                {
+                    Key = "disableFolderSelect",
+                    View = "boolean",
+                    Name = "Disable folder select",
+                    Description = "Do not allow folders to be picked."
+                });
+                Fields.Add(new PreValueField()
+                {
+                    Key = "startNodeId",
+                    View = "mediapicker",
+                    Name = "Start node",
+                    Config = new Dictionary<string, object>
+                    {
+                        {"idType", "udi"}
+                    }
+                });
+            }
         }
     }
 }

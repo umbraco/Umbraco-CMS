@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
@@ -16,7 +17,18 @@ namespace Umbraco.Web.PropertyEditors
         public ContentPickerPropertyEditor()
         {
             InternalPreValues["idType"] = "int";
-        }   
+        }
+
+        /// <summary>
+        /// overridden to change the pre-value picker to use INT ids
+        /// </summary>
+        /// <returns></returns>
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            var preValEditor = base.CreatePreValueEditor();
+            preValEditor.Fields.Single(x => x.Key == "startNodeId").Config["idType"] = "int";
+            return preValEditor;
+        }
     }
 
     /// <summary>
@@ -52,12 +64,27 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ContentPickerPreValueEditor : PreValueEditor
         {
-            [PreValueField("showOpenButton", "Show open button (this feature is in preview!)", "boolean", Description = " Opens the node in a dialog")]
-            public string ShowOpenButton { get; set; }
-            
-            [PreValueField("startNodeId", "Start node", "treepicker")]
-            public int StartNodeId { get; set; }
-
+            public ContentPickerPreValueEditor()
+            {
+                //create the fields
+                Fields.Add(new PreValueField()
+                {                    
+                    Key = "showOpenButton",
+                    View = "boolean",
+                    Name = "Show open button (this feature is in preview!)",
+                    Description = "Opens the node in a dialog"
+                });
+                Fields.Add(new PreValueField()
+                {
+                    Key = "startNodeId",
+                    View = "treepicker",
+                    Name = "Start node",
+                    Config = new Dictionary<string, object>
+                    {
+                        {"idType", "udi"}
+                    }
+                });
+            }
         }
     }
 }

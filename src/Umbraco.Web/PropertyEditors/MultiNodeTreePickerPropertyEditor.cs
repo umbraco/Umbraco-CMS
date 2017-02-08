@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -13,6 +14,17 @@ namespace Umbraco.Web.PropertyEditors
         public MultiNodeTreePickerPropertyEditor()
         {
             InternalPreValues["idType"] = "int";
+        }
+
+        /// <summary>
+        /// overridden to change the pre-value picker to use INT ids
+        /// </summary>
+        /// <returns></returns>
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            var preValEditor = base.CreatePreValueEditor();
+            preValEditor.Fields.Single(x => x.Key == "startNode").Config["idType"] = "int";
+            return preValEditor;
         }
     }
 
@@ -45,20 +57,46 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class MultiNodePickerPreValueEditor : PreValueEditor
         {
-            [PreValueField("startNode", "Node type", "treesource")]
-            public string StartNode { get; set; }
-            
-            [PreValueField("filter", "Allow items of type", "textstring", Description = "Separate with comma")]
-            public string Filter { get; set; }
-
-            [PreValueField("minNumber", "Minimum number of items", "number")]
-            public string MinNumber { get; set; }
-
-            [PreValueField("maxNumber", "Maximum number of items", "number")]
-            public string MaxNumber { get; set; }
-
-            [PreValueField("showOpenButton", "Show open button (this feature is in preview!)", "boolean", Description = " Opens the node in a dialog")]
-            public string ShowOpenButton { get; set; }
+            public MultiNodePickerPreValueEditor()
+            {
+                //create the fields
+                Fields.Add(new PreValueField()
+                {
+                    Key = "startNode",
+                    View = "treesource",
+                    Name = "Node type",
+                    Config = new Dictionary<string, object>
+                    {
+                        {"idType", "udi"}
+                    }
+                });
+                Fields.Add(new PreValueField()
+                {
+                    Key = "filter",
+                    View = "textstring",
+                    Name = "Allow items of type",
+                    Description = "Separate with comma"
+                });
+                Fields.Add(new PreValueField()
+                {
+                    Key = "minNumber",
+                    View = "number",
+                    Name = "Minimum number of items"
+                });
+                Fields.Add(new PreValueField()
+                {
+                    Key = "maxNumber",
+                    View = "number",
+                    Name = "Maximum number of items"
+                });
+                Fields.Add(new PreValueField()
+                {
+                    Key = "showOpenButton",
+                    View = "boolean",
+                    Name = "Show open button (this feature is in preview!)",
+                    Description = "Opens the node in a dialog"
+                });
+            }            
 
             /// <summary>
             /// This ensures the multiPicker pre-val is set based on the maxNumber of nodes set

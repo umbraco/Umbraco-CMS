@@ -58,7 +58,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         startNode: {
             query: "",
             type: "content",
-	            id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
+	        id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
         }
     };
 
@@ -105,10 +105,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 $scope.clear();
                 $scope.add(data);
             }
-        angularHelper.getCurrentForm($scope).$setDirty();
+            angularHelper.getCurrentForm($scope).$setDirty();
         },
         treeAlias: $scope.model.config.startNode.type,
-        section: $scope.model.config.startNode.type
+        section: $scope.model.config.startNode.type,
+        idType: "int"
     };
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
@@ -147,9 +148,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     if ($scope.model.config.startNode.query) {
         var rootId = $routeParams.id;
         entityResource.getByQuery($scope.model.config.startNode.query, rootId, "Document").then(function (ent) {
-            dialogOptions.startNodeId = ent.id;
+            dialogOptions.startNodeId = $scope.model.config.idType === "udi" ? ent.udi : ent.id;
         });
-    } else {
+    }
+    else {
         dialogOptions.startNodeId = $scope.model.config.startNode.id;
     }
 

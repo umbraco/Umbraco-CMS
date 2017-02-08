@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
@@ -12,6 +13,17 @@ namespace Umbraco.Web.PropertyEditors
         {
             //clear the pre-values so it defaults to a multiple picker.
             InternalPreValues.Clear();
+        }
+
+        /// <summary>
+        /// overridden to change the pre-value picker to use INT ids
+        /// </summary>
+        /// <returns></returns>
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            var preValEditor = base.CreatePreValueEditor();
+            preValEditor.Fields.Single(x => x.Key == "startNodeId").Config["idType"] = "int";
+            return preValEditor;
         }
     }    
 }
