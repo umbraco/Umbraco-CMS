@@ -103,7 +103,7 @@
 
                 angular.forEach(miniListViewsHistory, function(historyItem, index){
                     // We need to make sure we can compare the two id's. 
-                    // Some id's are numbers (1) and others are string numbers.
+                    // Some id's are integers and others are strings.
                     // Members have string ids like "all-members".
                     if(historyItem.node.id.toString() === ancestor.id.toString()) {
                         // load the list view from history
@@ -116,11 +116,11 @@
                 });
 
                 if(!found) {
-                    // if we can't find the view in the history 
-                    miniListViewsHistory = [];
-                    scope.miniListViews = [];
+                    // if we can't find the view in the history - close the list view
+                    scope.exitMiniListView();
                 }
 
+                // update the breadcrumb
                 makeBreadcrumb();
 
             };
