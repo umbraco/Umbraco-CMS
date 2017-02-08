@@ -492,19 +492,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 			angular.forEach(miniListViewsHistory, function(historyItem, index){
 				if(parseInt(historyItem.node.id) === parseInt(ancestor.id)) {
-
 					// load the list view from history
 					$scope.miniListViews = [];
 					$scope.miniListViews.push(historyItem);
-					// remove from history
-					miniListViewsHistory.splice(index, miniListViewsHistory.length - index);
-					found = true;
-
 					// get ancestors
-					entityResource.getAncestors(historyItem.node.id, entityType)
-						.then(function (ancestors) {
-							$scope.breadcrumb = ancestors;
-						});
+					getAncestors(historyItem.node);
+					found = true;
 				}
 			});
 
@@ -570,10 +563,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 				});
 			
 			// get ancestors
-			entityResource.getAncestors(node.id, entityType)
-               .then(function (ancestors) {
-                   $scope.breadcrumb = ancestors;
-               });
+			getAncestors(node);
 
 		}
 
@@ -617,6 +607,30 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 			
 			return deferred.promise;
 
+		}
+
+		function getAncestors(node) {
+			entityResource.getAncestors(node.id, entityType)
+				.then(function (ancestors) {
+
+					// if there is a start node remove all ancestors before that one
+					if(dialogOptions.startNodeId && dialogOptions.startNodeId !== -1) {
+						var found = false;
+						$scope.breadcrumb = [];
+						angular.forEach(ancestors, function(ancestor){
+							if(parseInt(ancestor.id) === parseInt(dialogOptions.startNodeId)) {
+								found = true;
+							}
+							if(found) {
+								$scope.breadcrumb.push(ancestor);
+							}
+						});
+
+					} else {
+						$scope.breadcrumb = ancestors;
+					}
+
+				});
 		}
 
 		$scope.getMiniListViewAnimation = function() {
