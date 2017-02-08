@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MiniListViewDirective(contentResource, memberResource, mediaResource, entityResource) {
+    function MiniListViewDirective(contentResource, memberResource, mediaResource) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -43,8 +43,7 @@
                 // get children
                 getChildrenForMiniListView(miniListView);
 
-                // get ancestors
-                getAncestors(node);
+                makeBreadcrumb();
 
             }
 
@@ -102,12 +101,15 @@
                 goingForward = false;
 
                 angular.forEach(miniListViewsHistory, function(historyItem, index){
-                    if(Number(historyItem.node.id) === Number(ancestor.id)) {
+                    // We need to make sure we can compare the two id's. 
+                    // Some id's are numbers (1) and others are string numbers.
+                    // Members have string ids like "all-members".
+                    if(historyItem.node.id.toString() === ancestor.id.toString()) {
                         // load the list view from history
                         scope.miniListViews = [];
                         scope.miniListViews.push(historyItem);
-                        // get ancestors
-                        getAncestors(historyItem.node);
+                        // clean up history - remove all children after
+                        miniListViewsHistory.splice(index + 1, miniListViewsHistory.length);
                         found = true;
                     }
                 });
@@ -118,30 +120,32 @@
                     scope.miniListViews = [];
                 }
 
+                makeBreadcrumb();
+
             };
 
-            function getAncestors(node) {
-                entityResource.getAncestors(node.id, scope.entityType)
-                    .then(function (ancestors) {
+            scope.showBackButton = function() {
+                // don't show the back button if the start node is a list view
+                if(scope.node.metaData && scope.node.metaData.IsContainer || scope.node.isContainer) {
+                    return false;
+                } else {
+                    return true;
+                }
+            };
 
-                        // if there is a start node remove all ancestors before that one
-                        if(scope.startNodeId && scope.startNodeId !== -1) {
-                            var found = false;
-                            scope.breadcrumb = [];
-                            angular.forEach(ancestors, function(ancestor){
-                                if(Number(ancestor.id) === Number(scope.startNodeId)) {
-                                    found = true;
-                                }
-                                if(found) {
-                                    scope.breadcrumb.push(ancestor);
-                                }
-                            });
+            scope.exitMiniListView = function() {
+                miniListViewsHistory = [];
+                scope.miniListViews = [];
+                if(scope.onClose) {
+                    scope.onClose();
+                }
+            };
 
-                        } else {
-                            scope.breadcrumb = ancestors;
-                        }
-
-                    });
+            function makeBreadcrumb() {
+                scope.breadcrumb = [];
+                angular.forEach(miniListViewsHistory, function(historyItem){
+                    scope.breadcrumb.push(historyItem.node);
+                });
             }
 
             /* Search */
@@ -180,7 +184,8 @@
                 node: "=",
                 entityType: "@",
                 startNodeId: "=",
-                onSelect: "&"
+                onSelect: "&",
+                onClose: "&"
             },
             link: link
         };

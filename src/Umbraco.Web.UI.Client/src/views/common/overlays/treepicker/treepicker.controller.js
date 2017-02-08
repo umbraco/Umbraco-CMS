@@ -472,6 +472,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             node.selected = node.selected === true ? false : true;
 		};
 
+		$scope.closeMiniListView = function() {
+			$scope.miniListView = undefined;
+		};
+
 		function openMiniListView(node) {
 			$scope.miniListView = node;
 		}

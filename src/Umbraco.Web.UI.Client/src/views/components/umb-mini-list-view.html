@@ -7,13 +7,21 @@
             <h4 class="umb-mini-list-view__title-text">{{ miniListView.node.name }}</h4>
         </div>
 
-        <umb-breadcrumbs
-            style="margin-bottom: 10px;"
-            ng-if="breadcrumb && breadcrumb.length > 0"
-            ancestors="breadcrumb"
-            entity-type="content"
-            on-open="clickBreadcrumb(ancestor)">
-        </umb-breadcrumbs>
+        <div class="flex" style="margin-bottom: 10px;">
+
+            <a ng-if="showBackButton()" href="" class="umb-mini-list-view__back" ng-click="exitMiniListView()">
+                <i class="icon-arrow-left" style="margin-right: 5px;"></i>
+                <span class="umb-mini-list-view__back-text">Back</span> /
+            </a>
+
+            <umb-breadcrumbs
+                ng-if="breadcrumb && breadcrumb.length > 0"
+                ancestors="breadcrumb"
+                entity-type="content"
+                on-open="clickBreadcrumb(ancestor)">
+            </umb-breadcrumbs>
+
+        </div>
 
         <div class="umb-table umb-table--condensed">
 
