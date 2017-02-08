@@ -222,11 +222,10 @@ namespace Umbraco.Web.Editors
                         file = string.Format("/{0}", file);
 
                     var filePath = IOHelper.MapPath(file);
+                    removedFiles.Add(filePath);
+
                     if (File.Exists(filePath))
-                    {
-                        removedFiles.Add(filePath);
                         File.Delete(filePath);
-                    }
                 }
                 pack.Data.Files.Remove(file);
             }
