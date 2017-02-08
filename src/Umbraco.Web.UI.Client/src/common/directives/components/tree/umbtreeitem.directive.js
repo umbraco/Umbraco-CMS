@@ -27,6 +27,7 @@ angular.module("umbraco.directives")
             section: '@',
             eventhandler: '=',
             currentNode: '=',
+            enablelistviewexpand: '@',
             node: '=',
             tree: '='
         },
@@ -74,10 +75,8 @@ angular.module("umbraco.directives")
 
                 //toggle visibility of last 'ins' depending on children
                 //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
-
-                console.log(node);
                 
-                if (node.hasChildren || node.metaData.isContainer) {
+                if (node.hasChildren || node.metaData.isContainer && scope.enablelistviewexpand === "true") {
                     element.find("ins").last().css("visibility", "visible");
                 }
                 else {
@@ -230,7 +229,7 @@ angular.module("umbraco.directives")
 
             setupNodeDom(scope.node, scope.tree);
 
-            var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
+            var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" enablelistviewexpand="{{enablelistviewexpand}}" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
             var newElement = angular.element(template);
             $compile(newElement)(scope);
             element.append(newElement);
