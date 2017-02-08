@@ -74,7 +74,7 @@ namespace Umbraco.Web.Cache
         public override void Remove(int id)
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
-            content.Instance.ClearDocumentCache(id);
+            content.Instance.ClearDocumentCache(id, false);
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Cache
         public override void Remove(IContent instance)
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
-            content.Instance.ClearDocumentCache(new Document(instance));
+            content.Instance.ClearDocumentCache(new Document(instance), false);
             XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
