@@ -11,6 +11,7 @@
 
             var miniListViewsHistory = [];
             var goingForward = true;
+            var skipAnimation = true;
 
             function onInit() {
                 open(scope.node);
@@ -165,6 +166,13 @@
 
             /* Animation */
             scope.getMiniListViewAnimation = function() {
+
+                // disable the first "slide-in-animation"" if the start node is a list view
+                if(scope.node.metaData && scope.node.metaData.IsContainer && skipAnimation || scope.node.isContainer && skipAnimation) {
+                    skipAnimation = false;
+                    return;
+                }
+
                 if(goingForward) {
                     return 'umb-mini-list-view--forward';
                 } else {
