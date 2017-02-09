@@ -97,10 +97,20 @@ namespace Umbraco.Web.Editors
         {
             var requestParam = HttpUtility.ParseQueryString(controllerContext.Request.RequestUri.Query).Get(found.ParamName);
 
-            if (requestParam != null)
+            requestParam = (requestParam == null) ? null : requestParam.Trim();
+            var paramTypes = found.SupportedTypes;
+
+            if (requestParam == string.Empty && paramTypes.Length > 0)
             {
-                var paramTypes = found.SupportedTypes;
-                
+                //if it's empty then in theory we can select any of the actions since they'll all need to deal with empty or null parameters
+                //so we'll try to use the first one available
+                method = MatchByType(paramTypes[0], controllerContext, found);
+                if (method != null)
+                    return true;
+            }
+
+            if (requestParam != null)
+            {   
                 foreach (var paramType in paramTypes)
                 {
                     //check if this is IEnumerable and if so this will get it's type
