@@ -694,7 +694,7 @@ namespace Umbraco.Tests.IO
         /// Returns the path relative to the filesystem root
         /// </summary>
         /// <remarks>
-        /// This test is kinda irrelevant with the current implementation.
+        /// This file stuff in this test is kinda irrelevant with the current implementation.
         /// We do tests that the files are written to the correct places and the relative path is returned correct,
         /// but GetRelativePath is currently really just string manipulation so files are not actually hit by the code.
         /// Leaving the file stuff in here for now in case the method becomes more clever at some point.
@@ -722,6 +722,45 @@ namespace Umbraco.Tests.IO
             var f2RelativePath = ss.GetRelativePath("f2.txt");
             Assert.AreEqual("f1.txt", f1RelativePath);
             Assert.AreEqual("f2.txt", f2RelativePath);
+            Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowTests", "f1.txt")));
+            Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowTests", "f2.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowSystem", "f2.txt")));
+            Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowSystem", "f1.txt")));
+        }
+
+        /// <summary>
+        /// Ensure the url returned contains the path relative to the FS root,
+        /// but including the rootUrl the FS was initialized with.
+        /// </summary>
+        /// <remarks>
+        /// This file stuff in this test is kinda irrelevant with the current implementation.
+        /// We do tests that the files are written to the correct places and the url is returned correct,
+        /// but GetUrl is currently really just string manipulation so files are not actually hit by the code.
+        /// Leaving the file stuff in here for now in case the method becomes more clever at some point.
+        /// </remarks>
+        [Test]
+        public void ShadowGetUrl()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "rootUrl");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "rootUrl");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f2.txt", ms);
+
+            // Assert
+            var f1Url = ss.GetUrl("f1.txt");
+            var f2Url = ss.GetUrl("f2.txt");
+            Assert.AreEqual("rootUrl/f1.txt", f1Url);
+            Assert.AreEqual("rootUrl/f2.txt", f2Url);
             Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowTests", "f1.txt")));
             Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowTests", "f2.txt")));
             Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowSystem", "f2.txt")));
