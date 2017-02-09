@@ -35,6 +35,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("path")]
         [Length(150)]
+        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodePath")]
         public string Path { get; set; }
 
         [Column("sortOrder")]

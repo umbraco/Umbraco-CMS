@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public interface IContentService : IService
+    public interface IContentService : IContentServiceBase
     {
         /// <summary>
         /// Gets all XML entries found in the cmsContentXml table based on the given path
@@ -367,6 +367,14 @@ namespace Umbraco.Core.Services
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         void DeleteContentOfType(int contentTypeId, int userId = 0);
+
+        /// <summary>
+        /// Deletes all content of the specified types. All Descendants of deleted content that is not of these types is moved to Recycle Bin.
+        /// </summary>
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="contentTypeIds">Ids of the <see cref="IContentType"/>s</param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteContentOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.

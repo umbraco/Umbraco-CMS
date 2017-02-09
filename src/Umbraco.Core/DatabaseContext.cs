@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core
@@ -26,7 +27,7 @@ namespace Umbraco.Core
     /// </remarks>
     public class DatabaseContext
     {
-        private readonly IDatabaseFactory _factory;
+        internal readonly IScopeProviderInternal ScopeProvider;
         private readonly ILogger _logger;
         private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
@@ -40,6 +41,19 @@ namespace Umbraco.Core
         /// </summary>
         private const int ConnectionCheckMinutes = 1;
 
+        #region Compatibility with 7.5
+
+        // note: the ctors accepting IDatabaseFactory are here only for backward compatibility purpose
+        //
+        // problem: IDatabaseFactory2 adds the CreateNewDatabase() method which creates a new database
+        // 'cos IDatabaseFactory CreateDatabase() is supposed to also manage the ambient thing. We
+        // want to keep these ctors for backward compatibility reasons (in case ppl use them in tests)
+        // so we need to create a scope provider (else nothing would work) and so we need a IDatabaseFactory2,
+        // so...?
+        // solution: wrap IDatabaseFactory and pretend we have a IDatabaseFactory2, it *should* work in most
+        // cases but really, it depends on what ppl are doing in their tests... yet, cannot really see any
+        // other way to do it?
+
         [Obsolete("Use the constructor specifying all dependencies instead")]
         public DatabaseContext(IDatabaseFactory factory)
             : this(factory, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
@@ -48,8 +62,7 @@ namespace Umbraco.Core
                 new SqlCeSyntaxProvider(),
                 new SqlServerSyntaxProvider()
             }))
-        {
-        }
+        { }
 
         /// <summary>
         /// Default constructor
@@ -63,7 +76,11 @@ namespace Umbraco.Core
             if (logger == null) throw new ArgumentNullException("logger");
             if (syntaxProviders == null) throw new ArgumentNullException("syntaxProviders");
 
-            _factory = factory;
+            var asDbFactory2 = factory as IDatabaseFactory2;
+            ScopeProvider = asDbFactory2 == null
+                ? new ScopeProvider(new DatabaseFactoryWrapper(factory))
+                : new ScopeProvider(asDbFactory2);
+
             _logger = logger;
             _syntaxProviders = syntaxProviders;
         }
@@ -80,22 +97,86 @@ namespace Umbraco.Core
             _providerName = providerName;
             SqlSyntax = sqlSyntax;
             SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
-            _factory = factory;
+
+            var asDbFactory2 = factory as IDatabaseFactory2;
+            ScopeProvider = asDbFactory2 == null 
+                ? new ScopeProvider(new DatabaseFactoryWrapper(factory)) 
+                : new ScopeProvider(asDbFactory2);
+            
             _logger = logger;
             _configured = true;
         }
 
-#if DEBUG_DATABASES
-        public List<UmbracoDatabase> Databases
+        private class DatabaseFactoryWrapper : IDatabaseFactory2
         {
-            get
+            private readonly IDatabaseFactory _factory;
+
+            public DatabaseFactoryWrapper(IDatabaseFactory factory)
             {
-                var factory = _factory as DefaultDatabaseFactory;
-                if (factory == null) throw new NotSupportedException();
-                return factory.Databases;
+                _factory = factory;
+            }
+
+            public UmbracoDatabase CreateDatabase()
+            {
+                return _factory.CreateDatabase();
+            }
+
+            public UmbracoDatabase CreateNewDatabase()
+            {
+                return CreateDatabase();
+            }
+
+            public void Dispose()
+            {
+                _factory.Dispose();
             }
         }
-#endif
+
+        #endregion
+
+        [Obsolete("Use the constructor specifying all dependencies instead")]
+        internal DatabaseContext(IScopeProviderInternal scopeProvider)
+            : this(scopeProvider, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
+            {
+                new MySqlSyntaxProvider(LoggerResolver.Current.Logger),
+                new SqlCeSyntaxProvider(),
+                new SqlServerSyntaxProvider()
+            }))
+        { }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="scopeProvider"></param>
+        /// <param name="logger"></param>
+        /// <param name="syntaxProviders"></param>
+        internal DatabaseContext(IScopeProviderInternal scopeProvider, ILogger logger, SqlSyntaxProviders syntaxProviders)
+        {
+            if (scopeProvider == null) throw new ArgumentNullException("scopeProvider");
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (syntaxProviders == null) throw new ArgumentNullException("syntaxProviders");
+
+            ScopeProvider = scopeProvider;
+            _logger = logger;
+            _syntaxProviders = syntaxProviders;
+        }
+
+        /// <summary>
+        /// Create a configured DatabaseContext
+        /// </summary>
+        /// <param name="scopeProvider"></param>
+        /// <param name="logger"></param>
+        /// <param name="sqlSyntax"></param>
+        /// <param name="providerName"></param>
+        internal DatabaseContext(IScopeProviderInternal scopeProvider, ILogger logger, ISqlSyntaxProvider sqlSyntax, string providerName)
+        {
+            _providerName = providerName;
+            SqlSyntax = sqlSyntax;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
+            ScopeProvider = scopeProvider;
+            _logger = logger;
+            _configured = true;
+        }
 
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
@@ -112,11 +193,14 @@ namespace Umbraco.Core
         {
             get
             {
-                if (IsDatabaseConfigured == false)
+            	if (IsDatabaseConfigured == false)
                 {
                     throw new InvalidOperationException("Cannot create a database instance, there is no available connection string");
                 }
-                return _factory.CreateDatabase();
+            
+                return ScopeProvider.GetAmbientOrNoScope().Database;
+                //var scope = ScopeProvider.AmbientScope;
+                //return scope != null ? scope.Database : ScopeProvider.CreateNoScope().Database;
             }
         }
 
@@ -130,6 +214,8 @@ namespace Umbraco.Core
         /// will be properly removed from call context and does not interfere with anything else. In most case
         /// it is not replacing anything, just temporarily installing a database in context.</para>
         /// </remarks>
+        // fixme - this should just entirely be replaced by Scope?
+        /*
         public virtual IDisposable UseSafeDatabase(bool force = false)
         {
             var factory = _factory as DefaultDatabaseFactory;
@@ -145,6 +231,7 @@ namespace Umbraco.Core
             // create a new, temp, database (will be disposed with UsingDatabase)
             return new UsingDatabase(null, factory.CreateDatabase());
         }
+        */
 
         /// <summary>
         /// Boolean indicating whether the database has been configured
@@ -166,7 +253,7 @@ namespace Umbraco.Core
 
                 //Don't check again if the timeout period hasn't elapsed
                 //this ensures we don't keep checking the connection too many times in a row like during startup.
-                //Do check if the _connectionLastChecked is null which means we're just initializing or it could 
+                //Do check if the _connectionLastChecked is null which means we're just initializing or it could
                 //not connect last time it was checked.
                 if ((_connectionLastChecked.HasValue && (DateTime.Now - _connectionLastChecked.Value).TotalMinutes > ConnectionCheckMinutes)
                     || _connectionLastChecked.HasValue == false)
@@ -816,6 +903,7 @@ namespace Umbraco.Core
             return true;
         }
 
+        /*
         private class UsingDatabase : IDisposable
         {
             private readonly UmbracoDatabase _orig;
@@ -838,5 +926,6 @@ namespace Umbraco.Core
                 GC.SuppressFinalize(this);
             }
         }
+        */
     }
 }

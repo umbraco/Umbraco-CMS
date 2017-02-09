@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence
     /// can then override any additional execution (such as additional loggging, functionality, etc...) that we need to without breaking compatibility since we'll always be exposing
     /// this object instead of the base PetaPoco database object.
     /// </remarks>
-    public class UmbracoDatabase : Database, IDisposeOnRequestEnd
+    public class UmbracoDatabase : Database
     {
         private readonly ILogger _logger;
         private readonly Guid _instanceId = Guid.NewGuid();
@@ -29,7 +29,6 @@ namespace Umbraco.Core.Persistence
         private int _spid = -1;
 #endif
 
-        internal DefaultDatabaseFactory.ContextOwner ContextOwner = DefaultDatabaseFactory.ContextOwner.None;
         internal DefaultDatabaseFactory DatabaseFactory = null;
 
         /// <summary>
@@ -56,6 +55,20 @@ namespace Umbraco.Core.Persistence
         /// Generally used for testing, will output all SQL statements executed to the logger
         /// </summary>
         internal bool EnableSqlTrace { get; set; }
+
+        public bool InTransaction { get; private set; }
+
+        public override void OnBeginTransaction()
+        {
+            base.OnBeginTransaction();
+            InTransaction = true;
+        }
+
+        public override void OnEndTransaction()
+        {
+            base.OnEndTransaction();
+            InTransaction = false;
+        }
 
 #if DEBUG_DATABASES
         private const bool EnableSqlTraceDefault = true;
@@ -142,6 +155,8 @@ namespace Umbraco.Core.Persistence
             // propagate timeout if none yet
 
 #if DEBUG_DATABASES
+            // determines the database connection SPID for debugging
+
             if (DatabaseType == DBType.MySql)
             {
                 using (var command = connection.CreateCommand())
@@ -206,6 +221,7 @@ namespace Umbraco.Core.Persistence
             }
 
 #if DEBUG_DATABASES
+            // ensures the database does not have an open reader, for debugging
             DatabaseDebugHelper.SetCommand(cmd, InstanceSid + " [T" + Thread.CurrentThread.ManagedThreadId + "]");
             var refsobj = DatabaseDebugHelper.GetReferencedObjects(cmd.Connection);
             if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
@@ -257,15 +273,6 @@ namespace Umbraco.Core.Persistence
 
             //use the defaults
             base.BuildSqlDbSpecificPagingQuery(databaseType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-#if DEBUG_DATABASES
-            LogHelper.Debug<UmbracoDatabase>("Dispose (" + InstanceSid + ").");
-#endif
-            if (DatabaseFactory != null) DatabaseFactory.OnDispose(this);
         }
     }
 }

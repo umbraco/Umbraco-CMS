@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMember> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMember> _contentPreviewRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection)
+        public MemberRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax, contentSection)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
@@ -37,8 +37,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
-            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.NoCache, logger, sqlSyntax);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.NoCache, logger, sqlSyntax);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, new PagingSqlQuery(sql));
 
         }
 
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 baseQuery.Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments))
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return ProcessQuery(baseQuery);
+                return ProcessQuery(baseQuery, new PagingSqlQuery(baseQuery));
             }
             else
             {
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sql = translator.Translate()
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return ProcessQuery(sql);
+                return ProcessQuery(sql, new PagingSqlQuery(sql));
             }
 
         }
@@ -129,7 +129,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.Full);
+            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.FullSingle);
         }
 
         protected override string GetBaseWhereClause()
@@ -385,7 +385,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
-            return ProcessQuery(sql, true);
+            return ProcessQuery(sql, new PagingSqlQuery(sql), true);
         }        
 
         public void RebuildXmlStructures(Func<IMember, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null)
@@ -408,7 +408,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 query = query
                     .Where<NodeDto>(x => x.NodeId > baseId)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
-                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
+                var sql = SqlSyntax.SelectTop(query, groupSize);
+                var xmlItems = ProcessQuery(sql, new PagingSqlQuery(sql))
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
                     .ToList();
 
@@ -449,7 +450,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.NodeId);
             var media = factory.BuildEntity(dto);
 
-            var properties = GetPropertyCollection(sql, new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) });
+            var properties = GetPropertyCollection(new PagingSqlQuery(sql), new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) });
 
             media.Properties = properties[dto.NodeId];
 
@@ -540,7 +541,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, new PagingSqlQuery(sql));
 
         }
 
@@ -586,45 +587,22 @@ namespace Umbraco.Core.Persistence.Repositories
         /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using PetaPoco paging (SQL paging)
         /// </remarks>
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMember> filter = null)
         {
-            var args = new List<object>();
-            var sbWhere = new StringBuilder();
-            Func<Tuple<string, object[]>> filterCallback = null;
-            if (filter.IsNullOrWhiteSpace() == false)
+            var filterSql = new Sql();
+            if (filter != null)
             {
-                //This will build up the where clause - even though the same 'filter' is being
-                //applied to both columns, the parameters values passed to PetaPoco need to be 
-                //duplicated, otherwise it gets confused :/ 
-                var columnFilters = new List<Tuple<string, string>>
+                foreach (var filterClaus in filter.GetWhereClauses())
                 {
-                    new Tuple<string, string>("umbracoNode", "text"),
-                    new Tuple<string, string>("cmsMember", "LoginName")
-                };
-                sbWhere.Append("AND (");
-                for (int i = 0; i < columnFilters.Count; i++)
-                {
-                    sbWhere
-                        .Append("(")
-                        .Append(SqlSyntax.GetQuotedTableName(columnFilters[i].Item1))
-                        .Append(".")
-                        .Append(SqlSyntax.GetQuotedColumnName(columnFilters[i].Item2))
-                        .Append(" LIKE @")
-                        .Append(args.Count)
-                        .Append(") ");
-                    args.Add(string.Format("%{0}%", filter));
-                    if (i < (columnFilters.Count - 1))
-                    {
-                        sbWhere.Append("OR ");
-                    }
+                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
                 }
-                sbWhere.Append(")");
-                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
             }
+
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);            
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsMember", "nodeId"),
-                (sqlFull, sqlIds) => ProcessQuery(sqlFull), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
         }
 
@@ -664,10 +642,21 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetEntityPropertyNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IMember> ProcessQuery(Sql sql, bool withCache = false)
+        /// <summary>
+        /// This is the underlying method that processes most queries for this repository
+        /// </summary>
+        /// <param name="sqlFull">
+        /// The full SQL to select all member data 
+        /// </param>
+        /// <param name="pagingSqlQuery">
+        /// The Id SQL to just return all member ids - used to process the properties for the member item
+        /// </param>
+        /// <param name="withCache"></param>
+        /// <returns></returns>
+        private IEnumerable<IMember> ProcessQuery(Sql sqlFull, PagingSqlQuery pagingSqlQuery, bool withCache = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
-            var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sqlFull);
 
             var content = new IMember[dtos.Count];
             var defs = new List<DocumentDefinition>();
@@ -679,7 +668,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // if the cache contains the item, use it
                 if (withCache)
                 {
-                    var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
                     if (cached != null)
                     {
                         content[i] = cached;
@@ -704,7 +693,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sql, defs);
+            var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
             // assign
             var dtoIndex = 0;

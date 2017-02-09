@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class ContentTypeServiceBase : RepositoryService
+    public class ContentTypeServiceBase : ScopeRepositoryService
     {
         public ContentTypeServiceBase(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services
                     {
                         //if a property was deleted or alias changed, then update all content of the current content type
                         // and all of it's desscendant doc types.     
-                        toUpdate.AddRange(contentType.DescendantsAndSelf());
+                        toUpdate.AddRange(contentType.DescendantsAndSelf(this));
                     }
                 }
             }

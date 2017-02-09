@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     internal abstract class RepositoryBase : DisposableObject
     {
         private readonly IUnitOfWork _work;
-        private readonly CacheHelper _cache;
+        private readonly CacheHelper _globalCache;
 
         protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
         {
@@ -24,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (logger == null) throw new ArgumentNullException("logger");
             Logger = logger;
             _work = work;
-            _cache = cache;
+            _globalCache = cache;
         }
 
         /// <summary>
@@ -43,18 +42,18 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return (Guid)_work.Key; }
         }
 
-        protected CacheHelper RepositoryCache
+        /// <summary>
+        /// Gets the global application cache.
+        /// </summary>
+        protected CacheHelper GlobalCache
         {
-            get { return _cache; }
+            get { return _globalCache; }
         }
 
         /// <summary>
-        /// The runtime cache used for this repo - by standard this is the runtime cache exposed by the CacheHelper but can be overridden
+        /// Gets the repository isolated cache.
         /// </summary>
-        protected virtual IRuntimeCacheProvider RuntimeCache
-        {
-            get { return _cache.RuntimeCache; }
-        }
+        protected abstract IRuntimeCacheProvider IsolatedCache { get; }
 
         public static string GetCacheIdKey<T>(object id)
         {
@@ -82,10 +81,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-
         #region Static Queries
 
-        private IQuery<TEntity> _hasIdQuery;
+        private static IQuery<TEntity> _hasIdQuery;
 
         #endregion
 
@@ -97,36 +95,110 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// The runtime cache used for this repo by default is the isolated cache for this type
         /// </summary>
-        protected override IRuntimeCacheProvider RuntimeCache
-        {
-            get { return RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>(); }
-        }
-
-        private IRepositoryCachePolicyFactory<TEntity, TId> _cachePolicyFactory;
-        /// <summary>
-        /// Returns the Cache Policy for the repository
-        /// </summary>
-        /// <remarks>
-        /// The Cache Policy determines how each entity or entity collection is cached
-        /// </remarks>
-        protected virtual IRepositoryCachePolicyFactory<TEntity, TId> CachePolicyFactory
+        private IRuntimeCacheProvider _isolatedCache;
+        protected override IRuntimeCacheProvider IsolatedCache
         {
             get
             {
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new DefaultRepositoryCachePolicyFactory<TEntity, TId>(
-                    RuntimeCache,
-                    new RepositoryCachePolicyOptions(() =>
-                    {
-                        //create it once if it is needed (no need for locking here)
-                        if (_hasIdQuery == null)
-                        {
-                            _hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0);
-                        }
+                if (_isolatedCache != null) return _isolatedCache;
 
-                        //Get count of all entities of current type (TEntity) to ensure cached result is correct
-                        return PerformCount(_hasIdQuery);
-                    })));
+                var scope = ((ScopeUnitOfWork) UnitOfWork).Scope; // fixme cast!
+                IsolatedRuntimeCache provider;
+                switch (scope.RepositoryCacheMode)
+                {
+                    case RepositoryCacheMode.Default:
+                        provider = GlobalCache.IsolatedRuntimeCache;
+                        break;
+                    case RepositoryCacheMode.Scoped:
+                        provider = scope.IsolatedRuntimeCache;
+                        break;
+                    default:
+                        throw new Exception("oops: cache mode.");
+                }
+
+                return _isolatedCache = GetIsolatedCache(provider);
             }
+        }
+
+        protected virtual IRuntimeCacheProvider GetIsolatedCache(IsolatedRuntimeCache provider)
+        {
+            return provider.GetOrCreateCache<TEntity>();
+        }
+
+        // this is a *bad* idea because PerformCount captures the current repository and its UOW
+        //
+        //private static RepositoryCachePolicyOptions _defaultOptions;
+        //protected virtual RepositoryCachePolicyOptions DefaultOptions
+        //{
+        //    get
+        //    {
+        //        return _defaultOptions ?? (_defaultOptions
+        //            = new RepositoryCachePolicyOptions(() =>
+        //            {
+        //                // get count of all entities of current type (TEntity) to ensure cached result is correct
+        //                // create query once if it is needed (no need for locking here) - query is static!
+        //                var query = _hasIdQuery ?? (_hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0));
+        //                return PerformCount(query);
+        //            }));
+        //    }
+        //}
+
+        protected virtual RepositoryCachePolicyOptions DefaultOptions
+        {
+            get
+            {
+                return new RepositoryCachePolicyOptions(() =>
+                    {
+                        // get count of all entities of current type (TEntity) to ensure cached result is correct
+                        // create query once if it is needed (no need for locking here) - query is static!
+                        var query = _hasIdQuery ?? (_hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0));
+                        return PerformCount(query);
+                    });
+            }
+        }
+
+        // this would be better for perfs BUT it breaks the tests - l8tr
+        //
+        //private static IRepositoryCachePolicy<TEntity, TId> _defaultCachePolicy;
+        //protected virtual IRepositoryCachePolicy<TEntity, TId> DefaultCachePolicy
+        //{
+        //    get
+        //    {
+        //        return _defaultCachePolicy ?? (_defaultCachePolicy
+        //            = new DefaultRepositoryCachePolicy<TEntity, TId>(IsolatedCache, DefaultOptions));
+        //    }
+        //}
+
+        private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
+        protected IRepositoryCachePolicy<TEntity, TId> CachePolicy
+        {
+            get
+            {
+                if (_cachePolicy != null) return _cachePolicy;
+
+                if (GlobalCache == CacheHelper.NoCache)
+                    return _cachePolicy = NoRepositoryCachePolicy<TEntity, TId>.Instance;
+                
+                _cachePolicy = CreateCachePolicy(IsolatedCache);
+                var scope = ((ScopeUnitOfWork) UnitOfWork).Scope; // fixme cast!
+                switch (scope.RepositoryCacheMode)
+                {
+                    case RepositoryCacheMode.Default:
+                        break;
+                    case RepositoryCacheMode.Scoped:
+                        _cachePolicy = _cachePolicy.Scoped(GetIsolatedCache(GlobalCache.IsolatedRuntimeCache), scope);
+                        break;
+                    default:
+                        throw new Exception("oops: cache mode.");
+                }
+
+                return _cachePolicy;
+            }
+        }
+
+        protected virtual IRepositoryCachePolicy<TEntity, TId> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        {
+            return new DefaultRepositoryCachePolicy<TEntity, TId>(runtimeCache, DefaultOptions);
         }
 
         /// <summary>
@@ -166,10 +238,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public TEntity Get(TId id)
         {
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                return p.Get(id, PerformGet);
-            }
+            return CachePolicy.Get(id, PerformGet, PerformGetAll);
         }
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
@@ -192,13 +261,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new InvalidOperationException("Cannot perform a query with more than 2000 parameters");
             }
 
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                var result = p.GetAll(ids, PerformGetAll);
-                return result;
-            }          
+            return CachePolicy.GetAll(ids, PerformGetAll);
         }
-        
+
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
         /// <summary>
         /// Gets a list of entities by the passed in query
@@ -220,10 +285,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public bool Exists(TId id)
         {
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                return p.Exists(id, PerformExists);
-            }
+            return CachePolicy.Exists(id, PerformExists, PerformGetAll);
         }
 
         protected abstract int PerformCount(IQuery<TEntity> query);
@@ -236,19 +298,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return PerformCount(query);
         }
-        
+
         /// <summary>
         /// Unit of work method that tells the repository to persist the new entity
         /// </summary>
         /// <param name="entity"></param>
         public virtual void PersistNewItem(IEntity entity)
         {
-            var casted = (TEntity)entity;
-
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                p.CreateOrUpdate(casted, PersistNewItem);
-            }
+            CachePolicy.Create((TEntity) entity, PersistNewItem);
         }
 
         /// <summary>
@@ -257,12 +314,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistUpdatedItem(IEntity entity)
         {
-            var casted = (TEntity)entity;
-
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                p.CreateOrUpdate(casted, PersistUpdatedItem);
-            }
+            CachePolicy.Update((TEntity) entity, PersistUpdatedItem);
         }
 
         /// <summary>
@@ -271,19 +323,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistDeletedItem(IEntity entity)
         {
-            var casted = (TEntity)entity;
-
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                p.Remove(casted, PersistDeletedItem);
-            }            
+            CachePolicy.Delete((TEntity) entity, PersistDeletedItem);
         }
-        
 
         protected abstract void PersistNewItem(TEntity item);
         protected abstract void PersistUpdatedItem(TEntity item);
         protected abstract void PersistDeletedItem(TEntity item);
-
 
         /// <summary>
         /// Dispose disposable properties

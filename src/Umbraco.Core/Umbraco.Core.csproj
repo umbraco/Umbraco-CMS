@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Umbraco.Core</RootNamespace>
     <AssemblyName>Umbraco.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -53,8 +53,8 @@
       <HintPath>..\packages\ImageProcessor.2.5.2\lib\net45\ImageProcessor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net-mediumtrust.2.0.0\lib\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -80,15 +80,14 @@
     <Reference Include="MySql.Data, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>..\packages\MySql.Data.6.9.8\lib\net45\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Semver, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\semver.1.1.2\lib\net45\Semver.dll</HintPath>
+    <Reference Include="Semver, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Semver.2.0.4\lib\net452\Semver.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -132,14 +131,13 @@
     <Compile Include="Attempt{T}.cs" />
     <Compile Include="Auditing\Audit.cs" />
     <Compile Include="Auditing\AuditTypes.cs" />
+    <Compile Include="BindingRedirects.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\DefaultRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\FullDataSetRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\ICacheProvider.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
@@ -147,8 +145,8 @@
     <Compile Include="Cache\HttpRequestCacheProvider.cs" />
     <Compile Include="Cache\IRepositoryCachePolicy.cs" />
     <Compile Include="Cache\IPayloadCacheRefresher.cs" />
-    <Compile Include="Cache\IRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\IsolatedRuntimeCache.cs" />
+    <Compile Include="Cache\NoRepositoryCachePolicy.cs" />
     <Compile Include="Cache\ObjectCacheRuntimeCacheProvider.cs" />
     <Compile Include="Cache\IRuntimeCacheProvider.cs" />
     <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />
@@ -157,10 +155,10 @@
     <Compile Include="Cache\NullCacheProvider.cs" />
     <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\OnlySingleItemsRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
+    <Compile Include="Cache\ScopedRepositoryCachePolicy.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="Cache\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
@@ -314,6 +312,8 @@
     <Compile Include="Deploy\Difference.cs" />
     <Compile Include="Deploy\Direction.cs" />
     <Compile Include="Deploy\IFileStore.cs" />
+    <Compile Include="Events\EventDefinitionFilter.cs" />
+    <Compile Include="OrderedHashSet.cs" />
     <Compile Include="Models\GridValue.cs" />
     <Compile Include="Deploy\IArtifact.cs" />
     <Compile Include="Deploy\IArtifactSignature.cs" />
@@ -340,18 +340,28 @@
     <Compile Include="Events\DeleteEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
     <Compile Include="Events\DeleteRevisionsEventArgs.cs" />
+    <Compile Include="Events\EventDefinition.cs" />
+    <Compile Include="Events\EventDefinitionBase.cs" />
     <Compile Include="Events\EventExtensions.cs" />
+    <Compile Include="Events\EventNameExtractor.cs" />
+    <Compile Include="Events\EventNameExtractorError.cs" />
+    <Compile Include="Events\EventNameExtractorResult.cs" />
+    <Compile Include="Events\IEventDefinition.cs" />
+    <Compile Include="Events\PassThroughEventDispatcher.cs" />
+    <Compile Include="Events\ScopeEventDispatcher.cs" />
     <Compile Include="Events\EventMessage.cs" />
     <Compile Include="Events\EventMessages.cs" />
     <Compile Include="Events\ExportEventArgs.cs" />
+    <Compile Include="Events\IEventDispatcher.cs" />
     <Compile Include="Events\IEventMessagesFactory.cs" />
     <Compile Include="Events\ImportEventArgs.cs" />
     <Compile Include="Events\ImportPackageEventArgs.cs" />
-    <Compile Include="Events\MessageType.cs" />
+    <Compile Include="Events\EventMessageType.cs" />
     <Compile Include="Events\MigrationEventArgs.cs" />
     <Compile Include="Events\MoveEventInfo.cs" />
     <Compile Include="Events\PublishEventArgs.cs" />
     <Compile Include="Events\RecycleBinEventArgs.cs" />
+    <Compile Include="Events\EventsDispatchMode.cs" />
     <Compile Include="Events\TransientMessagesFactory.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\MoveEventArgs.cs" />
@@ -375,7 +385,7 @@
     <Compile Include="ICompletable.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="IO\ShadowFileSystem.cs" />
-    <Compile Include="IO\ShadowFileSystemsScope.cs" />
+    <Compile Include="IO\ShadowFileSystems.cs" />
     <Compile Include="IO\ShadowWrapper.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
     <Compile Include="Logging\ImageProcessorLogger.cs" />
@@ -469,6 +479,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddUniqueIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\RemoveParentIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Mappers\TaskTypeMapper.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddIndexToUmbracoNodePath.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddRelationTypeUniqueIdColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddMacroUniqueIdColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemovePropertyDataIdIndex.cs" />
@@ -508,6 +519,7 @@
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeOne\UpdateUserLanguagesToIsoCode.cs" />
     <Compile Include="Persistence\PocoDataDataReader.cs" />
+    <Compile Include="Persistence\Querying\CachedExpression.cs" />
     <Compile Include="Persistence\Querying\QueryExtensions.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
@@ -534,6 +546,9 @@
     <Compile Include="Persistence\Repositories\XsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
+    <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWorkProvider.cs" />
+    <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWorkProvider.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueTypes.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
@@ -543,6 +558,17 @@
     <Compile Include="Publishing\UnPublishedStatusType.cs" />
     <Compile Include="Publishing\UnPublishStatus.cs" />
     <Compile Include="SafeCallContext.cs" />
+    <Compile Include="Scoping\ActionTime.cs" />
+    <Compile Include="Scoping\IScope.cs" />
+    <Compile Include="Scoping\IScopeInternal.cs" />
+    <Compile Include="Scoping\IScopeProvider.cs" />
+    <Compile Include="Scoping\IScopeProviderInternal.cs" />
+    <Compile Include="Scoping\NoScope.cs" />
+    <Compile Include="Scoping\Scope.cs" />
+    <Compile Include="Scoping\ScopeContext.cs" />
+    <Compile Include="Scoping\ScopeProvider.cs" />
+    <Compile Include="Scoping\ScopeReference.cs" />
+    <Compile Include="Scoping\RepositoryCacheMode.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
@@ -573,6 +599,7 @@
     <Compile Include="Services\AuditService.cs" />
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
     <Compile Include="Models\RedirectUrl.cs" />
+    <Compile Include="Services\IContentServiceBase.cs" />
     <Compile Include="Services\RedirectUrlService.cs" />
     <Compile Include="Services\DomainService.cs" />
     <Compile Include="Services\ExternalLoginService.cs" />
@@ -593,6 +620,7 @@
     <Compile Include="Services\RepositoryService.cs" />
     <Compile Include="Services\OperationStatus.cs" />
     <Compile Include="Services\OperationStatusType.cs" />
+    <Compile Include="Services\ScopeRepositoryService.cs" />
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
     <Compile Include="Models\IPartialView.cs" />
@@ -697,7 +725,7 @@
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateRelatedLinksData.cs" />
     <Compile Include="PropertyEditors\IValueEditor.cs" />
-    <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
+    <Compile Include="Persistence\Querying\SqlExpressionExtensions.cs" />
     <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
     <Compile Include="Persistence\Querying\TextColumnType.cs" />
     <Compile Include="Persistence\Querying\ValuePropertyMatchType.cs" />
@@ -1132,7 +1160,7 @@
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
-    <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
     <Compile Include="Profiling\IProfiler.cs" />
     <Compile Include="Profiling\LogProfiler.cs" />

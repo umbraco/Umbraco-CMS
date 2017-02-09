@@ -77,39 +77,6 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                "Failed to retrieve data for template with alias: " + alias);
         },
 
-
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.codefileResource#getScaffold
-         * @methodOf umbraco.resources.codefileResource
-         *
-         * @description
-         * Returns a scaffold of an empty codefile item
-         *
-         * The scaffold is used to build editors for code file editors that has not yet been populated with data.
-         *
-         * ##usage
-         * <pre>
-         * codefileResource.getScaffold()
-         *    .then(function(template) {
-         *        alert('its here!');
-         *    });
-         * </pre>
-         *
-         * @returns {Promise} resourcePromise object containing the codefile scaffold.
-         *
-         */
-        getScaffold: function (id) {
-
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "templateApiBaseUrl",
-                       "GetScaffold",
-                        [{ id: id }])),
-               "Failed to retrieve data for empty template");
-        },
-
         /**
          * @ngdoc method
          * @name umbraco.resources.codefileResource#deleteByPath
@@ -176,7 +143,102 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                          "PostSave"),
                          codeFile),
                 "Failed to save data for code file " + codeFile.virtualPath);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.codefileResource#getSnippets
+         * @methodOf umbraco.resources.codefileResource
+         *
+         * @description
+         * Gets code snippets for a given file type
+         * 
+         * ##usage
+         * <pre>
+         * codefileResource.getSnippets("partialViews")
+         *    .then(function(snippets) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         *
+         * @param {string} file type: (partialViews, partialViewMacros)
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getSnippets: function (fileType) {
+            return umbRequestHelper.resourcePromise(
+                 $http.get(
+                     umbRequestHelper.getApiUrl(
+                         "codeFileApiBaseUrl",
+                         "GetSnippets?type=" + fileType )),
+                "Failed to get snippet for" + fileType);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.codefileResource#getScaffold
+         * @methodOf umbraco.resources.codefileResource
+         *
+         * @description
+         * Returns a scaffold of an empty codefile item.
+         * 
+         * The scaffold is used to build editors for code file editors that has not yet been populated with data.
+         * 
+         * ##usage
+         * <pre>
+         * codefileResource.getScaffold("partialViews", "Breadcrumb")
+         *    .then(function(data) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         *
+         * @param {string} File type: (scripts, partialViews, partialViewMacros).
+         * @param {string} Snippet name (Ex. Breadcrumb).
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+
+        getScaffold: function (type, id, snippetName) {
+            return umbRequestHelper.resourcePromise(
+                 $http.get(
+                     umbRequestHelper.getApiUrl(
+                         "codeFileApiBaseUrl",
+                         "GetScaffold?type=" + type + "&id=" + id + "&snippetName=" + snippetName)),
+                "Failed to get scaffold for" + type);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.codefileResource#createContainer
+         * @methodOf umbraco.resources.codefileResource
+         *
+         * @description
+         * Creates a container/folder
+         * 
+         * ##usage
+         * <pre>
+         * codefileResource.createContainer("partialViews", "folder%2ffolder", "folder")
+         *    .then(function(data) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         *
+         * @param {string} File type: (scripts, partialViews, partialViewMacros).
+         * @param {string} Parent Id: url encoded path
+         * @param {string} Container name
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+
+        createContainer: function(type, parentId, name) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl(
+                    "codeFileApiBaseUrl", 
+                    "PostCreateContainer", 
+                    { type: type, parentId: parentId, name: encodeURIComponent(name) })),
+                'Failed to create a folder under parent id ' + parentId);
         }
+
     };
 }
 

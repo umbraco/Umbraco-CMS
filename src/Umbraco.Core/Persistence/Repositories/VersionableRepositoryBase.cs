@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IContentSection _contentSection;
 
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
+        protected VersionableRepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax)
         {
             _contentSection = contentSection;
@@ -432,7 +432,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <exception cref="System.ArgumentNullException">orderBy</exception>
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             Tuple<string, string> nodeIdSelect,
-            Func<Sql, Sql, IEnumerable<TEntity>> processQuery,
+            Func<Sql, PagingSqlQuery<TDto>, IEnumerable<TEntity>> processQuery,
             string orderBy,
             Direction orderDirection,
             bool orderBySystemField,
@@ -443,7 +443,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // Get base query for returning IDs
             var sqlBaseIds = GetBaseQuery(BaseQueryType.Ids);
             // Get base query for returning all data
-            var sqlBaseFull = GetBaseQuery(BaseQueryType.Full);
+            var sqlBaseFull = GetBaseQuery(BaseQueryType.FullMultiple);
 
             if (query == null) query = new Query<TEntity>();
             var translatorIds = new SqlTranslator<TEntity>(sqlBaseIds, query);
@@ -466,7 +466,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // the pageResult, then the GetAll will actually return ALL records in the db.
             if (pagedResult.Items.Any())
             {
-                //Crete the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
+                //Create the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
                 var args = sqlNodeIdsWithSort.Arguments;
                 string sqlStringCount, sqlStringPage;
                 Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
@@ -486,8 +486,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 var fullQuery = GetSortedSqlForPagedResults(
                     GetFilteredSqlForPagedResults(fullQueryWithPagedInnerJoin, defaultFilter),
                     orderDirection, orderBy, orderBySystemField, nodeIdSelect);
-
-                return processQuery(fullQuery, sqlNodeIdsWithSort);
+                
+                return processQuery(fullQuery, new PagingSqlQuery<TDto>(Database, sqlNodeIdsWithSort, pageIndex, pageSize));
             }
             else
             {
@@ -497,18 +497,47 @@ namespace Umbraco.Core.Persistence.Repositories
             return result;
         }
 
+        /// <summary>
+        /// Gets the property collection for a non-paged query
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="documentDefs"></param>
+        /// <returns></returns>
         protected IDictionary<int, PropertyCollection> GetPropertyCollection(
-            Sql docSql,
+            Sql sql,
+            IReadOnlyCollection<DocumentDefinition> documentDefs)
+        {
+            return GetPropertyCollection(new PagingSqlQuery(sql), documentDefs);
+        }
+
+        /// <summary>
+        /// Gets the property collection for a query
+        /// </summary>
+        /// <param name="pagingSqlQuery"></param>
+        /// <param name="documentDefs"></param>
+        /// <returns></returns>
+        protected IDictionary<int, PropertyCollection> GetPropertyCollection(
+            PagingSqlQuery pagingSqlQuery,
             IReadOnlyCollection<DocumentDefinition> documentDefs)
         {
             if (documentDefs.Count == 0) return new Dictionary<int, PropertyCollection>();
 
+            //initialize to the query passed in
+            var docSql = pagingSqlQuery.PrePagedSql;
+
             //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use
             // the statement to go get the property data for all of the items by using an inner join
             var parsedOriginalSql = "SELECT {0} " + docSql.SQL.Substring(docSql.SQL.IndexOf("FROM", StringComparison.Ordinal));
-            //now remove everything from an Orderby clause and beyond
-            if (parsedOriginalSql.InvariantContains("ORDER BY "))
+            
+            if (pagingSqlQuery.HasPaging)
             {
+                //if this is a paged query, build the paged query with the custom column substitution, then re-assign
+                docSql = pagingSqlQuery.BuildPagedQuery("{0}");
+                parsedOriginalSql = docSql.SQL;
+            }
+            else if (parsedOriginalSql.InvariantContains("ORDER BY "))
+            {
+                //now remove everything from an Orderby clause and beyond if this is unpaged data
                 parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.LastIndexOf("ORDER BY ", StringComparison.Ordinal));
             }
 
@@ -525,7 +554,7 @@ WHERE EXISTS(
 	INNER JOIN cmsPropertyType
 	ON b.datatypeNodeId = cmsPropertyType.dataTypeId
     INNER JOIN 
-	    (" + string.Format(parsedOriginalSql, "DISTINCT cmsContent.contentType") + @") as docData
+	    (" + string.Format(parsedOriginalSql, "cmsContent.contentType") + @") as docData
     ON cmsPropertyType.contentTypeId = docData.contentType
     WHERE a.id = b.id)", docSql.Arguments);
 
@@ -646,28 +675,7 @@ ORDER BY contentNodeId, propertytypeid
             return result;
 
         }
-
-        public class DocumentDefinition
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="T:System.Object"/> class.
-            /// </summary>
-            public DocumentDefinition(int id, Guid version, DateTime versionDate, DateTime createDate, IContentTypeComposition composition)
-            {
-                Id = id;
-                Version = version;
-                VersionDate = versionDate;
-                CreateDate = createDate;
-                Composition = composition;
-            }
-
-            public int Id { get; set; }
-            public Guid Version { get; set; }
-            public DateTime VersionDate { get; set; }
-            public DateTime CreateDate { get; set; }
-            public IContentTypeComposition Composition { get; set; }
-        }
-
+        
         protected virtual string GetDatabaseFieldNameForOrderBy(string orderBy)
         {
             // Translate the passed order by field (which were originally defined for in-memory object sorting
@@ -763,5 +771,92 @@ ORDER BY contentNodeId, propertytypeid
         /// <param name="queryType"></param>
         /// <returns></returns>
         protected abstract Sql GetBaseQuery(BaseQueryType queryType);
+
+        internal class DocumentDefinition
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+            /// </summary>
+            public DocumentDefinition(int id, Guid version, DateTime versionDate, DateTime createDate, IContentTypeComposition composition)
+            {
+                Id = id;
+                Version = version;
+                VersionDate = versionDate;
+                CreateDate = createDate;
+                Composition = composition;
+            }
+
+            public int Id { get; set; }
+            public Guid Version { get; set; }
+            public DateTime VersionDate { get; set; }
+            public DateTime CreateDate { get; set; }
+            public IContentTypeComposition Composition { get; set; }
+        }
+
+        /// <summary>
+        /// An object representing a query that may contain paging information
+        /// </summary>
+        internal class PagingSqlQuery
+        {
+            public Sql PrePagedSql { get; private set; }
+
+            public PagingSqlQuery(Sql prePagedSql)
+            {
+                PrePagedSql = prePagedSql;
+            }
+
+            public virtual bool HasPaging
+            {
+                get { return false; }
+            }
+
+            public virtual Sql BuildPagedQuery(string selectColumns)
+            {
+                throw new InvalidOperationException("This query has no paging information");
+            }
+        }
+
+        /// <summary>
+        /// An object representing a query that contains paging information
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        internal class PagingSqlQuery<T> : PagingSqlQuery
+        {
+            private readonly Database _db;
+            private readonly long _pageIndex;
+            private readonly int _pageSize;
+
+            public PagingSqlQuery(Database db, Sql prePagedSql, long pageIndex, int pageSize) : base(prePagedSql)
+            {
+                _db = db;
+                _pageIndex = pageIndex;
+                _pageSize = pageSize;                
+            }
+
+            public override bool HasPaging
+            {
+                get { return _pageSize > 0; }
+            }
+
+            /// <summary>
+            /// Creates a paged query based on the original query and subtitutes the selectColumns specified
+            /// </summary>
+            /// <param name="selectColumns"></param>
+            /// <returns></returns>
+            public override Sql BuildPagedQuery(string selectColumns)
+            {
+                if (HasPaging == false) throw new InvalidOperationException("This query has no paging information");
+
+                var resultSql = string.Format("SELECT {0} {1}", selectColumns, PrePagedSql.SQL.Substring(PrePagedSql.SQL.IndexOf("FROM", StringComparison.Ordinal)));
+
+                //this query is meant to be paged so we need to generate the paging syntax
+                //Create the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
+                var args = PrePagedSql.Arguments;
+                string sqlStringCount, sqlStringPage;
+                _db.BuildPageQueries<T>(_pageIndex * _pageSize, _pageSize, resultSql, ref args, out sqlStringCount, out sqlStringPage);
+
+                return new Sql(sqlStringPage, args);
+            }
+        }
     }
 }

@@ -206,9 +206,13 @@ namespace Umbraco.Core.Services
 
         private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = new NotificationsRepository(uow);
-            return repository.GetUsersNotifications(userIds, action, nodeIds, objectType);
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var repository = new NotificationsRepository(uow);
+                var ret = repository.GetUsersNotifications(userIds, action, nodeIds, objectType);
+                uow.Commit();
+                return ret;
+            }
         }
 
         /// <summary>
@@ -218,9 +222,13 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = new NotificationsRepository(uow);
-            return repository.GetUserNotifications(user);
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var repository = new NotificationsRepository(uow);
+                var ret = repository.GetUserNotifications(user);
+                uow.Commit();
+                return ret;
+            }
         }
 
         /// <summary>
@@ -256,9 +264,13 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = new NotificationsRepository(uow);
-            return repository.GetEntityNotifications(entity);
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var repository = new NotificationsRepository(uow);
+                var ret= repository.GetEntityNotifications(entity);
+                uow.Commit();
+                return ret;
+            }
         }
 
         /// <summary>
@@ -267,9 +279,12 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IEntity entity)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = new NotificationsRepository(uow);
-            repository.DeleteNotifications(entity);
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var repository = new NotificationsRepository(uow);
+                repository.DeleteNotifications(entity);
+                uow.Commit();
+            }
         }
 
         /// <summary>
@@ -278,9 +293,12 @@ namespace Umbraco.Core.Services
         /// <param name="user"></param>
         public void DeleteNotifications(IUser user)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = new NotificationsRepository(uow);
-            repository.DeleteNotifications(user);
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var repository = new NotificationsRepository(uow);
+                repository.DeleteNotifications(user);
+                uow.Commit();
+            }
         }
 
         /// <summary>
@@ -290,9 +308,12 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IUser user, IEntity entity)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = new NotificationsRepository(uow);
-            repository.DeleteNotifications(user, entity);
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var repository = new NotificationsRepository(uow);
+                repository.DeleteNotifications(user, entity);
+                uow.Commit();
+            }
         }
 
         /// <summary>
@@ -304,9 +325,13 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public Notification CreateNotification(IUser user, IEntity entity, string action)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = new NotificationsRepository(uow);
-            return repository.CreateNotification(user, entity, action);
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var repository = new NotificationsRepository(uow);
+                var ret = repository.CreateNotification(user, entity, action);
+                uow.Commit();
+                return ret;
+            }
         }
 
         #region private methods

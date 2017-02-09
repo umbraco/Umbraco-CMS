@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -17,9 +15,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -34,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
 
-        internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
+        internal TemplateRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
             : base(work, cache, logger, sqlSyntax)
         {
             _masterpagesFileSystem = masterpageFileSystem;
@@ -44,16 +40,9 @@ namespace Umbraco.Core.Persistence.Repositories
             _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
-
-        private FullDataSetRepositoryCachePolicyFactory<ITemplate, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<ITemplate, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ITemplate, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
-            }
+            return new FullDataSetRepositoryCachePolicy<ITemplate, int>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>

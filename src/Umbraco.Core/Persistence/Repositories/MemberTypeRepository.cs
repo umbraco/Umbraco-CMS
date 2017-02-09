@@ -21,25 +21,16 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MemberTypeRepository : ContentTypeBaseRepository<IMemberType>, IMemberTypeRepository
     {
-
-        public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public MemberTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<IMemberType, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IMemberType, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IMemberType, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(),
-                    //allow this cache to expire
-                    expires: true));
-            }
+            return new FullDataSetRepositoryCachePolicy<IMemberType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
-        
+
         protected override IMemberType PerformGet(int id)
         {
             //use the underlying GetAll which will force cache all content types

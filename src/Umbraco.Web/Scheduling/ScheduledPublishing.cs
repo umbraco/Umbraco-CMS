@@ -82,9 +82,10 @@ namespace Umbraco.Web.Scheduling
                             Content = new StringContent(string.Empty)
                         };
 
-                        // running on a background task, requires a safe database (see UsingSafeDatabase doc)
+                        // running on a background task, requires its own (safe) scope
                         // (GetAuthenticationHeaderValue uses UserService to load the current user, hence requires a database)
-                        using (ApplicationContext.Current.DatabaseContext.UseSafeDatabase())
+                        // (might not need a scope but we don't know really)
+                        using (ApplicationContext.Current.ScopeProvider.CreateScope())
                         {
                             //pass custom the authorization header
                             request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);

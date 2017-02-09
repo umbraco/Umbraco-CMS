@@ -15,7 +15,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
         /// <param name="parent"></param>
         /// <returns></returns>
         public static ContentType CreateBasicContentType(string alias = "basePage", string name = "Base Page",
-            ContentType parent = null)
+            IContentType parent = null)
         {
             var contentType = parent == null ? new ContentType(-1) : new ContentType(parent, alias);
 

@@ -28,15 +28,15 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
 
-        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection)
+        public MediaRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax, contentSection)
         {
             if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _mediaTypeRepository = mediaTypeRepository;
             _tagRepository = tagRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
-            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.NoCache, logger, sqlSyntax);
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.NoCache, logger, sqlSyntax);
             EnsureUniqueNaming = contentSection.EnsureUniqueNaming;
         }
 
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, new PagingSqlQuery(sql));
         }
 
         protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                                 .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, new PagingSqlQuery(sql));
         }
 
         #endregion
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.Full);
+            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.FullSingle);
         }
 
         protected override string GetBaseWhereClause()
@@ -143,13 +143,24 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
-            return ProcessQuery(sql, true);
+            return ProcessQuery(sql, new PagingSqlQuery(sql), true);
         }
 
-        private IEnumerable<IMedia> ProcessQuery(Sql sql, bool withCache = false)
+        /// <summary>
+        /// This is the underlying method that processes most queries for this repository
+        /// </summary>
+        /// <param name="sqlFull">
+        /// The full SQL to select all media data 
+        /// </param>
+        /// <param name="pagingSqlQuery">
+        /// The Id SQL to just return all media ids - used to process the properties for the media item
+        /// </param>
+        /// <param name="withCache"></param>
+        /// <returns></returns>
+        private IEnumerable<IMedia> ProcessQuery(Sql sqlFull, PagingSqlQuery pagingSqlQuery, bool withCache = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sqlFull);
             var content = new IMedia[dtos.Count];
             var defs = new List<DocumentDefinition>();
 
@@ -165,7 +176,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // if the cache contains the item, use it
                 if (withCache)
                 {
-                    var cached = RuntimeCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
                     if (cached != null)
                     {
                         content[i] = cached;
@@ -200,7 +211,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sql, defs);
+            var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
             // assign
             var dtoIndex = 0;
@@ -257,7 +268,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 query = query
                     .Where<NodeDto>(x => x.NodeId > baseId, SqlSyntax)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
-                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
+                var sql = SqlSyntax.SelectTop(query, groupSize);
+                var xmlItems = ProcessQuery(sql, new PagingSqlQuery(sql))
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
                     .ToList();
 
@@ -285,6 +297,11 @@ namespace Umbraco.Core.Persistence.Repositories
         public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
         {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(content, xml));
+        }
+
+        public void DeleteContentXml(IMedia content)
+        {
+            _contentXmlRepository.Delete(new ContentXmlEntity<IMedia>(content));
         }
 
         public void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml)
@@ -485,29 +502,22 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter = null)
         {
-            var args = new List<object>();
-            var sbWhere = new StringBuilder();
-            Func<Tuple<string, object[]>> filterCallback = null;
-            if (filter.IsNullOrWhiteSpace() == false)
+            var filterSql = new Sql();
+            if (filter != null)
             {
-                sbWhere
-                    .Append("AND (")
-                    .Append(SqlSyntax.GetQuotedTableName("umbracoNode"))
-                    .Append(".")
-                    .Append(SqlSyntax.GetQuotedColumnName("text"))
-                    .Append(" LIKE @")
-                    .Append(args.Count)
-                    .Append(")");
-                args.Add("%" + filter + "%");
-
-                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
+                foreach (var filterClaus in filter.GetWhereClauses())
+                {
+                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
+                }
             }
+
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);
 
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsContentVersion", "contentId"),
-                (sqlFull, sqlIds) => ProcessQuery(sqlFull), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, pagingSqlQuery) => ProcessQuery(sqlFull, pagingSqlQuery), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }
@@ -515,7 +525,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a media object from a ContentDto
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>
@@ -527,7 +537,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(new PagingSqlQuery(docSql), new[] { docDef });
 
             media.Properties = properties[dto.NodeId];
 

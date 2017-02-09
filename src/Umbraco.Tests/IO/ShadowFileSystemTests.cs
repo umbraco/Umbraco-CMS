@@ -2,10 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.IO
@@ -23,6 +24,7 @@ namespace Umbraco.Tests.IO
         {
             SafeCallContext.Clear();
             ClearFiles();
+            ShadowFileSystems.ResetId();
         }
 
         [TearDown]
@@ -30,6 +32,7 @@ namespace Umbraco.Tests.IO
         {
             SafeCallContext.Clear();
             ClearFiles();
+            ShadowFileSystems.ResetId();
         }
 
         private static void ClearFiles()
@@ -373,8 +376,11 @@ namespace Umbraco.Tests.IO
             var appdata = IOHelper.MapPath("App_Data");
             Directory.CreateDirectory(path);
 
+            var scopedFileSystems = false;
+            var scopeProvider = MockScopeProvider(() => scopedFileSystems);
+
             var fs = new PhysicalFileSystem(path, "ignore");
-            var sw = new ShadowWrapper(fs, "shadow");
+            var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
             var swa = new[] { sw };
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -394,46 +400,52 @@ namespace Umbraco.Tests.IO
             Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
 
             // shadow with scope but no complete does not complete
-            var scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            scopedFileSystems = true; // pretend we have a scope
+            var scope = new ShadowFileSystems(id = Guid.NewGuid(), swa);
             Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f3.txt", ms);
             Assert.IsFalse(fs.FileExists("sub/f3.txt"));
             Assert.AreEqual(1, Directory.GetDirectories(appdata + "/Shadow").Length);
             scope.Dispose();
+            scopedFileSystems = false;
             Assert.IsFalse(fs.FileExists("sub/f3.txt"));
             Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
 
             // shadow with scope and complete does complete
-            scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            scopedFileSystems = true; // pretend we have a scope
+            scope = new ShadowFileSystems(id = Guid.NewGuid(), swa);
             Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f4.txt", ms);
             Assert.IsFalse(fs.FileExists("sub/f4.txt"));
             Assert.AreEqual(1, Directory.GetDirectories(appdata + "/Shadow").Length);
             scope.Complete();
-            Assert.IsTrue(fs.FileExists("sub/f4.txt"));
-            TestHelper.TryAssert(() => Assert.AreEqual(0, Directory.GetDirectories(appdata + "/Shadow").Length));
             scope.Dispose();
+            scopedFileSystems = false;
+            TestHelper.TryAssert(() => Assert.AreEqual(0, Directory.GetDirectories(appdata + "/Shadow").Length));
             Assert.IsTrue(fs.FileExists("sub/f4.txt"));
             Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
 
             // test scope for "another thread"
 
-            scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            scopedFileSystems = true; // pretend we have a scope
+            scope = new ShadowFileSystems(id = Guid.NewGuid(), swa);
             Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f5.txt", ms);
             Assert.IsFalse(fs.FileExists("sub/f5.txt"));
-            using (new SafeCallContext()) // pretend we're another thread w/out scope
-            {
-                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
-                    sw.AddFile("sub/f6.txt", ms);
-            }
+
+            // pretend we're another thread w/out scope
+            scopedFileSystems = false;
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                sw.AddFile("sub/f6.txt", ms);
+            scopedFileSystems = true; // pretend we have a scope
+
             Assert.IsTrue(fs.FileExists("sub/f6.txt")); // other thread has written out to fs
             scope.Complete();
-            Assert.IsTrue(fs.FileExists("sub/f5.txt"));
             scope.Dispose();
+            scopedFileSystems = false;
             Assert.IsTrue(fs.FileExists("sub/f5.txt"));
             Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id));
         }
@@ -445,8 +457,11 @@ namespace Umbraco.Tests.IO
             var appdata = IOHelper.MapPath("App_Data");
             Directory.CreateDirectory(path);
 
+            var scopedFileSystems = false;
+            var scopeProvider = MockScopeProvider(() => scopedFileSystems);
+
             var fs = new PhysicalFileSystem(path, "ignore");
-            var sw = new ShadowWrapper(fs, "shadow");
+            var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
             var swa = new[] { sw };
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -455,20 +470,23 @@ namespace Umbraco.Tests.IO
 
             Guid id;
 
-            var scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            scopedFileSystems = true; // pretend we have a scope
+            var scope = new ShadowFileSystems(id = Guid.NewGuid(), swa);
             Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f2.txt", ms);
             Assert.IsFalse(fs.FileExists("sub/f2.txt"));
-            using (new SafeCallContext()) // pretend we're another thread w/out scope
-            {
-                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("bar")))
-                    sw.AddFile("sub/f2.txt", ms);
-            }
+
+            // pretend we're another thread w/out scope
+            scopedFileSystems = false;
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("bar")))
+                sw.AddFile("sub/f2.txt", ms);
+            scopedFileSystems = true; // pretend we have a scope
+
             Assert.IsTrue(fs.FileExists("sub/f2.txt")); // other thread has written out to fs
             scope.Complete();
-            Assert.IsTrue(fs.FileExists("sub/f2.txt"));
             scope.Dispose();
+            scopedFileSystems = false;
             Assert.IsTrue(fs.FileExists("sub/f2.txt"));
             TestHelper.TryAssert(() => Assert.IsFalse(Directory.Exists(appdata + "/Shadow/" + id)));
 
@@ -488,8 +506,11 @@ namespace Umbraco.Tests.IO
             var appdata = IOHelper.MapPath("App_Data");
             Directory.CreateDirectory(path);
 
+            var scopedFileSystems = false;
+            var scopeProvider = MockScopeProvider(() => scopedFileSystems);
+
             var fs = new PhysicalFileSystem(path, "ignore");
-            var sw = new ShadowWrapper(fs, "shadow");
+            var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
             var swa = new[] { sw };
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -498,27 +519,32 @@ namespace Umbraco.Tests.IO
 
             Guid id;
 
-            var scope = ShadowFileSystemsScope.CreateScope(id = Guid.NewGuid(), swa);
+            scopedFileSystems = true; // pretend we have a scope
+            var scope = new ShadowFileSystems(id = Guid.NewGuid(), swa);
             Assert.IsTrue(Directory.Exists(appdata + "/Shadow/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f2.txt", ms);
             Assert.IsFalse(fs.FileExists("sub/f2.txt"));
-            using (new SafeCallContext()) // pretend we're another thread w/out scope
-            {
-                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("bar")))
-                    sw.AddFile("sub/f2.txt/f2.txt", ms);
-            }
+
+            // pretend we're another thread w/out scope
+            scopedFileSystems = false;
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("bar")))
+                sw.AddFile("sub/f2.txt/f2.txt", ms);
+            scopedFileSystems = true; // pretend we have a scope
+
             Assert.IsTrue(fs.FileExists("sub/f2.txt/f2.txt")); // other thread has written out to fs
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f3.txt", ms);
             Assert.IsFalse(fs.FileExists("sub/f3.txt"));
 
+            scope.Complete();
+
             try
             {
                 // no way this can work since we're trying to write a file
                 // but there's now a directory with the same name on the real fs
-                scope.Complete();
+                scope.Dispose();
                 Assert.Fail("Expected AggregateException.");
             }
             catch (AggregateException ae)
@@ -575,6 +601,26 @@ namespace Umbraco.Tests.IO
             path = NormPath(path);
             TestHelper.Try(() => Directory.Delete(path, true));
             TestHelper.TryAssert(() => Assert.IsFalse(File.Exists(path + "/test/inner/f3.txt")));
+        }
+
+        [Test]
+        public void MockTest()
+        {
+            var scoped = false;
+            var provider = MockScopeProvider(() => scoped);
+
+            Assert.IsFalse(provider.AmbientScope.ScopedFileSystems);
+            scoped = true;
+            Assert.IsTrue(provider.AmbientScope.ScopedFileSystems);
+        }
+
+        private static IScopeProviderInternal MockScopeProvider(Func<bool> f)
+        {
+            var scopeMock = new Mock<IScopeInternal>();
+            scopeMock.Setup(x => x.ScopedFileSystems).Returns(f);
+            var providerMock = new Mock<IScopeProviderInternal>();
+            providerMock.Setup(x => x.AmbientScope).Returns(scopeMock.Object);
+            return providerMock.Object;
         }
     }
 }

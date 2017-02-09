@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
@@ -161,6 +162,9 @@ namespace Umbraco.Core
     	/// Singleton accessor
     	/// </summary>
     	public static ApplicationContext Current { get; internal set; }
+
+        // fixme
+        internal IScopeProvider ScopeProvider { get { return _databaseContext == null ? null : _databaseContext.ScopeProvider; } }
 
 		/// <summary>
 		/// Returns the application wide cache accessor
@@ -418,10 +422,17 @@ namespace Umbraco.Core
                 this.ApplicationCache = null;
                 if (_databaseContext != null) //need to check the internal field here
                 {
+                    if (_databaseContext.ScopeProvider.AmbientScope != null)
+                    {
+                        var scope = _databaseContext.ScopeProvider.AmbientScope;
+                        scope.Dispose();
+                    }
+                    /*
                     if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.Database != null)
                     {
                         DatabaseContext.Database.Dispose();       
-                    }                    
+                    } 
+                    */                   
                 }
                 this.DatabaseContext = null;
                 this.Services = null;

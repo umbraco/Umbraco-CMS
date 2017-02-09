@@ -58,7 +58,7 @@ namespace Umbraco.Web.Cache
                     : (contentType is IMediaType)
                         ? typeof(IMediaType).Name
                         : typeof(IMemberType).Name,
-                DescendantPayloads = contentType.Descendants().Select(x => FromContentType(x)).ToArray(),
+                DescendantPayloads = contentType.Descendants(ApplicationContext.Current.Services.ContentTypeService).Select(x => FromContentType(x)).ToArray(),
                 WasDeleted = isDeleted,
                 PropertyRemoved = contentType.WasPropertyDirty("HasPropertyTypeBeenRemoved"),
                 AliasChanged = contentType.WasPropertyDirty("Alias"),

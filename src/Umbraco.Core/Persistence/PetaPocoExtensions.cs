@@ -183,16 +183,31 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="T"></typeparam>
         /// <param name="db"></param>
         /// <param name="collection"></param>
+        [Obsolete("Use the method that specifies an SqlSyntaxContext instance instead")]
         public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection)
         {
-            //don't do anything if there are no records.
-            if (collection.Any() == false)
-                return;
+            db.BulkInsertRecords(collection, null, SqlSyntaxContext.SqlSyntaxProvider, true, false);
+        }
 
-            using (var tr = db.GetTransaction())
-            {
-                db.BulkInsertRecords(collection, tr, SqlSyntaxContext.SqlSyntaxProvider, true, true); // use native, commit
-            }
+
+        /// <summary>
+        /// Performs the bulk insertion
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="db"></param>
+        /// <param name="collection"></param>
+        /// <param name="syntaxProvider"></param>
+        /// <param name="useNativeSqlPlatformBulkInsert">
+        /// If this is false this will try to just generate bulk insert statements instead of using the current SQL platform's bulk
+        /// insert logic. For SQLCE, bulk insert statements do not work so if this is false it will insert one at a time.
+        /// </param>
+        /// <returns>The number of items inserted</returns>
+        public static int BulkInsertRecords<T>(this Database db,
+            IEnumerable<T> collection,
+            ISqlSyntaxProvider syntaxProvider,
+            bool useNativeSqlPlatformBulkInsert = true)
+        {
+            return BulkInsertRecords<T>(db, collection, null, syntaxProvider, useNativeSqlPlatformBulkInsert, false);
         }
 
         /// <summary>
@@ -217,6 +232,8 @@ namespace Umbraco.Core.Persistence
             bool useNativeSqlPlatformBulkInsert = true,
             bool commitTrans = false)
         {
+            if (commitTrans && tr == null)
+                throw new ArgumentNullException("tr", "The transaction cannot be null if commitTrans is true.");
 
             //don't do anything if there are no records.
             if (collection.Any() == false)
@@ -267,6 +284,7 @@ namespace Umbraco.Core.Persistence
 
                 if (commitTrans)
                 {
+                    if (tr == null) throw new ArgumentNullException("The transaction cannot be null if commitTrans is true");
                     tr.Complete();
                 }
                 return processed;
@@ -275,6 +293,7 @@ namespace Umbraco.Core.Persistence
             {
                 if (commitTrans)
                 {
+                    if (tr == null) throw new ArgumentNullException("The transaction cannot be null if commitTrans is true");
                     tr.Dispose();
                 }
                 throw;

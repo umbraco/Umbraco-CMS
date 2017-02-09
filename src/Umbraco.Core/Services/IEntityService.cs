@@ -8,6 +8,20 @@ namespace Umbraco.Core.Services
     public interface IEntityService
     {
         /// <summary>
+        /// Returns true if the entity exists
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        bool Exists(Guid key);
+
+        /// <summary>
+        /// Returns true if the entity exists
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        bool Exists(int id);
+
+        /// <summary>
         /// Returns the integer id for a given GUID
         /// </summary>
         /// <param name="key"></param>
