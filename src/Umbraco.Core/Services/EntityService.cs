@@ -606,5 +606,27 @@ namespace Umbraco.Core.Services
 
             return attribute.ModelType;
         }
+
+        public bool Exists(Guid key)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                var exists = repository.Exists(key);
+                uow.Commit();
+                return exists;
+            }
+        }
+
+        public bool Exists(int id)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                var exists = repository.Exists(id);
+                uow.Commit();
+                return exists;
+            }
+        }
     }
 }

@@ -1004,7 +1004,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         Attempt<OperationStatus> IContentServiceOperations.MoveToRecycleBin(IContent content, int userId)
         {
-            return MoveToRecycleBinDo(content, userId, null);
+            return MoveToRecycleBinDo(content, userId, false);
         }
 
         /// <summary>
@@ -1013,14 +1013,12 @@ namespace Umbraco.Core.Services
         /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
         /// <param name="userId">Optional Id of the User deleting the Content</param>
-        /// <param name="ignoreDescendantIds">
-        /// Hack: A list of content ids to ignore for processing for the descendants of this content item. This is required 
-        /// for when a content type is deleted, we already know what content items will be deleted so we don't want to run 
-        /// any of the recycle bin logic and don't want to raise trashed events for them either since they are actually
-        /// going to be removed.
+        /// <param name="ignoreDescendants">
+        /// A boolean indicating to ignore this item's descendant list from also being moved to the recycle bin. This is required for the DeleteContentOfTypes method
+        /// because it has already looked up all descendant nodes that will need to be recycled
         /// TODO: Fix all of this, it will require a reasonable refactor and most of this stuff should be done at the repo level instead of service sub operations
         /// </param>
-        private Attempt<OperationStatus> MoveToRecycleBinDo(IContent content, int userId, int[] ignoreDescendantIds)
+        private Attempt<OperationStatus> MoveToRecycleBinDo(IContent content, int userId, bool ignoreDescendants)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (new WriteLock(Locker))
@@ -1041,7 +1039,7 @@ namespace Umbraco.Core.Services
                     };
 
                     //get descendents to process of the content item that is being moved to trash - must be done before changing the state below
-                    var descendants = GetDescendants(content).OrderBy(x => x.Level);
+                    var descendants = ignoreDescendants ? Enumerable.Empty<IContent>() : GetDescendants(content).OrderByDescending(x => x.Level);
 
                     //Do the updates for this item
                     var repository = RepositoryFactory.CreateContentRepository(uow);
@@ -1058,17 +1056,13 @@ namespace Umbraco.Core.Services
                     //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
                     foreach (var descendant in descendants)
                     {
-                        //don't perform processing on any of the ignored ids
-                        if (ignoreDescendantIds == null || ignoreDescendantIds.Contains(descendant.Id) == false)
-                        {
-                            //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
-                            UnPublish(descendant, userId);
-                            descendant.WriterId = userId;
-                            descendant.ChangeTrashedState(true, descendant.ParentId);
-                            repository.AddOrUpdate(descendant);
+                        //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
+                        UnPublish(descendant, userId);
+                        descendant.WriterId = userId;
+                        descendant.ChangeTrashedState(true, descendant.ParentId);
+                        repository.AddOrUpdate(descendant);
 
-                            moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));
-                        }
+                        moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));                        
                     }
 
                     uow.Commit();
@@ -1370,11 +1364,10 @@ namespace Umbraco.Core.Services
                 // nesting UOW works, it's just that the outer one NEEDS to be flushed beforehand
                 // nevertheless, it would be nicer to create a global scope and inner uow
 
-                //get the ids that are going to be deleted and ensure these are ignored for the recycle bin processing
-                var toDeleteIds = contentToDelete.Select(x => x.Id).ToArray();
-                foreach (var child in contentToRecycle)
+                //move each item to the bin starting with the deepest items
+                foreach (var child in contentToRecycle.OrderByDescending(x => x.Level))
                 {
-                    MoveToRecycleBinDo(child, userId, toDeleteIds);
+                    MoveToRecycleBinDo(child, userId, true);
                 }
 
                 foreach (var content in contentToDelete)

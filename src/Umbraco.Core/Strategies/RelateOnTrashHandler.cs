@@ -33,6 +33,7 @@ namespace Umbraco.Core.Strategies
         private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e)
         {
             var relationService = ApplicationContext.Current.Services.RelationService;
+            var entityService = ApplicationContext.Current.Services.EntityService;
             var relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
             var relationType = relationService.GetRelationTypeByAlias(relationTypeAlias);
 
@@ -53,14 +54,22 @@ namespace Umbraco.Core.Strategies
                     ? int.Parse(originalPath[originalPath.Count - 2])
                     : Constants.System.Root;
 
-                // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
-                var relation = new Relation(originalParentId, item.Entity.Id, relationType);
-                relationService.Save(relation);
+                //before we can create this relation, we need to ensure that the original parent still exists which
+                //may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
 
-                ApplicationContext.Current.Services.AuditService.Add(AuditType.Delete,
-                    string.Format("Trashed content with Id: '{0}' related to original parent content with Id: '{1}'", item.Entity.Id, originalParentId),
-                    item.Entity.WriterId,
-                    item.Entity.Id);
+                if (entityService.Exists(originalParentId))
+                {
+                    // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
+                    var relation = new Relation(originalParentId, item.Entity.Id, relationType);
+                    relationService.Save(relation);
+
+                    ApplicationContext.Current.Services.AuditService.Add(AuditType.Delete,
+                        string.Format("Trashed content with Id: '{0}' related to original parent content with Id: '{1}'", item.Entity.Id, originalParentId),
+                        item.Entity.WriterId,
+                        item.Entity.Id);
+                }
+
+                
             }
         }
     }

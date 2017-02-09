@@ -168,7 +168,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items()
+        public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_1()
         {
             ContentService.Trashed += ContentServiceOnTrashed;
 
@@ -191,6 +191,7 @@ namespace Umbraco.Tests.Services
                         var contentType = contentTypes[index];
                         var contentItem = MockedContent.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
                         ServiceContext.ContentService.Save(contentItem);
+                        ServiceContext.ContentService.Publish(contentItem);
                         parentId = contentItem.Id;
                     }
                 }
@@ -199,6 +200,43 @@ namespace Umbraco.Tests.Services
                 {
                     ServiceContext.ContentTypeService.Delete(contentType);
                 }
+            }
+            finally
+            {
+                ContentService.Trashed -= ContentServiceOnTrashed;
+            }
+        }
+
+        [Test]
+        public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_2()
+        {
+            ContentService.Trashed += ContentServiceOnTrashed;
+
+            try
+            {
+                IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
+                ServiceContext.ContentTypeService.Save(contentType1);
+                IContentType contentType2 = MockedContentTypes.CreateSimpleContentType("test2", "Test2");
+                ServiceContext.ContentTypeService.Save(contentType2);
+                IContentType contentType3 = MockedContentTypes.CreateSimpleContentType("test3", "Test3");
+                ServiceContext.ContentTypeService.Save(contentType3);
+
+                var root = MockedContent.CreateSimpleContent(contentType1, "Root", -1);
+                ServiceContext.ContentService.Save(root);
+                ServiceContext.ContentService.Publish(root);
+                
+                var level1 = MockedContent.CreateSimpleContent(contentType2, "L1", root.Id);
+                ServiceContext.ContentService.Save(level1);
+                ServiceContext.ContentService.Publish(level1);
+
+                for (int i = 0; i < 2; i++)
+                {
+                    var level3 = MockedContent.CreateSimpleContent(contentType3, "L2" + i, level1.Id);
+                    ServiceContext.ContentService.Save(level3);
+                    ServiceContext.ContentService.Publish(level3);
+                }
+
+                ServiceContext.ContentTypeService.Delete(contentType1);
             }
             finally
             {

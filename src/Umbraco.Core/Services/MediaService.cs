@@ -998,11 +998,10 @@ namespace Umbraco.Core.Services
                 // nesting UOW works, it's just that the outer one NEEDS to be flushed beforehand
                 // nevertheless, it would be nicer to create a global scope and inner uow
 
-                //get the ids that are going to be deleted and ensure these are ignored for the recycle bin processing
-                var toDeleteIds = mediaToDelete.Select(x => x.Id).ToArray();
-                foreach (var child in mediaToRecycle)
+                //move each item to the bin starting with the deepest items
+                foreach (var child in mediaToRecycle.OrderByDescending(x => x.Level))
                 {
-                    MoveToRecycleBinDo(child, userId, toDeleteIds);
+                    MoveToRecycleBinDo(child, userId, true);
                 }
 
                 foreach (var content in mediaToDelete)
@@ -1038,7 +1037,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the User deleting the Media</param>
         Attempt<OperationStatus> IMediaServiceOperations.MoveToRecycleBin(IMedia media, int userId)
         {
-            return MoveToRecycleBinDo(media, userId, null);
+            return MoveToRecycleBinDo(media, userId, false);
         }
 
         /// <summary>
@@ -1046,14 +1045,12 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        /// <param name="ignoreDescendantIds">
-        /// Hack: A list of content ids to ignore for processing for the descendants of this content item. This is required 
-        /// for when a content type is deleted, we already know what content items will be deleted so we don't want to run 
-        /// any of the recycle bin logic and don't want to raise trashed events for them either since they are actually
-        /// going to be removed.
+        /// <param name="ignoreDescendants">
+        /// A boolean indicating to ignore this item's descendant list from also being moved to the recycle bin. This is required for the DeleteContentOfTypes method
+        /// because it has already looked up all descendant nodes that will need to be recycled
         /// TODO: Fix all of this, it will require a reasonable refactor and most of this stuff should be done at the repo level instead of service sub operations
         /// </param>
-        private Attempt<OperationStatus> MoveToRecycleBinDo(IMedia media, int userId, int[] ignoreDescendantIds)
+        private Attempt<OperationStatus> MoveToRecycleBinDo(IMedia media, int userId, bool ignoreDescendants)
         {
             if (media == null) throw new ArgumentNullException("media");
             var evtMsgs = EventMessagesFactory.Get();
@@ -1076,7 +1073,7 @@ namespace Umbraco.Core.Services
                     };
 
                     //get descendents to process of the content item that is being moved to trash - must be done before changing the state below
-                    var descendants = GetDescendants(media).OrderBy(x => x.Level);
+                    var descendants = ignoreDescendants ? Enumerable.Empty<IMedia>() : GetDescendants(media).OrderByDescending(x => x.Level);
 
                     //Do the updates for this item
                     var repository = RepositoryFactory.CreateMediaRepository(uow);
@@ -1087,15 +1084,11 @@ namespace Umbraco.Core.Services
                     //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
                     foreach (var descendant in descendants)
                     {
-                        //don't perform processing on any of the ignored ids
-                        if (ignoreDescendantIds == null || ignoreDescendantIds.Contains(descendant.Id) == false)
-                        {
-                            repository.DeleteContentXml(descendant);
-                            descendant.ChangeTrashedState(true, descendant.ParentId);
-                            repository.AddOrUpdate(descendant);
+                        repository.DeleteContentXml(descendant);
+                        descendant.ChangeTrashedState(true, descendant.ParentId);
+                        repository.AddOrUpdate(descendant);
 
-                            moveInfo.Add(new MoveEventInfo<IMedia>(descendant, descendant.Path, descendant.ParentId));
-                        }
+                        moveInfo.Add(new MoveEventInfo<IMedia>(descendant, descendant.Path, descendant.ParentId));
                     }
 
                     uow.Commit();
