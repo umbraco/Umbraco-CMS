@@ -109,5 +109,24 @@ namespace Umbraco.Core.IO
 	        var wrapped2 = Wrapped as IFileSystem2;
 	        return wrapped2 == null ? Wrapped.GetSize(path) : wrapped2.GetSize(path);
 	    }
+
+        // explicitely implementing - not breaking
+        bool IFileSystem2.CanAddPhysical
+	    {
+	        get
+	        {
+                var wrapped2 = Wrapped as IFileSystem2;
+	            return wrapped2 != null && wrapped2.CanAddPhysical;
+	        }
+        }
+
+        // explicitely implementing - not breaking
+	    void IFileSystem2.AddFile(string path, string physicalPath, bool overrideIfExists, bool copy)
+	    {
+            var wrapped2 = Wrapped as IFileSystem2;
+            if (wrapped2 == null)
+                throw new NotSupportedException();
+	        wrapped2.AddFile(path, physicalPath, overrideIfExists, copy);
+	    }
     }
 }

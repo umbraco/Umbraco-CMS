@@ -164,5 +164,22 @@ namespace Umbraco.Core.IO
             var filesystem2 = filesystem as IFileSystem2;
             return filesystem2 == null ? filesystem.GetSize(path) : filesystem2.GetSize(path);
         }
+
+        public bool CanAddPhysical
+        {
+            get
+            {
+                var fileSystem2 = FileSystem as IFileSystem2;
+                return fileSystem2 != null && fileSystem2.CanAddPhysical;
+            }
+        }
+
+        public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
+        {
+            var fileSystem2 = FileSystem as IFileSystem2;
+            if (fileSystem2 == null)
+                throw new NotSupportedException();
+            fileSystem2.AddFile(path, physicalPath, overrideIfExists, copy);
+        }
     }
 }
