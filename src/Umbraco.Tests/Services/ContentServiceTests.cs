@@ -1319,7 +1319,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(content.ParentId, Is.EqualTo(-20));
             Assert.That(content.Trashed, Is.True);
-            Assert.That(descendants.Count(), Is.EqualTo(3));
+            Assert.That(descendants.Count, Is.EqualTo(3));
             Assert.That(descendants.Any(x => x.Path.Contains("-20") == false), Is.False);
 
             //Empty Recycle Bin

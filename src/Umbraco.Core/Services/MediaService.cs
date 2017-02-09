@@ -1072,8 +1072,9 @@ namespace Umbraco.Core.Services
                         new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)
                     };
 
-                    //get descendents to process of the content item that is being moved to trash - must be done before changing the state below
-                    var descendants = ignoreDescendants ? Enumerable.Empty<IMedia>() : GetDescendants(media).OrderByDescending(x => x.Level);
+                    //get descendents to process of the content item that is being moved to trash - must be done before changing the state below, 
+                    //must be processed with shallowest levels first
+                    var descendants = ignoreDescendants ? Enumerable.Empty<IMedia>() : GetDescendants(media).OrderBy(x => x.Level);
 
                     //Do the updates for this item
                     var repository = RepositoryFactory.CreateMediaRepository(uow);
