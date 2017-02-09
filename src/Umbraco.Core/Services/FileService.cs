@@ -819,40 +819,10 @@ namespace Umbraco.Core.Services
                     return Attempt<IPartialView>.Fail();
             }
 
-            string partialViewHeader;
-            switch (partialViewType)
-            {
-                case PartialViewType.PartialView:
-                    partialViewHeader = PartialViewHeader;
-                    break;
-                case PartialViewType.PartialViewMacro:
-                    partialViewHeader = PartialViewMacroHeader;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("partialViewType");
-            }
-
             if (snippetName.IsNullOrWhiteSpace() == false)
             {
-                //create the file
-                var snippetPathAttempt = TryGetSnippetPath(snippetName);
-                if (snippetPathAttempt.Success == false)
-                {
-                    throw new InvalidOperationException("Could not load snippet with name " + snippetName);
-                }
+                partialView.Content = GetPartialViewMacroSnippetContent(snippetName, partialViewType);
 
-                using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result)))
-                {
-                    var snippetContent = snippetFile.ReadToEnd().Trim();
-
-                    //strip the @inherits if it's there
-                    snippetContent = StripPartialViewHeader(snippetContent);
-
-                    var content = string.Format("{0}{1}{2}",
-                        partialViewHeader,
-                        Environment.NewLine, snippetContent);
-                    partialView.Content = content;
-                }
             }
 
             using (var uow = _fileUowProvider.GetUnitOfWork())
@@ -995,6 +965,55 @@ namespace Umbraco.Core.Services
             {
                 var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, uow);
                 return repository.GetFileContentStream(filepath);
+            }
+        }
+
+        public string GetPartialViewSnippetContent(string snippetName)
+        {
+            return GetPartialViewMacroSnippetContent(snippetName, PartialViewType.PartialView);
+        }
+
+        public string GetPartialViewMacroSnippetContent(string snippetName)
+        {
+            return GetPartialViewMacroSnippetContent(snippetName, PartialViewType.PartialViewMacro);
+        }
+
+        private string GetPartialViewMacroSnippetContent(string snippetName, PartialViewType partialViewType)
+        {
+            if (snippetName.IsNullOrWhiteSpace())
+                throw new ArgumentNullException("snippetName");
+
+            string partialViewHeader;
+            switch (partialViewType)
+            {
+                case PartialViewType.PartialView:
+                    partialViewHeader = PartialViewHeader;
+                    break;
+                case PartialViewType.PartialViewMacro:
+                    partialViewHeader = PartialViewMacroHeader;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("partialViewType");
+            }
+
+            // Try and get the snippet path
+            var snippetPathAttempt = TryGetSnippetPath(snippetName);
+            if (snippetPathAttempt.Success == false)
+            {
+                throw new InvalidOperationException("Could not load snippet with name " + snippetName);
+            }
+
+            using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result)))
+            {
+                var snippetContent = snippetFile.ReadToEnd().Trim();
+
+                //strip the @inherits if it's there
+                snippetContent = StripPartialViewHeader(snippetContent);
+
+                var content = string.Format("{0}{1}{2}",
+                    partialViewHeader,
+                    Environment.NewLine, snippetContent);
+                return content;
             }
         }
 

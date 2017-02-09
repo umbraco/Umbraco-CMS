@@ -227,15 +227,25 @@
         function init() {
             //we need to load this somewhere, for now its here.
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+
             if ($routeParams.create) {
-                codefileResource.getScaffold().then(function (partialView) {
+                
+                var snippet = "Empty";
+
+                if($routeParams.snippet) {
+                    snippet = $routeParams.snippet;
+                }
+
+                codefileResource.getScaffold("partialViews", $routeParams.id, snippet).then(function (partialView) {
                     ready(partialView);
                 });
+                
             } else {
                 codefileResource.getByPath('partialViews', $routeParams.id).then(function (partialView) {
                     ready(partialView);
                 });
             }
+
         }
 
         function ready(partialView) {
