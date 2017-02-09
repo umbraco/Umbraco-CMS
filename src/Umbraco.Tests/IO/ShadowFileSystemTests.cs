@@ -624,6 +624,10 @@ namespace Umbraco.Tests.IO
             return providerMock.Object;
         }
 
+        /// <summary>
+        /// Check that GetFiles will return all files on the shadow, while returning
+        /// just one on each of the filesystems used by the shadow.
+        /// </summary>
         [Test]
         public void ShadowGetFiles()
         {
@@ -649,13 +653,18 @@ namespace Umbraco.Tests.IO
             var getFilesWithFilter = ss.GetFiles(string.Empty, "*");
             Assert.AreEqual(2, getFilesWithFilter.Count());
             
-            // ensure there's only one file on each of the filesystems used by the shadow
             var fsFiles = fs.GetFiles(string.Empty).ToArray();
             Assert.AreEqual(1, fsFiles.Length);
             var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
             Assert.AreEqual(1, sfsFiles.Length);
         }
 
+        /// <summary>
+        /// Returns the full paths of the files on the disk.
+        /// Note that this will be the *actual* path of the file, meaning a file existing on the initialized FS
+        /// will be in one location, while a file written after initializing the shadow, will exist at the
+        /// shadow location directory.
+        /// </summary>
         [Test]
         public void ShadowGetFullPath()
         {
@@ -675,11 +684,48 @@ namespace Umbraco.Tests.IO
                 ss.AddFile("f2.txt", ms);
 
             // Assert
-            // ensure the files are located at the expected locations on the actual filesystem
             var f1FullPath = ss.GetFullPath("f1.txt");
             var f2FullPath = ss.GetFullPath("f2.txt");
             Assert.AreEqual(Path.Combine(path, "ShadowTests", "f1.txt"), f1FullPath);
             Assert.AreEqual(Path.Combine(path, "ShadowSystem", "f2.txt"), f2FullPath);
+        }
+
+        /// <summary>
+        /// Returns the path relative to the filesystem root
+        /// </summary>
+        /// <remarks>
+        /// This test is kinda irrelevant with the current implementation.
+        /// We do tests that the files are written to the correct places and the relative path is returned correct,
+        /// but GetRelativePath is currently really just string manipulation so files are not actually hit by the code.
+        /// Leaving the file stuff in here for now in case the method becomes more clever at some point.
+        /// </remarks>
+        [Test]
+        public void ShadowGetRelativePath()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f2.txt", ms);
+
+            // Assert
+            var f1RelativePath = ss.GetRelativePath("f1.txt");
+            var f2RelativePath = ss.GetRelativePath("f2.txt");
+            Assert.AreEqual("f1.txt", f1RelativePath);
+            Assert.AreEqual("f2.txt", f2RelativePath);
+            Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowTests", "f1.txt")));
+            Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowTests", "f2.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowSystem", "f2.txt")));
+            Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowSystem", "f1.txt")));
         }
     }
 }
