@@ -201,19 +201,19 @@ namespace Umbraco.Core.IO
 
         public IEnumerable<string> GetFiles(string path)
         {
+            return GetFiles(path, null);
+        }
+
+        public IEnumerable<string> GetFiles(string path, string filter)
+        {
             var normPath = NormPath(path);
             var shadows = Nodes.Where(kvp => IsChild(normPath, kvp.Key)).ToArray();
-            var files = _fs.GetFiles(path);
+            var files = filter != null ? _fs.GetFiles(path, filter) : _fs.GetFiles(path);
             return files
                 .Except(shadows.Where(kvp => (kvp.Value.IsFile && kvp.Value.IsDelete) || kvp.Value.IsDir)
                     .Select(kvp => kvp.Key))
                 .Union(shadows.Where(kvp => kvp.Value.IsFile && kvp.Value.IsExist).Select(kvp => kvp.Key))
                 .Distinct();
-        }
-
-        public IEnumerable<string> GetFiles(string path, string filter)
-        {
-            return _fs.GetFiles(path, filter);
         }
 
         public Stream OpenFile(string path)

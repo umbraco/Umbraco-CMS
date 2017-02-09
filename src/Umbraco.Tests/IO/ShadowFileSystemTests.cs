@@ -381,7 +381,7 @@ namespace Umbraco.Tests.IO
 
             var fs = new PhysicalFileSystem(path, "ignore");
             var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
-            var swa = new[] { sw };
+            var swa = new[] {sw};
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);
@@ -462,7 +462,7 @@ namespace Umbraco.Tests.IO
 
             var fs = new PhysicalFileSystem(path, "ignore");
             var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
-            var swa = new[] { sw };
+            var swa = new[] {sw};
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);
@@ -511,7 +511,7 @@ namespace Umbraco.Tests.IO
 
             var fs = new PhysicalFileSystem(path, "ignore");
             var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
-            var swa = new[] { sw };
+            var swa = new[] {sw};
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);
@@ -621,6 +621,31 @@ namespace Umbraco.Tests.IO
             var providerMock = new Mock<IScopeProviderInternal>();
             providerMock.Setup(x => x.AmbientScope).Returns(scopeMock.Object);
             return providerMock.Object;
+        }
+
+        [Test]
+        public void ShadowGetFiles()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.txt", ms);
+
+            // Assert
+            var getFiles = ss.GetFiles(string.Empty);
+            Assert.AreEqual(2, getFiles.Count());
+            var getFilesWithFilter = ss.GetFiles(string.Empty, "*");
+            Assert.AreEqual(2, getFilesWithFilter.Count());
         }
     }
 }
