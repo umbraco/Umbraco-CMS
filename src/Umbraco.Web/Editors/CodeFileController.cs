@@ -57,6 +57,61 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Used to create a container/folder in 'partialViews', 'partialViewMacros' or 'scripts'
+        /// </summary>
+        /// <param name="type">'partialViews', 'partialViewMacros' or 'scripts'</param>
+        /// <param name="parentId">The virtual path of the parent.</param>
+        /// <param name="name">The name of the container/folder</param>
+        /// <returns></returns>
+        [HttpPost]
+        public CodeFileDisplay PostCreateContainer(string type, string parentId, string name)
+        {
+            if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(name))
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+
+            // if the parentId is root (-1) then we just need an empty string as we are 
+            // creating the path below and we don't wan't -1 in the path
+            if (parentId == Core.Constants.System.Root.ToInvariantString())
+            {
+                parentId = string.Empty;
+            }
+
+            name = System.Web.HttpUtility.UrlDecode(name);
+
+            if (parentId.IsNullOrWhiteSpace() == false)
+            {
+                parentId = System.Web.HttpUtility.UrlDecode(parentId);
+                name = parentId.EnsureEndsWith("/") + name;
+            }
+
+            var virtualPath = string.Empty;
+            switch (type)
+            {
+                case Core.Constants.Trees.PartialViews:
+                    virtualPath = NormalizeVirtualPath(name, SystemDirectories.PartialViews);
+                    Services.FileService.CreatePartialViewFolder(virtualPath);
+                    break;
+                case Core.Constants.Trees.PartialViewMacros:
+                    virtualPath = NormalizeVirtualPath(name, SystemDirectories.MacroPartials);
+                    Services.FileService.CreatePartialViewMacroFolder(virtualPath);
+                    break;
+                case Core.Constants.Trees.Scripts:
+                    virtualPath = NormalizeVirtualPath(name, SystemDirectories.Scripts);
+                    Services.FileService.CreateScriptFolder(virtualPath);
+                    break;
+
+            }
+
+            return new CodeFileDisplay
+            {
+                VirtualPath = virtualPath,
+                Path = Url.GetTreePathFromFilePath(virtualPath)
+            };
+        }
+
+        /// <summary>
         /// Used to get a specific file from disk via the FileService
         /// </summary>
         /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
@@ -70,7 +125,6 @@ namespace Umbraco.Web.Editors
             }
 
             virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
-            
 
             switch (type)
             {
