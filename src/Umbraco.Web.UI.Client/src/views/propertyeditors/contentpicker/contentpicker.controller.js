@@ -241,26 +241,36 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         unsubscribe();
     });
 
-    //load current data
+    
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
-    entityResource.getByIds(modelIds, entityType).then(function (data) {
+    //load current data if anything selected
+    if (modelIds.length > 0) {
+        entityResource.getByIds(modelIds, entityType).then(function(data) {
 
-        _.each(modelIds, function (id, i) {
-            var entity = _.find(data, function (d) {                
-                return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
-            });
-        
-            if (entity) {
-                setEntityUrl(entity);
-            }
-           
-         });
+            _.each(modelIds,
+                function(id, i) {
+                    var entity = _.find(data,
+                        function(d) {
+                            return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
+                        });
 
+                    if (entity) {
+                        setEntityUrl(entity);
+                    }
+
+                });
+
+            //everything is loaded, start the watch on the model
+            startWatch();
+
+        });
+    }
+    else {
         //everything is loaded, start the watch on the model
         startWatch();
-
-    });
+    }
+    
 
     function setEntityUrl(entity) {
 
