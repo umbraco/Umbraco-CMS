@@ -336,8 +336,9 @@ namespace Umbraco.Tests.IO
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 ss.AddFile("path/to/some/dir/f1.txt", ms);
 
+            // file is only written to the shadow fs
             Assert.IsTrue(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt"));
-
+            Assert.IsFalse(File.Exists(path + "/ShadowTests/path/to/some/dir/f1.txt"));
             // let the shadow fs die
         }
 
@@ -642,10 +643,17 @@ namespace Umbraco.Tests.IO
                 ss.AddFile("f1.txt", ms);
 
             // Assert
+            // ensure we get 2 files from the shadow
             var getFiles = ss.GetFiles(string.Empty);
             Assert.AreEqual(2, getFiles.Count());
             var getFilesWithFilter = ss.GetFiles(string.Empty, "*");
             Assert.AreEqual(2, getFilesWithFilter.Count());
+            
+            // ensure there's only one file on each of the filesystems used by the shadow
+            var fsFiles = fs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(1, fsFiles.Length);
+            var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(1, sfsFiles.Length);
         }
     }
 }
