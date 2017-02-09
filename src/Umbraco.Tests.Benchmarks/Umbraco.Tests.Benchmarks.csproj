@@ -85,12 +85,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeepCloneBenchmarks.cs" />
     <Compile Include="LinqCastBenchmarks.cs" />
     <Compile Include="ModelToSqlExpressionHelperBenchmarks.cs" />
     <Compile Include="BulkInsertBenchmarks.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlBenchmarks.cs" />
+    <Compile Include="XmlPublishedContentInitBenchmarks.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -104,6 +106,10 @@
     <ProjectReference Include="..\Umbraco.Tests\Umbraco.Tests.csproj">
       <Project>{5d3b8245-ada6-453f-a008-50ed04bfe770}</Project>
       <Name>Umbraco.Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
+      <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
+      <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
