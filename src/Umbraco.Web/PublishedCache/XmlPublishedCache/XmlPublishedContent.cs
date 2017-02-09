@@ -374,56 +374,61 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 _isDraft = (_xmlNode.Attributes.GetNamedItem("isDraft") != null);
             }
 
-		    // load data
-            //var dataXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
-		    //var nodes = _xmlNode.SelectNodes(dataXPath);
-		    var nodes = new List<XmlNode>();
+		    //dictionary to store the property node data
+            var propertyNodes = new Dictionary<string, XmlNode>();                     
 
-		    var legacy = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
+            var legacy = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
             foreach (XmlNode n in _xmlNode.ChildNodes)
             {
                 var e = n as XmlElement;
                 if (e == null) continue;
 		        if (legacy)
 		        {
-		            if (n.Name == "data") nodes.Add(n);
-		            else break;
-		        }
+		            if (n.Name == "data")
+		            {
+		                PopulatePropertyNodes(propertyNodes, e);
+		            }
+		            else break; //we are not longer on property elements
+                }
 		        else
 		        {
-		            if (e.HasAttribute("isDoc") == false) nodes.Add(n);
-		            else break;
+		            if (e.HasAttribute("isDoc") == false)
+		            {
+                        PopulatePropertyNodes(propertyNodes, e);
+		            }
+		            else break; //we are not longer on property elements
 		        }
 		    }
 
-		    _contentType = PublishedContentType.Get(PublishedItemType.Content, _docTypeAlias);
+            //lookup the content type and create the properties collection
+            _contentType = PublishedContentType.Get(PublishedItemType.Content, _docTypeAlias);
+            _properties = new Dictionary<string, IPublishedProperty>(StringComparer.OrdinalIgnoreCase);
 
-		    var propertyNodes = new Dictionary<string, XmlNode>();
-            if (nodes != null)
-                foreach (XmlNode n in nodes)
-                {
-                    var attrs = n.Attributes;
-                    if (attrs == null) continue;
-                    var alias = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                        ? attrs.GetNamedItem("alias").Value
-                        : n.Name;
-                    propertyNodes[alias.ToLowerInvariant()] = n;
-                }
-
-		    _properties = _contentType.PropertyTypes.Select(p =>
+            //fill in the property collection
+		    foreach (var propertyType in _contentType.PropertyTypes)
 		    {
-		        XmlNode n;
-		        return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
-		            ? new XmlPublishedProperty(p, _isPreviewing, n)
-		            : new XmlPublishedProperty(p, _isPreviewing);
-		    }).Cast<IPublishedProperty>().ToDictionary(
-		        x => x.PropertyTypeAlias,
-		        x => x,
-		        StringComparer.OrdinalIgnoreCase);
+                XmlNode n;
+		        var val = propertyNodes.TryGetValue(propertyType.PropertyTypeAlias.ToLowerInvariant(), out n)
+		            ? new XmlPublishedProperty(propertyType, _isPreviewing, n)
+		            : new XmlPublishedProperty(propertyType, _isPreviewing);
+
+		        _properties[propertyType.PropertyTypeAlias] = val;
+		    }
 
             // warn: this is not thread-safe...
             _nodeInitialized = true;
 		}
+
+        private void PopulatePropertyNodes(IDictionary<string, XmlNode> propertyNodes, XmlNode n)
+        {
+            var attrs = n.Attributes;
+	        if (attrs == null) return;
+
+            var alias = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                ? attrs.GetNamedItem("alias").Value
+                : n.Name;
+            propertyNodes[alias.ToLowerInvariant()] = n;
+        }
 
 	    private void InitializeChildren()
 	    {
