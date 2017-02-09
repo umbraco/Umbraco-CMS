@@ -85,12 +85,15 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
 
     //load media data
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
-    entityResource.getByIds(modelIds, dialogOptions.entityType).then(function (data) {
-        _.each(data, function (item, i) {
-            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
+    if (modelIds.length > 0) {
+        entityResource.getByIds(modelIds, dialogOptions.entityType).then(function (data) {
+            _.each(data, function (item, i) {
+                item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+                $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
+            });
         });
-    });
+    }
+    
     
 }
 
