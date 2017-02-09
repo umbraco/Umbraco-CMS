@@ -245,6 +245,9 @@ namespace Umbraco.Core.IO
 
         public string GetFullPath(string path)
         {
+            ShadowNode sf;
+            if (Nodes.TryGetValue(NormPath(path), out sf))
+                return sf.IsDir || sf.IsDelete ? null : _sfs.GetFullPath(path);
             return _fs.GetFullPath(path);
         }
 

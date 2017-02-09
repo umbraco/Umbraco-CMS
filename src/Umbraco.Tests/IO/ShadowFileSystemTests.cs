@@ -655,5 +655,31 @@ namespace Umbraco.Tests.IO
             var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
             Assert.AreEqual(1, sfsFiles.Length);
         }
+
+        [Test]
+        public void ShadowGetFullPath()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f2.txt", ms);
+
+            // Assert
+            // ensure the files are located at the expected locations on the actual filesystem
+            var f1FullPath = ss.GetFullPath("f1.txt");
+            var f2FullPath = ss.GetFullPath("f2.txt");
+            Assert.AreEqual(Path.Combine(path, "ShadowTests", "f1.txt"), f1FullPath);
+            Assert.AreEqual(Path.Combine(path, "ShadowSystem", "f2.txt"), f2FullPath);
+        }
     }
 }
