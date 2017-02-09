@@ -45,6 +45,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
@@ -86,17 +87,16 @@ namespace Umbraco.Web
         /// Creates and returns the service context for the app
         /// </summary>
         /// <param name="dbContext"></param>
-        /// <param name="dbFactory"></param>
+        /// <param name="scopeProvider"></param>
         /// <returns></returns>
-        protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
+        protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IScopeProvider scopeProvider)
         {
             //use a request based messaging factory
             var evtMsgs = new RequestLifespanMessagesFactory(new SingletonHttpContextAccessor());
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
-                new PetaPocoUnitOfWorkProvider(dbFactory),
-                new FileUnitOfWorkProvider(),
-                new PublishingStrategy(evtMsgs, ProfilingLogger.Logger),
+                new PetaPocoUnitOfWorkProvider(scopeProvider),
+                new FileUnitOfWorkProvider(scopeProvider),
                 ApplicationCache,
                 ProfilingLogger.Logger,
                 evtMsgs);

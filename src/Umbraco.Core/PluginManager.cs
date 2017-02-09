@@ -420,18 +420,31 @@ namespace Umbraco.Core
         internal void UpdateCachedPluginsFile<T>(IEnumerable<Type> typesFound, TypeResolutionKind resolutionType)
         {
             var filePath = GetPluginListFilePath();
-            XDocument xml;
-            try
+            XDocument xml = null;
+
+            if (File.Exists(filePath))
             {
-                xml = XDocument.Load(filePath);
+                try
+                {
+                    xml = XDocument.Load(filePath);
+                }
+                catch
+                {
+                    try
+                    {
+                        File.Delete(filePath); // file is corrupt somehow
+                    }
+                    catch
+                    {
+                        // on-purpose, does not matter
+                    }
+                    xml = null;
+                }
             }
-            catch
-            {
-                //if there's an exception loading then this is somehow corrupt, we'll just replace it.
-                File.Delete(filePath);
-                //create the document and the root
-                xml = new XDocument(new XElement("plugins"));
-            }
+
+            // else replace the xml, create the document and the root
+            if (xml == null) xml = new XDocument(new XElement("plugins"));
+
             if (xml.Root == null)
             {
                 //if for some reason there is no root, create it
@@ -458,6 +471,9 @@ namespace Umbraco.Core
             //now we have the type element, we need to clear any previous types as children and add/update it with new ones
             typeElement.ReplaceNodes(typesFound.Select(x => new XElement("add", new XAttribute("type", x.AssemblyQualifiedName))));
             //save the xml file
+            var dir = Path.GetDirectoryName(filePath);
+            if (Directory.Exists(dir) == false)
+                Directory.CreateDirectory(dir);
             xml.Save(filePath);
         }
 

@@ -24,6 +24,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -70,7 +71,12 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbConnectionString(),
                 GetDbProviderName(),
                 Logger);
-            _dbFactory.ResetForTests();
+
+            // fixme - bah - this is needed to reset static properties? Stephen to update this note
+            var scopeProvider = new ScopeProvider(null);
+            if (scopeProvider.AmbientScope != null)
+                scopeProvider.AmbientScope.Dispose();
+            scopeProvider.AmbientScope = null;
 
             base.Initialize();
 
@@ -92,11 +98,12 @@ namespace Umbraco.Tests.TestHelpers
             var repositoryFactory = new RepositoryFactory(CacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
 
             var evtMsgs = new TransientMessagesFactory();
+            var scopeProvider = new ScopeProvider(_dbFactory);
             _appContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(_dbFactory, Logger, SqlSyntax, GetDbProviderName()),
+                new DatabaseContext(scopeProvider, Logger, SqlSyntax, GetDbProviderName()),
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), new FileUnitOfWorkProvider(scopeProvider), CacheHelper, Logger, evtMsgs),
                 CacheHelper,
                 ProfilingLogger)
             {
@@ -273,9 +280,9 @@ namespace Umbraco.Tests.TestHelpers
                 _isFirstTestInFixture = false; //ensure this is false before anything!
 
                 if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
-                {
-                    RemoveDatabaseFile();
-                }
+                    RemoveDatabaseFile(); // closes connections too
+                else
+                    CloseDbConnections();
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
@@ -287,10 +294,14 @@ namespace Umbraco.Tests.TestHelpers
 
         private void CloseDbConnections()
         {
-            //Ensure that any database connections from a previous test is disposed.
-            //This is really just double safety as its also done in the TearDown.
-            if (ApplicationContext != null && DatabaseContext != null && DatabaseContext.Database != null)
-                DatabaseContext.Database.Dispose();
+            // just to be sure, although it's also done in TearDown
+            if (ApplicationContext != null
+                && ApplicationContext.DatabaseContext != null
+                && ApplicationContext.DatabaseContext.ScopeProvider != null)
+            {
+                ApplicationContext.DatabaseContext.ScopeProvider.Reset();
+            }
+
             SqlCeContextGuardian.CloseBackgroundConnection();
         }
 
@@ -341,12 +352,7 @@ namespace Umbraco.Tests.TestHelpers
                     onFail(ex);
             }
         }
-
-        protected ServiceContext ServiceContext
-        {
-            get { return ApplicationContext.Services; }
-        }
-
+        
         protected DatabaseContext DatabaseContext
         {
             get { return ApplicationContext.DatabaseContext; }

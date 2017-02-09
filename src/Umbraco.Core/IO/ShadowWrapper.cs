@@ -2,20 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.IO
 {
     internal class ShadowWrapper : IFileSystem2
     {
+        private readonly IScopeProviderInternal _scopeProvider;
         private readonly IFileSystem _innerFileSystem;
         private readonly string _shadowPath;
         private ShadowFileSystem _shadowFileSystem;
         private string _shadowDir;
 
-        public ShadowWrapper(IFileSystem innerFileSystem, string shadowPath)
+        public ShadowWrapper(IFileSystem innerFileSystem, string shadowPath, IScopeProviderInternal scopeProvider)
         {
             _innerFileSystem = innerFileSystem;
             _shadowPath = shadowPath;
+            _scopeProvider = scopeProvider;
         }
 
         internal void Shadow(Guid id)
@@ -62,7 +65,14 @@ namespace Umbraco.Core.IO
 
         private IFileSystem FileSystem
         {
-            get { return ShadowFileSystemsScope.NoScope ? _innerFileSystem : _shadowFileSystem; }
+            get
+            {
+                var isScoped = _scopeProvider != null && _scopeProvider.AmbientScope != null && _scopeProvider.AmbientScope.ScopedFileSystems;
+
+                return isScoped
+                    ? _shadowFileSystem
+                    : _innerFileSystem;
+            }
         }
 
         public IEnumerable<string> GetDirectories(string path)

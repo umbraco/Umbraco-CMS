@@ -15,5 +15,19 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params Guid[] keys);
         IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query);
         IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId);
+
+        /// <summary>
+        /// Returns true if the entity exists
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        bool Exists(Guid key);
+
+        /// <summary>
+        /// Returns true if the entity exists
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        bool Exists(int id);
     }
 }

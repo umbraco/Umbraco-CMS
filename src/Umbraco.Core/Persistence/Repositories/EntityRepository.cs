@@ -310,7 +310,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderBy("sortOrder, id");
 
             return wrappedSql;
-        }
+        }        
 
         protected virtual Sql GetBase(bool isContent, bool isMedia, Action<Sql> customFilter)
         {
@@ -456,6 +456,18 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void DisposeResources()
         {
             UnitOfWork.DisposeIfDisposable();
+        }
+
+        public bool Exists(Guid key)
+        {
+            var sql = new Sql().Select("COUNT(*)").From("umbracoNode").Where("uniqueID=@uniqueID", new {uniqueID = key});
+            return _work.Database.ExecuteScalar<int>(sql) > 0;            
+        }
+
+        public bool Exists(int id)
+        {
+            var sql = new Sql().Select("COUNT(*)").From("umbracoNode").Where("id=@id", new { id = id });
+            return _work.Database.ExecuteScalar<int>(sql) > 0;
         }
 
         #region umbracoNode POCO - Extends NodeDto

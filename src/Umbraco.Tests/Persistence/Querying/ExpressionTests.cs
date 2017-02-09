@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using Moq;
 using NUnit.Framework;
@@ -154,6 +155,22 @@ namespace Umbraco.Tests.Persistence.Querying
             Assert.AreEqual("hello@test.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
             Assert.AreEqual("@world", modelToSqlExpressionHelper.GetSqlParameters()[1]);
             Assert.AreEqual("@test", modelToSqlExpressionHelper.GetSqlParameters()[2]);
+        }
+
+        [Test]
+        public void Sql_In()
+        {
+            var userNames = new[] {"hello@world.com", "blah@blah.com"};
+
+            Expression<Func<IUser, bool>> predicate = user => userNames.Contains(user.Username);
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>();
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("[umbracoUser].[userLogin] IN (@1,@2)", result);
+            Assert.AreEqual("hello@world.com", modelToSqlExpressionHelper.GetSqlParameters()[1]);
+            Assert.AreEqual("blah@blah.com", modelToSqlExpressionHelper.GetSqlParameters()[2]);
         }
 
     }

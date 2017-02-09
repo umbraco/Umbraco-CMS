@@ -359,11 +359,12 @@ namespace umbraco.DataLayer
 
     internal class CurrentConnectionUsing : IDisposable
     {
-        public static MethodInfo OpenMethod { get; private set; }
-        public static MethodInfo CloseMethod { get; private set; }
+        private static MethodInfo OpenMethod { get; set; }
+        //private static MethodInfo CloseMethod { get; set; }
 
-        private static readonly object Factory;
-        private static readonly MethodInfo CreateMethod;
+        private static readonly object ScopeProvider;
+        private static readonly MethodInfo ScopeProviderAmbientOrNoScopeMethod;
+        private static readonly PropertyInfo ScopeDatabaseProperty;
         private static readonly PropertyInfo ConnectionProperty;
         private static readonly FieldInfo TransactionField;
         private static readonly PropertyInfo InnerConnectionProperty;
@@ -378,23 +379,30 @@ namespace umbraco.DataLayer
 
             var applicationContextType = coreAssembly.GetType("Umbraco.Core.ApplicationContext");
             var databaseContextType = coreAssembly.GetType("Umbraco.Core.DatabaseContext");
-            var defaultDatabaseFactoryType = coreAssembly.GetType("Umbraco.Core.Persistence.DefaultDatabaseFactory");
             var umbracoDatabaseType = coreAssembly.GetType("Umbraco.Core.Persistence.UmbracoDatabase");
             var databaseType = coreAssembly.GetType("Umbraco.Core.Persistence.Database");
+            var scopeProviderType = coreAssembly.GetType("Umbraco.Core.Scoping.IScopeProviderInternal");
+            var scopeType = coreAssembly.GetType("Umbraco.Core.Scoping.IScope");
 
-            var currentProperty = applicationContextType.GetProperty("Current", BindingFlags.Static | BindingFlags.Public);
-            var applicationContext = currentProperty.GetValue(null, NoArgs);
+            var applicationContextCurrentProperty = applicationContextType.GetProperty("Current", BindingFlags.Static | BindingFlags.Public);
+            if (applicationContextCurrentProperty == null) throw new Exception("oops: applicationContextCurrentProperty.");
+            var applicationContext = applicationContextCurrentProperty.GetValue(null, NoArgs);
 
-            var databaseContextProperty = applicationContextType.GetProperty("DatabaseContext", BindingFlags.Instance | BindingFlags.Public);
-            var databaseContext = databaseContextProperty.GetValue(applicationContext, NoArgs);
+            var applicationContextDatabaseContextProperty = applicationContextType.GetProperty("DatabaseContext", BindingFlags.Instance | BindingFlags.Public);
+            if (applicationContextDatabaseContextProperty == null) throw new Exception("oops: applicationContextDatabaseContextProperty.");
+            var databaseContext = applicationContextDatabaseContextProperty.GetValue(applicationContext, NoArgs);
 
-            var factoryField = databaseContextType.GetField("_factory", BindingFlags.Instance | BindingFlags.NonPublic);
-            Factory = factoryField.GetValue(databaseContext);
+            var databaseContextScopeProviderField = databaseContextType.GetField("ScopeProvider", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (databaseContextScopeProviderField == null) throw new Exception("oops: databaseContextScopeProviderField.");
+            ScopeProvider = databaseContextScopeProviderField.GetValue(databaseContext);
 
-            CreateMethod = defaultDatabaseFactoryType.GetMethod("CreateDatabase", BindingFlags.Instance | BindingFlags.Public);
+            ScopeProviderAmbientOrNoScopeMethod = scopeProviderType.GetMethod("GetAmbientOrNoScope", BindingFlags.Instance | BindingFlags.Public);
+            if (ScopeProviderAmbientOrNoScopeMethod == null) throw new Exception("oops: ScopeProviderAmbientOrNoScopeMethod.");
+            ScopeDatabaseProperty = scopeType.GetProperty("Database", BindingFlags.Instance | BindingFlags.Public);
+            if (ScopeDatabaseProperty == null) throw new Exception("oops: ScopeDatabaseProperty.");
 
             OpenMethod = databaseType.GetMethod("OpenSharedConnection", BindingFlags.Instance | BindingFlags.Public);
-            CloseMethod = databaseType.GetMethod("CloseSharedConnection", BindingFlags.Instance | BindingFlags.Public);
+            //CloseMethod = databaseType.GetMethod("CloseSharedConnection", BindingFlags.Instance | BindingFlags.Public);
 
             ConnectionProperty = umbracoDatabaseType.GetProperty("Connection", BindingFlags.Instance | BindingFlags.Public);
             TransactionField = databaseType.GetField("_transaction", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -408,7 +416,8 @@ namespace umbraco.DataLayer
 
         public CurrentConnectionUsing()
         {
-            _database = CreateMethod.Invoke(Factory, NoArgs);
+            var scope = ScopeProviderAmbientOrNoScopeMethod.Invoke(ScopeProvider, NoArgs);
+            _database = ScopeDatabaseProperty.GetValue(scope);
 
             var connection = ConnectionProperty.GetValue(_database, NoArgs);
             // we have to open to make sure that we *do* have a connection

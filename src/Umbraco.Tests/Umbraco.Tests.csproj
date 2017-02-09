@@ -154,7 +154,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
     <Compile Include="CallContextTests.cs" />
+    <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Migrations\CreateTableMigrationTests.cs" />
@@ -164,9 +166,19 @@
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\PetaPocoExpressionsTests.cs" />
+    <Compile Include="Persistence\Repositories\LockedRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Scheduling\DeployTest.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
+    <Compile Include="Scoping\EventNameExtractorTests.cs" />
+    <Compile Include="Scoping\LeakTests.cs" />
+    <Compile Include="Scoping\ScopedRepositoryTests.cs" />
+    <Compile Include="Scoping\PassThroughEventDispatcherTests.cs" />
+    <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
+    <Compile Include="Scoping\ScopedXmlTests.cs" />
+    <Compile Include="Scoping\ScopeFileSystemsTests.cs" />
+    <Compile Include="Scoping\ScopeTests.cs" />
+    <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TryConvertToTests.cs" />
     <Compile Include="UdiTests.cs" />

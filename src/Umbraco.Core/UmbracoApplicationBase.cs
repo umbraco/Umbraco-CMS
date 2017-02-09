@@ -8,6 +8,7 @@ using System.Web.Hosting;
 using log4net;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core
 {
@@ -59,15 +60,12 @@ namespace Umbraco.Core
             //And now we can dispose of our startup handlers - save some memory
             ApplicationEventsResolver.Current.Dispose();
 
-            // after Umbraco has started there is a database in "context" and that context is
+            // after Umbraco has started there is a scope in "context" and that context is
             // going to stay there and never get destroyed nor reused, so we have to ensure that
-            // the database is disposed (which will auto-remove it from context).
-            if (ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
-            {
-                var database = ApplicationContext.Current.DatabaseContext.Database;
-                if (database != null) // never to happen... unless in weird tests
-                    ApplicationContext.Current.DatabaseContext.Database.Dispose();
-            }
+            // the scope is disposed (along with database etc) - reset it all entirely
+            var scopeProvider = ApplicationContext.Current.ScopeProvider as ScopeProvider;
+            if (scopeProvider != null) // can be mocked...
+                scopeProvider.Reset();
         }
         
         /// <summary>

@@ -240,7 +240,7 @@ namespace SqlCE4Umbraco
             {
                 var cmd = trx == null ? new SqlCeCommand(commandText, conn) : new SqlCeCommand(commandText, conn, trx);
                 AttachParameters(cmd, commandParameters);
-                return cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                return cmd.ExecuteReader();
             }
             catch
             {
