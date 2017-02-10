@@ -153,6 +153,8 @@
             scope.searchMiniListView = function(search, miniListView) {
                 // set search value
                 miniListView.pagination.filter = search;
+                // reset pagination
+                miniListView.pagination.pageNumber = 1;
                 // start loading animation list view
                 miniListView.loading = true;
                 searchMiniListView(miniListView);
