@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -70,7 +71,6 @@ namespace Umbraco.Web.Editors
             }
 
             virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
-            
 
             switch (type)
             {
@@ -212,29 +212,46 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrWhiteSpace(type) == false && string.IsNullOrWhiteSpace(virtualPath) == false)
             {
+                virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
+
                 switch (type)
                 {
                     case Core.Constants.Trees.PartialViews:
+                        if (IsDirectory(virtualPath, SystemDirectories.PartialViews))
+                        {
+                            Services.FileService.DeletePartialViewFolder(virtualPath);
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
                         if (Services.FileService.DeletePartialView(virtualPath, Security.CurrentUser.Id))
                         {
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
-                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View found with the specified path");
+                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View or folder found with the specified path");
 
                     case Core.Constants.Trees.PartialViewMacros:
+                        if (IsDirectory(virtualPath, SystemDirectories.MacroPartials))
+                        {
+                            Services.FileService.DeletePartialViewMacroFolder(virtualPath);
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
                         if (Services.FileService.DeletePartialViewMacro(virtualPath, Security.CurrentUser.Id))
                         {
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
-                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro found with the specified path");
+                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro or folder found with the specified path");
 
                     case Core.Constants.Trees.Scripts:
+                        if (IsDirectory(virtualPath, SystemDirectories.Scripts))
+                        {
+                            Services.FileService.DeleteScriptFolder(virtualPath);
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
                         if (Services.FileService.GetScriptByName(virtualPath) != null)
                         {
                             Services.FileService.DeleteScript(virtualPath, Security.CurrentUser.Id);
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
-                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script found with the specified path");
+                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
                     default:
                         return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -387,6 +404,13 @@ namespace Umbraco.Web.Editors
                 value += extension;
 
             return value;
+        }
+
+        private bool IsDirectory(string virtualPath, string systemDirectory)
+        {
+            var path = IOHelper.MapPath(systemDirectory + "/" + virtualPath);
+            var dirInfo = new DirectoryInfo(path);
+            return dirInfo.Attributes == FileAttributes.Directory;
         }
     }
 }
