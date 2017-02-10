@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Events
 {   
@@ -117,9 +118,21 @@ namespace Umbraco.Core.Events
 
             if (_events == null) return;
 
+            var mediaFileSystem = FileSystemProviderManager.Current.MediaFileSystem;
+
             if (RaiseEvents && completed)
+            {
                 foreach (var e in _events)
+                {
                     e.RaiseEvent();
+
+                    // fixme - not sure I like doing it here - but then where? how?
+                    var delete = e.Args as IDeletingMediaFilesEventArgs;
+                    if (delete != null && delete.MediaFilesToDelete.Count > 0)
+                        mediaFileSystem.DeleteMediaFiles(delete.MediaFilesToDelete);
+                }
+            }
+
             _events.Clear();
         }
     }

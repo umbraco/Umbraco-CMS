@@ -179,7 +179,7 @@ namespace Umbraco.Core.Services
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId));
                 //Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this, uow.Events);
 
-                // fixme 
+                // fixme
                 var auditRepo = RepositoryFactory.CreateAuditRepository(uow);
                 auditRepo.AddOrUpdate(new AuditItem(content.Id, string.Format("Content '{0}' was created", name), AuditType.New, content.CreatorId));
                 uow.Commit();
@@ -1051,9 +1051,9 @@ namespace Umbraco.Core.Services
                         UnPublish(content, userId);
                     }
                     content.WriterId = userId;
-                    content.ChangeTrashedState(true);                    
+                    content.ChangeTrashedState(true);
                     repository.AddOrUpdate(content);
-                    
+
                     //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
                     foreach (var descendant in descendants)
                     {
@@ -1063,14 +1063,14 @@ namespace Umbraco.Core.Services
                         descendant.ChangeTrashedState(true, descendant.ParentId);
                         repository.AddOrUpdate(descendant);
 
-                        moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));                        
+                        moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));
                     }
 
                     uow.Commit();
 
                     uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, evtMsgs, moveInfo.ToArray()), "Trashed");
                 }
-                
+
                 Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
                 return OperationStatus.Success(evtMsgs);
@@ -1285,9 +1285,6 @@ namespace Umbraco.Core.Services
 
                     var args = new DeleteEventArgs<IContent>(content, false, evtMsgs);
                     uow.Events.Dispatch(Deleted, this, args, "Deleted"); // fixme why the event name?!
-
-                    //remove any flagged media files
-                    repository.DeleteMediaFiles(args.MediaFilesToDelete);
                 }
 
                 Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
@@ -1335,7 +1332,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Deletes all content of the specified types. All Descendants of deleted content that is not of these types is moved to Recycle Bin.
-        /// </summary>        
+        /// </summary>
         /// <param name="contentTypeIds">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         public void DeleteContentOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
@@ -1344,7 +1341,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-                
+
                 //track the 'root' items of the collection of nodes discovered to delete, we need to use
                 //these items to lookup descendants that are not of this doc type so they can be transfered
                 //to the recycle bin
@@ -1558,9 +1555,6 @@ namespace Umbraco.Core.Services
                     }
 
                     success = repository.EmptyRecycleBin();
-
-                    if (success)
-                        repository.DeleteMediaFiles(files);
 
                     uow.Events.Dispatch(EmptiedRecycleBin, this, new RecycleBinEventArgs(nodeObjectType, entities, files, success));
                     uow.Commit();

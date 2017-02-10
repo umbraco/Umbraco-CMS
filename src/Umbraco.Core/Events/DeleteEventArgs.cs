@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Events
 {
-	public class DeleteEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>, IEquatable<DeleteEventArgs<TEntity>>
+    public class DeleteEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>, IEquatable<DeleteEventArgs<TEntity>>, IDeletingMediaFilesEventArgs
 	{
 	    /// <summary>
 	    /// Constructor accepting multiple entities that are used in the delete operation

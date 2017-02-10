@@ -313,6 +313,7 @@
     <Compile Include="Deploy\Direction.cs" />
     <Compile Include="Deploy\IFileStore.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
+    <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
     <Compile Include="OrderedHashSet.cs" />
     <Compile Include="Models\GridValue.cs" />
     <Compile Include="Deploy\IArtifact.cs" />

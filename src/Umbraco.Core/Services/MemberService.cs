@@ -45,7 +45,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the default MemberType alias
         /// </summary>
-        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll 
+        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll
         /// return the first type that is not an admin, otherwise if there's only one we will return that one.</remarks>
         /// <returns>Alias of the default MemberType</returns>
         public string GetDefaultMemberType()
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>
-        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update 
+        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update
         /// Members if they choose to. </remarks>
         /// <param name="member">The Member to save the password for</param>
         /// <param name="password">The password to encrypt and save</param>
@@ -776,7 +776,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates and persists a Member
         /// </summary>
-        /// <remarks>Using this method will persist the Member object before its returned 
+        /// <remarks>Using this method will persist the Member object before its returned
         /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
@@ -792,7 +792,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates and persists a Member
         /// </summary>
-        /// <remarks>Using this method will persist the Member object before its returned 
+        /// <remarks>Using this method will persist the Member object before its returned
         /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
@@ -806,7 +806,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates and persists a Member
         /// </summary>
-        /// <remarks>Using this method will persist the Member object before its returned 
+        /// <remarks>Using this method will persist the Member object before its returned
         /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
@@ -836,7 +836,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates and persists a Member
         /// </summary>
-        /// <remarks>Using this method will persist the Member object before its returned 
+        /// <remarks>Using this method will persist the Member object before its returned
         /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
@@ -921,7 +921,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember GetByUsername(string username)
         {
-            //TODO: Somewhere in here, whether at this level or the repository level, we need to add 
+            //TODO: Somewhere in here, whether at this level or the repository level, we need to add
             // a caching mechanism since this method is used by all the membership providers and could be
             // called quite a bit when dealing with members.
 
@@ -953,9 +953,6 @@ namespace Umbraco.Core.Services
 
                 var args = new DeleteEventArgs<IMember>(member, false);
                 uow.Events.Dispatch(Deleted, this, args);
-
-                //remove any flagged media files
-                repository.DeleteMediaFiles(args.MediaFilesToDelete);
             }
         }
 
@@ -963,7 +960,7 @@ namespace Umbraco.Core.Services
         /// Saves an <see cref="IMember"/>
         /// </summary>
         /// <param name="entity"><see cref="IMember"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IMember entity, bool raiseEvents = true)
         {
@@ -1004,7 +1001,7 @@ namespace Umbraco.Core.Services
         /// Saves a list of <see cref="IMember"/> objects
         /// </summary>
         /// <param name="entities"><see cref="IEnumerable{IMember}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IEnumerable<IMember> entities, bool raiseEvents = true)
         {
