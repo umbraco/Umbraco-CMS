@@ -85,7 +85,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeepCloneBenchmarks.cs" />
     <Compile Include="LinqCastBenchmarks.cs" />
     <Compile Include="ModelToSqlExpressionHelperBenchmarks.cs" />
     <Compile Include="BulkInsertBenchmarks.cs" />

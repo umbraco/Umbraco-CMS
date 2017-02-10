@@ -1340,6 +1340,69 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Empty_RecycleBin_With_Content_That_Has_All_Related_Data()
+        {
+            // Arrange
+            //need to:
+            // * add relations
+            // * add permissions
+            // * add notifications
+            // * public access
+            // * tags
+            // * domain
+            // * published & preview data
+            // * multiple versions
+
+            var contentType = MockedContentTypes.CreateAllTypesContentType("test", "test");
+            ServiceContext.ContentTypeService.Save(contentType, 0);
+
+            object obj =
+               new
+               {
+                   tags = "Hello,World"
+               };
+            var content1 = MockedContent.CreateBasicContent(contentType);
+            content1.PropertyValues(obj);
+            content1.ResetDirtyProperties(false);
+            ServiceContext.ContentService.Save(content1, 0);
+            Assert.IsTrue(ServiceContext.ContentService.PublishWithStatus(content1, 0).Success);
+            var content2 = MockedContent.CreateBasicContent(contentType);
+            content2.PropertyValues(obj);
+            content2.ResetDirtyProperties(false);
+            ServiceContext.ContentService.Save(content2, 0);
+            Assert.IsTrue(ServiceContext.ContentService.PublishWithStatus(content2, 0).Success);
+
+            ServiceContext.RelationService.Save(new RelationType(Constants.ObjectTypes.DocumentGuid, Constants.ObjectTypes.DocumentGuid, "test"));
+            Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
+
+            ServiceContext.PublicAccessService.Save(new PublicAccessEntry(content1, content2, content2, new List<PublicAccessRule>
+            {
+                new PublicAccessRule
+                {
+                    RuleType = "test",
+                    RuleValue = "test"
+                }
+            }));
+            Assert.IsTrue(ServiceContext.PublicAccessService.AddRule(content1, "test2", "test2").Success);
+
+            Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(ServiceContext.UserService.GetUserById(0), content1, "test"));
+
+            ServiceContext.ContentService.AssignContentPermission(content1, 'A', new[] {0});
+
+            Assert.IsTrue(ServiceContext.DomainService.Save(new UmbracoDomain("www.test.com", "en-AU")
+            {
+                RootContentId = content1.Id
+            }).Success);
+            
+            // Act
+            ServiceContext.ContentService.EmptyRecycleBin();
+            var contents = ServiceContext.ContentService.GetContentInRecycleBin();
+
+            // Assert
+            Assert.That(contents.Any(), Is.False);
+        }
+
+        [Test]
         public void Can_Move_Content()
         {
             // Arrange
