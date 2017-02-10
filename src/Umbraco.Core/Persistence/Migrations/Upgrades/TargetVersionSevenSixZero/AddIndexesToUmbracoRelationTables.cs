@@ -6,21 +6,22 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 {
     [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
-    public class AddIndexesToUmbracoRelation : MigrationBase
+    public class AddIndexesToUmbracoRelationTables : MigrationBase
     {
-        public AddIndexesToUmbracoRelation(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+        public AddIndexesToUmbracoRelationTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
         { }
 
         public override void Up()
         {
-            //Ensure this executes in a defered block which will be done inside of the migration transaction
-            this.Execute.Code(database =>
-            {
-                var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(database);
+            var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database).ToArray();
 
-                //make sure it doesn't already exist
-                if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoRelation_parentChildType")) == false)
+            //make sure it doesn't already exist
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoRelation_parentChildType")) == false)
+            {
+                //This will remove any corrupt/duplicate data in the relation table before the index is applied
+                //Ensure this executes in a defered block which will be done inside of the migration transaction
+                this.Execute.Code(database =>
                 {
                     //We need to check if this index has corrupted data and then clear that data
                     var duplicates = database.Fetch<dynamic>("SELECT parentId,childId,relType FROM umbracoRelation GROUP BY parentId,childId,relType HAVING COUNT(*) > 1");
@@ -48,16 +49,38 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
                             }
                         }
                     }
-                }
-                return "";
-            });
+                    return "";
+                });
 
-            Create.Index("IX_umbracoRelation_parentChildType").OnTable("umbracoRelation")
-                .OnColumn("parentId").Ascending()
-                .OnColumn("childId").Ascending()
-                .OnColumn("relType").Ascending()
-                .WithOptions()
-                .Unique();
+                //unique index to prevent duplicates - and for better perf
+                Create.Index("IX_umbracoRelation_parentChildType").OnTable("umbracoRelation")
+                    .OnColumn("parentId").Ascending()
+                    .OnColumn("childId").Ascending()
+                    .OnColumn("relType").Ascending()
+                    .WithOptions()
+                    .Unique();
+            }
+
+            //need indexes on alias and name for relation type since these are queried against
+
+            //make sure it doesn't already exist
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoRelationType_alias")) == false)
+            {                
+                Create.Index("IX_umbracoRelationType_alias").OnTable("umbracoRelationType")
+                    .OnColumn("alias")
+                    .Ascending()
+                    .WithOptions()
+                    .NonClustered();
+            }
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoRelationType_name")) == false)
+            {
+                Create.Index("IX_umbracoRelationType_name").OnTable("umbracoRelationType")
+                    .OnColumn("name")
+                    .Ascending()
+                    .WithOptions()
+                    .NonClustered();
+            }
+
         }
 
         public override void Down()

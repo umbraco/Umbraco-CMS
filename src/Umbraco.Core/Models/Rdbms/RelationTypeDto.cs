@@ -29,11 +29,13 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid ChildObjectType { get; set; }
 
         [Column("name")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_name")]
         public string Name { get; set; }
 
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(100)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_alias")]
         public string Alias { get; set; }
     }
 }
