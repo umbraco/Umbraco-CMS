@@ -14,14 +14,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 
         public override void Up()
         {
-            var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+            var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database);
 
             //make sure it doesn't already exist
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoNodePath")) == false)
