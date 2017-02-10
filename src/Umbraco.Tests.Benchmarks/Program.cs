@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Benchmarks
                 typeof(ModelToSqlExpressionHelperBenchmarks),
                 typeof(XmlBenchmarks),
                 typeof(LinqCastBenchmarks),
-                typeof(DeepCloneBenchmarks),
+                //typeof(DeepCloneBenchmarks),
                 typeof(XmlPublishedContentInitBenchmarks),
 
             });

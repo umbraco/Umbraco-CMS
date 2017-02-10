@@ -93,7 +93,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// A delete statement taht will delete anything in the table specified where it's PK (keyName) is found in the 
+        /// A delete statement that will delete anything in the table specified where its PK (keyName) is found in the
         /// list of umbracoNode.id that have trashed flag set
         /// </summary>
         /// <param name="tableName"></param>
