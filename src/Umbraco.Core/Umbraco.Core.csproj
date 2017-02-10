@@ -214,10 +214,12 @@
     <Compile Include="Configuration\UmbracoSettings\CharCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharElement.cs" />
     <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\DataElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentError404Collection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorPageElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IDataSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
@@ -350,6 +352,7 @@
     <Compile Include="Logging\LoggingEventContext.cs" />
     <Compile Include="Logging\LoggingEventHelper.cs" />
     <Compile Include="Logging\RingBuffer.cs" />
+    <Compile Include="SQLRetryPolicyBehaviour.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />

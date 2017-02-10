@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.FaultHandling.Strategies;
+﻿using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence.FaultHandling.Strategies;
 
 namespace Umbraco.Core.Persistence.FaultHandling
 {
@@ -9,10 +10,20 @@ namespace Umbraco.Core.Persistence.FaultHandling
     {
         public static RetryPolicy GetDefaultSqlConnectionRetryPolicyByConnectionString(string connectionString)
         {
-            //Is this really the best way to determine if the database is an Azure database?
-            return connectionString.Contains("database.windows.net")
-                       ? GetDefaultSqlAzureConnectionRetryPolicy()
-                       : GetDefaultSqlConnectionRetryPolicy();
+            var sqlRetryPolicyBehaviour = UmbracoConfig.For.UmbracoSettings().Data.SQLRetryPolicyBehaviour;
+            switch (sqlRetryPolicyBehaviour)
+            {
+                case SQLRetryPolicyBehaviour.Basic:
+                    return GetDefaultSqlConnectionRetryPolicy();
+                case SQLRetryPolicyBehaviour.Azure:
+                    return GetDefaultSqlAzureConnectionRetryPolicy();
+                case SQLRetryPolicyBehaviour.Default:
+                default:
+                    //Is this really the best way to determine if the database is an Azure database?
+                    return connectionString.Contains("database.windows.net")
+                               ? GetDefaultSqlAzureConnectionRetryPolicy()
+                               : GetDefaultSqlConnectionRetryPolicy();
+            }
         }
 
         public static RetryPolicy GetDefaultSqlConnectionRetryPolicy()
@@ -32,10 +43,20 @@ namespace Umbraco.Core.Persistence.FaultHandling
 
         public static RetryPolicy GetDefaultSqlCommandRetryPolicyByConnectionString(string connectionString)
         {
-            //Is this really the best way to determine if the database is an Azure database?
-            return connectionString.Contains("database.windows.net")
-                       ? GetDefaultSqlAzureCommandRetryPolicy()
-                       : GetDefaultSqlCommandRetryPolicy();
+            var sqlRetryPolicyBehaviour = UmbracoConfig.For.UmbracoSettings().Data.SQLRetryPolicyBehaviour;
+            switch (sqlRetryPolicyBehaviour)
+            {
+                case SQLRetryPolicyBehaviour.Basic:
+                    return GetDefaultSqlCommandRetryPolicy();
+                case SQLRetryPolicyBehaviour.Azure:
+                    return GetDefaultSqlAzureCommandRetryPolicy();
+                case SQLRetryPolicyBehaviour.Default:
+                default:
+                    //Is this really the best way to determine if the database is an Azure database?
+                    return connectionString.Contains("database.windows.net")
+                               ? GetDefaultSqlAzureCommandRetryPolicy()
+                               : GetDefaultSqlCommandRetryPolicy();
+            }
         }
 
         public static RetryPolicy GetDefaultSqlCommandRetryPolicy()

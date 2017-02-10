@@ -154,6 +154,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configurations\UmbracoSettings\DataElementDefaultTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\DataElementTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />

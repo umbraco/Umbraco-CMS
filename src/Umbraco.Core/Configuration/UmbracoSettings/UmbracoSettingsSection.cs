@@ -127,7 +127,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (ScriptingElement)this["scripting"]; }
         }
-        
+
+        [ConfigurationProperty("data")]
+        internal DataElement Data
+        {
+            get { return (DataElement)this["data"]; }
+        }
+
         IContentSection IUmbracoSettingsSection.Content
         {
             get { return Content; }
@@ -196,6 +202,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IScriptingSection IUmbracoSettingsSection.Scripting
         {
             get { return Scripting; }
+        }
+
+        IDataSection IUmbracoSettingsSection.Data
+        {
+            get { return Data; }
         }
     }
 }

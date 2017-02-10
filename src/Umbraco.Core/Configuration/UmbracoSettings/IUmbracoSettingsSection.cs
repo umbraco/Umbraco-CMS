@@ -29,5 +29,7 @@
         IWebRoutingSection WebRouting { get; }
 
         IScriptingSection Scripting { get; }
+
+        IDataSection Data { get; }
     }
 }
