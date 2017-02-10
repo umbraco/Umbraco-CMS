@@ -382,7 +382,7 @@ namespace Umbraco.Core.IO
                 path = relativePath;
             }
 
-            return path.EnsurePathIsPrefixed();
+            return path.EnsurePathIsApplicationRootPrefixed();
         }
 
         /// <summary>
@@ -390,8 +390,10 @@ namespace Umbraco.Core.IO
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        internal static string EnsurePathIsPrefixed(this string path)
+        internal static string EnsurePathIsApplicationRootPrefixed(this string path)
         {
+            if (path.StartsWith("~/"))
+                return path;
             if (path.StartsWith("/") == false && path.StartsWith("\\") == false)
                 path = string.Format("/{0}", path);
             if (path.StartsWith("~") == false)
