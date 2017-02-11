@@ -30,6 +30,9 @@ namespace Umbraco.Core.Scoping
 #endif
 
         /// <inheritdoc />
+        public bool CallContext { get { return false; } }
+
+        /// <inheritdoc />
         public RepositoryCacheMode RepositoryCacheMode
         {
             get { return RepositoryCacheMode.Default; }
@@ -100,8 +103,7 @@ namespace Umbraco.Core.Scoping
             if (_database != null)
                 _database.Dispose();
 
-            _scopeProvider.AmbientScope = null;
-            _scopeProvider.AmbientContext = null;
+            _scopeProvider.SetAmbient(null);
 
             _disposed = true;
             GC.SuppressFinalize(this);

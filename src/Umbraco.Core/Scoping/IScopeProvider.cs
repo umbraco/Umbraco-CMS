@@ -24,7 +24,8 @@ namespace Umbraco.Core.Scoping
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
-            bool? scopeFileSystems = null);
+            bool? scopeFileSystems = null,
+            bool callContext = false);
 
         /// <summary>
         /// Creates a detached scope.
@@ -44,10 +45,11 @@ namespace Umbraco.Core.Scoping
         /// Attaches a scope.
         /// </summary>
         /// <param name="scope">The scope to attach.</param>
+        /// <param name="callContext">A value indicating whether to force usage of call context.</param>
         /// <remarks>
         /// <para>Only a scope created by <see cref="CreateDetachedScope"/> can be attached.</para>
         /// </remarks>
-        void AttachScope(IScope scope);
+        void AttachScope(IScope scope, bool callContext = false);
 
         /// <summary>
         /// Detaches a scope.

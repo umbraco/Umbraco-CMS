@@ -7,6 +7,7 @@ namespace Umbraco.Core.Scoping
     internal interface IScopeInternal : IScope
     {
         IScopeInternal ParentScope { get; }
+        bool CallContext { get; }
         EventsDispatchMode DispatchMode { get; }
         IsolationLevel IsolationLevel { get; }
         UmbracoDatabase DatabaseOrNull { get; }

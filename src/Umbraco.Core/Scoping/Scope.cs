@@ -19,6 +19,7 @@ namespace Umbraco.Core.Scoping
         private readonly EventsDispatchMode _dispatchMode;
         private readonly bool? _scopeFileSystem;
         private readonly ScopeContext _scopeContext;
+        private bool _callContext;
         private bool _disposed;
         private bool? _completed;
 
@@ -36,7 +37,8 @@ namespace Umbraco.Core.Scoping
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
-            bool? scopeFileSystems = null)
+            bool? scopeFileSystems = null,
+            bool callContext = false)
         {
             _scopeProvider = scopeProvider;
             _scopeContext = scopeContext;
@@ -44,6 +46,7 @@ namespace Umbraco.Core.Scoping
             _repositoryCacheMode = repositoryCacheMode;
             _dispatchMode = dispatchMode;
             _scopeFileSystem = scopeFileSystems;
+            _callContext = callContext;
             Detachable = detachable;
 
 #if DEBUG_SCOPES
@@ -98,20 +101,20 @@ namespace Umbraco.Core.Scoping
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
-            bool? scopeFileSystems = null)
-            : this(scopeProvider, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems)
-        {
-        }
+            bool? scopeFileSystems = null,
+            bool callContext = false)
+            : this(scopeProvider, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems, callContext)
+        { }
 
         // initializes a new scope in a nested scopes chain, with its parent
         public Scope(ScopeProvider scopeProvider, Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
-            bool? scopeFileSystems = null)
-            : this(scopeProvider, parent, null, false, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems)
-        {
-        }
+            bool? scopeFileSystems = null,
+            bool callContext = false)
+            : this(scopeProvider, parent, null, false, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems, callContext)
+        { }
 
         // initializes a new scope, replacing a NoScope instance
         public Scope(ScopeProvider scopeProvider, NoScope noScope,
@@ -119,8 +122,9 @@ namespace Umbraco.Core.Scoping
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
-            bool? scopeFileSystems = null)
-            : this(scopeProvider, null, scopeContext, false, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems)
+            bool? scopeFileSystems = null,
+            bool callContext = false)
+            : this(scopeProvider, null, scopeContext, false, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems, callContext)
         {
             // steal everything from NoScope
             _database = noScope.DatabaseOrNull;
@@ -134,6 +138,18 @@ namespace Umbraco.Core.Scoping
         private readonly Guid _instanceId = Guid.NewGuid();
         public Guid InstanceId { get { return _instanceId; } }
 #endif
+
+        // a value indicating whether to force call-context
+        public bool CallContext
+        {
+            get
+            {
+                if (_callContext) return true;
+                if (ParentScope != null) return ParentScope.CallContext;
+                return false;
+            }
+            set { _callContext = value; }
+        }
 
         public bool ScopedFileSystems
         {
@@ -331,7 +347,7 @@ namespace Umbraco.Core.Scoping
 #endif
 
             var parent = ParentScope;
-            _scopeProvider.AmbientScope = parent;
+            _scopeProvider.SetAmbientScope(parent);
 
             if (parent != null)
                 parent.ChildCompleted(_completed);
@@ -418,7 +434,7 @@ namespace Umbraco.Core.Scoping
                     }
                     finally
                     {
-                        _scopeProvider.AmbientContext = null;
+                        _scopeProvider.SetAmbient(null);
                     }
                 }
             }, () =>
@@ -426,8 +442,7 @@ namespace Umbraco.Core.Scoping
                 if (Detachable)
                 {
                     // get out of the way, restore original
-                    _scopeProvider.AmbientScope = OrigScope;
-                    _scopeProvider.AmbientContext = OrigContext;
+                    _scopeProvider.SetAmbient(OrigScope, OrigContext);
                 }
             });
         }

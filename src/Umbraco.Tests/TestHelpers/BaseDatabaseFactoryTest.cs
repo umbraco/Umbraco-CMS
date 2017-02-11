@@ -76,7 +76,7 @@ namespace Umbraco.Tests.TestHelpers
             var scopeProvider = new ScopeProvider(null);
             if (scopeProvider.AmbientScope != null)
                 scopeProvider.AmbientScope.Dispose();
-            scopeProvider.AmbientScope = null;
+            scopeProvider.SetAmbientScope(null);
 
             base.Initialize();
 
