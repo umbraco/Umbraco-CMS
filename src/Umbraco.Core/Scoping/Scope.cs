@@ -16,7 +16,6 @@ namespace Umbraco.Core.Scoping
         private readonly ScopeProvider _scopeProvider;
         private readonly IsolationLevel _isolationLevel;
         private readonly RepositoryCacheMode _repositoryCacheMode;
-        private readonly EventsDispatchMode _dispatchMode;
         private readonly bool? _scopeFileSystem;
         private readonly ScopeContext _scopeContext;
         private bool _callContext;
@@ -36,7 +35,7 @@ namespace Umbraco.Core.Scoping
             Scope parent, ScopeContext scopeContext, bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false)
         {
@@ -44,7 +43,7 @@ namespace Umbraco.Core.Scoping
             _scopeContext = scopeContext;
             _isolationLevel = isolationLevel;
             _repositoryCacheMode = repositoryCacheMode;
-            _dispatchMode = dispatchMode;
+            _eventDispatcher = eventDispatcher;
             _scopeFileSystem = scopeFileSystems;
             _callContext = callContext;
             Detachable = detachable;
@@ -77,9 +76,9 @@ namespace Umbraco.Core.Scoping
                 if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode != repositoryCacheMode)
                     throw new ArgumentException("Cannot be different from parent.", "repositoryCacheMode");
 
-                // cannot specify a different mode!
-                if (_dispatchMode != EventsDispatchMode.Unspecified && parent._dispatchMode != dispatchMode)
-                    throw new ArgumentException("Cannot be different from parent.", "dispatchMode");
+                // cannot specify a dispatcher!
+                if (_eventDispatcher != null)
+                    throw new ArgumentException("Cannot be specified on nested scope.", "eventDispatcher");
 
                 // cannot specify a different fs scope!
                 if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
@@ -100,20 +99,20 @@ namespace Umbraco.Core.Scoping
             ScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false)
-            : this(scopeProvider, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems, callContext)
+            : this(scopeProvider, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
         public Scope(ScopeProvider scopeProvider, Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false)
-            : this(scopeProvider, parent, null, false, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems, callContext)
+            : this(scopeProvider, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext)
         { }
 
         // initializes a new scope, replacing a NoScope instance
@@ -121,10 +120,10 @@ namespace Umbraco.Core.Scoping
             ScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false)
-            : this(scopeProvider, null, scopeContext, false, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems, callContext)
+            : this(scopeProvider, null, scopeContext, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext)
         {
             // steal everything from NoScope
             _database = noScope.DatabaseOrNull;
@@ -157,16 +156,6 @@ namespace Umbraco.Core.Scoping
             {
                 if (ParentScope != null) return ParentScope.ScopedFileSystems;
                 return _fscope != null;
-            }
-        }
-
-        public EventsDispatchMode DispatchMode
-        {
-            get
-            {
-                if (_dispatchMode != EventsDispatchMode.Unspecified) return _dispatchMode;
-                if (ParentScope != null) return ParentScope.DispatchMode;
-                return EventsDispatchMode.Scope;
             }
         }
 
@@ -306,7 +295,7 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Events;
-                return _eventDispatcher ?? (_eventDispatcher = new ScopeEventDispatcher(DispatchMode));
+                return _eventDispatcher ?? (_eventDispatcher = new ScopeEventDispatcher());
             }
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -8,7 +9,6 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Scoping
 {
-
     [TestFixture]
     public class ScopeEventDispatcherTests
     {
@@ -21,11 +21,15 @@ namespace Umbraco.Tests.Scoping
             DoThing3 = null;
         }
 
-        [TestCase(EventsDispatchMode.PassThrough, true, true)]
-        [TestCase(EventsDispatchMode.PassThrough, true, false)]
-        [TestCase(EventsDispatchMode.PassThrough, false, true)]
-        [TestCase(EventsDispatchMode.PassThrough, false, false)]
-        public void PassThroughCancelable(EventsDispatchMode mode, bool cancel, bool complete)
+        [TestCase(false, true, true)]
+        [TestCase(false, true, false)]
+        [TestCase(false, false, true)]
+        [TestCase(false, false, false)]
+        [TestCase(true, true, true)]
+        [TestCase(true, true, false)]
+        [TestCase(true, false, true)]
+        [TestCase(true, false, false)]
+        public void EventsHandling(bool passive, bool cancel, bool complete)
         {
             var counter1 = 0;
             var counter2 = 0;
@@ -34,7 +38,7 @@ namespace Umbraco.Tests.Scoping
             DoThing2 += (sender, args) => { counter2++; };
 
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            using (var scope = scopeProvider.CreateScope(dispatchMode: mode))
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: passive ? new PassiveEventDispatcher() : null))
             {
                 var cancelled = scope.Events.DispatchCancelable(DoThing1, this, new SaveEventArgs<string>("test"));
                 if (cancelled == false)
@@ -43,22 +47,15 @@ namespace Umbraco.Tests.Scoping
                     scope.Complete();
             }
 
-            var expected1 = mode == EventsDispatchMode.Passive ? 0 : 1;
+            var expected1 = passive ? 0 : 1;
             Assert.AreEqual(expected1, counter1);
 
-            var expected2 = -1;
-            switch (mode)
-            {
-                case EventsDispatchMode.PassThrough:
-                    expected2 = cancel ? 0 : 1;
-                    break;
-                case EventsDispatchMode.Scope:
-                    expected2 = cancel ? 0 : (complete ? 1 : 0);
-                    break;
-                case EventsDispatchMode.Passive:
-                    expected2 = 0;
-                    break;
-            }
+            int expected2;
+            if (passive)
+                expected2 = 0;
+            else
+                expected2 = cancel ? 0 : (complete ? 1 : 0);
+
             Assert.AreEqual(expected2, counter2);
         }
 
@@ -70,7 +67,7 @@ namespace Umbraco.Tests.Scoping
             DoThing3 += OnDoThingFail;
 
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            using (var scope = scopeProvider.CreateScope(dispatchMode: EventsDispatchMode.Passive))
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoThing1, this, new SaveEventArgs<string>("test"));
                 scope.Events.Dispatch(DoThing2, this, new SaveEventArgs<int>(0));
@@ -94,45 +91,14 @@ namespace Umbraco.Tests.Scoping
 
         [TestCase(true)]
         [TestCase(false)]
-        public void EventsDispatchmode_PassThrough(bool complete)
-        {
-            var counter = 0;
-
-            DoThing1 += (sender, args) => { counter++; };
-            DoThing2 += (sender, args) => { counter++; };
-            DoThing3 += (sender, args) => { counter++; };
-
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            using (var scope = scopeProvider.CreateScope(dispatchMode: EventsDispatchMode.PassThrough))
-            {
-                scope.Events.Dispatch(DoThing1, this, new SaveEventArgs<string>("test"));
-                scope.Events.Dispatch(DoThing2, this, new SaveEventArgs<int>(0));
-                scope.Events.Dispatch(DoThing3, this, new SaveEventArgs<decimal>(0));
-
-                // events have not been queued
-                Assert.IsEmpty(scope.Events.GetEvents(EventDefinitionFilter.All));
-
-                // events have been raised
-                Assert.AreEqual(3, counter);
-
-                if (complete)
-                    scope.Complete();
-            }
-
-            // nothing has changed
-            Assert.AreEqual(3, counter);
-        }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void EventsDispatchMode_Passive(bool complete)
+        public void EventsDispatching_Passive(bool complete)
         {
             DoThing1 += OnDoThingFail;
             DoThing2 += OnDoThingFail;
             DoThing3 += OnDoThingFail;
 
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
-            using (var scope = scopeProvider.CreateScope(dispatchMode: EventsDispatchMode.Passive))
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoThing1, this, new SaveEventArgs<string>("test"));
                 scope.Events.Dispatch(DoThing2, this, new SaveEventArgs<int>(0));
@@ -150,7 +116,7 @@ namespace Umbraco.Tests.Scoping
 
         [TestCase(true)]
         [TestCase(false)]
-        public void EventsDispatchMode_Scope(bool complete)
+        public void EventsDispatching_Scope(bool complete)
         {
             var counter = 0;
             IScope ambientScope = null;
@@ -170,7 +136,7 @@ namespace Umbraco.Tests.Scoping
             };
 
             Guid guid;
-            using (var scope = scopeProvider.CreateScope(dispatchMode: EventsDispatchMode.Scope))
+            using (var scope = scopeProvider.CreateScope())
             {
                 Assert.IsNotNull(scopeProvider.AmbientContext);
                 guid = scopeProvider.Context.Enlist("value", Guid.NewGuid, (c, o) => { });
@@ -181,6 +147,7 @@ namespace Umbraco.Tests.Scoping
 
                 // events have been queued
                 Assert.AreEqual(3, scope.Events.GetEvents(EventDefinitionFilter.All).Count());
+                Assert.AreEqual(0, counter);
 
                 if (complete)
                     scope.Complete();
@@ -215,5 +182,17 @@ namespace Umbraco.Tests.Scoping
         public static event EventHandler<SaveEventArgs<int>> DoThing2;
 
         public static event TypedEventHandler<ScopeEventDispatcherTests, SaveEventArgs<decimal>> DoThing3;
-    }    
+
+        public class PassiveEventDispatcher : ScopeEventDispatcherBase
+        {
+            public PassiveEventDispatcher()
+                : base(false)
+            { }
+
+            protected override void ScopeExitCompleted()
+            {
+                // do nothing
+            }
+        }
+    }
 }

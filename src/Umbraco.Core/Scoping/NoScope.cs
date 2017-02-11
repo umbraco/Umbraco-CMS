@@ -110,7 +110,6 @@ namespace Umbraco.Core.Scoping
         }
 
         public IScopeInternal ParentScope { get { return null; } }
-        public EventsDispatchMode DispatchMode { get {return EventsDispatchMode.Unspecified; } }
         public IsolationLevel IsolationLevel { get {return IsolationLevel.Unspecified; } }
         public bool ScopedFileSystems { get { return false; } }
         public void ChildCompleted(bool? completed) { }

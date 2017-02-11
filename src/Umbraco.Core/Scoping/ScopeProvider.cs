@@ -229,10 +229,10 @@ namespace Umbraco.Core.Scoping
         public IScope CreateDetachedScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null)
         {
-            return new Scope(this, true, null, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems);
+            return new Scope(this, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
         }
 
         /// <inheritdoc />
@@ -280,7 +280,7 @@ namespace Umbraco.Core.Scoping
         public IScope CreateScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false)
         {
@@ -289,7 +289,7 @@ namespace Umbraco.Core.Scoping
             {
                 var ambientContext = AmbientContext;
                 var newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, false, newContext, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems, callContext);
+                var scope = new Scope(this, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext);
                 // assign only if scope creation did not throw!
                 SetAmbient(scope, newContext ?? ambientContext);
                 return scope;
@@ -308,7 +308,7 @@ namespace Umbraco.Core.Scoping
                     throw new Exception("NoScope is in a transaction.");
                 var ambientContext = AmbientContext;
                 var newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, noScope, newContext, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems, callContext);
+                var scope = new Scope(this, noScope, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext);
                 // assign only if scope creation did not throw!
                 SetAmbient(scope, newContext ?? ambientContext);
                 return scope;
@@ -317,7 +317,7 @@ namespace Umbraco.Core.Scoping
             var ambientScope = ambient as Scope;
             if (ambientScope == null) throw new Exception("Ambient scope is not a Scope instance.");
 
-            var nested = new Scope(this, ambientScope, isolationLevel, repositoryCacheMode, dispatchMode, scopeFileSystems, callContext);
+            var nested = new Scope(this, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext);
             SetAmbient(nested, AmbientContext);
             return nested;
         }

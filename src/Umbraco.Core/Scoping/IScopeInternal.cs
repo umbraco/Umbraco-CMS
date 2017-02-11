@@ -8,7 +8,6 @@ namespace Umbraco.Core.Scoping
     {
         IScopeInternal ParentScope { get; }
         bool CallContext { get; }
-        EventsDispatchMode DispatchMode { get; }
         IsolationLevel IsolationLevel { get; }
         UmbracoDatabase DatabaseOrNull { get; }
         EventMessages MessagesOrNull { get; }

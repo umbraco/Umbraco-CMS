@@ -23,7 +23,7 @@ namespace Umbraco.Core.Scoping
         IScope CreateScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false);
 
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Scoping
         IScope CreateDetachedScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            EventsDispatchMode dispatchMode = EventsDispatchMode.Unspecified,
+            IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null);
 
         /// <summary>

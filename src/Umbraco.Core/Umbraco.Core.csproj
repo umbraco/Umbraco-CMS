@@ -314,6 +314,7 @@
     <Compile Include="Deploy\IFileStore.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
+    <Compile Include="Events\ScopeEventDispatcherBase.cs" />
     <Compile Include="OrderedHashSet.cs" />
     <Compile Include="Models\GridValue.cs" />
     <Compile Include="Deploy\IArtifact.cs" />
@@ -362,7 +363,6 @@
     <Compile Include="Events\MoveEventInfo.cs" />
     <Compile Include="Events\PublishEventArgs.cs" />
     <Compile Include="Events\RecycleBinEventArgs.cs" />
-    <Compile Include="Events\EventsDispatchMode.cs" />
     <Compile Include="Events\TransientMessagesFactory.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\MoveEventArgs.cs" />
@@ -559,7 +559,6 @@
     <Compile Include="Publishing\UnPublishedStatusType.cs" />
     <Compile Include="Publishing\UnPublishStatus.cs" />
     <Compile Include="SafeCallContext.cs" />
-    <Compile Include="Scoping\ActionTime.cs" />
     <Compile Include="Scoping\IScope.cs" />
     <Compile Include="Scoping\IScopeInternal.cs" />
     <Compile Include="Scoping\IScopeProvider.cs" />
