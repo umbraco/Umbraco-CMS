@@ -82,26 +82,6 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Searches media and returns a list of ContentItemBasic based on the IMedia
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="searchFrom"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> SearchMedia(string query, string searchFrom = null)
-        {
-            if (string.IsNullOrEmpty(query))
-                return Enumerable.Empty<ContentItemBasic<ContentPropertyBasic, IMedia>>();
-
-            // limiting the examine results to 50 to avoid killing the GetByIds lookup
-            var searchResult = ExamineSearch(query, UmbracoEntityTypes.Media, searchFrom).Take(50);
-            var mediaItems = Services.MediaService.GetByIds(searchResult.Select(x => Convert.ToInt32(x.Id)))
-                .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);             
-
-            return mediaItems;
-        }
-
-        /// <summary>
         /// Searches for all content that the user is allowed to see (based on their allowed sections)
         /// </summary>
         /// <param name="query"></param>
