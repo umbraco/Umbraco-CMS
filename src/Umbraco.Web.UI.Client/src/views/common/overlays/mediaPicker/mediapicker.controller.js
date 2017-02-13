@@ -33,6 +33,13 @@ angular.module("umbraco")
                     $scope.acceptedMediatypes = types;
                 });
 
+            $scope.searchOptions = {
+                pageNumber: 1,
+                pageSize: 100,
+                totalItems: 0,
+                totalPages: 0
+            };
+
             //preload selected item
             $scope.target = undefined;
             if (dialogOptions.currentTarget) {
@@ -106,35 +113,9 @@ angular.module("umbraco")
                     $scope.path = [];
                 }
 
-                //mediaResource.rootMedia()
-                mediaResource.getChildren(folder.id)
-                    .then(function(data) {
-                        $scope.searchTerm = "";
-                        $scope.images = data.items ? data.items : [];
-
-                        // set already selected images to selected
-                        for (var folderImageIndex = 0; folderImageIndex < $scope.images.length; folderImageIndex++) {
-                            var folderImage = $scope.images[folderImageIndex];
-                            var imageIsSelected = false;
-
-                            for (var selectedImageIndex = 0;
-                                selectedImageIndex < $scope.model.selectedImages.length;
-                                selectedImageIndex++) {
-                                var selectedImage = $scope.model.selectedImages[selectedImageIndex];
-
-                                if (folderImage.key === selectedImage.key) {
-                                    imageIsSelected = true;
-                                }
-                            }
-                            if (imageIsSelected) {
-                                folderImage.selected = true;
-                            }
-                        }
-                    });
+                getChildren(folder.id);
                 $scope.currentFolder = folder;
-
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
-
             };
 
             $scope.clickHandler = function(image, event, index) {
@@ -238,4 +219,83 @@ angular.module("umbraco")
                     $scope.mediaPickerDetailsOverlay = null;
                 };
             };
+
+            $scope.changeSearch = function() {
+                $scope.loading = true;
+                debounceSearchMedia();
+            };
+
+            $scope.changePagination = function(pageNumber) {
+                $scope.loading = true;
+                $scope.searchOptions.pageNumber = pageNumber;
+                searchMedia();
+            };
+
+            var debounceSearchMedia = _.debounce(function () {
+                $scope.$apply(function () {
+                    if ($scope.searchTerm) {
+                        searchMedia();
+                    } else {
+                        // reset pagination
+                        $scope.searchOptions = {
+                            pageNumber: 1,
+                            pageSize: 100,
+                            totalItems: 0,
+                            totalPages: 0
+                        };
+                        getChildren($scope.currentFolder.id);
+                    }
+                });
+            }, 500);
+
+            function searchMedia() {
+                $scope.loading = true;
+                mediaResource.search($scope.searchTerm, $scope.searchOptions.pageNumber, $scope.searchOptions.pageSize, $scope.startNodeId)
+                    .then(function (data) {
+                        // update images
+                        $scope.images = data.items ? data.items : [];
+                        // update pagination
+                        $scope.searchOptions = {
+                            pageNumber: data.pageNumber,
+                            pageSize: data.pageSize,
+                            totalItems: data.totalItems,
+                            totalPages: data.totalPages
+                        };
+                        // set already selected images to selected
+                        preSelectImages();
+                        $scope.loading = false;
+                    });
+            }
+
+            function getChildren(id) {
+                $scope.loading = true;
+                mediaResource.getChildren(id)
+                    .then(function(data) {
+                        $scope.searchTerm = "";
+                        $scope.images = data.items ? data.items : [];
+                        // set already selected images to selected
+                        preSelectImages();
+                        $scope.loading = false;
+                    });
+            }
+
+            function preSelectImages() {
+                for (var folderImageIndex = 0; folderImageIndex < $scope.images.length; folderImageIndex++) {
+                    var folderImage = $scope.images[folderImageIndex];
+                    var imageIsSelected = false;
+
+                    for (var selectedImageIndex = 0;
+                        selectedImageIndex < $scope.model.selectedImages.length;
+                        selectedImageIndex++) {
+                        var selectedImage = $scope.model.selectedImages[selectedImageIndex];
+
+                        if (folderImage.key === selectedImage.key) {
+                            imageIsSelected = true;
+                        }
+                    }
+                    if (imageIsSelected) {
+                        folderImage.selected = true;
+                    }
+                }
+            }
         });
