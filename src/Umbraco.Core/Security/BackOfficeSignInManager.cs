@@ -114,7 +114,7 @@ namespace Umbraco.Core.Security
                     AllowRefresh = true,
                     IssuedUtc = nowUtc,
                     ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
-                }, userIdentity, rememberBrowserIdentity);
+                }, userIdentity, rememberBrowserIdentity);                
             }
             else
             {
@@ -126,6 +126,10 @@ namespace Umbraco.Core.Security
                     ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
                 }, userIdentity);
             }
+
+            //track the last login date
+            user.LastLoginDateUtc = DateTime.UtcNow;
+            await UserManager.UpdateAsync(user);
 
             _logger.WriteCore(TraceEventType.Information, 0,
                 string.Format(
