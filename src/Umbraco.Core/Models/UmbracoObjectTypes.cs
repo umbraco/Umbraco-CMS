@@ -153,17 +153,17 @@ namespace Umbraco.Core.Models
         FormsForm,
 
         /// <summary>
-        /// Forms Workflow
+        /// Forms PreValue
         /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.FormsWorkflow)]
-        [FriendlyName("Workflow")]
-        FormsWorkflow,
+        [UmbracoObjectType(Constants.ObjectTypes.FormsPreValue)]
+        [FriendlyName("PreValue")]
+        FormsPreValue,
 
         /// <summary>
-        /// Forms Record
+        /// Forms DataSource
         /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.FormsRecord)]
-        [FriendlyName("Record")]
-        FormsRecord
+        [UmbracoObjectType(Constants.ObjectTypes.FormsDataSource)]
+        [FriendlyName("DataSource")]
+        FormsDataSource
     }
 }

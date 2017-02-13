@@ -40,8 +40,8 @@ namespace Umbraco.Core
             
             // forms
             public const string FormsForm = "forms-form";
-            public const string FormsWorkflow = "forms-workflow";
-            public const string FormsRecord = "forms-record";
+            public const string FormsPreValue = "forms-prevalue";
+            public const string FormsDataSource = "forms-datasource";
 
             // string entity types
 
@@ -89,10 +89,10 @@ namespace Umbraco.Core
                         return RelationType;
                     case UmbracoObjectTypes.FormsForm:
                         return FormsForm;
-                    case UmbracoObjectTypes.FormsWorkflow:
-                        return FormsWorkflow;
-                    case UmbracoObjectTypes.FormsRecord:
-                        return FormsRecord;
+                    case UmbracoObjectTypes.FormsPreValue:
+                        return FormsPreValue;
+                    case UmbracoObjectTypes.FormsDataSource:
+                        return FormsDataSource;
                 }
                 throw new NotSupportedException(string.Format("UmbracoObjectType \"{0}\" does not have a matching EntityType.", umbracoObjectType));
             }
@@ -131,10 +131,10 @@ namespace Umbraco.Core
                         return UmbracoObjectTypes.RelationType;
                     case FormsForm:
                         return UmbracoObjectTypes.FormsForm;
-                    case FormsWorkflow:
-                        return UmbracoObjectTypes.FormsWorkflow;
-                    case FormsRecord:
-                        return UmbracoObjectTypes.FormsRecord;
+                    case FormsPreValue:
+                        return UmbracoObjectTypes.FormsPreValue;
+                    case FormsDataSource:
+                        return UmbracoObjectTypes.FormsDataSource;
                 }
                 throw new NotSupportedException(
                     string.Format("EntityType \"{0}\" does not have a matching UmbracoObjectType.", entityType));
