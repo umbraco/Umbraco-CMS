@@ -32,7 +32,8 @@ angular.module('umbraco')
 		}
 
 		$scope.openContentPicker = function() {
-            $scope.treePickerOverlay = config;			
+            $scope.treePickerOverlay = config;		
+            $scope.treePickerOverlay.section = config.type;
 			$scope.treePickerOverlay.view = "treePicker";
             $scope.treePickerOverlay.show = true;
 
