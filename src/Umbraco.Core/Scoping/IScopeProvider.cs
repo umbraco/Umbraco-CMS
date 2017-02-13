@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using Umbraco.Core.Events;
 #if DEBUG_SCOPES
 using System.Collections.Generic;
@@ -66,7 +67,9 @@ namespace Umbraco.Core.Scoping
         ScopeContext Context { get; }
 
 #if DEBUG_SCOPES
+        Dictionary<Guid, object> CallContextObjects { get; }
         IEnumerable<ScopeInfo> ScopeInfos { get; }
+        ScopeInfo GetScopeInfo(IScope scope);
 #endif
     }
 }
