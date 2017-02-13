@@ -288,6 +288,7 @@ namespace Umbraco.Web.Editors
         /// <param name="pageSize"></param>
         /// <param name="searchFrom"></param>
         /// <returns></returns>
+        [HttpGet]
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> Search(string query, int pageNumber = 0,
             int pageSize = 0, string searchFrom = null)
