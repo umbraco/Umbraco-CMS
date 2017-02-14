@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services
         private readonly IMemberService _memberService;
 
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-        
+
 
         public MemberTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Services
         public void Save(IEnumerable<IMemberType> memberTypes, int userId = 0)
         {
             var asArray = memberTypes.ToArray();
-            
+
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())
@@ -137,7 +137,7 @@ namespace Umbraco.Core.Services
                     uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberType>(asArray, false));
                 }
             }
-            
+
         }
 
         public void Delete(IMemberType memberType, int userId = 0)
@@ -167,7 +167,7 @@ namespace Umbraco.Core.Services
         public void Delete(IEnumerable<IMemberType> memberTypes, int userId = 0)
         {
             var asArray = memberTypes.ToArray();
-            
+
             using (new WriteLock(Locker))
             {
                 using (var scope = UowProvider.ScopeProvider.CreateScope())

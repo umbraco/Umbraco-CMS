@@ -1604,7 +1604,6 @@ namespace Umbraco.Core.Services
                 // fixme mess!
                 using (var scope = UowProvider.ScopeProvider.CreateScope())
                 {
-
                     using (var uow = UowProvider.GetUnitOfWork())
                     {
                         if (uow.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(content, copy, parentId)))
