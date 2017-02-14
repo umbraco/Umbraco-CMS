@@ -867,6 +867,7 @@ namespace Umbraco.Tests.IO
             var filter5 = "f1.doc";
             var filter6 = "f1.d?c";
             var filter7 = "**.d?c";
+            var filter8 = "f*.doc";
 
             // Act & Assert
             var result1Disk = Directory.GetFiles(path + "/filter/", filter1).Select(Path.GetFileName).OrderBy(x => x).ToArray();
@@ -890,6 +891,9 @@ namespace Umbraco.Tests.IO
             var result7Disk = Directory.GetFiles(path + "/filter/", filter7).Select(Path.GetFileName).OrderBy(x => x).ToArray();
             var result7Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter7))).OrderBy(x => x).ToArray();
             Assert.AreEqual(result7Disk, result7Fake);
+            var result8Disk = Directory.GetFiles(path + "/filter/", filter8).Select(Path.GetFileName).OrderBy(x => x).ToArray();
+            var result8Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter8))).OrderBy(x => x).ToArray();
+            Assert.AreEqual(result8Disk, result8Fake);
         }
 
         /// <summary>
