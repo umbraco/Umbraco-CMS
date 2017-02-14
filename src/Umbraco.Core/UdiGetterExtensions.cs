@@ -17,7 +17,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this ITemplate entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.Template, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.Template, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IContentType entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.DocumentType, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.DocumentType, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IMediaType entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.MediaType, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.MediaType, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IMemberType entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.MemberType, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.MemberType, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IMemberGroup entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.MemberGroup, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.MemberGroup, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -74,9 +74,9 @@ namespace Umbraco.Core
             if (entity == null) throw new ArgumentNullException("entity");
 
             string type;
-            if (entity is IContentType) type = Constants.DeployEntityType.DocumentType;
-            else if (entity is IMediaType) type = Constants.DeployEntityType.MediaType;
-            else if (entity is IMemberType) type = Constants.DeployEntityType.MemberType;
+            if (entity is IContentType) type = Constants.UdiEntityType.DocumentType;
+            else if (entity is IMediaType) type = Constants.UdiEntityType.MediaType;
+            else if (entity is IMemberType) type = Constants.UdiEntityType.MemberType;
             else throw new NotSupportedException(string.Format("Composition type {0} is not supported.", entity.GetType().FullName));
             return new GuidUdi(type, entity.Key).EnsureClosed();
         }
@@ -89,7 +89,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IDataTypeDefinition entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.DataType, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.DataType, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -103,11 +103,11 @@ namespace Umbraco.Core
 
             string entityType;
             if (entity.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid)
-                entityType = Constants.DeployEntityType.DataTypeContainer;
+                entityType = Constants.UdiEntityType.DataTypeContainer;
             else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentTypeGuid)
-                entityType = Constants.DeployEntityType.DocumentTypeContainer;
+                entityType = Constants.UdiEntityType.DocumentTypeContainer;
             else if (entity.ContainedObjectType == Constants.ObjectTypes.MediaTypeGuid)
-                entityType = Constants.DeployEntityType.MediaTypeContainer;
+                entityType = Constants.UdiEntityType.MediaTypeContainer;
             else
                 throw new NotSupportedException(string.Format("Contained object type {0} is not supported.", entity.ContainedObjectType));
             return new GuidUdi(entityType, entity.Key).EnsureClosed();
@@ -121,7 +121,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IMedia entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.Media, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.Media, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IContent entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.Document, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.Document, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IMember entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.Member, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.Member, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Umbraco.Core
         public static StringUdi GetUdi(this Stylesheet entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new StringUdi(Constants.DeployEntityType.Stylesheet, entity.Path.TrimStart('/')).EnsureClosed();
+            return new StringUdi(Constants.UdiEntityType.Stylesheet, entity.Path.TrimStart('/')).EnsureClosed();
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace Umbraco.Core
         public static StringUdi GetUdi(this Script entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new StringUdi(Constants.DeployEntityType.Script, entity.Path.TrimStart('/')).EnsureClosed();
+            return new StringUdi(Constants.UdiEntityType.Script, entity.Path.TrimStart('/')).EnsureClosed();
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IDictionaryItem entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.DictionaryItem, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.DictionaryItem, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IMacro entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.Macro, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.Macro, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -198,7 +198,7 @@ namespace Umbraco.Core
         public static StringUdi GetUdi(this IPartialView entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new StringUdi(Constants.DeployEntityType.PartialView, entity.Path.TrimStart('/')).EnsureClosed();
+            return new StringUdi(Constants.UdiEntityType.PartialView, entity.Path.TrimStart('/')).EnsureClosed();
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace Umbraco.Core
         public static StringUdi GetUdi(this IXsltFile entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new StringUdi(Constants.DeployEntityType.Xslt, entity.Path.TrimStart('/')).EnsureClosed();
+            return new StringUdi(Constants.UdiEntityType.Xslt, entity.Path.TrimStart('/')).EnsureClosed();
         }
 
         /// <summary>
@@ -222,9 +222,9 @@ namespace Umbraco.Core
             if (entity == null) throw new ArgumentNullException("entity");
 
             string type;
-            if (entity is IContent) type = Constants.DeployEntityType.Document;
-            else if (entity is IMedia) type = Constants.DeployEntityType.Media;
-            else if (entity is IMember) type = Constants.DeployEntityType.Member;
+            if (entity is IContent) type = Constants.UdiEntityType.Document;
+            else if (entity is IMedia) type = Constants.UdiEntityType.Media;
+            else if (entity is IMember) type = Constants.UdiEntityType.Member;
             else throw new NotSupportedException(string.Format("ContentBase type {0} is not supported.", entity.GetType().FullName));
             return new GuidUdi(type, entity.Key).EnsureClosed();
         }
@@ -237,7 +237,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IRelationType entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.DeployEntityType.RelationType, entity.Key).EnsureClosed();
+            return new GuidUdi(Constants.UdiEntityType.RelationType, entity.Key).EnsureClosed();
         }
 
         /// <summary>

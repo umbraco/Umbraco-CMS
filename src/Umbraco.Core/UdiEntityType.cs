@@ -7,52 +7,82 @@ namespace Umbraco.Core
 
     public static partial class Constants
     {
-
         /// <summary>
         /// Defines well-known entity types.
         /// </summary>
         /// <remarks>Well-known entity types are those that Deploy already knows about,
         /// but entity types are strings and so can be extended beyond what is defined here.</remarks>
-        public static class DeployEntityType
+        public static class UdiEntityType
         {
+            [UdiType(UdiType.Unknown)]
+            public const string Unknown = "unknown";
+
             // guid entity types
 
+            [UdiType(UdiType.GuidUdi)]
             public const string AnyGuid = "any-guid"; // that one is for tests
 
+            [UdiType(UdiType.GuidUdi)]
             public const string Document = "document";
+            [UdiType(UdiType.GuidUdi)]
             public const string Media = "media";
+            [UdiType(UdiType.GuidUdi)]
             public const string Member = "member";
 
+            [UdiType(UdiType.GuidUdi)]
             public const string DictionaryItem = "dictionary-item";
+            [UdiType(UdiType.GuidUdi)]
             public const string Macro = "macro";
+            [UdiType(UdiType.GuidUdi)]
             public const string Template = "template";
 
+            [UdiType(UdiType.GuidUdi)]
             public const string DocumentType = "document-type";
+            [UdiType(UdiType.GuidUdi)]
             public const string DocumentTypeContainer = "document-type-container";
+            [UdiType(UdiType.GuidUdi)]
             public const string MediaType = "media-type";
+            [UdiType(UdiType.GuidUdi)]
             public const string MediaTypeContainer = "media-type-container";
+            [UdiType(UdiType.GuidUdi)]
             public const string DataType = "data-type";
+            [UdiType(UdiType.GuidUdi)]
             public const string DataTypeContainer = "data-type-container";
+            [UdiType(UdiType.GuidUdi)]
             public const string MemberType = "member-type";
+            [UdiType(UdiType.GuidUdi)]
             public const string MemberGroup = "member-group";
 
+            [UdiType(UdiType.GuidUdi)]
             public const string RelationType = "relation-type";
-            
+
             // forms
+
+            [UdiType(UdiType.GuidUdi)]
             public const string FormsForm = "forms-form";
+            [UdiType(UdiType.GuidUdi)]
             public const string FormsPreValue = "forms-prevalue";
+            [UdiType(UdiType.GuidUdi)]
             public const string FormsDataSource = "forms-datasource";
 
             // string entity types
 
+            [UdiType(UdiType.StringUdi)]
             public const string AnyString = "any-string"; // that one is for tests
 
+            [UdiType(UdiType.StringUdi)]
             public const string MediaFile = "media-file";
+            [UdiType(UdiType.StringUdi)]
             public const string TemplateFile = "template-file";
+            [UdiType(UdiType.StringUdi)]
             public const string Script = "script";
+            [UdiType(UdiType.StringUdi)]
             public const string Stylesheet = "stylesheet";
+            [UdiType(UdiType.StringUdi)]
             public const string PartialView = "partial-view";
+            [UdiType(UdiType.StringUdi)]
             public const string PartialViewMacro = "partial-view-macro";
+            [UdiType(UdiType.StringUdi)]
             public const string Xslt = "xslt";
 
             public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)
@@ -141,6 +171,15 @@ namespace Umbraco.Core
             }
         }
 
+        [AttributeUsage(AttributeTargets.Field)]
+        internal class UdiTypeAttribute : Attribute
+        {
+            public UdiType UdiType { get; private set; }
 
+            public UdiTypeAttribute(UdiType udiType)
+            {
+                UdiType = udiType;
+            }
+        }
     }
 }

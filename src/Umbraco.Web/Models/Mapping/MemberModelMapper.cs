@@ -61,6 +61,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMember TO MediaItemDisplay
             config.CreateMap<IMember, MemberDisplay>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
@@ -84,6 +85,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMember TO MemberBasic
             config.CreateMap<IMember, MemberBasic>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(dto => dto.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
@@ -96,9 +98,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM MembershipUser TO MemberBasic
-            config.CreateMap<MembershipUser, MemberBasic>()
+            config.CreateMap<MembershipUser, MemberBasic>()                
                 //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
+                .ForMember(display => display.Udi, expression => expression.Ignore())
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
                 .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
@@ -121,6 +124,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMember TO ContentItemDto<IMember>
             config.CreateMap<IMember, ContentItemDto<IMember>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(dto => dto.Published, expression => expression.Ignore())
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
