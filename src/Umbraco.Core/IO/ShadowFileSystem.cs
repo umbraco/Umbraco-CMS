@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Umbraco.Core.IO
 {
@@ -209,10 +210,11 @@ namespace Umbraco.Core.IO
             var normPath = NormPath(path);
             var shadows = Nodes.Where(kvp => IsChild(normPath, kvp.Key)).ToArray();
             var files = filter != null ? _fs.GetFiles(path, filter) : _fs.GetFiles(path);
+            var regexFilter = FilterToRegex(filter);
             return files
                 .Except(shadows.Where(kvp => (kvp.Value.IsFile && kvp.Value.IsDelete) || kvp.Value.IsDir)
                     .Select(kvp => kvp.Key))
-                .Union(shadows.Where(kvp => kvp.Value.IsFile && kvp.Value.IsExist).Select(kvp => kvp.Key))
+                .Union(shadows.Where(kvp => kvp.Value.IsFile && kvp.Value.IsExist && FilterByRegex(kvp.Key, regexFilter)).Select(kvp => kvp.Key))
                 .Distinct();
         }
 
@@ -284,6 +286,33 @@ namespace Umbraco.Core.IO
             }
             if (sf.IsDelete || sf.IsDir) throw new InvalidOperationException("Invalid path.");
             return _sfs.GetSize(path);
+        }
+
+        /// <summary>
+        /// Helper function for filtering keys by Regex if a filter is specified.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="regexFilter"></param>
+        /// <returns></returns>
+        internal static bool FilterByRegex(string input, string regexFilter)
+        {
+            if (regexFilter == null) return true;
+            return regexFilter != string.Empty && Regex.IsMatch(input, regexFilter);
+        }
+
+        /// <summary>
+        /// Transforms a filter pattern into a Regex pattern
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Appending '$' only if not containing wildcard is stupid and broken.
+        /// It is however what seems to be what they're doing in .NET so we need to match the functionality.
+        /// </remarks>
+        internal static string FilterToRegex(string pattern)
+        {
+            if (pattern == null) return null;
+            return "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + (pattern.Contains("*") ? string.Empty : "$");
         }
     }
 }
