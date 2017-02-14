@@ -24,10 +24,8 @@ namespace Umbraco.Core.Scoping
 #endif
         }
 
-#if DEBUG_SCOPES
         private readonly Guid _instanceId = Guid.NewGuid();
         public Guid InstanceId { get { return _instanceId; } }
-#endif
 
         /// <inheritdoc />
         public bool CallContext { get { return false; } }

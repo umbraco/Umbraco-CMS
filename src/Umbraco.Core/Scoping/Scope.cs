@@ -133,10 +133,8 @@ namespace Umbraco.Core.Scoping
                 throw new Exception("NoScope instance is not free.");
         }
 
-#if DEBUG_SCOPES
         private readonly Guid _instanceId = Guid.NewGuid();
         public Guid InstanceId { get { return _instanceId; } }
-#endif
 
         // a value indicating whether to force call-context
         public bool CallContext
@@ -188,6 +186,8 @@ namespace Umbraco.Core.Scoping
 
         // the parent scope (in a nested scopes chain)
         public IScopeInternal ParentScope { get; set; }
+
+        public bool Attached { get; set; }
 
         // the original scope (when attaching a detachable scope)
         public IScopeInternal OrigScope { get; set; }
@@ -329,7 +329,18 @@ namespace Umbraco.Core.Scoping
             EnsureNotDisposed();
 
             if (this != _scopeProvider.AmbientScope)
+            {
+#if DEBUG_SCOPES
+                var ambient = _scopeProvider.AmbientScope;
+                Logging.LogHelper.Debug<Scope>("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
+                if (ambient == null)
+                    throw new InvalidOperationException("Not the ambient scope (no ambient scope).");
+                var infos = _scopeProvider.GetScopeInfo(ambient);
+                throw new InvalidOperationException("Not the ambient scope (see current ambient ctor stack trace).\r\n" + infos.CtorStack);
+#else
                 throw new InvalidOperationException("Not the ambient scope.");
+#endif
+            }
 
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);
@@ -432,6 +443,9 @@ namespace Umbraco.Core.Scoping
                 {
                     // get out of the way, restore original
                     _scopeProvider.SetAmbient(OrigScope, OrigContext);
+                    Attached = false;
+                    OrigScope = null;
+                    OrigContext = null;
                 }
             });
         }

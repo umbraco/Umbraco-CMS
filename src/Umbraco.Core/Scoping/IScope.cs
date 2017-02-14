@@ -8,7 +8,7 @@ namespace Umbraco.Core.Scoping
     /// <summary>
     /// Represents a scope.
     /// </summary>
-    public interface IScope : IDisposable
+    public interface IScope : IDisposable, IInstanceIdentifiable
     {
         /// <summary>
         /// Gets the scope database.
@@ -39,9 +39,5 @@ namespace Umbraco.Core.Scoping
         /// Completes the scope.
         /// </summary>
         void Complete();
-
-#if DEBUG_SCOPES
-        Guid InstanceId { get; }
-#endif
     }
 }
