@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, new PagingSqlQuery(sql));
         }
 
         protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                                 .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, new PagingSqlQuery(sql));
         }
 
         #endregion
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.Full);
+            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.FullSingle);
         }
 
         protected override string GetBaseWhereClause()
@@ -143,13 +143,24 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
-            return ProcessQuery(sql, true);
+            return ProcessQuery(sql, new PagingSqlQuery(sql), true);
         }
 
-        private IEnumerable<IMedia> ProcessQuery(Sql sql, bool withCache = false)
+        /// <summary>
+        /// This is the underlying method that processes most queries for this repository
+        /// </summary>
+        /// <param name="sqlFull">
+        /// The full SQL to select all media data 
+        /// </param>
+        /// <param name="pagingSqlQuery">
+        /// The Id SQL to just return all media ids - used to process the properties for the media item
+        /// </param>
+        /// <param name="withCache"></param>
+        /// <returns></returns>
+        private IEnumerable<IMedia> ProcessQuery(Sql sqlFull, PagingSqlQuery pagingSqlQuery, bool withCache = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sqlFull);
             var content = new IMedia[dtos.Count];
             var defs = new List<DocumentDefinition>();
 
@@ -200,7 +211,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sql, defs);
+            var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
             // assign
             var dtoIndex = 0;
@@ -257,7 +268,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 query = query
                     .Where<NodeDto>(x => x.NodeId > baseId, SqlSyntax)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
-                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
+                var sql = SqlSyntax.SelectTop(query, groupSize);
+                var xmlItems = ProcessQuery(sql, new PagingSqlQuery(sql))
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
                     .ToList();
 
@@ -505,7 +517,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsContentVersion", "contentId"),
-                (sqlFull, sqlIds) => ProcessQuery(sqlFull), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, pagingSqlQuery) => ProcessQuery(sqlFull, pagingSqlQuery), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }
@@ -513,7 +525,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a media object from a ContentDto
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>
@@ -525,7 +537,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(new PagingSqlQuery(docSql), new[] { docDef });
 
             media.Properties = properties[dto.NodeId];
 

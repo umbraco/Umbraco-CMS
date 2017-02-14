@@ -285,17 +285,29 @@ namespace Umbraco.Core
             var member = entity as IMember;
             if (member != null) return member.GetUdi();
 
-            var contentBase = entity as IContentBase;
-            if (contentBase != null) return contentBase.GetUdi();
+            var stylesheet = entity as Stylesheet;
+            if (stylesheet != null) return stylesheet.GetUdi();
+
+            var script = entity as Script;
+            if (script != null) return script.GetUdi();
+
+            var dictionaryItem = entity as IDictionaryItem;
+            if (dictionaryItem != null) return dictionaryItem.GetUdi();
 
             var macro = entity as IMacro;
             if (macro != null) return macro.GetUdi();
 
+            var partialView = entity as IPartialView;
+            if (partialView != null) return partialView.GetUdi();
+
+            var xsltFile = entity as IXsltFile;
+            if (xsltFile != null) return xsltFile.GetUdi();
+
+            var contentBase = entity as IContentBase;
+            if (contentBase != null) return contentBase.GetUdi();
+
             var relationType = entity as IRelationType;
             if (relationType != null) return relationType.GetUdi();
-
-            var dictionaryItem = entity as IDictionaryItem;
-            if (dictionaryItem != null) return dictionaryItem.GetUdi();
 
             throw new NotSupportedException(string.Format("Entity type {0} is not supported.", entity.GetType().FullName));
         }

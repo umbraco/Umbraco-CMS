@@ -735,6 +735,26 @@ namespace Umbraco.Core.Services
             return empty.Union(files.Except(empty));
         }
 
+        public void CreatePartialViewFolder(string folderPath)
+        {
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreatePartialViewRepository(uow))
+            {
+                ((PartialViewRepository)repository).AddFolder(folderPath);
+                uow.Commit();
+            }
+        }
+
+        public void CreatePartialViewMacroFolder(string folderPath)
+        {
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow))
+            {
+                ((PartialViewMacroRepository)repository).AddFolder(folderPath);
+                uow.Commit();
+            }
+        }
+
         public void DeletePartialViewFolder(string folderPath)
         {
             using (var uow = _fileUowProvider.GetUnitOfWork())

@@ -174,24 +174,24 @@ namespace Umbraco.Core
             public static readonly Guid FormsFormGuid = new Guid(FormsForm);
 
             /// <summary>
-            /// Guid for a Forms Workflow.
+            /// Guid for a Forms PreValue Source.
             /// </summary>
-            public const string FormsWorkflow = "42D7BF9B-A362-4FEE-B45A-674D5C064B70";
+            public const string FormsPreValue = "42D7BF9B-A362-4FEE-B45A-674D5C064B70";
 
             /// <summary>
-            /// Guid for a Forms Workflow.
+            /// Guid for a Forms PreValue Source.
             /// </summary>
-            public static readonly Guid FormsWorkflowGuid = new Guid(FormsWorkflow);
+            public static readonly Guid FormsPreValueGuid = new Guid(FormsPreValue);
 
             /// <summary>
-            /// Guid for a Forms Record.
+            /// Guid for a Forms DataSource.
             /// </summary>
-            public const string FormsRecord = "CFED6CE4-9359-443E-9977-9956FEB1D867";
+            public const string FormsDataSource = "CFED6CE4-9359-443E-9977-9956FEB1D867";
 
             /// <summary>
-            /// Guid for a Forms Record.
+            /// Guid for a Forms DataSource.
             /// </summary>
-            public static readonly Guid FormsRecordGuid = new Guid(FormsRecord);
+            public static readonly Guid FormsDataSourceGuid = new Guid(FormsDataSource);
         }
     }
 }

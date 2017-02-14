@@ -496,6 +496,8 @@
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
     <key alias="search">Search</key>
+    <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
+    <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="show">Show</key>
     <key alias="showPageOnSend">Show page on Send</key>
