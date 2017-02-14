@@ -76,7 +76,7 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public void Complete()
+        public bool Complete()
         {
             throw new NotSupportedException();
         }

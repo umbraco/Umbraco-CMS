@@ -38,6 +38,8 @@ namespace Umbraco.Core.Scoping
         /// <summary>
         /// Completes the scope.
         /// </summary>
-        void Complete();
+        /// <returns>A value indicating whether the scope has been successfully completed.</returns>
+        /// <remarks>Can return false if any child scope has not completed.</remarks>
+        bool Complete();
     }
 }

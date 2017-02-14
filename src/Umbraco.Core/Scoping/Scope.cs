@@ -300,10 +300,11 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public void Complete()
+        public bool Complete()
         {
             if (_completed.HasValue == false)
                 _completed = true;
+            return _completed.Value;
         }
 
         public void Reset()
