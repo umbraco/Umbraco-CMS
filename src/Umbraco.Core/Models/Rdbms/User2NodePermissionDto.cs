@@ -15,6 +15,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("nodeId")]
         [ForeignKey(typeof(NodeDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_umbracoUser2NodePermission_nodeId")]
         public int NodeId { get; set; }
 
         [Column("permission")]
