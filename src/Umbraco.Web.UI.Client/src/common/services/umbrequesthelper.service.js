@@ -4,6 +4,17 @@
 * @description A helper object used for sending requests to the server
 **/
 function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService, notificationsService, eventsService) {
+    function showFailureNotifications(data, status) {
+        var i;
+
+        if (status >= 400 && data && data.notifications && data.notifications.length) {
+            for (i = 0; i < data.notifications.length; i++) {
+                notificationsService.showNotification(data.notifications[i]);
+            }
+        }
+
+    }
+
     return {
 
         /**
@@ -24,7 +35,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
             if (!virtualPath.startsWith("~/")) {
                 throw "The path " + virtualPath + " is not a virtual path";
             }
-            if (!Umbraco.Sys.ServerVariables.application.applicationPath) { 
+            if (!Umbraco.Sys.ServerVariables.application.applicationPath) {
                 throw "No applicationPath defined in Umbraco.ServerVariables.application.applicationPath";
             }
             return Umbraco.Sys.ServerVariables.application.applicationPath + virtualPath.trimStart("~/");
@@ -42,7 +53,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          * @param {Array} queryStrings An array of key/value pairs
          */
         dictionaryToQueryString: function (queryStrings) {
-            
+
             if (angular.isArray(queryStrings)) {
                 return _.map(queryStrings, function (item) {
                     var key = null;
@@ -63,7 +74,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 //this allows for a normal object to be passed in (ie. a dictionary)
                 return decodeURIComponent($.param(queryStrings));
             }
-            
+
             throw "The queryString parameter is not an array or object of key value pairs";
         },
 
@@ -168,7 +179,10 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         //show a simple error notification                         
                         notificationsService.error("Server error", "Contact administrator, see log for full details.<br/><i>" + result.errorMsg + "</i>");
                     }
-                    
+
+                }
+                else {
+                    showFailureNotifications(data, status);
                 }
 
                 //return an error object including the error message for UI
@@ -249,7 +263,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         // do this since it's very hacky/difficult to catch this on the server
                         if (typeof data !== "undefined" && typeof data.indexOf === "function" && data.indexOf("Maximum request length exceeded") >= 0) {
                             notificationsService.error("Server error", "The uploaded file was too large, check with your site administrator to adjust the maximum size allowed");
-                        }                        
+                        }
                         else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                             //show a ysod dialog
                             eventsService.emit('app.ysod',
@@ -262,16 +276,19 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                             //show a simple error notification                         
                             notificationsService.error("Server error", "Contact administrator, see log for full details.<br/><i>" + data.ExceptionMessage + "</i>");
                         }
-                        
+
                     }
-                    
+                    else {
+                        showFailureNotifications(data, status);
+                    }
+
                     //return an error object including the error message for UI
                     deferred.reject({
                         errorMsg: 'An error occurred',
                         data: data,
                         status: status
                     });
-                   
+
 
                 });
 
