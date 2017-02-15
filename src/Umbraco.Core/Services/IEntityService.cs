@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Services
 {
@@ -136,6 +137,9 @@ namespace Umbraco.Core.Services
         /// <param name="umbracoObjectType">UmbracoObjectType of the children to retrieve</param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         IEnumerable<IUmbracoEntity> GetChildren(int parentId, UmbracoObjectTypes umbracoObjectType);
+
+        IEnumerable<IUmbracoEntity> GetPagedChildren(int parentId, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of descendents by the parents Id

@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -369,6 +370,27 @@ namespace Umbraco.Core.Services
                 var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
 
                 var contents = repository.GetByQuery(query, objectTypeId);
+                uow.Commit();
+                return contents;
+            }
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedChildren(int parentId, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "")
+        {
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
+
+                IQuery<IUmbracoEntity> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IUmbracoEntity>.Builder.Where(x => x.Name.Contains(filter));
+                }
+
+                var contents = repository.GetPagedResultsByQuery(query, objectTypeId, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
                 uow.Commit();
                 return contents;
             }

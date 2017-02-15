@@ -26,7 +26,57 @@ namespace Umbraco.Tests.Services
         {
             base.TearDown();
         }
-        
+
+        [Test]
+        public void EntityService_Can_Get_Paged_Content_Children()
+        {
+            
+            var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
+            
+            var root = MockedContent.CreateSimpleContent(contentType);            
+            ServiceContext.ContentService.Save(root);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+                ServiceContext.ContentService.Save(c1);
+            }
+
+            var service = ServiceContext.EntityService;
+
+            long total;
+            var entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 0, 6, out total).ToArray();            
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void EntityService_Can_Get_Paged_Media_Children()
+        {
+            var folderType = ServiceContext.ContentTypeService.GetMediaType(1031);
+            var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
+
+            var root = MockedMedia.CreateMediaFolder(folderType, -1);
+            ServiceContext.MediaService.Save(root);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
+                ServiceContext.MediaService.Save(c1);
+            }
+
+            var service = ServiceContext.EntityService;
+
+            long total;
+            var entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));            
+        }
+
         [Test]
         public void EntityService_Can_Find_All_Content_By_UmbracoObjectTypes()
         {
