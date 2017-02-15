@@ -786,7 +786,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         public void ClearPublished(IContent content)
         {
             var sql = "UPDATE cmsDocument SET published=0 WHERE nodeId=@id AND published=1";
-            Database.Update(sql, new {id = content.Id});
+            Database.Execute(sql, new {id = content.Id});
         }
 
         /// <summary>
