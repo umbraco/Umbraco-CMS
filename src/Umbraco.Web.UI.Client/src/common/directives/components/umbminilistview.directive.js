@@ -60,7 +60,9 @@
                         _.each(miniListView.children, function(c) {
                             if (c.metaData) {
                                 c.hasChildren = c.metaData.HasChildren;
-                                c.published = c.metaData.IsPublished;
+                                if(scope.entityType === "Document") {
+                                    c.published = c.metaData.IsPublished;
+                                }
                             }
                         });
                         // update pagination
