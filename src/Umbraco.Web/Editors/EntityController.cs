@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Net;
 using System.Text;
@@ -30,6 +31,7 @@ using Umbraco.Web.Dynamics;
 using umbraco;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using System.Web.Http.Controllers;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Editors
@@ -44,6 +46,20 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class EntityControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
+            }
+        }
+
         /// <summary>
         /// Returns an Umbraco alias given a string
         /// </summary>
@@ -145,9 +161,7 @@ namespace Umbraco.Web.Editors
 
             return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
-
-
-
+        
         /// <summary>
         /// Gets the url of an entity
         /// </summary>
@@ -186,13 +200,9 @@ namespace Umbraco.Web.Editors
                 Content = new StringContent(returnUrl)
             };
         }
-
-        /// <summary>
-        /// Gets an entity by it's unique id if the entity supports that
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        
+        [Obsolete("Use GetyById instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public EntityBasic GetByKey(Guid id, UmbracoEntityTypes type)
         {
             return GetResultForKey(id, type);
@@ -236,13 +246,61 @@ namespace Umbraco.Web.Editors
                 },
                 publishedContentExists: i => Umbraco.TypedContent(i) != null);
         }
-        
+
+        #region GetById
+
+        /// <summary>
+        /// Gets an entity by it's id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
         {
             return GetResultForId(id, type);
         }
 
-        public IEnumerable<EntityBasic> GetByIds([FromUri]int[] ids, UmbracoEntityTypes type)
+        /// <summary>
+        /// Gets an entity by it's key
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public EntityBasic GetById(Guid id, UmbracoEntityTypes type)
+        {
+            return GetResultForKey(id, type);
+        }
+
+        /// <summary>
+        /// Gets an entity by it's UDI
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public EntityBasic GetById(Udi id, UmbracoEntityTypes type)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetResultForKey(guidUdi.Guid, type);
+            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        } 
+        #endregion
+
+        #region GetByIds
+        /// <summary>
+        /// Get entities by integer ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]int[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
             {
@@ -251,6 +309,66 @@ namespace Umbraco.Web.Editors
             return GetResultForIds(ids, type);
         }
 
+        /// <summary>
+        /// Get entities by GUID ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]Guid[] ids, UmbracoEntityTypes type)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return GetResultForKeys(ids, type);
+        }
+
+        /// <summary>
+        /// Get entities by UDIs
+        /// </summary>
+        /// <param name="ids">
+        /// A list of UDIs to lookup items by, all UDIs must be of the same UDI type!
+        /// </param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids.
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]Udi[] ids, [FromUri]UmbracoEntityTypes type)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (ids.Length == 0)
+            {
+                return Enumerable.Empty<EntityBasic>();
+            }
+
+            //all udi types will need to be the same in this list so we'll determine by the first
+            //currently we only support GuidIdi for this method
+
+            var guidUdi = ids[0] as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetResultForKeys(ids.Select(x => ((GuidUdi)x).Guid).ToArray(), type);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }       
+        #endregion
+
+        [Obsolete("Use GetyByIds instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<EntityBasic> GetByKeys([FromUri]Guid[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
@@ -691,21 +809,21 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private IEnumerable<EntityBasic> GetResultForKeys(IEnumerable<Guid> keys, UmbracoEntityTypes entityType)
+        private IEnumerable<EntityBasic> GetResultForKeys(Guid[] keys, UmbracoEntityTypes entityType)
         {
-            var keysArray = keys.ToArray();
-            if (keysArray.Any() == false) return Enumerable.Empty<EntityBasic>();
+            if (keys.Length == 0)
+                return Enumerable.Empty<EntityBasic>();
 
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                var entities = Services.EntityService.GetAll(objectType.Value, keysArray)
+                var entities = Services.EntityService.GetAll(objectType.Value, keys)
                     .WhereNotNull()
                     .Select(Mapper.Map<EntityBasic>);
 
                 // entities are in "some" order, put them back in order
                 var xref = entities.ToDictionary(x => x.Key);
-                var result = keysArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
+                var result = keys.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;
             }
@@ -723,21 +841,21 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private IEnumerable<EntityBasic> GetResultForIds(IEnumerable<int> ids, UmbracoEntityTypes entityType)
+        private IEnumerable<EntityBasic> GetResultForIds(int[] ids, UmbracoEntityTypes entityType)
         {
-            var idsArray = ids.ToArray();
-            if (idsArray.Any() == false) return Enumerable.Empty<EntityBasic>();
+            if (ids.Length == 0)
+                return Enumerable.Empty<EntityBasic>();
 
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                var entities = Services.EntityService.GetAll(objectType.Value, idsArray)
+                var entities = Services.EntityService.GetAll(objectType.Value, ids)
                     .WhereNotNull()
                     .Select(Mapper.Map<EntityBasic>);
 
                 // entities are in "some" order, put them back in order
                 var xref = entities.ToDictionary(x => x.Id);
-                var result = idsArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
+                var result = ids.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;
             }

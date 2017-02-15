@@ -25,6 +25,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             //FROM IMedia TO MediaItemDisplay
             config.CreateMap<IMedia, MediaItemDisplay>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Media, content.Key)))
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
@@ -45,6 +46,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Media, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(dto => dto.Trashed, expression => expression.MapFrom(content => content.Trashed))
@@ -56,6 +58,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMedia TO ContentItemDto<IMedia>
             config.CreateMap<IMedia, ContentItemDto<IMedia>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Media, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(dto => dto.Published, expression => expression.Ignore())
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
