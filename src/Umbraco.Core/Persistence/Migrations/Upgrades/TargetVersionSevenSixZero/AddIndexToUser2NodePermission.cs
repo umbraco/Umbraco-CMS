@@ -1,14 +1,13 @@
 using System.Linq;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 {
     [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
-    public class AddIndexToCmsMemberLoginName : MigrationBase
+    public class AddIndexToUser2NodePermission : MigrationBase
     {
-        public AddIndexToCmsMemberLoginName(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+        public AddIndexToUser2NodePermission(ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
         { }
 
@@ -17,10 +16,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database);
 
             //make sure it doesn't already exist
-            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsMember_LoginName")) == false)
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoUser2NodePermission_nodeId")) == false)
             {
-                Create.Index("IX_cmsMember_LoginName").OnTable("cmsMember")
-                    .OnColumn("LoginName")
+                Create.Index("IX_umbracoUser2NodePermission_nodeId").OnTable("umbracoUser2NodePermission")
+                    .OnColumn("nodeId")
                     .Ascending()
                     .WithOptions()
                     .NonClustered();
@@ -29,7 +28,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 
         public override void Down()
         {
-            Delete.Index("IX_cmsMember_LoginName").OnTable("cmsMember");
+            Delete.Index("IX_umbracoUser2NodePermission_nodeId").OnTable("cmsMember");
         }
     }
 }
