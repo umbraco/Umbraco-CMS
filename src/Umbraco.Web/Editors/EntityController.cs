@@ -29,6 +29,7 @@ using Examine.SearchCriteria;
 using Umbraco.Web.Dynamics;
 using umbraco;
 using System.Text.RegularExpressions;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Editors
@@ -206,7 +207,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public EntityBasic GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
         {
-            //TODO: Rename this!!! It's a bit misleading, it should be GetByXPath
+            //TODO: Rename this!!! It's misleading, it should be GetByXPath
 
           
             if (type != UmbracoEntityTypes.Document)
@@ -262,6 +263,53 @@ namespace Umbraco.Web.Editors
         public IEnumerable<EntityBasic> GetChildren(int id, UmbracoEntityTypes type)
         {
             return GetResultForChildren(id, type);
+        }
+
+        public PagedResult<EntityBasic> GetPagedChildren(
+            int id,
+            UmbracoEntityTypes type,
+            int pageNumber, 
+            int pageSize,
+            string orderBy = "SortOrder",
+            Direction orderDirection = Direction.Ascending,
+            string filter = "")
+        {
+            if (pageNumber <= 0)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (pageSize <= 0)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            
+            var objectType = ConvertToObjectType(type);
+            if (objectType.HasValue)
+            {
+                long totalRecords;
+                var entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+
+                if (totalRecords == 0)
+                {
+                    return new PagedResult<EntityBasic>(0, 0, 0);
+                }
+
+                var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
+                {
+                    Items = entities.Select(Mapper.Map<EntityBasic>)
+                };
+
+                return pagedResult;
+            }
+
+            //now we need to convert the unknown ones
+            switch (type)
+            {
+                case UmbracoEntityTypes.PropertyType:
+                case UmbracoEntityTypes.PropertyGroup:
+                case UmbracoEntityTypes.Domain:
+                case UmbracoEntityTypes.Language:
+                case UmbracoEntityTypes.User:
+                case UmbracoEntityTypes.Macro:
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + type);
+            }
         }
 
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type)

@@ -86,6 +86,37 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void EntityService_Can_Get_Paged_Content_Descendants_With_Search()
+        {
+            var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
+
+            var root = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(root);
+            
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType, "ssss" + Guid.NewGuid(), root);
+                ServiceContext.ContentService.Save(c1);
+
+                for (int j = 0; j < 5; j++)
+                {
+                    var c2 = MockedContent.CreateSimpleContent(contentType, "tttt" + Guid.NewGuid(), c1);
+                    ServiceContext.ContentService.Save(c2);
+                }
+            }
+
+            var service = ServiceContext.EntityService;
+
+            long total;
+            var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 10, out total, filter: "ssss").ToArray();
+            Assert.That(entities.Length, Is.EqualTo(10));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 50, out total, filter: "tttt").ToArray();
+            Assert.That(entities.Length, Is.EqualTo(50));
+            Assert.That(total, Is.EqualTo(50));
+        }
+
+        [Test]
         public void EntityService_Can_Get_Paged_Media_Children()
         {
             var folderType = ServiceContext.ContentTypeService.GetMediaType(1031);
@@ -142,6 +173,40 @@ namespace Umbraco.Tests.Services
             entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 1, 31, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(29));
             Assert.That(total, Is.EqualTo(60));
+        }
+
+        [Test]
+        public void EntityService_Can_Get_Paged_Media_Descendants_With_Search()
+        {
+            var folderType = ServiceContext.ContentTypeService.GetMediaType(1031);
+            var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
+
+            var root = MockedMedia.CreateMediaFolder(folderType, -1);
+            ServiceContext.MediaService.Save(root);
+            
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
+                c1.Name = "ssss" + Guid.NewGuid();
+                ServiceContext.MediaService.Save(c1);
+
+                for (int j = 0; j < 5; j++)
+                {
+                    var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
+                    c2.Name = "tttt" + Guid.NewGuid();
+                    ServiceContext.MediaService.Save(c2);
+                }
+            }
+
+            var service = ServiceContext.EntityService;
+
+            long total;
+            var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 10, out total, filter: "ssss").ToArray();
+            Assert.That(entities.Length, Is.EqualTo(10));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 50, out total, filter: "tttt").ToArray();
+            Assert.That(entities.Length, Is.EqualTo(50));
+            Assert.That(total, Is.EqualTo(50));
         }
 
         [Test]

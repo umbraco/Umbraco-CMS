@@ -56,8 +56,17 @@ namespace Umbraco.Core.Persistence.Repositories
             bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
             bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
             var factory = new UmbracoEntityFactory();
-
-            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
+            
+            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql =>
+            {
+                if (filter != null)
+                {
+                    foreach (var filterClaus in filter.GetWhereClauses())
+                    {
+                        sql.Where(filterClaus.Item1, filterClaus.Item2);
+                    }
+                }
+            }, objectTypeId);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var entitySql = translator.Translate();
             var pagedSql = entitySql.Append(GetGroupBy(isContent, isMedia, false)).OrderBy("umbracoNode.id");
@@ -141,7 +150,16 @@ namespace Umbraco.Core.Persistence.Repositories
             //the COUNT(*) query to return the wrong 
             var sqlCountClause = GetBaseWhere(
                 (isC, isM, f) => GetBase(isC, isM, f, true), //true == is a count query
-                isContent, isMedia, null, objectTypeId);
+                isContent, isMedia, sql =>
+                {
+                    if (filter != null)
+                    {
+                        foreach (var filterClaus in filter.GetWhereClauses())
+                        {
+                            sql.Where(filterClaus.Item1, filterClaus.Item2);
+                        }
+                    }
+                }, objectTypeId);
             var translatorCount = new SqlTranslator<IUmbracoEntity>(sqlCountClause, query);
             var countSql = translatorCount.Translate();
 
