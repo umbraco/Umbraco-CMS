@@ -53,6 +53,39 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void EntityService_Can_Get_Paged_Content_Descendants()
+        {
+            var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
+
+            var root = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(root);
+            var count = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+                ServiceContext.ContentService.Save(c1);
+                count++;
+
+                for (int j = 0; j < 5; j++)
+                {
+                    var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
+                    ServiceContext.ContentService.Save(c2);
+                    count++;
+                }                
+            }
+
+            var service = ServiceContext.EntityService;
+
+            long total;
+            var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 31, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(31));
+            Assert.That(total, Is.EqualTo(60));
+            entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 1, 31, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(29));
+            Assert.That(total, Is.EqualTo(60));
+        }
+
+        [Test]
         public void EntityService_Can_Get_Paged_Media_Children()
         {
             var folderType = ServiceContext.ContentTypeService.GetMediaType(1031);
@@ -75,6 +108,40 @@ namespace Umbraco.Tests.Services
             entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 1, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));            
+        }
+
+        [Test]
+        public void EntityService_Can_Get_Paged_Media_Descendants()
+        {
+            var folderType = ServiceContext.ContentTypeService.GetMediaType(1031);
+            var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
+
+            var root = MockedMedia.CreateMediaFolder(folderType, -1);
+            ServiceContext.MediaService.Save(root);
+            var count = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
+                ServiceContext.MediaService.Save(c1);
+                count++;
+
+                for (int j = 0; j < 5; j++)
+                {
+                    var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
+                    ServiceContext.MediaService.Save(c2);
+                    count++;
+                }
+            }
+
+            var service = ServiceContext.EntityService;
+
+            long total;
+            var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 31, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(31));
+            Assert.That(total, Is.EqualTo(60));
+            entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 1, 31, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(29));
+            Assert.That(total, Is.EqualTo(60));
         }
 
         [Test]

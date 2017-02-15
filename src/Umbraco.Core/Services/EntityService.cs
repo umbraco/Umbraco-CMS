@@ -396,6 +396,33 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IUmbracoEntity> GetPagedDescendants(int id, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
+        {
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+
+                var query = Query<IUmbracoEntity>.Builder;
+                //if the id is System Root, then just get all
+                if (id != Constants.System.Root)
+                {
+                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                }
+
+                IQuery<IUmbracoEntity> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IUmbracoEntity>.Builder.Where(x => x.Name.Contains(filter));
+                }
+
+                var contents = repository.GetPagedResultsByQuery(query, objectTypeId, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
+                uow.Commit();
+                return contents;
+            }
+        }
+
         /// <summary>
         /// Gets a collection of descendents by the parents Id
         /// </summary>

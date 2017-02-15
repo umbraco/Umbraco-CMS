@@ -55,23 +55,20 @@ namespace Umbraco.Core.Persistence.Repositories
         {   
             bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
             bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
-
-            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
-
-            var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
-            var entitySql = translator.Translate();
-
             var factory = new UmbracoEntityFactory();
 
-            //use dynamic so that we can get ALL properties from the SQL so we can chuck that data into our AdditionalData
+            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
+            var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
+            var entitySql = translator.Translate();
             var pagedSql = entitySql.Append(GetGroupBy(isContent, isMedia, false)).OrderBy("umbracoNode.id");
+
+            IEnumerable<IUmbracoEntity> result;
 
             if (isMedia)
             {
                 //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
                 var pagedResult = _work.Database.Page<dynamic>(pageIndex + 1, pageSize, pagedSql);
-                totalRecords = pagedResult.TotalItems;
-
+                
                 var ids = pagedResult.Items.Select(x => (int) x.id).InGroupsOf(2000);
                 var entities = pagedResult.Items.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
 
@@ -128,16 +125,29 @@ namespace Umbraco.Core.Persistence.Repositories
                         propertyDataSetEnumerator.Dispose();
                     }
                 }
-
-                totalRecords = pagedResult.TotalItems;
-                return entities;
+                
+                result = entities;
             }
             else
             {   
                 var pagedResult = _work.Database.Page<dynamic>(pageIndex + 1, pageSize, pagedSql);
-                totalRecords = pagedResult.TotalItems;
-                return pagedResult.Items.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
+                result = pagedResult.Items.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
             }
+
+            //The total items from the PetaPoco page query will be wrong due to the Outer join used on parent, depending on the search this will 
+            //return duplicate results when the COUNT is used in conjuction with it, so we need to get the total on our own.
+
+            //generate a query that does not contain the LEFT Join for parent, this would cause
+            //the COUNT(*) query to return the wrong 
+            var sqlCountClause = GetBaseWhere(
+                (isC, isM, f) => GetBase(isC, isM, f, true), //true == is a count query
+                isContent, isMedia, null, objectTypeId);
+            var translatorCount = new SqlTranslator<IUmbracoEntity>(sqlCountClause, query);
+            var countSql = translatorCount.Translate();
+
+            totalRecords = _work.Database.ExecuteScalar<int>(countSql);
+
+            return result;
         }
 
         public IUmbracoEntity GetByKey(Guid key)
@@ -404,39 +414,52 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderBy("sortOrder, id");
 
             return wrappedSql;
-        }        
+        }
 
         protected virtual Sql GetBase(bool isContent, bool isMedia, Action<Sql> customFilter)
         {
-            var columns = new List<object>
-            {
-                "umbracoNode.id",
-                "umbracoNode.trashed",
-                "umbracoNode.parentID",
-                "umbracoNode.nodeUser",
-                "umbracoNode.level",
-                "umbracoNode.path",
-                "umbracoNode.sortOrder",
-                "umbracoNode.uniqueID",
-                "umbracoNode.text",
-                "umbracoNode.nodeObjectType",
-                "umbracoNode.createDate",
-                "COUNT(parent.parentID) as children"
-            };
+            return GetBase(isContent, isMedia, customFilter, false);
+        }
 
-            if (isContent || isMedia)
+        protected virtual Sql GetBase(bool isContent, bool isMedia, Action<Sql> customFilter, bool isCount)
+        {
+            var columns = new List<object>();
+            if (isCount)
             {
-                if (isContent)
+                columns.Add("COUNT(*)");
+            }
+            else
+            {
+                columns.AddRange(new List<object>
                 {
-                    //only content has this info
-                    columns.Add("published.versionId as publishedVersion");
-                    columns.Add("document.versionId as newestVersion");
+                    "umbracoNode.id",
+                    "umbracoNode.trashed",
+                    "umbracoNode.parentID",
+                    "umbracoNode.nodeUser",
+                    "umbracoNode.level",
+                    "umbracoNode.path",
+                    "umbracoNode.sortOrder",
+                    "umbracoNode.uniqueID",
+                    "umbracoNode.text",
+                    "umbracoNode.nodeObjectType",
+                    "umbracoNode.createDate",
+                    "COUNT(parent.parentID) as children"
+                });
+
+                if (isContent || isMedia)
+                {
+                    if (isContent)
+                    {
+                        //only content has this info
+                        columns.Add("published.versionId as publishedVersion");
+                        columns.Add("document.versionId as newestVersion");
+                    }
+
+                    columns.Add("contenttype.alias");
+                    columns.Add("contenttype.icon");
+                    columns.Add("contenttype.thumbnail");
+                    columns.Add("contenttype.isContainer");
                 }
-                
-                columns.Add("contenttype.alias");
-                columns.Add("contenttype.icon");
-                columns.Add("contenttype.thumbnail");
-                columns.Add("contenttype.isContainer");
             }
 
             //Creates an SQL query to return a single row for the entity
@@ -461,7 +484,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 entitySql.LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType");
             }
 
-            entitySql.LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
+            if (isCount == false)
+            {
+                entitySql.LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
+            }
 
             if (customFilter != null)
             {
