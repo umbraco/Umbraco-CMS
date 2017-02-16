@@ -773,24 +773,102 @@ ORDER BY contentNodeId, propertytypeid
         /// <returns></returns>
         protected abstract Sql GetBaseQuery(BaseQueryType queryType);
 
+        internal class DocumentDefinitionCollection : KeyedCollection<int, DocumentDefinition>
+        {
+            protected override int GetKeyForItem(DocumentDefinition item)
+            {
+                return item.Id;
+            }
+
+            /// <summary>
+            /// if this key already exists if it does then we need to check
+            /// if the existing item is 'older' than the new item and if that is the case we'll replace the older one
+            /// </summary>
+            /// <param name="item"></param>
+            /// <returns></returns>
+            public bool AddOrUpdate(DocumentDefinition item)
+            {
+                if (Dictionary == null)
+                {
+                    base.Add(item);
+                    return true;
+                }
+
+                var key = GetKeyForItem(item);
+                DocumentDefinition found;
+                if (TryGetValue(key, out found))
+                {
+                    //it already exists and it's older so we need to replace it
+                    if (item.VersionDate > found.VersionDate)
+                    {
+                        var currIndex = Items.IndexOf(found);
+                        if (currIndex == -1)
+                            throw new IndexOutOfRangeException("Could not find the item in the list: " + found.Version);
+
+                        //replace the current one with the newer one
+                        SetItem(currIndex, item);
+                        return true;
+                    }
+                    //could not add or update
+                    return false;
+                }
+                
+                base.Add(item);
+                return true;
+            }
+          
+            public bool TryGetValue(int key, out DocumentDefinition val)
+            {
+                if (Dictionary == null)
+                {
+                    val = null;
+                    return false;
+                }
+                return Dictionary.TryGetValue(key, out val);
+            }
+        }
+
         internal class DocumentDefinition
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="T:System.Object"/> class.
             /// </summary>
-            public DocumentDefinition(int id, Guid version, DateTime versionDate, DateTime createDate, IContentTypeComposition composition)
+            public DocumentDefinition(DocumentDto dto, IContentTypeComposition composition)
             {
-                Id = id;
-                Version = version;
-                VersionDate = versionDate;
-                CreateDate = createDate;
+                DocumentDto = dto;
+                ContentVersionDto = dto.ContentVersionDto;
                 Composition = composition;
             }
 
-            public int Id { get; set; }
-            public Guid Version { get; set; }
-            public DateTime VersionDate { get; set; }
-            public DateTime CreateDate { get; set; }
+            public DocumentDefinition(ContentVersionDto dto, IContentTypeComposition composition)
+            {
+                ContentVersionDto = dto;
+                Composition = composition;
+            }
+
+            public DocumentDto DocumentDto { get; private set; }
+            public ContentVersionDto ContentVersionDto { get; private set; }
+
+            public int Id
+            {
+                get { return ContentVersionDto.NodeId; }
+            }
+
+            public Guid Version
+            {
+                get { return DocumentDto != null ? DocumentDto.VersionId : ContentVersionDto.VersionId; }
+            }
+
+            public DateTime VersionDate
+            {
+                get { return ContentVersionDto.VersionDate; }
+            }
+
+            public DateTime CreateDate
+            {
+                get { return ContentVersionDto.ContentDto.NodeDto.CreateDate; }
+            }
+
             public IContentTypeComposition Composition { get; set; }
         }
 

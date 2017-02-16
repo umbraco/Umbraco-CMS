@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateContentFromDto(dto, dto.ContentVersionDto.VersionId, sql);
+            var content = CreateContentFromDto(dto, sql);
 
             return content;
         }
@@ -287,7 +287,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateContentFromDto(dto, versionId, sql);
+            var content = CreateContentFromDto(dto, sql);
 
             return content;
         }
@@ -933,13 +933,14 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
                 parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.LastIndexOf("ORDER BY ", StringComparison.Ordinal));
             }            
 
+            //order by update date DESC, if there is corrupted published flags we only want the latest!
             var publishedSql = new Sql(@"SELECT *
 FROM cmsDocument AS doc2
 INNER JOIN 
 	(" + parsedOriginalSql + @") as docData
 ON doc2.nodeId = docData.nodeId
 WHERE doc2.published = 1
-ORDER BY doc2.nodeId
+ORDER BY doc2.updateDate DESC
 ", sqlFull.Arguments);
 
             //go and get the published version data, we do a Query here and not a Fetch so we are
@@ -955,8 +956,8 @@ ORDER BY doc2.nodeId
             }
 
 
-            var content = new IContent[dtos.Count];
-            var defs = new List<DocumentDefinition>();
+            var content = new List<IContent>();
+            var defs = new DocumentDefinitionCollection();
             var templateIds = new List<int>();
             
             //track the looked up content types, even though the content types are cached
@@ -964,9 +965,8 @@ ORDER BY doc2.nodeId
             // the overhead of deep cloning them on every item in this loop
             var contentTypes = new Dictionary<int, IContentType>();
             
-            for (var i = 0; i < dtos.Count; i++)
+            foreach (var dto in dtos)
             {
-                var dto = dtos[i];
                 DocumentPublishedReadOnlyDto publishedDto;
                 publishedDataCollection.TryGetValue(dto.NodeId, out publishedDto);
 
@@ -975,9 +975,10 @@ ORDER BY doc2.nodeId
                 {
                     var cached = RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
                     //only use this cached version if the dto returned is also the publish version, they must match
+                    //TODO: Shouldn't this also match on version!?
                     if (cached != null && cached.Published && dto.Published)
                     {
-                        content[i] = cached;
+                        content.Add(cached);
                         continue;
                     }
                 }
@@ -996,20 +997,15 @@ ORDER BY doc2.nodeId
                     contentTypes[dto.ContentVersionDto.ContentDto.ContentTypeId] = contentType;
                 }
                 
-                content[i] = ContentFactory.BuildEntity(dto, contentType, publishedDto);
+                // track the definition and if it's successfully added or updated then processed
+                if (defs.AddOrUpdate(new DocumentDefinition(dto, contentType)))
+                {
+                    // need template
+                    if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                        templateIds.Add(dto.TemplateId.Value);
 
-                // need template
-                if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
-                    templateIds.Add(dto.TemplateId.Value);
-
-                // need properties
-                defs.Add(new DocumentDefinition(
-                    dto.NodeId,
-                    dto.VersionId,
-                    dto.ContentVersionDto.VersionDate,
-                    dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                    contentType
-                ));
+                    content.Add(ContentFactory.BuildEntity(dto, contentType, publishedDto));
+                }
             }
 
             // load all required templates in 1 query
@@ -1019,26 +1015,21 @@ ORDER BY doc2.nodeId
             // load all properties for all documents from database in 1 query
             var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
-            // assign
-            var dtoIndex = 0;
-            foreach (var def in defs)
+            // assign template and property data
+            foreach (var cc in content)
             {
-                // move to corresponding item (which has to exist)
-                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
+                var def = defs[cc.Id];
 
-                // complete the item
-                var cc = content[dtoIndex];
-                var dto = dtos[dtoIndex];
                 ITemplate template = null;
-                if (dto.TemplateId.HasValue)
-                    templates.TryGetValue(dto.TemplateId.Value, out template); // else null
+                if (def.DocumentDto.TemplateId.HasValue)
+                    templates.TryGetValue(def.DocumentDto.TemplateId.Value, out template); // else null
                 cc.Template = template;
                 cc.Properties = propertyData[cc.Id];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
                 cc.ResetDirtyProperties(false);
-            }
+            }            
 
             return content;
         }
@@ -1047,10 +1038,9 @@ ORDER BY doc2.nodeId
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
         /// <param name="dto"></param>
-        /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>
-        private IContent CreateContentFromDto(DocumentDto dto, Guid versionId, Sql docSql)
+        private IContent CreateContentFromDto(DocumentDto dto, Sql docSql)
         {
             var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
@@ -1062,7 +1052,7 @@ ORDER BY doc2.nodeId
                 content.Template = _templateRepository.Get(dto.TemplateId.Value);
             }
 
-            var docDef = new DocumentDefinition(dto.NodeId, versionId, content.UpdateDate, content.CreateDate, contentType);
+            var docDef = new DocumentDefinition(dto, contentType);
 
             var properties = GetPropertyCollection(docSql, new[] { docDef });
 

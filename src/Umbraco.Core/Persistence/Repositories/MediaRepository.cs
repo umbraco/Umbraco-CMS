@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateMediaFromDto(dto, dto.VersionId, sql);
+            var content = CreateMediaFromDto(dto, sql);
 
             return content;
         }
@@ -161,25 +161,24 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sqlFull);
-            var content = new IMedia[dtos.Count];
-            var defs = new List<DocumentDefinition>();
+            var content = new List<IMedia>();
+            var defs = new DocumentDefinitionCollection();
 
             //track the looked up content types, even though the content types are cached
             // they still need to be deep cloned out of the cache and we don't want to add
             // the overhead of deep cloning them on every item in this loop
             var contentTypes = new Dictionary<int, IMediaType>();
 
-            for (var i = 0; i < dtos.Count; i++)
+            foreach (var dto in dtos)
             {
-                var dto = dtos[i];
-
                 // if the cache contains the item, use it
                 if (withCache)
                 {
                     var cached = RuntimeCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
+                    //TODO: Shouldn't this also match on version!?
                     if (cached != null)
                     {
-                        content[i] = cached;
+                        content.Add(cached);
                         continue;
                     }
                 }
@@ -197,37 +196,26 @@ namespace Umbraco.Core.Persistence.Repositories
                     contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
                     contentTypes[dto.ContentDto.ContentTypeId] = contentType;
                 }
-                
-                content[i] = MediaFactory.BuildEntity(dto, contentType);
 
-                // need properties
-                defs.Add(new DocumentDefinition(
-                    dto.NodeId,
-                    dto.VersionId,
-                    dto.VersionDate,
-                    dto.ContentDto.NodeDto.CreateDate,
-                    contentType
-                ));
+                // track the definition and if it's successfully added or updated then processed
+                if (defs.AddOrUpdate(new DocumentDefinition(dto, contentType)))
+                {
+                    content.Add(MediaFactory.BuildEntity(dto, contentType));
+                }
             }
 
             // load all properties for all documents from database in 1 query
             var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
-            // assign
-            var dtoIndex = 0;
-            foreach (var def in defs)
+            // assign property data
+            foreach (var cc in content)
             {
-                // move to corresponding item (which has to exist)
-                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
-
-                // complete the item
-                var cc = content[dtoIndex];
                 cc.Properties = propertyData[cc.Id];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
                 cc.ResetDirtyProperties(false);
-            }
+            }            
 
             return content;
         }
@@ -243,7 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateMediaFromDto(dto, versionId, sql);
+            var content = CreateMediaFromDto(dto, sql);
 
             return content;
         }
@@ -528,16 +516,15 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Private method to create a media object from a ContentDto
         /// </summary>
         /// <param name="dto"></param>
-        /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>
-        private IMedia CreateMediaFromDto(ContentVersionDto dto, Guid versionId, Sql docSql)
+        private IMedia CreateMediaFromDto(ContentVersionDto dto, Sql docSql)
         {
             var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
             
             var media = MediaFactory.BuildEntity(dto, contentType);
 
-            var docDef = new DocumentDefinition(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
+            var docDef = new DocumentDefinition(dto, contentType);
 
             var properties = GetPropertyCollection(new PagingSqlQuery(docSql), new[] { docDef });
 
