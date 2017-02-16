@@ -22,7 +22,7 @@ angular.module('umbraco.security.interceptor')
 
                     //Here we'll check if we should ignore the error, this will be based on an original header set
                     var headers = originalResponse.config ? originalResponse.config.headers : {};
-                    if (headers["x-umb-ignore-error"] === "ignore") {
+                    if (headers["x-umb-ignore-error"] === "ignore" || originalResponse.config.umbIgnoreErrors === true) {
                         //exit/ignore
                         return promise;
                     }
