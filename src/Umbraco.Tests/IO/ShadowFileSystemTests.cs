@@ -336,8 +336,9 @@ namespace Umbraco.Tests.IO
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 ss.AddFile("path/to/some/dir/f1.txt", ms);
 
+            // file is only written to the shadow fs
             Assert.IsTrue(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt"));
-
+            Assert.IsFalse(File.Exists(path + "/ShadowTests/path/to/some/dir/f1.txt"));
             // let the shadow fs die
         }
 
@@ -382,7 +383,7 @@ namespace Umbraco.Tests.IO
 
             var fs = new PhysicalFileSystem(path, "ignore");
             var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
-            var swa = new[] { sw };
+            var swa = new[] {sw};
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);
@@ -463,7 +464,7 @@ namespace Umbraco.Tests.IO
 
             var fs = new PhysicalFileSystem(path, "ignore");
             var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
-            var swa = new[] { sw };
+            var swa = new[] {sw};
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);
@@ -512,7 +513,7 @@ namespace Umbraco.Tests.IO
 
             var fs = new PhysicalFileSystem(path, "ignore");
             var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
-            var swa = new[] { sw };
+            var swa = new[] {sw};
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);
@@ -622,6 +623,386 @@ namespace Umbraco.Tests.IO
             var providerMock = new Mock<IScopeProviderInternal>();
             providerMock.Setup(x => x.AmbientScope).Returns(scopeMock.Object);
             return providerMock.Object;
+        }
+
+        /// <summary>
+        /// Check that GetFiles will return all files on the shadow, while returning
+        /// just one on each of the filesystems used by the shadow.
+        /// </summary>
+        [Test]
+        public void ShadowGetFiles()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.txt", ms);
+
+            // Assert
+            // ensure we get 2 files from the shadow
+            var getFiles = ss.GetFiles(string.Empty);
+            Assert.AreEqual(2, getFiles.Count());
+            
+            var fsFiles = fs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(1, fsFiles.Length);
+            var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(1, sfsFiles.Length);
+        }
+
+        /// <summary>
+        /// Check that GetFiles using the filter function with empty string will return expected results
+        /// </summary>
+        [Test]
+        public void ShadowGetFilesUsingEmptyFilter()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.txt", ms);
+
+            // Assert
+            // ensure we get 2 files from the shadow
+            var getFiles = ss.GetFiles(string.Empty);
+            Assert.AreEqual(2, getFiles.Count());
+            // ensure we get 0 files when using a empty filter
+            var getFilesWithEmptyFilter = ss.GetFiles(string.Empty, "");
+            Assert.AreEqual(0, getFilesWithEmptyFilter.Count());
+
+            var fsFiles = fs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(1, fsFiles.Length);
+            var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(1, sfsFiles.Length);
+        }
+
+        /// <summary>
+        /// Check that GetFiles using the filter function with null will return expected results
+        /// </summary>
+        [Test]
+        public void ShadowGetFilesUsingNullFilter()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.txt", ms);
+
+            // Assert
+            // ensure we get 2 files from the shadow
+            var getFiles = ss.GetFiles(string.Empty);
+            Assert.AreEqual(2, getFiles.Count());
+            // ensure we get 2 files when using null in filter parameter
+            var getFilesWithNullFilter = ss.GetFiles(string.Empty, null);
+            Assert.AreEqual(2, getFilesWithNullFilter.Count());
+
+            var fsFiles = fs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(1, fsFiles.Length);
+            var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(1, sfsFiles.Length);
+        }
+
+        [Test]
+        public void ShadowGetFilesUsingWildcardFilter()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
+            File.WriteAllText(path + "/ShadowTests/f2.doc", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.txt", ms);
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.doc", ms);
+
+            // Assert
+            // ensure we get 4 files from the shadow
+            var getFiles = ss.GetFiles(string.Empty);
+            Assert.AreEqual(4, getFiles.Count());
+            // ensure we get only 2 of 4 files from the shadow when using filter
+            var getFilesWithWildcardFilter = ss.GetFiles(string.Empty, "*.doc");
+            Assert.AreEqual(2, getFilesWithWildcardFilter.Count());
+
+            var fsFiles = fs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(2, fsFiles.Length);
+            var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(2, sfsFiles.Length);
+        }
+
+        [Test]
+        public void ShadowGetFilesUsingSingleCharacterFilter()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
+            File.WriteAllText(path + "/ShadowTests/f2.doc", "foo");
+            File.WriteAllText(path + "/ShadowTests/f2.docx", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.txt", ms);
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.doc", ms);
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.docx", ms);
+
+            // Assert
+            // ensure we get 6 files from the shadow
+            var getFiles = ss.GetFiles(string.Empty);
+            Assert.AreEqual(6, getFiles.Count());
+            // ensure we get only 2 of 6 files from the shadow when using filter on shadow
+            var getFilesWithWildcardSinglecharFilter = ss.GetFiles(string.Empty, "f1.d?c");
+            Assert.AreEqual(1, getFilesWithWildcardSinglecharFilter.Count());
+            // ensure we get only 2 of 6 files from the shadow when using filter on disk
+            var getFilesWithWildcardSinglecharFilter2 = ss.GetFiles(string.Empty, "f2.d?c");
+            Assert.AreEqual(1, getFilesWithWildcardSinglecharFilter2.Count());
+
+            var fsFiles = fs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(3, fsFiles.Length);
+            var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(3, sfsFiles.Length);
+        }
+
+        [Test]
+        public void ShadowGetFilesUsingWildcardAndSingleCharacterFilter()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
+            File.WriteAllText(path + "/ShadowTests/f2.doc", "foo");
+            File.WriteAllText(path + "/ShadowTests/f2.docx", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.txt", ms);
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.doc", ms);
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f1.docx", ms);
+
+            // Assert
+            // ensure we get 6 files from the shadow
+            var getFiles = ss.GetFiles(string.Empty);
+            Assert.AreEqual(6, getFiles.Count());
+            var getFilesWithWildcardSinglecharFilter = ss.GetFiles(string.Empty, "*.d?c");
+
+            Assert.AreEqual(4, getFilesWithWildcardSinglecharFilter.Count());
+            var getFilesWithWildcardSinglecharFilter2 = ss.GetFiles(string.Empty, "*.d?cx");
+            Assert.AreEqual(2, getFilesWithWildcardSinglecharFilter2.Count());
+
+            var fsFiles = fs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(3, fsFiles.Length);
+            var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
+            Assert.AreEqual(3, sfsFiles.Length);
+        }
+
+        [Test]
+        public void ShadowFileSystemFilterIsAsBrokenAsRealFileSystemFilter()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/filter");
+            // create files on disk and create a "fake" list of files to verify filters against
+            File.WriteAllText(path + "/filter/f1.txt", "foo");
+            File.WriteAllText(path + "/filter/f1.doc", "foo");
+            File.WriteAllText(path + "/filter/f1.docx", "foo");
+            var files = new string[]
+            {
+                "f1.txt",
+                "f1.doc",
+                "f1.docx",
+            };
+            var filter1 = "";
+            var filter2 = "*";
+            var filter3 = "*.doc";
+            var filter4 = "*.d?c";
+            var filter5 = "f1.doc";
+            var filter6 = "f1.d?c";
+            var filter7 = "**.d?c";
+            var filter8 = "f*.doc";
+
+            // Act & Assert
+            var result1Disk = Directory.GetFiles(path + "/filter/", filter1).Select(Path.GetFileName).OrderBy(x => x).ToArray();
+            var result1Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter1))).OrderBy(x => x).ToArray();
+            Assert.AreEqual(result1Disk, result1Fake);
+            var result2Disk = Directory.GetFiles(path + "/filter/", filter2).Select(Path.GetFileName).OrderBy(x => x).ToArray();
+            var result2Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter2))).OrderBy(x => x).ToArray();
+            Assert.AreEqual(result2Disk, result2Fake);
+            var result3Disk = Directory.GetFiles(path + "/filter/", filter3).Select(Path.GetFileName).OrderBy(x => x).ToArray();
+            var result3Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter3))).OrderBy(x => x).ToArray();
+            Assert.AreEqual(result3Disk, result3Fake);
+            var result4Disk = Directory.GetFiles(path + "/filter/", filter4).Select(Path.GetFileName).OrderBy(x => x).ToArray();
+            var result4Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter4))).OrderBy(x => x).ToArray();
+            Assert.AreEqual(result4Disk, result4Fake);
+            var result5Disk = Directory.GetFiles(path + "/filter/", filter5).Select(Path.GetFileName).OrderBy(x => x).ToArray();
+            var result5Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter5))).OrderBy(x => x).ToArray();
+            Assert.AreEqual(result5Disk, result5Fake);
+            var result6Disk = Directory.GetFiles(path + "/filter/", filter6).Select(Path.GetFileName).OrderBy(x => x).ToArray();
+            var result6Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter6))).OrderBy(x => x).ToArray();
+            Assert.AreEqual(result6Disk, result6Fake);
+            var result7Disk = Directory.GetFiles(path + "/filter/", filter7).Select(Path.GetFileName).OrderBy(x => x).ToArray();
+            var result7Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter7))).OrderBy(x => x).ToArray();
+            Assert.AreEqual(result7Disk, result7Fake);
+            var result8Disk = Directory.GetFiles(path + "/filter/", filter8).Select(Path.GetFileName).OrderBy(x => x).ToArray();
+            var result8Fake = files.Where(x => ShadowFileSystem.FilterByRegex(x, ShadowFileSystem.FilterToRegex(filter8))).OrderBy(x => x).ToArray();
+            Assert.AreEqual(result8Disk, result8Fake);
+        }
+
+        /// <summary>
+        /// Returns the full paths of the files on the disk.
+        /// Note that this will be the *actual* path of the file, meaning a file existing on the initialized FS
+        /// will be in one location, while a file written after initializing the shadow, will exist at the
+        /// shadow location directory.
+        /// </summary>
+        [Test]
+        public void ShadowGetFullPath()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f2.txt", ms);
+
+            // Assert
+            var f1FullPath = ss.GetFullPath("f1.txt");
+            var f2FullPath = ss.GetFullPath("f2.txt");
+            Assert.AreEqual(Path.Combine(path, "ShadowTests", "f1.txt"), f1FullPath);
+            Assert.AreEqual(Path.Combine(path, "ShadowSystem", "f2.txt"), f2FullPath);
+        }
+
+        /// <summary>
+        /// Returns the path relative to the filesystem root
+        /// </summary>
+        /// <remarks>
+        /// This file stuff in this test is kinda irrelevant with the current implementation.
+        /// We do tests that the files are written to the correct places and the relative path is returned correct,
+        /// but GetRelativePath is currently really just string manipulation so files are not actually hit by the code.
+        /// Leaving the file stuff in here for now in case the method becomes more clever at some point.
+        /// </remarks>
+        [Test]
+        public void ShadowGetRelativePath()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f2.txt", ms);
+
+            // Assert
+            var f1RelativePath = ss.GetRelativePath("f1.txt");
+            var f2RelativePath = ss.GetRelativePath("f2.txt");
+            Assert.AreEqual("f1.txt", f1RelativePath);
+            Assert.AreEqual("f2.txt", f2RelativePath);
+            Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowTests", "f1.txt")));
+            Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowTests", "f2.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowSystem", "f2.txt")));
+            Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowSystem", "f1.txt")));
+        }
+
+        /// <summary>
+        /// Ensure the url returned contains the path relative to the FS root,
+        /// but including the rootUrl the FS was initialized with.
+        /// </summary>
+        /// <remarks>
+        /// This file stuff in this test is kinda irrelevant with the current implementation.
+        /// We do tests that the files are written to the correct places and the url is returned correct,
+        /// but GetUrl is currently really just string manipulation so files are not actually hit by the code.
+        /// Leaving the file stuff in here for now in case the method becomes more clever at some point.
+        /// </remarks>
+        [Test]
+        public void ShadowGetUrl()
+        {
+            // Arrange
+            var path = IOHelper.MapPath("FileSysTests");
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path + "/ShadowTests");
+            Directory.CreateDirectory(path + "/ShadowSystem");
+
+            var fs = new PhysicalFileSystem(path + "/ShadowTests/", "rootUrl");
+            var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "rootUrl");
+            var ss = new ShadowFileSystem(fs, sfs);
+
+            // Act
+            File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                ss.AddFile("f2.txt", ms);
+
+            // Assert
+            var f1Url = ss.GetUrl("f1.txt");
+            var f2Url = ss.GetUrl("f2.txt");
+            Assert.AreEqual("rootUrl/f1.txt", f1Url);
+            Assert.AreEqual("rootUrl/f2.txt", f2Url);
+            Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowTests", "f1.txt")));
+            Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowTests", "f2.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowSystem", "f2.txt")));
+            Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowSystem", "f1.txt")));
         }
     }
 }
