@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using Umbraco.Core.Deploy;
 
 namespace Umbraco.Core
@@ -10,9 +12,10 @@ namespace Umbraco.Core
     /// Represents an entity identifier.
     /// </summary>
     /// <remarks>An Udi can be fully qualified or "closed" eg umb://document/{guid} or "open" eg umb://document.</remarks>
+    [TypeConverter(typeof(UdiTypeConverter))]
     public abstract class Udi : IComparable<Udi>
     {
-        private static readonly Dictionary<string, UdiType> UdiTypes = new Dictionary<string, UdiType>();
+        private static readonly Lazy<Dictionary<string, UdiType>> UdiTypes;
         private static readonly ConcurrentDictionary<string, Udi> RootUdis = new ConcurrentDictionary<string, Udi>();
         internal readonly Uri UriValue; // internal for UdiRange
 
@@ -39,32 +42,50 @@ namespace Umbraco.Core
 
         static Udi()
         {
-            // for tests etc.
-            UdiTypes[Constants.DeployEntityType.AnyGuid] = UdiType.GuidUdi;
-            UdiTypes[Constants.DeployEntityType.AnyString] = UdiType.StringUdi;
-
-            // we don't have connectors for these...
-            UdiTypes[Constants.DeployEntityType.Member] = UdiType.GuidUdi;
-            UdiTypes[Constants.DeployEntityType.MemberGroup] = UdiType.GuidUdi;
-
-            // fixme - or inject from...?
-            // there is no way we can get the "registered" service connectors, as registration
-            // happens in Deploy, not in Core, and the Udi class belongs to Core - therefore, we
-            // just pick every service connectors - just making sure that not two of them
-            // would register the same entity type, with different udi types (would not make
-            // much sense anyways).
-            var connectors = PluginManager.Current.ResolveTypes<IServiceConnector>();
-            foreach (var connector in connectors)
+            UdiTypes = new Lazy<Dictionary<string, UdiType>>(() =>
             {
-                var attrs = connector.GetCustomAttributes<UdiDefinitionAttribute>(false);
-                foreach (var attr in attrs)
+                var result = new Dictionary<string, UdiType>();
+                
+                // known types:
+                foreach (var fi in typeof(Constants.UdiEntityType).GetFields(BindingFlags.Public | BindingFlags.Static))
                 {
-                    UdiType udiType;
-                    if (UdiTypes.TryGetValue(attr.EntityType, out udiType) && udiType != attr.UdiType)
-                        throw new Exception(string.Format("Entity type \"{0}\" is declared by more than one IServiceConnector, with different UdiTypes.", attr.EntityType));
-                    UdiTypes[attr.EntityType] = attr.UdiType;
+                    // IsLiteral determines if its value is written at 
+                    //   compile time and not changeable
+                    // IsInitOnly determine if the field can be set 
+                    //   in the body of the constructor
+                    // for C# a field which is readonly keyword would have both true 
+                    //   but a const field would have only IsLiteral equal to true
+                    if (fi.IsLiteral && fi.IsInitOnly == false)
+                    {
+                        var udiType = fi.GetCustomAttribute<Constants.UdiTypeAttribute>();
+
+                        if (udiType == null) 
+                            throw new InvalidOperationException("All Constants listed in UdiEntityType must be attributed with " + typeof(Constants.UdiTypeAttribute));
+                        result[fi.GetValue(null).ToString()] = udiType.UdiType;
+                    }                        
                 }
-            }
+
+                // Scan for unknown UDI types
+                // there is no way we can get the "registered" service connectors, as registration
+                // happens in Deploy, not in Core, and the Udi class belongs to Core - therefore, we
+                // just pick every service connectors - just making sure that not two of them
+                // would register the same entity type, with different udi types (would not make
+                // much sense anyways).
+                var connectors = PluginManager.Current.ResolveTypes<IServiceConnector>();
+                foreach (var connector in connectors)
+                {
+                    var attrs = connector.GetCustomAttributes<UdiDefinitionAttribute>(false);
+                    foreach (var attr in attrs)
+                    {
+                        UdiType udiType;
+                        if (result.TryGetValue(attr.EntityType, out udiType) && udiType != attr.UdiType)
+                            throw new Exception(string.Format("Entity type \"{0}\" is declared by more than one IServiceConnector, with different UdiTypes.", attr.EntityType));
+                        result[attr.EntityType] = attr.UdiType;
+                    }
+                }
+
+                return result;
+            });                       
         }
 
         /// <summary>
@@ -105,8 +126,8 @@ namespace Umbraco.Core
             udi = null;
             Uri uri;
 
-            if (!Uri.IsWellFormedUriString(s, UriKind.Absolute)
-                || !Uri.TryCreate(s, UriKind.Absolute, out uri))
+            if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false
+                || Uri.TryCreate(s, UriKind.Absolute, out uri) == false)
             {
                 if (tryParse) return false;
                 throw new FormatException(string.Format("String \"{0}\" is not a valid udi.", s));
@@ -114,7 +135,7 @@ namespace Umbraco.Core
 
             var entityType = uri.Host;
             UdiType udiType;
-            if (!UdiTypes.TryGetValue(entityType, out udiType))
+            if (UdiTypes.Value.TryGetValue(entityType, out udiType) == false)
             {
                 if (tryParse) return false;
                 throw new FormatException(string.Format("Unknown entity type \"{0}\".", entityType));
@@ -128,7 +149,7 @@ namespace Umbraco.Core
                     return true;
                 }
                 Guid guid;
-                if (!Guid.TryParse(path, out guid))
+                if (Guid.TryParse(path, out guid) == false)
                 {
                     if (tryParse) return false;
                     throw new FormatException(string.Format("String \"{0}\" is not a valid udi.", s));
@@ -150,7 +171,7 @@ namespace Umbraco.Core
             return RootUdis.GetOrAdd(entityType, x =>
             {
                 UdiType udiType;
-                if (!UdiTypes.TryGetValue(x, out udiType))
+                if (UdiTypes.Value.TryGetValue(x, out udiType) == false)
                     throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType));
                 return udiType == UdiType.StringUdi
                     ? (Udi)new StringUdi(entityType, string.Empty)
@@ -177,7 +198,7 @@ namespace Umbraco.Core
         public static Udi Create(string entityType, string id)
         {
             UdiType udiType;
-            if (!UdiTypes.TryGetValue(entityType, out udiType))
+            if (UdiTypes.Value.TryGetValue(entityType, out udiType) == false)
                 throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType), "entityType");
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException("Value cannot be null or whitespace.", "id");
@@ -196,7 +217,7 @@ namespace Umbraco.Core
         public static Udi Create(string entityType, Guid id)
         {
             UdiType udiType;
-            if (!UdiTypes.TryGetValue(entityType, out udiType))
+            if (UdiTypes.Value.TryGetValue(entityType, out udiType) == false)
                 throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType), "entityType");
             if (udiType != UdiType.GuidUdi)
                 throw new InvalidOperationException(string.Format("Entity type \"{0}\" does not have guid udis.", entityType));
@@ -208,7 +229,7 @@ namespace Umbraco.Core
         internal static Udi Create(Uri uri)
         {
             UdiType udiType;
-            if (!UdiTypes.TryGetValue(uri.Host, out udiType))
+            if (UdiTypes.Value.TryGetValue(uri.Host, out udiType) == false)
                 throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", uri.Host), "uri");
             if (udiType == UdiType.GuidUdi)
                 return new GuidUdi(uri);
@@ -219,7 +240,7 @@ namespace Umbraco.Core
 
         public void EnsureType(params string[] validTypes)
         {
-            if (!validTypes.Contains(EntityType))
+            if (validTypes.Contains(EntityType) == false)
                 throw new Exception(string.Format("Unexpected entity type \"{0}\".", EntityType));
         }
 
@@ -260,7 +281,7 @@ namespace Umbraco.Core
 
         public static bool operator !=(Udi udi1, Udi udi2)
         {
-            return !(udi1 == udi2);
+            return (udi1 == udi2) == false;
         }
     }
 

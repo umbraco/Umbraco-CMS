@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -49,6 +50,124 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Query Methods
 
+        public IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, IQuery<IUmbracoEntity> filter = null)
+        {   
+            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
+            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            var factory = new UmbracoEntityFactory();
+            
+            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql =>
+            {
+                if (filter != null)
+                {
+                    foreach (var filterClaus in filter.GetWhereClauses())
+                    {
+                        sql.Where(filterClaus.Item1, filterClaus.Item2);
+                    }
+                }
+            }, objectTypeId);
+            var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
+            var entitySql = translator.Translate();
+            var pagedSql = entitySql.Append(GetGroupBy(isContent, isMedia, false)).OrderBy("umbracoNode.id");
+
+            IEnumerable<IUmbracoEntity> result;
+
+            if (isMedia)
+            {
+                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
+                var pagedResult = _work.Database.Page<dynamic>(pageIndex + 1, pageSize, pagedSql);
+                
+                var ids = pagedResult.Items.Select(x => (int) x.id).InGroupsOf(2000);
+                var entities = pagedResult.Items.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
+
+                //Now we need to merge in the property data since we need paging and we can't do this the way that the big media query was working before
+                foreach (var idGroup in ids)
+                {
+                    var propSql = GetPropertySql(Constants.ObjectTypes.Media)
+                        .Where("contentNodeId IN (@ids)", new {ids = idGroup})
+                        .OrderBy("contentNodeId");
+
+                    //This does NOT fetch all data into memory in a list, this will read
+                    // over the records as a data reader, this is much better for performance and memory,
+                    // but it means that during the reading of this data set, nothing else can be read
+                    // from SQL server otherwise we'll get an exception.
+                    var allPropertyData = _work.Database.Query<dynamic>(propSql);
+
+                    //keep track of the current property data item being enumerated
+                    var propertyDataSetEnumerator = allPropertyData.GetEnumerator();
+                    var hasCurrent = false; // initially there is no enumerator.Current
+
+                    try
+                    {
+                        //This must be sorted by node id (which is done by SQL) because this is how we are sorting the query to lookup property types above,
+                        // which allows us to more efficiently iterate over the large data set of property values.
+                        foreach (var entity in entities)
+                        {
+                            // assemble the dtos for this def
+                            // use the available enumerator.Current if any else move to next
+                            while (hasCurrent || propertyDataSetEnumerator.MoveNext())
+                            {
+                                if (propertyDataSetEnumerator.Current.contentNodeId == entity.Id)
+                                {
+                                    hasCurrent = false; // enumerator.Current is not available
+
+                                    //the property data goes into the additional data
+                                    entity.AdditionalData[propertyDataSetEnumerator.Current.propertyTypeAlias] = new UmbracoEntity.EntityProperty
+                                    {
+                                        PropertyEditorAlias = propertyDataSetEnumerator.Current.propertyEditorAlias,
+                                        Value = StringExtensions.IsNullOrWhiteSpace(propertyDataSetEnumerator.Current.dataNtext)
+                                            ? propertyDataSetEnumerator.Current.dataNvarchar
+                                            : StringExtensions.ConvertToJsonIfPossible(propertyDataSetEnumerator.Current.dataNtext)
+                                    };
+                                }
+                                else
+                                {
+                                    hasCurrent = true; // enumerator.Current is available for another def
+                                    break; // no more propertyDataDto for this def
+                                }
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        propertyDataSetEnumerator.Dispose();
+                    }
+                }
+                
+                result = entities;
+            }
+            else
+            {   
+                var pagedResult = _work.Database.Page<dynamic>(pageIndex + 1, pageSize, pagedSql);
+                result = pagedResult.Items.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
+            }
+
+            //The total items from the PetaPoco page query will be wrong due to the Outer join used on parent, depending on the search this will 
+            //return duplicate results when the COUNT is used in conjuction with it, so we need to get the total on our own.
+
+            //generate a query that does not contain the LEFT Join for parent, this would cause
+            //the COUNT(*) query to return the wrong 
+            var sqlCountClause = GetBaseWhere(
+                (isC, isM, f) => GetBase(isC, isM, f, true), //true == is a count query
+                isContent, isMedia, sql =>
+                {
+                    if (filter != null)
+                    {
+                        foreach (var filterClaus in filter.GetWhereClauses())
+                        {
+                            sql.Where(filterClaus.Item1, filterClaus.Item2);
+                        }
+                    }
+                }, objectTypeId);
+            var translatorCount = new SqlTranslator<IUmbracoEntity>(sqlCountClause, query);
+            var countSql = translatorCount.Translate();
+
+            totalRecords = _work.Database.ExecuteScalar<int>(countSql);
+
+            return result;
+        }
+
         public IUmbracoEntity GetByKey(Guid key)
         {
             var sql = GetBaseWhere(GetBase, false, false, key);
@@ -71,8 +190,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             if (isMedia)
             {
-                //for now treat media differently
-                //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
+                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
                 var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
                     new UmbracoEntityRelator().Map, sql);
 
@@ -115,8 +233,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             if (isMedia)
             {
-                //for now treat media differently
-                //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
+                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
                 var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
                     new UmbracoEntityRelator().Map, sql);
 
@@ -171,8 +288,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (isMedia)
             {
-                //for now treat media differently
-                //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
+                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
                 var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
                     new UmbracoEntityRelator().Map, sql);
                 foreach (var entity in entities)
@@ -231,8 +347,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 });
 
-                //treat media differently for now 
-                //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
+                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
                 var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
                     new UmbracoEntityRelator().Map, mediaSql);
                 return entities;
@@ -278,11 +393,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, true, false)), filter);
         }
 
-        private Sql GetFullSqlForMedia(Sql entitySql, Action<Sql> filter = null)
+        private Sql GetPropertySql(string nodeObjectType)
         {
-            //this will add any dataNvarchar property to the output which can be added to the additional properties
-
-            var joinSql = new Sql()
+            var sql = new Sql()
                 .Select("contentNodeId, versionId, dataNvarchar, dataNtext, propertyEditorAlias, alias as propertyTypeAlias")
                 .From<PropertyDataDto>()
                 .InnerJoin<NodeDto>()
@@ -291,7 +404,16 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyTypeDto, PropertyDataDto>(dto => dto.Id, dto => dto.PropertyTypeId)
                 .InnerJoin<DataTypeDto>()
                 .On<PropertyTypeDto, DataTypeDto>(dto => dto.DataTypeId, dto => dto.DataTypeId)
-                .Where("umbracoNode.nodeObjectType = @nodeObjectType", new {nodeObjectType = Constants.ObjectTypes.Media});
+                .Where("umbracoNode.nodeObjectType = @nodeObjectType", new { nodeObjectType = nodeObjectType });
+
+            return sql;
+        }
+
+        private Sql GetFullSqlForMedia(Sql entitySql, Action<Sql> filter = null)
+        {
+            //this will add any dataNvarchar property to the output which can be added to the additional properties
+
+            var joinSql = GetPropertySql(Constants.ObjectTypes.Media);
 
             if (filter != null)
             {
@@ -310,34 +432,52 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderBy("sortOrder, id");
 
             return wrappedSql;
-        }        
+        }
 
         protected virtual Sql GetBase(bool isContent, bool isMedia, Action<Sql> customFilter)
         {
-            var columns = new List<object>
-                              {
-                                  "umbracoNode.id",
-                                  "umbracoNode.trashed",
-                                  "umbracoNode.parentID",
-                                  "umbracoNode.nodeUser",
-                                  "umbracoNode.level",
-                                  "umbracoNode.path",
-                                  "umbracoNode.sortOrder",
-                                  "umbracoNode.uniqueID",
-                                  "umbracoNode.text",
-                                  "umbracoNode.nodeObjectType",
-                                  "umbracoNode.createDate",
-                                  "COUNT(parent.parentID) as children"
-                              };
+            return GetBase(isContent, isMedia, customFilter, false);
+        }
 
-            if (isContent || isMedia)
+        protected virtual Sql GetBase(bool isContent, bool isMedia, Action<Sql> customFilter, bool isCount)
+        {
+            var columns = new List<object>();
+            if (isCount)
             {
-                columns.Add("published.versionId as publishedVersion");
-                columns.Add("latest.versionId as newestVersion");
-                columns.Add("contenttype.alias");
-                columns.Add("contenttype.icon");
-                columns.Add("contenttype.thumbnail");
-                columns.Add("contenttype.isContainer");
+                columns.Add("COUNT(*)");
+            }
+            else
+            {
+                columns.AddRange(new List<object>
+                {
+                    "umbracoNode.id",
+                    "umbracoNode.trashed",
+                    "umbracoNode.parentID",
+                    "umbracoNode.nodeUser",
+                    "umbracoNode.level",
+                    "umbracoNode.path",
+                    "umbracoNode.sortOrder",
+                    "umbracoNode.uniqueID",
+                    "umbracoNode.text",
+                    "umbracoNode.nodeObjectType",
+                    "umbracoNode.createDate",
+                    "COUNT(parent.parentID) as children"
+                });
+
+                if (isContent || isMedia)
+                {
+                    if (isContent)
+                    {
+                        //only content has this info
+                        columns.Add("published.versionId as publishedVersion");
+                        columns.Add("document.versionId as newestVersion");
+                    }
+
+                    columns.Add("contenttype.alias");
+                    columns.Add("contenttype.icon");
+                    columns.Add("contenttype.thumbnail");
+                    columns.Add("contenttype.isContainer");
+                }
             }
 
             //Creates an SQL query to return a single row for the entity
@@ -348,17 +488,24 @@ namespace Umbraco.Core.Persistence.Repositories
                 
             if (isContent || isMedia)
             {
-                entitySql.InnerJoin("cmsContent content").On("content.nodeId = umbracoNode.id")
-                   .LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType")
-                   .LeftJoin(
-                       "(SELECT nodeId, versionId FROM cmsDocument WHERE published = 1 GROUP BY nodeId, versionId) as published")
-                   .On("umbracoNode.id = published.nodeId")
-                   .LeftJoin(
-                       "(SELECT nodeId, versionId FROM cmsDocument WHERE newest = 1 GROUP BY nodeId, versionId) as latest")
-                   .On("umbracoNode.id = latest.nodeId");
+                entitySql.InnerJoin("cmsContent content").On("content.nodeId = umbracoNode.id");
+
+                if (isContent)
+                {
+                    //only content has this info
+                    entitySql
+                        .InnerJoin("cmsDocument document").On("document.nodeId = umbracoNode.id")
+                        .LeftJoin("(SELECT nodeId, versionId FROM cmsDocument WHERE published = 1) as published")
+                        .On("umbracoNode.id = published.nodeId");
+                }
+
+                entitySql.LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType");
             }
 
-            entitySql.LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
+            if (isCount == false)
+            {
+                entitySql.LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
+            }
 
             if (customFilter != null)
             {
@@ -372,22 +519,42 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = baseQuery(isContent, isMedia, filter)
                 .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = nodeObjectType });
+
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
+
             return sql;
         }
 
         protected virtual Sql GetBaseWhere(Func<bool, bool, Action<Sql>, Sql> baseQuery, bool isContent, bool isMedia, int id)
         {
             var sql = baseQuery(isContent, isMedia, null)
-                .Where("umbracoNode.id = @Id", new { Id = id })
-                .Append(GetGroupBy(isContent, isMedia));
+                .Where("umbracoNode.id = @Id", new { Id = id });
+
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
+
+            sql.Append(GetGroupBy(isContent, isMedia));
+
             return sql;
         }
 
         protected virtual Sql GetBaseWhere(Func<bool, bool, Action<Sql>, Sql> baseQuery, bool isContent, bool isMedia, Guid key)
         {
             var sql = baseQuery(isContent, isMedia, null)
-                .Where("umbracoNode.uniqueID = @UniqueID", new { UniqueID = key })
-                .Append(GetGroupBy(isContent, isMedia));
+                .Where("umbracoNode.uniqueID = @UniqueID", new { UniqueID = key });
+
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
+
+            sql.Append(GetGroupBy(isContent, isMedia));
+
             return sql;
         }
 
@@ -396,6 +563,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.id = @Id AND umbracoNode.nodeObjectType = @NodeObjectType",
                        new {Id = id, NodeObjectType = nodeObjectType});
+
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
+
             return sql;
         }
 
@@ -404,30 +577,39 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.uniqueID = @UniqueID AND umbracoNode.nodeObjectType = @NodeObjectType",
                        new { UniqueID = key, NodeObjectType = nodeObjectType });
+
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
+
             return sql;
         }
 
         protected virtual Sql GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)
         {
             var columns = new List<object>
-                              {
-                                  "umbracoNode.id",
-                                  "umbracoNode.trashed",
-                                  "umbracoNode.parentID",
-                                  "umbracoNode.nodeUser",
-                                  "umbracoNode.level",
-                                  "umbracoNode.path",
-                                  "umbracoNode.sortOrder",
-                                  "umbracoNode.uniqueID",
-                                  "umbracoNode.text",
-                                  "umbracoNode.nodeObjectType",
-                                  "umbracoNode.createDate"
-                              };
+            {
+                "umbracoNode.id",
+                "umbracoNode.trashed",
+                "umbracoNode.parentID",
+                "umbracoNode.nodeUser",
+                "umbracoNode.level",
+                "umbracoNode.path",
+                "umbracoNode.sortOrder",
+                "umbracoNode.uniqueID",
+                "umbracoNode.text",
+                "umbracoNode.nodeObjectType",
+                "umbracoNode.createDate"
+            };
 
             if (isContent || isMedia)
             {
-                columns.Add("published.versionId");
-                columns.Add("latest.versionId");
+                if (isContent)
+                {
+                    columns.Add("published.versionId");
+                    columns.Add("document.versionId");
+                }
                 columns.Add("contenttype.alias");
                 columns.Add("contenttype.icon");
                 columns.Add("contenttype.thumbnail");

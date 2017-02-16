@@ -13,41 +13,41 @@ namespace Umbraco.Tests
         [Test]
         public void StringEntityCtorTest()
         {
-            var udi = new StringUdi(Constants.DeployEntityType.AnyString, "test-id");
-            Assert.AreEqual(Constants.DeployEntityType.AnyString, udi.EntityType);
+            var udi = new StringUdi(Constants.UdiEntityType.AnyString, "test-id");
+            Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
             Assert.AreEqual("test-id", udi.Id);
-            Assert.AreEqual("umb://" + Constants.DeployEntityType.AnyString + "/test-id", udi.ToString());
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/test-id", udi.ToString());
         }
 
         [Test]
         public void StringEntityParseTest()
         {
-            var udi = Udi.Parse("umb://" + Constants.DeployEntityType.AnyString + "/test-id");
-            Assert.AreEqual(Constants.DeployEntityType.AnyString, udi.EntityType);
+            var udi = Udi.Parse("umb://" + Constants.UdiEntityType.AnyString + "/test-id");
+            Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
             Assert.IsInstanceOf<StringUdi>(udi);
             var stringEntityId = udi as StringUdi;
             Assert.IsNotNull(stringEntityId);
             Assert.AreEqual("test-id", stringEntityId.Id);
-            Assert.AreEqual("umb://" + Constants.DeployEntityType.AnyString + "/test-id", udi.ToString());
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/test-id", udi.ToString());
         }
 
         [Test]
         public void GuidEntityCtorTest()
         {
             var guid = Guid.NewGuid();
-            var udi = new GuidUdi(Constants.DeployEntityType.AnyGuid, guid);
-            Assert.AreEqual(Constants.DeployEntityType.AnyGuid, udi.EntityType);
+            var udi = new GuidUdi(Constants.UdiEntityType.AnyGuid, guid);
+            Assert.AreEqual(Constants.UdiEntityType.AnyGuid, udi.EntityType);
             Assert.AreEqual(guid, udi.Guid);
-            Assert.AreEqual("umb://" + Constants.DeployEntityType.AnyGuid + "/" + guid.ToString("N"), udi.ToString());
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyGuid + "/" + guid.ToString("N"), udi.ToString());
         }
 
         [Test]
         public void GuidEntityParseTest()
         {
             var guid = Guid.NewGuid();
-            var s = "umb://" + Constants.DeployEntityType.AnyGuid + "/" + guid.ToString("N");
+            var s = "umb://" + Constants.UdiEntityType.AnyGuid + "/" + guid.ToString("N");
             var udi = Udi.Parse(s);
-            Assert.AreEqual(Constants.DeployEntityType.AnyGuid, udi.EntityType);
+            Assert.AreEqual(Constants.UdiEntityType.AnyGuid, udi.EntityType);
             Assert.IsInstanceOf<GuidUdi>(udi);
             var gudi = udi as GuidUdi;
             Assert.IsNotNull(gudi);
@@ -82,9 +82,9 @@ namespace Umbraco.Tests
             var guid1 = Guid.NewGuid();
             var entities = new[]
             {
-                new GuidUdi(Constants.DeployEntityType.AnyGuid, guid1),
-                new GuidUdi(Constants.DeployEntityType.AnyGuid, guid1),
-                new GuidUdi(Constants.DeployEntityType.AnyGuid, guid1),
+                new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1),
+                new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1),
+                new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1),
             };
             Assert.AreEqual(1, entities.Distinct().Count());
         }
@@ -93,12 +93,12 @@ namespace Umbraco.Tests
         public void CreateTest()
         {
             var guid = Guid.NewGuid();
-            var udi = Udi.Create(Constants.DeployEntityType.AnyGuid, guid);
-            Assert.AreEqual(Constants.DeployEntityType.AnyGuid, udi.EntityType);
+            var udi = Udi.Create(Constants.UdiEntityType.AnyGuid, guid);
+            Assert.AreEqual(Constants.UdiEntityType.AnyGuid, udi.EntityType);
             Assert.AreEqual(guid, ((GuidUdi)udi).Guid);
 
-            Assert.Throws<InvalidOperationException>(() => Udi.Create(Constants.DeployEntityType.AnyString, guid));
-            Assert.Throws<InvalidOperationException>(() => Udi.Create(Constants.DeployEntityType.AnyGuid, "foo"));
+            Assert.Throws<InvalidOperationException>(() => Udi.Create(Constants.UdiEntityType.AnyString, guid));
+            Assert.Throws<InvalidOperationException>(() => Udi.Create(Constants.UdiEntityType.AnyGuid, "foo"));
             Assert.Throws<ArgumentException>(() => Udi.Create("barf", "foo"));
         }
 
@@ -106,13 +106,13 @@ namespace Umbraco.Tests
         public void RangeTest()
         {
             // can parse open string udi
-            var stringUdiString = "umb://" + Constants.DeployEntityType.AnyString;
+            var stringUdiString = "umb://" + Constants.UdiEntityType.AnyString;
             Udi stringUdi;
             Assert.IsTrue(Udi.TryParse(stringUdiString, out stringUdi));
             Assert.AreEqual(string.Empty, ((StringUdi)stringUdi).Id);
 
             // can parse open guid udi
-            var guidUdiString = "umb://" + Constants.DeployEntityType.AnyGuid;
+            var guidUdiString = "umb://" + Constants.UdiEntityType.AnyGuid;
             Udi guidUdi;
             Assert.IsTrue(Udi.TryParse(guidUdiString, out guidUdi));
             Assert.AreEqual(Guid.Empty, ((GuidUdi)guidUdi).Guid);
@@ -134,12 +134,12 @@ namespace Umbraco.Tests
 
 
             var guid = Guid.NewGuid();
-            var udi = new GuidUdi(Constants.DeployEntityType.AnyGuid, guid);
+            var udi = new GuidUdi(Constants.UdiEntityType.AnyGuid, guid);
             var json = JsonConvert.SerializeObject(udi, settings);
             Assert.AreEqual(string.Format("\"umb://any-guid/{0:N}\"", guid), json);
 
             var dudi = JsonConvert.DeserializeObject<Udi>(json, settings);
-            Assert.AreEqual(Constants.DeployEntityType.AnyGuid, dudi.EntityType);
+            Assert.AreEqual(Constants.UdiEntityType.AnyGuid, dudi.EntityType);
             Assert.AreEqual(guid, ((GuidUdi)dudi).Guid);
 
             var range = new UdiRange(udi, Constants.DeploySelector.ChildrenOfThis);

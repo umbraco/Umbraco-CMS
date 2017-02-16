@@ -62,7 +62,7 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetChildren", "id", typeof(int), typeof(Guid), typeof(string))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetChildren", "id", typeof(int), typeof(Guid), typeof(Udi), typeof(string))));
             }
         }
 
@@ -190,6 +190,7 @@ namespace Umbraco.Web.Editors
                            .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
 
+        #region GetChildren
         /// <summary>
         /// Returns the child media objects - using the entity INT id
         /// </summary>
@@ -247,12 +248,45 @@ namespace Umbraco.Web.Editors
            Direction orderDirection = Direction.Ascending,
            bool orderBySystemField = true,
            string filter = "")
-        {            
+        {
             var entity = Services.EntityService.GetByKey(id);
             if (entity != null)
             {
                 return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
             }
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+
+        /// <summary>
+        /// Returns the child media objects - using the entity UDI id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="orderBySystemField"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Udi id,
+           int pageNumber = 0,
+           int pageSize = 0,
+           string orderBy = "SortOrder",
+           Direction orderDirection = Direction.Ascending,
+           bool orderBySystemField = true,
+           string filter = "")
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                var entity = Services.EntityService.GetByKey(guidUdi.Guid);
+                if (entity != null)
+                {
+                    return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+                }
+            }
+            
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
@@ -278,7 +312,8 @@ namespace Umbraco.Web.Editors
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Searches media and returns a paged result
