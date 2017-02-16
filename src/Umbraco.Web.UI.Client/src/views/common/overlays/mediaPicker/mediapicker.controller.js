@@ -37,7 +37,8 @@ angular.module("umbraco")
                 pageNumber: 1,
                 pageSize: 100,
                 totalItems: 0,
-                totalPages: 0
+                totalPages: 0,
+                filter: '',
             };
 
             //preload selected item
@@ -233,7 +234,7 @@ angular.module("umbraco")
 
             var debounceSearchMedia = _.debounce(function () {
                 $scope.$apply(function () {
-                    if ($scope.searchTerm) {
+                    if ($scope.searchOptions.filter) {
                         searchMedia();
                     } else {
                         // reset pagination
@@ -241,7 +242,8 @@ angular.module("umbraco")
                             pageNumber: 1,
                             pageSize: 100,
                             totalItems: 0,
-                            totalPages: 0
+                            totalPages: 0,
+                            filter: ''
                         };
                         getChildren($scope.currentFolder.id);
                     }
@@ -250,7 +252,7 @@ angular.module("umbraco")
 
             function searchMedia() {
                 $scope.loading = true;
-                mediaResource.search($scope.searchTerm, $scope.searchOptions.pageNumber, $scope.searchOptions.pageSize, $scope.startNodeId)
+                entityResource.getPagedDescendants($scope.startNodeId, "Media", $scope.searchOptions)
                     .then(function (data) {
                         // update images
                         $scope.images = data.items ? data.items : [];
