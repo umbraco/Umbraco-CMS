@@ -79,10 +79,11 @@ namespace Umbraco.Web.Scheduling
 
             // running on a background task, and Log.CleanLogs uses the old SqlHelper,
             // better wrap in a scope and ensure it's all cleaned up and nothing leaks
-            using (ApplicationContext.Current.ScopeProvider.CreateScope())
+            using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
             using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));
+                scope.Complete();
             }
 
             return true; // repeat

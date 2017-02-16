@@ -24,10 +24,11 @@ namespace Umbraco.Core.Scoping
 #endif
         }
 
-#if DEBUG_SCOPES
         private readonly Guid _instanceId = Guid.NewGuid();
         public Guid InstanceId { get { return _instanceId; } }
-#endif
+
+        /// <inheritdoc />
+        public bool CallContext { get { return false; } }
 
         /// <inheritdoc />
         public RepositoryCacheMode RepositoryCacheMode
@@ -75,7 +76,7 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public void Complete()
+        public bool Complete()
         {
             throw new NotSupportedException();
         }
@@ -100,15 +101,13 @@ namespace Umbraco.Core.Scoping
             if (_database != null)
                 _database.Dispose();
 
-            _scopeProvider.AmbientScope = null;
-            _scopeProvider.AmbientContext = null;
+            _scopeProvider.SetAmbient(null);
 
             _disposed = true;
             GC.SuppressFinalize(this);
         }
 
         public IScopeInternal ParentScope { get { return null; } }
-        public EventsDispatchMode DispatchMode { get {return EventsDispatchMode.Unspecified; } }
         public IsolationLevel IsolationLevel { get {return IsolationLevel.Unspecified; } }
         public bool ScopedFileSystems { get { return false; } }
         public void ChildCompleted(bool? completed) { }

@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Events
 {
-    public class RecycleBinEventArgs : CancellableEventArgs, IEquatable<RecycleBinEventArgs>
+    public class RecycleBinEventArgs : CancellableEventArgs, IEquatable<RecycleBinEventArgs>, IDeletingMediaFilesEventArgs
     {
         public RecycleBinEventArgs(Guid nodeObjectType, Dictionary<int, IEnumerable<Property>> allPropertyData, bool emptiedSuccessfully)
             : base(false)
@@ -96,6 +96,8 @@ namespace Umbraco.Core.Events
         /// This list can be appended to during an event handling operation, generally this is done based on the property data contained in these event args
         /// </remarks>
         public List<string> Files { get; private set; }
+
+        public List<string> MediaFilesToDelete { get { return Files; } }
 
         /// <summary>
         /// Gets the list of all property data associated with a content id

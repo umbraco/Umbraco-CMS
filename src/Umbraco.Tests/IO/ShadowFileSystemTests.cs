@@ -364,7 +364,8 @@ namespace Umbraco.Tests.IO
 
             ss.Complete();
 
-            Assert.IsTrue(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt")); // *not* cleaning
+            // yes we are cleaning now
+            //Assert.IsTrue(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt")); // *not* cleaning
             Assert.IsTrue(File.Exists(path + "/ShadowTests/path/to/some/dir/f1.txt"));
             Assert.IsFalse(File.Exists(path + "/ShadowTests/sub/sub/f2.txt"));
         }
@@ -558,7 +559,7 @@ namespace Umbraco.Tests.IO
                 Assert.AreEqual(1, ae.InnerExceptions.Count);
                 e = ae.InnerExceptions[0];
                 Assert.IsNotNull(e.InnerException);
-                Assert.IsInstanceOf<UnauthorizedAccessException>(e.InnerException);
+                Assert.IsInstanceOf<Exception>(e.InnerException);
             }
 
             // still, the rest of the changes has been applied ok

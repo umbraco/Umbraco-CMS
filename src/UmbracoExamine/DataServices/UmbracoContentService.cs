@@ -57,7 +57,7 @@ namespace UmbracoExamine.DataServices
         [Obsolete("This should no longer be used, latest content will be indexed by using the IContentService directly")]
 		public XDocument GetLatestContentByXPath(string xpath)
         {
-            using (ApplicationContext.Current.ScopeProvider.CreateScope())
+            using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
             {
                 var xmlContent = XDocument.Parse("<content></content>");
                 var rootContent = _applicationContext.Services.ContentService.GetRootContent();
@@ -67,6 +67,7 @@ namespace UmbracoExamine.DataServices
                     xmlContent.Root.Add(c.ToDeepXml(_applicationContext.Services.PackagingService));
                 }
                 var result = ((IEnumerable)xmlContent.XPathEvaluate(xpath)).Cast<XElement>();
+                scope.Complete();
                 return result.ToXDocument();
             }
         }
@@ -79,9 +80,11 @@ namespace UmbracoExamine.DataServices
         /// <returns></returns>
         public bool IsProtected(int nodeId, string path)
         {
-            using (ApplicationContext.Current.ScopeProvider.CreateScope())
+            using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
             {
-                return _applicationContext.Services.PublicAccessService.IsProtected(path.EnsureEndsWith("," + nodeId));
+                var ret = _applicationContext.Services.PublicAccessService.IsProtected(path.EnsureEndsWith("," + nodeId));
+                scope.Complete();
+                return ret;
             }
         }
 
@@ -92,11 +95,12 @@ namespace UmbracoExamine.DataServices
 		
 		public IEnumerable<string> GetAllUserPropertyNames()
 	    {
-            using (ApplicationContext.Current.ScopeProvider.CreateScope())
+            using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
             {
                 try
 	            {
 	                var result = _applicationContext.DatabaseContext.Database.Fetch<string>("select distinct alias from cmsPropertyType order by alias");
+	                scope.Complete();
 	                return result;
 	            }
 	            catch (Exception ex)
