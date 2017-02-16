@@ -254,15 +254,30 @@ angular.module("umbraco")
                 $scope.loading = true;
                 entityResource.getPagedDescendants($scope.startNodeId, "Media", $scope.searchOptions)
                     .then(function (data) {
+                        // update image data to work with image grid
+                        angular.forEach(data.items, function(mediaItem){
+                            // set thumbnail and src
+                            mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
+                            mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
+                            // set properties to match a media object
+                            mediaItem.properties = [
+                                {
+                                    alias: "umbracoWidth",
+                                    value: mediaItem.metaData.umbracoWidth.Value
+                                },
+                                {
+                                    alias: "umbracoHeight",
+                                    value: mediaItem.metaData.umbracoHeight.Value
+                                }
+                            ];
+                        });
                         // update images
                         $scope.images = data.items ? data.items : [];
                         // update pagination
-                        $scope.searchOptions = {
-                            pageNumber: data.pageNumber,
-                            pageSize: data.pageSize,
-                            totalItems: data.totalItems,
-                            totalPages: data.totalPages
-                        };
+                        $scope.searchOptions.pageNumber = data.pageNumber;
+                        $scope.searchOptions.pageSize = data.pageSize;
+                        $scope.searchOptions.totalItems = data.totalItems;
+                        $scope.searchOptions.totalPages = data.totalPages;
                         // set already selected images to selected
                         preSelectImages();
                         $scope.loading = false;
@@ -273,7 +288,7 @@ angular.module("umbraco")
                 $scope.loading = true;
                 mediaResource.getChildren(id)
                     .then(function(data) {
-                        $scope.searchTerm = "";
+                        $scope.searchOptions.filter = "";
                         $scope.images = data.items ? data.items : [];
                         // set already selected images to selected
                         preSelectImages();

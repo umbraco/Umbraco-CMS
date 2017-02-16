@@ -17,7 +17,7 @@
          <div class="form-search">
             <i class="icon-search"></i>
             <input
-                class="umb-search-field search-query"
+                class="umb-search-field search-query -full-width-input"
                 ng-model="searchOptions.filter"
                 localize="placeholder"
                 placeholder="@placeholders_search"
@@ -37,7 +37,7 @@
 
       </div>
 
-      <div class="row umb-control-group" ng-if="!searchTerm">
+      <div class="row umb-control-group" ng-if="!searchOptions.filter">
          <ul class="umb-breadcrumbs">
             <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
                <a href ng-click="gotoFolder()" prevent-default>Media</a>
@@ -75,7 +75,7 @@
          files-queued="onFilesQueue"
          accept="{{acceptedFileTypes}}"
          max-file-size="{{maxFileSize}}"
-         hide-dropzone="{{!activeDrag && images.length > 0 || searchTerm }}"
+         hide-dropzone="{{!activeDrag && images.length > 0 || searchOptions.filter }}"
          compact="{{ images.length > 0 }}">
       </umb-file-dropzone>
 
@@ -101,7 +101,7 @@
         </div>
 
         <umb-empty-state
-            ng-if="searchTerm && images.length === 0 && !loading"
+            ng-if="searchOptions.filter && images.length === 0 && !loading"
             position="center">
             <localize key="general_searchNoResult"></localize>
         </umb-empty-state>
