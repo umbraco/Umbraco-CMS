@@ -16,6 +16,7 @@ namespace Umbraco.Core.Deploy
             if (udi == null)
                 throw new ArgumentNullException("udi");
             Udi = udi;
+            Name = Udi.ToString();
 
             Dependencies = dependencies ?? Enumerable.Empty<ArtifactDependency>();
             _checksum = new Lazy<string>(GetChecksum);
@@ -48,5 +49,8 @@ namespace Umbraco.Core.Deploy
         }
 
         #endregion
+
+        public string Name { get; set; }
+        public string Alias { get; set; }
     }
 }
