@@ -831,9 +831,6 @@ namespace Umbraco.Core.Services
 
                 var args = new DeleteEventArgs<IMedia>(media, false, evtMsgs);
                 uow.Events.Dispatch(Deleted, this, args);
-
-                //remove any flagged media files
-                repository.DeleteMediaFiles(args.MediaFilesToDelete);
             }
 
             Audit(AuditType.Delete, "Delete Media performed by user", userId, media.Id);
@@ -958,9 +955,6 @@ namespace Umbraco.Core.Services
                     success = repository.EmptyRecycleBin();
                     // FIXME shouldn't we commit here?!
                     uow.Events.Dispatch(EmptiedRecycleBin, this, new RecycleBinEventArgs(nodeObjectType, entities, files, success));
-
-                    if (success)
-                        repository.DeleteMediaFiles(files);
                 }
             }
             Audit(AuditType.Delete, "Empty Media Recycle Bin performed by user", 0, -21);

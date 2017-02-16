@@ -213,12 +213,8 @@ namespace Umbraco.Tests.Scoping
 
             var scopeProvider = ApplicationContext.Current.ScopeProvider as IScopeProviderInternal;
             Assert.IsNotNull(scopeProvider);
-            if (complete)
-                // because some event handlers trigger xml refresh with directly uses the DB
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-            else
-                // because nothing happened
-                Assert.IsNull(scopeProvider.AmbientScope);
+            // ambient scope may be null, or maybe not, depending on whether the code that
+            // was called did proper scoped work, or some direct (NoScope) use of the database
             Assert.IsNull(scopeProvider.AmbientContext);
 
             // limited number of clones!

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
+using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.Events;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -95,6 +97,54 @@ namespace Umbraco.Tests.Scoping
                 }
             }
             Assert.IsNull(scopeProvider.AmbientScope);
+        }
+
+        [Test]
+        public void NestedMigrateScope()
+        {
+            var scopeProvider = DatabaseContext.ScopeProvider;
+            Assert.IsNull(scopeProvider.AmbientScope);
+
+            var httpContextItems = new Hashtable();
+            ScopeProvider.HttpContextItemsGetter = () => httpContextItems;
+            try
+            {
+                using (var scope = scopeProvider.CreateScope())
+                {
+                    Assert.IsInstanceOf<Scope>(scope);
+                    Assert.IsNotNull(scopeProvider.AmbientScope);
+                    Assert.AreSame(scope, scopeProvider.AmbientScope);
+                    Assert.AreSame(scope, httpContextItems[ScopeProvider.ScopeItemKey]);
+
+                    // only if Core.DEBUG_SCOPES are defined
+                    //Assert.IsEmpty(scopeProvider.CallContextObjects);
+
+                    using (var nested = scopeProvider.CreateScope(callContext: true))
+                    {
+                        Assert.IsInstanceOf<Scope>(nested);
+                        Assert.IsNotNull(scopeProvider.AmbientScope);
+                        Assert.AreSame(nested, scopeProvider.AmbientScope);
+                        Assert.AreSame(scope, ((Scope) nested).ParentScope);
+
+                        // it's moved over to call context
+                        Assert.IsNull(httpContextItems[ScopeProvider.ScopeItemKey]);
+                        var callContextKey = CallContext.LogicalGetData(ScopeProvider.ScopeItemKey).AsGuid();
+                        Assert.AreNotEqual(Guid.Empty, callContextKey);
+
+                        // only if Core.DEBUG_SCOPES are defined
+                        //var ccnested = scopeProvider.CallContextObjects[callContextKey];
+                        //Assert.AreSame(nested, ccnested);
+                    }
+
+                    // it's naturally back in http context
+                    Assert.AreSame(scope, httpContextItems[ScopeProvider.ScopeItemKey]);
+                }
+                Assert.IsNull(scopeProvider.AmbientScope);
+            }
+            finally
+            {
+                ScopeProvider.HttpContextItemsGetter = null;
+            }
         }
 
         [Test]
@@ -478,17 +528,82 @@ namespace Umbraco.Tests.Scoping
         }
 
         [Test]
-        public void CallContextScope()
+        public void CallContextScope1()
         {
             var scopeProvider = DatabaseContext.ScopeProvider;
-            var scope = scopeProvider.CreateScope();
-            Assert.IsNotNull(scopeProvider.AmbientScope);
-            using (new SafeCallContext())
+            using (var scope = scopeProvider.CreateScope())
             {
-                Assert.IsNull(scopeProvider.AmbientScope);
+                Assert.IsNotNull(scopeProvider.AmbientScope);
+                Assert.IsNotNull(scopeProvider.AmbientContext);
+                using (new SafeCallContext())
+                {
+                    Assert.IsNull(scopeProvider.AmbientScope);
+                    Assert.IsNull(scopeProvider.AmbientContext);
+
+                    using (var newScope = scopeProvider.CreateScope())
+                    {
+                        Assert.IsNotNull(scopeProvider.AmbientScope);
+                        Assert.IsNull(scopeProvider.AmbientScope.ParentScope);
+                        Assert.IsNotNull(scopeProvider.AmbientContext);
+                    }
+
+                    Assert.IsNull(scopeProvider.AmbientScope);
+                    Assert.IsNull(scopeProvider.AmbientContext);
+                }
+                Assert.IsNotNull(scopeProvider.AmbientScope);
+                Assert.AreSame(scope, scopeProvider.AmbientScope);
             }
-            Assert.IsNotNull(scopeProvider.AmbientScope);
-            Assert.AreSame(scope, scopeProvider.AmbientScope);
+
+            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.IsNull(scopeProvider.AmbientContext);
+        }
+
+        [Test]
+        public void CallContextScope2()
+        {
+            var scopeProvider = DatabaseContext.ScopeProvider;
+            Assert.IsNull(scopeProvider.AmbientScope);
+
+            var httpContextItems = new Hashtable();
+            ScopeProvider.HttpContextItemsGetter = () => httpContextItems;
+            try
+            {
+                using (var scope = scopeProvider.CreateScope())
+                {
+                    Assert.IsNotNull(scopeProvider.AmbientScope);
+                    Assert.IsNotNull(scopeProvider.AmbientContext);
+                    using (new SafeCallContext())
+                    {
+                        // pretend it's another thread
+                        ScopeProvider.HttpContextItemsGetter = null;
+
+                        Assert.IsNull(scopeProvider.AmbientScope);
+                        Assert.IsNull(scopeProvider.AmbientContext);
+
+                        using (var newScope = scopeProvider.CreateScope())
+                        {
+                            Assert.IsNotNull(scopeProvider.AmbientScope);
+                            Assert.IsNull(scopeProvider.AmbientScope.ParentScope);
+                            Assert.IsNotNull(scopeProvider.AmbientContext);
+                        }
+
+                        Assert.IsNull(scopeProvider.AmbientScope);
+                        Assert.IsNull(scopeProvider.AmbientContext);
+
+                        // back to original thread
+                        ScopeProvider.HttpContextItemsGetter = () => httpContextItems; 
+                    }
+                    Assert.IsNotNull(scopeProvider.AmbientScope);
+                    Assert.AreSame(scope, scopeProvider.AmbientScope);
+                }
+
+                Assert.IsNull(scopeProvider.AmbientScope);
+                Assert.IsNull(scopeProvider.AmbientContext);
+            }
+            finally
+            {
+                ScopeProvider.HttpContextItemsGetter = null;
+            }
         }
 
         [Test]

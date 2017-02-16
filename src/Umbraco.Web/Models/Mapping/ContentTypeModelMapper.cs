@@ -161,9 +161,12 @@ namespace Umbraco.Web.Models.Mapping
 
                 });
 
-            config.CreateMap<IMemberType, ContentTypeBasic>();
-            config.CreateMap<IMediaType, ContentTypeBasic>();
-            config.CreateMap<IContentType, ContentTypeBasic>();
+            config.CreateMap<IMemberType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MemberType, content.Key)));
+            config.CreateMap<IMediaType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MediaType, content.Key)));
+            config.CreateMap<IContentType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DocumentType, content.Key)));
 
             config.CreateMap<PropertyTypeBasic, PropertyType>()
 

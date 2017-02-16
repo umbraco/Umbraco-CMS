@@ -166,24 +166,17 @@ function entityResource($q, $http, umbRequestHelper) {
          */
         getByIds: function (ids, type) {
             
-            var query = "";
-            _.each(ids, function(item) {
-                query += "ids=" + item + "&";
-            });
-
-            // if ids array is empty we need a empty variable in the querystring otherwise the service returns a error
-            if (ids.length === 0) {
-                query += "ids=&";
-            }
-
-            query += "type=" + type;
+            var query = "type=" + type;
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
+               $http.post(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetByIds",
-                       query)),
+                       query),
+                   {
+                       ids: ids
+                   }),
                'Failed to retrieve entity data for ids ' + ids);
         },
 

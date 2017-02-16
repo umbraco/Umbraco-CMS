@@ -756,6 +756,7 @@ namespace Umbraco.Core.Services
             using (var scope = UowProvider.ScopeProvider.CreateScope()) // fixme what a mess
             {
                 scope.Events.Dispatch(SavedContentType, this, new SaveEventArgs<IContentType>(contentType, false));
+                scope.Complete();
             }
 	        Audit(AuditType.Save, "Save ContentType performed by user", userId, contentType.Id);
         }
@@ -800,8 +801,9 @@ namespace Umbraco.Core.Services
             using (var scope = UowProvider.ScopeProvider.CreateScope()) // fixme what a mess
             {
                 scope.Events.Dispatch(SavedContentType, this, new SaveEventArgs<IContentType>(asArray, false));
+                scope.Complete();
             }
-	        Audit(AuditType.Save, "Save ContentTypes performed by user", userId, -1);
+            Audit(AuditType.Save, "Save ContentTypes performed by user", userId, -1);
         }
 
         /// <summary>
@@ -1211,6 +1213,7 @@ namespace Umbraco.Core.Services
                 using (var scope = UowProvider.ScopeProvider.CreateScope()) // fixme what a mess
                 {
                     scope.Events.Dispatch(SavedMediaType, this, new SaveEventArgs<IMediaType>(mediaType, false));
+                    scope.Complete();
                 }
                 Audit(AuditType.Save, "Save MediaType performed by user", userId, mediaType.Id);
             }
@@ -1255,6 +1258,7 @@ namespace Umbraco.Core.Services
                 using (var scope = UowProvider.ScopeProvider.CreateScope()) // fixme what a mess
                 {
                     scope.Events.Dispatch(SavedMediaType, this, new SaveEventArgs<IMediaType>(asArray, false));
+                    scope.Complete();
                 }
                 Audit(AuditType.Save, "Save MediaTypes performed by user", userId, -1);
             }

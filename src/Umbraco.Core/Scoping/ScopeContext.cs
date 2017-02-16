@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Scoping
 {
-    public class ScopeContext
+    public class ScopeContext : IInstanceIdentifiable
     {
         private Dictionary<string, IEnlistedObject> _enlisted;
 
@@ -26,6 +26,9 @@ namespace Umbraco.Core.Scoping
             if (exceptions != null)
                 throw new AggregateException("Exceptions were thrown by listed actions.", exceptions);
         }
+
+        private readonly Guid _instanceId = Guid.NewGuid();
+        public Guid InstanceId { get { return _instanceId; } }
 
         private IDictionary<string, IEnlistedObject> Enlisted
         {

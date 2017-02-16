@@ -647,5 +647,10 @@ namespace Umbraco.Core
 				return "[GetPropertyValueException]";
 			}
 		}
+
+	    internal static Guid AsGuid(this object value)
+	    {
+	        return value is Guid ? (Guid) value : Guid.Empty;
+	    }
 	}
 }

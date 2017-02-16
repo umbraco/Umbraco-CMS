@@ -34,8 +34,16 @@ namespace Umbraco.Core.IO
                     {
                         try
                         {
-                            using (var stream = _sfs.OpenFile(kvp.Key))
-                                _fs.AddFile(kvp.Key, stream, true);
+                            var fs2 = _fs as IFileSystem2;
+                            if (fs2 != null && fs2.CanAddPhysical)
+                            {
+                                fs2.AddFile(kvp.Key, _sfs.GetFullPath(kvp.Key)); // overwrite, move
+                            }
+                            else
+                            {
+                                using (var stream = _sfs.OpenFile(kvp.Key))
+                                    _fs.AddFile(kvp.Key, stream, true);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -288,6 +296,37 @@ namespace Umbraco.Core.IO
             return _sfs.GetSize(path);
         }
 
+        public bool CanAddPhysical { get { return true; } }
+
+        public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
+        {
+            ShadowNode sf;
+            var normPath = NormPath(path);
+            if (Nodes.TryGetValue(normPath, out sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
+                throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+
+            var parts = normPath.Split('/');
+            for (var i = 0; i < parts.Length - 1; i++)
+            {
+                var dirPath = string.Join("/", parts.Take(i + 1));
+                ShadowNode sd;
+                if (Nodes.TryGetValue(dirPath, out sd))
+                {
+                    if (sd.IsFile) throw new InvalidOperationException("Invalid path.");
+                    if (sd.IsDelete) Nodes[dirPath] = new ShadowNode(false, true);
+                }
+                else
+                {
+                    if (_fs.DirectoryExists(dirPath)) continue;
+                    if (_fs.FileExists(dirPath)) throw new InvalidOperationException("Invalid path.");
+                    Nodes[dirPath] = new ShadowNode(false, true);
+                }
+            }
+
+            _sfs.AddFile(path, physicalPath, overrideIfExists, copy);
+            Nodes[normPath] = new ShadowNode(false, false);
+        }
+        
         /// <summary>
         /// Helper function for filtering keys by Regex if a filter is specified.
         /// </summary>

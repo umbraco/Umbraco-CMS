@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 

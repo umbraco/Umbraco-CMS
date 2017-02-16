@@ -72,11 +72,12 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbProviderName(),
                 Logger);
 
-            // fixme - bah - this is needed to reset static properties? Stephen to update this note
+            // ensure we start tests in a clean state ie without any scope in context
+            // anything that used a true 'Scope' would have removed it, but there could
+            // be a rogue 'NoScope' there - and we want to make sure it is gone
             var scopeProvider = new ScopeProvider(null);
             if (scopeProvider.AmbientScope != null)
-                scopeProvider.AmbientScope.Dispose();
-            scopeProvider.AmbientScope = null;
+                scopeProvider.AmbientScope.Dispose(); // removes scope from context
 
             base.Initialize();
 

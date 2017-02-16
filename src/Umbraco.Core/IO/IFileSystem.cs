@@ -44,6 +44,10 @@ namespace Umbraco.Core.IO
     {
         long GetSize(string path);
 
+        bool CanAddPhysical { get; }
+
+        void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false);
+
         // TODO: implement these
         //
         //void CreateDirectory(string path);

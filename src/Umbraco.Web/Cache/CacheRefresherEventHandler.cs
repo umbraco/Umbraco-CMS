@@ -243,6 +243,20 @@ namespace Umbraco.Web.Cache
 
         #region Publishing
 
+        // IPublishingStrategy (obsolete) events are proxied into ContentService, which works fine when
+        // events are actually raised, but not when they are handled by HandleEvents, so we have to have
+        // these proxy methods that are *not* registered against any event *but* used by HandleEvents.
+
+        static void PublishingStrategy_UnPublished(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        {
+            ContentService_UnPublished(sender, e);
+        }
+
+        static void PublishingStrategy_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        {
+            ContentService_Published(sender, e);
+        }
+
         static void ContentService_UnPublished(IPublishingStrategy sender, PublishEventArgs<IContent> e)
         {
             if (e.PublishedEntities.Any())

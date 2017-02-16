@@ -2,6 +2,7 @@
 using System.Data;
 using System.Runtime.Remoting.Messaging;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
@@ -38,11 +39,14 @@ namespace Umbraco.Tests.Scoping
             _database.BeginTransaction(); // opens and maintains a connection
 
             // the test is leaking a scope with a non-null database
-            var contextScope = CallContext.LogicalGetData(ScopeProvider.ScopeItemKey);
-            Assert.IsNotNull(contextScope);
-            Assert.IsInstanceOf<NoScope>(CallContext.LogicalGetData(ScopeProvider.ScopeItemKey));
-            Assert.IsNotNull(((NoScope) contextScope).DatabaseOrNull);
-            Assert.AreSame(_database, ((NoScope)contextScope).DatabaseOrNull);
+            var contextGuid = CallContext.LogicalGetData(ScopeProvider.ScopeItemKey).AsGuid();
+            Assert.AreNotEqual(Guid.Empty, contextGuid);
+
+            // only if Core.DEBUG_SCOPES are defined
+            //var contextScope = DatabaseContext.ScopeProvider.CallContextObjects[contextGuid] as NoScope;
+            //Assert.IsNotNull(contextScope);
+            //Assert.IsNotNull(contextScope.DatabaseOrNull);
+            //Assert.AreSame(_database, contextScope.DatabaseOrNull);
 
             // save the connection
             _connection = _database.Connection;
