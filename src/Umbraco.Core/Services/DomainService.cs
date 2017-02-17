@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
 
         public bool Exists(string domainName)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repo = RepositoryFactory.CreateDomainRepository(uow);
                 return repo.Exists(domainName);
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services
 
         public IDomain GetByName(string name)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateDomainRepository(uow);
                 return repository.GetByName(name);
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
 
         public IDomain GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
 	            var repo = RepositoryFactory.CreateDomainRepository(uow);
 	            return repo.Get(id);
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IDomain> GetAll(bool includeWildcards)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repo = RepositoryFactory.CreateDomainRepository(uow);
                 return repo.GetAll(includeWildcards);
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repo = RepositoryFactory.CreateDomainRepository(uow);
                 return repo.GetAssignedDomains(contentId, includeWildcards);

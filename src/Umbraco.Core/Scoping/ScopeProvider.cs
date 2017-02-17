@@ -168,6 +168,7 @@ namespace Umbraco.Core.Scoping
             }
         }
 
+        // this is for tests exclusively until we have a proper accessor in v8
         internal static Func<IDictionary> HttpContextItemsGetter { get; set; }
 
         private static IDictionary HttpContextItems

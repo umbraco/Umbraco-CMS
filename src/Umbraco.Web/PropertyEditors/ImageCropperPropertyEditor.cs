@@ -224,7 +224,7 @@ namespace Umbraco.Web.PropertyEditors
                     MediaFileSystem.UploadAutoFillProperties.Reset(content, autoFillConfig);
                 else
                     MediaFileSystem.UploadAutoFillProperties.Populate(content, autoFillConfig, MediaFileSystem.GetRelativePath(src));
-            }            
+            }
         }
 
         internal class ImageCropperPreValueEditor : PreValueEditor
@@ -249,7 +249,7 @@ namespace Umbraco.Web.PropertyEditors
         //  even if the property has NOT been modified (it could be the same filename but
         //  a different file) - this is accepted (auto-fill props should die)
         //
-        // FIXME
+        // TODO in v8:
         //  for some weird backward compatibility reasons,
         //  - media copy is not supported
         //  - auto-fill properties are not supported for content items

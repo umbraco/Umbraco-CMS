@@ -662,7 +662,6 @@
     <Compile Include="Models\ContentPreviewEntity.cs" />
     <Compile Include="Models\ContentTypeBase.cs" />
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
-    <Compile Include="Models\ContentTypeExtensions.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
     <Compile Include="Models\ContentXmlEntity.cs" />
     <Compile Include="Models\DeepCloneHelper.cs" />
@@ -1160,7 +1159,6 @@
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviders.cs" />
     <Compile Include="Persistence\TransactionType.cs" />
     <Compile Include="Persistence\UmbracoDatabase.cs" />
-    <Compile Include="Persistence\UnitOfWork\FileUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWorkProvider.cs" />

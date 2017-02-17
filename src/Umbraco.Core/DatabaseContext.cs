@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
@@ -34,7 +33,7 @@ namespace Umbraco.Core
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;
-        private DateTime? _connectionLastChecked = null;
+        private DateTime? _connectionLastChecked;
 
         /// <summary>
         /// The number of minutes to throttle the checks to CanConnect
@@ -99,10 +98,10 @@ namespace Umbraco.Core
             SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
 
             var asDbFactory2 = factory as IDatabaseFactory2;
-            ScopeProvider = asDbFactory2 == null 
-                ? new ScopeProvider(new DatabaseFactoryWrapper(factory)) 
+            ScopeProvider = asDbFactory2 == null
+                ? new ScopeProvider(new DatabaseFactoryWrapper(factory))
                 : new ScopeProvider(asDbFactory2);
-            
+
             _logger = logger;
             _configured = true;
         }
@@ -197,41 +196,12 @@ namespace Umbraco.Core
                 {
                     throw new InvalidOperationException("Cannot create a database instance, there is no available connection string");
                 }
-            
+
                 return ScopeProvider.GetAmbientOrNoScope().Database;
                 //var scope = ScopeProvider.AmbientScope;
                 //return scope != null ? scope.Database : ScopeProvider.CreateNoScope().Database;
             }
         }
-
-        /// <summary>
-        /// Replaces the "ambient" database (if any) and by a new temp database.
-        /// </summary>
-        /// <remarks>
-        /// <para>The returned IDisposable *must* be diposed in order to properly dispose the temp database and
-        /// restore the original "ambient" database (if any).</para>
-        /// <para>This is to be used in background tasks to ensure that they have an "ambient" database which
-        /// will be properly removed from call context and does not interfere with anything else. In most case
-        /// it is not replacing anything, just temporarily installing a database in context.</para>
-        /// </remarks>
-        // fixme - this should just entirely be replaced by Scope?
-        /*
-        public virtual IDisposable UseSafeDatabase(bool force = false)
-        {
-            var factory = _factory as DefaultDatabaseFactory;
-            if (factory == null) throw new NotSupportedException();
-
-            if (DefaultDatabaseFactory.HasAmbientDatabase)
-            {
-                return force
-                    ? new UsingDatabase(DefaultDatabaseFactory.DetachAmbientDatabase(), factory.CreateDatabase())
-                    : new UsingDatabase(null, null);
-            }
-
-            // create a new, temp, database (will be disposed with UsingDatabase)
-            return new UsingDatabase(null, factory.CreateDatabase());
-        }
-        */
 
         /// <summary>
         /// Boolean indicating whether the database has been configured

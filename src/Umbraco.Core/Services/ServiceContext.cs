@@ -1,12 +1,10 @@
 using System;
-using System.ComponentModel;
 using Umbraco.Core.Logging;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core.Services
@@ -15,7 +13,7 @@ namespace Umbraco.Core.Services
     /// These are used currently to return the temporary 'operation' interfaces for services
     /// which are used to return a status from operational methods so we can determine if things are
     /// cancelled, etc...
-    /// 
+    ///
     /// These will be obsoleted in v8 since all real services methods will be changed to have the correct result.
     /// </summary>
     public static class ServiceWithResultExtensions
@@ -37,11 +35,11 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
-        private Lazy<IMigrationEntryService> _migrationEntryService; 
-        private Lazy<IPublicAccessService> _publicAccessService; 
-        private Lazy<ITaskService> _taskService; 
-        private Lazy<IDomainService> _domainService; 
-        private Lazy<IAuditService> _auditService; 
+        private Lazy<IMigrationEntryService> _migrationEntryService;
+        private Lazy<IPublicAccessService> _publicAccessService;
+        private Lazy<ITaskService> _taskService;
+        private Lazy<IDomainService> _domainService;
+        private Lazy<IAuditService> _auditService;
         private Lazy<ILocalizedTextService> _localizedTextService;
         private Lazy<ITagService> _tagService;
         private Lazy<IContentService> _contentService;
@@ -150,22 +148,6 @@ namespace Umbraco.Core.Services
             if (redirectUrlService != null) _redirectUrlService = new Lazy<IRedirectUrlService>(() => redirectUrlService);
         }
 
-        // fixme - but this is obsoleting a new method?!!?!!?
-        [Obsolete("The IPublishingStrategy parameter is no longer required and not used")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public ServiceContext(
-            RepositoryFactory repositoryFactory,
-            IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
-            IScopeUnitOfWorkProvider fileUnitOfWorkProvider,
-            IPublishingStrategy publishingStrategy,
-            CacheHelper cache,
-            ILogger logger,
-            IEventMessagesFactory eventMessagesFactory)
-            : this(repositoryFactory, dbUnitOfWorkProvider, fileUnitOfWorkProvider, cache, logger, eventMessagesFactory)
-        { }
-
-        // fixme CLEAN THIS
-
         /// <summary>
         /// Creates a service context with a RepositoryFactory which is used to construct Services
         /// </summary>
@@ -178,8 +160,8 @@ namespace Umbraco.Core.Services
         public ServiceContext(
             RepositoryFactory repositoryFactory,
             IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
-            IScopeUnitOfWorkProvider fileUnitOfWorkProvider, 
-            CacheHelper cache, 
+            IScopeUnitOfWorkProvider fileUnitOfWorkProvider,
+            CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
         {
@@ -233,7 +215,7 @@ namespace Umbraco.Core.Services
 
             if (_localizedTextService == null)
             {
-                
+
                 _localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
                     {
@@ -266,7 +248,7 @@ namespace Umbraco.Core.Services
                     }),
                     logger));
             }
-                
+
 
             if (_notificationService == null)
                 _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value, logger));
@@ -304,7 +286,7 @@ namespace Umbraco.Core.Services
                     _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _memberService.Value, _memberTypeService.Value,
                     //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
-            
+
             if (_packagingService == null)
                 _packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _entityService.Value, _userService.Value, repositoryFactory, provider));
 

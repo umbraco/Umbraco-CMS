@@ -43,7 +43,8 @@ namespace Umbraco.Core.IO
 
         private IScopeProviderInternal ScopeProvider
         {
-            // fixme - 'course this is bad, but enough for now
+            // this is bad, but enough for now, and we'll refactor
+            // in v8 when we'll get rid of this class' singleton
             get { return ApplicationContext.Current == null ? null : ApplicationContext.Current.ScopeProvider as IScopeProviderInternal; }
         }
 

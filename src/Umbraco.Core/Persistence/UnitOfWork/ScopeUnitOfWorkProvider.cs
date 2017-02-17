@@ -24,48 +24,28 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             return new ScopeUnitOfWork(ScopeProvider);
         }
 
-        /// <summary>
-        /// Creates a Unit of work with a new UmbracoDatabase instance for the work item/transaction.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Each PetaPoco UOW uses it's own Database object, not the shared Database object that comes from
-        /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
-        /// and we Dispose of this Database object when the UOW is disposed.
-        /// fixme NO we dispose of it when the transaction completes
-        /// fixme just inheritdoc!
-        /// </remarks>
+        /// <inheritdoc />
         public virtual IScopeUnitOfWork GetUnitOfWork()
         {
             return new ScopeUnitOfWork(ScopeProvider);
         }
 
-        /// <summary>
-        /// Creates a Unit of work with a new UmbracoDatabase instance for the work item/transaction.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Each PetaPoco UOW uses it's own Database object, not the shared Database object that comes from
-        /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
-        /// and we Dispose of this Database object when the UOW is disposed.
-        /// fixme NO
-        /// fixme just inheritdoc!
-        /// </remarks>
+        /// <inheritdoc />
         public IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel)
         {
             return new ScopeUnitOfWork(ScopeProvider, isolationLevel);
         }
 
         /// <inheritdoc />
-        public IScopeUnitOfWork GetUnitOfWork(bool commit)
+        public IScopeUnitOfWork GetUnitOfWork(bool readOnly)
         {
-            return new ScopeUnitOfWork(ScopeProvider, commit: commit);
+            return new ScopeUnitOfWork(ScopeProvider, readOnly: readOnly);
         }
 
         /// <inheritdoc />
-        public IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel, bool commit)
+        public IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel, bool readOnly)
         {
-            return new ScopeUnitOfWork(ScopeProvider, isolationLevel, commit: commit);
+            return new ScopeUnitOfWork(ScopeProvider, isolationLevel, readOnly: readOnly);
         }
     }
 }

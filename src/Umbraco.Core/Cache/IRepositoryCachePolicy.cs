@@ -18,10 +18,17 @@ namespace Umbraco.Core.Cache
         // it is not *that* complicated but then RepositoryBase needs to have a TRepository generic
         // type parameter and it all becomes convoluted - keeping it simple for the time being.
 
-        // fixme explain
+        /// <summary>
+        /// Creates a scoped version of this cache policy.
+        /// </summary>
+        /// <param name="runtimeCache">The global isolated runtime cache for this policy.</param>
+        /// <param name="scope">The scope.</param>
+        /// <remarks>When a policy is scoped, it means that it has been created with a scoped
+        /// isolated runtime cache, and now it needs to be wrapped into something that can apply
+        /// changes to the global isolated runtime cache.</remarks>
         IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope);
 
-            /// <summary>
+        /// <summary>
         /// Gets an entity from the cache, else from the repository.
         /// </summary>
         /// <param name="id">The identifier.</param>

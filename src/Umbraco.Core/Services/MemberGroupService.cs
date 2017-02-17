@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -40,12 +37,12 @@ namespace Umbraco.Core.Services
                 scope.Complete(); // always complete
                 scope.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberGroup>(e.SavedEntities, false));
             }
-        } 
+        }
         #endregion
 
         public IEnumerable<IMemberGroup> GetAll()
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 return repository.GetAll();
@@ -54,7 +51,7 @@ namespace Umbraco.Core.Services
 
         public IMemberGroup GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 return repository.Get(id);
@@ -63,7 +60,7 @@ namespace Umbraco.Core.Services
 
         public IMemberGroup GetByName(string name)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 return repository.GetByName(name);
@@ -90,7 +87,7 @@ namespace Umbraco.Core.Services
                     uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberGroup>(memberGroup, false));
             }
 
-            
+
         }
 
         public void Delete(IMemberGroup memberGroup)
@@ -98,7 +95,10 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMemberGroup>(memberGroup)))
-                    return; // FIXME COMMIT
+                {
+                    uow.Commit();
+                    return;
+                }
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 repository.Delete(memberGroup);
                 uow.Commit();
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Occurs before Save of a member group
-        /// </summary>     
+        /// </summary>
         /// <remarks>
         /// We need to proxy these events because the events need to take place at the repo level
         /// </remarks>

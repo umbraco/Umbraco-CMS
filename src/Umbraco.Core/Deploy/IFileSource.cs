@@ -66,9 +66,19 @@ namespace Umbraco.Core.Deploy
         /// <returns>The length of the file, or -1 if the file does not exist.</returns>
         Task<long> GetFileLengthAsync(StringUdi udi, CancellationToken token);
 
-        // fixme - doc
+        /// <summary>
+        /// Gets files and store them using a file store.
+        /// </summary>
+        /// <param name="udis">The udis of the files to get.</param>
+        /// <param name="fileStore">A file store which can store the files.</param>
         void GetFiles(IEnumerable<StringUdi> udis, IFileStore fileStore);
 
+        /// <summary>
+        /// Gets files and store them using a file store.
+        /// </summary>
+        /// <param name="udis">The udis of the files to get.</param>
+        /// <param name="fileStore">A file store which can store the files.</param>
+        /// <param name="token">A cancellation token.</param>
         Task GetFilesAsync(IEnumerable<StringUdi> udis, IFileStore fileStore, CancellationToken token);
 
         ///// <summary>

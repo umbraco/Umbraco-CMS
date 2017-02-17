@@ -24,7 +24,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<PublicAccessEntry> GetAll()
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 return repo.GetAll();
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Services
             //start with the deepest id
             ids.Reverse();
 
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 //This will retrieve from cache!                 
                 var repo = RepositoryFactory.CreatePublicAccessRepository(uow);

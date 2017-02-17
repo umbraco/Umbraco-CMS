@@ -10,26 +10,27 @@ namespace umbraco
     internal class SafeXmlReaderWriter : IDisposable
     {
         private readonly bool _scoped;
+        private readonly Action<XmlDocument> _refresh;
         private readonly Action<XmlDocument, bool> _apply;
         private IDisposable _releaser;
         private bool _isWriter;
         private bool _applyChanges;
-        private XmlDocument _xml;
+        private XmlDocument _xml, _origXml;
         private bool _using;
         private bool _registerXmlChange;
 
-        private SafeXmlReaderWriter(IDisposable releaser, XmlDocument xml, Action<XmlDocument, bool> apply, bool isWriter, bool scoped)
+        private SafeXmlReaderWriter(IDisposable releaser, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool isWriter, bool scoped)
         {
             _releaser = releaser;
+            _refresh = refresh;
             _apply = apply;
             _isWriter = isWriter;
             _scoped = scoped;
 
-            // cloning for writer is not an option anymore (see XmlIsImmutable)
             _xml = _isWriter ? Clone(xml) : xml;
         }
 
-        public static SafeXmlReaderWriter Get(IScopeProviderInternal scopeProvider, AsyncLock xmlLock, XmlDocument xml, Action<XmlDocument, bool> apply, bool writer)
+        public static SafeXmlReaderWriter Get(IScopeProviderInternal scopeProvider, AsyncLock xmlLock, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool writer)
         {
             var scopeContext = scopeProvider.Context;
 
@@ -38,7 +39,7 @@ namespace umbraco
             {
                 // obtain exclusive access to xml and create reader/writer
                 var releaser = xmlLock.Lock();
-                return new SafeXmlReaderWriter(releaser, xml, apply, writer, false);
+                return new SafeXmlReaderWriter(releaser, xml, refresh, apply, writer, false);
             }
 
             // get or create an enlisted reader/writer
@@ -47,7 +48,7 @@ namespace umbraco
                 {
                     // obtain exclusive access to xml and create reader/writer
                     var releaser = xmlLock.Lock();
-                    return new SafeXmlReaderWriter(releaser, xml, apply, writer, true);
+                    return new SafeXmlReaderWriter(releaser, xml, refresh, apply, writer, true);
                 },
                 (completed, item) => // action
                 {
@@ -70,17 +71,18 @@ namespace umbraco
                 throw new InvalidOperationException("Already a writer.");
             _isWriter = true;
 
-            // cloning for writer is not an option anymore (see XmlIsImmutable)
-            //fixme: But XmlIsImmutable is not actually used!
-            _xml = Clone(_xml); 
+            _xml = Clone(_xml);
         }
 
         internal static Action Cloning { get; set; }
 
-        private static XmlDocument Clone(XmlDocument xmlDoc)
+        private XmlDocument Clone(XmlDocument xml)
         {
             if (Cloning != null) Cloning();
-            return xmlDoc == null ? null : (XmlDocument) xmlDoc.CloneNode(true);
+            if (_origXml != null)
+                throw new Exception("panic.");
+            _origXml = xml;
+            return xml == null ? null : (XmlDocument) xml.CloneNode(true);
         }
 
         public XmlDocument Xml
@@ -104,22 +106,18 @@ namespace umbraco
 
             _applyChanges = true;
             _registerXmlChange |= registerXmlChange;
-
-            // fixme - what about context cache?
-            // just 'clearing' here is not enough because it would be re-assigned to the
-            // un-modified _xmlContent, so we'd need to *change* it somehow to point to
-            // our temp _xml (and then maybe restore if the scope does not complete).
-            // not doing it means that the 'current' xml cache does *not* update during the
-            // scope but only once the scope has completed... might be an issue with
-            // GetUrl... would that impact Deploy? don't think so - so for the time being
-            // we do nothing *but* we need to deal with it at some point!
         }
 
         private void DisposeForReal(bool completed)
         {
-            // apply changes!
-            if (_isWriter && _applyChanges && completed)
-                _apply(_xml, _registerXmlChange);
+            if (_isWriter)
+            {
+                // apply changes, or restore the original xml for the current request
+                if (_applyChanges && completed)
+                    _apply(_xml, _registerXmlChange);
+                else
+                    _refresh(_origXml);
+            }
 
             // release the lock
             _releaser.Dispose();
@@ -131,7 +129,16 @@ namespace umbraco
             _using = false;
 
             if (_scoped == false)
+            {
+                // really dispose
                 DisposeForReal(true);
+            }
+            else
+            {
+                // don't really dispose,
+                // just apply the changes for the current request
+                _refresh(_xml);
+            }
         }
     }
 }

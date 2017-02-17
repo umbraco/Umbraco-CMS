@@ -26,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override PropertyValueEditor CreateValueEditor()
         {
-            var baseEditor = base.CreateValueEditor();            
+            var baseEditor = base.CreateValueEditor();
             baseEditor.Validators.Add(new UploadFileTypeValidator());
             return new FileUploadPropertyValueEditor(baseEditor, MediaFileSystem);
         }
@@ -142,11 +142,11 @@ namespace Umbraco.Web.PropertyEditors
                     MediaFileSystem.UploadAutoFillProperties.Reset(content, autoFillConfig);
                 else
                     MediaFileSystem.UploadAutoFillProperties.Populate(content, autoFillConfig, MediaFileSystem.GetRelativePath(svalue));
-            }            
+            }
         }
 
         /// <summary>
-        /// A custom pre-val editor to ensure that the data is stored how the legacy data was stored in 
+        /// A custom pre-val editor to ensure that the data is stored how the legacy data was stored in
         /// </summary>
         internal class FileUploadPreValueEditor : ValueListPreValueEditor
         {
@@ -197,7 +197,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 var result = base.ConvertEditorToDb(editorValue, currentValue);
 
-                //this should just be a dictionary of values, we want to re-format this so that it is just one value in the dictionary that is 
+                //this should just be a dictionary of values, we want to re-format this so that it is just one value in the dictionary that is
                 // semi-colon delimited
                 var values = result.Select(item => item.Value.Value).ToList();
 
@@ -231,7 +231,7 @@ namespace Umbraco.Web.PropertyEditors
                             {
                                 //we'll make the server field the index number of the value so it can be wired up to the view
                                 "item_" + index.ToInvariantString()
-                            });   
+                            });
                         }
                     }
                 }
@@ -254,7 +254,7 @@ namespace Umbraco.Web.PropertyEditors
         //  even if the property has NOT been modified (it could be the same filename but
         //  a different file) - this is accepted (auto-fill props should die)
         //
-        // FIXME
+        // TODO in v8:
         //  for some weird backward compatibility reasons,
         //  - media copy is not supported
         //  - auto-fill properties are not supported for content items
