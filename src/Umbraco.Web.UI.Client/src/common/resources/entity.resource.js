@@ -346,8 +346,8 @@ function entityResource($q, $http, umbRequestHelper) {
           * @param {Int} parentid id of content item to return children of
           * @param {string} type Object type name
           * @param {Object} options optional options object
-          * @param {Int} options.pageSize if paging data, number of nodes per page, default = 0
-          * @param {Int} options.pageNumber if paging data, current page index, default = 0
+          * @param {Int} options.pageSize if paging data, number of nodes per page, default = 1
+          * @param {Int} options.pageNumber if paging data, current page index, default = 100
           * @param {String} options.filter if provided, query will only return those with names matching the filter
           * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Ascending`
           * @param {String} options.orderBy property to order items by, default: `SortOrder`
@@ -357,8 +357,8 @@ function entityResource($q, $http, umbRequestHelper) {
         getPagedChildren: function (parentId, type, options) {
 
             var defaults = {
-                pageSize: 0,
-                pageNumber: 0,
+                pageSize: 1,
+                pageNumber: 100,
                 filter: '',
                 orderDirection: "Ascending",
                 orderBy: "SortOrder"
@@ -390,7 +390,7 @@ function entityResource($q, $http, umbRequestHelper) {
                             pageSize: options.pageSize,
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
-                            filter: options.filter
+                            filter: encodeURIComponent(options.filter)
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);
@@ -416,8 +416,8 @@ function entityResource($q, $http, umbRequestHelper) {
           * @param {Int} parentid id of content item to return descendants of
           * @param {string} type Object type name
           * @param {Object} options optional options object
-          * @param {Int} options.pageSize if paging data, number of nodes per page, default = 0
-          * @param {Int} options.pageNumber if paging data, current page index, default = 0
+          * @param {Int} options.pageSize if paging data, number of nodes per page, default = 1
+          * @param {Int} options.pageNumber if paging data, current page index, default = 100
           * @param {String} options.filter if provided, query will only return those with names matching the filter
           * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Ascending`
           * @param {String} options.orderBy property to order items by, default: `SortOrder`
@@ -427,8 +427,8 @@ function entityResource($q, $http, umbRequestHelper) {
         getPagedDescendants: function (parentId, type, options) {
 
             var defaults = {
-                pageSize: 0,
-                pageNumber: 0,
+                pageSize: 1,
+                pageNumber: 100,
                 filter: '',
                 orderDirection: "Ascending",
                 orderBy: "SortOrder"
@@ -460,7 +460,7 @@ function entityResource($q, $http, umbRequestHelper) {
                             pageSize: options.pageSize,
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
-                            filter: options.filter
+                            filter: encodeURIComponent(options.filter)
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);

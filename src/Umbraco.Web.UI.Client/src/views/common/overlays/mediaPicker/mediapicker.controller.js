@@ -260,22 +260,29 @@ angular.module("umbraco")
                             mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
                             mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
                             // set properties to match a media object
-                            mediaItem.properties = [
-                                {
-                                    alias: "umbracoWidth",
-                                    value: mediaItem.metaData.umbracoWidth.Value
-                                },
-                                {
-                                    alias: "umbracoHeight",
-                                    value: mediaItem.metaData.umbracoHeight.Value
-                                }
-                            ];
+                            if (mediaItem.metaData &&
+                                mediaItem.metaData.umbracoWidth &&
+                                mediaItem.metaData.umbracoHeight) {
+                                
+                                mediaItem.properties = [
+                                    {
+                                        alias: "umbracoWidth",
+                                        value: mediaItem.metaData.umbracoWidth.Value
+                                    },
+                                    {
+                                        alias: "umbracoHeight",
+                                        value: mediaItem.metaData.umbracoHeight.Value
+                                    }
+                                ];
+                            }
                         });
                         // update images
                         $scope.images = data.items ? data.items : [];
                         // update pagination
-                        $scope.searchOptions.pageNumber = data.pageNumber;
-                        $scope.searchOptions.pageSize = data.pageSize;
+                        if (data.pageNumber > 0)
+                            $scope.searchOptions.pageNumber = data.pageNumber;
+                        if (data.pageSize > 0)
+                            $scope.searchOptions.pageSize = data.pageSize;
                         $scope.searchOptions.totalItems = data.totalItems;
                         $scope.searchOptions.totalPages = data.totalPages;
                         // set already selected images to selected
