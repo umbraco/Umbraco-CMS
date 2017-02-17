@@ -69,7 +69,7 @@ namespace Umbraco.Core.Services
                     repo.AddOrUpdate(container);
                     uow.Commit();
 
-                    uow.Events.Dispatch(SavedContentTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                    uow.Events.Dispatch(SavedContentTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), "SavedContentTypeContainer");
                     //TODO: Audit trail ?
 
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Services
                     repo.AddOrUpdate(container);
                     uow.Commit();
 
-                    uow.Events.Dispatch(SavedMediaTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                    uow.Events.Dispatch(SavedMediaTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), "SavedMediaTypeContainer");
                     //TODO: Audit trail ?
 
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
@@ -122,14 +122,16 @@ namespace Umbraco.Core.Services
         {
             return SaveContainer(
                 SavingContentTypeContainer, SavedContentTypeContainer,
-                container, Constants.ObjectTypes.DocumentTypeContainerGuid, "document type", userId);
+                container, Constants.ObjectTypes.DocumentTypeContainerGuid, "document type",
+                "SavedContentTypeContainer", userId);
         }
 
         public Attempt<OperationStatus> SaveMediaTypeContainer(EntityContainer container, int userId = 0)
         {
             return SaveContainer(
                 SavingMediaTypeContainer, SavedMediaTypeContainer,
-                container, Constants.ObjectTypes.MediaTypeContainerGuid, "media type", userId);
+                container, Constants.ObjectTypes.MediaTypeContainerGuid, "media type",
+                "SavedMediaTypeContainer", userId);
         }
 
         private Attempt<OperationStatus> SaveContainer(
@@ -137,7 +139,9 @@ namespace Umbraco.Core.Services
             TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> savedEvent,
             EntityContainer container,
             Guid containerObjectType,
-            string objectTypeName, int userId)
+            string objectTypeName, 
+            string savedEventName,
+            int userId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -165,7 +169,7 @@ namespace Umbraco.Core.Services
                 var repo = RepositoryFactory.CreateEntityContainerRepository(uow, containerObjectType);
                 repo.AddOrUpdate(container);
                 uow.Commit();
-                uow.Events.Dispatch(savedEvent, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                uow.Events.Dispatch(savedEvent, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), savedEventName);
             }
 
             //TODO: Audit trail ?
