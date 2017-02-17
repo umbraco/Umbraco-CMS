@@ -24,6 +24,7 @@ namespace Umbraco.Core.Scoping
 
         private IsolatedRuntimeCache _isolatedRuntimeCache;
         private UmbracoDatabase _database;
+        private EventMessages _messages;
         private ICompletable _fscope;
         private IEventDispatcher _eventDispatcher;
 
@@ -127,6 +128,7 @@ namespace Umbraco.Core.Scoping
         {
             // steal everything from NoScope
             _database = noScope.DatabaseOrNull;
+            _messages = noScope.MessagesOrNull;
 
             // make sure the NoScope can be replaced ie not in a transaction
             if (_database != null && _database.InTransaction)
@@ -271,11 +273,27 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Messages;
-                //return _messages ?? (_messages = new EventMessages());
 
-                // ok, this isn't pretty, but it works
-                // TODO kill the message factory and let the scope manage it all
-                return ApplicationContext.Current.Services.EventMessagesFactory.Get();
+                if (_messages != null) return _messages;
+
+                // this is ugly - in v7 for backward compatibility reasons, EventMessages need
+                // to survive way longer that the scopes, and kinda resides on its own in http
+                // context, but must also be in scopes for when we do async and lose http context
+                // TODO refactor in v8
+
+                var factory = ScopeLifespanMessagesFactory.Current;
+                if (factory == null)
+                {
+                    _messages = new EventMessages();
+                }
+                else
+                {
+                    _messages = factory.GetFromHttpContext();
+                    if (_messages == null)
+                        factory.Set(_messages = new EventMessages());
+                }
+
+                return _messages;
             }
         }
 
@@ -284,7 +302,14 @@ namespace Umbraco.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                return ParentScope == null ? null : ParentScope.MessagesOrNull;
+                if (ParentScope != null) return ParentScope.MessagesOrNull;
+
+                // see comments in Messages
+
+                if (_messages != null) return _messages;
+
+                var factory = ScopeLifespanMessagesFactory.Current;
+                return factory == null ? null : factory.GetFromHttpContext();
             }
         }
 

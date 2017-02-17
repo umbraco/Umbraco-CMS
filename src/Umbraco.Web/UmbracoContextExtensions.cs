@@ -53,7 +53,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static EventMessages GetCurrentEventMessages(this UmbracoContext umbracoContext)
         {
-            var eventMessagesFactory = umbracoContext.Application.Services.EventMessagesFactory as RequestLifespanMessagesFactory;
+            var eventMessagesFactory = umbracoContext.Application.Services.EventMessagesFactory as ScopeLifespanMessagesFactory;
             return eventMessagesFactory == null ? null : eventMessagesFactory.TryGet();
         }
 

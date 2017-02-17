@@ -374,7 +374,6 @@
     <Compile Include="Routing\RedirectTrackingEventHandler.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="Models\ContentEditing\RedirectUrlSearchResults.cs" />
-    <Compile Include="RequestLifespanMessagesFactory.cs" />
     <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />

@@ -42,6 +42,7 @@ using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -92,7 +93,7 @@ namespace Umbraco.Web
         protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IScopeProvider scopeProvider)
         {
             //use a request based messaging factory
-            var evtMsgs = new RequestLifespanMessagesFactory(new SingletonHttpContextAccessor());
+            var evtMsgs = new ScopeLifespanMessagesFactory(new SingletonHttpContextAccessor(), scopeProvider);
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
                 new PetaPocoUnitOfWorkProvider(scopeProvider),

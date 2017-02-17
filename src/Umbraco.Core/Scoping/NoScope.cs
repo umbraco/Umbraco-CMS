@@ -15,6 +15,7 @@ namespace Umbraco.Core.Scoping
         private bool _disposed;
 
         private UmbracoDatabase _database;
+        private EventMessages _messages;
 
         public NoScope(ScopeProvider scopeProvider)
         {
@@ -61,12 +62,42 @@ namespace Umbraco.Core.Scoping
         /// <inheritdoc />
         public EventMessages Messages
         {
-            get { throw new NotSupportedException(); }
+            get
+            {
+                EnsureNotDisposed();
+                if (_messages != null) return _messages;
+
+                // see comments in Scope
+
+                var factory = ScopeLifespanMessagesFactory.Current;
+                if (factory == null)
+                {
+                    _messages = new EventMessages();
+                }
+                else
+                {
+                    _messages = factory.GetFromHttpContext();
+                    if (_messages == null)
+                        factory.Set(_messages = new EventMessages());
+                }
+
+                return _messages;
+            }
         }
 
         public EventMessages MessagesOrNull
         {
-            get { throw new NotSupportedException(); }
+            get
+            {
+                EnsureNotDisposed();
+
+                // see comments in Scope
+
+                if (_messages != null) return _messages;
+
+                var factory = ScopeLifespanMessagesFactory.Current;
+                return factory == null ? null : factory.GetFromHttpContext();
+            }
         }
 
         /// <inheritdoc />

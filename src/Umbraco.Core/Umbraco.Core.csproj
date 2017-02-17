@@ -315,6 +315,8 @@
     <Compile Include="Events\EventDefinitionFilter.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
+    <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
+    <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="OrderedHashSet.cs" />
     <Compile Include="Events\UninstallPackageEventArgs.cs" />
     <Compile Include="Models\GridValue.cs" />
