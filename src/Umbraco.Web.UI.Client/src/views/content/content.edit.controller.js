@@ -101,6 +101,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
             $scope.page.buttonGroupState = "error";
 
             deferred.reject(err);
+            $scope.busy = false;
         });
 
         return deferred.promise;
