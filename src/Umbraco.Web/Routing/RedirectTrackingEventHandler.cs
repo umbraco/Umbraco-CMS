@@ -187,6 +187,9 @@ namespace Umbraco.Web.Routing
                 // skip if no segment change
                 if (process == false) continue;
 
+                // skip if URL tracking not enabled for content type
+                if (entity.ContentType.EnableUrlTracking == false) continue;
+
                 // else save routes for all descendants
                 var entityContent = contentCache.GetById(entity.Id);
                 if (entityContent == null) continue;
