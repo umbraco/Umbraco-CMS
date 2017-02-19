@@ -98,6 +98,10 @@
 				{
 				    "description": localizationService.localize("shortcuts_addChildNode"),
 				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
+				},
+				{
+				    "description": localizationService.localize("shortcuts_toggleEnableUrlTracking"),
+				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "u" }]
 				}
 		    ]
 		},

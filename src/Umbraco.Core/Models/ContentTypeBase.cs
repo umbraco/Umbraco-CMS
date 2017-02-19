@@ -31,6 +31,7 @@ namespace Umbraco.Core.Models
         private int _creatorId;
         private bool _allowedAsRoot;
         private bool _isContainer;
+        private bool _enableUrlTracking;
         private bool _trashed;
         private PropertyGroupCollection _propertyGroups;
         private PropertyTypeCollection _propertyTypes;
@@ -83,6 +84,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.CreatorId);
             public readonly PropertyInfo AllowedAsRootSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.AllowedAsRoot);
             public readonly PropertyInfo IsContainerSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsContainer);
+            public readonly PropertyInfo EnableUrlTrackingSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.EnableUrlTracking);
             public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
             public readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
             public readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
@@ -241,6 +243,16 @@ namespace Umbraco.Core.Models
         {
             get { return _isContainer; }
             set { SetPropertyValueAndDetectChanges(value, ref _isContainer, Ps.Value.IsContainerSelector); }
+        }
+
+        /// <summary>
+        /// Gets or Sets a boolean indicating whether URL tracking is enabled for this content type
+        /// </summary>
+        [DataMember]
+        public virtual bool EnableUrlTracking
+        {
+            get { return _enableUrlTracking; }
+            set { SetPropertyValueAndDetectChanges(value, ref _enableUrlTracking, Ps.Value.EnableUrlTrackingSelector); }
         }
 
         /// <summary>

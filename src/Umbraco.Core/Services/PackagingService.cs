@@ -562,6 +562,11 @@ namespace Umbraco.Core.Services
             if (isListView != null)
                 contentType.IsContainer = isListView.Value.InvariantEquals("true");
 
+            //NOTE EnableUrlTracking is a new property in the package xml so we need to verify it exists before using it.
+            var enableUrlTracking = infoElement.Element("EnableUrlTracking");
+            if (enableUrlTracking != null)
+                contentType.EnableUrlTracking = enableUrlTracking.Value.InvariantEquals("true");
+
             //Name of the master corresponds to the parent and we need to ensure that the Parent Id is set
             var masterElement = infoElement.Element("Master");
             if (masterElement != null)

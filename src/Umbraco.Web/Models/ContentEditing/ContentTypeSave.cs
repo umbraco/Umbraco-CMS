@@ -28,6 +28,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "allowAsRoot")]
         public bool AllowAsRoot { get; set; }
 
+        [DataMember(Name = "enableUrlTracking")]
+        public bool EnableUrlTracking { get; set; }
+
         //Allowed child types
         [DataMember(Name = "allowedContentTypes")]
         public IEnumerable<int> AllowedContentTypes { get; set; }

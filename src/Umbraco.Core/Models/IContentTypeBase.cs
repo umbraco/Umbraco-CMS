@@ -44,6 +44,11 @@ namespace Umbraco.Core.Models
         bool IsContainer { get; set; }
 
         /// <summary>
+        /// Gets or Sets a boolean indicating whether URL tracking is enabled for this content type
+        /// </summary>
+        bool EnableUrlTracking { get; set; }
+
+        /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType
         /// </summary>
         IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; }

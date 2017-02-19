@@ -553,6 +553,7 @@
 
     <key alias="toggleListView">Toggle list view</key>
     <key alias="toggleAllowAsRoot">Toggle allow as root</key>
+    <key alias="toggleEnableUrlTracking">Toggle enable URL tracking</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -1103,6 +1104,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="childNodesDescription">Allow content of the specified types to be created underneath content of this type</key>
 
     <key alias="chooseChildNode">Choose child node</key>
+
+    <key alias="enableUrlTrackingHeading">Enable URL tracking</key>
+    <key alias="enableUrlTrackingDescription">If enabled, when content of this type is renamed or moved, an automatic 301 redirect will be created</key>
+    <key alias="enableUrlTrackingCheckbox">Yes - enable URL tracking</key>
+    
     <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
     <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
     <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>

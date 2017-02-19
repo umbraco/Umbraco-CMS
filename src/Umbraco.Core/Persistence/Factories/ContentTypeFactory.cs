@@ -109,6 +109,7 @@ namespace Umbraco.Core.Persistence.Factories
             entity.CreatorId = dto.NodeDto.UserId.Value;
             entity.AllowedAsRoot = dto.AllowAtRoot;
             entity.IsContainer = dto.IsContainer;
+            entity.EnableUrlTracking = dto.EnableUrlTracking;
             entity.Trashed = dto.NodeDto.Trashed;
         }
 
@@ -133,6 +134,7 @@ namespace Umbraco.Core.Persistence.Factories
                 NodeId = entity.Id,
                 AllowAtRoot = entity.AllowedAsRoot,
                 IsContainer = entity.IsContainer,
+                EnableUrlTracking = entity.EnableUrlTracking,
                 NodeDto = BuildNodeDto(entity, nodeObjectType)
             };
             return contentTypeDto;

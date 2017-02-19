@@ -225,6 +225,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(display.Thumbnail, result.Thumbnail);
             Assert.AreEqual(display.IsContainer, result.IsContainer);
             Assert.AreEqual(display.AllowAsRoot, result.AllowedAsRoot);
+            Assert.AreEqual(display.EnableUrlTracking, result.EnableUrlTracking);
             Assert.AreEqual(display.CreateDate, result.CreateDate);
             Assert.AreEqual(display.UpdateDate, result.UpdateDate);
             

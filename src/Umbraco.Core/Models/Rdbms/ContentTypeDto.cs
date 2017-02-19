@@ -43,6 +43,10 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = "0")]
         public bool AllowAtRoot { get; set; }
 
+        [Column("enableUrlTracking")]
+        [Constraint(Default = "0")]
+        public bool EnableUrlTracking { get; set; }
+
         [ResultColumn]
         public NodeDto NodeDto { get; set; }
     }

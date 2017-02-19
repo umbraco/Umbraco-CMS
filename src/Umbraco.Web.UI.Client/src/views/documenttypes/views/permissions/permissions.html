@@ -18,28 +18,43 @@
     <div class="sub-view-columns">
 
         <div class="sub-view-column-left">
-            <h5><localize key="contentTypeEditor_childNodesHeading" /></h5>
-            <small><localize key="contentTypeEditor_childNodesDescription" /></small>
+            <h5><localize key="contentTypeEditor_childNodesHeading"/></h5>
+            <small><localize key="contentTypeEditor_childNodesDescription"/></small>
         </div>
 
         <div class="sub-view-column-right">
             <umb-child-selector
-                    selected-children="vm.selectedChildren"
-                    available-children="vm.contentTypes"
-                    parent-name="model.name"
-                    parent-icon="model.icon"
-                    parent-id="model.id"
-                    on-add="vm.addChild"
-                    on-remove="vm.removeChild">
+                selected-children="vm.selectedChildren"
+                available-children="vm.contentTypes"
+                parent-name="model.name"
+                parent-icon="model.icon"
+                parent-id="model.id"
+                on-add="vm.addChild"
+                on-remove="vm.removeChild">
             </umb-child-selector>
 
             <umb-overlay
-               ng-if="vm.childNodeSelectorOverlay.show"
-               model="vm.childNodeSelectorOverlay"
-               position="target"
-               view="vm.childNodeSelectorOverlay.view">
+                ng-if="vm.childNodeSelectorOverlay.show"
+                model="vm.childNodeSelectorOverlay"
+                position="target"
+                view="vm.childNodeSelectorOverlay.view">
             </umb-overlay>
 
+        </div>
+
+    </div>
+
+    <div class="sub-view-columns">
+
+        <div class="sub-view-column-left">
+            <h5><localize key="contentTypeEditor_enableUrlTrackingHeading" /></h5>
+            <small><localize key="contentTypeEditor_enableUrlTrackingDescription" /></small>
+        </div>
+        <div class="sub-view-column-right">
+            <label class="checkbox no-indent">
+                <input type="checkbox" ng-model="model.enableUrlTracking" hotkey="alt+shift+u" />
+                <localize key="contentTypeEditor_enableUrlTrackingCheckbox" />
+            </label>
         </div>
 
     </div>
