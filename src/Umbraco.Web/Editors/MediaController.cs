@@ -160,19 +160,25 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns media items known to be a container of other media items
+        /// Returns media items known to be of a "Folder" type
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Obsolete("This is no longer used and shouldn't be because it performs poorly when there are a lot of media items")]
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id = -1)
         {
             //Suggested convention for folder mediatypes - we can make this more or less complicated as long as we document it...
             //if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
-            var folderTypes = Services.ContentTypeService.GetAllMediaTypes().ToArray().Where(x => x.Alias.EndsWith("Folder")).Select(x => x.Id);
+            var folderTypes = Services.ContentTypeService
+                .GetAllContentTypeAliases(Constants.ObjectTypes.MediaTypeGuid)
+                .Where(x => x.EndsWith("Folder"));
+            
+            var children = (id < 0) 
+                ? Services.MediaService.GetRootMedia()
+                : Services.MediaService.GetChildren(id);
 
-            var children = (id < 0) ? Services.MediaService.GetRootMedia() : Services.MediaService.GetById(id).Children();
-            return children.Where(x => folderTypes.Contains(x.ContentTypeId)).Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
+            return children.Where(x => folderTypes.Contains(x.ContentType.Alias)).Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
 
         /// <summary>

@@ -438,7 +438,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           * @param {int} parentId Id of the media item to query for child folders    
           * @returns {Promise} resourcePromise object.
-          *
+          * @deprecated This method is no longer used and shouldn't be because it performs poorly when there are a lot of media items
           */
         getChildFolders: function (parentId) {
             if (!parentId) {
