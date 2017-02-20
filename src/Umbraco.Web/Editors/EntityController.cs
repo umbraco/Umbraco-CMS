@@ -55,6 +55,11 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+
+                    //This is a special case, we'll accept a String here so that we can get page members when the special "all-members" 
+                    //id is passed in eventually we'll probably want to support GUID + Udi too
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPagedChildren", "id", typeof(int), typeof(string)),
+
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
@@ -383,6 +388,52 @@ namespace Umbraco.Web.Editors
             return GetResultForChildren(id, type);
         }
 
+        /// <summary>
+        /// Get paged child entities by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public PagedResult<EntityBasic> GetPagedChildren(
+            string id,
+            UmbracoEntityTypes type,
+            int pageNumber,
+            int pageSize,
+            string orderBy = "SortOrder",
+            Direction orderDirection = Direction.Ascending,
+            string filter = "")
+        {
+            int intId;
+            if (id == Constants.Conventions.MemberTypes.AllMembersListId)
+            {
+                intId = 0;
+                return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
+            }
+            
+            if(int.TryParse(id, out intId))
+            {
+                return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+
+        /// <summary>
+        /// Get paged child entities by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public PagedResult<EntityBasic> GetPagedChildren(
             int id,
             UmbracoEntityTypes type,
