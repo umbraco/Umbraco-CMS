@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence
             //if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
             if (settings == null) throw new ArgumentNullException("settings");
 
-            _cacheHelper = cacheHelper;            
+            _cacheHelper = cacheHelper;
 
             //IMPORTANT: We will force the DeepCloneRuntimeCacheProvider to be used here which is a wrapper for the underlying
             // runtime cache to ensure that anything that can be deep cloned in/out is done so, this also ensures that our tracks
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence
         {
         }
 
-        [Obsolete("Use the ctor specifying all dependencies instead, NOTE: disableAllCache has zero effect")]        
+        [Obsolete("Use the ctor specifying all dependencies instead, NOTE: disableAllCache has zero effect")]
         public RepositoryFactory(bool disableAllCache, CacheHelper cacheHelper)
             : this(cacheHelper, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
         {
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence
         {
         }
 
-     
+
         #endregion
 
         public virtual IExternalLoginRepository CreateExternalLoginRepository(IScopeUnitOfWork uow)
@@ -235,12 +235,13 @@ namespace Umbraco.Core.Persistence
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow, IDatabaseUnitOfWork db)
         {
+            // note: the second unit of work is ignored.
             return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
         }
 
         public virtual ITemplateRepository CreateTemplateRepository(IScopeUnitOfWork uow)
         {
-            return new TemplateRepository(uow, 
+            return new TemplateRepository(uow,
                 _cacheHelper,
                 _logger, _sqlSyntax,
                 FileSystemProviderManager.Current.MasterPagesFileSystem,
@@ -279,7 +280,7 @@ namespace Umbraco.Core.Persistence
         }
 
         public virtual IUserRepository CreateUserRepository(IScopeUnitOfWork uow)
-        {            
+        {
             return new UserRepository(
                 uow,
                 //Need to cache users - we look up user information more than anything in the back office!

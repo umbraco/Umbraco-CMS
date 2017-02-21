@@ -15,31 +15,21 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    // note
-    // file unit of work are just IUnitOfWork which is not IDisposable
-    // they don't really participate in the scope etc ;(
-    // FIXME not anymore now that Shan's made FileUnitOfWork a normal UOW? then WTF?
-
     /// <summary>
     /// Represents the File Service, which is an easy access to operations involving <see cref="IFile"/> objects like Scripts, Stylesheets and Templates
     /// </summary>
     public class FileService : ScopeRepositoryService, IFileService
     {
-        private readonly IScopeUnitOfWorkProvider _fileUowProvider;
-
         private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoTemplatePage";
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
 
         public FileService(
-            IScopeUnitOfWorkProvider fileProvider,
-            IDatabaseUnitOfWorkProvider dataProvider,
+            IDatabaseUnitOfWorkProvider provider,
             RepositoryFactory repositoryFactory,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
-            : base(dataProvider, repositoryFactory, logger, eventMessagesFactory)
-        {
-            _fileUowProvider = fileProvider;
-        }
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        { }
 
 
         #region Stylesheets
@@ -52,9 +42,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
-                // FIXME is it ok to use the same UOW here twice?
-                // review everywhere in this file!!
-                var repository = RepositoryFactory.CreateStylesheetRepository(uow, uow);
+                var repository = RepositoryFactory.CreateStylesheetRepository(uow);
                 return repository.GetAll(names);
             }
         }
@@ -68,7 +56,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
-                var repository = RepositoryFactory.CreateStylesheetRepository(uow, uow);
+                var repository = RepositoryFactory.CreateStylesheetRepository(uow);
                 return repository.Get(name);
             }
         }
@@ -88,7 +76,7 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
-                var repository = RepositoryFactory.CreateStylesheetRepository(uow, uow);
+                var repository = RepositoryFactory.CreateStylesheetRepository(uow);
                 repository.AddOrUpdate(stylesheet);
 
                 uow.Events.Dispatch(SavedStylesheet, this, new SaveEventArgs<Stylesheet>(stylesheet, false));
@@ -107,7 +95,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var repository = RepositoryFactory.CreateStylesheetRepository(uow, uow);
+                var repository = RepositoryFactory.CreateStylesheetRepository(uow);
                 var stylesheet = repository.Get(path);
                 if (stylesheet == null)
                 {
@@ -139,7 +127,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
-                var repository = RepositoryFactory.CreateStylesheetRepository(uow, uow);
+                var repository = RepositoryFactory.CreateStylesheetRepository(uow);
                 return repository.ValidateStylesheet(stylesheet);
             }
         }
@@ -153,7 +141,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Script"/> objects</returns>
         public IEnumerable<Script> GetScripts(params string[] names)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateScriptRepository(uow);
                 return repository.GetAll(names);
@@ -167,7 +155,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Script"/> object</returns>
         public Script GetScriptByName(string name)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateScriptRepository(uow);
                 return repository.Get(name);
@@ -181,7 +169,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveScript(Script script, int userId = 0)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 if (uow.Events.DispatchCancelable(SavingScript, this, new SaveEventArgs<Script>(script)))
                 {
@@ -206,7 +194,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteScript(string path, int userId = 0)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateScriptRepository(uow);
                 var script = repository.Get(path);
@@ -238,7 +226,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if Script is valid, otherwise false</returns>
         public bool ValidateScript(Script script)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateScriptRepository(uow);
                 return repository.ValidateScript(script);
@@ -247,7 +235,7 @@ namespace Umbraco.Core.Services
 
         public void CreateScriptFolder(string folderPath)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateScriptRepository(uow);
                 ((ScriptRepository)repository).AddFolder(folderPath);
@@ -257,7 +245,7 @@ namespace Umbraco.Core.Services
 
         public void DeleteScriptFolder(string folderPath)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateScriptRepository(uow);
                 ((ScriptRepository)repository).DeleteFolder(folderPath);
@@ -739,7 +727,7 @@ namespace Umbraco.Core.Services
 
         public void CreatePartialViewFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreatePartialViewRepository(uow))
             {
                 ((PartialViewRepository)repository).AddFolder(folderPath);
@@ -749,7 +737,7 @@ namespace Umbraco.Core.Services
 
         public void CreatePartialViewMacroFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
+            var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow))
             {
                 ((PartialViewMacroRepository)repository).AddFolder(folderPath);
@@ -759,7 +747,7 @@ namespace Umbraco.Core.Services
 
         public void DeletePartialViewFolder(string folderPath)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreatePartialViewRepository(uow);
                 ((PartialViewRepository)repository).DeleteFolder(folderPath);
@@ -769,7 +757,7 @@ namespace Umbraco.Core.Services
 
         public void DeletePartialViewMacroFolder(string folderPath)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow);
                 ((PartialViewMacroRepository)repository).DeleteFolder(folderPath);
@@ -779,7 +767,7 @@ namespace Umbraco.Core.Services
 
         public IPartialView GetPartialView(string path)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreatePartialViewRepository(uow);
                 return repository.Get(path);
@@ -788,7 +776,7 @@ namespace Umbraco.Core.Services
 
         public IPartialView GetPartialViewMacro(string path)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow);
                 return repository.Get(path);
@@ -797,7 +785,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IPartialView> GetPartialViewMacros(params string[] names)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow);
                 return repository.GetAll(names).OrderBy(x => x.Name);
@@ -806,7 +794,7 @@ namespace Umbraco.Core.Services
 
         public IXsltFile GetXsltFile(string path)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateXsltFileRepository(uow);
                 return repository.Get(path);
@@ -815,7 +803,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IXsltFile> GetXsltFiles(params string[] names)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateXsltFileRepository(uow);
                 return repository.GetAll(names).OrderBy(x => x.Name);
@@ -847,7 +835,7 @@ namespace Umbraco.Core.Services
 
             }
 
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = GetPartialViewRepository(partialViewType, uow);
                 repository.AddOrUpdate(partialView);
@@ -873,7 +861,7 @@ namespace Umbraco.Core.Services
 
         private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = 0)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = GetPartialViewRepository(partialViewType, uow);
                 var partialView = repository.Get(path);
@@ -913,7 +901,7 @@ namespace Umbraco.Core.Services
 
         private Attempt<IPartialView> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = 0)
         {
-            using (var uow = _fileUowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 if (uow.Events.DispatchCancelable(SavingPartialView, this, new SaveEventArgs<IPartialView>(partialView)))
                 {
@@ -1042,7 +1030,6 @@ namespace Umbraco.Core.Services
 
         public void SetPartialViewMacroFileContent(string filepath, Stream content)
         {
-            // FIXME FTW would we use a READONLY unit of work to SET FILE CONTENT
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = GetPartialViewRepository(PartialViewType.PartialViewMacro, uow);

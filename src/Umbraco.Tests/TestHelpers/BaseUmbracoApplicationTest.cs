@@ -164,7 +164,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the db context
                 new DatabaseContext(scopeProvider, Logger, sqlSyntax, Constants.DatabaseProviders.SqlCe),
                 //assign the service context
-                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), new FileUnitOfWorkProvider(scopeProvider), CacheHelper, Logger, evtMsgs),
+                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), CacheHelper, Logger, evtMsgs),
                 CacheHelper,
                 ProfilingLogger)
             {

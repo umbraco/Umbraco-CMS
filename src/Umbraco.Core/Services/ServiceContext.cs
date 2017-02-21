@@ -152,29 +152,26 @@ namespace Umbraco.Core.Services
         /// Creates a service context with a RepositoryFactory which is used to construct Services
         /// </summary>
         /// <param name="repositoryFactory"></param>
-        /// <param name="dbUnitOfWorkProvider"></param>
-        /// <param name="fileUnitOfWorkProvider"></param>
+        /// <param name="provider"></param>
         /// <param name="cache"></param>
         /// <param name="logger"></param>
         /// <param name="eventMessagesFactory"></param>
         public ServiceContext(
             RepositoryFactory repositoryFactory,
-            IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
-            IScopeUnitOfWorkProvider fileUnitOfWorkProvider,
+            IScopeUnitOfWorkProvider provider,
             CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
         {
             if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
-            if (dbUnitOfWorkProvider == null) throw new ArgumentNullException("dbUnitOfWorkProvider");
-            if (fileUnitOfWorkProvider == null) throw new ArgumentNullException("fileUnitOfWorkProvider");
+            if (provider == null) throw new ArgumentNullException("provider");
             if (cache == null) throw new ArgumentNullException("cache");
             if (logger == null) throw new ArgumentNullException("logger");
             if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
 
             EventMessagesFactory = eventMessagesFactory;
 
-            BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, cache,
+            BuildServiceCache(provider, cache,
                               repositoryFactory,
                               logger, eventMessagesFactory);
         }
@@ -183,17 +180,13 @@ namespace Umbraco.Core.Services
         /// Builds the various services
         /// </summary>
         private void BuildServiceCache(
-            IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
-            IScopeUnitOfWorkProvider fileUnitOfWorkProvider,
+            IScopeUnitOfWorkProvider provider,
             CacheHelper cache,
             RepositoryFactory repositoryFactory,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
         {
             EventMessagesFactory = eventMessagesFactory;
-
-            var provider = dbUnitOfWorkProvider;
-            var fileProvider = fileUnitOfWorkProvider;
 
             if (_migrationEntryService == null)
                 _migrationEntryService = new Lazy<IMigrationEntryService>(() => new MigrationEntryService(provider, repositoryFactory, logger, eventMessagesFactory));
@@ -275,7 +268,7 @@ namespace Umbraco.Core.Services
                 _dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, repositoryFactory, logger, eventMessagesFactory));
 
             if (_fileService == null)
-                _fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory, logger, eventMessagesFactory));
+                _fileService = new Lazy<IFileService>(() => new FileService(provider, repositoryFactory, logger, eventMessagesFactory));
 
             if (_localizationService == null)
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory, logger, eventMessagesFactory));
