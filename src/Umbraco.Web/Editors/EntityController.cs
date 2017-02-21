@@ -526,7 +526,10 @@ namespace Umbraco.Web.Editors
             if (objectType.HasValue)
             {
                 long totalRecords;
-                var entities = Services.EntityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                //if it's from root, don't return recycled
+                var entities = id == Constants.System.Root
+                    ? Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed:false)
+                    : Services.EntityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
 
                 if (totalRecords == 0)
                 {
