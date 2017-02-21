@@ -508,6 +508,56 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        public PagedResult<EntityBasic> GetPagedDescendants(
+            int id,
+            UmbracoEntityTypes type,
+            int pageNumber,
+            int pageSize,
+            string orderBy = "SortOrder",
+            Direction orderDirection = Direction.Ascending,
+            string filter = "")
+        {
+            if (pageNumber <= 0)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (pageSize <= 0)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var objectType = ConvertToObjectType(type);
+            if (objectType.HasValue)
+            {
+                long totalRecords;
+                //if it's from root, don't return recycled
+                var entities = id == Constants.System.Root
+                    ? Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed:false)
+                    : Services.EntityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+
+                if (totalRecords == 0)
+                {
+                    return new PagedResult<EntityBasic>(0, 0, 0);
+                }
+
+                var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
+                {
+                    Items = entities.Select(Mapper.Map<EntityBasic>)
+                };
+
+                return pagedResult;
+            }
+
+            //now we need to convert the unknown ones
+            switch (type)
+            {
+                case UmbracoEntityTypes.PropertyType:
+                case UmbracoEntityTypes.PropertyGroup:
+                case UmbracoEntityTypes.Domain:
+                case UmbracoEntityTypes.Language:
+                case UmbracoEntityTypes.User:
+                case UmbracoEntityTypes.Macro:
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + type);
+            }
+        }
+
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type)
         {
             return GetResultForAncestors(id, type);
