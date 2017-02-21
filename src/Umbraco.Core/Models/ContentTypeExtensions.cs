@@ -30,7 +30,8 @@ namespace Umbraco.Core.Models
                 return descendants;
             }
 
-            throw new NotSupportedException("The content type must be " + typeof(IContentType) + " or " + typeof(IMediaType));
+            //No other content types have children (i.e. member types)
+            return Enumerable.Empty<IContentTypeBase>();
         }
 
         /// <summary>

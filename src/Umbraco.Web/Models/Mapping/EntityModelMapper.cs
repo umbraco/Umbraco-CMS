@@ -21,7 +21,14 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Udi, expression => expression.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectTypeId), x.Key))) 
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore());
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .AfterMap((entity, basic) =>
+                {
+                    if (entity.NodeObjectTypeId == Constants.ObjectTypes.MemberGuid && basic.Icon.IsNullOrWhiteSpace())
+                    {
+                        basic.Icon = "icon-user";
+                    }
+                });
 
             config.CreateMap<PropertyType, EntityBasic>()
                 .ForMember(x => x.Udi, expression => expression.Ignore())
@@ -150,6 +157,9 @@ namespace Umbraco.Web.Models.Mapping
                       });
 
             config.CreateMap<ISearchResults, IEnumerable<EntityBasic>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
+
+            config.CreateMap<IEnumerable<SearchResult>, IEnumerable<EntityBasic>>()
                   .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
         }
     }

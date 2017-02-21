@@ -110,6 +110,11 @@ namespace Umbraco.Core
             public const string Member = "39EB0F98-B348-42A1-8662-E7EB18487560";
 
             /// <summary>
+            /// Guid for a Media Type object.
+            /// </summary>
+            public static readonly Guid MemberGuid = new Guid(Member);
+
+            /// <summary>
             /// Guid for a Member Group object.
             /// </summary>
             public const string MemberGroup = "366E63B9-880F-4E13-A61C-98069B029728";

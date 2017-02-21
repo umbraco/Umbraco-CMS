@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MiniListViewDirective(contentResource, memberResource, mediaResource) {
+    function MiniListViewDirective(entityResource) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -52,22 +52,19 @@
 
                 // start loading animation list view
                 miniListView.loading = true;
-
-                // setup the correct resource depending on section
-                var resource = "";
-
-                if (scope.entityType === "Member") {
-                    resource = memberResource.getPagedResults;
-                } else if (scope.entityType === "Media") {
-                    resource = mediaResource.getChildren;
-                } else {
-                    resource = contentResource.getChildren;
-                }
-
-                resource(miniListView.node.id, miniListView.pagination)
+                
+                entityResource.getPagedChildren(miniListView.node.id, scope.entityType, miniListView.pagination)
                     .then(function (data) {
                         // update children
                         miniListView.children = data.items;
+                        _.each(miniListView.children, function(c) {
+                            if (c.metaData) {
+                                c.hasChildren = c.metaData.HasChildren;
+                                if(scope.entityType === "Document") {
+                                    c.published = c.metaData.IsPublished;
+                                }
+                            }
+                        });
                         // update pagination
                         miniListView.pagination.totalItems = data.totalItems;
                         miniListView.pagination.totalPages = data.totalPages;
