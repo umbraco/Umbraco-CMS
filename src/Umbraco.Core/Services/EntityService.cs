@@ -376,7 +376,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Returns a apged collection of children
+        /// Returns a paged collection of children
         /// </summary>
         /// <param name="parentId">The parent id to return children for</param>
         /// <param name="umbracoObjectType"></param>
