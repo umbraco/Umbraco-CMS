@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Factories
             try
             {
                 entity.DisableChangeTracking();
-
+                entity.Key = dto.UniqueId;
                 entity.Comment = dto.Comment;
                 entity.CreateDate = dto.Datetime;
                 entity.Id = dto.Id;
@@ -42,6 +42,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new RelationDto
             {
+                UniqueId = entity.Key,
                 ChildId = entity.ChildId,
                 Comment = string.IsNullOrEmpty(entity.Comment) ? string.Empty : entity.Comment,
                 Datetime = entity.CreateDate,

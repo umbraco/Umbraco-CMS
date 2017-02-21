@@ -245,6 +245,17 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <returns>The entity identifier of the entity.</returns>
+        public static GuidUdi GetUdi(this IRelation entity)
+        {
+            if (entity == null) throw new ArgumentNullException("entity");
+            return new GuidUdi(Constants.UdiEntityType.Relation, entity.Key).EnsureClosed();
+        }
+
+        /// <summary>
+        /// Gets the entity identifier of the entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <returns>The entity identifier of the entity.</returns>
         public static Udi GetUdi(this IEntity entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");

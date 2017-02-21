@@ -160,6 +160,14 @@ namespace Umbraco.Core.Models
         RelationType,
 
         /// <summary>
+        /// Relation
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.Relation)]
+        [FriendlyName("Relation")]
+        [UmbracoUdiType(Constants.UdiEntityType.Relation)]
+        Relation,
+
+        /// <summary>
         /// Forms Form
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.FormsForm)]

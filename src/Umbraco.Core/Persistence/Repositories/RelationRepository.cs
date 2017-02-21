@@ -5,7 +5,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -19,11 +18,38 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class RelationRepository : PetaPocoRepositoryBase<int, IRelation>, IRelationRepository
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
+        private readonly IEntityRepository _entityRepository;
 
-        public RelationRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IRelationTypeRepository relationTypeRepository)
+        public RelationRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IRelationTypeRepository relationTypeRepository, IEntityRepository entityRepository)
             : base(work, cache, logger, sqlSyntax)
         {
             _relationTypeRepository = relationTypeRepository;
+            _entityRepository = entityRepository;
+        }
+
+        public IRelation Get(Guid id)
+        {
+            var sql = GetBaseQuery(false).Where("uniqueId=@Id", new { Id = id });
+            var dto = Database.Fetch<RelationDto>(sql).FirstOrDefault();
+            if (dto == null)
+                return null;
+
+            var relationType = _relationTypeRepository.Get(dto.RelationType);
+            if (relationType == null)
+                throw new Exception(string.Format("RelationType with Id: {0} doesn't exist", dto.RelationType));
+
+            var factory = new RelationFactory(relationType);
+            return DtoToEntity(dto, factory);
+        }
+
+        public IEnumerable<IRelation> GetAll(params Guid[] ids)
+        {
+            return ids.Length > 0 ? ids.Select(Get) : PerformGetAll();
+        }
+
+        public bool Exists(Guid id)
+        {
+            return Get(id) != null;
         }
 
         #region Overrides of RepositoryBase<int,Relation>
@@ -112,9 +138,9 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
-                           {
-                               "DELETE FROM umbracoRelation WHERE id = @Id"
-                           };
+            {
+                "DELETE FROM umbracoRelation WHERE id = @Id"
+            };
             return list;
         }
 
@@ -131,9 +157,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Entity)entity).AddingEntity();
 
+            var parent = _entityRepository.Get(entity.ParentId);
+            var child = _entityRepository.Get(entity.ChildId);
+            entity.Key = GuidExtensions.Combine(parent.Key, child.Key, entity.RelationType.Key);
+
             var factory = new RelationFactory(entity.RelationType);
             var dto = factory.BuildDto(entity);
-
+            
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
@@ -144,8 +174,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Entity)entity).UpdatingEntity();
 
+            var parent = _entityRepository.Get(entity.ParentId);
+            var child = _entityRepository.Get(entity.ChildId);
+            entity.Key = GuidExtensions.Combine(parent.Key, child.Key, entity.RelationType.Key);
+
             var factory = new RelationFactory(entity.RelationType);
             var dto = factory.BuildDto(entity);
+
             Database.Update(dto);
 
             entity.ResetDirtyProperties();

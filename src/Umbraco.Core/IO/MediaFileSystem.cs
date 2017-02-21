@@ -106,7 +106,7 @@ namespace Umbraco.Core.IO
                 // default media filesystem maps to "~/media/<filepath>"
                 // assumes that cuid and puid keys can be trusted - and that a single property type
                 // for a single content cannot store two different files with the same name
-                folder = Combine(cuid, puid).ToHexString(/*'/', 2, 4*/); // could use ext to fragment path eg 12/e4/f2/...
+                folder = GuidExtensions.CombineToBytes(cuid, puid).ToHexString(/*'/', 2, 4*/); // could use ext to fragment path eg 12/e4/f2/...
             }
 
             var filepath = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
@@ -114,16 +114,6 @@ namespace Umbraco.Core.IO
                 : folder + "-" + filename;
 
             return filepath;
-        }
-
-        private static byte[] Combine(Guid guid1, Guid guid2)
-        {
-            var bytes1 = guid1.ToByteArray();
-            var bytes2 = guid2.ToByteArray();
-            var bytes = new byte[bytes1.Length];
-            for (var i = 0; i < bytes1.Length; i++)
-                bytes[i] = (byte)(bytes1[i] ^ bytes2[i]);
-            return bytes;
         }
 
         /// <summary>

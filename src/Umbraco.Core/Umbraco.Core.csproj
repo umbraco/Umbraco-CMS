@@ -317,6 +317,7 @@
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
+    <Compile Include="GuidExtensions.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="OrderedHashSet.cs" />
     <Compile Include="Events\UninstallPackageEventArgs.cs" />
@@ -488,6 +489,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddIndexesToUmbracoRelationTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddIndexToUmbracoNodePath.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddIndexToUser2NodePermission.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddRelationUniqueIdColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddRelationTypeUniqueIdColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddMacroUniqueIdColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemovePropertyDataIdIndex.cs" />
