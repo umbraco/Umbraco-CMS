@@ -222,6 +222,17 @@ namespace Umbraco.Web.Editors
             return GetResultForChildren(id, type);
         }
 
+        /// <summary>
+        /// Get paged descendant entities by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type)
         {
             return GetResultForAncestors(id, type);
