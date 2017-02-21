@@ -409,18 +409,45 @@ namespace Umbraco.Web.Editors
             string filter = "")
         {
             int intId;
-            if (id == Constants.Conventions.MemberTypes.AllMembersListId)
-            {
-                intId = 0;
-                return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
-            }
-            
-            if(int.TryParse(id, out intId))
+
+            if (int.TryParse(id, out intId))
             {
                 return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
             }
 
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+            Guid guidId;
+            if (Guid.TryParse(id, out guidId))
+            {
+                //Not supported currently
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            Udi udiId;
+            if (Udi.TryParse(id, out udiId))
+            {
+                //Not supported currently
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            //so we don't have an INT, GUID or UDI, it's just a string, so now need to check if it's a special id or a member type
+            if (id == Constants.Conventions.MemberTypes.AllMembersListId)
+            {
+                //the EntityService can search paged members from the root
+
+                intId = -1;
+                return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
+            }
+
+            //the EntityService cannot search members of a certain type, this is currently not supported and would require 
+            //quite a bit of plumbing to do in the Services/Repository, we'll revert to a paged search
+
+            int total;
+            var searchResult = ExamineSearch(filter ?? "", type, pageSize, pageNumber - 1, out total, id);
+
+            return new PagedResult<EntityBasic>(total, pageNumber, pageSize)
+            {
+                Items = searchResult
+            };            
         }
 
         /// <summary>
@@ -496,12 +523,30 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="query"></param>
         /// <param name="entityType"></param>
-        /// <param name="searchFrom">
-        /// A starting point for the search, generally a node id, but for members this is a member type alias
-        /// </param>
+        /// <param name="searchFrom"></param>
         /// <returns></returns>
         private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
+            int total;
+            return ExamineSearch(query, entityType, 200, 0, out total, searchFrom);
+        }
+
+        /// <summary>
+        /// Searches for results based on the entity type
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="entityType"></param>
+        /// <param name="totalFound"></param>
+        /// <param name="searchFrom">
+        /// A starting point for the search, generally a node id, but for members this is a member type alias
+        /// </param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, int pageSize, int pageIndex, out int totalFound, string searchFrom = null)
+        {
+            //TODO: We need to update this to support paging
+
             var sb = new StringBuilder();
 
             string type;
@@ -577,91 +622,113 @@ namespace Umbraco.Web.Editors
 
                 query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
-                if (query.IsNullOrWhiteSpace())
+                //nothing to search
+                if (searchFrom.IsNullOrWhiteSpace() && query.IsNullOrWhiteSpace())
                 {
+                    totalFound = 0;
                     return new List<EntityBasic>();
                 }
 
-                //add back the surrounding quotes
-                query = string.Format("{0}{1}{0}", "\"", query);
-
-                //node name exactly boost x 10
-                sb.Append("+(__nodeName: (");
-                sb.Append(query.ToLower());
-                sb.Append(")^10.0 ");
-
-                foreach (var f in fields)
+                //update the query with the query term
+                if (query.IsNullOrWhiteSpace() == false)
                 {
-                    //additional fields normally
-                    sb.Append(f);
-                    sb.Append(": (");
-                    sb.Append(query);
+                    //add back the surrounding quotes
+                    query = string.Format("{0}{1}{0}", "\"", query);
+
+                    //node name exactly boost x 10
+                    sb.Append("+(__nodeName: (");
+                    sb.Append(query.ToLower());
+                    sb.Append(")^10.0 ");
+
+                    foreach (var f in fields)
+                    {
+                        //additional fields normally
+                        sb.Append(f);
+                        sb.Append(": (");
+                        sb.Append(query);
+                        sb.Append(") ");
+                    }
+
                     sb.Append(") ");
                 }
             }
             else
             {
-                if (query.Trim(new[] { '\"', '\'' }).IsNullOrWhiteSpace())
+                var trimmed = query.Trim(new[] {'\"', '\''});
+
+                //nothing to search
+                if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
                 {
+                    totalFound = 0;
                     return new List<EntityBasic>();
                 }
-                
-                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
-                var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                //node name exactly boost x 10
-                sb.Append("+(__nodeName:");
-                sb.Append("\"");
-                sb.Append(query.ToLower());
-                sb.Append("\"");
-                sb.Append("^10.0 ");
-
-                //node name normally with wildcards
-                sb.Append(" __nodeName:");
-                sb.Append("(");
-                foreach (var w in querywords)
+                //update the query with the query term
+                if (trimmed.IsNullOrWhiteSpace() == false)
                 {
-                    sb.Append(w.ToLower());
-                    sb.Append("* ");
-                }
-                sb.Append(") ");
+                    query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
+                    var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (var f in fields)
-                {
-                    //additional fields normally
-                    sb.Append(f);
-                    sb.Append(":");
+                    //node name exactly boost x 10
+                    sb.Append("+(__nodeName:");
+                    sb.Append("\"");
+                    sb.Append(query.ToLower());
+                    sb.Append("\"");
+                    sb.Append("^10.0 ");
+
+                    //node name normally with wildcards
+                    sb.Append(" __nodeName:");
                     sb.Append("(");
                     foreach (var w in querywords)
                     {
                         sb.Append(w.ToLower());
                         sb.Append("* ");
                     }
-                    sb.Append(")");
-                    sb.Append(" ");
+                    sb.Append(") ");
+
+
+                    foreach (var f in fields)
+                    {
+                        //additional fields normally
+                        sb.Append(f);
+                        sb.Append(":");
+                        sb.Append("(");
+                        foreach (var w in querywords)
+                        {
+                            sb.Append(w.ToLower());
+                            sb.Append("* ");
+                        }
+                        sb.Append(")");
+                        sb.Append(" ");
+                    }
+
+                    sb.Append(") ");
                 }
             }
 
             //must match index type
-            sb.Append(") +__IndexType:");
+            sb.Append("+__IndexType:");
             sb.Append(type);
-
             
             var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
             
-            //limit results to 200 to avoid huge over processing (CPU)
-            var result = internalSearcher.Search(raw, 200);
+            var result = internalSearcher
+                //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
+                .Search(raw, pageSize * (pageIndex + 1)); 
 
+            totalFound = result.TotalItemCount;
+
+            var pagedResult = result.Skip(pageIndex);
+            
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    return MemberFromSearchResults(result);
+                    return MemberFromSearchResults(pagedResult.ToArray());
                 case UmbracoEntityTypes.Media:
-                    return MediaFromSearchResults(result);                    
+                    return MediaFromSearchResults(pagedResult);                    
                 case UmbracoEntityTypes.Document:
-                    return ContentFromSearchResults(result);
+                    return ContentFromSearchResults(pagedResult);
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
             }
@@ -672,7 +739,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> MemberFromSearchResults(ISearchResults results)
+        private IEnumerable<EntityBasic> MemberFromSearchResults(SearchResult[] results)
         {
             var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
             //add additional data
@@ -706,7 +773,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> MediaFromSearchResults(ISearchResults results)
+        private IEnumerable<EntityBasic> MediaFromSearchResults(IEnumerable<SearchResult> results)
         {
             var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
             //add additional data
@@ -726,9 +793,9 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> ContentFromSearchResults(ISearchResults results)
+        private IEnumerable<EntityBasic> ContentFromSearchResults(IEnumerable<SearchResult> results)
         {
-            var mapped = Mapper.Map<ISearchResults, IEnumerable<EntityBasic>>(results).ToArray();
+            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
             //add additional data
             foreach (var m in mapped)
             {
