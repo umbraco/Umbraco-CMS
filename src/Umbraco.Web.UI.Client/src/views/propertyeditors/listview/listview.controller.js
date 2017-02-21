@@ -483,7 +483,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                    //we need to do a double sync here: first refresh the node where the content was moved,
                    // then refresh the node where the content was moved from
                    navigationService.syncTree({
-                           tree: target.nodeType,
+                           tree: target.nodeType ? target.nodeType : (target.metaData.treeAlias),
                            path: newPath,
                            forceReload: true,
                            activate: false
