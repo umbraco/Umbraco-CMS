@@ -311,7 +311,8 @@
     <Compile Include="Deploy\ArtifactSignature.cs" />
     <Compile Include="Deploy\Difference.cs" />
     <Compile Include="Deploy\Direction.cs" />
-    <Compile Include="Deploy\IFileStore.cs" />
+    <Compile Include="Deploy\IFileType.cs" />
+    <Compile Include="Deploy\IFileTypeCollection.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
