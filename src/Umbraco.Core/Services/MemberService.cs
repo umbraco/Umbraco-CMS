@@ -584,10 +584,11 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreateMemberRepository(uow);
                 var contents = repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);
+                uow.Commit();
                 return contents;
             }
         }
@@ -936,6 +937,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 Delete(uow, member);
+                uow.Commit();
             }
         }
 
@@ -1010,14 +1012,12 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (raiseEvents)
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(asArray)))
                     {
-                        if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(asArray)))
-                        {
-                            uow.Commit();
-                            return;
-                        }
+                        uow.Commit();
+                        return;
                     }
+
                     var repository = RepositoryFactory.CreateMemberRepository(uow);
                     foreach (var member in asArray)
                     {
@@ -1057,7 +1057,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<string> GetAllRoles()
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
                 var result = repository.GetAll();

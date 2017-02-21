@@ -423,8 +423,6 @@ namespace Umbraco.Core.Services
                 uow.Events.Dispatch(SavedRelation, this, new SaveEventArgs<IRelation>(relation, false));
                 return relation;
             }
-
-            
         }
 
         /// <summary>
@@ -456,8 +454,6 @@ namespace Umbraco.Core.Services
                 uow.Events.Dispatch(SavedRelation, this, new SaveEventArgs<IRelation>(relation, false));
                 return relation;
             }
-
-            
         }
 
         /// <summary>
@@ -582,8 +578,6 @@ namespace Umbraco.Core.Services
                 uow.Commit();
                 uow.Events.Dispatch(SavedRelation, this, new SaveEventArgs<IRelation>(relation, false));
             }
-
-            
         }
 
         /// <summary>
@@ -604,8 +598,6 @@ namespace Umbraco.Core.Services
                 uow.Commit();
                 uow.Events.Dispatch(SavedRelationType, this, new SaveEventArgs<IRelationType>(relationType, false));
             }
-
-            
         }
 
         /// <summary>
@@ -625,9 +617,7 @@ namespace Umbraco.Core.Services
                 repository.Delete(relation);
                 uow.Commit();
                 uow.Events.Dispatch(DeletedRelation, this, new DeleteEventArgs<IRelation>(relation, false));
-
             }
-
         }
 
         /// <summary>
@@ -647,9 +637,7 @@ namespace Umbraco.Core.Services
                 repository.Delete(relationType);
                 uow.Commit();
                 uow.Events.Dispatch(DeletedRelationType, this, new DeleteEventArgs<IRelationType>(relationType, false));
-
             }
-
         }
 
         /// <summary>
@@ -671,9 +659,7 @@ namespace Umbraco.Core.Services
                 }
                 uow.Commit();
                 uow.Events.Dispatch(DeletedRelation, this, new DeleteEventArgs<IRelation>(relations, false));
-
             }
-
         }
 
         #region Private Methods

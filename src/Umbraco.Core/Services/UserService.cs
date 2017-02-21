@@ -303,9 +303,7 @@ namespace Umbraco.Core.Services
                     repository.Delete(user);
                     uow.Commit();
                     uow.Events.Dispatch(DeletedUser, this, new DeleteEventArgs<IUser>(user, false));
-
                 }
-
             }
         }
 
@@ -701,14 +699,12 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (raiseEvents)
+                if (raiseEvents && uow.Events.DispatchCancelable(SavingUserType, this, new SaveEventArgs<IUserType>(userType)))
                 {
-                    if (uow.Events.DispatchCancelable(SavingUserType, this, new SaveEventArgs<IUserType>(userType)))
-                    {
-                        uow.Commit();
-                        return;
-                    }
+                    uow.Commit();
+                    return;
                 }
+
                 var repository = RepositoryFactory.CreateUserTypeRepository(uow);
                 repository.AddOrUpdate(userType);
                 uow.Commit();

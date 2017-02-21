@@ -1611,7 +1611,7 @@ namespace Umbraco.Core.Services
                                 NodeId = copy.Id, TagId = tag.TagId, PropertyTypeId = tag.PropertyTypeId
                             });
                     }
-                    uow.Commit();
+                    uow.Commit(); // todo - this should flush, not commit
 
                     if (recursive)
                     {

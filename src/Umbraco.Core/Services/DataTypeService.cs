@@ -545,7 +545,10 @@ namespace Umbraco.Core.Services
 			using (var uow = UowProvider.GetUnitOfWork())
             {
                 if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition)))
+                {
+                    uow.Commit();
                     return;
+                }
 
                 var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow);
 

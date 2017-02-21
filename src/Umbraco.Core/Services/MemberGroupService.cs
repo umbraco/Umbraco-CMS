@@ -71,13 +71,10 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (raiseEvents)
+                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberGroup>(memberGroup)))
                 {
-                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberGroup>(memberGroup)))
-                    {
-                        uow.Commit();
-                        return;
-                    }
+                    uow.Commit();
+                    return;
                 }
 
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);

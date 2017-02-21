@@ -220,7 +220,10 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs)))
+                {
+                    uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
+                }
 
                 var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 repo.AddOrUpdate(entry);
@@ -243,7 +246,10 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs)))
+                {
+                    uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
+                }
 
                 var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 repo.Delete(entry);

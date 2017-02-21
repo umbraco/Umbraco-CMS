@@ -226,7 +226,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if Script is valid, otherwise false</returns>
         public bool ValidateScript(Script script)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateScriptRepository(uow);
                 return repository.ValidateScript(script);
@@ -727,9 +727,9 @@ namespace Umbraco.Core.Services
 
         public void CreatePartialViewFolder(string folderPath)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreatePartialViewRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreatePartialViewRepository(uow);
                 ((PartialViewRepository)repository).AddFolder(folderPath);
                 uow.Commit();
             }
@@ -737,9 +737,9 @@ namespace Umbraco.Core.Services
 
         public void CreatePartialViewMacroFolder(string folderPath)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow);
                 ((PartialViewMacroRepository)repository).AddFolder(folderPath);
                 uow.Commit();
             }

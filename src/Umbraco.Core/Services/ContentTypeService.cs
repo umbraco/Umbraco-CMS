@@ -69,6 +69,7 @@ namespace Umbraco.Core.Services
                 }
                 catch (Exception ex)
                 {
+                    uow.Commit();
                     return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
                 }
             }
@@ -106,6 +107,7 @@ namespace Umbraco.Core.Services
                 }
                 catch (Exception ex)
                 {
+                    uow.Commit();
                     return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
                 }
             }

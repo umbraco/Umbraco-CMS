@@ -1190,13 +1190,10 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (raiseEvents)
+                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(asArray)))
                 {
-                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(asArray)))
-                    {
-                        uow.Commit();
-                        return false;
-                    }
+                    uow.Commit();
+                    return false;
                 }
 
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
