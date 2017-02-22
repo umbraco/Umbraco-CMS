@@ -27,7 +27,7 @@ namespace Umbraco.Core.IO
             // on ShadowFileSystemsScope.None - and if None is false then we should be running
             // in a single thread anyways
 
-            var virt = "~/App_Data/Shadow/" + id + "/" + _shadowPath;
+            var virt = "~/App_Data/TEMP/ShadowFs/" + id + "/" + _shadowPath;
             _shadowDir = IOHelper.MapPath(virt);
             Directory.CreateDirectory(_shadowDir);
             var tempfs = new PhysicalFileSystem(virt);
