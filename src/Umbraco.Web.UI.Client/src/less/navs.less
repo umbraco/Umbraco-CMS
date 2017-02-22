@@ -123,7 +123,7 @@
 
 // Give the tabs something to sit on
 .nav-tabs {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid @purple-l3;
 }
 // Make the list-items overlay the bottom border
 .nav-tabs > li {
@@ -142,7 +142,7 @@
   }
   &:hover,
   &:focus {
-    border-color: @grayLighter @grayLighter #ddd;
+    border-color: transparent transparent @purple-l3;
   }
 }
 // Active state, and it's :hover/:focus to override normal :hover/:focus
@@ -151,7 +151,7 @@
 .nav-tabs > .active > a:focus {
   color: @black;
   background-color: @bodyBackground;
-  border: 1px solid #ddd;
+  border: 1px solid @purple-l3;
   border-bottom-color: transparent;
   cursor: default;
 }
