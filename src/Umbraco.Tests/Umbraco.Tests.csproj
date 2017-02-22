@@ -160,6 +160,7 @@
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\PetaPocoExpressionsTests.cs" />
+    <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />

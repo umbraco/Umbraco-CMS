@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
@@ -241,8 +242,15 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //use dynamic so that we can get ALL properties from the SQL so we can chuck that data into our AdditionalData
                 var finalSql = entitySql.Append(GetGroupBy(isContent, false));
-                var dtos = _work.Database.Fetch<dynamic>(finalSql);
-                return dtos.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
+
+                //query = read forward data reader, do not load everything into mem
+                var dtos = _work.Database.Query<dynamic>(finalSql);
+                var collection = new EntityDefinitionCollection();
+                foreach (var dto in dtos)
+                {
+                    collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
+                }
+                return collection.Select(x => x.BuildFromDynamic()).ToList();
             }
         }
 
@@ -315,25 +323,30 @@ namespace Umbraco.Core.Persistence.Repositories
         protected virtual Sql GetBase(bool isContent, bool isMedia, Action<Sql> customFilter)
         {
             var columns = new List<object>
-                              {
-                                  "umbracoNode.id",
-                                  "umbracoNode.trashed",
-                                  "umbracoNode.parentID",
-                                  "umbracoNode.nodeUser",
-                                  "umbracoNode.level",
-                                  "umbracoNode.path",
-                                  "umbracoNode.sortOrder",
-                                  "umbracoNode.uniqueID",
-                                  "umbracoNode.text",
-                                  "umbracoNode.nodeObjectType",
-                                  "umbracoNode.createDate",
-                                  "COUNT(parent.parentID) as children"
-                              };
+            {
+                "umbracoNode.id",
+                "umbracoNode.trashed",
+                "umbracoNode.parentID",
+                "umbracoNode.nodeUser",
+                "umbracoNode.level",
+                "umbracoNode.path",
+                "umbracoNode.sortOrder",
+                "umbracoNode.uniqueID",
+                "umbracoNode.text",
+                "umbracoNode.nodeObjectType",
+                "umbracoNode.createDate",
+                "COUNT(parent.parentID) as children"
+            };
 
             if (isContent || isMedia)
             {
-                columns.Add("published.versionId as publishedVersion");
-                columns.Add("latest.versionId as newestVersion");
+                if (isContent)
+                {
+                    //only content has this info
+                    columns.Add("published.versionId as publishedVersion");
+                    columns.Add("document.versionId as newestVersion");
+                }
+                
                 columns.Add("contenttype.alias");
                 columns.Add("contenttype.icon");
                 columns.Add("contenttype.thumbnail");
@@ -345,17 +358,21 @@ namespace Umbraco.Core.Persistence.Repositories
             var entitySql = new Sql()
                 .Select(columns.ToArray())
                 .From("umbracoNode umbracoNode");
-                
+
             if (isContent || isMedia)
             {
-                entitySql.InnerJoin("cmsContent content").On("content.nodeId = umbracoNode.id")
-                   .LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType")
-                   .LeftJoin(
-                       "(SELECT nodeId, versionId FROM cmsDocument WHERE published = 1 GROUP BY nodeId, versionId) as published")
-                   .On("umbracoNode.id = published.nodeId")
-                   .LeftJoin(
-                       "(SELECT nodeId, versionId FROM cmsDocument WHERE newest = 1 GROUP BY nodeId, versionId) as latest")
-                   .On("umbracoNode.id = latest.nodeId");
+                entitySql.InnerJoin("cmsContent content").On("content.nodeId = umbracoNode.id");
+
+                if (isContent)
+                {
+                    //only content has this info
+                    entitySql
+                        .InnerJoin("cmsDocument document").On("document.nodeId = umbracoNode.id")
+                        .LeftJoin("(SELECT nodeId, versionId FROM cmsDocument WHERE published = 1) as published")
+                        .On("umbracoNode.id = published.nodeId");
+                }
+
+                entitySql.LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType");
             }
 
             entitySql.LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
@@ -372,22 +389,33 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = baseQuery(isContent, isMedia, filter)
                 .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = nodeObjectType });
+
+            if (isContent)            {                sql.Where("document.newest = 1");            }
+
             return sql;
         }
 
         protected virtual Sql GetBaseWhere(Func<bool, bool, Action<Sql>, Sql> baseQuery, bool isContent, bool isMedia, int id)
         {
             var sql = baseQuery(isContent, isMedia, null)
-                .Where("umbracoNode.id = @Id", new { Id = id })
-                .Append(GetGroupBy(isContent, isMedia));
+                .Where("umbracoNode.id = @Id", new { Id = id });
+
+            if (isContent)            {                sql.Where("document.newest = 1");            }
+
+            sql.Append(GetGroupBy(isContent, isMedia));
+
             return sql;
         }
 
         protected virtual Sql GetBaseWhere(Func<bool, bool, Action<Sql>, Sql> baseQuery, bool isContent, bool isMedia, Guid key)
         {
             var sql = baseQuery(isContent, isMedia, null)
-                .Where("umbracoNode.uniqueID = @UniqueID", new { UniqueID = key })
-                .Append(GetGroupBy(isContent, isMedia));
+                .Where("umbracoNode.uniqueID = @UniqueID", new {UniqueID = key});
+
+            if (isContent)            {                sql.Where("document.newest = 1");            }
+
+            sql.Append(GetGroupBy(isContent, isMedia));
+
             return sql;
         }
 
@@ -396,6 +424,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.id = @Id AND umbracoNode.nodeObjectType = @NodeObjectType",
                        new {Id = id, NodeObjectType = nodeObjectType});
+
+            if (isContent)            {                sql.Where("document.newest = 1");            }
+
             return sql;
         }
 
@@ -404,47 +435,19 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.uniqueID = @UniqueID AND umbracoNode.nodeObjectType = @NodeObjectType",
                        new { UniqueID = key, NodeObjectType = nodeObjectType });
-            return sql;
-        }
 
-        protected virtual Sql GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)
-        {
-            var columns = new List<object>
-                              {
-                                  "umbracoNode.id",
-                                  "umbracoNode.trashed",
-                                  "umbracoNode.parentID",
-                                  "umbracoNode.nodeUser",
-                                  "umbracoNode.level",
-                                  "umbracoNode.path",
-                                  "umbracoNode.sortOrder",
-                                  "umbracoNode.uniqueID",
-                                  "umbracoNode.text",
-                                  "umbracoNode.nodeObjectType",
-                                  "umbracoNode.createDate"
-                              };
-
-            if (isContent || isMedia)
-            {
-                columns.Add("published.versionId");
-                columns.Add("latest.versionId");
-                columns.Add("contenttype.alias");
-                columns.Add("contenttype.icon");
-                columns.Add("contenttype.thumbnail");
-                columns.Add("contenttype.isContainer");
-            }
-            
-            var sql = new Sql()
-                .GroupBy(columns.ToArray());
-
-            if (includeSort)
-            {
-                sql = sql.OrderBy("umbracoNode.sortOrder");
-            }
+            if (isContent)            {                sql.Where("document.newest = 1");            }
 
             return sql;
         }
-        
+
+        protected virtual Sql GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)        {            var columns = new List<object>            {                "umbracoNode.id",                "umbracoNode.trashed",                "umbracoNode.parentID",                "umbracoNode.nodeUser",                "umbracoNode.level",                "umbracoNode.path",                "umbracoNode.sortOrder",                "umbracoNode.uniqueID",                "umbracoNode.text",                "umbracoNode.nodeObjectType",                "umbracoNode.createDate"            };
+            if (isContent || isMedia)            {                if (isContent)                {                    columns.Add("published.versionId");                    columns.Add("document.versionId");                }                columns.Add("contenttype.alias");                columns.Add("contenttype.icon");                columns.Add("contenttype.thumbnail");                columns.Add("contenttype.isContainer");            }
+
+            var sql = new Sql()                .GroupBy(columns.ToArray());
+            if (includeSort)            {                sql = sql.OrderBy("umbracoNode.sortOrder");            }
+            return sql;        }
+
         #endregion
 
         /// <summary>
@@ -458,33 +461,7 @@ namespace Umbraco.Core.Persistence.Repositories
             UnitOfWork.DisposeIfDisposable();
         }
 
-        #region umbracoNode POCO - Extends NodeDto
-        [TableName("umbracoNode")]
-        [PrimaryKey("id")]
-        [ExplicitColumns]
-        internal class UmbracoEntityDto : NodeDto
-        {
-            [Column("children")]
-            public int Children { get; set; }
-
-            [Column("publishedVersion")]
-            public Guid PublishedVersion { get; set; }
-
-            [Column("newestVersion")]
-            public Guid NewestVersion { get; set; }
-
-            [Column("alias")]
-            public string Alias { get; set; }
-
-            [Column("icon")]
-            public string Icon { get; set; }
-
-            [Column("thumbnail")]
-            public string Thumbnail { get; set; }
-
-            [ResultColumn]
-            public List<UmbracoPropertyDto> UmbracoPropertyDtos { get; set; }
-        }
+        #region private classes
         
         [ExplicitColumns]
         internal class UmbracoPropertyDto
@@ -566,6 +543,100 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 // Return the now populated previous UmbracoEntity (or null if first time through)
                 return prev;
+            }
+        }
+
+        private class EntityDefinitionCollection : KeyedCollection<int, EntityDefinition>
+        {
+            protected override int GetKeyForItem(EntityDefinition item)
+            {
+                return item.Id;
+            }
+
+            /// <summary>
+            /// if this key already exists if it does then we need to check
+            /// if the existing item is 'older' than the new item and if that is the case we'll replace the older one
+            /// </summary>
+            /// <param name="item"></param>
+            /// <returns></returns>
+            public bool AddOrUpdate(EntityDefinition item)
+            {
+                if (Dictionary == null)
+                {
+                    base.Add(item);
+                    return true;
+                }
+
+                var key = GetKeyForItem(item);
+                EntityDefinition found;
+                if (TryGetValue(key, out found))
+                {
+                    //it already exists and it's older so we need to replace it
+                    //TODO: Also check integer ID?
+                    if (item.EntityDate > found.EntityDate)
+                    {
+                        var currIndex = Items.IndexOf(found);
+                        if (currIndex == -1)
+                            throw new IndexOutOfRangeException("Could not find the item in the list: " + found.Id);
+
+                        //replace the current one with the newer one
+                        SetItem(currIndex, item);
+                        return true;
+                    }
+                    //could not add or update
+                    return false;
+                }
+
+                base.Add(item);
+                return true;
+            }
+
+            public bool TryGetValue(int key, out EntityDefinition val)
+            {
+                if (Dictionary == null)
+                {
+                    val = null;
+                    return false;
+                }
+                return Dictionary.TryGetValue(key, out val);
+            }
+        }
+
+        private class EntityDefinition
+        {
+            private readonly UmbracoEntityFactory _factory;
+            private readonly dynamic _entity;
+            private readonly bool _isContent;
+            private readonly bool _isMedia;
+
+            public EntityDefinition(UmbracoEntityFactory factory, dynamic entity, bool isContent, bool isMedia)
+            {
+                _factory = factory;
+                _entity = entity;
+                _isContent = isContent;
+                _isMedia = isMedia;
+            }
+
+            public IUmbracoEntity BuildFromDynamic()
+            {
+                return _factory.BuildEntityFromDynamic(_entity);
+            }
+
+            public int Id
+            {
+                get { return _entity.id; }
+            }
+
+            public DateTime EntityDate
+            {
+                get
+                {
+                    if (_isContent || _isMedia)
+                    {
+                        return _entity.VersionDate;
+                    }
+                    return _entity.createDate;
+                }
             }
         }
         #endregion
