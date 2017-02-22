@@ -136,6 +136,7 @@ namespace Umbraco.Web.Editors
                         var display = Mapper.Map<IPartialView, CodeFileDisplay>(view);
                         display.FileType = Core.Constants.Trees.PartialViews;
                         display.Path = Url.GetTreePathFromFilePath(view.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(view.Path);
                         return display;
                     }
                     return null;
@@ -147,6 +148,7 @@ namespace Umbraco.Web.Editors
                         var display = Mapper.Map<IPartialView, CodeFileDisplay>(viewMacro);
                         display.FileType = Core.Constants.Trees.PartialViewMacros;
                         display.Path = Url.GetTreePathFromFilePath(viewMacro.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(viewMacro.Path);
                         return display;
                     }
                     return null;
@@ -158,6 +160,7 @@ namespace Umbraco.Web.Editors
                         var display = Mapper.Map<Script, CodeFileDisplay>(script);
                         display.FileType = Core.Constants.Trees.Scripts;
                         display.Path = Url.GetTreePathFromFilePath(script.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
                         return display;
                     }
                     return null;
@@ -341,6 +344,7 @@ namespace Umbraco.Web.Editors
                     {
                         display = Mapper.Map(partialViewResult.Result, display);
                         display.Path = Url.GetTreePathFromFilePath(partialViewResult.Result.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(partialViewResult.Result.Path);
                         return display;
                     }
 
@@ -355,6 +359,7 @@ namespace Umbraco.Web.Editors
                     {
                         display = Mapper.Map(partialViewMacroResult.Result, display);
                         display.Path = Url.GetTreePathFromFilePath(partialViewMacroResult.Result.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(partialViewMacroResult.Result.Path);
                         return display;
                     }
                         
@@ -371,6 +376,7 @@ namespace Umbraco.Web.Editors
                         script.Path = display.Name;
                         display = Mapper.Map(script, display);
                         display.Path = Url.GetTreePathFromFilePath(script.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
                         return display;
                         
                     }
