@@ -155,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dependencies\NuGet.cs" />
+    <Compile Include="Issues\U9560.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
