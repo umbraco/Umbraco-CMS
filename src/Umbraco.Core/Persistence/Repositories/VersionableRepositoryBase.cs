@@ -799,6 +799,7 @@ ORDER BY contentNodeId, propertytypeid
                 if (TryGetValue(key, out found))
                 {
                     //it already exists and it's older so we need to replace it
+                    //TODO: Also check integer ID?
                     if (item.VersionDate > found.VersionDate)
                     {
                         var currIndex = Items.IndexOf(found);
