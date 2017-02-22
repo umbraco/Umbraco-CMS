@@ -382,7 +382,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = baseQuery(isContent, isMedia, filter)
                 .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = nodeObjectType });
 
-            if (isContent)            {                sql.Where("document.newest = 1");            }
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
 
             return sql;
         }
@@ -392,7 +395,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.id = @Id", new { Id = id });
 
-            if (isContent)            {                sql.Where("document.newest = 1");            }
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
 
             sql.Append(GetGroupBy(isContent, isMedia));
 
@@ -404,7 +410,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.uniqueID = @UniqueID", new {UniqueID = key});
 
-            if (isContent)            {                sql.Where("document.newest = 1");            }
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
 
             sql.Append(GetGroupBy(isContent, isMedia));
 
@@ -417,7 +426,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where("umbracoNode.id = @Id AND umbracoNode.nodeObjectType = @NodeObjectType",
                        new {Id = id, NodeObjectType = nodeObjectType});
 
-            if (isContent)            {                sql.Where("document.newest = 1");            }
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
 
             return sql;
         }
@@ -428,17 +440,54 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where("umbracoNode.uniqueID = @UniqueID AND umbracoNode.nodeObjectType = @NodeObjectType",
                        new { UniqueID = key, NodeObjectType = nodeObjectType });
 
-            if (isContent)            {                sql.Where("document.newest = 1");            }
+            if (isContent)
+            {
+                sql.Where("document.newest = 1");
+            }
 
             return sql;
         }
 
-        protected virtual Sql GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)        {            var columns = new List<object>            {                "umbracoNode.id",                "umbracoNode.trashed",                "umbracoNode.parentID",                "umbracoNode.nodeUser",                "umbracoNode.level",                "umbracoNode.path",                "umbracoNode.sortOrder",                "umbracoNode.uniqueID",                "umbracoNode.text",                "umbracoNode.nodeObjectType",                "umbracoNode.createDate"            };
-            if (isContent || isMedia)            {                if (isContent)                {                    columns.Add("published.versionId");                    columns.Add("document.versionId");                }                columns.Add("contenttype.alias");                columns.Add("contenttype.icon");                columns.Add("contenttype.thumbnail");                columns.Add("contenttype.isContainer");            }
+        protected virtual Sql GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)
+        {
+            var columns = new List<object>
+            {
+                "umbracoNode.id",
+                "umbracoNode.trashed",
+                "umbracoNode.parentID",
+                "umbracoNode.nodeUser",
+                "umbracoNode.level",
+                "umbracoNode.path",
+                "umbracoNode.sortOrder",
+                "umbracoNode.uniqueID",
+                "umbracoNode.text",
+                "umbracoNode.nodeObjectType",
+                "umbracoNode.createDate"
+            };
 
-            var sql = new Sql()                .GroupBy(columns.ToArray());
-            if (includeSort)            {                sql = sql.OrderBy("umbracoNode.sortOrder");            }
-            return sql;        }
+            if (isContent || isMedia)
+            {
+                if (isContent)
+                {
+                    columns.Add("published.versionId");
+                    columns.Add("document.versionId");
+                }
+                columns.Add("contenttype.alias");
+                columns.Add("contenttype.icon");
+                columns.Add("contenttype.thumbnail");
+                columns.Add("contenttype.isContainer");
+            }
+
+            var sql = new Sql()
+                .GroupBy(columns.ToArray());
+
+            if (includeSort)
+            {
+                sql = sql.OrderBy("umbracoNode.sortOrder");
+            }
+
+            return sql;
+        }
 
         #endregion
 
