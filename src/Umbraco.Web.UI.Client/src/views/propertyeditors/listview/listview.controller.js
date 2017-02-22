@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, mediaTypeHelper, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -53,7 +53,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.isNew = false;
    $scope.actionInProgress = false;
    $scope.selection = [];
-   $scope.folders = [];
+   $scope.folders = [];   
+   //tracks if we've already loaded the folders for the current node
+   var foldersLoaded = false;
    $scope.listViewResultSet = {
       totalPages: 0,
       items: []
@@ -261,25 +263,25 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          $scope.actionInProgress = false;
          $scope.listViewResultSet = data;
 
-          //reset
-         $scope.folders = [];
-
-          //update all values for display
+         //update all values for display
          if ($scope.listViewResultSet.items) {
             _.each($scope.listViewResultSet.items, function (e, index) {
-                setPropertyValues(e);
-
-                //special case, we need to check if any of these types are folder types 
-                //and add them to the folders collection
-                if ($scope.entityType === 'media') {
-                    if (mediaTypeHelper.isFolderType(e)) {
-                        $scope.folders.push(e);
-                    }
-                }
+               setPropertyValues(e);
             });
          }
 
-         $scope.viewLoaded = true;
+         if (!foldersLoaded && $scope.entityType === 'media') {
+            //The folders aren't loaded - we only need to do this once since we're never changing node ids
+            mediaResource.getChildFolders($scope.contentId)
+                    .then(function (folders) {
+                       $scope.folders = folders;
+                       $scope.viewLoaded = true;
+                       foldersLoaded = true;
+                    });
+
+         } else {
+            $scope.viewLoaded = true;
+         }
 
          //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
          // if you have more than one page and you delete all items on the last page. In this case, we need to reset to the last

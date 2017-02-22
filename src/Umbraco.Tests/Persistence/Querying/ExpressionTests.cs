@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using Moq;
 using NUnit.Framework;
@@ -16,19 +17,35 @@ namespace Umbraco.Tests.Persistence.Querying
     [TestFixture]
     public class ExpressionTests : BaseUsingSqlCeSyntax
     {
-        //    [Test]
-        //    public void Can_Query_With_Content_Type_Alias()
-        //    {
-        //        //Arrange
-        //        Expression<Func<IMedia, bool>> predicate = content => content.ContentType.Alias == "Test";
-        //        var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>();
-        //        var result = modelToSqlExpressionHelper.Visit(predicate);
+        [Test]
+        public void Can_Query_With_Content_Type_Alias()
+        {
+            //Arrange
+            Expression<Func<IMedia, bool>> predicate = content => content.ContentType.Alias == "Test";
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>();
+            var result = modelToSqlExpressionHelper.Visit(predicate);
 
-        //        Debug.Print("Model to Sql ExpressionHelper: \n" + result);
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
-        //        Assert.AreEqual("[cmsContentType].[alias] = @0", result);
-        //        Assert.AreEqual("Test", modelToSqlExpressionHelper.GetSqlParameters()[0]);
-        //    }
+            Assert.AreEqual("([cmsContentType].[alias] = @0)", result);
+            Assert.AreEqual("Test", modelToSqlExpressionHelper.GetSqlParameters()[0]);
+        }
+
+        [Test]
+        public void Can_Query_With_Content_Type_Aliases()
+        {
+            //Arrange
+            var aliases = new[] {"Test1", "Test2"};
+            Expression<Func<IMedia, bool>> predicate = content => aliases.Contains(content.ContentType.Alias);
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>();
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("[cmsContentType].[alias] IN (@1,@2)", result);
+            Assert.AreEqual("Test1", modelToSqlExpressionHelper.GetSqlParameters()[1]);
+            Assert.AreEqual("Test2", modelToSqlExpressionHelper.GetSqlParameters()[2]);
+        }
 
         [Test]
         public void CachedExpression_Can_Verify_Path_StartsWith_Predicate_In_Same_Result()

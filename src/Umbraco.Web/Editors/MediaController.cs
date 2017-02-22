@@ -168,17 +168,40 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id = -1)
         {
+            //we are only allowing a max of 500 to be returned here, if more is required it needs to be paged
+            var result = GetChildFolders(id, 1, 500);
+            return result.Items;
+        }
+
+        /// <summary>
+        /// Returns a paged result of media items known to be of a "Folder" type
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id, int pageNumber, int pageSize)
+        {
             //Suggested convention for folder mediatypes - we can make this more or less complicated as long as we document it...
             //if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
             var folderTypes = Services.ContentTypeService
-                .GetAllContentTypeAliases(Constants.ObjectTypes.MediaTypeGuid)
-                .Where(x => x.EndsWith("Folder"));
-            
-            var children = (id < 0) 
-                ? Services.MediaService.GetRootMedia()
-                : Services.MediaService.GetChildren(id);
+                .GetAllMediaTypes()
+                .Where(x => x.Alias.EndsWith("Folder"))
+                .Select(x => x.Id)
+                .ToArray();
 
-            return children.Where(x => folderTypes.Contains(x.ContentType.Alias)).Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
+            if (folderTypes.Length == 0)
+            {
+                return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, pageNumber, pageSize);
+            }
+
+            long total;
+            var children = Services.MediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out total, "Name", Direction.Ascending, true, null, folderTypes.ToArray());
+            
+            return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(total, pageNumber, pageSize)
+            {
+                Items = children.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>)
+            };
         }
 
         /// <summary>
