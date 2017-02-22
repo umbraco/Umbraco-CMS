@@ -18,6 +18,23 @@ namespace Umbraco.Tests.Persistence.Querying
     public class ExpressionTests : BaseUsingSqlCeSyntax
     {
         [Test]
+        public void Equals_Claus_With_Two_Entity_Values()
+        {
+            var dataType = new DataTypeDefinition(-1, "Test")
+            {
+                Id = 12345
+            };
+            Expression<Func<PropertyType, bool>> predicate = p => p.DataTypeDefinitionId == dataType.Id;
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<PropertyType>();
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("([cmsPropertyType].[dataTypeId] = @0)", result);
+            Assert.AreEqual(12345, modelToSqlExpressionHelper.GetSqlParameters()[0]);
+        }
+
+        [Test]
         public void Can_Query_With_Content_Type_Alias()
         {
             //Arrange

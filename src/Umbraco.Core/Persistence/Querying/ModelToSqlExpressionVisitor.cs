@@ -61,7 +61,10 @@ namespace Umbraco.Core.Persistence.Querying
                 return string.Empty;
             }
 
-            if (m.Expression != null && m.Expression.Type != typeof(T) && TypeHelper.IsTypeAssignableFrom<IUmbracoEntity>(m.Expression.Type))
+            if (m.Expression != null 
+                && m.Expression.Type != typeof(T) 
+                && TypeHelper.IsTypeAssignableFrom<IUmbracoEntity>(m.Expression.Type)
+                && EndsWithConstant(m) == false)
             {
                 //if this is the case, it means we have a sub expression / nested property access, such as: x.ContentType.Alias == "Test";
                 //and since the sub type (x.ContentType) is not the same as x, we need to resolve a mapper for x.ContentType to get it's mapped SQL column
@@ -100,6 +103,25 @@ namespace Umbraco.Core.Persistence.Querying
             //already compiled, return
             return string.Empty;
 
+        }
+
+        /// <summary>
+        /// Determines if the MemberExpression ends in a Constant value
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        private bool EndsWithConstant(MemberExpression m)
+        {
+            Expression expr = m;
+            
+            while (expr is MemberExpression)
+            {
+                var memberExpr = expr as MemberExpression;
+                expr = memberExpr.Expression;
+            }
+            
+            var constExpr = expr as ConstantExpression;
+            return constExpr != null;
         }
     }
 }
