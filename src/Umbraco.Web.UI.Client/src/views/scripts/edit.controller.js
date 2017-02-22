@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ScriptsEditController($scope, $routeParams, $timeout, appState, editorState, navigationService, assetsService, codefileResource, contentEditingHelper, notificationsService, localizationService) {
+    function ScriptsEditController($scope, $routeParams, $timeout, appState, editorState, navigationService, assetsService, codefileResource, contentEditingHelper, notificationsService, localizationService, templateHelper) {
 
         var vm = this;
         var currentPosition = null;
@@ -19,54 +19,10 @@
         vm.showKeyboardShortcut = false;
 
         //Keyboard shortcuts for help dialog
-        vm.page.keyboardShortcutsOverview = [
-			{
-			    "name": localizationService.localize("shortcuts_generalHeader"), 
-			    "shortcuts": [
-                    {
-				        "description": localizationService.localize("buttons_undo"),
-				        "keys": [{ "key": "ctrl" }, { "key": "z" }]
-				    },
-                    {
-				        "description": localizationService.localize("buttons_redo"),
-				        "keys": [{ "key": "ctrl" }, { "key": "y" }]
-				    },
-                    {
-				        "description": localizationService.localize("buttons_save"),
-				        "keys": [{ "key": "ctrl" }, { "key": "s" }]
-				    }
-			    ]
-			},
-			{
-			    "name": localizationService.localize("shortcuts_editorHeader"),
-			    "shortcuts": [
-                    {
-				        "description": localizationService.localize("shortcuts_commentLine"),
-				        "keys": [{ "key": "ctrl" }, { "key": "/" }]
-				    },
-                    {
-				        "description": localizationService.localize("shortcuts_removeLine"),
-				        "keys": [{ "key": "ctrl" }, { "key": "d" }]
-				    },
-                    {
-				        "description": localizationService.localize("shortcuts_copyLineUp"),
-				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "up" }]
-				    },
-                    {
-				        "description": localizationService.localize("shortcuts_copyLineDown"),
-				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "down" }]
-				    },
-                    {
-				        "description": localizationService.localize("shortcuts_moveLineUp"),
-				        "keys": [{ "key": "alt" }, { "key": "up" }]
-				    },
-                    {
-				        "description": localizationService.localize("shortcuts_moveLineDown"),
-				        "keys": [{ "key": "alt" }, { "key": "down" }]
-				    }
-                ]
-			}
-        ];
+        vm.page.keyboardShortcutsOverview = [];
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
+        
 
         vm.script = {};
 
