@@ -440,9 +440,14 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object.
           *
           */
-        getChildFolders: function (parentId) {
+        getChildFolders: function (parentId, folderFilter) {
             if (!parentId) {
                 parentId = -1;
+            }
+
+            var params = [{ id: parentId }];
+            if (folderFilter && folderFilter.length > 0) {
+            	params.push({ filter: folderFilter });
             }
 
             return umbRequestHelper.resourcePromise(
@@ -450,9 +455,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         umbRequestHelper.getApiUrl(
                               "mediaApiBaseUrl",
                               "GetChildFolders",
-                              [
-                                    { id: parentId }
-                              ])),
+                              params)),
                   'Failed to retrieve child folders for media item ' + parentId);
         },
 

@@ -270,7 +270,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
          if ($scope.entityType === 'media') {
 
-            mediaResource.getChildFolders($scope.contentId)
+            mediaResource.getChildFolders($scope.contentId, $scope.options.filter)
                     .then(function (folders) {
                        $scope.folders = folders;
                        $scope.viewLoaded = true;
