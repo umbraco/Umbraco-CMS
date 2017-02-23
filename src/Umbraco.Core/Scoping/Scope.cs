@@ -368,12 +368,12 @@ namespace Umbraco.Core.Scoping
 #endif
             }
 
+            var parent = ParentScope;
+            _scopeProvider.AmbientScope = parent;
+
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);
 #endif
-
-            var parent = ParentScope;
-            _scopeProvider.AmbientScope = parent;
 
             if (parent != null)
                 parent.ChildCompleted(_completed);
