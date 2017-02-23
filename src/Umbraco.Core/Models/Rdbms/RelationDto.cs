@@ -14,6 +14,10 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
+        [Column("uniqueId")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelation_UniqueId")]
+        public Guid UniqueId { get; set; }
+
         [Column("parentId")]
         [ForeignKey(typeof(NodeDto), Name = "FK_umbracoRelation_umbracoNode")]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelation_parentChildType", ForColumns = "parentId,childId,relType")]

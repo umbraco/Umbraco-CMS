@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core
@@ -35,7 +34,7 @@ namespace Umbraco.Core
             public const string Macro = "macro";
             [UdiType(UdiType.GuidUdi)]
             public const string Template = "template";
-
+            
             [UdiType(UdiType.GuidUdi)]
             public const string DocumentType = "document-type";
             [UdiType(UdiType.GuidUdi)]
@@ -52,9 +51,10 @@ namespace Umbraco.Core
             public const string MemberType = "member-type";
             [UdiType(UdiType.GuidUdi)]
             public const string MemberGroup = "member-group";
-
             [UdiType(UdiType.GuidUdi)]
             public const string RelationType = "relation-type";
+            [UdiType(UdiType.GuidUdi)]
+            public const string Relation = "relation";
 
             // forms
 
@@ -117,6 +117,8 @@ namespace Umbraco.Core
                         return Stylesheet;
                     case UmbracoObjectTypes.RelationType:
                         return RelationType;
+                    case UmbracoObjectTypes.Relation:
+                        return Relation;
                     case UmbracoObjectTypes.FormsForm:
                         return FormsForm;
                     case UmbracoObjectTypes.FormsPreValue:
@@ -159,6 +161,8 @@ namespace Umbraco.Core
                         return UmbracoObjectTypes.Stylesheet;
                     case RelationType:
                         return UmbracoObjectTypes.RelationType;
+                    case Relation:
+                        return UmbracoObjectTypes.Relation;
                     case FormsForm:
                         return UmbracoObjectTypes.FormsForm;
                     case FormsPreValue:

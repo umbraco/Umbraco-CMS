@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
+﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -33,6 +31,7 @@ namespace Umbraco.Core.Persistence.Mappers
         internal override void BuildMap()
         {
             CacheMap<Relation, RelationDto>(src => src.Id, dto => dto.Id);
+            CacheMap<Relation, RelationDto>(src => src.Key, dto => dto.UniqueId);
             CacheMap<Relation, RelationDto>(src => src.ChildId, dto => dto.ChildId);
             CacheMap<Relation, RelationDto>(src => src.Comment, dto => dto.Comment);
             CacheMap<Relation, RelationDto>(src => src.CreateDate, dto => dto.Datetime);

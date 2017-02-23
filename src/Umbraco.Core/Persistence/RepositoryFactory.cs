@@ -200,7 +200,8 @@ namespace Umbraco.Core.Persistence
                 uow,
                 _nullCache,
                 _logger, _sqlSyntax,
-                CreateRelationTypeRepository(uow));
+                CreateRelationTypeRepository(uow),
+                CreateEntityRepository(uow));
         }
 
         public virtual IRelationTypeRepository CreateRelationTypeRepository(IScopeUnitOfWork uow)

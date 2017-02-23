@@ -169,6 +169,16 @@ namespace Umbraco.Core
             public static readonly Guid RelationTypeGuid = new Guid(RelationType);
 
             /// <summary>
+            /// Guid for a relation.
+            /// </summary>
+            public const string Relation = "6A050149-8365-4CBC-BC2A-3C0710586242";
+
+            /// <summary>
+            /// Guid for a relation.
+            /// </summary>
+            public static readonly Guid RelationGuid = new Guid(Relation);
+
+            /// <summary>
             /// Guid for a Forms Form.
             /// </summary>
             public const string FormsForm = "F5A9F787-6593-46F0-B8FF-BFD9BCA9F6BB";
