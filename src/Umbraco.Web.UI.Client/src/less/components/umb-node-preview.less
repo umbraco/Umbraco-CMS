@@ -1,7 +1,7 @@
 .umb-node-preview {
     padding: 5px 15px;
     margin-bottom: 5px;
-    background: @grayLighter;
+    background: @gray-10;
     border-radius: 3px;
     display: flex;
     align-items: center;
@@ -11,10 +11,6 @@
 
 .umb-node-preview--sortable {
     cursor: move;
-}
-
-.umb-node-preview--sortable:hover {
-    border-color: #d9d9d9;
 }
 
 .umb-node-preview--unpublished {
@@ -49,6 +45,7 @@
 .umb-node-preview__description {
     font-size: 11px;
     line-height: 1.5em;
+    color: @gray-3;
 }
 
 .umb-node-preview__actions {
@@ -62,21 +59,25 @@
     margin-right: 5px;
     font-size: 13px;
     font-weight: bold;
-    opacity: 0.5;
+    color: @gray-5;
 }
 
 .umb-node-preview__action:hover {
-    color: @blue;
+    color: @turquoise;
     text-decoration: none;
     opacity: 1;
+}
+
+.umb-node-preview__action--red:hover {
+    color: @red;
 }
 
 .umb-node-preview-add {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px dashed #d9d9d9;
-    color: @blue;
+    border: 1px dashed @gray-8;
+    color: @turquoise;
     font-weight: bold;
     padding: 5px 15px;
     max-width: 66.6%;
@@ -84,7 +85,7 @@
 }
 
 .umb-node-preview-add:hover {
-    color: @blue;
+    color: @turquoise;
 }
 
 .umb-overlay, 
