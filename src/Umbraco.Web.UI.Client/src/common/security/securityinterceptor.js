@@ -19,15 +19,20 @@ angular.module('umbraco.security.interceptor')
                     return promise;
                 }, function(originalResponse) {
                     // Intercept failed requests
+                    
+                    // Make sure we have the configuration of the request (don't we always?)
+                    var config = originalResponse.config ? originalResponse.config : {};
+                    
+                    // Make sure we have an object for the headers of the request
+                    var headers = config.headers ? config.headers : {};
 
-                    //Here we'll check if we should ignore the error, this will be based on an original header set
-                    var headers = originalResponse.config ? originalResponse.config.headers : {};
-                    if (headers["x-umb-ignore-error"] === "ignore") {
+                    //Here we'll check if we should ignore the error (either based on the original header set or the request configuration)
+                    if (headers["x-umb-ignore-error"] === "ignore" || config.umbIgnoreErrors === true) {
                         //exit/ignore
                         return promise;
                     }
                     var filtered = _.find(requestInterceptorFilter(), function(val) {
-                        return originalResponse.config.url.indexOf(val) > 0;
+                        return config.url.indexOf(val) > 0;
                     });
                     if (filtered) {
                         return promise;
