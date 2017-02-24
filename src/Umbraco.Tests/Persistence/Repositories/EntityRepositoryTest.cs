@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Deal_With_Corrupt_Duplicate_Newest_Published_Flags()
+        public void Deal_With_Corrupt_Duplicate_Newest_Published_Flags_Full_Model()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
@@ -66,17 +67,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
             }
 
+            var versionDtos = new List<ContentVersionDto>();
+
             //Now manually corrupt the data
-            for (var index = 0; index < new[] { Guid.NewGuid(), Guid.NewGuid() }.Length; index++)
+            var versions = new[] {Guid.NewGuid(), Guid.NewGuid()};
+            for (var index = 0; index < versions.Length; index++)
             {
-                var version = new[] { Guid.NewGuid(), Guid.NewGuid() }[index];
+                var version = versions[index];
                 var versionDate = DateTime.Now.AddMinutes(index);
-                this.DatabaseContext.Database.Insert(new ContentVersionDto
+                var versionDto = new ContentVersionDto
                 {
                     NodeId = content1.Id,
                     VersionDate = versionDate,
                     VersionId = version
-                });
+                };
+                this.DatabaseContext.Database.Insert(versionDto);
+                versionDtos.Add(versionDto);
                 this.DatabaseContext.Database.Insert(new DocumentDto
                 {
                     Newest = true,
@@ -93,8 +99,84 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             using (var repository = new EntityRepository(unitOfWork))
             {
-                var content = repository.GetByQuery(new Query<IUmbracoEntity>().Where(c => c.Id == content1.Id), Constants.ObjectTypes.DocumentGuid);
-                Assert.AreEqual(1, content.Count());
+                var content = repository.GetByQuery(new Query<IUmbracoEntity>().Where(c => c.Id == content1.Id), Constants.ObjectTypes.DocumentGuid).ToArray();
+                Assert.AreEqual(1, content.Length);
+                Assert.AreEqual(versionDtos.Max(x => x.Id), content[0].AdditionalData["VersionId"]);
+
+                content = repository.GetAll(Constants.ObjectTypes.DocumentGuid, content[0].Key).ToArray();
+                Assert.AreEqual(1, content.Length);
+                Assert.AreEqual(versionDtos.Max(x => x.Id), content[0].AdditionalData["VersionId"]);
+
+                content = repository.GetAll(Constants.ObjectTypes.DocumentGuid, content[0].Id).ToArray();
+                Assert.AreEqual(1, content.Length);
+                Assert.AreEqual(versionDtos.Max(x => x.Id), content[0].AdditionalData["VersionId"]);
+
+                var contentItem = repository.Get(content[0].Id, Constants.ObjectTypes.DocumentGuid);
+                Assert.AreEqual(versionDtos.Max(x => x.Id), contentItem.AdditionalData["VersionId"]);
+
+                contentItem = repository.GetByKey(content[0].Key, Constants.ObjectTypes.DocumentGuid);
+                Assert.AreEqual(versionDtos.Max(x => x.Id), contentItem.AdditionalData["VersionId"]);
+            }
+        }
+
+        /// <summary>
+        /// The Slim model will test the EntityRepository when it doesn't know the object type so it will 
+        /// make the simplest (slim) query
+        /// </summary>
+        [Test]
+        public void Deal_With_Corrupt_Duplicate_Newest_Published_Flags_Slim_Model()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            IContent content1;
+
+            using (var repository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            {
+                var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
+
+                contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+            }
+
+            //Now manually corrupt the data
+            var versions = new[] { Guid.NewGuid(), Guid.NewGuid() };
+            for (var index = 0; index < versions.Length; index++)
+            {
+                var version = versions[index];
+                var versionDate = DateTime.Now.AddMinutes(index);
+                var versionDto = new ContentVersionDto
+                {
+                    NodeId = content1.Id,
+                    VersionDate = versionDate,
+                    VersionId = version
+                };
+                this.DatabaseContext.Database.Insert(versionDto);
+                this.DatabaseContext.Database.Insert(new DocumentDto
+                {
+                    Newest = true,
+                    NodeId = content1.Id,
+                    Published = true,
+                    Text = content1.Name,
+                    VersionId = version,
+                    WriterUserId = 0,
+                    UpdateDate = versionDate,
+                    TemplateId = content1.Template == null || content1.Template.Id <= 0 ? null : (int?)content1.Template.Id
+                });
+            }
+
+            // Assert
+            using (var repository = new EntityRepository(unitOfWork))
+            {
+                var content = repository.GetByQuery(new Query<IUmbracoEntity>().Where(c => c.Id == content1.Id)).ToArray();
+                Assert.AreEqual(1, content.Length);
+                var contentItem = repository.Get(content[0].Id);
+                Assert.IsNotNull(contentItem);
+                contentItem = repository.GetByKey(content[0].Key);
+                Assert.IsNotNull(contentItem);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -85,17 +86,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();                
             }
 
+            var versionDtos = new List<ContentVersionDto>();
+
             //Now manually corrupt the data
-            for (var index = 0; index < new[] {Guid.NewGuid(), Guid.NewGuid()}.Length; index++)
+            var versions = new[] { Guid.NewGuid(), Guid.NewGuid() };
+            for (var index = 0; index < versions.Length; index++)
             {
-                var version = new[] {Guid.NewGuid(), Guid.NewGuid()}[index];
+                var version = versions[index];
                 var versionDate = DateTime.Now.AddMinutes(index);
-                this.DatabaseContext.Database.Insert(new ContentVersionDto
+                var versionDto = new ContentVersionDto
                 {
                     NodeId = content1.Id,
                     VersionDate = versionDate,
                     VersionId = version
-                });
+                };
+                this.DatabaseContext.Database.Insert(versionDto);
+                versionDtos.Add(versionDto);
                 this.DatabaseContext.Database.Insert(new DocumentDto
                 {
                     Newest = true,
@@ -112,8 +118,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                var content = repository.GetByQuery(new Query<IContent>().Where(c => c.Id == content1.Id));
-                Assert.AreEqual(1, content.Count());
+                var content = repository.GetByQuery(new Query<IContent>().Where(c => c.Id == content1.Id)).ToArray();
+                Assert.AreEqual(1, content.Length);
+                Assert.AreEqual(content[0].UpdateDate.ToString(CultureInfo.InvariantCulture), versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionDate.ToString(CultureInfo.InvariantCulture));
             }
         }
 

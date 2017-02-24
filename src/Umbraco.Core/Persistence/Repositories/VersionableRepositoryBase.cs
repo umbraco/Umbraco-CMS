@@ -799,8 +799,7 @@ ORDER BY contentNodeId, propertytypeid
                 if (TryGetValue(key, out found))
                 {
                     //it already exists and it's older so we need to replace it
-                    //TODO: Also check integer ID?
-                    if (item.VersionDate > found.VersionDate)
+                    if (item.VersionId > found.VersionId)
                     {
                         var currIndex = Items.IndexOf(found);
                         if (currIndex == -1)
@@ -858,6 +857,14 @@ ORDER BY contentNodeId, propertytypeid
             public Guid Version
             {
                 get { return DocumentDto != null ? DocumentDto.VersionId : ContentVersionDto.VersionId; }
+            }
+
+            /// <summary>
+            /// This is used to determien which version is the most recent
+            /// </summary>
+            public int VersionId
+            {
+                get { return ContentVersionDto.Id; }
             }
 
             public DateTime VersionDate
