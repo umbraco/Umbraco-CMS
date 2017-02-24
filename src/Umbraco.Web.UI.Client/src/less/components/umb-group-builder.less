@@ -9,7 +9,7 @@
 .umb-group-builder__group {
   min-height: 86px;
   margin: 50px 0 0 0;
-  border: 2px solid #CCCCCC;
+  border: 2px solid @gray-7;
   border-radius: 0 10px 10px 10px;
   position: relative;
   padding: 10px 10px 5px 10px;
@@ -17,11 +17,11 @@
 }
 
 .umb-group-builder__group.-active {
-  border-color: @blue;
+  border-color: @turquoise;
 }
 
 .umb-group-builder__group.-inherited {
-  border-color: #F2F2F2;
+  border-color: @gray-9;
   animation: fadeIn 0.5s;
 }
 
@@ -31,8 +31,8 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border: 1px dashed @grayLight;
-  color: @blue;
+  border: 1px dashed @gray-8;
+  color: @turquoise-d1;
   font-weight: bold;
 }
 
@@ -63,7 +63,7 @@
 
 .umb-group-builder__group-remove:hover {
   cursor: pointer;
-  color: @blueDark;
+  color: @turquoise;
 }
 
 .umb-group-builder__group-title-wrapper {
@@ -96,11 +96,11 @@
 }
 
 .umb-group-builder__group-title.-active {
-  border-color: @blue;
+  border-color: @turquoise;
 }
 
 .umb-group-builder__group-title.-placeholder {
-  border: 1px dashed @grayLight;
+  border: 1px dashed @gray-8;
   border-bottom: none;
   width: 70px;
 }
@@ -127,7 +127,7 @@ input.umb-group-builder__group-title-input {
 
 .umb-group-builder__group-inherited-label {
   font-size: 13px;
-  color: @grayLight;
+  color: @gray-8;
   display: inline-block;
   position: relative;
   top: 2px;
@@ -176,7 +176,7 @@ input.umb-group-builder__group-sort-value {
 
 .umb-group-builder__property.-placeholder {
   background: #ffffff;
-  border: 1px dashed @grayLight;
+  border: 1px dashed @gray-8;
   border-radius: 5px;
   cursor: pointer;
   align-items: center;
@@ -217,7 +217,7 @@ input.umb-group-builder__group-sort-value {
 }
 
 .umb-group-builder__property.-sortable-locked {
-  background: @grayLighter;
+  background: @gray-10;
   padding-left: 30px;
 }
 
@@ -305,7 +305,7 @@ input.umb-group-builder__group-sort-value {
   left: 0;
   text-transform: uppercase;
   z-index: 15;
-  background: @grayLighter;
+  background: @gray-10;
   padding: 3px;
   line-height: 12px;
   opacity: 0.8
@@ -326,7 +326,7 @@ input.umb-group-builder__group-sort-value {
 }
 
 .umb-group-builder__property-action:hover {
-    color: @blueDark;
+    color: @turquoise;
 }
 
 .umb-group-builder__property-tags {
@@ -345,7 +345,7 @@ input.umb-group-builder__group-sort-value {
 
 .umb-group-builder__property-tag {
     font-size: 11px;
-    background-color: @grayLight;
+    background-color: @gray-8;
     margin-left: 10px;
     padding: 0 4px;
     display: flex;
@@ -372,9 +372,9 @@ input.umb-group-builder__group-sort-value {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
-  color: @blue;
+  color: @turquoise-d1;
 }
 
 .umb-group-builder__placeholder-box.-input {
@@ -403,7 +403,7 @@ input.umb-group-builder__group-sort-value {
 
 .umb-group-builder__group-sortable-placeholder {
   background: transparent;
-  border: 1px dashed @grayLight;
+  border: 1px dashed @gray-8;
   margin: 0 0 70px 0;
   border-radius: 10px;
   border-radius: 5px;
@@ -411,7 +411,7 @@ input.umb-group-builder__group-sort-value {
 
 .umb-group-builder__property_sortable-placeholder {
   background: transparent;
-  border: 1px dashed @grayLight;
+  border: 1px dashed @gray-8;
   margin-bottom: 5px;
   border-radius: 5px;
 }
@@ -466,7 +466,7 @@ input.umb-group-builder__group-sort-value {
   }
 
   .editor-placeholder {
-    border: 1px dashed @grayLight;
+    border: 1px dashed @gray-8;
     width: 100%;
     height: 80px;
     line-height: 80px;
@@ -485,7 +485,7 @@ input.umb-group-builder__group-sort-value {
   .editor {
     margin-bottom: 10px;
     .editor-icon-wrapper {
-      border: 1px solid @grayLight;
+      border: 1px solid @gray-8;
       width: 60px;
       height: 60px;
       text-align: center;
