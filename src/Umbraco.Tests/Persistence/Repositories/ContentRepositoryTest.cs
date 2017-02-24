@@ -36,11 +36,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.Initialize();
 
             CreateTestData();
+
+            VersionableRepositoryBase<int, IContent>.ThrowOnWarning = true;
         }
 
         [TearDown]
         public override void TearDown()
         {
+            VersionableRepositoryBase<int, IContent>.ThrowOnWarning = false;
+
             base.TearDown();
         }
 
@@ -66,7 +70,61 @@ namespace Umbraco.Tests.Persistence.Repositories
             var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
-        
+
+        [Test]
+        public void Get_Always_Returns_Latest_Version()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            IContent content1;
+
+            var versions = new List<Guid>();
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
+
+                //save version
+                contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+                versions.Add(content1.Version);
+
+                //publish version
+                content1.ChangePublishedState(PublishedState.Published);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+                versions.Add(content1.Version);
+
+                //change something and make a pending version
+                content1.Name = "new name";
+                content1.ChangePublishedState(PublishedState.Saved);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+                versions.Add(content1.Version);
+            }
+
+            // Assert
+            Assert.AreEqual(3, versions.Distinct().Count());
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var content = repository.GetByQuery(new Query<IContent>().Where(c => c.Id == content1.Id)).ToArray()[0];
+                Assert.AreEqual(versions[2], content.Version);
+
+                content = repository.Get(content1.Id);
+                Assert.AreEqual(versions[2], content.Version);
+
+                foreach (var version in versions)
+                {
+                    content = repository.GetByVersion(version);
+                    Assert.IsNotNull(content);
+                    Assert.AreEqual(version, content.Version);
+                }
+            }
+        }
+
         [Test]
         public void Deal_With_Corrupt_Duplicate_Newest_Published_Flags()
         {
@@ -120,10 +178,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var content = repository.GetByQuery(new Query<IContent>().Where(c => c.Id == content1.Id)).ToArray();
                 Assert.AreEqual(1, content.Length);
+                Assert.AreEqual(content[0].Version, versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionId);
                 Assert.AreEqual(content[0].UpdateDate.ToString(CultureInfo.InvariantCulture), versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionDate.ToString(CultureInfo.InvariantCulture));
 
                 var contentItem = repository.GetByVersion(content1.Version);
                 Assert.IsNotNull(contentItem);
+
+                contentItem = repository.Get(content1.Id);
+                Assert.IsNotNull(contentItem);
+                Assert.AreEqual(contentItem.UpdateDate.ToString(CultureInfo.InvariantCulture), versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionDate.ToString(CultureInfo.InvariantCulture));
+                Assert.AreEqual(contentItem.Version, versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionId);
 
                 var allVersions = repository.GetAllVersions(content[0].Id);
                 var allKnownVersions = versionDtos.Select(x => x.VersionId).Union(new[]{ content1.Version }).ToArray();

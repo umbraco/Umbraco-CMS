@@ -211,7 +211,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // assign property data
             foreach (var cc in content)
             {
-                cc.Properties = propertyData[cc.Id];
+                cc.Properties = propertyData[cc.Version];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
@@ -529,7 +529,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var properties = GetPropertyCollection(new PagingSqlQuery(docSql), new[] { docDef });
 
-            media.Properties = properties[dto.NodeId];
+            media.Properties = properties[dto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

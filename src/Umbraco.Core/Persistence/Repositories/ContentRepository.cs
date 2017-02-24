@@ -1039,7 +1039,7 @@ ORDER BY doc2.updateDate DESC
                 if (def.DocumentDto.TemplateId.HasValue)
                     templates.TryGetValue(def.DocumentDto.TemplateId.Value, out template); // else null
                 cc.Template = template;
-                cc.Properties = propertyData[cc.Id];
+                cc.Properties = propertyData[cc.Version];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
@@ -1071,7 +1071,7 @@ ORDER BY doc2.updateDate DESC
 
             var properties = GetPropertyCollection(docSql, new[] { docDef });
 
-            content.Properties = properties[dto.NodeId];
+            content.Properties = properties[dto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

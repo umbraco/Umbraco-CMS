@@ -36,11 +36,15 @@ namespace Umbraco.Tests.Services
         public override void Initialize()
         {
             base.Initialize();
+
+            VersionableRepositoryBase<int, IContent>.ThrowOnWarning = true;
         }
 
         [TearDown]
         public override void TearDown()
         {
+            VersionableRepositoryBase<int, IContent>.ThrowOnWarning = false;
+
             base.TearDown();
         }
 

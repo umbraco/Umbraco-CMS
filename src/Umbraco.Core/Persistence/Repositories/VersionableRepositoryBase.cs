@@ -32,6 +32,11 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IContentSection _contentSection;
 
+        /// <summary>
+        /// This is used for unit tests ONLY
+        /// </summary>
+        internal static bool ThrowOnWarning = false;
+
         protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax)
         {
@@ -502,7 +507,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="sql"></param>
         /// <param name="documentDefs"></param>
         /// <returns></returns>
-        protected IDictionary<int, PropertyCollection> GetPropertyCollection(
+        protected IDictionary<Guid, PropertyCollection> GetPropertyCollection(
             Sql sql,
             IReadOnlyCollection<DocumentDefinition> documentDefs)
         {
@@ -515,11 +520,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="pagingSqlQuery"></param>
         /// <param name="documentDefs"></param>
         /// <returns></returns>
-        protected IDictionary<int, PropertyCollection> GetPropertyCollection(
+        protected IDictionary<Guid, PropertyCollection> GetPropertyCollection(
             PagingSqlQuery pagingSqlQuery,
             IReadOnlyCollection<DocumentDefinition> documentDefs)
         {
-            if (documentDefs.Count == 0) return new Dictionary<int, PropertyCollection>();
+            if (documentDefs.Count == 0) return new Dictionary<Guid, PropertyCollection>();
 
             //initialize to the query passed in
             var docSql = pagingSqlQuery.PrePagedSql;
@@ -584,7 +589,7 @@ ORDER BY contentNodeId, propertytypeid
             // from SQL server otherwise we'll get an exception.
             var allPropertyData = Database.Query<PropertyDataDto>(propSql);
 
-            var result = new Dictionary<int, PropertyCollection>();
+            var result = new Dictionary<Guid, PropertyCollection>();
             var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();
             //used to track the resolved composition property types per content type so we don't have to re-resolve (ToArray) the list every time
             var resolvedCompositionProperties = new Dictionary<int, PropertyType[]>();
@@ -661,11 +666,19 @@ ORDER BY contentNodeId, propertytypeid
                         }
                     }
 
-                    if (result.ContainsKey(def.Id))
+                    if (result.ContainsKey(def.Version))
                     {
-                        Logger.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
+                        var msg = string.Format("The query returned multiple property sets for document definition {0}, {1}, {2}", def.Id, def.Version, def.Composition.Name);
+                        if (ThrowOnWarning)
+                        {
+                            throw new InvalidOperationException(msg);
+                        }
+                        else
+                        {
+                            Logger.Warn<VersionableRepositoryBase<TId, TEntity>>(msg);
+                        }
                     }
-                    result[def.Id] = new PropertyCollection(properties);
+                    result[def.Version] = new PropertyCollection(properties);
                 }
             }
             finally

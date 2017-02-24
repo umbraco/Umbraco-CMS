@@ -452,7 +452,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var properties = GetPropertyCollection(new PagingSqlQuery(sql), new[] { new DocumentDefinition(dto.ContentVersionDto, memberType) });
 
-            member.Properties = properties[dto.NodeId];
+            member.Properties = properties[dto.ContentVersionDto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
@@ -690,7 +690,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (withCache)
                 {
                     var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
-                    if (cached != null)
+                    //only use this cached version if the dto returned is the same version - this is just a safety check, members dont 
+                    //store different versions, but just in case someone corrupts some data we'll double check to be sure.
+                    if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)
                     {
                         content.Add(cached);
                         continue;
@@ -714,7 +716,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // assign property data
             foreach (var cc in content)
             {
-                cc.Properties = propertyData[cc.Id];
+                cc.Properties = propertyData[cc.Version];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
@@ -741,7 +743,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var properties = GetPropertyCollection(docSql, new[] { docDef });
 
-            member.Properties = properties[dto.ContentVersionDto.NodeId];
+            member.Properties = properties[dto.ContentVersionDto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
