@@ -273,12 +273,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlFull = translate(GetBaseQuery(BaseQueryType.FullMultiple));
             var sqlIds = translate(GetBaseQuery(BaseQueryType.Ids));
             
-            return ProcessQuery(sqlFull, new PagingSqlQuery(sqlIds), true);
+            return ProcessQuery(sqlFull, new PagingSqlQuery(sqlIds), true,  includeAllVersions:true);
         }
 
         public override IContent GetByVersion(Guid versionId)
         {
             var sql = GetBaseQuery(BaseQueryType.FullSingle);
+            //TODO: cmsContentVersion.VersionId has a Unique Index constraint applied, seems silly then to also add OrderByDescending since it would be impossible to return more than one.
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
@@ -297,7 +298,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql()
                 .Select("*")
                 .From<DocumentDto>(SqlSyntax)
-                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, DocumentDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
+                .InnerJoin<ContentVersionDto>(SqlSyntax)
+                .On<ContentVersionDto, DocumentDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
                 .Where<ContentVersionDto>(x => x.VersionId == versionId, SqlSyntax)
                 .Where<DocumentDto>(x => x.Newest != true, SqlSyntax);
             var dto = Database.Fetch<DocumentDto, ContentVersionDto>(sql).FirstOrDefault();
@@ -317,7 +319,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql()
                 .Select("*")
                 .From<DocumentDto>()
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
+                .InnerJoin<ContentVersionDto>()
+                .On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
                 .Where<ContentVersionDto>(x => x.NodeId == id)
                 .Where<ContentVersionDto>(x => x.VersionDate < versionDate)
                 .Where<DocumentDto>(x => x.Newest != true);
@@ -897,7 +900,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
-        
+
         /// <summary>
         /// This is the underlying method that processes most queries for this repository
         /// </summary>
@@ -908,8 +911,12 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         /// The Id SQL without the outer join to just return all document ids - used to process the properties for the content item
         /// </param>
         /// <param name="withCache"></param>
+        /// <param name="includeAllVersions">
+        /// Generally when querying for content we only want to return the most recent version of the content item, however in some cases like when 
+        /// we want to return all versions of a content item, we can't simply return the latest
+        /// </param>
         /// <returns></returns>
-        private IEnumerable<IContent> ProcessQuery(Sql sqlFull, PagingSqlQuery pagingSqlQuery, bool withCache = false)
+        private IEnumerable<IContent> ProcessQuery(Sql sqlFull, PagingSqlQuery pagingSqlQuery, bool withCache = false, bool includeAllVersions = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sqlFull);
@@ -952,7 +959,7 @@ ORDER BY doc2.updateDate DESC
 
 
             var content = new List<IContent>();
-            var defs = new DocumentDefinitionCollection();
+            var defs = new DocumentDefinitionCollection(includeAllVersions);
             var templateIds = new List<int>();
             
             //track the looked up content types, even though the content types are cached
@@ -969,9 +976,8 @@ ORDER BY doc2.updateDate DESC
                 if (withCache)
                 {
                     var cached = RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
-                    //only use this cached version if the dto returned is also the publish version, they must match
-                    //TODO: Shouldn't this also match on version!?
-                    if (cached != null && cached.Published && dto.Published)
+                    //only use this cached version if the dto returned is also the publish version, they must match and be teh same version
+                    if (cached != null && cached.Version == dto.VersionId && cached.Published && dto.Published)
                     {
                         content.Add(cached);
                         continue;
@@ -991,15 +997,29 @@ ORDER BY doc2.updateDate DESC
                     contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
                     contentTypes[dto.ContentVersionDto.ContentDto.ContentTypeId] = contentType;
                 }
-                
-                // track the definition and if it's successfully added or updated then processed
-                if (defs.AddOrUpdate(new DocumentDefinition(dto, contentType)))
+
+                if (includeAllVersions)
                 {
-                    // need template
+                    // track the definition
+                    defs.Add(new DocumentDefinition(dto, contentType));
+
+                    // assign template
                     if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
                         templateIds.Add(dto.TemplateId.Value);
 
                     content.Add(ContentFactory.BuildEntity(dto, contentType, publishedDto));
+                }
+                else
+                {
+                    // track the definition and if it's successfully added or updated then processed
+                    if (defs.AddOrUpdate(new DocumentDefinition(dto, contentType)))
+                    {
+                        // assign template
+                        if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                            templateIds.Add(dto.TemplateId.Value);
+
+                        content.Add(ContentFactory.BuildEntity(dto, contentType, publishedDto));
+                    }
                 }
             }
 
@@ -1013,7 +1033,7 @@ ORDER BY doc2.updateDate DESC
             // assign template and property data
             foreach (var cc in content)
             {
-                var def = defs[cc.Id];
+                var def = defs[includeAllVersions ? (ValueType)cc.Version : cc.Id];
 
                 ITemplate template = null;
                 if (def.DocumentDto.TemplateId.HasValue)

@@ -121,6 +121,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var content = repository.GetByQuery(new Query<IContent>().Where(c => c.Id == content1.Id)).ToArray();
                 Assert.AreEqual(1, content.Length);
                 Assert.AreEqual(content[0].UpdateDate.ToString(CultureInfo.InvariantCulture), versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionDate.ToString(CultureInfo.InvariantCulture));
+
+                var contentItem = repository.GetByVersion(content1.Version);
+                Assert.IsNotNull(contentItem);
+
+                var allVersions = repository.GetAllVersions(content[0].Id);
+                var allKnownVersions = versionDtos.Select(x => x.VersionId).Union(new[]{ content1.Version }).ToArray();
+                Assert.IsTrue(allKnownVersions.ContainsAll(allVersions.Select(x => x.Version)));
+                Assert.IsTrue(allVersions.Select(x => x.Version).ContainsAll(allKnownVersions));
             }
         }
 

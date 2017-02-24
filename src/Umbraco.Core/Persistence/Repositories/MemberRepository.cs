@@ -690,7 +690,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (withCache)
                 {
                     var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
-                    //TODO: Shouldn't this also match on version!?
                     if (cached != null)
                     {
                         content.Add(cached);

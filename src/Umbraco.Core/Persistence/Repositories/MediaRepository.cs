@@ -175,8 +175,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (withCache)
                 {
                     var cached = RuntimeCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
-                    //TODO: Shouldn't this also match on version!?
-                    if (cached != null)
+                    //only use this cached version if the dto returned is the same version - this is just a safety check, media doesn't 
+                    //store different versions, but just in case someone corrupts some data we'll double check to be sure.
+                    if (cached != null && cached.Version == dto.VersionId)
                     {
                         content.Add(cached);
                         continue;

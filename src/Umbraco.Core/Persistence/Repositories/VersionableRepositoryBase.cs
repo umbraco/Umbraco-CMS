@@ -773,11 +773,22 @@ ORDER BY contentNodeId, propertytypeid
         /// <returns></returns>
         protected abstract Sql GetBaseQuery(BaseQueryType queryType);
 
-        internal class DocumentDefinitionCollection : KeyedCollection<int, DocumentDefinition>
+        internal class DocumentDefinitionCollection : KeyedCollection<ValueType, DocumentDefinition>
         {
-            protected override int GetKeyForItem(DocumentDefinition item)
+            private readonly bool _includeAllVersions;
+
+            /// <summary>
+            /// Constructor specifying if all versions should be allowed, in that case the key for the collection becomes the versionId (GUID)
+            /// </summary>
+            /// <param name="includeAllVersions"></param>
+            public DocumentDefinitionCollection(bool includeAllVersions = false)
             {
-                return item.Id;
+                _includeAllVersions = includeAllVersions;
+            }
+
+            protected override ValueType GetKeyForItem(DocumentDefinition item)
+            {
+                return _includeAllVersions ? (ValueType)item.Version : item.Id;
             }
 
             /// <summary>
@@ -817,7 +828,7 @@ ORDER BY contentNodeId, propertytypeid
                 return true;
             }
           
-            public bool TryGetValue(int key, out DocumentDefinition val)
+            public bool TryGetValue(ValueType key, out DocumentDefinition val)
             {
                 if (Dictionary == null)
                 {
