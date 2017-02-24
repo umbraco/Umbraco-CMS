@@ -812,6 +812,13 @@ ORDER BY contentNodeId, propertytypeid
             /// <returns></returns>
             public bool AddOrUpdate(DocumentDefinition item)
             {
+                //if we are including all versions then just add, we aren't checking for latest
+                if (_includeAllVersions)
+                {
+                    base.Add(item);
+                    return true;
+                }
+
                 if (Dictionary == null)
                 {
                     base.Add(item);

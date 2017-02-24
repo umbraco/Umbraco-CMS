@@ -998,28 +998,14 @@ ORDER BY doc2.updateDate DESC
                     contentTypes[dto.ContentVersionDto.ContentDto.ContentTypeId] = contentType;
                 }
 
-                if (includeAllVersions)
+                // track the definition and if it's successfully added or updated then processed
+                if (defs.AddOrUpdate(new DocumentDefinition(dto, contentType)))
                 {
-                    // track the definition
-                    defs.Add(new DocumentDefinition(dto, contentType));
-
                     // assign template
                     if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
                         templateIds.Add(dto.TemplateId.Value);
 
                     content.Add(ContentFactory.BuildEntity(dto, contentType, publishedDto));
-                }
-                else
-                {
-                    // track the definition and if it's successfully added or updated then processed
-                    if (defs.AddOrUpdate(new DocumentDefinition(dto, contentType)))
-                    {
-                        // assign template
-                        if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
-                            templateIds.Add(dto.TemplateId.Value);
-
-                        content.Add(ContentFactory.BuildEntity(dto, contentType, publishedDto));
-                    }
                 }
             }
 
