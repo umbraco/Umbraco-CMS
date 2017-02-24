@@ -928,7 +928,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             //we need to parse the original SQL statement and reduce the columns to just cmsDocument.nodeId so that we can use
             // the statement to go get the published data for all of the items by using an inner join
-            var parsedOriginalSql = "SELECT cmsDocument.nodeId " + sqlFull.SQL.Substring(sqlFull.SQL.IndexOf("FROM", StringComparison.Ordinal));
+            var parsedOriginalSql = "SELECT cmsDocument.nodeId, cmsContentVersion.id as contentVersionPk " + sqlFull.SQL.Substring(sqlFull.SQL.IndexOf("FROM", StringComparison.Ordinal));
             //now remove everything from an Orderby clause and beyond
             if (parsedOriginalSql.InvariantContains("ORDER BY "))
             {
@@ -942,7 +942,7 @@ INNER JOIN
 	(" + parsedOriginalSql + @") as docData
 ON doc2.nodeId = docData.nodeId
 WHERE doc2.published = 1
-ORDER BY doc2.updateDate DESC
+ORDER BY docData.contentVersionPk DESC
 ", sqlFull.Arguments);
 
             //go and get the published version data, we do a Query here and not a Fetch so we are
