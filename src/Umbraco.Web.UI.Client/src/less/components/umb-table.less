@@ -2,14 +2,10 @@
 .umb-table {
     display: flex;
     flex-direction: column;
-
     position: relative;
-
-    border: 1px solid @grayLight;
-
+    border: 1px solid @gray-8;
     flex-wrap: nowrap;
     justify-content: space-between;
-
     min-width: auto;
 }
 
@@ -18,15 +14,12 @@
     &:before {
         content: "";
         background: rgba(255, 255, 255, 0.75);
-
         position: absolute;
         top: 0;
         bottom: 0;
         left: 0;
         right: 0;
-
         z-index: 10;
-
         outline: 1px solid rgba(255, 255, 255, 0.75);
     }
 
@@ -51,26 +44,19 @@ input.umb-table__input {
 
 // Table Head Styles
 .umb-table-head {
-    text-transform: uppercase;
-
-    background-color: @grayLighter;
-
-    font-size: 11px;
-    font-weight: 600;
+    background-color: @gray-10;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 .umb-table-head__link {
     position: relative;
-
     cursor: default;
     text-decoration: none;
-
-    color: fade(@gray, 75%);
-
-
+    color: @gray-3;
     &:hover {
         text-decoration: none;
-        color: fade(@gray, 75%);
+        color: @gray-3;
     }
 }
 
@@ -84,12 +70,9 @@ input.umb-table__input {
 
 .umb-table-thead__icon {
     position: absolute;
-
     padding-top: 1px;
     padding-left: 3px;
-
     font-size: 13px;
-
     cursor: default;
 }
 
@@ -99,9 +82,6 @@ input.umb-table__input {
 }
 
 
-
-
-
 // Table Body Styles
 .umb-table-body {
     position: relative;
@@ -109,14 +89,13 @@ input.umb-table__input {
 
 .umb-table-body .umb-table-row {
     color: fade(@gray, 75%);
-    border-top: 1px solid @grayLight;
+    border-top: 1px solid @gray-8;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     position: relative;
     min-height: 32px;
-
     &:hover {
-        background-color: fade(@grayLighter, 90%);
+        background-color: @gray-10;
     }
 }
 
@@ -142,7 +121,7 @@ input.umb-table__input {
     margin: 0 auto;
     font-size: 22px;
     line-height: 22px;
-    color: @purple;
+    color: @turquoise-d1;
 }
 
 .umb-table-body__checkicon,
@@ -164,11 +143,8 @@ input.umb-table__input {
 .umb-table-body__empty {
     font-size: 16px;
     text-align: center;
-
-    color: @gray;
-
+    color: @gray-3;
     padding: 20px 0;
-
     height: 100%;
 }
 
@@ -227,22 +203,14 @@ input.umb-table__input {
     cursor: auto;
 }
 
-.umb-table-row.-selected,
-.umb-table-row.-selected:hover {
-    background-color: fade(@blueDark, 4%);
-}
-
 // Table Cell Styles
 .umb-table-cell {
     display: flex;
     flex-flow: row nowrap;
     flex: 1 1 1%; //NOTE 1% is a Internet Explore hack, so that cells don't collapse
-
     position: relative;
-
     margin: auto 14px;
     padding: 6px 2px;
-
     text-align: left;
     overflow:hidden;
 }
@@ -255,7 +223,6 @@ input.umb-table__input {
 
 .umb-table-cell:first-of-type:not(.not-fixed) {
     flex: 0 0 25px;
-
     margin: 0 0 0 15px;
     padding: 15px 0;
 }
