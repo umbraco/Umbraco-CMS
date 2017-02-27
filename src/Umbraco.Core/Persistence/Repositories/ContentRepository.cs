@@ -560,6 +560,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
             if (entity.ShouldClearPublishedFlagForPreviousVersions(publishedState, shouldCreateNewVersion))
             {
+                //TODO: This perf can be improved, it could easily be UPDATE WHERE.... (one SQL call instead of many)
                 var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
                 foreach (var doc in publishedDocs)
                 {
@@ -573,6 +574,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //Look up (newest) entries by id in cmsDocument table to set newest = false
+            //TODO: This perf can be improved, it could easily be UPDATE WHERE.... (one SQL call instead of many)
             var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = @IsNewest", new { Id = entity.Id, IsNewest = true });
             foreach (var documentDto in documentDtos)
             {
@@ -928,7 +930,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             //we need to parse the original SQL statement and reduce the columns to just cmsDocument.nodeId so that we can use
             // the statement to go get the published data for all of the items by using an inner join
-            var parsedOriginalSql = "SELECT cmsDocument.nodeId, cmsContentVersion.id as contentVersionPk " + sqlFull.SQL.Substring(sqlFull.SQL.IndexOf("FROM", StringComparison.Ordinal));
+            var parsedOriginalSql = "SELECT cmsDocument.nodeId " + sqlFull.SQL.Substring(sqlFull.SQL.IndexOf("FROM", StringComparison.Ordinal));
             //now remove everything from an Orderby clause and beyond
             if (parsedOriginalSql.InvariantContains("ORDER BY "))
             {
@@ -936,13 +938,11 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             }            
 
             //order by update date DESC, if there is corrupted published flags we only want the latest!
-            var publishedSql = new Sql(@"SELECT *
-FROM cmsDocument AS doc2
-INNER JOIN 
-	(" + parsedOriginalSql + @") as docData
-ON doc2.nodeId = docData.nodeId
-WHERE doc2.published = 1
-ORDER BY docData.contentVersionPk DESC
+            var publishedSql = new Sql(@"SELECT cmsDocument.nodeId, cmsDocument.published, cmsDocument.versionId, cmsDocument.newest
+FROM cmsDocument INNER JOIN cmsContentVersion ON cmsContentVersion.VersionId = cmsDocument.versionId
+WHERE cmsDocument.published = 1 AND cmsDocument.nodeId IN 
+(" + parsedOriginalSql + @")
+ORDER BY cmsContentVersion.id DESC
 ", sqlFull.Arguments);
 
             //go and get the published version data, we do a Query here and not a Fetch so we are

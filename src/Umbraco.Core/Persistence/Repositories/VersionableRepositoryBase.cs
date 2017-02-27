@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -580,9 +581,9 @@ ON cmsPropertyData.propertytypeid = cmsPropertyType.id
 INNER JOIN 
 	(" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
 ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.contentNodeId = docData.nodeId
-ORDER BY contentNodeId, propertytypeid
+ORDER BY contentNodeId, versionId, propertytypeid
 ", docSql.Arguments);
-
+            
             //This does NOT fetch all data into memory in a list, this will read
             // over the records as a data reader, this is much better for performance and memory,
             // but it means that during the reading of this data set, nothing else can be read
@@ -598,11 +599,13 @@ ORDER BY contentNodeId, propertytypeid
             var propertyDataSetEnumerator = allPropertyData.GetEnumerator();
             var hasCurrent = false; // initially there is no enumerator.Current
 
+            var comparer = new DocumentDefinitionComparer(SqlSyntax);
+
             try
             {
                 //This must be sorted by node id because this is how we are sorting the query to lookup property types above,
                 // which allows us to more efficiently iterate over the large data set of property values
-                foreach (var def in documentDefs.OrderBy(x => x.Id))
+                foreach (var def in documentDefs.OrderBy(x => x.Id).ThenBy(x => x.Version, comparer))
                 {
                     // get the resolved properties from our local cache, or resolve them and put them in cache
                     PropertyType[] compositionProperties;
@@ -621,15 +624,17 @@ ORDER BY contentNodeId, propertytypeid
                     var propertyDataDtos = new List<PropertyDataDto>();
                     while (hasCurrent || propertyDataSetEnumerator.MoveNext())
                     {
-                        if (propertyDataSetEnumerator.Current.NodeId == def.Id)
+                        //Not checking null on VersionId because it can never be null - no idea why it's set to nullable
+                        // ReSharper disable once PossibleInvalidOperationException
+                        if (propertyDataSetEnumerator.Current.VersionId.Value == def.Version)
                         {
                             hasCurrent = false; // enumerator.Current is not available
                             propertyDataDtos.Add(propertyDataSetEnumerator.Current);
                         }
                         else
                         {
-                            hasCurrent = true; // enumerator.Current is available for another def
-                            break; // no more propertyDataDto for this def
+                            hasCurrent = true;  // enumerator.Current is available for another def
+                            break;              // no more propertyDataDto for this def
                         }
                     }
 
@@ -701,8 +706,8 @@ ORDER BY contentNodeId, propertytypeid
                 case "NAME":
                     return "umbracoNode.text";
                 case "PUBLISHED":
-                    return "cmsDocument.published";
                 case "OWNER":
+                    return "cmsDocument.published";
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
                 // Members only
@@ -859,6 +864,34 @@ ORDER BY contentNodeId, propertytypeid
             }
         }
 
+        /// <summary>
+        /// A custom comparer required for sorting entities by GUIDs to match how the sorting of GUIDs works on SQL server
+        /// </summary>
+        /// <remarks>
+        /// MySql sorts GUIDs as a string, MSSQL sorts based on byte sections, this comparer will allow sorting GUIDs to be the same as how SQL server does
+        /// </remarks>
+        private class DocumentDefinitionComparer : IComparer<Guid>
+        {
+            private readonly ISqlSyntaxProvider _sqlSyntax;
+
+            public DocumentDefinitionComparer(ISqlSyntaxProvider sqlSyntax)
+            {
+                _sqlSyntax = sqlSyntax;
+            }
+
+            public int Compare(Guid x, Guid y)
+            {
+                //MySql sorts on GUIDs as strings (i.e. normal)
+                if (_sqlSyntax is MySqlSyntaxProvider)
+                {
+                    return x.CompareTo(y);
+                }
+
+                //MSSQL doesn't it sorts them on byte sections!
+                return new SqlGuid(x).CompareTo(new SqlGuid(y));
+            }
+        }
+
         internal class DocumentDefinition
         {
             /// <summary>
@@ -884,7 +917,7 @@ ORDER BY contentNodeId, propertytypeid
             {
                 get { return ContentVersionDto.NodeId; }
             }
-
+            
             public Guid Version
             {
                 get { return DocumentDto != null ? DocumentDto.VersionId : ContentVersionDto.VersionId; }
@@ -908,7 +941,9 @@ ORDER BY contentNodeId, propertytypeid
                 get { return ContentVersionDto.ContentDto.NodeDto.CreateDate; }
             }
 
-            public IContentTypeComposition Composition { get; set; }
+            public IContentTypeComposition Composition { get; set; }            
+
+            
         }
 
         /// <summary>

@@ -766,8 +766,13 @@ namespace Umbraco.Tests.Services
             var parent = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
             ServiceContext.ContentService.Publish(parent);//Publishing root, so Text Page 2 can be updated.
             var subpage2 = contentService.GetById(NodeDto.NodeIdSeed + 3);
+
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
+            contentService.SaveAndPublishWithStatus(subpage2, 0);//NOTE New versions are only added between publish-state-changed, so publishing to ensure addition version.
+
+            subpage2.Name = "Text Page 2 Updated again";
+            subpage2.SetValue("author", "Bob Hope");
             contentService.SaveAndPublishWithStatus(subpage2, 0);//NOTE New versions are only added between publish-state-changed, so publishing to ensure addition version.
 
             // Act
@@ -776,6 +781,11 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(versions.Any(), Is.True);
             Assert.That(versions.Count(), Is.GreaterThanOrEqualTo(2));
+
+            //ensure each version contains the correct property values
+            Assert.AreEqual("John Doe", versions[2].GetValue("author"));
+            Assert.AreEqual("Jane Doe", versions[1].GetValue("author"));
+            Assert.AreEqual("Bob Hope", versions[0].GetValue("author"));
         }
 
         [Test]
