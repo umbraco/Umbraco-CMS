@@ -7,6 +7,19 @@ function mediaTypeHelper(mediaTypeResource, $q) {
 
     var mediaTypeHelperService = {
 
+        isFolderType: function(mediaEntity) {
+            if (!mediaEntity) {
+                throw "mediaEntity is null";
+            }
+            if (!mediaEntity.contentTypeAlias) {
+                throw "mediaEntity.contentTypeAlias is null";
+            }
+
+            //if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
+            //this is the exact same logic that is performed in MediaController.GetChildFolders
+            return mediaEntity.contentTypeAlias.endsWith("Folder");
+        },
+
         getAllowedImagetypes: function (mediaId){
 				
             // Get All allowedTypes

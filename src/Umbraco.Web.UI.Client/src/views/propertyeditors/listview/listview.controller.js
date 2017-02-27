@@ -53,7 +53,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.isNew = false;
    $scope.actionInProgress = false;
    $scope.selection = [];
-   $scope.folders = [];
+   $scope.folders = [];   
+   //tracks if we've already loaded the folders for the current node
+   var foldersLoaded = false;
    $scope.listViewResultSet = {
       totalPages: 0,
       items: []
@@ -268,12 +270,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             });
          }
 
-         if ($scope.entityType === 'media') {
-
+         if (!foldersLoaded && $scope.entityType === 'media') {
+            //The folders aren't loaded - we only need to do this once since we're never changing node ids
             mediaResource.getChildFolders($scope.contentId)
                     .then(function (folders) {
                        $scope.folders = folders;
                        $scope.viewLoaded = true;
+                       foldersLoaded = true;
                     });
 
          } else {
