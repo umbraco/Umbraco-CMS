@@ -9,7 +9,7 @@
 
 small.umb-detail,
 label small, .guiDialogTiny {
-  color: @grayMed !important;
+  color: @gray-5 !important;
   text-decoration: none;
   display: block;
   font-weight: normal;
@@ -24,7 +24,7 @@ label.control-label, .control-label {
 
 
 .umb-status-label{
-    color: @gray !important;
+    color: @gray-3 !important;
   }
 
 
@@ -56,19 +56,19 @@ label.control-label, .control-label {
     cursor:pointer;
 }
 .form-search a:hover{
-    color: @gray;
+    color: @gray-3;
 }
 .form-search h4 {
-    color: @gray;
+    color: @gray-3;
 }
 .form-search small {
-    color: @grayLight;
+    color: @gray-8;
 }
 .form-search .icon, .form-search .icon-search {
   position: absolute;
   top: 6px;
   left: 4px;
-  color: @grayLight;
+  color: @gray-8;
 }
 
 .form-search .icon-search {
@@ -79,7 +79,7 @@ label.control-label, .control-label {
   width: 90%;
   font-size: @fontSizeLarge;
   font-weight: 400;
-  border: 1px solid @grayLight;
+  border: 1px solid @gray-8;
   padding: 4px 0px 4px 16px;
   padding-left: 25px !Important;
   line-height: 22px;
@@ -137,12 +137,12 @@ legend {
   line-height: @baseLineHeight * 2;
   color: @grayDark;
   border: 0;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid @gray-8;
 
   // Small
   small {
     font-size: @baseLineHeight * .75;
-    color: @grayLight;
+    color: @gray-8;
   }
 }
 
@@ -196,7 +196,7 @@ input[type="color"],
   margin-bottom: @baseLineHeight / 2;
   font-size: @baseFontSize;
   line-height: @baseLineHeight;
-  color: @gray;
+  color: @gray-3;
   .border-radius(@inputBorderRadius);
   vertical-align: middle;
   box-sizing: border-box;
@@ -305,7 +305,7 @@ input[type="checkbox"]:focus {
 // Make uneditable inputs look inactive
 .uneditable-input,
 .uneditable-textarea {
-  color: @grayLight;
+  color: @gray-8;
   background-color: darken(@inputBackground, 1%);
   border-color: @inputBorder;
   .box-shadow(inset 0 1px 2px rgba(0,0,0,.025));
@@ -487,7 +487,7 @@ input[type="checkbox"][readonly] {
 //val-highlight directive styling
 .highlight-error {
     color: @formErrorText !important;
-    border-color: #ee5f5b !important;
+    border-color: @red-l1 !important;
 }
 
 //disable the glowing border for the umb-content-name
@@ -513,7 +513,7 @@ input[type="checkbox"][readonly] {
   margin-top: @baseLineHeight;
   margin-bottom: @baseLineHeight;
   background-color: @formActionsBackground;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid @gray-8;
   .clearfix(); // Adding clearfix to allow for .pull-right button containers
 }
 
@@ -585,8 +585,8 @@ input[type="checkbox"][readonly] {
     line-height: @baseLineHeight;
     text-align: center;
     text-shadow: 0 1px 0 @white;
-    background-color: @grayLighter;
-    border: 1px solid #ccc;
+    background-color: @gray-10;
+    border: 1px solid @gray-8;
   }
   .add-on,
   .btn,

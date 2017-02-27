@@ -1,7 +1,7 @@
 // Panel
 // -------------------------
 .umb-panel {
-    background: white;
+    background: @white;
     position: absolute;
     top: 0px;
     bottom: 0px;
@@ -15,8 +15,8 @@
 }
 
 .umb-panel-header {
-    background: @grayLighter;
-    border-bottom: 1px solid @grayLight;
+    background: @gray-10;
+    border-bottom: 1px solid @gray-8;
     position: absolute;
     height: 99px;
     top: 0px;
@@ -72,11 +72,11 @@
     line-height: 1.4;
     height: auto;
     width: 100%;
-    border: 1px solid @grayLighter;
+    border: 1px solid @gray-10;
 }
 
 .umb-panel-header .umb-headline:focus, .umb-panel-header .umb-headline:active {
-    border: 1px solid @grayLight;
+    border: 1px solid @gray-8;
     background-color: @white;
 }
 
@@ -161,7 +161,7 @@
 }
 
 .umb-btn-toolbar .dropdown-menu small {
-    background: #fef9db;
+    background: @turquoise-l3;
     display: block;
     padding: 10px 20px;
 }
@@ -173,11 +173,11 @@
 
 /* tab buttons */
 .umb-bottom-bar {
-    background: white;
+    background: @white;
     -webkit-box-shadow: 0px -18px 20px rgba(255, 255, 255, 1);
     -moz-box-shadow: 0px -18px 20px rgba(255, 255, 255, 1);
     box-shadow: 0px -18px 20px rgba(255, 255, 255, 1);
-    border-top: 1px solid @grayLighter;
+    border-top: 1px solid @gray-10;
     padding: 10px 0 10px 0;
     position: fixed;
     bottom: 0;
@@ -224,8 +224,8 @@
     height: 30px;
     left: 0px;
     right: 0px;
-    background: @grayLighter;
-    border-top: @grayLight 1px solid;
+    background: @gray-10;
+    border-top: @gray-8 1px solid;
     display: block;
     margin: 0;
     overflow: hidden;
@@ -236,13 +236,13 @@
     display: block;
     float: left;
     height: 30px;
-    background: @grayLighter;
+    background: @gray-10;
     text-align: center;
     padding: 8px 0px 8px 30px;
     position: relative;
     margin: 0 1px 0 0;
     text-decoration: none;
-    color: @gray;
+    color: @gray-3;
     font-size: 12px;
 }
 
@@ -250,7 +250,7 @@
     content: "";
     border-top: 16px solid transparent;
     border-bottom: 16px solid transparent;
-    border-left: 16px solid @grayLighter;
+    border-left: 16px solid @gray-10;
     position: absolute;
     right: -16px;
     top: 0;
@@ -261,7 +261,7 @@
     content: "";
     border-top: 16px solid transparent;
     border-bottom: 16px solid transparent;
-    border-left: 16px solid @grayLight;
+    border-left: 16px solid @gray-8;
     position: absolute;
     left: 0;
     top: 0;
@@ -286,7 +286,7 @@
 // form styles
 .umb-dialog .muted,
 .umb-panel .muted {
-    color: @grayMed;
+    color: @gray-5;
 }
 
 .umb-dialog a.muted:hover,
