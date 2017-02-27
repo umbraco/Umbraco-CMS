@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using Umbraco.Core.Models;
-using Umbraco.Core;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories
 {

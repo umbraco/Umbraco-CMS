@@ -581,15 +581,15 @@ namespace Umbraco.Core.Persistence.Querying
                 case "InvariantContains":
                 case "InvariantEquals":
 
-                    //special case, if it is 'Contains' and the argumet that Contains is being called on is 
-                    //Enumerable and the methodArgs is the actual member access, then it's an SQL IN claus
+                    //special case, if it is 'Contains' and the argument that Contains is being called on is 
+                    //Enumerable and the methodArgs is the actual member access, then it's an SQL IN clause
                     if (m.Object == null 
                         && m.Arguments[0].Type != typeof(string)
                         && m.Arguments.Count == 2
                         && methodArgs.Length == 1 
                         && methodArgs[0].NodeType == ExpressionType.MemberAccess
                         && TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type))
-                    {                        
+                    {
                         goto case "SqlIn";
                     }
 
