@@ -40,11 +40,11 @@
 
                 <form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)">
                     <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
-                        <input type="text" ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
+                        <input type="text" ng-model="login" name="username" class="input-xlarge input--no-border" localize="placeholder" placeholder="@placeholders_username" />
                     </div>
 
                     <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
-                        <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" />
+                        <input type="password" ng-model="password" name="password" class="input-xlarge input--no-border" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" />
                     </div>
                     
                     <div class="control-group" ng-show="loginForm.$invalid">
