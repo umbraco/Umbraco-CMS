@@ -9,7 +9,7 @@
         </div>
 
         <div class="umb-healthcheck-action-bar">
-            <button class="umb-era-button -blue" type="button" ng-click="vm.checkAllGroups(vm.groups);">Check All Groups</button>
+            <button class="umb-era-button -green" type="button" ng-click="vm.checkAllGroups(vm.groups);">Check All Groups</button>
         </div>
 
         <div class="umb-healthcheck">
@@ -106,7 +106,7 @@
 
                                         <button
                                             type="button"
-                                            class="umb-era-button -blue"
+                                            class="umb-era-button umb-button--s -green"
                                             ng-class="{ '-inactive': healthCheckAction.providedValue.$invalid}"
                                             ng-click="vm.executeAction(check, $parent.$index, action);"
                                             ng-disabled="healthCheckAction.providedValue.$invalid">
