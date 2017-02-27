@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Umbraco.Core.Persistence.Querying
@@ -6,8 +7,13 @@ namespace Umbraco.Core.Persistence.Querying
     /// <summary>
     /// String extension methods used specifically to translate into SQL
     /// </summary>
-    internal static class SqlStringExtensions
+    internal static class SqlExpressionExtensions
     {
+        public static bool SqlIn<T>(this IEnumerable<T> collection, T item)
+        {
+            return collection.Contains(item);
+        }
+
         public static bool SqlWildcard(this string str, string txt, TextColumnType columnType)
         {
             var wildcardmatch = new Regex("^" + Regex.Escape(txt).

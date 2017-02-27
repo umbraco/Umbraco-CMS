@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence
 				{
 					DatabaseContext = _dbContext,
 					IsReady = true
-				};			
+				};
 		}
 
 		[TearDown]
@@ -43,6 +43,13 @@ namespace Umbraco.Tests.Persistence
 			_dbContext = null;
 			ApplicationContext.Current = null;
 		}
+
+        [Test]
+        public void Database_Connection()
+        {
+            var db = _dbContext.Database;
+            Assert.IsNull(db.Connection);
+        }
 
         [Test]
         public void Can_Verify_Single_Database_Instance()
@@ -99,7 +106,7 @@ namespace Umbraco.Tests.Persistence
 
             var appCtx = new ApplicationContext(
                 new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
-                new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()), 
+                new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 

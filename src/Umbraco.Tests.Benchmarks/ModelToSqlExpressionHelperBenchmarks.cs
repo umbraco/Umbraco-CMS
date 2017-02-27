@@ -16,6 +16,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -43,15 +44,18 @@ namespace Umbraco.Tests.Benchmarks
 
         public ModelToSqlExpressionHelperBenchmarks()
         {
-            _contentMapper = new ContentMapper(_syntaxProvider);
-            _contentMapper.BuildMap();
+            var contentMapper = new ContentMapper(_syntaxProvider);
+            contentMapper.BuildMap();
             _cachedExpression = new CachedExpression();
+            var mappingResolver = new Mock<MappingResolver>();
+            mappingResolver.Setup(resolver => resolver.ResolveMapperByType(It.IsAny<Type>())).Returns(contentMapper);
+            _mappingResolver = mappingResolver.Object;
         }
         
         private readonly ISqlSyntaxProvider _syntaxProvider = new SqlCeSyntaxProvider();
-        private readonly BaseMapper _contentMapper;
         private readonly CachedExpression _cachedExpression;
-        
+        private readonly MappingResolver _mappingResolver;
+
         [Benchmark(Baseline = true)]
         public void WithNonCached()
         {
@@ -62,7 +66,7 @@ namespace Umbraco.Tests.Benchmarks
                 Expression<Func<IContent, bool>> predicate = content =>
                 content.Path.StartsWith("-1") && content.Published && (content.ContentTypeId == a || content.ContentTypeId == b);
 
-                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _contentMapper);
+                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _mappingResolver);
                 var result = modelToSqlExpressionHelper.Visit(predicate);
             }
             
@@ -80,7 +84,7 @@ namespace Umbraco.Tests.Benchmarks
                 Expression<Func<IContent, bool>> predicate = content =>
                 content.Path.StartsWith("-1") && content.Published && (content.ContentTypeId == a || content.ContentTypeId == b);
                 
-                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _contentMapper);
+                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _mappingResolver);
 
                 //wrap it!
                 _cachedExpression.Wrap(predicate);

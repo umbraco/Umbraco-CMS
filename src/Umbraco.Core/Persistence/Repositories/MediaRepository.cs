@@ -94,6 +94,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId, SqlSyntax)
+                //TODO: IF we want to enable querying on content type information this will need to be joined
+                //.InnerJoin<ContentTypeDto>(SqlSyntax)
+                //.On<ContentDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId, SqlSyntax);
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId, SqlSyntax);
             return sql;
         }
