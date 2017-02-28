@@ -23,6 +23,8 @@ using File = System.IO.File;
 
 namespace Umbraco.Core
 {
+    
+
     /// <summary>
     /// Used to resolve all plugin types and cache them and is also used to instantiate plugin types
     /// </summary>
@@ -313,7 +315,7 @@ namespace Umbraco.Core
                     return Attempt<IEnumerable<string>>.Fail();
 
                 var typeElement = xml.Root.Elements()
-                    .SingleOrDefault(x =>
+                    .FirstOrDefault(x =>
                                      x.Name.LocalName == "baseType"
                                      && ((string)x.Attribute("type")) == typeof(T).FullName
                                      && ((string)x.Attribute("resolutionType")) == resolutionType.ToString());
@@ -466,7 +468,8 @@ namespace Umbraco.Core
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
         private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
         private IEnumerable<Assembly> _assemblies;
-
+        private HashSet<Type> _extensions;
+        
         /// <summary>
         /// Returns all found property editors (based on the resolved Iparameter editors - this saves a scan)
         /// </summary>
@@ -617,8 +620,8 @@ namespace Umbraco.Core
             var instances = CreateInstances<T>(new[] { type }, throwException);
             return instances.FirstOrDefault();
         }
-
-        private IEnumerable<Type> ResolveTypes<T>(
+        
+        private IEnumerable<Type> ResolveTypesInternal<T>(
             Func<IEnumerable<Type>> finder,
             TypeResolutionKind resolutionType,
             bool cacheResult)
@@ -632,7 +635,7 @@ namespace Umbraco.Core
                     String.Format("Completed resolution of types of {0}, found {1}", typeof(T).FullName, typesFound.Count)))
                 {
                     //check if the TypeList already exists, if so return it, if not we'll create it
-                    var typeList = _types.SingleOrDefault(x => x.IsTypeList<T>(resolutionType));
+                    var typeList = _types.FirstOrDefault(x => x.IsTypeList<T>(resolutionType));
 
                     //need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
                     if (cacheResult && typeList != null)
@@ -753,10 +756,27 @@ namespace Umbraco.Core
         /// <returns></returns>
         public IEnumerable<Type> ResolveTypes<T>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
         {
-            return ResolveTypes<T>(
-                () => TypeFinder.FindClassesOfType<T>(specificAssemblies ?? AssembliesToScan),
-                TypeResolutionKind.FindAllTypes,
-                cacheResult);
+            if (//true || 
+                
+                specificAssemblies != null || cacheResult == false || typeof(IDiscoverable).IsAssignableFrom(typeof(T)) == false)
+            {
+                var extensions = ResolveTypesInternal<T>(
+                    () => TypeFinder.FindClassesOfType<T>(specificAssemblies ?? AssembliesToScan),
+                    TypeResolutionKind.FindAllTypes, 
+                    cacheResult);
+
+                return extensions.Where(x => typeof(T).IsAssignableFrom(x));
+            }
+            else
+            {
+                //Use the cache if all assemblies
+
+                var extensions = _extensions ?? (_extensions = new HashSet<Type>(ResolveTypesInternal<IDiscoverable>(
+                    () => TypeFinder.FindClassesOfType<IDiscoverable>(AssembliesToScan),
+                    TypeResolutionKind.FindAllTypes, true)));
+
+                return extensions.Where(x => typeof(T).IsAssignableFrom(x));
+            }            
         }
 
         /// <summary>
@@ -768,10 +788,8 @@ namespace Umbraco.Core
         public IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
-            return ResolveTypes<T>(
-                () => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(specificAssemblies ?? AssembliesToScan),
-                TypeResolutionKind.FindTypesWithAttribute,
-                cacheResult);
+            return ResolveTypes<T>(specificAssemblies: specificAssemblies)
+                .Where(x => x.GetCustomAttributes<TAttribute>(false).Any());
         }
 
         /// <summary>
@@ -782,7 +800,7 @@ namespace Umbraco.Core
         public IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
-            return ResolveTypes<TAttribute>(
+            return ResolveTypesInternal<TAttribute>(
                 () => TypeFinder.FindClassesWithAttribute<TAttribute>(specificAssemblies ?? AssembliesToScan),
                 TypeResolutionKind.FindAttributedTypes,
                 cacheResult);
@@ -828,13 +846,13 @@ namespace Umbraco.Core
                 _resolutionType = resolutionType;
             }
 
-            private readonly List<Type> _types = new List<Type>();
+            private readonly HashSet<Type> _types = new HashSet<Type>();
 
             public override void AddType(Type t)
             {
                 //if the type is an attribute type we won't do the type check because typeof<T> is going to be the 
                 //attribute type whereas the 't' type is the object type found with the attribute.
-                if (_resolutionType == TypeResolutionKind.FindAttributedTypes || t.IsType<T>())
+                if (_resolutionType == TypeResolutionKind.FindAttributedTypes || typeof(T).IsAssignableFrom(t))
                 {
                     _types.Add(t);
                 }

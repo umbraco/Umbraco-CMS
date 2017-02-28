@@ -18,6 +18,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using umbraco.editorControls;
+using umbraco.interfaces;
 using umbraco.MacroEngines;
 using umbraco.uicontrols;
 using Umbraco.Web;
@@ -371,7 +372,7 @@ namespace Umbraco.Tests.Plugins
 
         }
 
-        public interface IFindMe
+        public interface IFindMe : IDiscoverable
         {
 
         }
