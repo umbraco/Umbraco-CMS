@@ -756,9 +756,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         public IEnumerable<Type> ResolveTypes<T>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
         {
-            if (//true || 
-                
-                specificAssemblies != null || cacheResult == false || typeof(IDiscoverable).IsAssignableFrom(typeof(T)) == false)
+            if (specificAssemblies != null || cacheResult == false || typeof(IDiscoverable).IsAssignableFrom(typeof(T)) == false)
             {
                 var extensions = ResolveTypesInternal<T>(
                     () => TypeFinder.FindClassesOfType<T>(specificAssemblies ?? AssembliesToScan),
