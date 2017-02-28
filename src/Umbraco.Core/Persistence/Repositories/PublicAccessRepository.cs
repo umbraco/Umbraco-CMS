@@ -69,7 +69,8 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Select("*")
                 .From<AccessDto>(SqlSyntax)
                 .LeftJoin<AccessRuleDto>(SqlSyntax)
-                .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
+                .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId)
+                .OrderBy(new string[] { "umbracoAccess.id" });
 
             return sql;
         }
