@@ -394,14 +394,13 @@ namespace Umbraco.Core.Models
             return content.Properties
                           .Where(property => propertyGroup.PropertyTypes
                                                           .Select(propertyType => propertyType.Id)
-                                                          .Contains(property.PropertyTypeId))
-                          .OrderBy(x => x.PropertyType.SortOrder);
+                                                          .Contains(property.PropertyTypeId));
         }
 
         /// <summary>
         /// Set property values by alias with an annonymous object
         /// </summary>
-        public static void PropertyValues(this IContent content, object value)
+        public static void PropertyValues(this IContentBase content, object value)
         {
             if (value == null)
                 throw new Exception("No properties has been passed in");

@@ -106,7 +106,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
                     var activeNode = appState.getTreeState("selectedNode");
 
                     //we need to do a double sync here: first sync to the moved content - but don't activate the node,
-                    //then sync to the currenlty edited content (note: this might not be the content that was moved!!)
+                    //then sync to the currently edited content (note: this might not be the content that was moved!!)
 
                     navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false }).then(function (args) {
                         if (activeNode) {

@@ -4,21 +4,26 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
+using System.Web.SessionState;
 using AutoMapper;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using umbraco;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// API controller to deal with Macro data
     /// </summary>
+    /// <remarks>
+    /// Note that this implements IRequiresSessionState which will enable HttpContext.Session - generally speaking we don't normally
+    /// enable this for webapi controllers, however since this controller is used to render macro content and macros can access
+    /// Session, we don't want it to throw null reference exceptions.
+    /// </remarks>
     [PluginController("UmbracoApi")]
-    public class MacroController : UmbracoAuthorizedJsonController
+    public class MacroController : UmbracoAuthorizedJsonController, IRequiresSessionState
     {
-        
-
         /// <summary>
         /// Gets the macro parameters to be filled in for a particular macro
         /// </summary>
@@ -124,6 +129,6 @@ namespace Umbraco.Web.Editors
                 "text/html");
             return result;
         }
-
+        
     }
 }

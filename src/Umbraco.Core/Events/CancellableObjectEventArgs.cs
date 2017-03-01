@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Security.Permissions;
 using Umbraco.Core.Models;
@@ -10,7 +11,7 @@ namespace Umbraco.Core.Events
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	[HostProtection(SecurityAction.LinkDemand, SharedState = true)]
-	public class CancellableObjectEventArgs<T> : CancellableEventArgs
+	public class CancellableObjectEventArgs<T> : CancellableEventArgs, IEquatable<CancellableObjectEventArgs<T>>
 	{
 	    public CancellableObjectEventArgs(T eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
             : base(canCancel, messages, additionalData)
@@ -48,5 +49,37 @@ namespace Umbraco.Core.Events
 		/// </remarks>
 		protected T EventObject { get; set; }
 
+	    public bool Equals(CancellableObjectEventArgs<T> other)
+	    {
+	        if (ReferenceEquals(null, other)) return false;
+	        if (ReferenceEquals(this, other)) return true;
+	        return base.Equals(other) && EqualityComparer<T>.Default.Equals(EventObject, other.EventObject);
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+	        if (ReferenceEquals(null, obj)) return false;
+	        if (ReferenceEquals(this, obj)) return true;
+	        if (obj.GetType() != this.GetType()) return false;
+	        return Equals((CancellableObjectEventArgs<T>) obj);
+	    }
+
+	    public override int GetHashCode()
+	    {
+	        unchecked
+	        {
+	            return (base.GetHashCode() * 397) ^ EqualityComparer<T>.Default.GetHashCode(EventObject);
+	        }
+	    }
+
+	    public static bool operator ==(CancellableObjectEventArgs<T> left, CancellableObjectEventArgs<T> right)
+	    {
+	        return Equals(left, right);
+	    }
+
+	    public static bool operator !=(CancellableObjectEventArgs<T> left, CancellableObjectEventArgs<T> right)
+	    {
+	        return !Equals(left, right);
+	    }
 	}
 }

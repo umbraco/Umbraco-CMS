@@ -8,6 +8,7 @@ using System.Web.Hosting;
 using log4net;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core
 {
@@ -48,8 +49,7 @@ namespace Umbraco.Core
                 LogHelper.Error<UmbracoApplicationBase>(msg, exception);
             };
 
-            // this only gets called when an assembly can't be resolved
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
+            BindingRedirects.Initialize();
 
             //boot up the application
             GetBootManager()
@@ -60,30 +60,14 @@ namespace Umbraco.Core
             //And now we can dispose of our startup handlers - save some memory
             ApplicationEventsResolver.Current.Dispose();
 
-            // after Umbraco has started there is a database in "context" and that context is
+            // after Umbraco has started there is a scope in "context" and that context is
             // going to stay there and never get destroyed nor reused, so we have to ensure that
-            // the database is disposed (which will auto-remove it from context).
-            var database = ApplicationContext.Current.DatabaseContext.Database;
-            if (database != null) // never to happen... unless in weird tests
-                ApplicationContext.Current.DatabaseContext.Database.Dispose();
+            // the scope is disposed (along with database etc) - reset it all entirely
+            var scopeProvider = ApplicationContext.Current.ScopeProvider as ScopeProvider;
+            if (scopeProvider != null) // can be mocked...
+                scopeProvider.Reset();
         }
-
-        /// <summary>
-        /// Called when an assembly can't be resolved. In here we can do magic with the assembly name and try loading another.
-        /// This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
-            // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stackoverflow
-            if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
-                return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
-            return null;
-        }
-
+        
         /// <summary>
         /// Initializes the Umbraco application
         /// </summary>

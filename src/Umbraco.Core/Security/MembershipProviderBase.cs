@@ -76,7 +76,8 @@ namespace Umbraco.Core.Security
         private bool _requiresQuestionAndAnswer;
         private bool _requiresUniqueEmail;
         private string _customHashAlgorithmType ;
-        internal bool UseLegacyEncoding;
+
+        public bool UseLegacyEncoding { get; private set; }
 
         #region Properties
 

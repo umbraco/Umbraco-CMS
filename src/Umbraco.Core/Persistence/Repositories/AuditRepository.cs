@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class AuditRepository : PetaPocoRepositoryBase<int, AuditItem>, IAuditRepository
     {
-        public AuditRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public AuditRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }

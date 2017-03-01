@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -24,6 +25,7 @@ namespace Umbraco.Core.IO
 	{
 	    private readonly IContentSection _contentConfig;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
+	    private readonly ILogger _logger;
 
         private readonly object _folderCounterLock = new object();
         private long _folderCounter;
@@ -42,6 +44,7 @@ namespace Umbraco.Core.IO
         public MediaFileSystem(IFileSystem wrapped, IContentSection contentConfig, ILogger logger)
             : base(wrapped)
         {
+            _logger = logger;
             _contentConfig = contentConfig;
             _uploadAutoFillProperties = new UploadAutoFillProperties(this, logger, contentConfig);
         }
@@ -99,7 +102,7 @@ namespace Umbraco.Core.IO
             }
             else
             {
-                // new scheme: path is "<cuid>-<puid>/<filename>" OR "<cuid>-<puid>-<filename>"
+                // new scheme: path is "<xuid>/<filename>" where xuid is a combination of cuid and puid
                 // default media filesystem maps to "~/media/<filepath>"
                 // assumes that cuid and puid keys can be trusted - and that a single property type
                 // for a single content cannot store two different files with the same name
@@ -434,6 +437,64 @@ namespace Umbraco.Core.IO
                 this.CopyFile(sourceThumbPath, targetThumbPath);
             }
         }
+
+	    public void DeleteMediaFiles(IEnumerable<string> files)
+	    {
+            files = files.Distinct();
+
+            Parallel.ForEach(files, file =>
+            {
+                try
+                {
+                    if (file.IsNullOrWhiteSpace()) return;
+
+                    if (FileExists(file) == false) return;
+                    DeleteFile(file, true);
+
+                    if (UseTheNewMediaPathScheme == false)
+                    {
+                        // old scheme: filepath is "<int>/<filename>" OR "<int>-<filename>"
+                        // remove the directory if any
+                        var dir = Path.GetDirectoryName(file);
+                        if (string.IsNullOrWhiteSpace(dir) == false)
+                            DeleteDirectory(dir, true);
+                    }
+                    else
+                    {
+                        // new scheme: path is "<xuid>/<filename>" where xuid is a combination of cuid and puid
+                        // remove the directory
+                        var dir = Path.GetDirectoryName(file);
+                        DeleteDirectory(dir, true);
+                    }
+
+                    // I don't even understand...
+                    /*
+
+                    var relativeFilePath = GetRelativePath(file); // fixme - should be relative already
+                    if (FileExists(relativeFilePath) == false) return;
+
+                    var parentDirectory = Path.GetDirectoryName(relativeFilePath);
+
+                    // don't want to delete the media folder if not using directories.
+                    if (_contentSection.UploadAllowDirectories && parentDirectory != GetRelativePath("/"))
+                    {
+                        //issue U4-771: if there is a parent directory the recursive parameter should be true
+                        DeleteDirectory(parentDirectory, string.IsNullOrEmpty(parentDirectory) == false);
+                    }
+                    else
+                    {
+                        DeleteFile(file, true);
+                    }
+
+                    */
+                }
+                catch (Exception e)
+                {
+                    _logger.Error<MediaFileSystem>("Failed to delete attached file \"" + file + "\".", e);
+                }
+            });
+        }
+
 
         #endregion
 

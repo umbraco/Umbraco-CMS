@@ -137,11 +137,9 @@ namespace Umbraco.Web.Strategies
             {
                 try
                 {
-                    // running on a background task, requires a safe database (see UsingSafeDatabase doc)
-                    using (ApplicationContext.Current.DatabaseContext.UseSafeDatabase())
-                    {
-                        _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
-                    }
+                    // TouchServer uses a proper unit of work etc underneath so even in a
+                    // background task it is safe to call it without dealing with any scope
+                    _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
 
                     return true; // repeat
                 }

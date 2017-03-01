@@ -7,8 +7,15 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContentTypes
     {
+        /// <summary>
+        /// Creates a content type without any properties
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <param name="name"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
         public static ContentType CreateBasicContentType(string alias = "basePage", string name = "Base Page",
-            ContentType parent = null)
+            IContentType parent = null)
         {
             var contentType = parent == null ? new ContentType(-1) : new ContentType(parent, alias);
 
@@ -351,9 +358,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.DateAlias, DataTypeDatabaseType.Date) { Alias = "date", Name = "Date", Mandatory = false, SortOrder = 13, DataTypeDefinitionId = -41 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.DropDownListAlias, DataTypeDatabaseType.Integer) { Alias = "ddl", Name = "Dropdown List", Mandatory = false, SortOrder = 14, DataTypeDefinitionId = -42 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.CheckBoxListAlias, DataTypeDatabaseType.Nvarchar) { Alias = "chklist", Name = "Checkbox List", Mandatory = false, SortOrder = 15, DataTypeDefinitionId = -43 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.ContentPickerAlias, DataTypeDatabaseType.Integer) { Alias = "contentPicker", Name = "Content Picker", Mandatory = false, SortOrder = 16, DataTypeDefinitionId = 1034 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.MediaPickerAlias, DataTypeDatabaseType.Integer) { Alias = "mediaPicker", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeDefinitionId = 1035 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.MemberPickerAlias, DataTypeDatabaseType.Integer) { Alias = "memberPicker", Name = "Member Picker", Mandatory = false, SortOrder = 18, DataTypeDefinitionId = 1036 });            
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.ContentPicker2Alias, DataTypeDatabaseType.Integer) { Alias = "contentPicker", Name = "Content Picker", Mandatory = false, SortOrder = 16, DataTypeDefinitionId = 1046 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.MediaPicker2Alias, DataTypeDatabaseType.Integer) { Alias = "mediaPicker", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeDefinitionId = 1048 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.MemberPicker2Alias, DataTypeDatabaseType.Integer) { Alias = "memberPicker", Name = "Member Picker", Mandatory = false, SortOrder = 18, DataTypeDefinitionId = 1047 });            
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.RelatedLinksAlias, DataTypeDatabaseType.Ntext) { Alias = "relatedLinks", Name = "Related Links", Mandatory = false, SortOrder = 21, DataTypeDefinitionId = 1040 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.TagsAlias, DataTypeDatabaseType.Ntext) { Alias = "tags", Name = "Tags", Mandatory = false, SortOrder = 22, DataTypeDefinitionId = 1041 });
 

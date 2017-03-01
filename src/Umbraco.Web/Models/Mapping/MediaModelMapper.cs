@@ -25,6 +25,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             //FROM IMedia TO MediaItemDisplay
             config.CreateMap<IMedia, MediaItemDisplay>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Media, content.Key)))
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
@@ -45,6 +46,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Media, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(dto => dto.Trashed, expression => expression.MapFrom(content => content.Trashed))
@@ -56,6 +58,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMedia TO ContentItemDto<IMedia>
             config.CreateMap<IMedia, ContentItemDto<IMedia>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Media, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(dto => dto.Published, expression => expression.Ignore())
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
@@ -66,8 +69,8 @@ namespace Umbraco.Web.Models.Mapping
 
         private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, ILogger logger)
         {
-			// Adapted from ContentModelMapper
-			//map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            // Adapted from ContentModelMapper
+            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             //TODO: Fix this shorthand .Ancestors() lookup, at least have an overload to use the current
             if (media.HasIdentity)
             {
@@ -92,20 +95,20 @@ namespace Umbraco.Web.Models.Mapping
                     display.IsChildOfListView = ancesctorListView != null;
                 }
             }
-			
+
             //map the tree node url
             if (HttpContext.Current != null)
             {
-                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+                var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                 var url = urlHelper.GetUmbracoApiService<MediaTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
                 display.TreeNodeUrl = url;
             }
-            
+
             if (media.ContentType.IsContainer)
             {
                 TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, localizedText);
             }
-            
+
             var genericProperties = new List<ContentPropertyDisplay>
             {
                 new ContentPropertyDisplay
@@ -116,20 +119,6 @@ namespace Umbraco.Web.Models.Mapping
                     View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
                 }
             };
-
-            var links = media.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger);
-
-            if (links.Any())
-            {
-                var link = new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("media/urls"),
-                    Value = string.Join(",", links),
-                    View = "urllist"
-                };
-                genericProperties.Add(link);
-            }
 
             TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText, genericProperties, properties =>
             {
@@ -151,6 +140,20 @@ namespace Umbraco.Web.Models.Mapping
                         }
                     };
                     docTypeProperty.View = "urllist";
+                }
+
+                // inject 'Link to media' as the first generic property
+                var links = media.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger);
+                if (links.Any())
+                {
+                    var link = new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = localizedText.Localize("media/urls"),
+                        Value = string.Join(",", links),
+                        View = "urllist"
+                    };
+                    properties.Insert(0, link);
                 }
             });
         }

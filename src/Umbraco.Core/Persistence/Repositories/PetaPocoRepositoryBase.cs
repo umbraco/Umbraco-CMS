@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlServerCe;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
@@ -20,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
-        protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        protected PetaPocoRepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger)
         {
             if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
@@ -28,11 +27,11 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-		/// Returns the database Unit of Work added to the repository
+		/// Returns the Scope Unit of Work added to the repository
 		/// </summary>
-		protected internal new IDatabaseUnitOfWork UnitOfWork
+		protected internal new IScopeUnitOfWork UnitOfWork
 		{
-			get { return (IDatabaseUnitOfWork)base.UnitOfWork; }
+			get { return (IScopeUnitOfWork)base.UnitOfWork; }
 		}
 
 		protected UmbracoDatabase Database

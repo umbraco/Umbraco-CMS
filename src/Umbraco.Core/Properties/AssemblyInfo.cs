@@ -3,9 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
-using Umbraco.Core.Deploy;
 
-// General Information about an assembly is controlled through the following
+// General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Umbraco.Core")]
@@ -13,15 +12,13 @@ using Umbraco.Core.Deploy;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("Umbraco CMS")]
 
-// Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("130a6b5c-50e7-4df3-a0dd-e9e7eb0b7c5c")]
-
-[assembly: DeploySupport("1.0.0-alpha000")]
 
 [assembly: InternalsVisibleTo("umbraco")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
@@ -32,7 +29,7 @@ using Umbraco.Core.Deploy;
 [assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("umbraco.datalayer")]
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
-
+[assembly: InternalsVisibleTo("umbraco.providers")]
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
@@ -45,7 +42,10 @@ using Umbraco.Core.Deploy;
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
-[assembly: InternalsVisibleTo("umbraco.providers")]
+
+[assembly: InternalsVisibleTo("Umbraco.Deploy")]
+[assembly: InternalsVisibleTo("Umbraco.Deploy.UI")]
+[assembly: InternalsVisibleTo("Umbraco.Deploy.Cloud")]
 
 //allow this to be mocked in our unit tests
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

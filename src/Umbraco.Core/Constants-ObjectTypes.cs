@@ -110,6 +110,11 @@ namespace Umbraco.Core
             public const string Member = "39EB0F98-B348-42A1-8662-E7EB18487560";
 
             /// <summary>
+            /// Guid for a Media Type object.
+            /// </summary>
+            public static readonly Guid MemberGuid = new Guid(Member);
+
+            /// <summary>
             /// Guid for a Member Group object.
             /// </summary>
             public const string MemberGroup = "366E63B9-880F-4E13-A61C-98069B029728";
@@ -152,6 +157,46 @@ namespace Umbraco.Core
             /// Guid for a Lock object.
             /// </summary>
             public static readonly Guid LockObjectGuid = new Guid(LockObject);
+
+            /// <summary>
+            /// Guid for a relation type.
+            /// </summary>
+            public const string RelationType = "B1988FAD-8675-4F47-915A-B3A602BC5D8D";
+
+            /// <summary>
+            /// Guid for a relation type.
+            /// </summary>
+            public static readonly Guid RelationTypeGuid = new Guid(RelationType);
+
+            /// <summary>
+            /// Guid for a Forms Form.
+            /// </summary>
+            public const string FormsForm = "F5A9F787-6593-46F0-B8FF-BFD9BCA9F6BB";
+
+            /// <summary>
+            /// Guid for a Forms Form.
+            /// </summary>
+            public static readonly Guid FormsFormGuid = new Guid(FormsForm);
+
+            /// <summary>
+            /// Guid for a Forms PreValue Source.
+            /// </summary>
+            public const string FormsPreValue = "42D7BF9B-A362-4FEE-B45A-674D5C064B70";
+
+            /// <summary>
+            /// Guid for a Forms PreValue Source.
+            /// </summary>
+            public static readonly Guid FormsPreValueGuid = new Guid(FormsPreValue);
+
+            /// <summary>
+            /// Guid for a Forms DataSource.
+            /// </summary>
+            public const string FormsDataSource = "CFED6CE4-9359-443E-9977-9956FEB1D867";
+
+            /// <summary>
+            /// Guid for a Forms DataSource.
+            /// </summary>
+            public static readonly Guid FormsDataSourceGuid = new Guid(FormsDataSource);
         }
     }
 }

@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveFive
 {
-    [Migration("7.5.5", 100, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.5.5", 100, Constants.System.UmbracoMigrationName)]
     public class AddLockTable : MigrationBase
     {
         public AddLockTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)

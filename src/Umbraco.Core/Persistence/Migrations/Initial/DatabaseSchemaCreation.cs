@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     /// <summary>
     /// Represents the initial database schema creation by running CreateTable for all DTOs against the db.
     /// </summary>
-    internal class DatabaseSchemaCreation
+    public class DatabaseSchemaCreation
     {
         /// <summary>
         /// Constructor
@@ -82,8 +82,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {43, typeof (CacheInstructionDto)},
                                                                               {44, typeof (ExternalLoginDto)},
                                                                               {45, typeof (MigrationDto)},
-                                                                              {46, typeof (UmbracoDeployChecksumDto)},
-                                                                              {47, typeof (UmbracoDeployDependencyDto)},
+                                                                              //46, removed: UmbracoDeployChecksumDto
+                                                                              //47, removed: UmbracoDeployDependencyDto
                                                                               {48, typeof (RedirectUrlDto) },
                                                                               {49, typeof (LockDto) }
                                                                           };
@@ -345,7 +345,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// Raises the <see cref="BeforeCreation"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected internal virtual void FireBeforeCreation(DatabaseCreationEventArgs e)
+        internal virtual void FireBeforeCreation(DatabaseCreationEventArgs e)
         {
             if (BeforeCreation != null)
             {
@@ -361,7 +361,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// Raises the <see cref="AfterCreation"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterCreation(DatabaseCreationEventArgs e)
+        internal virtual void FireAfterCreation(DatabaseCreationEventArgs e)
         {
             if (AfterCreation != null)
             {

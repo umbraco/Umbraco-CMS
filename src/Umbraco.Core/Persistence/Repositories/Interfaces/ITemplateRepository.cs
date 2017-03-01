@@ -72,5 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="filepath">The filesystem path to the template.</param>
         /// <param name="content">The content of the template.</param>
         void SetFileContent(string filepath, Stream content);
+
+        long GetFileSize(string filepath);
     }
 }

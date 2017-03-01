@@ -452,14 +452,11 @@ namespace umbraco.presentation.developer.packages
             //Order the DocumentTypes before removing them
             if (contentTypes.Any())
             {
+                //TODO: I don't think this ordering is necessary
                 var orderedTypes = (from contentType in contentTypes
-                                    orderby contentType.ParentId descending, contentType.Id descending 
-                                    select contentType);
-
-                foreach (var contentType in orderedTypes)
-                {
-                    contentTypeService.Delete(contentType);
-                }
+                    orderby contentType.ParentId descending, contentType.Id descending
+                    select contentType);
+                contentTypeService.Delete(orderedTypes);
             }
 
             //Remove Dictionary items

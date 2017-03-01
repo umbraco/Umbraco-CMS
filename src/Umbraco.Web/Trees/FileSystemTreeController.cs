@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Http.Formatting;
+using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
@@ -13,6 +13,7 @@ namespace Umbraco.Web.Trees
     {
         protected abstract string FilePath { get; }
         protected abstract string FileSearchPattern { get; }
+        protected abstract string FileIcon { get; }
 
         /// <summary>
         /// Inheritors can override this method to modify the file node that is created.
@@ -26,13 +27,13 @@ namespace Umbraco.Web.Trees
         /// <param name="xNode"></param>
         protected virtual void OnRenderFolderNode(ref TreeNode treeNode) { }
 
-        protected override Models.Trees.TreeNodeCollection GetTreeNodes(string id, System.Net.Http.Formatting.FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             string orgPath = "";
             string path = "";
             if (!string.IsNullOrEmpty(id) && id != "-1")
             {
-                orgPath = id;
+                orgPath = System.Web.HttpUtility.UrlDecode(id);
                 path = IOHelper.MapPath(FilePath + "/" + orgPath);
                 orgPath += "/";
             }
@@ -50,7 +51,7 @@ namespace Umbraco.Web.Trees
                 if ((dir.Attributes & FileAttributes.Hidden) == 0)
                 {
                     var HasChildren = dir.GetFiles().Length > 0 || dir.GetDirectories().Length > 0;
-                    var node = CreateTreeNode(orgPath + dir.Name, orgPath, queryStrings, dir.Name, "icon-folder", HasChildren);
+                    var node = CreateTreeNode(System.Web.HttpUtility.UrlEncode(orgPath + dir.Name), orgPath, queryStrings, dir.Name, "icon-folder", HasChildren);
 
                     OnRenderFolderNode(ref node);
                     if(node != null)
@@ -79,7 +80,7 @@ namespace Umbraco.Web.Trees
                     if (filterByMultipleExtensions && Array.IndexOf<string>(allowedExtensions, file.Extension.ToLower().Trim('.')) < 0)
                         continue;
 
-                    var node = CreateTreeNode(orgPath + file.Name, orgPath, queryStrings, file.Name, "icon-file", false);
+                    var node = CreateTreeNode(System.Web.HttpUtility.UrlEncode(orgPath + file.Name), orgPath, queryStrings, file.Name, FileIcon, false);
 
                     OnRenderFileNode(ref node);
 
@@ -89,6 +90,64 @@ namespace Umbraco.Web.Trees
             }
 
             return nodes;
-        }    
+        }
+
+        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        {
+            var menu = new MenuItemCollection();
+
+            //if root node no need to visit the filesystem so lets just create the menu and return it
+            if (id == Constants.System.Root.ToInvariantString())
+            {
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                //create action
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                //refresh action
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+
+                return menu;
+            }
+
+            string path;
+            if (string.IsNullOrEmpty(id) == false)
+            {
+                var orgPath = System.Web.HttpUtility.UrlDecode(id);
+                path = IOHelper.MapPath(FilePath + "/" + orgPath);
+            }
+            else
+            {
+                path = IOHelper.MapPath(FilePath);
+            }
+
+            var dirInfo = new DirectoryInfo(path);
+            //check if it's a directory
+            if (dirInfo.Attributes == FileAttributes.Directory)
+            {
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                //create action
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                
+                var hasChildren = dirInfo.GetFiles().Length > 0 || dirInfo.GetDirectories().Length > 0;
+                //We can only delete folders if it doesn't have any children (folders or files)
+                if (hasChildren == false)
+                {
+                    //delete action
+                    menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
+                }
+
+                //refresh action
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+            }
+            //if it's not a directory then we only allow to delete the item
+            else
+            {
+                //delete action
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+            }
+
+            return menu;
+        }
     }
 }

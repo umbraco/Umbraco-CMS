@@ -21,7 +21,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             customtreeparams: '@',
             eventhandler: '=',
             enablecheckboxes: '@',
-            enablelistviewsearch: '@'
+            enablelistviewsearch: '@',
+            enablelistviewexpand: '@'
         },
 
         compile: function(element, attrs) {
@@ -35,7 +36,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 '<a class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)"><i></i><i></i><i></i></a>' +
                 '</div>';
             template += '<ul>' +
-                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                '<umb-tree-item ng-repeat="child in tree.root.children" enablelistviewexpand="{{enablelistviewexpand}}" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                 '</ul>' +
                 '</li>' +
                 '</ul>';

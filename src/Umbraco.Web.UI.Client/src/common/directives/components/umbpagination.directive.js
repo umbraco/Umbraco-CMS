@@ -134,25 +134,40 @@ Use this directive to generate a pagination.
 
          }
 
-         scope.next = function() {
-            if (scope.onNext && scope.pageNumber < scope.totalPages) {
-               scope.pageNumber++;
-               scope.onNext(scope.pageNumber);
-            }
+         scope.next = function () {
+             if (scope.pageNumber < scope.totalPages) {
+                 scope.pageNumber++;
+                 if (scope.onNext) {
+                     scope.onNext(scope.pageNumber);
+                 }
+                 if (scope.onChange) {
+                     scope.onChange({ "pageNumber": scope.pageNumber });
+                 }
+             }
          };
 
-         scope.prev = function(pageNumber) {
-            if (scope.onPrev && scope.pageNumber > 1) {
-                scope.pageNumber--;
-                scope.onPrev(scope.pageNumber);
-            }
+         scope.prev = function (pageNumber) {
+             if (scope.pageNumber > 1) {
+                 scope.pageNumber--;
+                 if (scope.onPrev) {
+                     scope.onPrev(scope.pageNumber);
+                 }
+                 if (scope.onChange) {
+                     scope.onChange({ "pageNumber": scope.pageNumber });
+                 }
+             }
          };
 
-         scope.goToPage = function(pageNumber) {
-            if(scope.onGoToPage) {
-               scope.pageNumber = pageNumber + 1;
-               scope.onGoToPage(scope.pageNumber);
-            }
+         scope.goToPage = function (pageNumber) {
+             scope.pageNumber = pageNumber + 1;
+             if (scope.onGoToPage) {
+                 scope.onGoToPage(scope.pageNumber);
+             }
+             if (scope.onChange) {
+                 if (scope.onChange) {
+                     scope.onChange({ "pageNumber": scope.pageNumber });
+                 }
+             }
          };
 
          var unbindPageNumberWatcher = scope.$watch('pageNumber', function(newValue, oldValue){
@@ -176,7 +191,8 @@ Use this directive to generate a pagination.
             totalPages: "=",
             onNext: "=",
             onPrev: "=",
-            onGoToPage: "="
+            onGoToPage: "=",
+            onChange: "&"
          },
          link: link
       };

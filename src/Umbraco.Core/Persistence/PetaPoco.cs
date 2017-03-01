@@ -167,12 +167,12 @@ namespace Umbraco.Core.Persistence
 			var providerName = Constants.DatabaseProviders.SqlServer;
 			if (ConfigurationManager.ConnectionStrings[connectionStringName] != null)
 			{
-				if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName))
+				if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName) == false)
 					providerName = ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName;
 			}
 			else
 			{
-				throw new InvalidOperationException("Can't find a connection string with the name '" + connectionStringName + "'");
+				throw new NullReferenceException("Can't find a connection string with the name '" + connectionStringName + "'");
 			}
 
 			// Store factory and connection string
@@ -332,8 +332,16 @@ namespace Umbraco.Core.Persistence
 			if (_transactionDepth == 1)
 			{
 				OpenSharedConnection();
-				_transaction = _sharedConnection.BeginTransaction(isolationLevel);
-				_transactionCancelled = false;
+			    try
+			    {
+			        _transaction = _sharedConnection.BeginTransaction(isolationLevel);
+			    }
+
+			    catch (Exception e)
+			    {
+			        throw;
+			    }
+                _transactionCancelled = false;
 				OnBeginTransaction();
 			}
             else if (isolationLevel > _transaction.IsolationLevel)
@@ -695,7 +703,7 @@ namespace Umbraco.Core.Persistence
 
 		static Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+        static Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		public static bool SplitSqlForPaging(string sql, out string sqlCount, out string sqlSelectRemoved, out string sqlOrderBy)
 		{
 			sqlSelectRemoved = null;
@@ -715,10 +723,9 @@ namespace Umbraco.Core.Persistence
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(" + m.Groups[1].ToString().Trim() + ") " + sql.Substring(g.Index + g.Length);
 			else
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
-
-
-			// Look for an "ORDER BY <whatever>" clause
-			m = rxOrderBy.Match(sqlCount);
+            
+		    // Look for an "ORDER BY <whatever>" clause
+            m = rxOrderBy.Match(sqlCount);
 			if (!m.Success)
 			{
 				sqlOrderBy = null;
@@ -729,8 +736,7 @@ namespace Umbraco.Core.Persistence
 				sqlOrderBy = g.ToString();
 				sqlCount = sqlCount.Substring(0, g.Index) + sqlCount.Substring(g.Index + g.Length);
 			}
-
-			return true;
+            return true;
 		}
 
 	    /// <summary>
@@ -812,7 +818,7 @@ namespace Umbraco.Core.Persistence
 			result.CurrentPage = page;
 			result.ItemsPerPage = itemsPerPage;
 			result.TotalItems = ExecuteScalar<long>(sqlCount, args);
-			result.TotalPages = result.TotalItems / itemsPerPage;
+		    result.TotalPages = result.TotalItems / itemsPerPage;
 			if ((result.TotalItems % itemsPerPage) != 0)
 				result.TotalPages++;
 

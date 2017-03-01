@@ -82,6 +82,19 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Cannot_Save_Media_With_Empty_Name()
+        {
+            // Arrange
+            var mediaService = ServiceContext.MediaService;
+            var mediaType = MockedContentTypes.CreateVideoMediaType();
+            ServiceContext.ContentTypeService.Save(mediaType);
+            var media = mediaService.CreateMedia(string.Empty, -1, "video");
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => mediaService.Save(media));
+        }
+
+        [Test]
         public void Ensure_Content_Xml_Created()
         {
             var mediaService = ServiceContext.MediaService;
@@ -92,10 +105,10 @@ namespace Umbraco.Tests.Services
             mediaService.Save(media);
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var uow = provider.GetUnitOfWork();
-
-            Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
-
+            using (var uow = provider.GetUnitOfWork())
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
+            }
         }
 
         [Test]

@@ -5,9 +5,10 @@ using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.IO
-{	
+{
     public class FileSystemProviderManager
     {
         private readonly FileSystemProvidersSection _config;
@@ -40,6 +41,12 @@ namespace Umbraco.Core.IO
             get { return Instance; }
         }
 
+        private IScopeProviderInternal ScopeProvider
+        {
+            // fixme - 'course this is bad, but enough for now
+            get { return ApplicationContext.Current == null ? null : ApplicationContext.Current.ScopeProvider as IScopeProviderInternal; }
+        }
+
         internal FileSystemProviderManager()
         {
             _config = (FileSystemProvidersSection) ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
@@ -52,13 +59,13 @@ namespace Umbraco.Core.IO
             _masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             _mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
 
-            _macroPartialFileSystem = _macroPartialFileSystemWrapper = new ShadowWrapper(_macroPartialFileSystem, "Views/MacroPartials");
-            _partialViewsFileSystem = _partialViewsFileSystemWrapper = new ShadowWrapper(_partialViewsFileSystem, "Views/Partials");
-            _stylesheetsFileSystem = _stylesheetsFileSystemWrapper = new ShadowWrapper(_stylesheetsFileSystem, "css");
-            _scriptsFileSystem = _scriptsFileSystemWrapper = new ShadowWrapper(_scriptsFileSystem, "scripts");
-            _xsltFileSystem = _xsltFileSystemWrapper = new ShadowWrapper(_xsltFileSystem, "xslt");
-            _masterPagesFileSystem = _masterPagesFileSystemWrapper = new ShadowWrapper(_masterPagesFileSystem, "masterpages");
-            _mvcViewsFileSystem = _mvcViewsFileSystemWrapper = new ShadowWrapper(_mvcViewsFileSystem, "Views");
+            _macroPartialFileSystem = _macroPartialFileSystemWrapper = new ShadowWrapper(_macroPartialFileSystem, "Views/MacroPartials", ScopeProvider);
+            _partialViewsFileSystem = _partialViewsFileSystemWrapper = new ShadowWrapper(_partialViewsFileSystem, "Views/Partials", ScopeProvider);
+            _stylesheetsFileSystem = _stylesheetsFileSystemWrapper = new ShadowWrapper(_stylesheetsFileSystem, "css", ScopeProvider);
+            _scriptsFileSystem = _scriptsFileSystemWrapper = new ShadowWrapper(_scriptsFileSystem, "scripts", ScopeProvider);
+            _xsltFileSystem = _xsltFileSystemWrapper = new ShadowWrapper(_xsltFileSystem, "xslt", ScopeProvider);
+            _masterPagesFileSystem = _masterPagesFileSystemWrapper = new ShadowWrapper(_masterPagesFileSystem, "masterpages", ScopeProvider);
+            _mvcViewsFileSystem = _mvcViewsFileSystemWrapper = new ShadowWrapper(_mvcViewsFileSystem, "Views", ScopeProvider);
 
             // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
             MediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
@@ -92,7 +99,7 @@ namespace Umbraco.Core.IO
 		}
 
 		private readonly ConcurrentDictionary<string, ProviderConstructionInfo> _providerLookup = new ConcurrentDictionary<string, ProviderConstructionInfo>();
-		private readonly ConcurrentDictionary<Type, string> _aliases = new ConcurrentDictionary<Type, string>(); 
+		private readonly ConcurrentDictionary<Type, string> _aliases = new ConcurrentDictionary<Type, string>();
 
         /// <summary>
         /// Gets an underlying (non-typed) filesystem supporting a strongly-typed filesystem.
@@ -121,7 +128,7 @@ namespace Umbraco.Core.IO
 
                     // find a ctor matching the config parameters
 			        var paramCount = providerConfig.Parameters != null ? providerConfig.Parameters.Count : 0;
-			        var constructor = providerType.GetConstructors().SingleOrDefault(x 
+			        var constructor = providerType.GetConstructors().SingleOrDefault(x
                         => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.AllKeys.Contains(y.Name)));
 			        if (constructor == null)
 				        throw new InvalidOperationException(string.Format("Type {0} has no ctor matching the {1} configuration parameter(s).", providerType.FullName, paramCount));
@@ -129,7 +136,7 @@ namespace Umbraco.Core.IO
 			        var parameters = new object[paramCount];
                     if (providerConfig.Parameters != null) // keeps ReSharper happy
 			            for (var i = 0; i < paramCount; i++)
-				            parameters[i] = providerConfig.Parameters[providerConfig.Parameters.AllKeys[i]].Value;			
+				            parameters[i] = providerConfig.Parameters[providerConfig.Parameters.AllKeys[i]].Value;
 
 			        return new ProviderConstructionInfo
 				        {
@@ -159,7 +166,7 @@ namespace Umbraco.Core.IO
 	        var alias = _aliases.GetOrAdd(typeof (TFileSystem), fsType =>
 		        {
 					// validate the ctor
-					var constructor = fsType.GetConstructors().SingleOrDefault(x 
+					var constructor = fsType.GetConstructors().SingleOrDefault(x
                         => x.GetParameters().Length == 1 && TypeHelper.IsTypeAssignableFrom<IFileSystem>(x.GetParameters().Single().ParameterType));
 					if (constructor == null)
 						throw new InvalidOperationException("Type " + fsType.FullName + " must inherit from FileSystemWrapper and have a constructor that accepts one parameter of type " + typeof(IFileSystem).FullName + ".");
@@ -176,8 +183,8 @@ namespace Umbraco.Core.IO
             // so we are double-wrapping here
             // could be optimized by having FileSystemWrapper inherit from ShadowWrapper, maybe
             var innerFs = GetUnderlyingFileSystemProvider(alias);
-            var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias);
-	        var fs = (TFileSystem) Activator.CreateInstance(typeof (TFileSystem), innerFs);
+            var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, ScopeProvider);
+	        var fs = (TFileSystem) Activator.CreateInstance(typeof (TFileSystem), shadowWrapper);
             _wrappers.Add(shadowWrapper); // keeping a weak reference to the wrapper
 	        return fs;
         }
@@ -186,25 +193,7 @@ namespace Umbraco.Core.IO
 
         #region Shadow
 
-        // note
-        // shadowing is thread-safe, but entering and exiting shadow mode is not, and there is only one
-        // global shadow for the entire application, so great care should be taken to ensure that the
-        // application is *not* doing anything else when using a shadow.
-        // shadow applies to well-known filesystems *only* - at the moment, any other filesystem that would
-        // be created directly (via ctor) or via GetFileSystemProvider<T> is *not* shadowed.
-
-        // shadow must be enabled in an app event handler before anything else ie before any filesystem
-        // is actually created and used - after, it is too late - enabling shadow has a neglictible perfs
-        // impact.
-        // NO! by the time an app event handler is instanciated it is already too late, see note in ctor.
-        //internal void EnableShadow()
-        //{
-        //    if (_mvcViewsFileSystem != null) // test one of the fs...
-        //        throw new InvalidOperationException("Cannot enable shadow once filesystems have been created.");
-        //    _shadowEnabled = true;
-        //}
-
-        public ICompletable Shadow(Guid id)
+        internal ICompletable Shadow(Guid id)
         {
             var typed = _wrappers.ToArray();
             var wrappers = new ShadowWrapper[typed.Length + 7];
@@ -218,7 +207,7 @@ namespace Umbraco.Core.IO
             wrappers[i++] = _masterPagesFileSystemWrapper;
             wrappers[i] = _mvcViewsFileSystemWrapper;
 
-            return ShadowFileSystemsScope.CreateScope(id, wrappers);
+            return new ShadowFileSystems(id, wrappers);
         }
 
         #endregion

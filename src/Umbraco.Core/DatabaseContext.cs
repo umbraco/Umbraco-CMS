@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core
@@ -26,13 +27,32 @@ namespace Umbraco.Core
     /// </remarks>
     public class DatabaseContext
     {
-        private readonly IDatabaseFactory _factory;
+        internal readonly IScopeProviderInternal ScopeProvider;
         private readonly ILogger _logger;
         private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;
+        private DateTime? _connectionLastChecked = null;
+
+        /// <summary>
+        /// The number of minutes to throttle the checks to CanConnect
+        /// </summary>
+        private const int ConnectionCheckMinutes = 1;
+
+        #region Compatibility with 7.5
+
+        // note: the ctors accepting IDatabaseFactory are here only for backward compatibility purpose
+        //
+        // problem: IDatabaseFactory2 adds the CreateNewDatabase() method which creates a new database
+        // 'cos IDatabaseFactory CreateDatabase() is supposed to also manage the ambient thing. We
+        // want to keep these ctors for backward compatibility reasons (in case ppl use them in tests)
+        // so we need to create a scope provider (else nothing would work) and so we need a IDatabaseFactory2,
+        // so...?
+        // solution: wrap IDatabaseFactory and pretend we have a IDatabaseFactory2, it *should* work in most
+        // cases but really, it depends on what ppl are doing in their tests... yet, cannot really see any
+        // other way to do it?
 
         [Obsolete("Use the constructor specifying all dependencies instead")]
         public DatabaseContext(IDatabaseFactory factory)
@@ -42,8 +62,7 @@ namespace Umbraco.Core
                 new SqlCeSyntaxProvider(),
                 new SqlServerSyntaxProvider()
             }))
-        {
-        }
+        { }
 
         /// <summary>
         /// Default constructor
@@ -57,7 +76,11 @@ namespace Umbraco.Core
             if (logger == null) throw new ArgumentNullException("logger");
             if (syntaxProviders == null) throw new ArgumentNullException("syntaxProviders");
 
-            _factory = factory;
+            var asDbFactory2 = factory as IDatabaseFactory2;
+            ScopeProvider = asDbFactory2 == null
+                ? new ScopeProvider(new DatabaseFactoryWrapper(factory))
+                : new ScopeProvider(asDbFactory2);
+
             _logger = logger;
             _syntaxProviders = syntaxProviders;
         }
@@ -74,22 +97,86 @@ namespace Umbraco.Core
             _providerName = providerName;
             SqlSyntax = sqlSyntax;
             SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
-            _factory = factory;
+
+            var asDbFactory2 = factory as IDatabaseFactory2;
+            ScopeProvider = asDbFactory2 == null 
+                ? new ScopeProvider(new DatabaseFactoryWrapper(factory)) 
+                : new ScopeProvider(asDbFactory2);
+            
             _logger = logger;
             _configured = true;
         }
 
-#if DEBUG_DATABASES
-        public List<UmbracoDatabase> Databases
+        private class DatabaseFactoryWrapper : IDatabaseFactory2
         {
-            get
+            private readonly IDatabaseFactory _factory;
+
+            public DatabaseFactoryWrapper(IDatabaseFactory factory)
             {
-                var factory = _factory as DefaultDatabaseFactory;
-                if (factory == null) throw new NotSupportedException();
-                return factory.Databases;
+                _factory = factory;
+            }
+
+            public UmbracoDatabase CreateDatabase()
+            {
+                return _factory.CreateDatabase();
+            }
+
+            public UmbracoDatabase CreateNewDatabase()
+            {
+                return CreateDatabase();
+            }
+
+            public void Dispose()
+            {
+                _factory.Dispose();
             }
         }
-#endif
+
+        #endregion
+
+        [Obsolete("Use the constructor specifying all dependencies instead")]
+        internal DatabaseContext(IScopeProviderInternal scopeProvider)
+            : this(scopeProvider, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
+            {
+                new MySqlSyntaxProvider(LoggerResolver.Current.Logger),
+                new SqlCeSyntaxProvider(),
+                new SqlServerSyntaxProvider()
+            }))
+        { }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="scopeProvider"></param>
+        /// <param name="logger"></param>
+        /// <param name="syntaxProviders"></param>
+        internal DatabaseContext(IScopeProviderInternal scopeProvider, ILogger logger, SqlSyntaxProviders syntaxProviders)
+        {
+            if (scopeProvider == null) throw new ArgumentNullException("scopeProvider");
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (syntaxProviders == null) throw new ArgumentNullException("syntaxProviders");
+
+            ScopeProvider = scopeProvider;
+            _logger = logger;
+            _syntaxProviders = syntaxProviders;
+        }
+
+        /// <summary>
+        /// Create a configured DatabaseContext
+        /// </summary>
+        /// <param name="scopeProvider"></param>
+        /// <param name="logger"></param>
+        /// <param name="sqlSyntax"></param>
+        /// <param name="providerName"></param>
+        internal DatabaseContext(IScopeProviderInternal scopeProvider, ILogger logger, ISqlSyntaxProvider sqlSyntax, string providerName)
+        {
+            _providerName = providerName;
+            SqlSyntax = sqlSyntax;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
+            ScopeProvider = scopeProvider;
+            _logger = logger;
+            _configured = true;
+        }
 
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
@@ -104,7 +191,17 @@ namespace Umbraco.Core
         /// </remarks>
         public virtual UmbracoDatabase Database
         {
-            get { return _factory.CreateDatabase(); }
+            get
+            {
+            	if (IsDatabaseConfigured == false)
+                {
+                    throw new InvalidOperationException("Cannot create a database instance, there is no available connection string");
+                }
+            
+                return ScopeProvider.GetAmbientOrNoScope().Database;
+                //var scope = ScopeProvider.AmbientScope;
+                //return scope != null ? scope.Database : ScopeProvider.CreateNoScope().Database;
+            }
         }
 
         /// <summary>
@@ -117,6 +214,8 @@ namespace Umbraco.Core
         /// will be properly removed from call context and does not interfere with anything else. In most case
         /// it is not replacing anything, just temporarily installing a database in context.</para>
         /// </remarks>
+        // fixme - this should just entirely be replaced by Scope?
+        /*
         public virtual IDisposable UseSafeDatabase(bool force = false)
         {
             var factory = _factory as DefaultDatabaseFactory;
@@ -132,6 +231,7 @@ namespace Umbraco.Core
             // create a new, temp, database (will be disposed with UsingDatabase)
             return new UsingDatabase(null, factory.CreateDatabase());
         }
+        */
 
         /// <summary>
         /// Boolean indicating whether the database has been configured
@@ -148,12 +248,27 @@ namespace Umbraco.Core
         {
             get
             {
-                if (IsDatabaseConfigured == false) return false;
-                var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
-                LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
-                return canConnect;
+                if (IsDatabaseConfigured == false)
+                    return false;
+
+                //Don't check again if the timeout period hasn't elapsed
+                //this ensures we don't keep checking the connection too many times in a row like during startup.
+                //Do check if the _connectionLastChecked is null which means we're just initializing or it could
+                //not connect last time it was checked.
+                if ((_connectionLastChecked.HasValue && (DateTime.Now - _connectionLastChecked.Value).TotalMinutes > ConnectionCheckMinutes)
+                    || _connectionLastChecked.HasValue == false)
+                {
+                    var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
+                    LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
+
+                    _connectionLastChecked = canConnect == false ? null : (DateTime?) DateTime.Now;
+                    return canConnect;
+                }
+
+                return _connectionLastChecked.HasValue;
             }
         }
+
 
         /// <summary>
         /// Gets the configured umbraco db connection string.
@@ -174,14 +289,14 @@ namespace Umbraco.Core
                     return _providerName;
 
                 _providerName = Constants.DatabaseProviders.SqlServer;
-                if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
+                if (ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName] != null)
                 {
-                    if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName) == false)
-                        _providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
+                    if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ProviderName) == false)
+                        _providerName = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ProviderName;
                 }
                 else
                 {
-                    throw new InvalidOperationException("Can't find a connection string with the name '" + GlobalSettings.UmbracoConnectionName + "'");
+                    throw new NullReferenceException("Can't find a connection string with the name '" + Constants.System.UmbracoConnectionName + "'");
                 }
                 return _providerName;
             }
@@ -220,15 +335,10 @@ namespace Umbraco.Core
             var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
-                var engine = new SqlCeEngine(connectionString);
-                engine.CreateDatabase();
-
-                // SD: Pretty sure this should be in a using clause but i don't want to cause unknown side-effects here
-                // since it's been like this for quite some time
-                //using (var engine = new SqlCeEngine(connectionString))
-                //{
-                //    engine.CreateDatabase();
-                //}
+                using (var engine = new SqlCeEngine(connectionString))
+                {
+                    engine.CreateDatabase();
+                }
             }
 
             Initialize(providerName);
@@ -367,9 +477,9 @@ namespace Umbraco.Core
         {
             //Set the connection string for the new datalayer
             var connectionStringSettings = string.IsNullOrEmpty(providerName)
-                                      ? new ConnectionStringSettings(GlobalSettings.UmbracoConnectionName,
+                                      ? new ConnectionStringSettings(Constants.System.UmbracoConnectionName,
                                                                      connectionString)
-                                      : new ConnectionStringSettings(GlobalSettings.UmbracoConnectionName,
+                                      : new ConnectionStringSettings(Constants.System.UmbracoConnectionName,
                                                                      connectionString, providerName);
 
             _connectionString = connectionString;
@@ -380,10 +490,10 @@ namespace Umbraco.Core
             var connectionstrings = xml.Root.DescendantsAndSelf("connectionStrings").Single();
 
             // Update connectionString if it exists, or else create a new appSetting for the given key and value
-            var setting = connectionstrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == GlobalSettings.UmbracoConnectionName);
+            var setting = connectionstrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == Constants.System.UmbracoConnectionName);
             if (setting == null)
                 connectionstrings.Add(new XElement("add",
-                    new XAttribute("name", GlobalSettings.UmbracoConnectionName),
+                    new XAttribute("name", Constants.System.UmbracoConnectionName),
                     new XAttribute("connectionString", connectionStringSettings),
                     new XAttribute("providerName", providerName)));
             else
@@ -408,23 +518,23 @@ namespace Umbraco.Core
         /// </remarks>
         internal void Initialize()
         {
-            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             if (databaseSettings != null && string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) == false && string.IsNullOrWhiteSpace(databaseSettings.ProviderName) == false)
             {
                 var providerName = Constants.DatabaseProviders.SqlServer;
                 string connString = null;
-                if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
+                if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ProviderName))
                 {
-                    providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
-                    connString = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
+                    providerName = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ProviderName;
+                    connString = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ConnectionString;
                 }
                 Initialize(providerName, connString);
 
             }
-            else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName]) == false)
+            else if (ConfigurationManager.AppSettings.ContainsKey(Constants.System.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[Constants.System.UmbracoConnectionName]) == false)
             {
                 //A valid connectionstring does not exist, but the legacy appSettings key was found, so we'll reconfigure the conn.string.
-                var legacyConnString = ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName];
+                var legacyConnString = ConfigurationManager.AppSettings[Constants.System.UmbracoConnectionName];
                 if (legacyConnString.ToLowerInvariant().Contains("sqlce4umbraco"))
                 {
                     ConfigureEmbeddedDatabaseConnection();
@@ -455,7 +565,7 @@ namespace Umbraco.Core
                 }
 
                 //Remove the legacy connection string, so we don't end up in a loop if something goes wrong.
-                GlobalSettings.RemoveSetting(GlobalSettings.UmbracoConnectionName);
+                GlobalSettings.RemoveSetting(Constants.System.UmbracoConnectionName);
 
             }
             else
@@ -651,7 +761,7 @@ namespace Umbraco.Core
 
                 //DO the upgrade!
 
-                var runner = new MigrationRunner(migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), Constants.System.UmbracoMigrationName);
 
                 var upgraded = runner.Execute(database, true);
 
@@ -793,6 +903,7 @@ namespace Umbraco.Core
             return true;
         }
 
+        /*
         private class UsingDatabase : IDisposable
         {
             private readonly UmbracoDatabase _orig;
@@ -815,5 +926,6 @@ namespace Umbraco.Core
                 GC.SuppressFinalize(this);
             }
         }
+        */
     }
 }

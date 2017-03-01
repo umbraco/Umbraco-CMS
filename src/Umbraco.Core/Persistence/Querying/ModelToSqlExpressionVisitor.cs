@@ -20,6 +20,7 @@ namespace Umbraco.Core.Persistence.Querying
             _mapper = mapper;
         }
 
+        [Obsolete("Use the overload the specifies a SqlSyntaxProvider")]
         public ModelToSqlExpressionVisitor()
             : this(SqlSyntaxContext.SqlSyntaxProvider, MappingResolver.Current.ResolveMapperByType(typeof(T)))
         { }

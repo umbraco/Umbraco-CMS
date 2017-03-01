@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -392,10 +393,10 @@ namespace Umbraco.Tests.Web.Mvc
                     new Mock<IEntityService>().Object,
                     new Mock<IUserService>().Object,
                     new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), logger, Mock.Of<ISqlSyntaxProvider>(), umbracoSettings),
-                    new Mock<IDatabaseUnitOfWorkProvider>().Object),
+                    new Mock<IScopeUnitOfWorkProvider>().Object),
                 new Mock<IEntityService>().Object,
                 new RelationService(
-                    new Mock<IDatabaseUnitOfWorkProvider>().Object,
+                    new Mock<IScopeUnitOfWorkProvider>().Object,
                     new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), logger, Mock.Of<ISqlSyntaxProvider>(), umbracoSettings),
                     logger,
                     new TransientMessagesFactory(),
@@ -463,7 +464,7 @@ namespace Umbraco.Tests.Web.Mvc
             var svcCtx = GetServiceContext(umbracoSettings, logger);
 
             var appCtx = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(Mock.Of<IScopeProviderInternal>(), logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
                 svcCtx,
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(logger, Mock.Of<IProfiler>())) { IsReady = true };

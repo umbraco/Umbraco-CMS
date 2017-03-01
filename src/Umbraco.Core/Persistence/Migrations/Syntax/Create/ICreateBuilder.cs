@@ -8,6 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 {
     public interface ICreateBuilder : IFluentSyntax
     {
+        void Table<T>();
+
         ICreateTableWithColumnSyntax Table(string tableName);
         ICreateColumnOnTableSyntax Column(string columnName);
 

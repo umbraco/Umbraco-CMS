@@ -55,10 +55,19 @@ namespace Umbraco.Web.Security.Identity
             app.SetLoggerFactory(new OwinLoggerFactory());
         }
 
-        // TODO: Move this method in v8, it doesn't belong in this namespace/extension class
-        public static void ConfigureSignalR(this IAppBuilder app)
+        /// <summary>
+        /// This maps a Signal path/hub
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseSignalR(this IAppBuilder app)
         {
-            app.MapSignalR("/umbraco/signalr", new HubConfiguration { EnableDetailedErrors = true });
+
+            // TODO: Move this method in v8, it doesn't belong in this namespace/extension class
+            var umbracoPath = GlobalSettings.UmbracoMvcArea;
+            
+            return app.MapSignalR(HttpRuntime.AppDomainAppVirtualPath + 
+                umbracoPath + "/BackOffice/signalr", new HubConfiguration { EnableDetailedErrors = true });
         }
 
         /// <summary>

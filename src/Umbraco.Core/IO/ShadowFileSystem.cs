@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Umbraco.Core.IO
 {
@@ -33,8 +34,16 @@ namespace Umbraco.Core.IO
                     {
                         try
                         {
-                            using (var stream = _sfs.OpenFile(kvp.Key))
-                                _fs.AddFile(kvp.Key, stream, true);
+                            var fs2 = _fs as IFileSystem2;
+                            if (fs2 != null && fs2.CanAddPhysical)
+                            {
+                                fs2.AddFile(kvp.Key, _sfs.GetFullPath(kvp.Key)); // overwrite, move
+                            }
+                            else
+                            {
+                                using (var stream = _sfs.OpenFile(kvp.Key))
+                                    _fs.AddFile(kvp.Key, stream, true);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -201,19 +210,20 @@ namespace Umbraco.Core.IO
 
         public IEnumerable<string> GetFiles(string path)
         {
-            var normPath = NormPath(path);
-            var shadows = Nodes.Where(kvp => IsChild(normPath, kvp.Key)).ToArray();
-            var files = _fs.GetFiles(path);
-            return files
-                .Except(shadows.Where(kvp => (kvp.Value.IsFile && kvp.Value.IsDelete) || kvp.Value.IsDir)
-                    .Select(kvp => kvp.Key))
-                .Union(shadows.Where(kvp => kvp.Value.IsFile && kvp.Value.IsExist).Select(kvp => kvp.Key))
-                .Distinct();
+            return GetFiles(path, null);
         }
 
         public IEnumerable<string> GetFiles(string path, string filter)
         {
-            return _fs.GetFiles(path, filter);
+            var normPath = NormPath(path);
+            var shadows = Nodes.Where(kvp => IsChild(normPath, kvp.Key)).ToArray();
+            var files = filter != null ? _fs.GetFiles(path, filter) : _fs.GetFiles(path);
+            var regexFilter = FilterToRegex(filter);
+            return files
+                .Except(shadows.Where(kvp => (kvp.Value.IsFile && kvp.Value.IsDelete) || kvp.Value.IsDir)
+                    .Select(kvp => kvp.Key))
+                .Union(shadows.Where(kvp => kvp.Value.IsFile && kvp.Value.IsExist && FilterByRegex(kvp.Key, regexFilter)).Select(kvp => kvp.Key))
+                .Distinct();
         }
 
         public Stream OpenFile(string path)
@@ -245,6 +255,9 @@ namespace Umbraco.Core.IO
 
         public string GetFullPath(string path)
         {
+            ShadowNode sf;
+            if (Nodes.TryGetValue(NormPath(path), out sf))
+                return sf.IsDir || sf.IsDelete ? null : _sfs.GetFullPath(path);
             return _fs.GetFullPath(path);
         }
 
@@ -281,6 +294,64 @@ namespace Umbraco.Core.IO
             }
             if (sf.IsDelete || sf.IsDir) throw new InvalidOperationException("Invalid path.");
             return _sfs.GetSize(path);
+        }
+
+        public bool CanAddPhysical { get { return true; } }
+
+        public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
+        {
+            ShadowNode sf;
+            var normPath = NormPath(path);
+            if (Nodes.TryGetValue(normPath, out sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
+                throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+
+            var parts = normPath.Split('/');
+            for (var i = 0; i < parts.Length - 1; i++)
+            {
+                var dirPath = string.Join("/", parts.Take(i + 1));
+                ShadowNode sd;
+                if (Nodes.TryGetValue(dirPath, out sd))
+                {
+                    if (sd.IsFile) throw new InvalidOperationException("Invalid path.");
+                    if (sd.IsDelete) Nodes[dirPath] = new ShadowNode(false, true);
+                }
+                else
+                {
+                    if (_fs.DirectoryExists(dirPath)) continue;
+                    if (_fs.FileExists(dirPath)) throw new InvalidOperationException("Invalid path.");
+                    Nodes[dirPath] = new ShadowNode(false, true);
+                }
+            }
+
+            _sfs.AddFile(path, physicalPath, overrideIfExists, copy);
+            Nodes[normPath] = new ShadowNode(false, false);
+        }
+        
+        /// <summary>
+        /// Helper function for filtering keys by Regex if a filter is specified.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="regexFilter"></param>
+        /// <returns></returns>
+        internal static bool FilterByRegex(string input, string regexFilter)
+        {
+            if (regexFilter == null) return true;
+            return regexFilter != string.Empty && Regex.IsMatch(input, regexFilter);
+        }
+
+        /// <summary>
+        /// Transforms a filter pattern into a Regex pattern
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Appending '$' only if not containing wildcard is stupid and broken.
+        /// It is however what seems to be what they're doing in .NET so we need to match the functionality.
+        /// </remarks>
+        internal static string FilterToRegex(string pattern)
+        {
+            if (pattern == null) return null;
+            return "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + (pattern.Contains("*") ? string.Empty : "$");
         }
     }
 }

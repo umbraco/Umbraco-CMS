@@ -10,7 +10,7 @@
     flex-wrap: nowrap;
     justify-content: space-between;
 
-    min-width: 640px;
+    min-width: auto;
 }
 
 .umb-table.umb-table-inactive {
@@ -103,11 +103,17 @@ input.umb-table__input {
 
 
 // Table Body Styles
+.umb-table-body {
+    position: relative;
+}
+
 .umb-table-body .umb-table-row {
     color: fade(@gray, 75%);
     border-top: 1px solid @grayLight;
     cursor: pointer;
     font-size: 13px;
+    position: relative;
+    min-height: 32px;
 
     &:hover {
         background-color: fade(@grayLighter, 90%);
@@ -198,29 +204,32 @@ input.umb-table__input {
     }
 }
 
-
-
-
-
-
 // Table Row Styles
 .umb-table-row {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
-
     user-select: none;
 }
 
+.umb-table-body .umb-table-row--empty {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    padding: 5px 0;
+    cursor: auto;
+    user-select: auto;
+}
 
+.umb-table-body .umb-table-row--empty:hover {
+    background-color: transparent;
+    cursor: auto;
+}
 
 .umb-table-row.-selected,
 .umb-table-row.-selected:hover {
     background-color: fade(@blueDark, 4%);
 }
-
-
-
 
 // Table Cell Styles
 .umb-table-cell {
@@ -250,9 +259,48 @@ input.umb-table__input {
     padding: 15px 0;
 }
 
+.umb-table-cell--auto-width {
+    flex: 0 0 auto !important;
+}
+
+.umb-table-cell--faded {
+    opacity: 0.4;
+}
+
 
 // Increases the space for the name cell
 .umb-table__name {
     flex: 1 1 25%;
     max-width: 25%;
+}
+
+.umb-table__loading-overlay {
+    position: absolute;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 1;
+}
+
+.umb-table__row-expand {
+    font-size: 12px;
+    text-decoration: none;
+    color: @black;
+}
+
+.umb-table__row-expand--hidden {
+    visibility: hidden;
+}
+
+.umb-table--condensed {
+    
+    .umb-table-cell:first-of-type:not(.not-fixed) {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .umb-table-body__icon {
+        font-size: 20px;
+    }
+
 }

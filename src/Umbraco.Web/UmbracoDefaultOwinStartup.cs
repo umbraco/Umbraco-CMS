@@ -42,9 +42,7 @@ namespace Umbraco.Web
             // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
             app.ConfigureUserManagerForUmbracoBackOffice(
                 ApplicationContext,
-                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
-
-            app.ConfigureSignalR();
+                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());            
         }
 
         /// <summary>
@@ -59,6 +57,7 @@ namespace Umbraco.Web
                 .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
                 .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.Authorize)
+                .UseSignalR()
                 .FinalizeMiddlewareConfiguration();
         }
 

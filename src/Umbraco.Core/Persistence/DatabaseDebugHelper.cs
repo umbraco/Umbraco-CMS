@@ -42,6 +42,8 @@ namespace Umbraco.Core.Persistence
         {
             var prof = con as StackExchange.Profiling.Data.ProfiledDbConnection;
             if (prof != null) con = prof.InnerConnection;
+            var ceCon = con as System.Data.SqlServerCe.SqlCeConnection;
+            if (ceCon != null) return null; // "NotSupported: SqlCE";
             var dbCon = con as DbConnection;
             return dbCon == null
                 ? "NotSupported: " + con.GetType()

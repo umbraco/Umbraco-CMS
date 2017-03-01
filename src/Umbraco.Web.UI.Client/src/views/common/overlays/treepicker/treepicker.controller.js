@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
-	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService) {
+	function ($scope, $q, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService, contentResource, mediaResource, memberResource) {
 
 	    var tree = null;
 	    var dialogOptions = $scope.model;
@@ -22,17 +22,17 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 		  $scope.init = function(contentType) {
 
 			  if(contentType === "content") {
-				  entityType = "Document";
+				  $scope.entityType = "Document";
 				  if(!$scope.model.title) {
 					  $scope.model.title = localizationService.localize("defaultdialogs_selectContent");
 				  }
 			  } else if(contentType === "member") {
-				  entityType = "Member";
+				  $scope.entityType = "Member";
 				  if(!$scope.model.title) {
 					  $scope.model.title = localizationService.localize("defaultdialogs_selectMember");
 				  }
 			  } else if(contentType === "media") {
-				  entityType = "Media";
+				  $scope.entityType = "Media";
 				  if(!$scope.model.title) {
 					  $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
 				  }
@@ -49,7 +49,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    });
 
         // Allow the entity type to be passed in but defaults to Document for backwards compatibility.
-	    var entityType = dialogOptions.entityType ? dialogOptions.entityType : "Document";
+	    $scope.entityType = dialogOptions.entityType ? dialogOptions.entityType : "Document";
 
 
 	    //min / max values
@@ -61,10 +61,24 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    }
 
 	    if (dialogOptions.section === "member") {
-	        entityType = "Member";
+	        $scope.entityType = "Member";
 	    }
 	    else if (dialogOptions.section === "media") {
-	        entityType = "Media";
+	        $scope.entityType = "Media";
+	    }
+
+		// Search and listviews is only working for content, media and member section so we will remove it from everything else
+	    if ($scope.section === "content" || $scope.section === "media" || $scope.section === "member") {
+	        $scope.enableSearh = true;
+
+	        //if a alternative startnode is used, we need to check if it is a container
+            if (dialogOptions.startNodeId && dialogOptions.startNodeId !== -1 && dialogOptions.startNodeId !== "-1") {
+	            entityResource.getById(dialogOptions.startNodeId, $scope.entityType).then(function (node) {
+	                if (node.metaData.IsContainer) {
+						openMiniListView(node);
+	                }
+	            });
+	        }
 	    }
 
 	    //Configures filtering
@@ -96,53 +110,16 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    }
 
 	    function nodeExpandedHandler(ev, args) {
+			
+			// open mini list view for list views
+			if (args.node.metaData.isContainer) {
+				openMiniListView(args.node);
+			}
+			
 	        if (angular.isArray(args.children)) {
 
                 //iterate children
 	            _.each(args.children, function (child) {
-
-	                //check if any of the items are list views, if so we need to add some custom
-	                // children: A node to activate the search, any nodes that have already been
-	                // selected in the search
-	                if (child.metaData.isContainer) {
-	                    child.hasChildren = true;
-	                    child.children = [
-	                        {
-                                level: child.level + 1,
-                                hasChildren: false,
-                                parent: function () {
-                                    return child;
-                                },
-	                            name: searchText,
-	                            metaData: {
-	                                listViewNode: child,
-	                            },
-	                            cssClass: "icon-search",
-	                            cssClasses: ["not-published"]
-	                        }
-	                    ];
-                        //add base transition classes to this node
-	                    child.cssClasses.push("tree-node-slide-up");
-
-	                    var listViewResults = _.filter($scope.searchInfo.selectedSearchResults, function(i) {
-	                        return i.parentId == child.id;
-	                    });
-	                    _.each(listViewResults, function(item) {
-	                        child.children.unshift({
-	                            id: item.id,
-	                            name: item.name,
-	                            cssClass: "icon umb-tree-icon sprTree " + item.icon,
-	                            level: child.level + 1,
-	                            metaData: {
-	                                isSearchResult: true
-	                            },
-	                            hasChildren: false,
-	                            parent: function () {
-	                                return child;
-	                            }
-	                        });
-	                    });
-	                }
 
 	                //now we need to look in the already selected search results and
 	                // toggle the check boxes for those ones that are listed
@@ -169,18 +146,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	        args.event.preventDefault();
 	        args.event.stopPropagation();
 
-	        if (args.node.metaData.listViewNode) {
-	            //check if list view 'search' node was selected
-
-                $scope.searchInfo.showSearch = true;
-                $scope.searchInfo.searchFromId = args.node.metaData.listViewNode.id;
-                $scope.searchInfo.searchFromName = args.node.metaData.listViewNode.name;
-
-                //add transition classes
-	            var listViewNode = args.node.parent();
-	            listViewNode.cssClasses.push('tree-node-slide-up-hide-active');
-	        }
-            else if (args.node.metaData.isSearchResult) {
+            if (args.node.metaData.isSearchResult) {
                 //check if the item selected was a search result from a list view
 
                 //unselect
@@ -206,10 +172,14 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
                 //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
                 //from the server in this method.
-                select(args.node.name, args.node.id);
-
-                //toggle checked state
-                args.node.selected = args.node.selected === true ? false : true;
+                if($scope.model.select){
+                	$scope.model.select(args.node)
+                }else{
+                	select(args.node.name, args.node.id);
+                	//toggle checked state
+                	args.node.selected = args.node.selected === true ? false : true;
+            	}
+                
             }
 	    }
 
@@ -223,7 +193,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 							 multiSelectItem(entity);
 						} else {
 							 //otherwise we have to get it from the server
-							 entityResource.getById(id, entityType).then(function (ent) {
+							 entityResource.getById(id, $scope.entityType).then(function (ent) {
 								 multiSelectItem(ent);
 							 });
 						}
@@ -248,7 +218,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 							 multiSelectItem(entity);
 						} else {
 							 //otherwise we have to get it from the server
-							 entityResource.getById(id, entityType).then(function (ent) {
+							 entityResource.getById(id, $scope.entityType).then(function (ent) {
 								 multiSelectItem(ent);
 							 });
 						}
@@ -265,7 +235,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 							  $scope.model.submit($scope.model);
 	                } else {
 	                    //otherwise we have to get it from the server
-	                    entityResource.getById(id, entityType).then(function (ent) {
+	                    entityResource.getById(id, $scope.entityType).then(function (ent) {
 								   $scope.model.selection.push(ent);
 	                        $scope.model.submit($scope.model);
 	                    });
@@ -346,7 +316,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	    }
 
 	    $scope.multiSubmit = function (result) {
-	        entityResource.getByIds(result, entityType).then(function (ents) {
+	        entityResource.getByIds(result, $scope.entityType).then(function (ents) {
 	            $scope.submit(ents);
 	        });
 	    };
@@ -495,4 +465,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
 	    });
+
+		$scope.selectListViewNode = function(node) {
+			select(node.name, node.id);
+            //toggle checked state
+            node.selected = node.selected === true ? false : true;
+		};
+
+		$scope.closeMiniListView = function() {
+			$scope.miniListView = undefined;
+		};
+
+		function openMiniListView(node) {
+			$scope.miniListView = node;
+		}
+
 	});

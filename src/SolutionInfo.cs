@@ -2,7 +2,7 @@
 using System.Resources;
 
 [assembly: AssemblyCompany("Umbraco")]
-[assembly: AssemblyCopyright("Copyright © Umbraco 2016")]
+[assembly: AssemblyCopyright("Copyright © Umbraco 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -12,4 +12,4 @@ using System.Resources;
 [assembly: AssemblyVersion("1.0.*")]
 
 [assembly: AssemblyFileVersion("7.6.0")]
-[assembly: AssemblyInformationalVersion("7.6.0-alpha032")]
+[assembly: AssemblyInformationalVersion("7.6.0-alpha068")]
