@@ -52,7 +52,7 @@
                 localizationService.localizeMany(["speechBubbles_fileSavedHeader", "speechBubbles_fileSavedText"]).then(function(data){
                     var header = data[0];
                     var message = data[1];
-                    notificationService.success(header, message);
+                    notificationsService.success(header, message);
                 });
 
                 vm.page.saveButtonState = "success";
@@ -73,7 +73,7 @@
                 localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
                     var header = data[0];
                     var message = data[1];
-                    notificationService.error(header, message);
+                    notificationsService.error(header, message);
                 });
 
             });
