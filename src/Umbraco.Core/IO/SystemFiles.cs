@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -72,15 +73,28 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                if (GlobalSettings.ContentCacheXmlStoredInCodeGen && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
-                {
-                    return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
+                switch (GlobalSettings.ContentCacheXmlStorageLocation)
+                {                    
+                    case ContentXmlStorage.AspNetTemp:
+                        return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
+                    case ContentXmlStorage.EnvironmentTemp:
+                        var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                        var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoXml",
+                            //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                            // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                            // utilizing an old path
+                            appDomainHash);
+                        return Path.Combine(cachePath, "umbraco.config");
+                    case ContentXmlStorage.Default:
+                        return IOHelper.ReturnPath("umbracoContentXML", "~/App_Data/umbraco.config");
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                return IOHelper.ReturnPath("umbracoContentXML", "~/App_Data/umbraco.config");
             }
         }
 
         [Obsolete("Use GlobalSettings.ContentCacheXmlStoredInCodeGen instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         internal static bool ContentCacheXmlStoredInCodeGen
         {
             get { return GlobalSettings.ContentCacheXmlStoredInCodeGen; }
