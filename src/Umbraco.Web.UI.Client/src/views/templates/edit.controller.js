@@ -15,6 +15,17 @@
         vm.page.menu = {};
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
+
+        //Used to toggle the keyboard shortcut modal
+        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
+        vm.showKeyboardShortcut = false;
+
+        //Keyboard shortcuts for help dialog
+        vm.page.keyboardShortcutsOverview = [];
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getTemplateEditorShortcuts());
+
         
         vm.save = function () {
             vm.page.saveButtonState = "busy";
@@ -33,10 +44,10 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-                localizationService.localize("speechBubbles_templateSavedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_templateSavedText").then(function(msgValue) {
-                        notificationsService.success(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_templateSavedHeader", "speechBubbles_templateSavedText"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationsService.success(header, message);
                 });
 
 
@@ -78,10 +89,10 @@
 
                 vm.page.saveButtonState = "error";
                 
-                localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
-                        notificationsService.error(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationsService.error(header, message);
                 });
 
             });
@@ -135,10 +146,109 @@
                 theme: "chrome",
                 showPrintMargin: false,
                 advanced: {
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
+                    enableBasicAutocompletion: true,
+                    enableLiveAutocompletion: false
                 },
                 onLoad: function(_editor) {
                     vm.editor = _editor;
+                    
+                    //Update the auto-complete method to use ctrl+alt+space
+                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
+                    
+                    //Unassigns the keybinding (That was previously auto-complete)
+                    //As conflicts with our own tree search shortcut
+                    _editor.commands.bindKey("ctrl-space", null);
+
+                    // Assign new keybinding
+                    _editor.commands.addCommands([
+                        //Disable (alt+shift+K)
+                        //Conflicts with our own show shortcuts dialog - this overrides it
+                        {
+                            name: 'unSelectOrFindPrevious',
+                            bindKey: 'Alt-Shift-K',
+                            exec: function() {
+                                //Toggle the show keyboard shortcuts overlay
+                                $scope.$apply(function(){
+                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
+                                });
+                                
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertUmbracoValue',
+                            bindKey: 'Alt-Shift-V',
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openPageFieldOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertPartialView',
+                            bindKey: 'Alt-Shift-P',
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openPartialOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                         {
+                            name: 'insertDictionary',
+                            bindKey: 'Alt-Shift-D',
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openDictionaryItemOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertUmbracoMacro',
+                            bindKey: 'Alt-Shift-M',
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openMacroOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertQuery',
+                            bindKey: 'Alt-Shift-Q',
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openQueryBuilderOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertSection',
+                            bindKey: 'Alt-Shift-S',
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openSectionsOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'chooseMasterTemplate',
+                            bindKey: 'Alt-Shift-T',
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openMasterTemplateOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        
+                    ]);
                     
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
