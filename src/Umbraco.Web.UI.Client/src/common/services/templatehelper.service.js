@@ -130,6 +130,30 @@
 			    };
         }
 
+        function getPartialViewEditorShortcuts(){
+            return {
+			        "name": "Umbraco", //No need to localise Umbraco is the same in all languages :)
+			        "shortcuts": [
+                        {
+                            "description": localizationService.format(["template_insert", "template_insertPageField"], "%0% %1%"),
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "v" }]
+                        },
+                        {
+                            "description": localizationService.format(["template_insert", "template_insertDictionaryItem"], "%0% %1%"),
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
+                        },
+                        {
+                            "description": localizationService.format(["template_insert", "template_insertMacro"], "%0% %1%"),
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "m" }]
+                        },
+                        {
+                            "description": localizationService.localize("template_queryBuilder"),
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "q" }]
+                        }
+                    ]
+			    };
+        }
+
         ////////////
 
         var service = {
@@ -141,7 +165,8 @@
             getAddSectionSnippet: getAddSectionSnippet,
             getGeneralShortcuts: getGeneralShortcuts,
             getEditorShortcuts: getEditorShortcuts,
-            getTemplateEditorShortcuts: getTemplateEditorShortcuts
+            getTemplateEditorShortcuts: getTemplateEditorShortcuts,
+            getPartialViewEditorShortcuts: getPartialViewEditorShortcuts
         };
 
         return service;

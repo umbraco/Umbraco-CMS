@@ -15,6 +15,16 @@
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
 
+        //Used to toggle the keyboard shortcut modal
+        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
+        vm.showKeyboardShortcut = false;
+
+        //Keyboard shortcuts for help dialog
+        vm.page.keyboardShortcutsOverview = [];
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getPartialViewEditorShortcuts());
+
         // bind functions to view model
         vm.save = save;
         vm.openPageFieldOverlay = openPageFieldOverlay;
@@ -270,6 +280,72 @@
                 },
                 onLoad: function(_editor) {
                     vm.editor = _editor;
+
+                    //Update the auto-complete method to use ctrl+alt+space
+                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
+                    
+                    //Unassigns the keybinding (That was previously auto-complete)
+                    //As conflicts with our own tree search shortcut
+                    _editor.commands.bindKey("ctrl-space", null);
+
+                    //TODO: Move all these keybinding config out into some helper/service
+                    // Assign new keybinding
+                    _editor.commands.addCommands([
+                        //Disable (alt+shift+K)
+                        //Conflicts with our own show shortcuts dialog - this overrides it
+                        {
+                            name: 'unSelectOrFindPrevious',
+                            bindKey: 'Alt-Shift-K',
+                            exec: function () {
+                                //Toggle the show keyboard shortcuts overlay
+                                $scope.$apply(function () {
+                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertUmbracoValue',
+                            bindKey: 'Alt-Shift-V',
+                            exec: function () {
+                                $scope.$apply(function () {
+                                    openPageFieldOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertDictionary',
+                            bindKey: 'Alt-Shift-D',
+                            exec: function () {
+                                $scope.$apply(function () {
+                                    openDictionaryItemOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertUmbracoMacro',
+                            bindKey: 'Alt-Shift-M',
+                            exec: function () {
+                                $scope.$apply(function () {
+                                    openMacroOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertQuery',
+                            bindKey: 'Alt-Shift-Q',
+                            exec: function () {
+                                $scope.$apply(function () {
+                                    openQueryBuilderOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+
+                    ]);
                     
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template

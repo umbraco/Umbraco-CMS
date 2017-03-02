@@ -161,9 +161,8 @@
                     //As conflicts with our own tree search shortcut
                     _editor.commands.bindKey("ctrl-space", null);
 
-
-
                     //TODO: Move all these keybinding config out into some helper/service
+                    // Assign new keybinding
                     _editor.commands.addCommands([
                         //Disable (alt+shift+K)
                         //Conflicts with our own show shortcuts dialog - this overrides it
