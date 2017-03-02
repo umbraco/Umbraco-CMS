@@ -170,7 +170,7 @@ When this combination is hit an overview is opened with shortcuts based on the m
             scope: {
                 model: "=",
                 onToggle: "&",
-                showOverlay: "="
+                showOverlay: "=?"
             }
         };
 
