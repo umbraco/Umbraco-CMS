@@ -140,15 +140,12 @@
                         //Conflicts with our own show shortcuts dialog - this overrides it
                         {
                             name: 'unSelectOrFindPrevious',
-                            bindKey: {
-                                win: 'Alt-Shift-K'
-                            },
+                            bindKey: 'Alt-Shift-K',
                             exec: function() {
                                 //Toggle the show keyboard shortcuts overlay
                                 $scope.$apply(function(){
                                     vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
                                 });
-                                
                             },
                             readOnly: true
                         },

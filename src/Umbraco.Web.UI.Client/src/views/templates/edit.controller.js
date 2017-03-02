@@ -169,9 +169,7 @@
                         //Conflicts with our own show shortcuts dialog - this overrides it
                         {
                             name: 'unSelectOrFindPrevious',
-                            bindKey: {
-                                win: 'Alt-Shift-K'
-                            },
+                            bindKey: 'Alt-Shift-K',
                             exec: function() {
                                 //Toggle the show keyboard shortcuts overlay
                                 $scope.$apply(function(){
@@ -183,9 +181,7 @@
                         },
                         {
                             name: 'insertUmbracoValue',
-                            bindKey: {
-                                win: 'Alt-Shift-V'
-                            },
+                            bindKey: 'Alt-Shift-V',
                             exec: function() {
                                 $scope.$apply(function(){
                                     openPageFieldOverlay();
@@ -195,9 +191,7 @@
                         },
                         {
                             name: 'insertPartialView',
-                            bindKey: {
-                                win: 'Alt-Shift-P'
-                            },
+                            bindKey: 'Alt-Shift-P',
                             exec: function() {
                                 $scope.$apply(function(){
                                     openPartialOverlay();
@@ -207,9 +201,7 @@
                         },
                          {
                             name: 'insertDictionary',
-                            bindKey: {
-                                win: 'Alt-Shift-D'
-                            },
+                            bindKey: 'Alt-Shift-D',
                             exec: function() {
                                 $scope.$apply(function(){
                                     openDictionaryItemOverlay();
@@ -219,9 +211,7 @@
                         },
                         {
                             name: 'insertUmbracoMacro',
-                            bindKey: {
-                                win: 'Alt-Shift-M'
-                            },
+                            bindKey: 'Alt-Shift-M',
                             exec: function() {
                                 $scope.$apply(function(){
                                     openMacroOverlay();
@@ -231,9 +221,7 @@
                         },
                         {
                             name: 'insertQuery',
-                            bindKey: {
-                                win: 'Alt-Shift-Q'
-                            },
+                            bindKey: 'Alt-Shift-Q',
                             exec: function() {
                                 $scope.$apply(function(){
                                     openQueryBuilderOverlay();
@@ -243,9 +231,7 @@
                         },
                         {
                             name: 'insertSection',
-                            bindKey: {
-                                win: 'Alt-Shift-S'
-                            },
+                            bindKey: 'Alt-Shift-S',
                             exec: function() {
                                 $scope.$apply(function(){
                                     openSectionsOverlay();
@@ -255,9 +241,7 @@
                         },
                         {
                             name: 'chooseMasterTemplate',
-                            bindKey: {
-                                win: 'Alt-Shift-T'
-                            },
+                            bindKey: 'Alt-Shift-T',
                             exec: function() {
                                 $scope.$apply(function(){
                                     openMasterTemplateOverlay();
