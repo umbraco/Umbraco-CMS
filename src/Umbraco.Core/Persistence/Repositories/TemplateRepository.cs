@@ -270,12 +270,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // once content has been set, "template on disk" are not "on disk" anymore
             template.Content = content;
+            SetVirtualPath(template);
 
             if (dto.Design == content) return;
             dto.Design = content;
             Database.Update(dto); // though... we don't care about the db value really??!!
-
-            SetVirtualPath(template);
         }
 
         protected override void PersistDeletedItem(ITemplate entity)
