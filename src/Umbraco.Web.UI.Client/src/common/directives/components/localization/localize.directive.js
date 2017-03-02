@@ -2,7 +2,7 @@ angular.module("umbraco.directives")
 
     /**
     * @ngdoc directive
-    * @name umbraco.directives.directive:localize
+    * @name umbraco.directives.directive:localize (Component)
     * @restrict E
     * @function
     * @description 
@@ -32,7 +32,7 @@ angular.module("umbraco.directives")
 
     /**
     * @ngdoc directive
-    * @name umbraco.directives.directive:localize
+    * @name umbraco.directives.directive:localize (Attribute)
     * @restrict A
     * @function
     * @description 
