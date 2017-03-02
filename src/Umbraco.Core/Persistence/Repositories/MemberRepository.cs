@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateMemberFromDto(dto, dto.ContentVersionDto.VersionId, sql);
+            var content = CreateMemberFromDto(dto, sql);
 
             return content;
 
@@ -448,16 +448,16 @@ namespace Umbraco.Core.Persistence.Repositories
             var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
             var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.NodeId);
-            var media = factory.BuildEntity(dto);
+            var member = factory.BuildEntity(dto);
 
-            var properties = GetPropertyCollection(new PagingSqlQuery(sql), new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) });
+            var properties = GetPropertyCollection(new PagingSqlQuery(sql), new[] { new DocumentDefinition(dto.ContentVersionDto, memberType) });
 
-            media.Properties = properties[dto.NodeId];
+            member.Properties = properties[dto.ContentVersionDto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)media).ResetDirtyProperties(false);
-            return media;
+            ((Entity)member).ResetDirtyProperties(false);
+            return member;
 
         }
 
@@ -681,20 +681,20 @@ namespace Umbraco.Core.Persistence.Repositories
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sqlFull);
 
-            var content = new IMember[dtos.Count];
-            var defs = new List<DocumentDefinition>();
+            var content = new List<IMember>();
+            var defs = new DocumentDefinitionCollection();
 
-            for (var i = 0; i < dtos.Count; i++)
+            foreach (var dto in dtos)
             {
-                var dto = dtos[i];
-
                 // if the cache contains the item, use it
                 if (withCache)
                 {
                     var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
-                    if (cached != null)
+                    //only use this cached version if the dto returned is the same version - this is just a safety check, members dont 
+                    //store different versions, but just in case someone corrupts some data we'll double check to be sure.
+                    if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)
                     {
-                        content[i] = cached;
+                        content.Add(cached);
                         continue;
                     }
                 }
@@ -702,36 +702,25 @@ namespace Umbraco.Core.Persistence.Repositories
                 // else, need to fetch from the database
                 // content type repository is full-cache so OK to get each one independently
                 var contentType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
-                var factory = new MemberFactory(contentType, NodeObjectTypeId, dto.NodeId);
-                content[i] = factory.BuildEntity(dto);
 
                 // need properties
-                defs.Add(new DocumentDefinition(
-                    dto.NodeId,
-                    dto.ContentVersionDto.VersionId,
-                    dto.ContentVersionDto.VersionDate,
-                    dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                    contentType
-                ));
+                if (defs.AddOrUpdate(new DocumentDefinition(dto.ContentVersionDto, contentType)))
+                {
+                    content.Add(MemberFactory.BuildEntity(dto, contentType));
+                }
             }
 
             // load all properties for all documents from database in 1 query
             var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
-            // assign
-            var dtoIndex = 0;
-            foreach (var def in defs)
+            // assign property data
+            foreach (var cc in content)
             {
-                // move to corresponding item (which has to exist)
-                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
-
-                // complete the item
-                var cc = content[dtoIndex];
-                cc.Properties = propertyData[cc.Id];
+                cc.Properties = propertyData[cc.Version];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
-                ((Entity)cc).ResetDirtyProperties(false);
+                cc.ResetDirtyProperties(false);
             }
 
             return content;
@@ -741,21 +730,20 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Private method to create a member object from a MemberDto
         /// </summary>
         /// <param name="dto"></param>
-        /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>
-        private IMember CreateMemberFromDto(MemberDto dto, Guid versionId, Sql docSql)
+        private IMember CreateMemberFromDto(MemberDto dto, Sql docSql)
         {
             var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
             var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.ContentVersionDto.NodeId);
             var member = factory.BuildEntity(dto);
 
-            var docDef = new DocumentDefinition(dto.ContentVersionDto.NodeId, versionId, member.UpdateDate, member.CreateDate, memberType);
+            var docDef = new DocumentDefinition(dto.ContentVersionDto, memberType);
 
             var properties = GetPropertyCollection(docSql, new[] { docDef });
 
-            member.Properties = properties[dto.ContentVersionDto.NodeId];
+            member.Properties = properties[dto.ContentVersionDto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
