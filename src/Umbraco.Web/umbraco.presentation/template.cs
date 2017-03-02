@@ -88,19 +88,19 @@ namespace umbraco
                 string originalPath = IOHelper.MapPath(VirtualPathUtility.ToAbsolute(MasterPageFile));
                 string copyPath = IOHelper.MapPath(VirtualPathUtility.ToAbsolute(path));
 
-                FileStream fs = new FileStream(originalPath, FileMode.Open, FileAccess.ReadWrite);
-                StreamReader f = new StreamReader(fs);
-                String newfile = f.ReadToEnd();
-                f.Close();
-                fs.Close();
+                string newFile;
+                using (var fs = new FileStream(originalPath, FileMode.Open, FileAccess.ReadWrite))
+                using (var f = new StreamReader(fs))
+                {
+                    newFile = f.ReadToEnd();
+                    newFile = newFile.Replace("MasterPageFile=\"~/masterpages/", "MasterPageFile=\"");
+                }
 
-                newfile = newfile.Replace("MasterPageFile=\"~/masterpages/", "MasterPageFile=\"");
-
-                fs = new FileStream(copyPath, FileMode.Create, FileAccess.Write);
-
-                StreamWriter replacement = new StreamWriter(fs);
-                replacement.Write(newfile);
-                replacement.Close();
+                using (var fs = new FileStream(copyPath, FileMode.Create, FileAccess.Write))
+                using (var replacement = new StreamWriter(fs))
+                {
+                    replacement.Write(newFile);
+                }
             }
 
             return path;
