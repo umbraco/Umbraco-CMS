@@ -164,7 +164,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sqlFull);
-            var content = new List<IMedia>();
+            
+            //This is a tuple list identifying if the content item came from the cache or not
+            var content = new List<Tuple<IMedia, bool>>();
             var defs = new DocumentDefinitionCollection();
 
             //track the looked up content types, even though the content types are cached
@@ -182,7 +184,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     //store different versions, but just in case someone corrupts some data we'll double check to be sure.
                     if (cached != null && cached.Version == dto.VersionId)
                     {
-                        content.Add(cached);
+                        content.Add(new Tuple<IMedia, bool>(cached, true));
                         continue;
                     }
                 }
@@ -204,7 +206,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // track the definition and if it's successfully added or updated then processed
                 if (defs.AddOrUpdate(new DocumentDefinition(dto, contentType)))
                 {
-                    content.Add(MediaFactory.BuildEntity(dto, contentType));
+                    content.Add(new Tuple<IMedia, bool>(MediaFactory.BuildEntity(dto, contentType), false));
                 }
             }
 
@@ -212,16 +214,22 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
             // assign property data
-            foreach (var cc in content)
+            foreach (var contentItem in content)
             {
+                var cc = contentItem.Item1;
+                var fromCache = contentItem.Item2;
+
+                //if this has come from cache, we do not need to build up it's structure
+                if (fromCache) continue;
+
                 cc.Properties = propertyData[cc.Version];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
                 cc.ResetDirtyProperties(false);
-            }            
+            }
 
-            return content;
+            return content.Select(x => x.Item1).ToArray();
         }
 
         public override IMedia GetByVersion(Guid versionId)

@@ -681,7 +681,8 @@ namespace Umbraco.Core.Persistence.Repositories
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sqlFull);
 
-            var content = new List<IMember>();
+            //This is a tuple list identifying if the content item came from the cache or not
+            var content = new List<Tuple<IMember, bool>>();
             var defs = new DocumentDefinitionCollection();
 
             foreach (var dto in dtos)
@@ -694,7 +695,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     //store different versions, but just in case someone corrupts some data we'll double check to be sure.
                     if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)
                     {
-                        content.Add(cached);
+                        content.Add(new Tuple<IMember, bool>(cached, true));
                         continue;
                     }
                 }
@@ -706,7 +707,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // need properties
                 if (defs.AddOrUpdate(new DocumentDefinition(dto.ContentVersionDto, contentType)))
                 {
-                    content.Add(MemberFactory.BuildEntity(dto, contentType));
+                    content.Add(new Tuple<IMember, bool>(MemberFactory.BuildEntity(dto, contentType), false));
                 }
             }
 
@@ -714,8 +715,14 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
             // assign property data
-            foreach (var cc in content)
+            foreach (var contentItem in content)
             {
+                var cc = contentItem.Item1;
+                var fromCache = contentItem.Item2;
+
+                //if this has come from cache, we do not need to build up it's structure
+                if (fromCache) continue;
+
                 cc.Properties = propertyData[cc.Version];
 
                 //on initial construction we don't want to have dirty properties tracked
@@ -723,7 +730,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 cc.ResetDirtyProperties(false);
             }
 
-            return content;
+            return content.Select(x => x.Item1).ToArray();
         }
 
         /// <summary>
