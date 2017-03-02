@@ -2,15 +2,29 @@ angular.module("umbraco.directives")
 
     /**
     * @ngdoc directive
-    * @name umbraco.directives.directive:localize (Component)
-    * @restrict E
+    * @name umbraco.directives.directive:localize
+    * @restrict EA
     * @function
-    * @description 
-    * Localize a specific token to put into the HTML as an item
+    * @description
+    * <div>
+    *   <strong>Component</strong><br />
+    *   Localize a specific token to put into the HTML as an item
+    * </div>
+    * <div>
+    *   <strong>Attribute</strong><br />
+    *   Add a HTML attribute to an element containing the HTML attribute name you wish to localise
+    *   Using the format of '@section_key' or 'section_key'
+    * </div>
     * ##Usage
     * <pre>
+    * <!-- Component -->
     * <localize key="general_close">Close</localize>
     * <localize key="section_key">Fallback value</localize>
+    *
+    * <!-- Attribute -->
+    * <input type="text" localize="placeholder" placeholder="@placeholders_entername" />
+    * <input type="text" localize="placeholder,title" title="@section_key" placeholder="@placeholders_entername" />
+    * <div localize="title" title="@section_key"></div>
     * </pre>
     **/
     .directive('localize', function ($log, localizationService) {
@@ -30,22 +44,6 @@ angular.module("umbraco.directives")
         };
     })
 
-    /**
-    * @ngdoc directive
-    * @name umbraco.directives.directive:localize (Attribute)
-    * @restrict A
-    * @function
-    * @description 
-    * Add a HTML attribute to an element containing the HTML attribute name you wish to localise
-    * Using the format of '@section_key' or 'section_key'
-
-    * ##Usage
-    * <pre>
-    * <input type="text" localize="placeholder" placeholder="@placeholders_entername" />
-    * <input type="text" localize="placeholder,title" title="@section_key" placeholder="@placeholders_entername" />
-    * <div localize="title" title="@section_key"></div>
-    * </pre>
-    **/
     .directive('localize', function ($log, localizationService) {
         return {
             restrict: 'A',
