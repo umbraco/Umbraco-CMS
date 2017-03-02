@@ -844,7 +844,7 @@ namespace umbraco
         internal void SaveXmlToFile()
         {
             LogHelper.Info<content>("Save Xml to file...");
-
+            //Thread.Sleep(30000);
             try
             {
                 var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
@@ -861,7 +861,7 @@ namespace umbraco
                     Directory.CreateDirectory(directoryName);
 
                 // save
-                using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true))
+                using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     SaveXmlToStream(xml, fs);
                 }
