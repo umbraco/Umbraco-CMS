@@ -265,13 +265,19 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //now delete the items that shouldn't be there
-            var allContentIds = Database.Fetch<int>(translate(0, GetBaseQuery(BaseQueryType.Ids)));
-
+            var sqlAllIds = translate(0, GetBaseQuery(BaseQueryType.Ids));
+            var allContentIds = Database.Fetch<int>(sqlAllIds);
+            var docObjectType = Guid.Parse(Constants.ObjectTypes.Document);
             var xmlIdsQuery = new Sql()
                 .Select("DISTINCT cmsContentXml.nodeId")
                 .From<ContentXmlDto>(SqlSyntax)
-                .InnerJoin<DocumentDto>(SqlSyntax)
-                .On<DocumentDto, ContentXmlDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(dto => dto.NodeObjectType == docObjectType, SqlSyntax);
+            if (contentTypeIdsA.Length > 0)
+            {
+                xmlIdsQuery.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+            }
 
             var allXmlIds = Database.Fetch<int>(xmlIdsQuery);
 

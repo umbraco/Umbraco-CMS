@@ -304,6 +304,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType, SqlSyntax);
+            if (contentTypeIdsA.Length > 0)
+            {
+                xmlIdsQuery.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+            }
+
 
             var allXmlIds = Database.Fetch<int>(xmlIdsQuery);
 
