@@ -251,10 +251,19 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMediaRepository(uow))
             using (var mediaTypeRepository = RepositoryFactory.CreateMediaTypeRepository(uow))
             {
-                var mediaType = mediaTypeRepository.Get(contentTypeAlias);
-                if (mediaType == null) return 0;
+                var mediaTypeId = 0;
+                if (contentTypeAlias.IsNullOrWhiteSpace() == false)
+                {
+                    var mediaType = mediaTypeRepository.Get(contentTypeAlias);
+                    if (mediaType == null) return 0;
+                    mediaTypeId = mediaType.Id;
+                }
 
-                var query = Query<IMedia>.Builder.Where(media => media.Trashed == false && media.ContentTypeId == mediaType.Id);
+                var query = Query<IMedia>.Builder.Where(media => media.Trashed == false);
+                if (mediaTypeId > 0)
+                {
+                    query.Where(media => media.ContentTypeId == mediaTypeId);
+                }
                 return repository.Count(query);
             }
         }
