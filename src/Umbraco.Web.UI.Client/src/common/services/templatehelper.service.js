@@ -70,11 +70,17 @@
                         },
                         {
                             "description": localizationService.localize("shortcuts_copyLineUp"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "up" }]
+                            "keys": {
+                                "win": [{ "key": "alt" }, { "key": "shift" }, { "key": "up" }],
+                                "mac": [{ "key": "cmd" }, { "key": "alt" }, { "key": "up" }]
+                            }
                         },
                         {
                             "description": localizationService.localize("shortcuts_copyLineDown"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "down" }]
+                            "keys": {
+                                "win": [{ "key": "alt" }, { "key": "shift" }, { "key": "down" }],
+                                "mac": [{ "key": "cmd" }, { "key": "alt" }, { "key": "down" }]
+                            } 
                         },
                         {
                             "description": localizationService.localize("shortcuts_moveLineUp"),
