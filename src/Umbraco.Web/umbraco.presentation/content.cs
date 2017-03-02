@@ -844,7 +844,6 @@ namespace umbraco
         internal void SaveXmlToFile()
         {
             LogHelper.Info<content>("Save Xml to file...");
-            //Thread.Sleep(30000);
             try
             {
                 var xml = _xmlContent; // capture (atomic + volatile), immutable anyway

@@ -92,9 +92,10 @@ namespace umbraco
                 using (var fs = new FileStream(originalPath, FileMode.Open, FileAccess.ReadWrite))
                 using (var f = new StreamReader(fs))
                 {
-                    newFile = f.ReadToEnd();
-                    newFile = newFile.Replace("MasterPageFile=\"~/masterpages/", "MasterPageFile=\"");
+                    newFile = f.ReadToEnd();                    
                 }
+
+                newFile = newFile.Replace("MasterPageFile=\"~/masterpages/", "MasterPageFile=\"");
 
                 using (var fs = new FileStream(copyPath, FileMode.Create, FileAccess.Write))
                 using (var replacement = new StreamWriter(fs))
