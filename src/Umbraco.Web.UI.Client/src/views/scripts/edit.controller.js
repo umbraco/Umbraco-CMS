@@ -14,6 +14,60 @@
         vm.page.menu.currentNode = null;
         vm.page.saveButtonState = "init";
 
+         //Used to toggle the keyboard shortcut modal
+        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
+        vm.showKeyboardShortcut = false;
+
+        //Keyboard shortcuts for help dialog
+        vm.page.keyboardShortcutsOverview = [
+			{
+			    "name": localizationService.localize("shortcuts_generalHeader"), 
+			    "shortcuts": [
+                    {
+				        "description": localizationService.localize("buttons_undo"),
+				        "keys": [{ "key": "ctrl" }, { "key": "z" }]
+				    },
+                    {
+				        "description": localizationService.localize("buttons_redo"),
+				        "keys": [{ "key": "ctrl" }, { "key": "y" }]
+				    },
+                    {
+				        "description": localizationService.localize("buttons_save"),
+				        "keys": [{ "key": "ctrl" }, { "key": "s" }]
+				    }
+			    ]
+			},
+			{
+			    "name": localizationService.localize("shortcuts_editorHeader"),
+			    "shortcuts": [
+                    {
+				        "description": localizationService.localize("shortcuts_commentLine"),
+				        "keys": [{ "key": "ctrl" }, { "key": "/" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_removeLine"),
+				        "keys": [{ "key": "ctrl" }, { "key": "d" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_copyLineUp"),
+				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "up" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_copyLineDown"),
+				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "down" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_moveLineUp"),
+				        "keys": [{ "key": "alt" }, { "key": "up" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_moveLineDown"),
+				        "keys": [{ "key": "alt" }, { "key": "down" }]
+				    }
+                ]
+			}
+        ];
+
         vm.script = {};
 
         // bind functions to view model
@@ -39,10 +93,10 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-                localizationService.localize("speechBubbles_fileSavedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_fileSavedText").then(function(msgValue) {
-                        notificationsService.success(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_fileSavedHeader", "speechBubbles_fileSavedText"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.success(header, message);
                 });
 
                 vm.page.saveButtonState = "success";
@@ -60,10 +114,10 @@
 
                 vm.page.saveButtonState = "error";
                 
-                localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
-                        notificationsService.error(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.error(header, message);
                 });
 
             });
@@ -108,11 +162,41 @@
                 theme: "chrome",
                 showPrintMargin: false,
                 advanced: {
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    enableSnippets: true,
+                    enableBasicAutocompletion: true,
+                    enableLiveAutocompletion: false
                 },
                 onLoad: function(_editor) {
                     
                     vm.editor = _editor;
+
+                    //Update the auto-complete method to use ctrl+alt+space
+                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
+                    
+                    //Unassigns the keybinding (That was previously auto-complete)
+                    //As conflicts with our own tree search shortcut
+                    _editor.commands.bindKey("ctrl-space", null);
+
+                    //TODO: Move all these keybinding config out into some helper/service
+                    _editor.commands.addCommands([
+                        //Disable (alt+shift+K)
+                        //Conflicts with our own show shortcuts dialog - this overrides it
+                        {
+                            name: 'unSelectOrFindPrevious',
+                            bindKey: {
+                                win: 'Alt-Shift-K'
+                            },
+                            exec: function() {
+                                //Toggle the show keyboard shortcuts overlay
+                                $scope.$apply(function(){
+                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
+                                });
+                                
+                            },
+                            readOnly: true
+                        },
+                    ]);
                     
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new script

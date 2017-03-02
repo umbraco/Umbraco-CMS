@@ -15,6 +15,95 @@
         vm.page.menu = {};
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
+
+        //Used to toggle the keyboard shortcut modal
+        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
+        vm.showKeyboardShortcut = false;
+
+        //Keyboard shortcuts for help dialog
+        vm.page.keyboardShortcutsOverview = [
+			{
+			    "name": localizationService.localize("shortcuts_generalHeader"), 
+			    "shortcuts": [
+                    {
+				        "description": localizationService.localize("buttons_undo"),
+				        "keys": [{ "key": "ctrl" }, { "key": "z" }]
+				    },
+                    {
+				        "description": localizationService.localize("buttons_redo"),
+				        "keys": [{ "key": "ctrl" }, { "key": "y" }]
+				    },
+                    {
+				        "description": localizationService.localize("buttons_save"),
+				        "keys": [{ "key": "ctrl" }, { "key": "s" }]
+				    }
+			    ]
+			},
+			{
+			    "name": localizationService.localize("shortcuts_editorHeader"),
+			    "shortcuts": [
+                    {
+				        "description": localizationService.localize("shortcuts_commentLine"),
+				        "keys": [{ "key": "ctrl" }, { "key": "/" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_removeLine"),
+				        "keys": [{ "key": "ctrl" }, { "key": "d" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_copyLineUp"),
+				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "up" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_copyLineDown"),
+				        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "down" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_moveLineUp"),
+				        "keys": [{ "key": "alt" }, { "key": "up" }]
+				    },
+                    {
+				        "description": localizationService.localize("shortcuts_moveLineDown"),
+				        "keys": [{ "key": "alt" }, { "key": "down" }]
+				    }
+                ]
+			},
+            {
+			    "name": "Umbraco", //No need to localise Umbraco is the same in all languages :)
+			    "shortcuts": [
+                    {
+                        "description": localizationService.format(["template_insert", "template_insertPageField"], "%0% %1%"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "v" }]
+                    },
+                    {
+                        "description": localizationService.format(["template_insert", "template_insertPartialView"], "%0% %1%"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
+                    },
+                    {
+                        "description": localizationService.format(["template_insert", "template_insertDictionaryItem"], "%0% %1%"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
+                    },
+                    {
+                        "description": localizationService.format(["template_insert", "template_insertMacro"], "%0% %1%"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "m" }]
+                    },
+                    {
+                        "description": localizationService.localize("template_queryBuilder"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "q" }]
+                    },
+                    {
+                        "description": localizationService.format(["template_insert", "template_insertSections"], "%0% %1%"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "s" }]
+                    },
+                    {
+                        "description": localizationService.localize("template_mastertemplate"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                    },
+                ]
+			}
+        ];
+
+
         
         vm.save = function () {
             vm.page.saveButtonState = "busy";
@@ -33,10 +122,10 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-                localizationService.localize("speechBubbles_templateSavedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_templateSavedText").then(function(msgValue) {
-                        notificationsService.success(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_templateSavedHeader", "speechBubbles_templateSavedText"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.success(header, message);
                 });
 
 
@@ -78,10 +167,10 @@
 
                 vm.page.saveButtonState = "error";
                 
-                localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
-                        notificationsService.error(headerValue, msgValue);
-                    });
+                localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.error(header, message);
                 });
 
             });
@@ -135,10 +224,129 @@
                 theme: "chrome",
                 showPrintMargin: false,
                 advanced: {
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
+                    enableBasicAutocompletion: true,
+                    enableLiveAutocompletion: false
                 },
                 onLoad: function(_editor) {
                     vm.editor = _editor;
+                    
+                    //Update the auto-complete method to use ctrl+alt+space
+                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
+                    
+                    //Unassigns the keybinding (That was previously auto-complete)
+                    //As conflicts with our own tree search shortcut
+                    _editor.commands.bindKey("ctrl-space", null);
+
+                    
+                    //Push our custom code completor in
+                    _editor.completers.push(umbracoCompletor);
+
+                    //TODO: Move all these keybinding config out into some helper/service
+                    _editor.commands.addCommands([
+                        //Disable (alt+shift+K)
+                        //Conflicts with our own show shortcuts dialog - this overrides it
+                        {
+                            name: 'unSelectOrFindPrevious',
+                            bindKey: {
+                                win: 'Alt-Shift-K'
+                            },
+                            exec: function() {
+                                //Toggle the show keyboard shortcuts overlay
+                                $scope.$apply(function(){
+                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
+                                });
+                                
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertUmbracoValue',
+                            bindKey: {
+                                win: 'Alt-Shift-V'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openPageFieldOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertPartialView',
+                            bindKey: {
+                                win: 'Alt-Shift-P'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openPartialOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                         {
+                            name: 'insertDictionary',
+                            bindKey: {
+                                win: 'Alt-Shift-D'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openDictionaryItemOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertUmbracoMacro',
+                            bindKey: {
+                                win: 'Alt-Shift-M'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openMacroOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertQuery',
+                            bindKey: {
+                                win: 'Alt-Shift-Q'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openQueryBuilderOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'insertSection',
+                            bindKey: {
+                                win: 'Alt-Shift-S'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openSectionsOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        {
+                            name: 'chooseMasterTemplate',
+                            bindKey: {
+                                win: 'Alt-Shift-T'
+                            },
+                            exec: function() {
+                                $scope.$apply(function(){
+                                    openMasterTemplateOverlay();
+                                });
+                            },
+                            readOnly: true
+                        },
+                        
+                    ]);
                     
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
@@ -537,6 +745,130 @@
     
         vm.init();
 
+
+
+        //Code Completer
+        var umbracoCompletor = {
+
+            // Used as the main API entrypoint for ACE editor to invoke
+            // What completions are available in the dropdown list
+            getCompletions: function(editor, session, pos, prefix, callback) {
+
+                //It may been triggered by mistake on a space so no word/prefix is passed in
+                if (prefix.length === 0) {
+                    callback(null, []);
+                    return
+                }
+
+                console.log("v3");
+      
+                //Switch case to determine what trigger keyword is being used
+                switch (prefix.toLowerCase()) {
+                    case 'macro':
+                    //Invoke the code for inserting Macros
+                    umbracoCompletor.getMacroCompletions(callback);
+                    break;
+                    
+                    case 'partial':
+                    //Invoke the code for inserting Partials
+                    umbracoCompletor.getPartialCompletions(callback);
+                    break;
+                    
+                    case 'field':
+                    //Invoke the code for inserting Umbraco Field/Property
+                    break;
+                    
+                    default:
+                    //Did not match our keywords to invoke the completer
+                    //So just set the callback function to an empty array of items
+                    callback(null, []);
+                    return
+                    
+                }
+            },
+
+            // ACE editor API entrypoint for overriding what is displayed in the tooltip
+            // From the code completion JSON object we can combine properties to set a value in a new prop docHTML
+            getDocTooltip: function(item) {
+        
+                //Used to override display of the tooltip
+                //With the properties docHTML or docText set on the completion items
+                //So can ammend here what gets displayed in the tooltip output
+                console.log('Get Tooltip');
+
+                if (item.snippet && !item.docHTML) {
+                    console.log('Display Tooltip');
+
+                    var lang = ace.require("ace/lib/lang");
+
+                    item.docHTML = [
+                        "<b>", item.caption, "</b><br/>",
+                        "<em>", item.alias ? item.alias : "", "</em>",
+                        "<hr></hr>",
+                        lang.escapeHTML(item.snippet)
+                    ].join("");
+                }
+            },
+
+            //This is our own custom function - where we are getting Macros from the server to populate the list
+            getMacroCompletions: function(callback){
+      
+                //This is where we would call an API endpoint or Angular Resource to get our macros
+                //For now a hardcoded list to show implementation ideas
+
+                //IMPORTANT NOTE
+                //Our trigger keyword of 'macro' must be contained in the caption otherwise it does not match & gets filtered out of the results
+
+                var macros = [];
+                macros.push({
+                    caption: "Macro - Insert Form",
+                    alias: "insertUmbracoForm",
+                    meta: "Macro",
+                    snippet: "@Umbraco.RenderMacro('insertUmbracoForm', new { formId = '${1:GUID-TO-FORM-HERE}' });"
+                });
+      
+                macros.push({
+                    caption: "Macro - Insert Quote",
+                    alias: "insertQuote",
+                    meta: "Macro",
+                    snippet: "@Umbraco.RenderMacro('insertQuote', new { name = '${1:Warren}', age = ${2:31} });"
+                });
+                
+                macros.push({
+                    caption: "Macro - Render Footer",
+                    alias: "renderFooter",
+                    meta: "Macro",
+                    snippet: "@Umbraco.RenderMacro('renderFooter');"
+                });
+      
+                return callback(null, macros);
+            },
+
+            getPartialCompletions: function(callback){
+      
+                //This is where we would call an API endpoint or Angular Resource to get partials
+                //For now a hardcoded list to show implementation ideas
+
+                //IMPORTANT NOTE
+                //Our trigger keyword of 'partial' must be contained in the caption otherwise it does not match & gets filtered out of the results
+
+                var partials = [];
+                partials.push({
+                    caption: "[Partial] MainNavigation",
+                    meta: "Partial",
+                    snippet: "@Html.RenderPartial('MainNavigation')",
+                });
+      
+                partials.push({
+                    caption: "[Partial] BottomNavigation",
+                    alias: "insertQuote",
+                    meta: "Partial",
+                    snippet: "@Html.RenderPartial('BottomNavigation')"
+                });
+      
+                return callback(null, partials);
+            },
+        }
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Templates.EditController", TemplatesEditController);

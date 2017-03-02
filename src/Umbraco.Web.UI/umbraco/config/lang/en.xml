@@ -100,6 +100,8 @@
     <key alias="styleShow">Show styles</key>
     <key alias="tableInsert">Insert table</key>
     <key alias="generateModels">Generate models</key>
+    <key alias="undo">Undo</key>
+    <key alias="redo">Redo</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -558,6 +560,16 @@
 
       <key alias="toggleListView">Toggle list view</key>
       <key alias="toggleAllowAsRoot">Toggle allow as root</key>
+
+      <key alias="commentLine">Comment/Uncomment lines</key>
+      <key alias="removeLine">Remove line</key>
+      <key alias="copyLineUp">Copy Lines Up</key>
+      <key alias="copyLineDown">Copy Lines Down</key>
+      <key alias="moveLineUp">Move Lines Up</key>
+      <key alias="moveLineDown">Move Lines Down</key>
+    
+      <key alias="generalHeader">General</key>
+      <key alias="editorHeader">Editor</key>
   </area>
 
   <area alias="graphicheadline">

@@ -553,6 +553,16 @@
 
     <key alias="toggleListView">Toggle list view</key>
     <key alias="toggleAllowAsRoot">Toggle allow as root</key>
+
+    <key alias="commentLine">Comment/Uncomment lines</key>
+    <key alias="removeLine">Remove line</key>
+    <key alias="copyLineUp">Copy Lines Up</key>
+    <key alias="copyLineDown">Copy Lines Down</key>
+    <key alias="moveLineUp">Move Lines Up</key>
+    <key alias="moveLineDown">Move Lines Down</key>
+
+    <key alias="generalHeader">General</key>
+    <key alias="editorHeader">Editor</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
