@@ -169,7 +169,7 @@
     <Compile Include="Persistence\PetaPocoExpressionsTests.cs" />
     <Compile Include="Persistence\Repositories\LockedRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
-    <Compile Include="Scheduling\DeployTest.cs" />
+    <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
     <Compile Include="Scoping\EventNameExtractorTests.cs" />
     <Compile Include="Scoping\LeakTests.cs" />
