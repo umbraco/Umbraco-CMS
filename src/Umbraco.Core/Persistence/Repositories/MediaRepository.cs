@@ -263,10 +263,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 // get the next group of nodes
                 var query = GetBaseQuery(false);
                 if (contentTypeIdsA.Length > 0)
-                    query = query
-                        .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+                {
+                    query = query.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+                }
                 query = query
                     .Where<NodeDto>(x => x.NodeId > baseId, SqlSyntax)
+                    .Where<NodeDto>(x => x.Trashed == false, SqlSyntax)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
                 var sql = SqlSyntax.SelectTop(query, groupSize);
                 var xmlItems = ProcessQuery(sql, new PagingSqlQuery(sql))
@@ -290,8 +292,24 @@ namespace Umbraco.Core.Persistence.Repositories
                         Logger.Error<MediaRepository>("Could not rebuild XML for nodeId=" + xmlItem.NodeId, e);
                     }
                 }
-                baseId = xmlItems.Last().NodeId;
+                baseId = xmlItems[xmlItems.Count - 1].NodeId;
             }
+
+            //now delete the items that shouldn't be there
+            var allMediaIds = Database.Fetch<int>(GetBaseQuery(BaseQueryType.Ids).Where<NodeDto>(x => x.Trashed == false, SqlSyntax));
+            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
+            var xmlIdsQuery = new Sql()
+                .Select("DISTINCT cmsContentXml.nodeId")
+                .From<ContentXmlDto>(SqlSyntax)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType, SqlSyntax);
+
+            var allXmlIds = Database.Fetch<int>(xmlIdsQuery);
+
+            var toRemove = allXmlIds.Except(allMediaIds).ToArray();
+            if (toRemove.Length > 0)
+                Database.Execute("DELETE FROM cmsContentXml WHERE nodeId IN (@ids)", new { ids = toRemove });
         }
 
         public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
