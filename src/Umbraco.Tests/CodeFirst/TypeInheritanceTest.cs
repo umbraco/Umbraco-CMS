@@ -86,7 +86,7 @@ namespace Umbraco.Tests.CodeFirst
             Assert.That(foundTypes.Count(), Is.EqualTo(15));
             Assert.AreEqual(1,
                             _pluginManager.GetTypeLists()
-                                .Count(x => x.IsTypeList<ContentTypeBase>(PluginManager.TypeResolutionKind.FindAllTypes)));
+                                .Count(x => x.IsList<ContentTypeBase>(PluginManager.TypeResolutionKind.FindAllTypes)));
         }
 
     }

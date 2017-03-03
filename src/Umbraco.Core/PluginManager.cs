@@ -8,46 +8,57 @@ using System.Text;
 using System.Threading;
 using System.Web.Compilation;
 using System.Xml.Linq;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Cache;
 using umbraco.interfaces;
 using File = System.IO.File;
 
 namespace Umbraco.Core
 {
-    
-
     /// <summary>
-    /// Used to resolve all plugin types and cache them and is also used to instantiate plugin types
+    /// Provides methods to find and instanciate types.
     /// </summary>
     /// <remarks>
-    /// 
-    /// This class should be used to resolve all plugin types, the TypeFinder should not be used directly!
-    /// 
-    /// This class can expose extension methods to resolve custom plugins
-    /// 
-    /// Before this class resolves any plugins it checks if the hash has changed for the DLLs in the /bin folder, if it hasn't
-    /// it will use the cached resolved plugins that it has already found which means that no assembly scanning is necessary. This leads
-    /// to much faster startup times.
+    /// <para>This class should be used to resolve all types, the <see cref="TypeFinder"/> class should never be used directly.</para>
+    /// <para>In most cases this class is not used directly but through extension methods that retrieve specific types.</para>
+    /// <para>This class caches the types it knows to avoid excessive assembly scanning and shorten startup times, relying
+    /// on a hash of the DLLs in the ~/bin folder to check for cache expiration.</para>
     /// </remarks>
     public class PluginManager
     {
+        private const string CacheKey = "umbraco-plugins.list";
+
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+
+        private static PluginManager _current;
+        private static bool _hasCurrent;
+        private static object _currentLock = new object();
+
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IRuntimeCacheProvider _runtimeCache;
+        private readonly ProfilingLogger _logger;
+        private readonly string _tempFolder;
+        private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
+
+        private long _cachedAssembliesHash = -1;
+        private long _currentAssembliesHash = -1;
+        private IEnumerable<Assembly> _assemblies;
+        private HashSet<Type> _extensions;
+
         /// <summary>
-        /// Creates a new PluginManager with an ApplicationContext instance which ensures that the plugin xml 
-        /// file is cached temporarily until app startup completes.
+        /// Initializes a new instance of the <see cref="PluginManager"/> class.
+        /// Creates a new PluginManager with an ApplicationContext instance which ensures that the plugin xml
+        /// file is cached temporarily until app startup completes. fixme?
         /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="detectChanges"></param>
-        /// <param name="serviceProvider"></param>
-        /// <param name="runtimeCache"></param>
+        /// <param name="serviceProvider">A mechanism for retrieving service objects.</param>
+        /// <param name="runtimeCache">The application runtime cache.</param>
+        /// <param name="logger">A profiling logger.</param>
+        /// <param name="detectChanges">fixme</param>
         internal PluginManager(IServiceProvider serviceProvider, IRuntimeCacheProvider runtimeCache, ProfilingLogger logger, bool detectChanges = true)
         {
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
@@ -58,12 +69,10 @@ namespace Umbraco.Core
             _runtimeCache = runtimeCache;
             _logger = logger;
 
+            // the temp folder where the cache file lives
             _tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
-            //create the folder if it doesn't exist
             if (Directory.Exists(_tempFolder) == false)
-            {
                 Directory.CreateDirectory(_tempFolder);
-            }
 
             var pluginListFile = GetPluginListFilePath();
 
@@ -103,48 +112,54 @@ namespace Umbraco.Core
             }
         }
 
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IRuntimeCacheProvider _runtimeCache;
-        private readonly ProfilingLogger _logger;
-        private const string CacheKey = "umbraco-plugins.list";
-        static PluginManager _resolver;
-        private readonly string _tempFolder;
-        private long _cachedAssembliesHash = -1;
-        private long _currentAssembliesHash = -1;
-        private static bool _initialized = false;
-        private static object _singletonLock = new object();
-
         /// <summary>
-        /// We will ensure that no matter what, only one of these is created, this is to ensure that caching always takes place
+        /// Gets or sets the set of assemblies to scan.
         /// </summary>
         /// <remarks>
-        /// The setter is generally only used for unit tests
+        /// <para>If not explicitely set, defaults to all assemblies except those that are know to not have any of the
+        /// types we might scan. Because we only scan for application types, this means we can safely exclude GAC assemblies
+        /// for example.</para>
+        /// <para>This is for unit tests.</para>
         /// </remarks>
+        internal IEnumerable<Assembly> AssembliesToScan
+        {
+            get { return _assemblies ?? (_assemblies = TypeFinder.GetAssembliesWithKnownExclusions()); }
+            set { _assemblies = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the singleton instance.
+        /// </summary>
+        /// <remarks>The setter exists for unit tests.</remarks>
         public static PluginManager Current
         {
             get
             {
-                return LazyInitializer.EnsureInitialized(ref _resolver, ref _initialized, ref _singletonLock, () =>
+                return LazyInitializer.EnsureInitialized(ref _current, ref _hasCurrent, ref _currentLock, () =>
                 {
+                    IRuntimeCacheProvider runtimeCache;
+                    ProfilingLogger profilingLogger;
+
                     if (ApplicationContext.Current == null)
                     {
+                        runtimeCache = new NullCacheProvider();
                         var logger = LoggerResolver.HasCurrent ? LoggerResolver.Current.Logger : new DebugDiagnosticsLogger();
                         var profiler = ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : new LogProfiler(logger);
-                        return new PluginManager(
-                            new ActivatorServiceProvider(), 
-                            new NullCacheProvider(), 
-                            new ProfilingLogger(logger, profiler));
+                        profilingLogger = new ProfilingLogger(logger, profiler);
                     }
-                    return new PluginManager(
-                        new ActivatorServiceProvider(), 
-                        ApplicationContext.Current.ApplicationCache.RuntimeCache, 
-                        ApplicationContext.Current.ProfilingLogger);
+                    else
+                    {
+                        runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+                        profilingLogger = ApplicationContext.Current.ProfilingLogger;
+                    }
+
+                    return new PluginManager(new ActivatorServiceProvider(), runtimeCache, profilingLogger);
                 });
             }
             set
             {
-                _initialized = true;
-                _resolver = value;
+                _hasCurrent = true;
+                _current = value;
             }
         }
 
@@ -157,7 +172,7 @@ namespace Umbraco.Core
         internal bool RequiresRescanning { get; private set; }
 
         /// <summary>
-        /// Returns the currently cached hash value of the scanned assemblies in the /bin folder. Returns 0 
+        /// Returns the currently cached hash value of the scanned assemblies in the /bin folder. Returns 0
         /// if no cache is found.
         /// </summary>
         /// <value> </value>
@@ -225,7 +240,7 @@ namespace Umbraco.Core
         /// Returns a unique hash for the combination of FileInfo objects passed in
         /// </summary>
         /// <param name="filesAndFolders">
-        /// A collection of files and whether or not to use their file contents to determine the hash or the file's properties 
+        /// A collection of files and whether or not to use their file contents to determine the hash or the file's properties
         /// (true will make a hash based on it's contents)
         /// </param>
         /// <returns></returns>
@@ -238,7 +253,7 @@ namespace Umbraco.Core
                 //get the file info's to check
                 var fileInfos = filesAndFolders.Where(x => x.Item2 == false).ToArray();
                 var fileContents = filesAndFolders.Except(fileInfos);
-                
+
                 //add each unique folder/file to the hash
                 foreach (var i in fileInfos.Select(x => x.Item1).DistinctBy(x => x.FullName))
                 {
@@ -251,9 +266,9 @@ namespace Umbraco.Core
                     if (File.Exists(i.FullName))
                     {
                         var content = File.ReadAllText(i.FullName).Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
-                        hashCombiner.AddCaseInsensitiveString(content);    
+                        hashCombiner.AddCaseInsensitiveString(content);
                     }
-                    
+
                 }
 
                 return ConvertPluginsHashFromHex(hashCombiner.GetCombinedHashCode());
@@ -292,7 +307,7 @@ namespace Umbraco.Core
 
         /// <summary>
         /// Attempts to resolve the list of plugin + assemblies found in the runtime for the base type 'T' passed in.
-        /// If the cache file doesn't exist, fails to load, is corrupt or the type 'T' element is not found then 
+        /// If the cache file doesn't exist, fails to load, is corrupt or the type 'T' element is not found then
         /// a false attempt is returned.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -352,7 +367,7 @@ namespace Umbraco.Core
 
             _runtimeCache.ClearCacheItem(CacheKey);
         }
-        
+
         private string GetPluginListFilePath()
         {
             return Path.Combine(_tempFolder, string.Format("umbraco-plugins.{0}.list", NetworkHelper.FileSafeMachineName));
@@ -368,7 +383,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// This method exists purely due to an error in 4.11. We were writing the plugin list file without the 
+        /// This method exists purely due to an error in 4.11. We were writing the plugin list file without the
         /// type resolution kind which will have caused some problems. Now we detect this legacy file and if it is detected
         /// we remove it so it can be recreated properly.
         /// </remarks>
@@ -465,131 +480,22 @@ namespace Umbraco.Core
 
         #endregion
 
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-        private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
-        private IEnumerable<Assembly> _assemblies;
-        private HashSet<Type> _extensions;
-        
-        /// <summary>
-        /// Returns all found property editors (based on the resolved Iparameter editors - this saves a scan)
-        /// </summary>
-        internal IEnumerable<Type> ResolvePropertyEditors()
-        {
-            //return all proeprty editor types found except for the base property editor type
-            return ResolveTypes<IParameterEditor>()
-                .Where(x => x.IsType<PropertyEditor>())
-                .Except(new[] { typeof(PropertyEditor) });
-        }
+        #region Create Instances
 
         /// <summary>
-        /// Returns all found parameter editors (which includes property editors)
+        /// Resolves and creates instances.
         /// </summary>
-        internal IEnumerable<Type> ResolveParameterEditors()
-        {
-            //return all paramter editor types found except for the base property editor type
-            return ResolveTypes<IParameterEditor>()
-                .Except(new[] { typeof(ParameterEditor), typeof(PropertyEditor) });
-        } 
-
-        /// <summary>
-        /// Returns all available IApplicationStartupHandler objects
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveApplicationStartupHandlers()
-        {
-            return ResolveTypes<IApplicationStartupHandler>();
-        }
-
-        /// <summary>
-        /// Returns all classes of type ICacheRefresher
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveCacheRefreshers()
-        {
-            return ResolveTypes<ICacheRefresher>();
-        }
-
-        /// <summary>
-        /// Returns all available IPropertyEditorValueConverter
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolvePropertyEditorValueConverters()
-        {
-            return ResolveTypes<IPropertyEditorValueConverter>();
-        }
-
-        /// <summary>
-        /// Returns all available IDataType in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveDataTypes()
-        {
-            return ResolveTypes<IDataType>();
-        }
-
-        /// <summary>
-        /// Returns all available IMacroGuiRendering in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveMacroRenderings()
-        {
-            return ResolveTypes<IMacroGuiRendering>();
-        }
-
-        /// <summary>
-        /// Returns all available IPackageAction in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolvePackageActions()
-        {
-            return ResolveTypes<IPackageAction>();
-        }
-
-        /// <summary>
-        /// Returns all available IAction in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveActions()
-        {
-            return ResolveTypes<IAction>();
-        }
-
-        /// <summary>
-        /// Returns all mapper types that have a MapperFor attribute defined
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveAssignedMapperTypes()
-        {
-            return ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
-        } 
-        
-        /// <summary>
-        /// Returns all SqlSyntaxProviders with the SqlSyntaxProviderAttribute
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveSqlSyntaxProviders()
-        {
-            return ResolveTypesWithAttribute<ISqlSyntaxProvider, SqlSyntaxProviderAttribute>();
-        }
-
-        /// <summary>
-        /// Gets/sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
-        /// this will search all assemblies known to have plugins and exclude ones known to not have them.
-        /// </summary>
-        internal IEnumerable<Assembly> AssembliesToScan
-        {
-            get { return _assemblies ?? (_assemblies = TypeFinder.GetAssembliesWithKnownExclusions()); }
-            set { _assemblies = value; }
-        }
-
-        /// <summary>
-        /// Used to resolve and create instances of the specified type based on the resolved/cached plugin types
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
-        /// <param name="cacheResult"></param>
-        /// <param name="specificAssemblies"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type to use for resolution.</typeparam>
+        /// <param name="throwException">Indicates whether to throw if an instance cannot be created.</param>
+        /// <param name="cacheResult">Indicates whether to use cache for type resolution.</param>
+        /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
+        /// <returns>The created instances.</returns>
+        /// <remarks>
+        /// <para>By default <paramref name="throwException"/> is false and instances that cannot be created are just skipped.</para>
+        /// <para>By default <paramref name="cacheResult"/> is true and cache is used for type resolution.</para>
+        /// <para>By default <paramref name="specificAssemblies"/> is null and <see cref="AssembliesToScan"/> is used.</para>
+        //fixme if we specify assemblies we should not cache?
+        /// </remarks>
         internal IEnumerable<T> FindAndCreateInstances<T>(bool throwException = false, bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
         {
             var types = ResolveTypes<T>(cacheResult, specificAssemblies);
@@ -597,30 +503,35 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Used to create instances of the specified type based on the resolved/cached plugin types
+        /// Creates instances of the specified types.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="types"></param>
-        /// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
-        /// <returns></returns>
+        /// <typeparam name="T">The base type for all instances.</typeparam>
+        /// <param name="types">The instance types.</param>
+        /// <param name="throwException">Indicates whether to throw if an instance cannot be created.</param>
+        /// <returns>The created instances.</returns>
+        /// <remarks>By default <paramref name="throwException"/> is false and instances that cannot be created are just skipped.</remarks>
         internal IEnumerable<T> CreateInstances<T>(IEnumerable<Type> types, bool throwException = false)
         {
             return _serviceProvider.CreateInstances<T>(types, _logger.Logger, throwException);
         }
 
         /// <summary>
-        /// Used to create an instance of the specified type based on the resolved/cached plugin types
+        /// Creates an instance of the specified type.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="type"></param>
+        /// <typeparam name="T">The base type of the instance.</typeparam>
+        /// <param name="type">The type of the instance.</param>
         /// <param name="throwException"></param>
-        /// <returns></returns>
+        /// <returns>The created instance.</returns>
         internal T CreateInstance<T>(Type type, bool throwException = false)
         {
             var instances = CreateInstances<T>(new[] { type }, throwException);
             return instances.FirstOrDefault();
         }
-        
+
+        #endregion
+
+        #region Resolve Types
+
         private IEnumerable<Type> ResolveTypesInternal<T>(
             Func<IEnumerable<Type>> finder,
             TypeResolutionKind resolutionType,
@@ -635,14 +546,14 @@ namespace Umbraco.Core
                     String.Format("Completed resolution of types of {0}, found {1}", typeof(T).FullName, typesFound.Count)))
                 {
                     //check if the TypeList already exists, if so return it, if not we'll create it
-                    var typeList = _types.FirstOrDefault(x => x.IsTypeList<T>(resolutionType));
+                    var typeList = _types.FirstOrDefault(x => x.IsList<T>(resolutionType));
 
                     //need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
                     if (cacheResult && typeList != null)
                     {
                         _logger.Logger.Debug<PluginManager>("Existing typeList found for {0} with resolution type {1}", () => typeof(T), () => resolutionType);
                     }
-                    
+
                     //if we're not caching the result then proceed, or if the type list doesn't exist then proceed
                     if (cacheResult == false || typeList == null)
                     {
@@ -680,11 +591,11 @@ namespace Umbraco.Core
                                             //we use the build manager to ensure we get all types loaded, this is slightly slower than
                                             //Type.GetType but if the types in the assembly aren't loaded yet then we have problems with that.
                                             var type = BuildManager.GetType(t, true);
-                                            typeList.AddType(type);
+                                            typeList.Add(type);
                                         }
                                         catch (Exception ex)
                                         {
-                                            //if there are any exceptions loading types, we have to exist, this should never happen so 
+                                            //if there are any exceptions loading types, we have to exist, this should never happen so
                                             //we will need to revert to scanning for types.
                                             successfullyLoadedFromCache = false;
                                             _logger.Logger.Error<PluginManager>("Could not load a cached plugin type: " + t + " now reverting to re-scanning assemblies for the base type: " + typeof(T).FullName, ex);
@@ -721,12 +632,14 @@ namespace Umbraco.Core
 
                         }
                     }
-                    typesFound = typeList.GetTypes().ToList();
+                    typesFound = typeList.Types.ToList();
                 }
 
                 return typesFound;
             }
         }
+
+        #endregion
 
         /// <summary>
         /// This method invokes the finder which scans the assemblies for the types and then loads the result into the type finder.
@@ -743,12 +656,13 @@ namespace Umbraco.Core
             //we don't have a cache for this so proceed to look them up by scanning
             foreach (var t in finder())
             {
-                typeList.AddType(t);
+                typeList.Add(t);
             }
-            UpdateCachedPluginsFile<T>(typeList.GetTypes(), resolutionKind);
+            UpdateCachedPluginsFile<T>(typeList.Types, resolutionKind);
         }
 
         #region Public Methods
+
         /// <summary>
         /// Generic method to find the specified type and cache the result
         /// </summary>
@@ -760,7 +674,7 @@ namespace Umbraco.Core
             {
                 var extensions = ResolveTypesInternal<T>(
                     () => TypeFinder.FindClassesOfType<T>(specificAssemblies ?? AssembliesToScan),
-                    TypeResolutionKind.FindAllTypes, 
+                    TypeResolutionKind.FindAllTypes,
                     cacheResult);
 
                 return extensions.Where(x => typeof(T).IsAssignableFrom(x));
@@ -774,7 +688,7 @@ namespace Umbraco.Core
                     TypeResolutionKind.FindAllTypes, true)));
 
                 return extensions.Where(x => typeof(T).IsAssignableFrom(x));
-            }            
+            }
         }
 
         /// <summary>
@@ -791,10 +705,12 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Generic method to find any type that has the specified attribute
+        /// Resolves class types marked with the specified attribute.
         /// </summary>
-        /// <typeparam name="TAttribute"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <param name="cacheResult">Indicates whether to use cache for type resolution.</param>
+        /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
+        /// <returns>All class types marked with the specified attribute.</returns>
         public IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
@@ -802,7 +718,8 @@ namespace Umbraco.Core
                 () => TypeFinder.FindClassesWithAttribute<TAttribute>(specificAssemblies ?? AssembliesToScan),
                 TypeResolutionKind.FindAttributedTypes,
                 cacheResult);
-        } 
+        }
+
         #endregion
 
         /// <summary>
@@ -816,7 +733,7 @@ namespace Umbraco.Core
 
 
 
-        #region Private classes/Enums
+        #region Nested classes and stuff
 
         /// <summary>
         /// The type of resolution being invoked
@@ -828,60 +745,185 @@ namespace Umbraco.Core
             FindTypesWithAttribute
         }
 
+        /// <summary>
+        /// Represents a list of types obtained by looking for types inheriting/implementing a
+        /// specified type, and/or marked with a specified attribute type.
+        /// </summary>
         internal abstract class TypeList
         {
-            public abstract void AddType(Type t);
-            public abstract bool IsTypeList<TLookup>(TypeResolutionKind resolutionType);
-            public abstract IEnumerable<Type> GetTypes();
+            /// <summary>
+            /// Adds a type.
+            /// </summary>
+            public abstract void Add(Type t);
+
+            /// <summary>
+            /// Gets the types.
+            /// </summary>
+            public abstract IEnumerable<Type> Types { get; }
+
+            /// <summary>
+            /// Gets a value indicating whether this instance is a type list for a specified type and resolution type.
+            /// </summary>
+            public abstract bool IsList<TLookup>(TypeResolutionKind resolutionType);
         }
 
+        /// <summary>
+        /// Represents a list of types obtained by looking for types inheriting/implementing a
+        /// specified type, and/or marked with a specified attribute type.
+        /// </summary>
         internal class TypeList<T> : TypeList
         {
             private readonly TypeResolutionKind _resolutionType;
+            private readonly HashSet<Type> _types = new HashSet<Type>();
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TypeList{T}"/> class.
+            /// </summary>
             public TypeList(TypeResolutionKind resolutionType)
             {
                 _resolutionType = resolutionType;
             }
 
-            private readonly HashSet<Type> _types = new HashSet<Type>();
-
-            public override void AddType(Type t)
+            /// <inheritdoc />
+            public override void Add(Type type)
             {
-                //if the type is an attribute type we won't do the type check because typeof<T> is going to be the 
-                //attribute type whereas the 't' type is the object type found with the attribute.
-                if (_resolutionType == TypeResolutionKind.FindAttributedTypes || typeof(T).IsAssignableFrom(t))
-                {
-                    _types.Add(t);
-                }
+                // only add the type if it inherits/implements T
+                // skip the check for FindAttributedTypes as in this case T is the attribute type
+                if (_resolutionType == TypeResolutionKind.FindAttributedTypes || typeof(T).IsAssignableFrom(type))
+                    _types.Add(type);
             }
 
-            /// <summary>
-            /// Returns true if the current TypeList is of the same lookup type
-            /// </summary>
-            /// <typeparam name="TLookup"></typeparam>
-            /// <param name="resolutionType"></param>
-            /// <returns></returns>
-            public override bool IsTypeList<TLookup>(TypeResolutionKind resolutionType)
+            /// <inheritdoc />
+            public override IEnumerable<Type> Types
             {
-                return _resolutionType == resolutionType && (typeof(T)) == typeof(TLookup);
+                get { return _types; }
             }
 
-            public override IEnumerable<Type> GetTypes()
+            /// <inheritdoc />
+            public override bool IsList<TLookup>(TypeResolutionKind resolutionType)
             {
-                return _types;
+                return _resolutionType == resolutionType && typeof (T) == typeof (TLookup);
             }
         }
 
         /// <summary>
-        /// This class is used simply to determine that a plugin was not found in the cache plugin list with the specified
-        /// TypeResolutionKind.
+        /// Represents the error that occurs when a plugin was not found in the cache plugin
+        /// list with the specified TypeResolutionKind.
         /// </summary>
         internal class CachedPluginNotFoundInFileException : Exception
-        {
-
-        }
+        { }
 
         #endregion
+    }
+
+    internal static class PluginManagerExtensions
+    {
+        /// <summary>
+        /// Gets all classes inheriting from PropertyEditor.
+        /// </summary>
+        /// <remarks>
+        /// <para>Excludes the actual PropertyEditor base type.</para>
+        /// </remarks>
+        public static IEnumerable<Type> ResolvePropertyEditors(this PluginManager mgr)
+        {
+            // look for IParameterEditor (fast, IDiscoverable) then filter
+
+            var propertyEditor = typeof (PropertyEditor);
+
+            return mgr.ResolveTypes<IParameterEditor>()
+                .Where(x => propertyEditor.IsAssignableFrom(x) && x != propertyEditor);
+        }
+
+        /// <summary>
+        /// Gets all classes implementing IParameterEditor.
+        /// </summary>
+        /// <remarks>
+        /// <para>Includes property editors.</para>
+        /// <para>Excludes the actual ParameterEditor and PropertyEditor base types.</para>
+        /// </remarks>
+        public static IEnumerable<Type> ResolveParameterEditors(this PluginManager mgr)
+        {
+            var propertyEditor = typeof (PropertyEditor);
+            var parameterEditor = typeof (ParameterEditor);
+
+            return mgr.ResolveTypes<IParameterEditor>()
+                .Where(x => x != propertyEditor && x != parameterEditor);
+        }
+
+        /// <summary>
+        /// Gets all classes implementing IApplicationStartupHandler.
+        /// </summary>
+        [Obsolete("IApplicationStartupHandler is obsolete.")]
+        public static IEnumerable<Type> ResolveApplicationStartupHandlers(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<IApplicationStartupHandler>();
+        }
+
+        /// <summary>
+        /// Gets all classes implementing ICacheRefresher.
+        /// </summary>
+        public static IEnumerable<Type> ResolveCacheRefreshers(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<ICacheRefresher>();
+        }
+
+        /// <summary>
+        /// Gets all classes implementing IPropertyEditorValueConverter.
+        /// </summary>
+        [Obsolete("IPropertyEditorValueConverter is obsolete.")]
+        public static IEnumerable<Type> ResolvePropertyEditorValueConverters(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<IPropertyEditorValueConverter>();
+        }
+
+        /// <summary>
+        /// Gets all classes implementing IDataType.
+        /// </summary>
+        [Obsolete("IDataType is obsolete.")]
+        public static IEnumerable<Type> ResolveDataTypes(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<IDataType>();
+        }
+
+        /// <summary>
+        /// Gets all classes implementing IMacroGuiRendering.
+        /// </summary>
+        [Obsolete("IMacroGuiRendering is obsolete.")]
+        public static IEnumerable<Type> ResolveMacroRenderings(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<IMacroGuiRendering>();
+        }
+
+        /// <summary>
+        /// Gets all classes implementing IPackageAction.
+        /// </summary>
+        public static IEnumerable<Type> ResolvePackageActions(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<IPackageAction>();
+        }
+
+        /// <summary>
+        /// Gets all classes implementing IAction.
+        /// </summary>
+        public static IEnumerable<Type> ResolveActions(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<IAction>();
+        }
+
+        /// <summary>
+        /// Gets all classes inheriting from BaseMapper and marked with the MapperForAttribute.
+        /// </summary>
+        public static IEnumerable<Type> ResolveAssignedMapperTypes(this PluginManager mgr)
+        {
+            return mgr.ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
+        }
+
+        /// <summary>
+        /// Gets all classes implementing ISqlSyntaxProvider and marked with the SqlSyntaxProviderAttribute.
+        /// </summary>
+        public static IEnumerable<Type> ResolveSqlSyntaxProviders(this PluginManager mgr)
+        {
+            return mgr.ResolveTypesWithAttribute<ISqlSyntaxProvider, SqlSyntaxProviderAttribute>();
+        }
     }
 }

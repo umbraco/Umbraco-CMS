@@ -1,9 +1,8 @@
 ﻿namespace umbraco.interfaces
 {
     /// <summary>
-    /// Marker interface for discoverable extensions via assembly scanning
+    /// Marks a class or an interface as discoverable by PluginManager.
     /// </summary>
     public interface IDiscoverable
-    {
-    }
+    { }
 }

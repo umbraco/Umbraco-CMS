@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Plugins
             var foundTypes2 = _manager.ResolveFindMeTypes();
             Assert.AreEqual(1,
                             _manager.GetTypeLists()
-                                .Count(x => x.IsTypeList<IFindMe>(PluginManager.TypeResolutionKind.FindAllTypes)));
+                                .Count(x => x.IsList<IFindMe>(PluginManager.TypeResolutionKind.FindAllTypes)));
         }
 
         [Test]
@@ -346,15 +346,15 @@ namespace Umbraco.Tests.Plugins
             var types = new HashSet<PluginManager.TypeList>();
 
             var propEditors = new PluginManager.TypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes);
-            propEditors.AddType(typeof(LabelPropertyEditor));
+            propEditors.Add(typeof(LabelPropertyEditor));
             types.Add(propEditors);
 
-            var found = types.SingleOrDefault(x => x.IsTypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
+            var found = types.SingleOrDefault(x => x.IsList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
 
             Assert.IsNotNull(found);
 
             //This should not find a type list of this type
-            var shouldNotFind = types.SingleOrDefault(x => x.IsTypeList<IParameterEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
+            var shouldNotFind = types.SingleOrDefault(x => x.IsList<IParameterEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
 
             Assert.IsNull(shouldNotFind);
         }
