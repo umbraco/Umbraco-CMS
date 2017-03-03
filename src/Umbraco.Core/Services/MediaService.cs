@@ -457,7 +457,7 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
 
                 var query = Query<IMedia>.Builder;
-                // always check for a parent - else it will also get decendants
+                // always check for a parent - else it will also get decendants (and then you should use the GetPagedDescendants method)
                 query.Where(x => x.ParentId == id);
 
                 IQuery<IMedia> filterQuery = null;
