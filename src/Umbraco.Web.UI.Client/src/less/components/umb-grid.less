@@ -14,7 +14,7 @@
 // sortable-helper
 .umb-grid .ui-sortable-helper {
     position: absolute !important;
-    background-color: @blue !important;
+    background-color: @turquoise !important;
     height: 42px !important;
     width: 42px !important;
     overflow: hidden;
@@ -28,7 +28,7 @@
         line-height: 42px;
         font-size: 22px;
         content: "\e126";
-        color: #ffffff;
+        color: @white;
     }
 
     * {
@@ -46,7 +46,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    background-color: @blue;
+    background-color: @turquoise;
     height: 2px;
     margin-bottom: 20px;
 
@@ -55,7 +55,7 @@
         top: -9px;
         font-family: "icomoon";
         font-size: 18px;
-        color: @blue;
+        color: @turquoise;
     }
 
     &:before {
@@ -151,24 +151,24 @@
 
 .umb-grid .umb-row .umb-cell-placeholder {
     min-height: 130px;
-    background-color: @grayLighter;
+    background-color: @gray-10;
     border-width: 2px;
     border-style: dashed;
-    border-color: @grayLight;
+    border-color: @gray-8;
     transition: border-color 100ms linear;
 
     &:hover {
-        border-color: @blue;
+        border-color: @turquoise;
         cursor: pointer;
     }
 }
 
 .umb-grid .umb-cell-content.-has-editors {
     padding-top: 38px;
-    background-color: #ffffff;
+    background-color: @white;
     border-width: 1px;
     border-style: solid;
-    border-color: @grayLight;
+    border-color: @gray-8;
 
     &:hover {
         cursor: auto;
@@ -179,30 +179,24 @@
     padding-top: 10px;
 }
 
-
-
 .umb-grid .cell-tools {
     position: absolute;
     top: 10px;
     right: 10px;
-    color: @gray;
+    color: @gray-3;
     font-size: 16px;
 }
-
 
 .umb-grid .cell-tool {
     cursor: pointer;
     float: right;
-
     &:hover {
-        color: @blueDark;
+        color: @turquoise-d1;
     }
 }
 
-
 .umb-grid .cell-tools-add {
-    color: @blue;
-
+    color: @turquoise-d1;
     &:focus, &:hover {
         text-decoration: none;
     }
@@ -213,15 +207,15 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: @blue;
+    color: @turquoise-d1;
 }
 
 .umb-grid .cell-tools-add.-bar {
     display: block;
-    background: @grayLighter;
+    background: @gray-10;
     text-align: center;
     padding: 5px;
-    border: 1px dashed #ccc;
+    border: 1px dashed @gray-7;
     margin: 10px;
 }
 
@@ -251,7 +245,7 @@
     z-index: 10;
     top: 0;
     left: 0;
-    background: #ffffff;
+    background: @white;
     opacity: 0.9;
     width: 100%;
     height: 100%;
@@ -293,7 +287,7 @@
 }
 
 .umb-control-collapsed {
-    background-color: @grayLighter;
+    background-color: @gray-10;
     padding: 5px 10px;
     border-width: 1px;
     border-style: solid;
@@ -302,7 +296,7 @@
 }
 
 .umb-control-collapsed:hover {
-    border-color: @blue;
+    border-color: @turquoise;
 }
 
 .umb-grid .umb-control-click-overlay {
@@ -314,14 +308,12 @@
     left: 0;
     opacity: 0;
     cursor: pointer;
-
     &:hover {
+        background-color: @turquoise;
         opacity: 0.1;
-        background-color: @blue;
         transition: opacity 0.1s;
     }
 }
-
 
 .umb-grid .umb-row-title-bar {
     display: flex;
@@ -335,7 +327,6 @@
     font-size: 15px;
     font-weight: bold;
     color: @black;
-
     margin-right: 6px;
 }
 
@@ -343,7 +334,7 @@
     display: inline-block;
     margin-left: 10px;
     font-size: 18px;
-    color: @gray;
+    color: @gray-3;
 }
 
 .umb-grid .row-tool {
@@ -371,12 +362,12 @@
     opacity: 0.7;
     text-align: left;
     padding: 5px;
-    border: 1px solid rgba(182, 182, 182, 0.3);
+    border: 1px solid @gray-9;
     height: 20px;
 }
 
 .umb-grid .umb-control-placeholder:hover .placeholder {
-    border: 1px solid rgba(182, 182, 182, 0.8);
+    border: 1px solid @gray-7;
 }
 
 
@@ -389,14 +380,14 @@
     padding-bottom: 30px;
     position: relative;
     background-color: @white;
-    border: 4px dashed @grayLight;
+    border: 4px dashed @gray-8;
     text-align: center;
     text-align: -moz-center;
     cursor: pointer;
 }
 
 .umb-grid .umb-editor-placeholder i {
-    color: @grayLight;
+    color: @gray-8;
     font-size: 85px;
     line-height: 85px;
     display: block;
@@ -410,7 +401,7 @@
 
 // Row states
 .umb-grid .umb-row.-active {
-    background-color: @blue;
+    background-color: @turquoise-d1;
 
     .umb-row-title-bar {
         cursor: move;
@@ -418,7 +409,7 @@
 
     .row-tool,
     .umb-row-title {
-        color: #fff;
+        color: @white;
     }
 
     .umb-grid-has-config {
@@ -438,14 +429,14 @@
 
 
 .umb-grid .umb-row.-active-child {
-    background-color: @grayLighter;
+    background-color: @gray-10;
 
     .umb-row-title-bar {
         cursor: default;
     }
 
     .umb-row-title {
-        color: @gray;
+        color: @gray-3;
     }
 
     .row-tool {
@@ -457,7 +448,7 @@
     }
 
     .umb-cell-content.-placeholder {
-        border-color: @grayLight;
+        border-color: @gray-8;
 
         &:hover {
             border-color: fade(@gray, 44);
@@ -469,11 +460,11 @@
 // Cell states
 
 .umb-grid .umb-row .umb-cell.-active {
-    border-color: @grayLight;
+    border-color: @gray-8;
 
     .umb-cell-content.-has-editors {
         box-shadow: 3px 3px 6px rgba(0, 0, 0, .07);
-        border-color: @blue;
+        border-color: @turquoise;
     }
 }
 
@@ -517,15 +508,11 @@
     width: auto;
     padding: 6px 15px;
     border-style: solid;
-
     font-size: 12px;
     font-weight: bold;
-
     display: inline-block;
-
     margin: 10px auto 20px;
-
-    border-color: #E2E2E2;
+    border-color: @gray-9;
 
     &:hover {
         cursor: pointer;
@@ -542,10 +529,10 @@
     display: block;
     overflow: hidden;
     border: none;
-    background: #fff;
+    background: @white;
     outline: none;
     resize: none;
-    color: @gray;
+    color: @gray-3;
 }
 
 .umb-grid .umb-cell-rte textarea {
@@ -556,7 +543,7 @@
     display: block;
     overflow: hidden;
     border: none;
-    background: #fff;
+    background: @white;
     outline: none;
     width: 98%;
     resize: none;
@@ -584,14 +571,14 @@
     display: inline-block;
     cursor: pointer;
     border-radius: 200px;
-    background: rgba(255,255,255, 1);
-    border: 1px solid rgb(182, 182, 182);
+    background: @gray-10;
+    border: 1px solid @gray-7;
     margin: 2px;
 
     &:hover, &:hover * {
-        background: @blue !important;
-        color: white !important;
-        border-color: @blue !important;
+        background: @turquoise !important;
+        color: @white !important;
+        border-color: @turquoise !important;
         text-decoration: none;
     }
 }
@@ -608,7 +595,7 @@
 
 .umb-grid .iconBox a:hover {
     text-decoration: none;
-    color: white !important;
+    color: @white !important;
 }
 
 .umb-grid .iconBox.selected {
@@ -626,7 +613,7 @@
 
 .umb-grid .iconBox i {
     font-size: 16px !important;
-    color: #5F5F5F;
+    color: @gray-3 ;
     display: block;
 }
 
@@ -655,7 +642,7 @@
 }
 
 .umb-grid .mce-toolbar {
-    border-bottom: 1px solid rgba(207, 207, 207, 0.7);
+    border-bottom: 1px solid @gray-8;
     background-color: rgba(250, 250, 250, 1);
     display: none;
 }
@@ -697,7 +684,7 @@
     font-size: 10px;
     padding: 0;
     margin: 5px 5px 0 0;
-    color: #808080;
+    color: @gray-5;
 }
 
 
@@ -711,7 +698,7 @@
 }
 
 .umb-grid .umb-control.-active {
-    border-color: @blue;
+    border-color: @turquoise;
 }
 
 .umb-grid .umb-templates-columns {
@@ -724,10 +711,10 @@
 
 .umb-grid .umb-control-bar {
     opacity: 0;
-    background: @blue;
+    background: @turquoise;
     padding: 2px 5px;
-    color: #ffffff;
-    font-size: 10px;
+    color: @white;
+    font-size: 12px;
     height: 0;
     display: flex;
     transition: height 80ms linear, opacity 80ms linear;
@@ -737,6 +724,7 @@
 .umb-grid .umb-control-title {
     display: flex;
     align-items: center;
+    font-weight: bold;
 }
 
 .umb-grid .umb-control.-active .umb-control-bar {
@@ -776,15 +764,15 @@
 }
 
 .umb-grid .umb-templates-template a.tb:hover {
-    border: 5px solid @blue;
+    border: 5px solid @turquoise;
 }
 
 .umb-grid .umb-templates-template .tb {
     width: 100%;
     height: 150px;
     padding: 10px;
-    background-color: @grayLighter;
-    border: 5px solid @grayLight;
+    background-color: @gray-10;
+    border: 5px solid @gray-8;
     cursor: pointer;
     position: relative;
 }
@@ -796,17 +784,17 @@
 
 .umb-grid .umb-templates-template .tb .umb-templates-column {
     height: 100%;
-    border: 1px dashed @grayLight;
+    border: 1px dashed @gray-8;
     border-right: none;
 }
 
 .umb-grid .umb-templates-template .tb .umb-templates-column.last {
-    border-right: 1px dashed @grayLight !important;
+    border-right: 1px dashed @gray-8 !important;
 }
 
 .umb-grid a.umb-templates-column:hover,
 .umb-grid a.umb-templates-column.selected {
-    background-color: @blue;
+    background-color: @turquoise;
 }
 
 
@@ -841,7 +829,7 @@
         box-sizing: border-box;
         width: 125px;
         margin: 15px;
-        border: 3px solid @grayLight;
+        border: 3px solid @gray-8;
         transition: border 100ms linear;
 
         &.prevalues-rows {
@@ -856,7 +844,7 @@
         }
 
         &:hover {
-            border-color: @blue;
+            border-color: @turquoise;
             cursor: pointer;
         }
 
@@ -879,7 +867,7 @@
         }
 
         .preview-cell {
-            background-color: @grayLighter;
+            background-color: @gray-10;
         }
 
         .preview-overlay {
@@ -915,7 +903,7 @@
                 display: block;
                 width: 100%;
                 height: 100%;
-                background-color: @grayLight;
+                background-color: @gray-8;
                 margin: 0 1px 1px 0;
             }
         }
@@ -935,7 +923,7 @@
         top: 0;
         box-sizing: border-box;
         left: 0;
-        border: 3px solid white;
+        border: 3px solid @white;
     }
 }
 
@@ -944,9 +932,8 @@
 
 .umb-grid .umb-grid-has-config {
     display: inline;
-
-    font-size: 12px;
-    color: fade(@black, 44);
+    font-size: 13px;
+    color: @gray-5;
 }
 
 .umb-grid .umb-cell {
@@ -965,7 +952,7 @@
     width: 360px;
     height: 380px;
     overflow: auto;
-    border: 1px solid #ccc;
+    border: 1px solid @gray-8;
     margin-top: -270px;
     margin-left: -150px;
     background: @white;
@@ -977,8 +964,8 @@
 }
 
 .umb-grid .cell-tools-menu h5 {
-    border-bottom: 1px solid #d9d9d9;
-    color: #999;
+    border-bottom: 1px solid @gray-8;
+    color: @gray-5;
     padding: 10px;
     margin-top: 0;
 }
@@ -996,23 +983,23 @@
     margin: 5px;
     padding: 5px;
     overflow: hidden;
-    font-size: 11px;
+    font-size: 12px;
 
     &:hover, &:hover * {
-        background: #2e8aea;
+        background: @turquoise;
         color: @white;
     }
 }
 
 .umb-grid .elements a {
-    color: #222;
+    color: @gray-1;
     text-decoration: none;
 }
 
 .umb-grid .elements i {
     font-size: 30px;
     line-height: 50px;
-    color: #999;
+    color: @gray-6;
     display: block;
 }
 
@@ -1043,7 +1030,7 @@
 }
 
 .umb-grid-configuration .umb-templates .umb-templates-template span {
-    background: @grayLight;
+    background: @gray-8;
     display: inline-block;
 }
 
@@ -1055,8 +1042,8 @@
     display: block;
     float: left;
     margin-left: -1px;
-    border: 1px white solid !important;
-    background: @grayLight;
+    border: 1px @white solid !important;
+    background: @gray-8;
 }
 
 .umb-grid-configuration .umb-templates-column.last {
@@ -1067,7 +1054,7 @@
     text-align: center;
     font-size: 20px;
     line-height: 70px;
-    color: #ccc;
+    color: @gray-8;
     text-decoration: none;
     background: @white;
 }
