@@ -1,8 +1,9 @@
 using System.Xml;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core._Legacy.PackageActions
 {
-    public interface IPackageAction
+    public interface IPackageAction : IDiscoverable
     {
         bool Execute(string packageName, XmlNode xmlData);
         string Alias();

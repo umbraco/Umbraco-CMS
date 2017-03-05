@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using LightInject;
 using Umbraco.Core.DI;
+using Umbraco.Core.Plugins;
 using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web._Legacy.Actions
@@ -88,7 +89,7 @@ namespace Umbraco.Web._Legacy.Actions
         }
     }
 
-    public interface IAction
+    public interface IAction : IDiscoverable
     {
         char Letter { get; }
         bool ShowInNotifier { get; }

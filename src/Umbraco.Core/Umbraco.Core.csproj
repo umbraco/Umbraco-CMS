@@ -488,6 +488,7 @@
     <Compile Include="Persistence\SqlContext.cs" />
     <Compile Include="Persistence\NPocoSqlExtensions.cs" />
     <Compile Include="Persistence\UnitOfWork\UnitOfWorkBase.cs" />
+    <Compile Include="Plugins\IDiscoverable.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditorCollection.cs" />
     <Compile Include="PropertyEditors\ParameterEditorCollectionBuilder.cs" />

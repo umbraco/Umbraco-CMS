@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.Cache
 {
@@ -6,7 +7,7 @@ namespace Umbraco.Core.Cache
     /// The IcacheRefresher Interface is used for loadbalancing.
     /// 
     /// </summary>
-    public interface ICacheRefresher
+    public interface ICacheRefresher : IDiscoverable
     {
         Guid RefresherUniqueId { get; }
         string Name { get; }

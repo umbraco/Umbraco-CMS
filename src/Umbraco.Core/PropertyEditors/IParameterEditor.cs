@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.PropertyEditors
 {
-    public interface IParameterEditor
+    public interface IParameterEditor : IDiscoverable
     {
         /// <summary>
         /// The id  of the property editor

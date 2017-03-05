@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             if (Completed)
                 _transaction.Complete(); // complete the transaction
             else
-                _transaction.Dispose(); // abort the transaction
+                _transaction.Dispose(); // abort the transaction - fixme or should we always dispose it?! 
 
             _transaction = null;
         }

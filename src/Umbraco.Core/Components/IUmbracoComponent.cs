@@ -1,9 +1,11 @@
-﻿namespace Umbraco.Core.Components
+﻿using Umbraco.Core.Plugins;
+
+namespace Umbraco.Core.Components
 {
     /// <summary>
     /// Represents an Umbraco component.
     /// </summary>
-    public interface IUmbracoComponent
+    public interface IUmbracoComponent : IDiscoverable
     {
         /// <summary>
         /// Composes the component.

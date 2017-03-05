@@ -1,8 +1,10 @@
-﻿namespace Umbraco.Web.Models.Trees
+﻿using Umbraco.Core.Plugins;
+
+namespace Umbraco.Web.Models.Trees
 {
     /// <summary>
     /// Marker interface for created applications in the umbraco backoffice
     /// </summary>
-    public interface IApplication
+    public interface IApplication : IDiscoverable
     { }
 }

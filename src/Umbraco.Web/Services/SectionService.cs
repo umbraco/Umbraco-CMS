@@ -295,7 +295,7 @@ namespace Umbraco.Web.Services
                     // Load all Applications by attribute and add them to the XML config
 
                     //don't cache the result of this because it is only used once during app startup, caching will just add a bit more mem overhead for no reason
-                    var types = Current.PluginManager.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>(cacheResult: false); // fixme - inject
+                    var types = Current.PluginManager.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>(cache: false); // fixme - inject
 
                     //since applications don't populate their metadata from the attribute and because it is an interface,
                     //we need to interrogate the attributes for the data. Would be better to have a base class that contains

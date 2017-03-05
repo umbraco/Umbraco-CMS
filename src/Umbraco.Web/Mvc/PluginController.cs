@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Provides a base class for plugin controllers.
     /// </summary>
-    public abstract class PluginController : Controller
+    public abstract class PluginController : Controller, IDiscoverable
     {
         private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage 
             = new ConcurrentDictionary<Type, PluginControllerMetadata>();

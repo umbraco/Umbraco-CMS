@@ -1,10 +1,13 @@
 ﻿// ReSharper disable once CheckNamespace
+
+using Umbraco.Core.Plugins;
+
 namespace Umbraco.Core
 {
     /// <summary>
 	/// Custom IApplicationStartupHandler that auto subscribes to the applications events
 	/// </summary>
-	public interface IApplicationEventHandler
+	public interface IApplicationEventHandler : IDiscoverable
     {
         /// <summary>
         /// ApplicationContext is created and other static objects that require initialization have been setup

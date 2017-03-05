@@ -166,11 +166,10 @@ namespace Umbraco.Tests.Plugins
 </baseType>
 </plugins>");
 
-            Assert.IsTrue(_manager.DetectLegacyPluginListFile());
+            Assert.IsEmpty(_manager.ReadCache()); // uber-legacy cannot be read
 
             File.Delete(filePath);
 
-            //now create a valid one
             File.WriteAllText(filePath, @"<?xml version=""1.0"" encoding=""utf-8""?>
 <plugins>
 <baseType type=""umbraco.interfaces.ICacheRefresher"" resolutionType=""FindAllTypes"">
@@ -178,19 +177,32 @@ namespace Umbraco.Tests.Plugins
 </baseType>
 </plugins>");
 
-            Assert.IsFalse(_manager.DetectLegacyPluginListFile());
+            Assert.IsEmpty(_manager.ReadCache()); // legacy cannot be read
+
+            File.Delete(filePath);
+
+            File.WriteAllText(filePath, @"IContentFinder
+
+MyContentFinder
+AnotherContentFinder
+
+");
+
+            Assert.IsNotNull(_manager.ReadCache()); // works
         }
 
         [Test]
         public void Create_Cached_Plugin_File()
         {
-            var types = new[] { typeof(PluginManager), typeof(PluginManagerTests), typeof(UmbracoContext) };
+            var types = new[] { typeof (PluginManager), typeof (PluginManagerTests), typeof (UmbracoContext) };
 
-            //yes this is silly, none of these types inherit from string, but this is just to test the xml file format
-            _manager.UpdateCachedPluginsFile<string>(types, PluginManager.TypeResolutionKind.FindAllTypes);
+            var typeList1 = new PluginManager.TypeList(typeof (object), null);
+            foreach (var type in types) typeList1.Add(type);
+            _manager.AddTypeList(typeList1);
+            _manager.WriteCache();
 
-            var plugins = _manager.TryGetCachedPluginsFromFile<string>(PluginManager.TypeResolutionKind.FindAllTypes);
-            var diffType = _manager.TryGetCachedPluginsFromFile<string>(PluginManager.TypeResolutionKind.FindAttributedTypes);
+            var plugins = _manager.TryGetCached(typeof (object), null);
+            var diffType = _manager.TryGetCached(typeof (object), typeof (ObsoleteAttribute));
 
             Assert.IsTrue(plugins.Success);
             //this will be false since there is no cache of that type resolution kind
@@ -206,7 +218,7 @@ namespace Umbraco.Tests.Plugins
         public void PluginHash_From_String()
         {
             var s = "hello my name is someone".GetHashCode().ToString("x", CultureInfo.InvariantCulture);
-            var output = PluginManager.ConvertPluginsHashFromHex(s);
+            var output = PluginManager.ConvertHashToInt64(s);
             Assert.AreNotEqual(0, output);
         }
 
@@ -255,9 +267,7 @@ namespace Umbraco.Tests.Plugins
         {
             var foundTypes1 = _manager.ResolveFindMeTypes();
             var foundTypes2 = _manager.ResolveFindMeTypes();
-            Assert.AreEqual(1,
-                            _manager.GetTypeLists()
-                                .Count(x => x.IsTypeList<IFindMe>(PluginManager.TypeResolutionKind.FindAllTypes)));
+            Assert.AreEqual(1, _manager.TypeLists.Count(x => x.BaseType == typeof(IFindMe) && x.AttributeType == null));
         }
 
         [Test]
@@ -304,16 +314,16 @@ namespace Umbraco.Tests.Plugins
         {
             var types = new HashSet<PluginManager.TypeList>();
 
-            var propEditors = new PluginManager.TypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes);
-            propEditors.AddType(typeof(LabelPropertyEditor));
+            var propEditors = new PluginManager.TypeList(typeof (PropertyEditor), null);
+            propEditors.Add(typeof(LabelPropertyEditor));
             types.Add(propEditors);
 
-            var found = types.SingleOrDefault(x => x.IsTypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
+            var found = types.SingleOrDefault(x => x.BaseType == typeof (PropertyEditor) && x.AttributeType == null);
 
             Assert.IsNotNull(found);
 
             //This should not find a type list of this type
-            var shouldNotFind = types.SingleOrDefault(x => x.IsTypeList<IParameterEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
+            var shouldNotFind = types.SingleOrDefault(x => x.BaseType == typeof (IParameterEditor) && x.AttributeType == null);
 
             Assert.IsNull(shouldNotFind);
         }
@@ -324,7 +334,7 @@ namespace Umbraco.Tests.Plugins
 
         }
 
-        public interface IFindMe
+        public interface IFindMe : IDiscoverable
         {
 
         }
