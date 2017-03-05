@@ -139,7 +139,6 @@ namespace Umbraco.Core
         {
             lock (LocalFilteredAssemblyCacheLocker)
             {
-                // double check
                 if (_localFilteredAssemblyCache != null)
                     return _localFilteredAssemblyCache;
 

@@ -13,9 +13,12 @@ namespace Umbraco.Core
 	/// </summary>
 	internal static class TypeHelper
 	{
-		
-		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new ConcurrentDictionary<Type, FieldInfo[]>();
-		private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
+	    private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache
+            = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
+		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache 
+            = new ConcurrentDictionary<Type, FieldInfo[]>();
+
+        private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
         
         /// <summary>
         /// Checks if the method is actually overriding a base method
@@ -39,12 +42,9 @@ namespace Umbraco.Core
         /// </remarks>
         public static Assembly[] GetReferencingAssemblies(Assembly assembly, IEnumerable<Assembly> assemblies)
         {
-            // check if it is the app_code assembly.
-            // check if it is App_global.asax assembly
             if (assembly.IsAppCodeAssembly() || assembly.IsGlobalAsaxAssembly())
-            {
-                return Enumerable.Empty<Assembly>().ToArray();
-            }
+                return EmptyAssemblies;
+
             
             // find all assembly references that are referencing the current type's assembly since we 
             // should only be scanning those assemblies because any other assembly will definitely not
@@ -54,7 +54,7 @@ namespace Umbraco.Core
         }
 
 	    /// <summary>
-	    /// checks if the assembly has a reference with the same name as the expected assembly name.
+	    /// Determines if an assembly references another assembly.
 	    /// </summary>
 	    /// <param name="assembly"></param>
 	    /// <param name="name"></param>
@@ -105,13 +105,10 @@ namespace Umbraco.Core
         public static Attempt<Type> GetLowestBaseType(params Type[] types)
 	    {
 	        if (types.Length == 0)
-	        {
 	            return Attempt<Type>.Fail();
-	        }
-	        if (types.Length == 1)
-	        {
+
+            if (types.Length == 1)
                 return Attempt.Succeed(types[0]);
-	        }
 
 	        foreach (var curr in types)
 	        {
@@ -195,20 +192,15 @@ namespace Umbraco.Core
 		/// <param name="includeIndexed"></param>
 		/// <param name="caseSensitive"> </param>
 		/// <returns></returns>
-		public static PropertyInfo GetProperty(Type type, string name, 
-			bool mustRead = true, 
-			bool mustWrite = true, 
+		public static PropertyInfo GetProperty(Type type, string name,
+			bool mustRead = true,
+			bool mustWrite = true,
 			bool includeIndexed = false,
 			bool caseSensitive = true)
 		{
-			return CachedDiscoverableProperties(type, mustRead, mustWrite, includeIndexed)
-				.FirstOrDefault(x =>
-					{
-						if (caseSensitive)
-							return x.Name == name;
-						return x.Name.InvariantEquals(name);
-					});
-		}        
+            return CachedDiscoverableProperties(type, mustRead, mustWrite, includeIndexed)
+		        .FirstOrDefault(x => caseSensitive ? (x.Name == name) : x.Name.InvariantEquals(name));
+        }
 
 		/// <summary>
 		/// Gets (and caches) <see cref="FieldInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.
@@ -221,7 +213,7 @@ namespace Umbraco.Core
 				type,
 				x => type
 				     	.GetFields(BindingFlags.Public | BindingFlags.Instance)
-				     	.Where(y => !y.IsInitOnly)
+				     	.Where(y => y.IsInitOnly == false)
 				     	.ToArray());
 		}
 
@@ -239,12 +231,11 @@ namespace Umbraco.Core
 				new Tuple<Type, bool, bool, bool>(type, mustRead, mustWrite, includeIndexed),
 				x => type
 				     	.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-				     	.Where(y => (!mustRead || y.CanRead)
-				     	            && (!mustWrite || y.CanWrite)
-				     	            && (includeIndexed || !y.GetIndexParameters().Any()))
+				     	.Where(y => (mustRead == false || y.CanRead)
+				     	            && (mustWrite == false || y.CanWrite)
+				     	            && (includeIndexed || y.GetIndexParameters().Any() == false))
 				     	.ToArray());
 		}
-
 
         #region Match Type
 
@@ -336,9 +327,9 @@ namespace Umbraco.Core
 
             // not a generic type, not a generic parameter
             // so normal class or interface
-            // fixme structs? enums? array types?
             // about primitive types, value types, etc:
             // http://stackoverflow.com/questions/1827425/how-to-check-programatically-if-a-type-is-a-struct-or-a-class
+            // if it's a primitive type... it needs to be ==
 
             if (implementation == contract) return true;
             if (contract.IsClass && implementation.IsClass && implementation.IsSubclassOf(contract)) return true;
