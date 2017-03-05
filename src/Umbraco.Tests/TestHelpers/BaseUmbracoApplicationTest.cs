@@ -60,7 +60,7 @@ namespace Umbraco.Tests.TestHelpers
         public override void TearDown()
         {
             base.TearDown();
-            
+
             // reset settings
             SettingsForTests.Reset();
             UmbracoContext.Current = null;
@@ -117,7 +117,7 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         /// <summary>
-        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan 
+        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan
         /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs
         /// to be set to true if the SetupPluginManager has been overridden.
         /// </summary>

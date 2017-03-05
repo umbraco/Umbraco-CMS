@@ -30,44 +30,43 @@ namespace Umbraco.Core
         /// <summary>
         /// Find all assembly references that are referencing the assignTypeFrom Type's assembly found in the assemblyList
         /// </summary>
-        /// <param name="assignTypeFrom"></param>
-        /// <param name="assemblies"></param>
+        /// <param name="assembly">The referenced assembly.</param>
+        /// <param name="assemblies">A list of assemblies.</param>
         /// <returns></returns>
         /// <remarks>
         /// If the assembly of the assignTypeFrom Type is in the App_Code assembly, then we return nothing since things cannot
         /// reference that assembly, same with the global.asax assembly.
         /// </remarks>
-        public static Assembly[] GetReferencedAssemblies(Type assignTypeFrom, IEnumerable<Assembly> assemblies)
+        public static Assembly[] GetReferencingAssemblies(Assembly assembly, IEnumerable<Assembly> assemblies)
         {
-            //check if it is the app_code assembly.
-            //check if it is App_global.asax assembly
-            if (assignTypeFrom.Assembly.IsAppCodeAssembly() || assignTypeFrom.Assembly.IsGlobalAsaxAssembly())
+            // check if it is the app_code assembly.
+            // check if it is App_global.asax assembly
+            if (assembly.IsAppCodeAssembly() || assembly.IsGlobalAsaxAssembly())
             {
                 return Enumerable.Empty<Assembly>().ToArray();
             }
             
-            //find all assembly references that are referencing the current type's assembly since we 
-            //should only be scanning those assemblies because any other assembly will definitely not
-            //contain sub type's of the one we're currently looking for
-            return assemblies
-                .Where(assembly =>
-                       assembly == assignTypeFrom.Assembly 
-                        || HasReferenceToAssemblyWithName(assembly, assignTypeFrom.Assembly.GetName().Name))
-                .ToArray();
+            // find all assembly references that are referencing the current type's assembly since we 
+            // should only be scanning those assemblies because any other assembly will definitely not
+            // contain sub type's of the one we're currently looking for
+            var name = assembly.GetName().Name;
+            return assemblies.Where(x => x == assembly || HasReference(x, name)).ToArray();
         }
 
 	    /// <summary>
 	    /// checks if the assembly has a reference with the same name as the expected assembly name.
 	    /// </summary>
 	    /// <param name="assembly"></param>
-	    /// <param name="expectedAssemblyName"></param>
+	    /// <param name="name"></param>
 	    /// <returns></returns>
-        private static bool HasReferenceToAssemblyWithName(Assembly assembly, string expectedAssemblyName)
-        {           
-            return assembly
-                .GetReferencedAssemblies()                
-                .Select(a => a.Name)
-                .Contains(expectedAssemblyName, StringComparer.Ordinal);
+        public static bool HasReference(Assembly assembly, string name)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery - no!
+            foreach (var a in assembly.GetReferencedAssemblies())
+            {
+                if (string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase)) return true;
+            }
+            return false;
         }
 
         /// <summary>
