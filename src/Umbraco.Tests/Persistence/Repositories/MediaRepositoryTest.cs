@@ -72,6 +72,44 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Rebuild_All_Xml_Structures_Ensure_Orphaned_Are_Removed()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+                //delete all xml
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+
+                var mediaType = mediaTypeRepository.Get(1032);
+
+                for (var i = 0; i < 100; i++)
+                {
+                    var image = MockedMedia.CreateMediaImage(mediaType, -1);
+                    repository.AddOrUpdate(image);
+                }
+                unitOfWork.Commit();
+
+                //Add some extra orphaned rows that shouldn't be there
+                var trashed = MockedMedia.CreateMediaImage(mediaType, -1);
+                trashed.ChangeTrashedState(true, Constants.System.RecycleBinMedia);
+                repository.AddOrUpdate(trashed);
+                unitOfWork.Commit();
+                //Force add it
+                unitOfWork.Database.Insert(new ContentXmlDto
+                {
+                    NodeId = trashed.Id,
+                    Xml = "<test></test>"
+                });
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10);
+
+                Assert.AreEqual(103, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
+        }
+
+        [Test]
         public void Rebuild_Some_Xml_Structures()
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);

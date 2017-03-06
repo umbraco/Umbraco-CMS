@@ -80,6 +80,7 @@ namespace Umbraco.Core.Services
         /// </param>
         void RebuildXmlStructures(params int[] contentTypeIds);
 
+        int CountNotTrashed(string contentTypeAlias = null);
         int Count(string contentTypeAlias = null);
         int CountChildren(int parentId, string contentTypeAlias = null);
         int CountDescendants(int parentId, string contentTypeAlias = null);

@@ -263,6 +263,39 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 baseId = xmlItems[xmlItems.Count - 1].NodeId;
             }
+
+            //now delete the items that shouldn't be there
+            var sqlAllIds = translate(0, GetBaseQuery(BaseQueryType.Ids));
+            var allContentIds = Database.Fetch<int>(sqlAllIds);
+            var docObjectType = Guid.Parse(Constants.ObjectTypes.Document);
+            var xmlIdsQuery = new Sql()
+                .Select("DISTINCT cmsContentXml.nodeId")
+                .From<ContentXmlDto>(SqlSyntax)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+
+            if (contentTypeIdsA.Length > 0)
+            {
+                xmlIdsQuery.InnerJoin<ContentDto>(SqlSyntax)
+                    .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>(SqlSyntax)
+                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+            }
+
+            xmlIdsQuery.Where<NodeDto>(dto => dto.NodeObjectType == docObjectType, SqlSyntax);
+            
+            var allXmlIds = Database.Fetch<int>(xmlIdsQuery);
+
+            var toRemove = allXmlIds.Except(allContentIds).ToArray();
+            if (toRemove.Length > 0)
+            {
+                foreach (var idGroup in toRemove.InGroupsOf(2000))
+                {
+                    Database.Execute("DELETE FROM cmsContentXml WHERE nodeId IN (@ids)", new { ids = idGroup });
+                }                
+            }
+                
         }
 
         public override IEnumerable<IContent> GetAllVersions(int id)
