@@ -272,13 +272,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select("DISTINCT cmsContentXml.nodeId")
                 .From<ContentXmlDto>(SqlSyntax)
                 .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == docObjectType, SqlSyntax);
+                .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+
             if (contentTypeIdsA.Length > 0)
             {
-                xmlIdsQuery.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+                xmlIdsQuery.InnerJoin<ContentDto>(SqlSyntax)
+                    .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>(SqlSyntax)
+                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
             }
 
+            xmlIdsQuery.Where<NodeDto>(dto => dto.NodeObjectType == docObjectType, SqlSyntax);
+            
             var allXmlIds = Database.Fetch<int>(xmlIdsQuery);
 
             var toRemove = allXmlIds.Except(allContentIds).ToArray();
