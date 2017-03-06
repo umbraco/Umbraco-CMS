@@ -289,7 +289,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var toRemove = allXmlIds.Except(allContentIds).ToArray();
             if (toRemove.Length > 0)
-                Database.Execute("DELETE FROM cmsContentXml WHERE nodeId IN (@ids)", new { ids = toRemove });
+            {
+                foreach (var idGroup in toRemove.InGroupsOf(2000))
+                {
+                    Database.Execute("DELETE FROM cmsContentXml WHERE nodeId IN (@ids)", new { ids = idGroup });
+                }                
+            }
+                
         }
 
         public override IEnumerable<IContent> GetAllVersions(int id)
