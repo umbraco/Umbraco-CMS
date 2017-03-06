@@ -2185,6 +2185,7 @@ namespace Umbraco.Core.Services
                 //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
                 if (published && previouslyPublished == false && HasChildren(content.Id))
                 {
+                    //TODO: Horrible for performance if there are lots of descendents! We should page if anything but this is crazy
                     var descendants = GetPublishedDescendants(content);
 
                     _publishingStrategy.PublishingFinalized(descendants, false);

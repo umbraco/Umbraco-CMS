@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -54,7 +55,9 @@ namespace umbraco.IO
 			get { return Umbraco.Core.IO.SystemFiles.ContentCacheXml; }
 		}
 
-		public static bool ContentCacheXmlIsEphemeral
+        [Obsolete("This is not used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static bool ContentCacheXmlIsEphemeral
 		{
 			get { return Umbraco.Core.IO.SystemFiles.ContentCacheXmlStoredInCodeGen; }
 		}

@@ -960,8 +960,8 @@ ORDER BY cmsContentVersion.id DESC
                     publishedDataCollection.Add(publishedDto);
             }
 
-
-            var content = new List<IContent>();
+            //This is a tuple list identifying if the content item came from the cache or not
+            var content = new List<Tuple<IContent, bool>>();
             var defs = new DocumentDefinitionCollection(includeAllVersions);
             var templateIds = new List<int>();
             
@@ -982,7 +982,7 @@ ORDER BY cmsContentVersion.id DESC
                     //only use this cached version if the dto returned is also the publish version, they must match and be teh same version
                     if (cached != null && cached.Version == dto.VersionId && cached.Published && dto.Published)
                     {
-                        content.Add(cached);
+                        content.Add(new Tuple<IContent, bool>(cached, true));
                         continue;
                     }
                 }
@@ -1008,7 +1008,7 @@ ORDER BY cmsContentVersion.id DESC
                     if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
                         templateIds.Add(dto.TemplateId.Value);
 
-                    content.Add(ContentFactory.BuildEntity(dto, contentType, publishedDto));
+                    content.Add(new Tuple<IContent, bool>(ContentFactory.BuildEntity(dto, contentType, publishedDto), false));
                 }
             }
 
@@ -1020,8 +1020,14 @@ ORDER BY cmsContentVersion.id DESC
             var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
             // assign template and property data
-            foreach (var cc in content)
+            foreach (var contentItem in content)
             {
+                var cc = contentItem.Item1;
+                var fromCache = contentItem.Item2;
+
+                //if this has come from cache, we do not need to build up it's structure
+                if (fromCache) continue;
+
                 var def = defs[includeAllVersions ? (ValueType)cc.Version : cc.Id];
 
                 ITemplate template = null;
@@ -1033,9 +1039,9 @@ ORDER BY cmsContentVersion.id DESC
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
                 cc.ResetDirtyProperties(false);
-            }            
+            }
 
-            return content;
+            return content.Select(x => x.Item1).ToArray();
         }
 
         /// <summary>
