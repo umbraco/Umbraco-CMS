@@ -12,25 +12,15 @@ namespace Umbraco.Core.IO
     public class FileSystemProviderManager
     {
         private readonly FileSystemProvidersSection _config;
-        private readonly WeakSet<ShadowWrapper> _wrappers = new WeakSet<ShadowWrapper>();
+        private readonly ConcurrentSet<ShadowWrapper> _wrappers = new ConcurrentSet<ShadowWrapper>();
 
-        // actual well-known filesystems returned by properties
-        private readonly IFileSystem2 _macroPartialFileSystem;
-        private readonly IFileSystem2 _partialViewsFileSystem;
-        private readonly IFileSystem2 _stylesheetsFileSystem;
-        private readonly IFileSystem2 _scriptsFileSystem;
-        private readonly IFileSystem2 _xsltFileSystem;
-        private readonly IFileSystem2 _masterPagesFileSystem;
-        private readonly IFileSystem2 _mvcViewsFileSystem;
-
-        // when shadowing is enabled, above filesystems, as wrappers
-        private readonly ShadowWrapper _macroPartialFileSystemWrapper;
-        private readonly ShadowWrapper _partialViewsFileSystemWrapper;
-        private readonly ShadowWrapper _stylesheetsFileSystemWrapper;
-        private readonly ShadowWrapper _scriptsFileSystemWrapper;
-        private readonly ShadowWrapper _xsltFileSystemWrapper;
-        private readonly ShadowWrapper _masterPagesFileSystemWrapper;
-        private readonly ShadowWrapper _mvcViewsFileSystemWrapper;
+        private readonly ShadowWrapper _macroPartialFileSystem;
+        private readonly ShadowWrapper _partialViewsFileSystem;
+        private readonly ShadowWrapper _stylesheetsFileSystem;
+        private readonly ShadowWrapper _scriptsFileSystem;
+        private readonly ShadowWrapper _xsltFileSystem;
+        private readonly ShadowWrapper _masterPagesFileSystem;
+        private readonly ShadowWrapper _mvcViewsFileSystem;
 
         #region Singleton & Constructor
 
@@ -51,21 +41,21 @@ namespace Umbraco.Core.IO
         {
             _config = (FileSystemProvidersSection) ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
 
-            _macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials);
-            _partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
-            _stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
-            _scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
-            _xsltFileSystem = new PhysicalFileSystem(SystemDirectories.Xslt);
-            _masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
-            _mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials);
+            var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
+            var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
+            var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
+            var xsltFileSystem = new PhysicalFileSystem(SystemDirectories.Xslt);
+            var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
+            var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
 
-            _macroPartialFileSystem = _macroPartialFileSystemWrapper = new ShadowWrapper(_macroPartialFileSystem, "Views/MacroPartials", ScopeProvider);
-            _partialViewsFileSystem = _partialViewsFileSystemWrapper = new ShadowWrapper(_partialViewsFileSystem, "Views/Partials", ScopeProvider);
-            _stylesheetsFileSystem = _stylesheetsFileSystemWrapper = new ShadowWrapper(_stylesheetsFileSystem, "css", ScopeProvider);
-            _scriptsFileSystem = _scriptsFileSystemWrapper = new ShadowWrapper(_scriptsFileSystem, "scripts", ScopeProvider);
-            _xsltFileSystem = _xsltFileSystemWrapper = new ShadowWrapper(_xsltFileSystem, "xslt", ScopeProvider);
-            _masterPagesFileSystem = _masterPagesFileSystemWrapper = new ShadowWrapper(_masterPagesFileSystem, "masterpages", ScopeProvider);
-            _mvcViewsFileSystem = _mvcViewsFileSystemWrapper = new ShadowWrapper(_mvcViewsFileSystem, "Views", ScopeProvider);
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", ScopeProvider);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", ScopeProvider);
+            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", ScopeProvider);
+            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", ScopeProvider);
+            _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", ScopeProvider);
+            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", ScopeProvider);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", ScopeProvider);
 
             // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
             MediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
@@ -80,7 +70,7 @@ namespace Umbraco.Core.IO
         public IFileSystem2 StylesheetsFileSystem { get { return _stylesheetsFileSystem; } }
         public IFileSystem2 ScriptsFileSystem { get { return _scriptsFileSystem; } }
         public IFileSystem2 XsltFileSystem { get { return _xsltFileSystem; } }
-        public IFileSystem2 MasterPagesFileSystem { get { return _masterPagesFileSystem; } }
+        public IFileSystem2 MasterPagesFileSystem { get { return _mvcViewsFileSystem; } }
         public IFileSystem2 MvcViewsFileSystem { get { return _mvcViewsFileSystem; } }
         public MediaFileSystem MediaFileSystem { get; private set; }
 
@@ -99,55 +89,76 @@ namespace Umbraco.Core.IO
 		}
 
 		private readonly ConcurrentDictionary<string, ProviderConstructionInfo> _providerLookup = new ConcurrentDictionary<string, ProviderConstructionInfo>();
-		private readonly ConcurrentDictionary<Type, string> _aliases = new ConcurrentDictionary<Type, string>();
+        private readonly ConcurrentDictionary<string, IFileSystem2> _filesystems = new ConcurrentDictionary<string, IFileSystem2>();
 
         /// <summary>
         /// Gets an underlying (non-typed) filesystem supporting a strongly-typed filesystem.
         /// </summary>
         /// <param name="alias">The alias of the strongly-typed filesystem.</param>
         /// <returns>The non-typed filesystem supporting the strongly-typed filesystem with the specified alias.</returns>
-        /// <remarks>This method should not be used directly, used <see cref="GetFileSystemProvider{TFileSystem}"/> instead.</remarks>
+        /// <remarks>This method should not be used directly, used <see cref="GetFileSystemProvider{TFileSystem}()"/> instead.</remarks>
         public IFileSystem GetUnderlyingFileSystemProvider(string alias)
         {
+            return GetUnderlyingFileSystemProvider(alias, null);
+        }
+
+        /// <summary>
+        /// Gets an underlying (non-typed) filesystem supporting a strongly-typed filesystem.
+        /// </summary>
+        /// <param name="alias">The alias of the strongly-typed filesystem.</param>
+        /// /// <param name="fallback">A fallback creator for the filesystem.</param>
+        /// <returns>The non-typed filesystem supporting the strongly-typed filesystem with the specified alias.</returns>
+        /// <remarks>This method should not be used directly, used <see cref="GetFileSystemProvider{TFileSystem}()"/> instead.</remarks>
+        private IFileSystem GetUnderlyingFileSystemProvider(string alias, Func<IFileSystem> fallback)
+        {
 			// either get the constructor info from cache or create it and add to cache
-	        var ctorInfo = _providerLookup.GetOrAdd(alias, s =>
-		        {
-                    // get config
-			        var providerConfig = _config.Providers[s];
-			        if (providerConfig == null)
-				        throw new ArgumentException(string.Format("No provider found with alias {0}.", s));
+            var ctorInfo = _providerLookup.GetOrAdd(alias, _ => GetUnderlyingFileSystemCtor(alias, fallback));
+            return ctorInfo == null ? fallback() : (IFileSystem) ctorInfo.Constructor.Invoke(ctorInfo.Parameters);
+        }
 
-                    // get the filesystem type
-			        var providerType = Type.GetType(providerConfig.Type);
-			        if (providerType == null)
-				        throw new InvalidOperationException(string.Format("Could not find type {0}.", providerConfig.Type));
+        private IFileSystem GetUnderlyingFileSystemNoCache(string alias, Func<IFileSystem> fallback)
+        {
+            var ctorInfo = GetUnderlyingFileSystemCtor(alias, fallback);
+            return ctorInfo == null ? fallback() : (IFileSystem) ctorInfo.Constructor.Invoke(ctorInfo.Parameters);
+        }
 
-                    // ensure it implements IFileSystem
-			        if (providerType.IsAssignableFrom(typeof (IFileSystem)))
-				        throw new InvalidOperationException(string.Format("Type {0} does not implement IFileSystem.", providerType.FullName));
+        private ProviderConstructionInfo GetUnderlyingFileSystemCtor(string alias, Func<IFileSystem> fallback)
+        {
+            // get config
+            var providerConfig = _config.Providers[alias];
+            if (providerConfig == null)
+            {
+                if (fallback != null) return null;
+                throw new ArgumentException(string.Format("No provider found with alias {0}.", alias));
+            }
 
-                    // find a ctor matching the config parameters
-			        var paramCount = providerConfig.Parameters != null ? providerConfig.Parameters.Count : 0;
-			        var constructor = providerType.GetConstructors().SingleOrDefault(x
-                        => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.AllKeys.Contains(y.Name)));
-			        if (constructor == null)
-				        throw new InvalidOperationException(string.Format("Type {0} has no ctor matching the {1} configuration parameter(s).", providerType.FullName, paramCount));
+            // get the filesystem type
+            var providerType = Type.GetType(providerConfig.Type);
+            if (providerType == null)
+                throw new InvalidOperationException(string.Format("Could not find type {0}.", providerConfig.Type));
 
-			        var parameters = new object[paramCount];
-                    if (providerConfig.Parameters != null) // keeps ReSharper happy
-			            for (var i = 0; i < paramCount; i++)
-				            parameters[i] = providerConfig.Parameters[providerConfig.Parameters.AllKeys[i]].Value;
+            // ensure it implements IFileSystem
+            if (providerType.IsAssignableFrom(typeof(IFileSystem)))
+                throw new InvalidOperationException(string.Format("Type {0} does not implement IFileSystem.", providerType.FullName));
 
-			        return new ProviderConstructionInfo
-				        {
-					        Constructor = constructor,
-					        Parameters = parameters,
-					        //ProviderAlias = s
-				        };
-		        });
+            // find a ctor matching the config parameters
+            var paramCount = providerConfig.Parameters != null ? providerConfig.Parameters.Count : 0;
+            var constructor = providerType.GetConstructors().SingleOrDefault(x
+                => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.AllKeys.Contains(y.Name)));
+            if (constructor == null)
+                throw new InvalidOperationException(string.Format("Type {0} has no ctor matching the {1} configuration parameter(s).", providerType.FullName, paramCount));
 
-            // create the fs and return
-			return (IFileSystem) ctorInfo.Constructor.Invoke(ctorInfo.Parameters);
+            var parameters = new object[paramCount];
+            if (providerConfig.Parameters != null) // keeps ReSharper happy
+                for (var i = 0; i < paramCount; i++)
+                    parameters[i] = providerConfig.Parameters[providerConfig.Parameters.AllKeys[i]].Value;
+
+            return new ProviderConstructionInfo
+            {
+                Constructor = constructor,
+                Parameters = parameters,
+                //ProviderAlias = s
+            };
         }
 
         /// <summary>
@@ -155,38 +166,68 @@ namespace Umbraco.Core.IO
         /// </summary>
         /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
         /// <returns>A strongly-typed filesystem of the specified type.</returns>
+        /// <remarks>
+        /// <para>Ideally, this should cache the instances, but that would break backward compatibility, so we
+        /// only do it for our own MediaFileSystem - for everything else, it's the responsibility of the caller
+        /// to ensure that they maintain singletons. This is important for singletons, as each filesystem maintains
+        /// its own shadow and having multiple instances would lead to inconsistencies.</para>
+        /// <para>Note that any filesystem created by this method *after* shadowing begins, will *not* be
+        /// shadowing (and an exception will be thrown by the ShadowWrapper).</para>
+        /// </remarks>
         public TFileSystem GetFileSystemProvider<TFileSystem>()
-			where TFileSystem : FileSystemWrapper
+            where TFileSystem : FileSystemWrapper
         {
-            // deal with known types - avoid infinite loops!
-            if (typeof(TFileSystem) == typeof(MediaFileSystem) && MediaFileSystem != null)
-                return MediaFileSystem as TFileSystem; // else create and return
+            return GetFileSystemProvider<TFileSystem>(null);
+        }
 
-			// get/cache the alias for the filesystem type
-	        var alias = _aliases.GetOrAdd(typeof (TFileSystem), fsType =>
-		        {
-					// validate the ctor
-					var constructor = fsType.GetConstructors().SingleOrDefault(x
-                        => x.GetParameters().Length == 1 && TypeHelper.IsTypeAssignableFrom<IFileSystem>(x.GetParameters().Single().ParameterType));
-					if (constructor == null)
-						throw new InvalidOperationException("Type " + fsType.FullName + " must inherit from FileSystemWrapper and have a constructor that accepts one parameter of type " + typeof(IFileSystem).FullName + ".");
+        /// <summary>
+        /// Gets a strongly-typed filesystem.
+        /// </summary>
+        /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
+        /// <param name="fallback">A fallback creator for the inner filesystem.</param>
+        /// <returns>A strongly-typed filesystem of the specified type.</returns>
+        /// <remarks>
+        /// <para>The fallback creator is used only if nothing is configured.</para>
+        /// <para>Ideally, this should cache the instances, but that would break backward compatibility, so we
+        /// only do it for our own MediaFileSystem - for everything else, it's the responsibility of the caller
+        /// to ensure that they maintain singletons. This is important for singletons, as each filesystem maintains
+        /// its own shadow and having multiple instances would lead to inconsistencies.</para>
+        /// <para>Note that any filesystem created by this method *after* shadowing begins, will *not* be
+        /// shadowing (and an exception will be thrown by the ShadowWrapper).</para>
+        /// </remarks>
+        public TFileSystem GetFileSystemProvider<TFileSystem>(Func<IFileSystem> fallback)
+            where TFileSystem : FileSystemWrapper
+        {
+            var alias = GetFileSystemAlias<TFileSystem>();
+            return (TFileSystem) _filesystems.GetOrAdd(alias, _ =>
+            {
+                // gets the inner fs, create the strongly-typed fs wrapping the inner fs, register & return
+                // so we are double-wrapping here
+                // could be optimized by having FileSystemWrapper inherit from ShadowWrapper, maybe
+                var innerFs = GetUnderlyingFileSystemNoCache(alias, fallback);
+                var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, ScopeProvider);
+                var fs = (IFileSystem2) Activator.CreateInstance(typeof (TFileSystem), shadowWrapper);
+                _wrappers.Add(shadowWrapper); // keeping a reference to the wrapper
+                return fs;
+            });
+        }
 
-                    // find the attribute and get the alias
-					var attr = (FileSystemProviderAttribute) fsType.GetCustomAttributes(typeof(FileSystemProviderAttribute), false).SingleOrDefault();
-					if (attr == null)
-						throw new InvalidOperationException("Type " + fsType.FullName + "is missing the required FileSystemProviderAttribute.");
+        private string GetFileSystemAlias<TFileSystem>()
+        {
+            var fsType = typeof(TFileSystem);
 
-			        return attr.Alias;
-		        });
+            // validate the ctor
+            var constructor = fsType.GetConstructors().SingleOrDefault(x
+                => x.GetParameters().Length == 1 && TypeHelper.IsTypeAssignableFrom<IFileSystem>(x.GetParameters().Single().ParameterType));
+            if (constructor == null)
+                throw new InvalidOperationException("Type " + fsType.FullName + " must inherit from FileSystemWrapper and have a constructor that accepts one parameter of type " + typeof(IFileSystem).FullName + ".");
 
-            // gets the inner fs, create the strongly-typed fs wrapping the inner fs, register & return
-            // so we are double-wrapping here
-            // could be optimized by having FileSystemWrapper inherit from ShadowWrapper, maybe
-            var innerFs = GetUnderlyingFileSystemProvider(alias);
-            var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, ScopeProvider);
-	        var fs = (TFileSystem) Activator.CreateInstance(typeof (TFileSystem), shadowWrapper);
-            _wrappers.Add(shadowWrapper); // keeping a weak reference to the wrapper
-	        return fs;
+            // find the attribute and get the alias
+            var attr = (FileSystemProviderAttribute)fsType.GetCustomAttributes(typeof(FileSystemProviderAttribute), false).SingleOrDefault();
+            if (attr == null)
+                throw new InvalidOperationException("Type " + fsType.FullName + "is missing the required FileSystemProviderAttribute.");
+
+            return attr.Alias;
         }
 
         #endregion
@@ -199,30 +240,29 @@ namespace Umbraco.Core.IO
             var wrappers = new ShadowWrapper[typed.Length + 7];
             var i = 0;
             while (i < typed.Length) wrappers[i] = typed[i++];
-            wrappers[i++] = _macroPartialFileSystemWrapper;
-            wrappers[i++] = _partialViewsFileSystemWrapper;
-            wrappers[i++] = _stylesheetsFileSystemWrapper;
-            wrappers[i++] = _scriptsFileSystemWrapper;
-            wrappers[i++] = _xsltFileSystemWrapper;
-            wrappers[i++] = _masterPagesFileSystemWrapper;
-            wrappers[i] = _mvcViewsFileSystemWrapper;
+            wrappers[i++] = _macroPartialFileSystem;
+            wrappers[i++] = _partialViewsFileSystem;
+            wrappers[i++] = _stylesheetsFileSystem;
+            wrappers[i++] = _scriptsFileSystem;
+            wrappers[i++] = _xsltFileSystem;
+            wrappers[i++] = _masterPagesFileSystem;
+            wrappers[i] = _mvcViewsFileSystem;
 
             return new ShadowFileSystems(id, wrappers);
         }
 
         #endregion
 
-        private class WeakSet<T>
+        private class ConcurrentSet<T>
             where T : class
         {
-            private readonly HashSet<WeakReference<T>> _set = new HashSet<WeakReference<T>>();
+            private readonly HashSet<T> _set = new HashSet<T>();
 
             public void Add(T item)
             {
                 lock (_set)
                 {
-                    _set.Add(new WeakReference<T>(item));
-                    CollectLocked();
+                    _set.Add(item);
                 }
             }
 
@@ -230,22 +270,8 @@ namespace Umbraco.Core.IO
             {
                 lock (_set)
                 {
-                    CollectLocked();
-                    return _set.Select(x =>
-                    {
-                        T target;
-                        return x.TryGetTarget(out target) ? target : null;
-                    }).WhereNotNull().ToArray();
+                    return _set.ToArray();
                 }
-            }
-
-            private void CollectLocked()
-            {
-                _set.RemoveWhere(x =>
-                {
-                    T target;
-                    return x.TryGetTarget(out target) == false;
-                });
             }
         }
     }
