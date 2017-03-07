@@ -320,6 +320,9 @@
             if (!$routeParams.notemplate && contentType.id === 0) {
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
+
+                // initialise the setting for URL tracking (if template created, should enable by default, otherwise not)
+                contentType.enableUrlTracking = true;
             }
 
             // convert icons for content type
