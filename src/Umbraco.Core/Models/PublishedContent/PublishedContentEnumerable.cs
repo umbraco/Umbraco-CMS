@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,7 +13,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// The items in the collection
         /// </summary>
-        private readonly List<IPublishedContent> _items = new List<IPublishedContent>();
+        private readonly IEnumerable<IPublishedContent> _items;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentEnumerable"/> class.
@@ -22,7 +23,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </param>
         public PublishedContentEnumerable(IEnumerable<IPublishedContent> publishedContent)
         {
-            _items.AddRange(publishedContent);
+            if (publishedContent == null) throw new ArgumentNullException("publishedContent");
+            _items = publishedContent;
         }
 
         /// <summary>

@@ -318,6 +318,7 @@
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
     <Compile Include="OrderedHashSet.cs" />
     <Compile Include="Events\UninstallPackageEventArgs.cs" />
     <Compile Include="Models\GridValue.cs" />
@@ -576,8 +577,6 @@
     <Compile Include="PropertyEditors\ValueConverters\SliderValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TagsValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\UserPickerValueConverter.cs" />
-    <Compile Include="PublishedContentTypeConverter.cs" />
     <Compile Include="Publishing\UnPublishedStatusType.cs" />
     <Compile Include="Publishing\UnPublishStatus.cs" />
     <Compile Include="SafeCallContext.cs" />

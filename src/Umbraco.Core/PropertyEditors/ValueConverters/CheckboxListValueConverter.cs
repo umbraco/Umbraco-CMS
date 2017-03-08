@@ -6,7 +6,10 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    public class CheckboxListValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(IEnumerable<string>))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
+    public class CheckboxListValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
@@ -19,7 +22,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
-            var sourceString = (source ?? "").ToString();
+            var sourceString = (source ?? string.Empty).ToString();
 
             if (string.IsNullOrEmpty(sourceString))
                 return Enumerable.Empty<string>();
@@ -28,17 +31,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 sourceString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim());
 
             return values;
-        }
-
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(IEnumerable<string>);
-        }
-
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType,
-                                                        PropertyCacheValue cacheValue)
-        {
-            return PropertyCacheLevel.Content;
-        }
+        }        
     }
 }

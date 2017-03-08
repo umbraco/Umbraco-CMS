@@ -1,13 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RelatedLink.cs" company="Umbraco">
-//   Umbraco
-// </copyright>
-// <summary>
-//   Defines the RelatedLink type.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
-
-﻿namespace Umbraco.Web.Models
+﻿﻿namespace Umbraco.Web.Models
 {
 	public class RelatedLink : RelatedLinkBase
 	{

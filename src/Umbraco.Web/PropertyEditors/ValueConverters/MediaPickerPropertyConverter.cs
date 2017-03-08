@@ -19,7 +19,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// <summary>
     /// The media picker property value converter.
     /// </summary>
-    public class MediaPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(IPublishedContent))]
+    [PropertyValueCache(PropertyCacheValue.Object, PropertyCacheLevel.ContentCache)]
+    [PropertyValueCache(PropertyCacheValue.Source, PropertyCacheLevel.Content)]
+    [PropertyValueCache(PropertyCacheValue.XPath, PropertyCacheLevel.Content)]
+    public class MediaPickerPropertyConverter : PropertyValueConverterBase
     {
         /// <summary>
         /// Checks if this converter can convert the property editor and registers if it can.
@@ -94,52 +99,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return null;
         }
 
-        /// <summary>
-        /// The get property cache level.
-        /// </summary>
-        /// <param name="propertyType">
-        /// The property type.
-        /// </param>
-        /// <param name="cacheValue">
-        /// The cache value.
-        /// </param>
-        /// <returns>
-        /// The <see cref="PropertyCacheLevel"/>.
-        /// </returns>
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
-        {
-            PropertyCacheLevel returnLevel;
-            switch (cacheValue)
-            {
-                case PropertyCacheValue.Object:
-                    returnLevel = PropertyCacheLevel.ContentCache;
-                    break;
-                case PropertyCacheValue.Source:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                case PropertyCacheValue.XPath:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                default:
-                    returnLevel = PropertyCacheLevel.None;
-                    break;
-            }
-
-            return returnLevel;
-        }
-
-        /// <summary>
-        /// The CLR type that the value converter returns.
-        /// </summary>
-        /// <param name="propertyType">
-        /// The property type.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Type"/>.
-        /// </returns>
-        public virtual Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(IPublishedContent);
-        }
+        
     }
 }

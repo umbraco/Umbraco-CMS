@@ -4,7 +4,10 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    public class RadioButtonListValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(int))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
+    public class RadioButtonListValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
@@ -23,15 +26,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             return null;
         }
-
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(int);
-        }
-
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
-        {
-            return PropertyCacheLevel.Content;
-        }
+        
     }
 }

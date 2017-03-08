@@ -1,29 +1,27 @@
 ﻿using System;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    public class MemberGroupPickerValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(string))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
+    public class MemberGroupPickerValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberGroupPickerAlias);
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberGroupPickerAlias);
+            }
+            return false;
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             return source == null ? string.Empty : source.ToString();
         }
-
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(string);
-        }
-
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType,
-                                                        PropertyCacheValue cacheValue)
-        {
-            return PropertyCacheLevel.Content;
-        }
+        
     }
 }

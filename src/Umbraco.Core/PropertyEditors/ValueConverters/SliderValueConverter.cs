@@ -3,11 +3,27 @@ using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     public class SliderValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
+        private readonly IDataTypeService _dataTypeService;
+
+        //TODO: Remove this ctor in v8 since the other one will use IoC
+        public SliderValueConverter()
+            : this(ApplicationContext.Current.Services.DataTypeService)
+        {
+        }
+
+        public SliderValueConverter(IDataTypeService dataTypeService)
+        {
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            _dataTypeService = dataTypeService;
+        }
+
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
@@ -72,10 +88,9 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// </returns>
         private bool IsRangeDataType(int dataTypeId)
         {
-            // ** This must be cached (U4-8862) **
-            var dts = ApplicationContext.Current.Services.DataTypeService;
+            // ** This must be cached (U4-8862) **            
             var enableRange =
-                dts.GetPreValuesCollectionByDataTypeId(dataTypeId)
+                _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId)
                     .PreValuesAsDictionary.FirstOrDefault(
                         x => string.Equals(x.Key, "enableRange", StringComparison.InvariantCultureIgnoreCase)).Value;
 

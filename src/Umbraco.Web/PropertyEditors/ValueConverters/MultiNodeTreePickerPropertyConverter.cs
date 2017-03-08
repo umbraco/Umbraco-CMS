@@ -23,7 +23,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// <summary>
     /// The multi node tree picker property editor value converter.
     /// </summary>
-    public class MultiNodeTreePickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(IEnumerable<IPublishedContent>))]
+    [PropertyValueCache(PropertyCacheValue.Object, PropertyCacheLevel.ContentCache)]
+    [PropertyValueCache(PropertyCacheValue.Source, PropertyCacheLevel.Content)]
+    [PropertyValueCache(PropertyCacheValue.XPath, PropertyCacheLevel.Content)]
+    public class MultiNodeTreePickerPropertyConverter : PropertyValueConverterBase
     {
         /// <summary>
         /// The properties to exclude.
@@ -100,6 +105,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 return null;
             }
 
+            //TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
             if (UmbracoContext.Current != null)
             {
                 var nodeIds = (int[])source;
@@ -126,6 +132,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             }
                         }
                     }
+                    //TODO: Get rid of this Yield thing
                     return multiNodeTreePicker.Yield().Where(x => x != null);
                 }
 
@@ -136,54 +143,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 return null;
             }
-        }
-
-        /// <summary>
-        /// The get property cache level.
-        /// </summary>
-        /// <param name="propertyType">
-        /// The property type.
-        /// </param>
-        /// <param name="cacheValue">
-        /// The cache value.
-        /// </param>
-        /// <returns>
-        /// The <see cref="PropertyCacheLevel"/>.
-        /// </returns>
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
-        {
-            PropertyCacheLevel returnLevel;
-            switch (cacheValue)
-            {
-                case PropertyCacheValue.Object:
-                    returnLevel = PropertyCacheLevel.ContentCache;
-                    break;
-                case PropertyCacheValue.Source:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                case PropertyCacheValue.XPath:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                default:
-                    returnLevel = PropertyCacheLevel.None;
-                    break;
-            }
-
-            return returnLevel;
-        }
-
-        /// <summary>
-        /// The CLR type that the value converter returns.
-        /// </summary>
-        /// <param name="propertyType">
-        /// The property type.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Type"/>.
-        /// </returns>
-        public virtual Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(IEnumerable<IPublishedContent>);
         }
 
         /// <summary>

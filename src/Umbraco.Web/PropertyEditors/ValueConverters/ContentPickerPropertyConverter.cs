@@ -22,7 +22,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// <summary>
     /// The content picker property value converter.
     /// </summary>
-    public class ContentPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(IPublishedContent))]
+    [PropertyValueCache(PropertyCacheValue.Object, PropertyCacheLevel.ContentCache)]
+    [PropertyValueCache(PropertyCacheValue.Source, PropertyCacheLevel.Content)]
+    [PropertyValueCache(PropertyCacheValue.XPath, PropertyCacheLevel.Content)]
+    public class ContentPickerPropertyConverter : PropertyValueConverterBase
     {
         /// <summary>
         /// The properties to exclude.
@@ -130,53 +135,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             return source.ToString();
         }
-
-        /// <summary>
-        /// The CLR type that the value converter returns.
-        /// </summary>
-        /// <param name="propertyType">
-        /// The property type.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Type"/>.
-        /// </returns>
-        public virtual Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(IPublishedContent);
-        }
-
-        /// <summary>
-        /// The get property cache level.
-        /// </summary>
-        /// <param name="propertyType">
-        /// The property type.
-        /// </param>
-        /// <param name="cacheValue">
-        /// The cache value.
-        /// </param>
-        /// <returns>
-        /// The <see cref="PropertyCacheLevel"/>.
-        /// </returns>
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
-        {
-            PropertyCacheLevel returnLevel;
-            switch (cacheValue)
-            {
-                case PropertyCacheValue.Object:
-                    returnLevel = PropertyCacheLevel.ContentCache;
-                    break;
-                case PropertyCacheValue.Source:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                case PropertyCacheValue.XPath:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                default:
-                    returnLevel = PropertyCacheLevel.None;
-                    break;
-            }
-
-            return returnLevel;
-        }
+        
     }
 }

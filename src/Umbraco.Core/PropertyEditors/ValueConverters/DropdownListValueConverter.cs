@@ -1,28 +1,28 @@
 ﻿using System;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    public class DropdownListValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(string))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
+    public class DropdownListValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.DropDownListAlias);
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.DropDownListAlias);
+            }
+            return false;
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             return source == null ? string.Empty : source.ToString();
         }
-
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(string);
-        }
-
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
-        {
-            return PropertyCacheLevel.Content;
-        }
+        
     }
 }

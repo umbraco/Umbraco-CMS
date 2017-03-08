@@ -6,7 +6,11 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    public class DropdownListMultipleWithKeysValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(IEnumerable<int>))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
+    public class DropdownListMultipleWithKeysValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
@@ -30,16 +34,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             return prevalueIds;
         }
-
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(IEnumerable<int>);
-        }
-
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType,
-                                                        PropertyCacheValue cacheValue)
-        {
-            return PropertyCacheLevel.Content;
-        }
+        
     }
 }

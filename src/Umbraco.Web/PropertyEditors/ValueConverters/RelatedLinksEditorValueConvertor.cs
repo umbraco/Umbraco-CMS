@@ -7,6 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -15,16 +16,30 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// The related links property value converter.
     /// </summary>
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(RelatedLinks))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.ContentCache)]
     public class RelatedLinksPropertyConverter : PropertyValueConverterBase
     {
+        private readonly UrlProvider _urlProvider;
+
+        public RelatedLinksPropertyConverter()
+        {
+        }
+
+        public RelatedLinksPropertyConverter(UrlProvider urlProvider)
+        {
+            if (urlProvider == null) throw new ArgumentNullException("urlProvider");
+            _urlProvider = urlProvider;
+        }
+
         /// <summary>
         /// Checks if this converter can convert the property editor and registers if it can.
         /// </summary>
@@ -89,7 +104,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 else
                 {
-                    LogHelper.Warn<RelatedLinks>(
+                    LogHelper.Warn<RelatedLinksPropertyConverter>(
                         string.Format("Related Links value converter skipped a link as the node has been unpublished/deleted (Internal Link NodeId: {0}, Link Caption: \"{1}\")", relatedLink.Link, relatedLink.Caption));
                 }
             }
@@ -101,12 +116,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             if (link.IsInternal && link.Id != null)
             {
-                if (UmbracoContext.Current == null)
+                if (_urlProvider == null && UmbracoContext.Current == null)
                 {
                     return null;
                 }
 
-                link.Link = UmbracoContext.Current.UrlProvider.GetUrl((int)link.Id);
+                var urlProvider = _urlProvider ?? UmbracoContext.Current.UrlProvider;
+
+                link.Link = urlProvider.GetUrl((int)link.Id);
                 if (link.Link.Equals("#"))
                 {
                     link.IsDeleted = true;
@@ -119,6 +136,18 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
 
             return link;
+        }
+
+        internal class RelatedLinkData : RelatedLinkBase
+        {
+            [JsonProperty("internal")]
+            public int? Internal { get; set; }
+            [JsonProperty("edit")]
+            public bool Edit { get; set; }
+            [JsonProperty("internalName")]
+            public string InternalName { get; set; }
+            [JsonProperty("title")]
+            public string Title { get; set; }
         }
     }
 }

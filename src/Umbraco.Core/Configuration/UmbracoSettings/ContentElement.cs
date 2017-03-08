@@ -180,13 +180,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("EnablePropertyValueConverters")]
         internal InnerTextConfigurationElement<bool> EnablePropertyValueConverters
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                       (InnerTextConfigurationElement<bool>)this["EnablePropertyValueConverters"],
-                       //set the default
-                       false);
-            }
+            get { return GetOptionalTextElement("EnablePropertyValueConverters", false); }
         }
 
         string IContentSection.NotificationEmailAddress

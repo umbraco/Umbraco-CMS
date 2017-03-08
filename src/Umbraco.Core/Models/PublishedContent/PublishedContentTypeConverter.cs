@@ -1,21 +1,20 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Models.PublishedContent
 {
-    public class PublishedContentTypeConverter : TypeConverter
+    internal class PublishedContentTypeConverter : TypeConverter
     {
+        private static readonly Type[] ConvertableTypes = new[]
+        {
+            typeof(int)
+        };
+
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            var convertableTypes = new[]
-            {
-                typeof(int)
-            };
-
-            return convertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, destinationType))
+            return ConvertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, destinationType))
                    || base.CanConvertFrom(context, destinationType);
         }
 

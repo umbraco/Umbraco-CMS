@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 
@@ -8,7 +10,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// <summary>
     /// The upload property value converter.
     /// </summary>
-    public class UploadPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(string))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
+    public class UploadPropertyConverter : PropertyValueConverterBase
     {
         /// <summary>
         /// Checks if this converter can convert the property editor and registers if it can.
@@ -21,21 +26,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.UploadFieldAlias);
-        }
-
-        /// <summary>
-        /// The CLR type that the value converter returns.
-        /// </summary>
-        /// <param name="propertyType">
-        /// The property type.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Type"/>.
-        /// </returns>
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(string);
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.UploadFieldAlias);
+            }
+            return false;
         }
 
         /// <summary>
@@ -57,23 +52,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             return (source ?? "").ToString();
         }
-
-        /// <summary>
-        /// The get property cache level.
-        /// </summary>
-        /// <param name="propertyType">
-        /// The property type.
-        /// </param>
-        /// <param name="cacheValue">
-        /// The cache value.
-        /// </param>
-        /// <returns>
-        /// The <see cref="PropertyCacheLevel"/>.
-        /// </returns>
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
-        {
-            return PropertyCacheLevel.Content;
-        }
-
+        
     }
 }

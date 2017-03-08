@@ -5,11 +5,29 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    public class TagsValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(IEnumerable<string>))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
+    public class TagsValueConverter : PropertyValueConverterBase
     {
+        private readonly IDataTypeService _dataTypeService;
+
+        //TODO: Remove this ctor in v8 since the other one will use IoC
+        public TagsValueConverter()
+            : this(ApplicationContext.Current.Services.DataTypeService)
+        {
+        }
+
+        public TagsValueConverter(IDataTypeService dataTypeService)
+        {
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            _dataTypeService = dataTypeService;
+        }
+
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
@@ -45,16 +63,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return (string[]) source;
         }
 
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(IEnumerable<string>);
-        }
-
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
-        {
-            return PropertyCacheLevel.Content;
-        }
-
         /// <summary>
         /// Discovers if the tags data type is storing its data in a Json format
         /// </summary>
@@ -64,12 +72,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        private static bool JsonStorageType(int dataTypeId)
+        private bool JsonStorageType(int dataTypeId)
         {
             // ** This must be cached (U4-8862) **
-            var dts = ApplicationContext.Current.Services.DataTypeService;
             var storageType =
-                dts.GetPreValuesCollectionByDataTypeId(dataTypeId)
+                _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId)
                     .PreValuesAsDictionary.FirstOrDefault(
                         x => string.Equals(x.Key, "storageType", StringComparison.InvariantCultureIgnoreCase)).Value;
 

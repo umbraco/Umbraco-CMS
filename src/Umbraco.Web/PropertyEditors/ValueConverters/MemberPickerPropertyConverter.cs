@@ -8,7 +8,12 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    public class MemberPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(IPublishedContent))]
+    [PropertyValueCache(PropertyCacheValue.Object, PropertyCacheLevel.ContentCache)]
+    [PropertyValueCache(PropertyCacheValue.Source, PropertyCacheLevel.Content)]
+    [PropertyValueCache(PropertyCacheValue.XPath, PropertyCacheLevel.Content)]
+    public class MemberPickerPropertyConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
@@ -42,32 +47,5 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return null;
         }
 
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(IPublishedContent);
-        }
-
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType,
-                                                        PropertyCacheValue cacheValue)
-        {
-            PropertyCacheLevel returnLevel;
-            switch (cacheValue)
-            {
-                case PropertyCacheValue.Object:
-                    returnLevel = PropertyCacheLevel.ContentCache;
-                    break;
-                case PropertyCacheValue.Source:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                case PropertyCacheValue.XPath:
-                    returnLevel = PropertyCacheLevel.Content;
-                    break;
-                default:
-                    returnLevel = PropertyCacheLevel.None;
-                    break;
-            }
-
-            return returnLevel;
-        }
     }
 }

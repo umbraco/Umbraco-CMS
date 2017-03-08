@@ -4,7 +4,10 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    public class ColorPickerValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(string))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
+    public class ColorPickerValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
@@ -18,17 +21,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             // make sure it's a string
-            return source.ToString();
+            return source == null ? string.Empty : source.ToString();
         }
-
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(string);
-        }
-
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
-        {
-            return PropertyCacheLevel.Content;
-        }
+        
     }
 }

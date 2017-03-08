@@ -17,14 +17,30 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// The multiple media picker property value converter.
     /// </summary>
+    [DefaultPropertyValueConverter]
     public class MultipleMediaPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
+        private readonly IDataTypeService _dataTypeService;
+
+        //TODO: Remove this ctor in v8 since the other one will use IoC
+        public MultipleMediaPickerPropertyConverter()
+            : this(ApplicationContext.Current.Services.DataTypeService)
+        {
+        }
+
+        public MultipleMediaPickerPropertyConverter(IDataTypeService dataTypeService)
+        {
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            _dataTypeService = dataTypeService;
+        }
+
         /// <summary>
         /// Checks if this converter can convert the property editor and registers if it can.
         /// </summary>
@@ -207,9 +223,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public bool IsMultipleDataType(int dataTypeId)
         {
             // ** This must be cached (U4-8862) **
-            var dts = ApplicationContext.Current.Services.DataTypeService;
             var multiPickerPreValue =
-                dts.GetPreValuesCollectionByDataTypeId(dataTypeId)
+                _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId)
                     .PreValuesAsDictionary.FirstOrDefault(
                         x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase)).Value;
 

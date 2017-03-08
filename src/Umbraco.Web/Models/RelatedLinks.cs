@@ -1,13 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RelatedLinks.cs" company="Umbraco">
-//   Umbraco
-// </copyright>
-// <summary>
-//   Defines the RelatedLinks type.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
-
-﻿using System.Collections;
+﻿﻿using System.Collections;
 using System.Collections.Generic;
 ﻿using System.ComponentModel;
 ﻿using System.Linq;
@@ -19,9 +10,9 @@ namespace Umbraco.Web.Models
     {
         private readonly string _propertyData;
 
-        private readonly List<RelatedLink> _relatedLinks;
+        private readonly IEnumerable<RelatedLink> _relatedLinks;
 
-        public RelatedLinks(List<RelatedLink> relatedLinks, string propertyData)
+        public RelatedLinks(IEnumerable<RelatedLink> relatedLinks, string propertyData)
         {
             _relatedLinks = relatedLinks;
             _propertyData = propertyData;
@@ -36,12 +27,7 @@ namespace Umbraco.Web.Models
             {
                 return this._propertyData;
             }
-        }
-
-        public bool Any()
-        {
-            return Enumerable.Any(this);
-        }
+        }        
 
         public IEnumerator<RelatedLink> GetEnumerator()
         {
