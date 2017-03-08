@@ -2,20 +2,14 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using Newtonsoft.Json.Linq;
-using Umbraco.Core;
-using Umbraco.Web.Models;
 
-namespace Umbraco.Web.PropertyEditors.ValueConverters
+namespace Umbraco.Core.Models.PublishedContent
 {
-    /// <summary>
-    /// Used to do some type conversions from ImageCropDataSet to string and JObject
-    /// </summary>
-    public class ImageCropDataSetConverter : TypeConverter
+    internal class PublishedContentTypeConverter : TypeConverter
     {
         private static readonly Type[] ConvertableTypes = new[]
         {
-            typeof(JObject)
+            typeof(int)
         };
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
@@ -30,14 +24,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             object value,
             Type destinationType)
         {
-            var cropDataSet = value as ImageCropDataSet;
-            if (cropDataSet == null)
+            var publishedContent = value as IPublishedContent;
+            if (publishedContent == null)
                 return null;
 
-            //JObject
-            if (TypeHelper.IsTypeAssignableFrom<JObject>(destinationType))
+            if (TypeHelper.IsTypeAssignableFrom<int>(destinationType))
             {
-                return JObject.FromObject(cropDataSet);
+                return publishedContent.Id;
             }
 
             return base.ConvertTo(context, culture, value, destinationType);
