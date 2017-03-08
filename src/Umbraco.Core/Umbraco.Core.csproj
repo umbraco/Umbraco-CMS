@@ -199,6 +199,7 @@
     <Compile Include="Configuration\Dashboard\SectionElement.cs" />
     <Compile Include="Configuration\Dashboard\TabCollection.cs" />
     <Compile Include="Configuration\Dashboard\TabElement.cs" />
+    <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
