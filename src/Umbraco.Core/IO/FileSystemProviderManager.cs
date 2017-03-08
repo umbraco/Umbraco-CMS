@@ -14,13 +14,16 @@ namespace Umbraco.Core.IO
         private readonly FileSystemProvidersSection _config;
         private readonly ConcurrentSet<ShadowWrapper> _wrappers = new ConcurrentSet<ShadowWrapper>();
 
-        private readonly ShadowWrapper _macroPartialFileSystem;
-        private readonly ShadowWrapper _partialViewsFileSystem;
-        private readonly ShadowWrapper _stylesheetsFileSystem;
-        private readonly ShadowWrapper _scriptsFileSystem;
-        private readonly ShadowWrapper _xsltFileSystem;
-        private readonly ShadowWrapper _masterPagesFileSystem;
-        private readonly ShadowWrapper _mvcViewsFileSystem;
+        private readonly ConcurrentDictionary<string, ProviderConstructionInfo> _providerLookup = new ConcurrentDictionary<string, ProviderConstructionInfo>();
+        private readonly ConcurrentDictionary<string, IFileSystem2> _filesystems = new ConcurrentDictionary<string, IFileSystem2>();
+
+        private ShadowWrapper _macroPartialFileSystem;
+        private ShadowWrapper _partialViewsFileSystem;
+        private ShadowWrapper _stylesheetsFileSystem;
+        private ShadowWrapper _scriptsFileSystem;
+        private ShadowWrapper _xsltFileSystem;
+        private ShadowWrapper _masterPagesFileSystem;
+        private ShadowWrapper _mvcViewsFileSystem;
 
         #region Singleton & Constructor
 
@@ -31,16 +34,30 @@ namespace Umbraco.Core.IO
             get { return Instance; }
         }
 
+        // for tests only, totally unsafe
+        internal void Reset()
+        {
+            _wrappers.Clear();
+            _providerLookup.Clear();
+            _filesystems.Clear();
+            CreateWellKnownFileSystems();
+        }
+
         private IScopeProviderInternal ScopeProvider
         {
             // fixme - 'course this is bad, but enough for now
+            // beware: means that we capture the "current" scope provider - take care in tests!
             get { return ApplicationContext.Current == null ? null : ApplicationContext.Current.ScopeProvider as IScopeProviderInternal; }
         }
 
         internal FileSystemProviderManager()
         {
             _config = (FileSystemProvidersSection) ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
+            CreateWellKnownFileSystems();
+        }
 
+        private void CreateWellKnownFileSystems()
+        {
             var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials);
             var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
             var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
@@ -87,9 +104,6 @@ namespace Umbraco.Core.IO
 			public ConstructorInfo Constructor { get; set; }
 			//public string ProviderAlias { get; set; }
 		}
-
-		private readonly ConcurrentDictionary<string, ProviderConstructionInfo> _providerLookup = new ConcurrentDictionary<string, ProviderConstructionInfo>();
-        private readonly ConcurrentDictionary<string, IFileSystem2> _filesystems = new ConcurrentDictionary<string, IFileSystem2>();
 
         /// <summary>
         /// Gets an underlying (non-typed) filesystem supporting a strongly-typed filesystem.
@@ -263,6 +277,14 @@ namespace Umbraco.Core.IO
                 lock (_set)
                 {
                     _set.Add(item);
+                }
+            }
+
+            public void Clear()
+            {
+                lock (_set)
+                {
+                    _set.Clear();
                 }
             }
 

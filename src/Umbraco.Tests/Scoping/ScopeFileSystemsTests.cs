@@ -32,6 +32,7 @@ namespace Umbraco.Tests.Scoping
 
         private static void ClearFiles()
         {
+            TestHelper.DeleteDirectory(IOHelper.MapPath("media"));
             TestHelper.DeleteDirectory(IOHelper.MapPath("FileSysTests"));
             TestHelper.DeleteDirectory(IOHelper.MapPath("App_Data"));
         }
@@ -42,6 +43,8 @@ namespace Umbraco.Tests.Scoping
         {
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = FileSystemProviderManager.Current.MediaFileSystem;
+
+            Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
             var scopeProvider = ApplicationContext.ScopeProvider;
             using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))
