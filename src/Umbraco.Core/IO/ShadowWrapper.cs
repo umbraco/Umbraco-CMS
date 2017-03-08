@@ -69,6 +69,11 @@ namespace Umbraco.Core.IO
             {
                 var isScoped = _scopeProvider != null && _scopeProvider.AmbientScope != null && _scopeProvider.AmbientScope.ScopedFileSystems;
 
+                // if the filesystem is created *after* shadowing starts, it won't be shadowing
+                // better not ignore that situation and raised a meaningful (?) exception
+                if (isScoped && _shadowFileSystem == null)
+                    throw new Exception("The filesystems are shadowing, but this filesystem is not.");
+
                 return isScoped
                     ? _shadowFileSystem
                     : _innerFileSystem;

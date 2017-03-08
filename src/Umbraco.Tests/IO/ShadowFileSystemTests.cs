@@ -806,6 +806,7 @@ namespace Umbraco.Tests.IO
         }
 
         [Test]
+        [Ignore("Does not work on all environments, Directory.GetFiles is broken.")]
         public void ShadowGetFilesUsingWildcardAndSingleCharacterFilter()
         {
             // Arrange
@@ -846,6 +847,7 @@ namespace Umbraco.Tests.IO
         }
 
         [Test]
+        [Ignore("Does not work on all environments, Directory.GetFiles is broken.")]
         public void ShadowFileSystemFilterIsAsBrokenAsRealFileSystemFilter()
         {
             // Arrange
