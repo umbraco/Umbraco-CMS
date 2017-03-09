@@ -42,6 +42,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [ReadOnly(true)]
         public string Snippet { get; set; }
 
+        [DataMember(Name = "id")]
+        [ReadOnly(true)]
+        public string Id { get; set; }
+
         public List<Notification> Notifications { get; private set; }
     }
 }

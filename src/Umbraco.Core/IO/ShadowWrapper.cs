@@ -27,7 +27,7 @@ namespace Umbraco.Core.IO
             // on ShadowFileSystemsScope.None - and if None is false then we should be running
             // in a single thread anyways
 
-            var virt = "~/App_Data/Shadow/" + id + "/" + _shadowPath;
+            var virt = "~/App_Data/TEMP/ShadowFs/" + id + "/" + _shadowPath;
             _shadowDir = IOHelper.MapPath(virt);
             Directory.CreateDirectory(_shadowDir);
             var tempfs = new PhysicalFileSystem(virt);
@@ -68,6 +68,11 @@ namespace Umbraco.Core.IO
             get
             {
                 var isScoped = _scopeProvider != null && _scopeProvider.AmbientScope != null && _scopeProvider.AmbientScope.ScopedFileSystems;
+
+                // if the filesystem is created *after* shadowing starts, it won't be shadowing
+                // better not ignore that situation and raised a meaningful (?) exception
+                if (isScoped && _shadowFileSystem == null)
+                    throw new Exception("The filesystems are shadowing, but this filesystem is not.");
 
                 return isScoped
                     ? _shadowFileSystem

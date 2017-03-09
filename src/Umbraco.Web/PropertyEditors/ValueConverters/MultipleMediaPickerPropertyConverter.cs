@@ -1,0 +1,234 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MultipleMediaPickerPropertyConverter.cs" company="Umbraco">
+//   Umbraco
+// </copyright>
+// <summary>
+//   The multiple media picker property editor converter.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+
+namespace Umbraco.Web.PropertyEditors.ValueConverters
+{
+    /// <summary>
+    /// The multiple media picker property value converter.
+    /// </summary>
+    [DefaultPropertyValueConverter]
+    public class MultipleMediaPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    {
+        private readonly IDataTypeService _dataTypeService;
+
+        //TODO: Remove this ctor in v8 since the other one will use IoC
+        public MultipleMediaPickerPropertyConverter()
+            : this(ApplicationContext.Current.Services.DataTypeService)
+        {
+        }
+
+        public MultipleMediaPickerPropertyConverter(IDataTypeService dataTypeService)
+        {
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            _dataTypeService = dataTypeService;
+        }
+
+        /// <summary>
+        /// Checks if this converter can convert the property editor and registers if it can.
+        /// </summary>
+        /// <param name="propertyType">
+        /// The property type.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        public override bool IsConverter(PublishedPropertyType propertyType)
+        {
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultipleMediaPickerAlias);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Convert the raw string into a nodeId integer array or a single integer
+        /// </summary>
+        /// <param name="propertyType">
+        /// The published property type.
+        /// </param>
+        /// <param name="source">
+        /// The value of the property
+        /// </param>
+        /// <param name="preview">
+        /// The preview.
+        /// </param>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// </returns>
+        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        {
+            if (IsMultipleDataType(propertyType.DataTypeId))
+            {
+                var nodeIds =
+                    source.ToString()
+                        .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(int.Parse)
+                        .ToArray();
+                return nodeIds;
+            }
+
+            var attemptConvertInt = source.TryConvertTo<int>();
+            if (attemptConvertInt.Success)
+            {
+                return attemptConvertInt.Result;
+            }
+            else
+            {
+                var nodeIds =
+                   source.ToString()
+                       .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+                       .Select(int.Parse)
+                       .ToArray();
+
+                if (nodeIds.Length > 0)
+                {
+                    var error =
+                        string.Format(
+                            "Data type \"{0}\" is not set to allow multiple items but appears to contain multiple items, check the setting and save the data type again",
+                            ApplicationContext.Current.Services.DataTypeService.GetDataTypeDefinitionById(
+                                propertyType.DataTypeId).Name);
+
+                    LogHelper.Warn<MultipleMediaPickerPropertyConverter>(error);
+                    throw new Exception(error);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Convert the source nodeId into a IPublishedContent or IEnumerable of IPublishedContent (or DynamicPublishedContent) depending on data type setting
+        /// </summary>
+        /// <param name="propertyType">
+        /// The published property type.
+        /// </param>
+        /// <param name="source">
+        /// The value of the property
+        /// </param>
+        /// <param name="preview">
+        /// The preview.
+        /// </param>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// </returns>
+        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            if (UmbracoContext.Current == null)
+            {
+                return null;
+            }
+
+            var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+
+            if (IsMultipleDataType(propertyType.DataTypeId))
+            {
+                var nodeIds = (int[])source;
+                var multiMediaPicker = Enumerable.Empty<IPublishedContent>();
+                if (nodeIds.Length > 0)
+                {
+                    multiMediaPicker =  umbHelper.TypedMedia(nodeIds).Where(x => x != null);
+                }
+
+                // in v8 should return multiNodeTreePickerEnumerable but for v7 need to return as PublishedContentEnumerable so that string can be returned for legacy compatibility
+                return new PublishedContentEnumerable(multiMediaPicker);
+            }
+
+            // single value picker
+            var nodeId = (int)source;
+            
+            return umbHelper.TypedMedia(nodeId);
+        }
+
+        /// <summary>
+        /// The get property cache level.
+        /// </summary>
+        /// <param name="propertyType">
+        /// The property type.
+        /// </param>
+        /// <param name="cacheValue">
+        /// The cache value.
+        /// </param>
+        /// <returns>
+        /// The <see cref="PropertyCacheLevel"/>.
+        /// </returns>
+        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
+        {
+            PropertyCacheLevel returnLevel;
+            switch (cacheValue)
+            {
+                case PropertyCacheValue.Object:
+                    returnLevel = PropertyCacheLevel.ContentCache;
+                    break;
+                case PropertyCacheValue.Source:
+                    returnLevel = PropertyCacheLevel.Content;
+                    break;
+                case PropertyCacheValue.XPath:
+                    returnLevel = PropertyCacheLevel.Content;
+                    break;
+                default:
+                    returnLevel = PropertyCacheLevel.None;
+                    break;
+            }
+
+            return returnLevel;
+        }
+
+        /// <summary>
+        /// The get property value type.
+        /// </summary>
+        /// <param name="propertyType">
+        /// The property type.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Type"/>.
+        /// </returns>
+        public virtual Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return IsMultipleDataType(propertyType.DataTypeId) ? typeof(IEnumerable<IPublishedContent>) : typeof(IPublishedContent);
+        }
+
+        /// <summary>
+        /// The is multiple data type.
+        /// </summary>
+        /// <param name="dataTypeId">
+        /// The data type id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        public bool IsMultipleDataType(int dataTypeId)
+        {
+            // ** This must be cached (U4-8862) **
+            var multiPickerPreValue =
+                _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId)
+                    .PreValuesAsDictionary.FirstOrDefault(
+                        x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase)).Value;
+
+            return multiPickerPreValue != null && multiPickerPreValue.Value.TryConvertTo<bool>().Result;
+        }
+    }
+}

@@ -1785,6 +1785,74 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(content.HasPublishedVersion());
         }
 
+        [Test]
+        public void Can_Get_Paged_Children()
+        {
+            var service = ServiceContext.ContentService;
+            // Start by cleaning the "db"
+            var umbTextPage = service.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            service.Delete(umbTextPage);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+            }
+            
+            long total;
+            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void Can_Get_Paged_Children_Dont_Get_Descendants()
+        {
+            var service = ServiceContext.ContentService;
+            // Start by cleaning the "db"
+            var umbTextPage = service.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            service.Delete(umbTextPage);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            // only add 9 as we also add a content with children 
+            for (int i = 0; i < 9; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+            }
+
+            var willHaveChildren = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(willHaveChildren);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType, "Content" + i, willHaveChildren.Id);
+                ServiceContext.ContentService.Save(c1);
+            }
+
+            long total;
+            // children in root including the folder - not the descendants in the folder
+            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+
+            // children in folder
+            entities = service.GetPagedChildren(willHaveChildren.Id, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(willHaveChildren.Id, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+        }
+
         private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");

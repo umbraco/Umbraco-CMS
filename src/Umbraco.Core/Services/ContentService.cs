@@ -573,11 +573,9 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateContentRepository(uow);
 
                 var query = Query<IContent>.Builder;
-                //if the id is System Root, then just get all
-                if (id != Constants.System.Root)
-                {
-                    query.Where(x => x.ParentId == id);
-                }
+                // always check for a parent - else it will also get decendants (and then you should use the GetPagedDescendants method)
+                query.Where(x => x.ParentId == id);
+
                 IQuery<IContent> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {

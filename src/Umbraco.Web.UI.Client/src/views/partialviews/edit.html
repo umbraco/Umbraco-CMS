@@ -67,18 +67,23 @@
 
             <umb-editor-footer>
 
-            <umb-editor-footer-content-right>
+                <umb-editor-footer-content-left>
+                    <umb-keyboard-shortcuts-overview
+                        model="vm.page.keyboardShortcutsOverview"
+                        show-overlay="vm.showKeyboardShortcut">
+                    </umb-keyboard-shortcuts-overview>
+                </umb-editor-footer-content-left>
 
-               <umb-button
-                  type="submit"
-                  button-style="success"
-                  state="vm.page.saveButtonState"
-                  shortcut="ctrl+s"
-                  label="Save"
-                  label-key="buttons_save">
-               </umb-button>
-
-            </umb-editor-footer-content-right>
+                <umb-editor-footer-content-right>
+                    <umb-button
+                        type="submit"
+                        button-style="success"
+                        state="vm.page.saveButtonState"
+                        shortcut="ctrl+s"
+                        label="Save"
+                        label-key="buttons_save">
+                    </umb-button>
+                </umb-editor-footer-content-right>
 
          </umb-editor-footer>
 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Remoting.Messaging;
+using System.Text;
 using System.Web;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
@@ -99,18 +100,23 @@ namespace Umbraco.Core.Scoping
             where T : class
         {
             var objectKey = CallContext.LogicalGetData(key).AsGuid();
+            if (objectKey == Guid.Empty) return null;
+
             lock (StaticCallContextObjectsLock)
             {
                 object callContextObject;
                 if (StaticCallContextObjects.TryGetValue(objectKey, out callContextObject))
                 {
 #if DEBUG_SCOPES
-                    //Logging.LogHelper.Debug<ScopeProvider>("GotObject " + objectKey.ToString("N").Substring(0, 8));
+                    Logging.LogHelper.Debug<ScopeProvider>("Got " + typeof(T).Name + " Object " + objectKey.ToString("N").Substring(0, 8));
+                    //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                     return (T) callContextObject;
                 }
+
+                Logging.LogHelper.Warn<ScopeProvider>("Missed " + typeof(T).Name + " Object " + objectKey.ToString("N").Substring(0, 8));
 #if DEBUG_SCOPES
-                //Logging.LogHelper.Debug<ScopeProvider>("MissedObject " + objectKey.ToString("N").Substring(0, 8));
+                //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                 return null;
             }
@@ -146,7 +152,8 @@ namespace Umbraco.Core.Scoping
                 lock (StaticCallContextObjectsLock)
                 {
 #if DEBUG_SCOPES
-                    //Logging.LogHelper.Debug<ScopeProvider>("RemoveObject " + objectKey.ToString("N").Substring(0, 8));
+                    Logging.LogHelper.Debug<ScopeProvider>("Remove Object " + objectKey.ToString("N").Substring(0, 8));
+                    //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                     StaticCallContextObjects.Remove(objectKey);
                 }
@@ -160,7 +167,8 @@ namespace Umbraco.Core.Scoping
                 lock (StaticCallContextObjectsLock)
                 {
 #if DEBUG_SCOPES
-                    //Logging.LogHelper.Debug<ScopeProvider>("AddObject " + objectKey.ToString("N").Substring(0, 8));
+                    Logging.LogHelper.Debug<ScopeProvider>("AddObject " + objectKey.ToString("N").Substring(0, 8));
+                    //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                     StaticCallContextObjects.Add(objectKey, value);
                 }
@@ -507,7 +515,7 @@ namespace Umbraco.Core.Scoping
             lock (StaticScopeInfosLock)
             {
                 if (StaticScopeInfos.ContainsKey(scope)) throw new Exception("oops: already registered.");
-                //Logging.LogHelper.Debug<ScopeProvider>("Register " + scope.InstanceId.ToString("N").Substring(0, 8));
+                Logging.LogHelper.Debug<ScopeProvider>("Register " + scope.InstanceId.ToString("N").Substring(0, 8));
                 StaticScopeInfos[scope] = new ScopeInfo(scope, Environment.StackTrace);
             }
         }
@@ -525,12 +533,33 @@ namespace Umbraco.Core.Scoping
                     if (context == null) return;
                     throw new Exception("oops: unregistered scope.");
                 }
-                //Logging.LogHelper.Debug<ScopeProvider>("Register context " + (context ?? "null") + " for " + scope.InstanceId.ToString("N").Substring(0, 8));
+                var sb = new StringBuilder();
+                var s = scope;
+                while (s != null)
+                {
+                    if (sb.Length > 0) sb.Append(" < ");
+                    sb.Append(s.InstanceId.ToString("N").Substring(0, 8));
+                    var ss = s as IScopeInternal;
+                    s = ss == null ? null : ss.ParentScope;
+                }
+                Logging.LogHelper.Debug<ScopeProvider>("Register " + (context ?? "null") + " context " + sb);
                 if (context == null) info.NullStack = Environment.StackTrace;
-                //if (context == null)
-                //    Logging.LogHelper.Debug<ScopeProvider>("STACK\r\n" + info.NullStack);
+                //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 16));
                 info.Context = context;
             }
+        }
+
+        private static string Head(string s, int count)
+        {
+            var pos = 0;
+            var i = 0;
+            while (i < count && pos >= 0)
+            {
+                pos = s.IndexOf("\r\n", pos + 1, StringComparison.OrdinalIgnoreCase);
+                i++;
+            }
+            if (pos < 0) return s;
+            return s.Substring(0, pos);
         }
 
         public void Disposed(IScope scope)
@@ -542,7 +571,7 @@ namespace Umbraco.Core.Scoping
                     // enable this by default
                     //Console.WriteLine("unregister " + scope.InstanceId.ToString("N").Substring(0, 8));
                     StaticScopeInfos.Remove(scope);
-                    //Logging.LogHelper.Debug<ScopeProvider>("Remove " + scope.InstanceId.ToString("N").Substring(0, 8));
+                    Logging.LogHelper.Debug<ScopeProvider>("Remove " + scope.InstanceId.ToString("N").Substring(0, 8));
 
                     // instead, enable this to keep *all* scopes
                     // beware, there can be a lot of scopes!

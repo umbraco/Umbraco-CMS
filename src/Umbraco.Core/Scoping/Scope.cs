@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
@@ -341,7 +342,11 @@ namespace Umbraco.Core.Scoping
         {
             // if child did not complete we cannot complete
             if (completed.HasValue == false || completed.Value == false)
+            {
+                if (LogUncompletedScopes)
+                    Logging.LogHelper.Debug<Scope>("Uncompleted Child Scope at\r\n" + Environment.StackTrace);
                 _completed = false;
+            }
         }
 
         private void EnsureNotDisposed()
@@ -368,12 +373,12 @@ namespace Umbraco.Core.Scoping
 #endif
             }
 
+            var parent = ParentScope;
+            _scopeProvider.AmbientScope = parent;
+
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);
 #endif
-
-            var parent = ParentScope;
-            _scopeProvider.AmbientScope = parent;
 
             if (parent != null)
                 parent.ChildCompleted(_completed);
@@ -492,6 +497,16 @@ namespace Umbraco.Core.Scoping
             {
                 TryFinally(index + 1, actions);
             }
+        }
+
+        // backing field for LogUncompletedScopes
+        private static bool? _logUncompletedScopes;
+
+        // caching config
+        // true if Umbraco.CoreDebug.LogUncompletedScope appSetting is set to "true"
+        private static bool LogUncompletedScopes
+        {
+            get { return (_logUncompletedScopes ?? (_logUncompletedScopes = UmbracoConfig.For.CoreDebug().LogUncompletedScopes)).Value; }
         }
     }
 }

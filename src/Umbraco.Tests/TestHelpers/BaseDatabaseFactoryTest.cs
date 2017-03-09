@@ -24,6 +24,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.TestHelpers
@@ -109,6 +110,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 IsReady = true
             };
+
             return _appContext;
         }
 

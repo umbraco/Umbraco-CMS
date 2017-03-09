@@ -18,6 +18,7 @@ using Umbraco.Web;
 using Umbraco.Web.Models.Mapping;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.TestHelpers
@@ -150,6 +151,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             var applicationContext = CreateApplicationContext();
             ApplicationContext.Current = applicationContext;
+
+            // FileSystemProviderManager captures the current ApplicationContext ScopeProvider
+            // in its current static instance (yea...) so we need to reset it here to ensure
+            // it is using the proper ScopeProvider
+            FileSystemProviderManager.Current.Reset();
         }
 
         protected virtual ApplicationContext CreateApplicationContext()
@@ -170,6 +176,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 IsReady = true
             };
+
             return applicationContext;
         }
 

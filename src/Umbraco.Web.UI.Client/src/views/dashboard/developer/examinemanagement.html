@@ -1,6 +1,6 @@
 <div id="examineManagement" ng-controller="Umbraco.Dashboard.ExamineMgmtController">
 
-    <h3>Examine Management</h3>
+    <h3 class="bold">Examine Management</h3>
 
     <div ng-show="loading">
         Loading...
@@ -24,7 +24,7 @@
                     <div ng-show="indexer.showTools && indexer.isLuceneIndex">
                         <div>
                             <br />
-                            <div ng-show="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)" class="btn-group">
+                            <div ng-show="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)">
 
                                 <button type="button" class="btn btn-warning" ng-click="rebuildIndex(indexer)">Rebuild index</button>
                                 <button type="button" class="btn btn-warning" ng-click="optimizeIndex(indexer)" ng-show="indexer.documentCount > 0">Optimize index</button>
