@@ -263,73 +263,73 @@
 
     <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
     <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
-    <!-- Build the Umbraco.Web.UI project -->
-    <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath);Verbosity=minimal" Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False" />
+    
+    <!-- Build the Umbraco.Web.UI project (and all dependencies) -->
+    <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" 
+      Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath);Verbosity=minimal"
+      Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="$(MSBuildToolsVersion)" UnloadProjectsOnCompletion="False" />
+	
+    <!-- Build the Umbraco.Tests project (is not a dependency) -->
+    <MSBuild Projects="..\src\Umbraco.Tests\Umbraco.Tests.csproj"
+      Condition="'$(BUILD_TESTS)'!=''"
+      Properties="WarningLevel=0;Configuration=Debug;PipelineDependsOnBuild=False;Verbosity=minimal"
+      Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="$(MSBuildToolsVersion)" UnloadProjectsOnCompletion="False" />
 
     <!-- DONE -->
     <Message Text="Finished compiling projects" Importance="high" />
+    
   </Target>
 
   <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
     <PropertyGroup>
-      <NewVersion>$(BUILD_RELEASE)</NewVersion>
-      <NewVersion Condition="'$(BUILD_COMMENT)'!=''">$(BUILD_RELEASE)-$(BUILD_COMMENT)</NewVersion>
-      <NewVersion Condition="'$(BUILD_NIGHTLY)'!=''">$(BUILD_RELEASE)-$(BUILD_NIGHTLY)</NewVersion>
-      <NewVersion Condition="'$(BUILD_COMMENT)'!='' And '$(BUILD_NIGHTLY)'!=''">$(BUILD_RELEASE)-$(BUILD_COMMENT)-$(BUILD_NIGHTLY)</NewVersion>
+    
+      <!-- eg 1.2.0 -->
+      <ReleaseVersion>$(BUILD_RELEASE)</ReleaseVersion>
+      
+      <!-- empty, or eg .6689 -->
+      <DotBuild></DotBuild>
+      <DotBuild Condition="'$(BUILD_NUMBER)'!=''">.$(BUILD_NUMBER)</DotBuild>
+
+      <!-- eg 1.2.0, 1.2.0.6689 -->
+      <ReleaseFullVersion>$(ReleaseVersion)$(DotBuild)</ReleaseFullVersion>
+      
+      <!-- empty, or eg -alpha002 -->
+      <DashComment></DashComment>
+      <DashComment Condition="'$(BUILD_COMMENT)'!=''">-$(BUILD_COMMENT)</DashComment>
+      
+      <!-- empty, or eg +6689 -->
+      <PlusBuild></PlusBuild>
+      <PlusBuild Condition="'$(BUILD_NUMBER)'!=''">+$(BUILD_NUMBER)</PlusBuild>
+      
+      <!-- eg 1.2.0, 1.2.0-alpha002, 1.2.0-alpha002+6689, 1.2.0+6689 -->
+      <ReleaseSemVersion>$(ReleaseVersion)$(DashComment)$(PlusBuild)</ReleaseSemVersion>
+      
+      <!-- empty, or eg alpha002 -->
+      <ReleaseComment>$(BUILD_COMMENT)</ReleaseComment>
+      
     </PropertyGroup>
 
     <!-- Match & replace 3 and 4 digit version numbers and -beta and +nightly (if they're there) -->
     <FileUpdate
       Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="(\d+)\.(\d+)\.(\d+)(.(\d+))?"
-      ReplacementText="$(BUILD_RELEASE)"/>
+      ReplacementText="$(ReleaseFullVersion)"/>
 
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="CurrentComment { get { return &quot;(.+)?&quot;"
-      ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)&quot;"/>
-
-    <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
-	  Condition="'$(BUILD_NIGHTLY)'!=''"
-      Regex="CurrentComment { get { return &quot;(.+)?&quot;"
-      ReplacementText="CurrentComment { get { return &quot;$(BUILD_NIGHTLY)&quot;"/>
-	  
-    <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
-	  Condition="'$(BUILD_COMMENT)'!='' AND '$(BUILD_NIGHTLY)'!=''"
-      Regex="CurrentComment { get { return &quot;(.+)?&quot;"
-      ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)-$(BUILD_NIGHTLY)&quot;"/>
+      ReplacementText="CurrentComment { get { return &quot;$(ReleaseComment)&quot;"/>
 
     <!--This updates the AssemblyFileVersion for the solution to the umbraco version-->
     <FileUpdate
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyFileVersion\(&quot;(.+)?&quot;\)"
-      ReplacementText="AssemblyFileVersion(&quot;$(BUILD_RELEASE)&quot;)"/>
+      ReplacementText="AssemblyFileVersion(&quot;$(ReleaseFullVersion)&quot;)"/>
 
     <!--This updates the AssemblyInformationalVersion for the solution to the umbraco version and comment-->
     <FileUpdate
-      Condition="'$(BUILD_COMMENT)'!=''"
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
-      ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)-$(BUILD_COMMENT)&quot;)"/>
-    <FileUpdate
-      Condition="'$(BUILD_COMMENT)'==''"
-      Files="..\src\SolutionInfo.cs"
-      Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
-      ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)&quot;)"/>
-    <FileUpdate
-      Condition="'$(BUILD_NIGHTLY)'!=''"
-      Files="..\src\SolutionInfo.cs"
-      Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
-      ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)-$(BUILD_NIGHTLY)&quot;)"/>
-	<FileUpdate
-      Condition="'$(BUILD_COMMENT)'!='' AND '$(BUILD_NIGHTLY)'!=''"
-      Files="..\src\SolutionInfo.cs"
-      Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
-      ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)-$(BUILD_COMMENT)-$(BUILD_NIGHTLY)&quot;)"/>
-    <FileUpdate
-      Condition="'$(BUILD_COMMENT)'=='' AND '$(BUILD_NIGHTLY)'==''"
-      Files="..\src\SolutionInfo.cs"
-      Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
-      ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)&quot;)"/>
+      ReplacementText="AssemblyInformationalVersion(&quot;$(ReleaseSemVersion)&quot;)"/>
 
     <!--This updates the copyright year-->
     <FileUpdate
@@ -340,6 +340,6 @@
     <XmlPoke XmlInputPath=".\NuSpecs\build\UmbracoCms.props"
                Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
          Query="//x:UmbracoVersion"
-         Value="$(NewVersion)" />
+         Value="$(ReleaseSemVersion)" />
   </Target>
 </Project>
