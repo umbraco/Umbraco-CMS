@@ -53,7 +53,6 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\umbraco.providers.dll) { Remove-Item $umbracoBinFolder\umbraco.providers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Umbraco.Web.UI.dll) { Remove-Item $umbracoBinFolder\Umbraco.Web.UI.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\UmbracoExamine.dll) { Remove-Item $umbracoBinFolder\UmbracoExamine.dll -Force -Confirm:$false }
-		if(Test-Path $umbracoBinFolder\UrlRewritingNet.UrlRewriter.dll) { Remove-Item $umbracoBinFolder\UrlRewritingNet.UrlRewriter.dll -Force -Confirm:$false }
 		
 		# Delete files Umbraco depends upon
 		$amd64Folder = Join-Path $umbracoBinFolder "amd64"
