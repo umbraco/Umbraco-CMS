@@ -585,9 +585,12 @@ namespace UmbracoExamine
             var contentTypes = getContentTypes();
             var icons = contentTypes.ToDictionary(x => x.Id, y => y.Icon);
 
+            // total number of pages must be calculated below on the first iteration
+            var numPages = 0;
+
             do
             {
-                long total;
+                long total = 0;
                 if (parentId == -1)
                 {
                     var pagedElements = getPagedXmlEntries("-1", pageIndex, pageSize);
@@ -608,6 +611,11 @@ namespace UmbracoExamine
                     }
                 }
 
+                if (numPages == 0)
+                {
+                    numPages = (int)Math.Ceiling(total / (decimal)pageSize);
+                }
+
                 //if specific types are declared we need to post filter them
                 //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
                 if (IndexerData.IncludeNodeTypes.Any())
@@ -626,7 +634,7 @@ namespace UmbracoExamine
 
                 AddNodesToIndex(xElements, type);
                 pageIndex++;
-            } while (xElements.Length == pageSize);
+            } while (pageIndex < numPages);
         }
 
         internal static IEnumerable<XElement> GetSerializedContent(
