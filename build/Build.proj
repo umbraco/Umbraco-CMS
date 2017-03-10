@@ -1,5 +1,15 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+    <!--
+        Arguments
+        
+        BUILD_RELEASE     Build release number eg 1.2.0
+        BUILD_COMMENT     Build optional comment eg alpha002
+        BUILD_NUMBER      Build optional number eg 6689
+        BUILD_TESTS       Whether to build the tests (if non-empty)
+        NugetPackageDirectory         The NuGet packages directory     (is this ever used?)
+    -->
+    
   <!--
  ****************************************************
  INCLUDES
@@ -51,50 +61,64 @@
     </Task>
   </UsingTask>
 
+    <!-- define version vars -->
+    <PropertyGroup>
 
-  <!--
- ****************************************************
- VARIABLES
- *****************************************************
- -->
+        <!-- eg 1.2.0 -->
+        <ReleaseVersion>$(BUILD_RELEASE)</ReleaseVersion>
 
-  <!-- NB: BUILD_NUMBER is passed in by the build server -->
-  <PropertyGroup Condition="'$(BUILD_NUMBER)'!=''">
-    <DECIMAL_BUILD_NUMBER>.$(BUILD_NUMBER)</DECIMAL_BUILD_NUMBER>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BUILD_RELEASE)'!=''">
-    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)</DECIMAL_BUILD_NUMBER>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_COMMENT)'!=''">
-    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_COMMENT)</DECIMAL_BUILD_NUMBER>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_NIGHTLY)'!=''">
-    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_NIGHTLY)</DECIMAL_BUILD_NUMBER>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_COMMENT)'!='' AND '$(BUILD_NIGHTLY)'!=''">
-    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_COMMENT)-$(BUILD_NIGHTLY)</DECIMAL_BUILD_NUMBER>
-  </PropertyGroup>
+        <!-- empty, or eg .6689 -->
+        <DotBuild></DotBuild>
+        <DotBuild Condition="'$(BUILD_NUMBER)'!=''">.$(BUILD_NUMBER)</DotBuild>
 
-  <PropertyGroup>
-    <BuildConfiguration>Release</BuildConfiguration>
-    <BuildFolder>_BuildOutput\</BuildFolder>
-    <BuildZipFileName>UmbracoCms$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileName>
-    <BuildZipFileNameBin>UmbracoCms.AllBinaries$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameBin>
-    <BuildZipFileNameWebPi>UmbracoCms.WebPI$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameWebPi>
-    <IncludeSymbols>False</IncludeSymbols>
-    <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
-    <BuildFolderAbsolutePath>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolutePath>
-    <SolutionBinFolder>$(BuildFolder)bin\</SolutionBinFolder>
-    <WebAppFolder>$(BuildFolder)WebApp\</WebAppFolder>
-    <WebPiFolder>$(BuildFolder)WebPi\</WebPiFolder>
-    <ConfigsFolder>$(BuildFolder)Configs\</ConfigsFolder>
-    <SolutionBinFolderRelativeToProjects>$(BuildFolderRelativeToProjects)bin\</SolutionBinFolderRelativeToProjects>
-    <SolutionBinFolderAbsolutePath>$(BuildFolderAbsolutePath)bin\</SolutionBinFolderAbsolutePath>
-    <WebAppFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebApp\</WebAppFolderRelativeToProjects>
-    <WebAppFolderAbsolutePath>$(BuildFolderAbsolutePath)WebApp\</WebAppFolderAbsolutePath>
-    <WebPiFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebPi\</WebPiFolderRelativeToProjects>
-    <WebPiFolderAbsolutePath>$(BuildFolderAbsolutePath)WebPi\</WebPiFolderAbsolutePath>
-  </PropertyGroup>
+        <!-- eg 1.2.0, 1.2.0.6689 -->
+        <ReleaseFullVersion>$(ReleaseVersion)$(DotBuild)</ReleaseFullVersion>
+
+        <!-- empty, or eg -alpha002 -->
+        <DashComment></DashComment>
+        <DashComment Condition="'$(BUILD_COMMENT)'!=''">-$(BUILD_COMMENT)</DashComment>
+
+        <!-- empty, or eg +6689 -->
+        <PlusBuild></PlusBuild>
+        <PlusBuild Condition="'$(BUILD_NUMBER)'!=''">+$(BUILD_NUMBER)</PlusBuild>
+
+        <!-- eg 1.2.0, 1.2.0-alpha002, 1.2.0-alpha002+6689, 1.2.0+6689 -->
+        <ReleaseSemVersion>$(ReleaseVersion)$(DashComment)$(PlusBuild)</ReleaseSemVersion>
+
+        <!-- empty, or eg alpha002 -->
+        <ReleaseComment>$(BUILD_COMMENT)</ReleaseComment>
+  
+        <!-- eg 2017 -->
+        <ReleaseYear>$([System.DateTime]::Now.ToString(`yyyy`))</ReleaseYear>
+
+    </PropertyGroup>
+
+    <!-- define vars -->
+    <PropertyGroup>
+    
+        <BuildConfiguration>Release</BuildConfiguration>        
+        <BuildFolder>_BuildOutput\</BuildFolder>
+        
+        <BuildZipFileName>UmbracoCms.$(ReleaseSemVersion).zip</BuildZipFileName>
+        <BuildZipFileNameBin>UmbracoCms.AllBinaries.$(ReleaseSemVersion).zip</BuildZipFileNameBin>
+        <BuildZipFileNameWebPi>UmbracoCms.WebPI.$(ReleaseSemVersion).zip</BuildZipFileNameWebPi>
+        
+        <IncludeSymbols>False</IncludeSymbols>
+        
+        <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
+        <BuildFolderAbsolute>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolute>
+        <SolutionBinFolder>$(BuildFolder)bin\</SolutionBinFolder>
+        <WebAppFolder>$(BuildFolder)WebApp\</WebAppFolder>
+        <WebPiFolder>$(BuildFolder)WebPi\</WebPiFolder>
+        <ConfigsFolder>$(BuildFolder)Configs\</ConfigsFolder>
+        <SolutionBinFolderRelativeToProjects>$(BuildFolderRelativeToProjects)bin\</SolutionBinFolderRelativeToProjects>
+        <SolutionBinFolderAbsolute>$(BuildFolderAbsolute)bin\</SolutionBinFolderAbsolute>
+        <WebAppFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebApp\</WebAppFolderRelativeToProjects>
+        <WebAppFolderAbsolute>$(BuildFolderAbsolute)WebApp\</WebAppFolderAbsolute>
+        <WebPiFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebPi\</WebPiFolderRelativeToProjects>
+        <WebPiFolderAbsolute>$(BuildFolderAbsolute)WebPi\</WebPiFolderAbsolute>
+        
+    </PropertyGroup>
 
   <ItemGroup>
     <SystemFolders Include="$(WebAppFolder)App_Data" />
@@ -133,7 +157,7 @@
     <MakeDir Directories="$(WebPiFolder)umbraco" />
 
     <!-- Copy fresh built umbraco files -->
-    <Exec Command="xcopy %22$(WebAppFolderAbsolutePath)*%22 %22$(WebPiFolderAbsolutePath)umbraco%22 /S /E /Y /I" />
+    <Exec Command="xcopy %22$(WebAppFolderAbsolute)*%22 %22$(WebPiFolderAbsolute)umbraco%22 /S /E /Y /I" />
 
     <!-- Copy Web Pi template files -->
     <ItemGroup>
@@ -144,14 +168,14 @@
         DestinationFiles="@(WebPiFiles->'$(WebPiFolder)%(RecursiveDir)%(Filename)%(Extension)')" />
 
     <!-- Zip the files -->
-    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22 -x!dotLess.Core.dll -x![Content_Types].xml >NUL" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolute)*%22 -x!dotLess.Core.dll -x![Content_Types].xml >NUL" />
   </Target>
 
   <Target Name="ZipWebApp" DependsOnTargets="CreateSystemFolders" >
     <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
 
-    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolutePath)*%22 -x!dotLess.Core.dll >NUL" />
-    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolutePath)*%22 -x!dotLess.Core.dll -x![Content_Types].xml >NUL" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolute)*%22 -x!dotLess.Core.dll >NUL" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolute)*%22 -x!dotLess.Core.dll -x![Content_Types].xml >NUL" />
 
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
@@ -252,94 +276,67 @@
   </Target>
 
   <!-- Unlike 2010, the VS2012 build targets file doesn't clean up the umbraco.presentation dir, do it manually -->
-  <Target Name="CleanupPresentation" DependsOnTargets="CompileProjects">
+  <Target Name="CleanupPresentation" DependsOnTargets="Compile">
     <ItemGroup>
       <PresentationFolderToDelete Include="$(WebAppFolder)umbraco.presentation" />
     </ItemGroup>
     <RemoveDir Directories="@(PresentationFolderToDelete)" />
   </Target>
 
-  <Target Name="CompileProjects" DependsOnTargets="SetVersionNumber">
+    <Target Name="Compile" DependsOnTargets="SetVersionNumber">
 
-    <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
-    <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
-    
-    <!-- Build the Umbraco.Web.UI project (and all dependencies) -->
-    <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" 
-      Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath);Verbosity=minimal"
-      Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="$(MSBuildToolsVersion)" UnloadProjectsOnCompletion="False" />
-	
-    <!-- Build the Umbraco.Tests project (is not a dependency) -->
-    <MSBuild Projects="..\src\Umbraco.Tests\Umbraco.Tests.csproj"
-      Condition="'$(BUILD_TESTS)'!=''"
-      Properties="WarningLevel=0;Configuration=Debug;PipelineDependsOnBuild=False;Verbosity=minimal"
-      Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="$(MSBuildToolsVersion)" UnloadProjectsOnCompletion="False" />
+        <Message Text="Compiling to $(BuildFolder)..." Importance="high" />
 
-    <!-- DONE -->
-    <Message Text="Finished compiling projects" Importance="high" />
-    
-  </Target>
+        <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
 
-  <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
-    <PropertyGroup>
-    
-      <!-- eg 1.2.0 -->
-      <ReleaseVersion>$(BUILD_RELEASE)</ReleaseVersion>
-      
-      <!-- empty, or eg .6689 -->
-      <DotBuild></DotBuild>
-      <DotBuild Condition="'$(BUILD_NUMBER)'!=''">.$(BUILD_NUMBER)</DotBuild>
+        <!-- build the Umbraco.Web.UI project (and all dependencies) -->
+        <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" 
+            Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolute);WebProjectOutputDir=$(WebAppFolderAbsolute);Verbosity=minimal"
+            Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="$(MSBuildToolsVersion)" UnloadProjectsOnCompletion="False" />
 
-      <!-- eg 1.2.0, 1.2.0.6689 -->
-      <ReleaseFullVersion>$(ReleaseVersion)$(DotBuild)</ReleaseFullVersion>
-      
-      <!-- empty, or eg -alpha002 -->
-      <DashComment></DashComment>
-      <DashComment Condition="'$(BUILD_COMMENT)'!=''">-$(BUILD_COMMENT)</DashComment>
-      
-      <!-- empty, or eg +6689 -->
-      <PlusBuild></PlusBuild>
-      <PlusBuild Condition="'$(BUILD_NUMBER)'!=''">+$(BUILD_NUMBER)</PlusBuild>
-      
-      <!-- eg 1.2.0, 1.2.0-alpha002, 1.2.0-alpha002+6689, 1.2.0+6689 -->
-      <ReleaseSemVersion>$(ReleaseVersion)$(DashComment)$(PlusBuild)</ReleaseSemVersion>
-      
-      <!-- empty, or eg alpha002 -->
-      <ReleaseComment>$(BUILD_COMMENT)</ReleaseComment>
-      
-    </PropertyGroup>
+        <!-- build the Umbraco.Tests project (is not a dependency) -->
+        <MSBuild Projects="..\src\Umbraco.Tests\Umbraco.Tests.csproj"
+            Condition="'$(BUILD_TESTS)'!=''"
+            Properties="WarningLevel=0;Configuration=Debug;PipelineDependsOnBuild=False;Verbosity=minimal"
+            Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="$(MSBuildToolsVersion)" UnloadProjectsOnCompletion="False" />
 
-    <!-- Match & replace 3 and 4 digit version numbers and -beta and +nightly (if they're there) -->
-    <FileUpdate
-      Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
-      Regex="(\d+)\.(\d+)\.(\d+)(.(\d+))?"
-      ReplacementText="$(ReleaseFullVersion)"/>
+        <Message Text="Finished compiling projects" Importance="high" />
 
-    <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
-      Regex="CurrentComment { get { return &quot;(.+)?&quot;"
-      ReplacementText="CurrentComment { get { return &quot;$(ReleaseComment)&quot;"/>
+    </Target>
 
-    <!--This updates the AssemblyFileVersion for the solution to the umbraco version-->
-    <FileUpdate
-      Files="..\src\SolutionInfo.cs"
-      Regex="AssemblyFileVersion\(&quot;(.+)?&quot;\)"
-      ReplacementText="AssemblyFileVersion(&quot;$(ReleaseFullVersion)&quot;)"/>
+    <Target Name="SetVersionNumber" Condition="'$(ReleaseVersion)'!=''">
 
-    <!--This updates the AssemblyInformationalVersion for the solution to the umbraco version and comment-->
-    <FileUpdate
-      Files="..\src\SolutionInfo.cs"
-      Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
-      ReplacementText="AssemblyInformationalVersion(&quot;$(ReleaseSemVersion)&quot;)"/>
+        <!-- match & replace 3 and 4 digit version numbers and -beta and +nightly (if they're there) -->
+        <FileUpdate
+            Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
+            Regex="(\d+)\.(\d+)\.(\d+)(.(\d+))?"
+            ReplacementText="$(ReleaseFullVersion)"/>
 
-    <!--This updates the copyright year-->
-    <FileUpdate
-      Files="..\src\SolutionInfo.cs"
-      Regex="AssemblyCopyright\(&quot;Copyright © Umbraco (\d{4})&quot;\)"
-      ReplacementText="AssemblyCopyright(&quot;Copyright © Umbraco $([System.DateTime]::Now.ToString(`yyyy`))&quot;)"/>
+        <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
+            Regex="CurrentComment { get { return &quot;(.+)?&quot;"
+            ReplacementText="CurrentComment { get { return &quot;$(ReleaseComment)&quot;"/>
 
-    <XmlPoke XmlInputPath=".\NuSpecs\build\UmbracoCms.props"
-               Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
-         Query="//x:UmbracoVersion"
-         Value="$(ReleaseSemVersion)" />
-  </Target>
+        <!-- update the AssemblyFileVersion for the solution to the umbraco version -->
+        <FileUpdate
+            Files="..\src\SolutionInfo.cs"
+            Regex="AssemblyFileVersion\(&quot;(.+)?&quot;\)"
+            ReplacementText="AssemblyFileVersion(&quot;$(ReleaseFullVersion)&quot;)"/>
+
+        <!-- update the AssemblyInformationalVersion for the solution to the umbraco version and comment -->
+        <FileUpdate
+            Files="..\src\SolutionInfo.cs"
+            Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
+            ReplacementText="AssemblyInformationalVersion(&quot;$(ReleaseSemVersion)&quot;)"/>
+
+        <!-- update the copyright year -->
+        <FileUpdate
+            Files="..\src\SolutionInfo.cs"
+            Regex="AssemblyCopyright\(&quot;Copyright © Umbraco (\d{4})&quot;\)"
+            ReplacementText="AssemblyCopyright(&quot;Copyright © Umbraco $(ReleaseYear)&quot;)"/>
+
+        <XmlPoke XmlInputPath=".\NuSpecs\build\UmbracoCms.props"
+            Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
+            Query="//x:UmbracoVersion"
+            Value="$(ReleaseSemVersion)" />
+    </Target>
 </Project>

@@ -26,7 +26,7 @@ build_script:
 
     XCOPY "%SRC%\Umbraco.Tests\unit-test-log4net.CI.config" "%SRC%\Umbraco.Tests\unit-test-log4net.config" /Y
     
-    build.bat -integration -release:%release% -comment:%comment% -build:%APPVEYOR_BUILD_NUMBER% -tests -nugetfolder:%PACKAGES%
+    build.bat -integration -build:%APPVEYOR_BUILD_NUMBER% -tests -nugetfolder:%PACKAGES%
     
 test:
   assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll

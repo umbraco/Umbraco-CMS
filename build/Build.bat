@@ -31,8 +31,8 @@ IF EXIST UmbracoVersion.txt (
 :: process args
 
 SET INTEGRATION=0
-SET nuGetFolder=%CD%\..\src\packages
-SET NUPKG=0
+SET NUGET_FOLDER=%CD%\..\src\packages
+SET NUGET_PKG=0
 SET BUILD=
 SET TESTS=
 
@@ -89,12 +89,12 @@ SHIFT
 GOTO processArgs
 
 :argNugetFolder
-SET nuGetFolder=%VALUE%
+SET NUGET_FOLDER=%VALUE%
 SHIFT
 GOTO processArgs
 
 :argNugetPkg
-SET NUPKG=1
+SET NUGET_PKG=1
 SHIFT
 GOTO processArgs
 
@@ -115,8 +115,8 @@ IF [%RELEASE%] EQU [] (
 )
 
 ECHO # Usage: on line 2 put the release version, on line 3 put the version comment (example: beta)> UmbracoVersion.txt
-ECHO %release%>> UmbracoVersion.txt
-ECHO %comment%>> UmbracoVersion.txt
+ECHO %RELEASE%>> UmbracoVersion.txt
+ECHO %COMMENT%>> UmbracoVersion.txt
 
 
 :: run
@@ -126,12 +126,13 @@ IF [%COMMENT%] NEQ [] (SET VERSION=%VERSION%-%COMMENT%)
 IF [%BUILD%] NEQ [] (SET VERSION=%VERSION%+%BUILD%)
 
 ECHO ################################################################
-ECHO Building Umbraco %VERSION%
+ECHO Building Umbraco Core %VERSION%
 ECHO ################################################################
 
 SET MSBUILDPATH=C:\Program Files (x86)\MSBuild\14.0\Bin
 SET MSBUILD="%MSBUILDPATH%\MsBuild.exe"
 SET PATH="%MSBUILDPATH%";%PATH%
+SET NUGET=%CD%\..\src\.nuget\NuGet.exe
 
 ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %RELEASE%
 
@@ -144,7 +145,7 @@ RD ..\src\Umbraco.Web.UI.Client\build /Q /S
 RD ..\src\Umbraco.Web.UI.Client\bower_components /Q /S
 
 ECHO.
-ECHO Removing existing built files
+ECHO Removing existing build files
 RMDIR /Q /S _BuildOutput
 DEL /F /Q UmbracoCms.*.zip 2>NUL
 DEL /F /Q UmbracoExamine.*.zip 2>NUL
@@ -166,17 +167,17 @@ IF NOT EXIST "%CD%\..\src\Umbraco.Web.UI\web.config" COPY "%CD%\..\src\Umbraco.W
 
 ECHO.
 ECHO Reporting NuGet version
-"%CD%\..\src\.nuget\NuGet.exe" help | findstr "^NuGet Version:"
+"%NUGET%" help | findstr "^NuGet Version:"
 
 ECHO.
 ECHO Restoring NuGet packages
-ECHO Into %nuGetFolder%
-"%CD%\..\src\.nuget\NuGet.exe" restore "%CD%\..\src\umbraco.sln" -Verbosity Quiet -NonInteractive -PackagesDirectory "%nuGetFolder%"
+ECHO Into %NUGET_FOLDER%
+"%NUGET%" restore "%CD%\..\src\umbraco.sln" -Verbosity Quiet -NonInteractive -PackagesDirectory "%NUGET_FOLDER%"
 IF ERRORLEVEL 1 GOTO :error
 
 ECHO.
 ECHO.
-ECHO Performing MSBuild and producing Umbraco binaries zip files
+ECHO Performing MSBuild and producing Umbraco Core binaries zip files
 ECHO This takes a few minutes and logging is set to report warnings
 ECHO and errors only so it might seems like nothing is happening for a while. 
 ECHO You can check the msbuild.log file for progress.
@@ -186,7 +187,7 @@ ECHO.
   /p:BUILD_COMMENT=%COMMENT% ^
   /p:BUILD_NUMBER=%BUILD% ^
   /p:BUILD_TESTS=%TESTS% ^
-  /p:NugetPackagesDirectory="%nuGetFolder%" ^
+  /p:NugetPackagesDirectory="%NUGET_FOLDER%" ^
   /consoleloggerparameters:Summary;ErrorsOnly ^
   /fileLogger
 IF ERRORLEVEL 1 GOTO error
@@ -196,7 +197,7 @@ ECHO Setting node_modules folder to hidden to prevent VS13 from
 ECHO crashing on it while loading the websites project
 attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
 
-IF %NUPKG% EQU 0 GOTO success
+IF %NUGET_PKG% EQU 0 GOTO success
 
 ECHO.
 ECHO Adding Web.config transform files to the NuGet package
@@ -205,8 +206,8 @@ REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO.
 ECHO Packing the NuGet release files
-..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %VERSION% -Symbols -Verbosity quiet
-..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %VERSION% -Verbosity quiet
+"%NUGET%" Pack NuSpecs\UmbracoCms.Core.nuspec -Version %VERSION% -Symbols -Verbosity quiet
+"%NUGET%" Pack NuSpecs\UmbracoCms.nuspec -Version %VERSION% -Verbosity quiet
 IF ERRORLEVEL 1 GOTO error
 
 :success
