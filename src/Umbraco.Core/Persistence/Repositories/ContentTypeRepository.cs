@@ -2,19 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -118,7 +112,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (objectTypes.Any())
             {
-                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", objectTypes);
+                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", new {objectTypes = objectTypes});
             }
 
             return Database.Fetch<string>(sql);

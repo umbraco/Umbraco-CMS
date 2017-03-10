@@ -128,8 +128,14 @@ namespace Umbraco.Core.Events
             get { return TargetSemVersion.GetVersion(); }
         }
 
+        /// <summary>
+        /// Gets the origin version of the migration, i.e. the one that is currently installed.
+        /// </summary>
         public SemVersion ConfiguredSemVersion { get; private set; }
 
+        /// <summary>
+        /// Gets the target version of the migration.
+        /// </summary>
         public SemVersion TargetSemVersion { get; private set; }
 
         public string ProductName { get; private set; }

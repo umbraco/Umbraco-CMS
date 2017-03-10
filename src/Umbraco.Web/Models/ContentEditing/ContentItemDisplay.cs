@@ -20,6 +20,11 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "content", Namespace = "")]
     public class ContentItemDisplay : ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
     {
+        public ContentItemDisplay()
+        {
+            AllowPreview = true;
+        }
+
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
 
@@ -34,7 +39,16 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "urls")]
         public string[] Urls { get; set; }
-        
+
+        /// <summary>
+        /// Determines whether previewing is allowed for this node
+        /// </summary>
+        /// <remarks>
+        /// By default this is true but by using events developers can toggle this off for certain documents if there is nothing to preview
+        /// </remarks>
+        [DataMember( Name = "allowPreview" )]
+        public bool AllowPreview { get; set; }
+
         /// <summary>
         /// The allowed 'actions' based on the user's permissions - Create, Update, Publish, Send to publish
         /// </summary>

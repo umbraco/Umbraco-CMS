@@ -19,25 +19,35 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IDataTypeDefinition BuildEntity(DataTypeDto dto)
         {
-            var dataTypeDefinition = new DataTypeDefinition(dto.PropertyEditorAlias)
-                                         {
-                                             CreateDate = dto.NodeDto.CreateDate,
-                                             DatabaseType = dto.DbType.EnumParse<DataTypeDatabaseType>(true),
-                                             Id = dto.DataTypeId,
-                                             Key = dto.NodeDto.UniqueId,
-                                             Level = dto.NodeDto.Level,
-                                             UpdateDate = dto.NodeDto.CreateDate,
-                                             Name = dto.NodeDto.Text,
-                                             ParentId = dto.NodeDto.ParentId,
-                                             Path = dto.NodeDto.Path,
-                                             SortOrder = dto.NodeDto.SortOrder,
-                                             Trashed = dto.NodeDto.Trashed,
-                                             CreatorId = dto.NodeDto.UserId.Value
-                                         };
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            dataTypeDefinition.ResetDirtyProperties(false);
-            return dataTypeDefinition;
+            var dataTypeDefinition = new DataTypeDefinition(dto.PropertyEditorAlias);
+
+
+            try
+            {
+                dataTypeDefinition.DisableChangeTracking();
+
+                dataTypeDefinition.CreateDate = dto.NodeDto.CreateDate;
+                dataTypeDefinition.DatabaseType = dto.DbType.EnumParse<DataTypeDatabaseType>(true);
+                dataTypeDefinition.Id = dto.DataTypeId;
+                dataTypeDefinition.Key = dto.NodeDto.UniqueId;
+                dataTypeDefinition.Level = dto.NodeDto.Level;
+                dataTypeDefinition.UpdateDate = dto.NodeDto.CreateDate;
+                dataTypeDefinition.Name = dto.NodeDto.Text;
+                dataTypeDefinition.ParentId = dto.NodeDto.ParentId;
+                dataTypeDefinition.Path = dto.NodeDto.Path;
+                dataTypeDefinition.SortOrder = dto.NodeDto.SortOrder;
+                dataTypeDefinition.Trashed = dto.NodeDto.Trashed;
+                dataTypeDefinition.CreatorId = dto.NodeDto.UserId.Value;
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                dataTypeDefinition.ResetDirtyProperties(false);
+                return dataTypeDefinition;
+            }
+            finally
+            {
+                dataTypeDefinition.EnableChangeTracking();
+            }
         }
 
         public DataTypeDto BuildDto(IDataTypeDefinition entity)

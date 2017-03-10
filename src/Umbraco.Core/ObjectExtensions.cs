@@ -9,15 +9,28 @@ using System.Xml;
 
 namespace Umbraco.Core
 {
+	/// <summary>
+	/// Provides object extension methods.
+	/// </summary>
 	public static class ObjectExtensions
 	{
 		//private static readonly ConcurrentDictionary<Type, Func<object>> ObjectFactoryCache = new ConcurrentDictionary<Type, Func<object>>();
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="input"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
 		public static IEnumerable<T> AsEnumerableOfOne<T>(this T input)
 		{
 			return Enumerable.Repeat(input, 1);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="input"></param>
 		public static void DisposeIfDisposable(this object input)
 		{
 			var disposable = input as IDisposable;
@@ -25,7 +38,8 @@ namespace Umbraco.Core
 		}
 
 		/// <summary>
-		/// Provides a shortcut way of safely casting an input when you cannot guarantee the <typeparam name="T"></typeparam> is an instance type (i.e., when the C# AS keyword is not applicable)
+		/// Provides a shortcut way of safely casting an input when you cannot guarantee the <typeparamref name="T"/> is
+		/// an instance type (i.e., when the C# AS keyword is not applicable).
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="input">The input.</param>
@@ -63,30 +77,30 @@ namespace Umbraco.Core
 		}
 
 		/// <summary>
-		/// Tries to convert the input object to the output type using TypeConverters. If the destination type is a superclass of the input type,
-		/// if will use <see cref="Convert.ChangeType(object,System.Type)"/>.
+		/// Tries to convert the input object to the output type using TypeConverters. If the destination
+		/// type is a superclass of the input type, if will use <see cref="Convert.ChangeType(object,System.Type)"/>.
 		/// </summary>
 		/// <param name="input">The input.</param>
 		/// <param name="destinationType">Type of the destination.</param>
 		/// <returns></returns>
 		public static Attempt<object> TryConvertTo(this object input, Type destinationType)
 		{
-            //if it is null and it is nullable, then return success with null
-            if (input == null && destinationType.IsGenericType && destinationType.GetGenericTypeDefinition() == typeof (Nullable<>))
-            {
-                return Attempt<object>.Succeed(null);
+            // if null...
+		    if (input == null)
+		    {
+		        // nullable is ok
+                if (destinationType.IsGenericType && destinationType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    return Attempt<object>.Succeed(null);
+
+                // value type is nok, else can be null, so is ok
+		        return Attempt<object>.SucceedIf(destinationType.IsValueType == false, null);
             }
-			
-            //if its not nullable and it is a value type
-			if (input == null && destinationType.IsValueType) return Attempt<object>.Fail();
-            //if the type can be null, then no problem
-            if (input == null && destinationType.IsValueType == false) return Attempt<object>.Succeed(null);
 
+            // easy
 			if (destinationType == typeof(object)) return Attempt.Succeed(input);
-
 			if (input.GetType() == destinationType) return Attempt.Succeed(input);
 
-            //check for string so that overloaders of ToString() can take advantage of the conversion.
+            // check for string so that overloaders of ToString() can take advantage of the conversion.
             if (destinationType == typeof(string)) return Attempt<object>.Succeed(input.ToString());
 
 			// if we've got a nullable of something, we try to convert directly to that thing.
@@ -116,9 +130,10 @@ namespace Umbraco.Core
 			{
 				if (input is string)
 				{
+                    // try convert from string, returns an Attempt if the string could be
+                    // processed (either succeeded or failed), else null if we need to try
+                    // other methods
 					var result = TryConvertToFromString(input as string, destinationType);
-
-					// if we processed the string (succeed or fail), we're done
 					if (result.HasValue) return result.Value;
 				}
 
@@ -201,90 +216,124 @@ namespace Umbraco.Core
 			return Attempt<object>.Fail();
 		}
 
-		private static Nullable<Attempt<object>> TryConvertToFromString(this string input, Type destinationType)
+        // returns an attempt if the string has been processed (either succeeded or failed)
+        // returns null if we need to try other methods
+		private static Attempt<object>? TryConvertToFromString(this string input, Type destinationType)
 		{
+            // easy
 			if (destinationType == typeof(string))
 				return Attempt<object>.Succeed(input);
 
-			if (string.IsNullOrEmpty(input))
+            // null, empty, whitespaces
+			if (string.IsNullOrWhiteSpace(input))
 			{
-				if (destinationType == typeof(Boolean))
-					return Attempt<object>.Succeed(false);   // special case for booleans, null/empty == false
-				if (destinationType == typeof(DateTime))
+				if (destinationType == typeof(bool)) // null/empty = bool false
+					return Attempt<object>.Succeed(false);
+				if (destinationType == typeof(DateTime)) // null/empty = min DateTime value
                     return Attempt<object>.Succeed(DateTime.MinValue);
+
+			    // cannot decide here,
+                // any of the types below will fail parsing and will return a failed attempt
+                // but anything else will not be processed and will return null
+                // so even though the string is null/empty we have to proceed
 			}
 
-			// we have a non-empty string, look for type conversions in the expected order of frequency of use...
+			// look for type conversions in the expected order of frequency of use...
 			if (destinationType.IsPrimitive)
 			{
-			    if (destinationType == typeof(Int32))
+			    if (destinationType == typeof(int)) // aka Int32
 				{
-					Int32 value;
-					return Int32.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-			    if (destinationType == typeof(Int64))
-			    {
-			        Int64 value;
-			        return Int64.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-			    }
-			    if (destinationType == typeof(Boolean))
-			    {
-			        Boolean value;
-			        if (Boolean.TryParse(input, out value))
-			            return Attempt<object>.Succeed(value);  // don't declare failure so the CustomBooleanTypeConverter can try
-			    }
-			    else if (destinationType == typeof(Int16))
-			    {
-			        Int16 value;
-			        return Int16.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-			    }
-			    else if (destinationType == typeof(Double))
-			    {
-			        Double value;
-			        var input2 = NormalizeNumberDecimalSeparator(input);
-			        return Double.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-			    }
-			    else if (destinationType == typeof(Single))
-			    {
-			        Single value;
+					int value;
+				    if (int.TryParse(input, out value)) return Attempt<object>.Succeed(value);
+
+                    // because decimal 100.01m will happily convert to integer 100, it
+                    // makes sense that string "100.01" *also* converts to integer 100.
+                    decimal value2;
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Single.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-			    }
-			    else if (destinationType == typeof(Char))
+                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out value2), Convert.ToInt32(value2));
+                }
+
+                if (destinationType == typeof(long)) // aka Int64
 			    {
-			        Char value;
-			        return Char.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			        long value;
+			        if (long.TryParse(input, out value)) return Attempt<object>.Succeed(value);
+
+                    // same as int
+                    decimal value2;
+                    var input2 = NormalizeNumberDecimalSeparator(input);
+			        return Attempt<object>.SucceedIf(decimal.TryParse(input2, out value2), Convert.ToInt64(value2));
 			    }
-			    else if (destinationType == typeof(Byte))
+
+                // fixme - should we do the decimal trick for short, byte, unsigned?
+
+			    if (destinationType == typeof(bool)) // aka Boolean
 			    {
-			        Byte value;
-			        return Byte.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			        bool value;
+			        if (bool.TryParse(input, out value)) return Attempt<object>.Succeed(value);
+                    // don't declare failure so the CustomBooleanTypeConverter can try
+                    return null;
 			    }
-			    else if (destinationType == typeof(SByte))
+
+			    if (destinationType == typeof(short)) // aka Int16
 			    {
-			        SByte value;
-			        return SByte.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			        short value;
+			        return Attempt<object>.SucceedIf(short.TryParse(input, out value), value);
 			    }
-			    else if (destinationType == typeof(UInt32))
+
+			    if (destinationType == typeof(double)) // aka Double
 			    {
-			        UInt32 value;
-			        return UInt32.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			        double value;
+			        var input2 = NormalizeNumberDecimalSeparator(input);
+			        return Attempt<object>.SucceedIf(double.TryParse(input2, out value), value);
 			    }
-			    else if (destinationType == typeof(UInt16))
+
+			    if (destinationType == typeof(float)) // aka Single
 			    {
-			        UInt16 value;
-			        return UInt16.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			        float value;
+			        var input2 = NormalizeNumberDecimalSeparator(input);
+			        return Attempt<object>.SucceedIf(float.TryParse(input2, out value), value);
 			    }
-			    else if (destinationType == typeof(UInt64))
+
+			    if (destinationType == typeof(char)) // aka Char
 			    {
-			        UInt64 value;
-			        return UInt64.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			        char value;
+			        return Attempt<object>.SucceedIf(char.TryParse(input, out value), value);
+			    }
+
+			    if (destinationType == typeof(byte)) // aka Byte
+			    {
+			        byte value;
+			        return Attempt<object>.SucceedIf(byte.TryParse(input, out value), value);
+			    }
+
+			    if (destinationType == typeof(sbyte)) // aka SByte
+                {
+			        sbyte value;
+			        return Attempt<object>.SucceedIf(sbyte.TryParse(input, out value), value);
+                }
+
+			    if (destinationType == typeof(uint)) // aka UInt32
+                {
+			        uint value;
+			        return Attempt<object>.SucceedIf(uint.TryParse(input, out value), value);
+                }
+
+			    if (destinationType == typeof(ushort)) // aka UInt16
+                {
+			        ushort value;
+			        return Attempt<object>.SucceedIf(ushort.TryParse(input, out value), value);
+                }
+
+			    if (destinationType == typeof(ulong)) // aka UInt64
+                {
+			        ulong value;
+                    return Attempt<object>.SucceedIf(ulong.TryParse(input, out value), value);
 			    }
 			}
 			else if (destinationType == typeof(Guid))
 			{
 				Guid value;
-				return Guid.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    return Attempt<object>.SucceedIf(Guid.TryParse(input, out value), value);
 			}
 			else if (destinationType == typeof(DateTime))
 			{
@@ -307,30 +356,30 @@ namespace Umbraco.Core
 			else if (destinationType == typeof(DateTimeOffset))
 			{
 				DateTimeOffset value;
-				return DateTimeOffset.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    return Attempt<object>.SucceedIf(DateTimeOffset.TryParse(input, out value), value);
 			}
 			else if (destinationType == typeof(TimeSpan))
 			{
 				TimeSpan value;
-				return TimeSpan.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    return Attempt<object>.SucceedIf(TimeSpan.TryParse(input, out value), value);
 			}
-			else if (destinationType == typeof(Decimal))
+			else if (destinationType == typeof(decimal)) // aka Decimal
 			{
-				Decimal value;
+				decimal value;
                 var input2 = NormalizeNumberDecimalSeparator(input);
-                return Decimal.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                return Attempt<object>.SucceedIf(decimal.TryParse(input2, out value), value);
 			}
 			else if (destinationType == typeof(Version))
 			{
 				Version value;
-				return Version.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    return Attempt<object>.SucceedIf(Version.TryParse(input, out value), value);
 			}
 			// E_NOTIMPL IPAddress, BigInteger
 
 			return null; // we can't decide...
 		}
 
-        private static readonly char[] NumberDecimalSeparatorsToNormalize = new[] {'.', ','};
+        private static readonly char[] NumberDecimalSeparatorsToNormalize = {'.', ','};
 
 	    private static string NormalizeNumberDecimalSeparator(string s)
 	    {

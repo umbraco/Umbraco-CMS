@@ -38,5 +38,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "");
+        
     }
 }

@@ -2,14 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -54,6 +57,12 @@ namespace Umbraco.Core.Services
             _dataTypeService = dataTypeService;
             _userService = userService;
         }
+
+        #region Static Queries
+
+        private IQuery<IContent> _notTrashedQuery;
+
+        #endregion
 
         public int CountPublished(string contentTypeAlias = null)
         {
@@ -341,11 +350,23 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IEnumerable<IContent> GetByIds(IEnumerable<int> ids)
         {
-            if (ids.Any() == false) return Enumerable.Empty<IContent>();
+            var idsArray = ids.ToArray();
+            if (idsArray.Length == 0) return Enumerable.Empty<IContent>();
 
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.GetAll(ids.ToArray());
+                //ensure that the result has the order based on the ids passed in
+                var result = repository.GetAll(idsArray);
+
+                var content = result.ToDictionary(x => x.Id, x => x);
+
+                var sortedResult = idsArray.Select(x =>
+                {
+                    IContent c;
+                    return content.TryGetValue(x, out c) ? c : null;
+                }).WhereNotNull();
+
+                return sortedResult;
             }
         }
 
@@ -431,6 +452,21 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
                 var versions = repository.GetAllVersions(id);
+                return versions;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all version Ids for the given content item ordered so latest is first
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        public IEnumerable<Guid> GetVersionIds(int id, int maxRows)
+        {
+            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
+            {
+                var versions = repository.GetVersionIds(id, maxRows);
                 return versions;
             }
         }
@@ -536,7 +572,12 @@ namespace Umbraco.Core.Services
                 {
                     query.Where(x => x.ParentId == id);
                 }
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                IQuery<IContent> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IContent>.Builder.Where(x => x.Name.Contains(filter));
+                }
+                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filterQuery);
 
                 return contents;
             }
@@ -544,7 +585,7 @@ namespace Umbraco.Core.Services
 
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        public IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
             long total;
             var result = GetPagedDescendants(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
@@ -563,7 +604,7 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns> 
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
             return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
         }
@@ -588,6 +629,43 @@ namespace Umbraco.Core.Services
             {
 
                 var query = Query<IContent>.Builder;
+                //if the id is System Root, then just get all
+                if (id != Constants.System.Root)
+                {
+                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                }
+                IQuery<IContent> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IContent>.Builder.Where(x => x.Name.Contains(filter));
+                }
+                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filterQuery);
+
+                return contents;
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalChildren">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
+        {
+            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
+
+            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder;
+
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
@@ -638,7 +716,12 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetDescendants(IContent content)
         {
-            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
+            //This is a check to ensure that the path is correct for this entity to avoid problems like: http://issues.umbraco.org/issue/U4-9336 due to data corruption
+            if (content.ValidatePath() == false)
+                throw new InvalidDataException(string.Format("The content item {0} has an invalid path: {1} with parentID: {2}", content.Id, content.Path, content.ParentId));
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 var pathMatch = content.Path + ",";
                 var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(pathMatch) && x.Id != content.Id);
@@ -717,10 +800,15 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         internal IEnumerable<IContent> GetAllPublished()
         {
+            //create it once if it is needed (no need for locking here)
+            if (_notTrashedQuery == null)
+            {
+                _notTrashedQuery = Query<IContent>.Builder.Where(x => x.Trashed == false);
+            }
+
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Trashed == false);
-                return repository.GetByPublishedVersion(query);
+                return repository.GetByPublishedVersion(_notTrashedQuery);
             }
         }
 
@@ -915,6 +1003,10 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                //Hack: this ensures that the entity's path is valid and if not it fixes/persists it
+                //see: http://issues.umbraco.org/issue/U4-9336
+                content.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);
+
                 var originalPath = content.Path;
 
                 if (Trashing.IsRaisedEventCancelled(
@@ -1602,16 +1694,16 @@ namespace Umbraco.Core.Services
         /// <returns>True if sorting succeeded, otherwise False</returns>
         public bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
         {
+            var asArray = items.ToArray();
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(items), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(asArray), this))
                     return false;
             }
 
             var shouldBePublished = new List<IContent>();
             var shouldBeSaved = new List<IContent>();
-
-            var asArray = items.ToArray();
+            
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
@@ -1673,6 +1765,45 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets paged content descendants as XML by path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>
+        public IEnumerable<XElement> GetPagedXmlEntries(string path, long pageIndex, int pageSize, out long totalRecords)
+        {
+            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                var contents = repository.GetPagedXmlEntriesByPath(path, pageIndex, pageSize,
+                    //This order by is VERY important! This allows us to figure out what is implicitly not published, see ContentRepository.BuildXmlCache and
+                    // UmbracoContentIndexer.PerformIndexAll which uses the logic based on this sort order
+                    new[] {"level", "parentID", "sortOrder"},
+                    out totalRecords);
+                return contents;
+            }
+        }
+
+        /// <summary>
+        /// This builds the Xml document used for the XML cache
+        /// </summary>
+        /// <returns></returns>
+        public XmlDocument BuildXmlCache()
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                var result = repository.BuildXmlCache();
+                return result;
+            }
+        }
+
+        /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
         /// <param name="contentTypeIds">
@@ -1716,6 +1847,23 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Hack: This is used to fix some data if an entity's properties are invalid/corrupt
+        /// </summary>
+        /// <param name="content"></param>
+        private void QuickUpdate(IContent content)
+        {
+            if (content == null) throw new ArgumentNullException("content");
+            if (content.HasIdentity == false) throw new InvalidOperationException("Cannot update an entity without an Identity");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                repository.AddOrUpdate(content);                
+                uow.Commit();
+            }
+        }
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
@@ -1824,6 +1972,10 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                //Hack: this ensures that the entity's path is valid and if not it fixes/persists it
+                //see: http://issues.umbraco.org/issue/U4-9336
+                content.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);
+
                 var result = new List<Attempt<PublishStatus>>();
 
                 //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
@@ -2033,6 +2185,7 @@ namespace Umbraco.Core.Services
                 //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
                 if (published && previouslyPublished == false && HasChildren(content.Id))
                 {
+                    //TODO: Horrible for performance if there are lots of descendents! We should page if anything but this is crazy
                     var descendants = GetPublishedDescendants(content);
 
                     _publishingStrategy.PublishingFinalized(descendants, false);
@@ -2063,6 +2216,11 @@ namespace Umbraco.Core.Services
                 {
                     return OperationStatus.Cancelled(evtMsgs);
                 }
+            }
+
+            if (string.IsNullOrWhiteSpace(content.Name))
+            {
+                throw new ArgumentException("Cannot save content with empty name.");
             }
 
             using (new WriteLock(Locker))

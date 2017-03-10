@@ -86,7 +86,7 @@ namespace Umbraco.Core.IO
         private void Initialize()
         {
             Filename = _fs.GetFileName(Path);
-            Extension = _fs.GetExtension(Path) != null
+            Extension = string.IsNullOrEmpty(_fs.GetExtension(Path)) == false
                 ? _fs.GetExtension(Path).Substring(1).ToLowerInvariant()
                 : "";
             Url = _fs.GetUrl(Path);

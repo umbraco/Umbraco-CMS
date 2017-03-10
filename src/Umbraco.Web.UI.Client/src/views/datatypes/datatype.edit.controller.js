@@ -178,8 +178,6 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
                     //share state
                     editorState.set($scope.content);
-
-                    dataTypeHelper.rebindChangedProperties($scope.content, data);
                 });
         }
 

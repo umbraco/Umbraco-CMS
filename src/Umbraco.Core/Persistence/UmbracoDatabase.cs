@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
@@ -153,6 +154,42 @@ namespace Umbraco.Core.Persistence
                 SqlCount++;
             }
             base.OnExecutedCommand(cmd);
+        }
+
+        /// <summary>
+        /// We are overriding this in the case that we are using SQL Server 2012+ so we can make paging more efficient than the default PetaPoco paging
+        /// see: http://issues.umbraco.org/issue/U4-8837
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="sqlSelectRemoved"></param>
+        /// <param name="sqlOrderBy"></param>
+        /// <param name="args"></param>
+        /// <param name="sqlPage"></param>
+        /// <param name="databaseType"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        internal override void BuildSqlDbSpecificPagingQuery(DBType databaseType, long skip, long take, string sql, string sqlSelectRemoved, string sqlOrderBy, ref object[] args, out string sqlPage)
+        {
+            if (databaseType == DBType.SqlServer)
+            {
+                //we need to check it's version to see what kind of paging format we can use
+                //TODO: This is a hack, but we don't have access to the SqlSyntaxProvider here, we can in v8 but not now otherwise
+                // this would be a breaking change.
+                var sqlServerSyntax = SqlSyntaxContext.SqlSyntaxProvider as SqlServerSyntaxProvider;
+                if (sqlServerSyntax != null)
+                {
+                    if ((int) sqlServerSyntax.GetVersionName(this) >= (int) SqlServerVersionName.V2012)
+                    {
+                        //we can use the good paging! to do that we are going to change the databaseType to SQLCE since
+                        //it also uses the good paging syntax.
+                        base.BuildSqlDbSpecificPagingQuery(DBType.SqlServerCE, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
+                        return;
+                    }
+                }
+            }
+           
+            //use the defaults
+            base.BuildSqlDbSpecificPagingQuery(databaseType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
         }
     }
 }

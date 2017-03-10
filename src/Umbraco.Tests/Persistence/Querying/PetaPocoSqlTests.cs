@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -176,7 +177,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -195,7 +196,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -209,7 +210,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -223,7 +224,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -237,7 +238,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -257,7 +258,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
     }
 }

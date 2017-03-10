@@ -67,6 +67,32 @@ namespace Umbraco.Web.Routing
 
 		#region Public
 
+        /// <summary>
+        /// Tries to route the request.
+        /// </summary>
+	    internal bool TryRouteRequest()
+	    {
+            // disabled - is it going to change the routing?
+            //_pcr.OnPreparing();
+
+            FindDomain();
+	        if (_pcr.IsRedirect) return false;
+	        if (_pcr.HasPublishedContent) return true;
+	        FindPublishedContent();
+            if (_pcr.IsRedirect) return false;
+
+            // don't handle anything - we just want to ensure that we find the content
+            //HandlePublishedContent();
+            //FindTemplate();
+            //FollowExternalRedirect();
+            //HandleWildcardDomains();
+
+            // disabled - we just want to ensure that we find the content
+            //_pcr.OnPrepared();
+
+            return _pcr.HasPublishedContent;
+	    }
+
 		/// <summary>
 		/// Prepares the request.
 		/// </summary>

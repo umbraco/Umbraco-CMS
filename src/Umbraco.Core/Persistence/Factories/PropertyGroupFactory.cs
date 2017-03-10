@@ -39,47 +39,65 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 var group = new PropertyGroup();
 
-                // if the group is defined on the current content type,
-                // assign its identifier, else it will be zero
-                if (groupDto.ContentTypeNodeId == _contentTypeId)
-                    group.Id = groupDto.Id;
-
-                group.Name = groupDto.Text;
-                group.SortOrder = groupDto.SortOrder;
-                group.PropertyTypes = new PropertyTypeCollection();
-                group.Key = groupDto.UniqueId;
-
-                //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
-                var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
-                foreach (var typeDto in typeDtos)
+                try
                 {
-                    var tempGroupDto = groupDto;
-                    var propertyType = _propertyTypeCtor(typeDto.DataTypeDto.PropertyEditorAlias,
-                        typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
-                        typeDto.Alias);
+                    group.DisableChangeTracking();
 
-                    propertyType.Alias = typeDto.Alias;
-                    propertyType.DataTypeDefinitionId = typeDto.DataTypeId;
-                    propertyType.Description = typeDto.Description;
-                    propertyType.Id = typeDto.Id;
-                    propertyType.Key = typeDto.UniqueId;
-                    propertyType.Name = typeDto.Name;
-                    propertyType.Mandatory = typeDto.Mandatory;
-                    propertyType.SortOrder = typeDto.SortOrder;
-                    propertyType.ValidationRegExp = typeDto.ValidationRegExp;
-                    propertyType.PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id);
-                    propertyType.CreateDate = _createDate;
-                    propertyType.UpdateDate = _updateDate;
+                    // if the group is defined on the current content type,
+                    // assign its identifier, else it will be zero
+                    if (groupDto.ContentTypeNodeId == _contentTypeId)
+                        group.Id = groupDto.Id;
 
+                    group.Name = groupDto.Text;
+                    group.SortOrder = groupDto.SortOrder;
+                    group.PropertyTypes = new PropertyTypeCollection();
+                    group.Key = groupDto.UniqueId;
+
+                    //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
+                    var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
+                    foreach (var typeDto in typeDtos)
+                    {
+                        var tempGroupDto = groupDto;
+                        var propertyType = _propertyTypeCtor(typeDto.DataTypeDto.PropertyEditorAlias,
+                            typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
+                            typeDto.Alias);
+
+                        try
+                        {
+                            propertyType.DisableChangeTracking();
+
+                            propertyType.Alias = typeDto.Alias;
+                            propertyType.DataTypeDefinitionId = typeDto.DataTypeId;
+                            propertyType.Description = typeDto.Description;
+                            propertyType.Id = typeDto.Id;
+                            propertyType.Key = typeDto.UniqueId;
+                            propertyType.Name = typeDto.Name;
+                            propertyType.Mandatory = typeDto.Mandatory;
+                            propertyType.SortOrder = typeDto.SortOrder;
+                            propertyType.ValidationRegExp = typeDto.ValidationRegExp;
+                            propertyType.PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id);
+                            propertyType.CreateDate = _createDate;
+                            propertyType.UpdateDate = _updateDate;
+
+                            //on initial construction we don't want to have dirty properties tracked
+                            // http://issues.umbraco.org/issue/U4-1946
+                            propertyType.ResetDirtyProperties(false);
+                            group.PropertyTypes.Add(propertyType);
+                        }
+                        finally
+                        {
+                            propertyType.EnableChangeTracking();
+                        }
+                    }
                     //on initial construction we don't want to have dirty properties tracked
                     // http://issues.umbraco.org/issue/U4-1946
-                    propertyType.ResetDirtyProperties(false);
-                    group.PropertyTypes.Add(propertyType);
+                    group.ResetDirtyProperties(false);
+                    propertyGroups.Add(group);
                 }
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
-                group.ResetDirtyProperties(false);
-                propertyGroups.Add(group);
+                finally
+                {
+                    group.EnableChangeTracking();
+                }
             }
 
             return propertyGroups;

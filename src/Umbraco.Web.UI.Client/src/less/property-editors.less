@@ -232,11 +232,11 @@ ul.color-picker li a  {
   max-height: none !important;
 }
 
-.umb-sortable-thumbnails .icon-holder {
+.umb-sortable-thumbnails .umb-icon-holder {
     text-align: center;
 }
 
-.umb-sortable-thumbnails .icon-holder .icon{
+.umb-sortable-thumbnails .umb-icon-holder .icon{
     font-size: 40px;
     line-height: 50px;
     color: @gray;
@@ -702,6 +702,31 @@ ul.color-picker li a  {
   text-transform: uppercase;
   font-size: 10px;
   padding-top: 27px;
+}
+
+.umb-fileupload .file-icon {
+  text-align: center;
+  display: block;
+  position: relative;
+  padding: 5px 0;
+
+  > .icon {
+    font-size: 70px;
+    line-height: 110%;
+    color: #666;
+    text-align: center;
+  }
+
+  > span {
+    color: #fff;
+    background: #666;
+    padding: 1px 3px;
+    font-size: 12px;
+    line-height: 130%;
+    position: absolute;
+    top: 45px;
+    left: 110px;
+  }
 }
 
 .umb-fileupload input {

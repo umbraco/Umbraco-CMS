@@ -432,20 +432,21 @@ namespace umbraco.cms.businesslogic.web
         public static void RegeneratePreviews()
         {
             XmlDocument xd = new XmlDocument();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument");
 
-            while (dr.Read())
+            var nodeIds = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                "select nodeId from cmsDocument");
+
+            foreach (var nodeId in nodeIds)
             {
                 try
                 {
-                    new Document(dr.GetInt("nodeId")).SaveXmlPreview(xd);
+                    new Document(nodeId).SaveXmlPreview(xd);
                 }
                 catch (Exception ee)
                 {
-					LogHelper.Error<Document>("Error generating preview xml", ee);
+                    LogHelper.Error<Document>("Error generating preview xml", ee);
                 }
-            }
-            dr.Close();
+            }            
         }
 
         /// <summary>
@@ -1368,12 +1369,14 @@ namespace umbraco.cms.businesslogic.web
 
             string pathExp = childrenOnly ? Path + ",%" : Path;
 
-            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp));
-            while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), !dr.GetBoolean("published")));
-            dr.Close();
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp)))
+            {
+                while (dr.Read())
+                    nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), !dr.GetBoolean("published")));
 
-            return nodes;
+                return nodes;
+            }
         }
 
         public override XmlNode ToPreviewXml(XmlDocument xd)
@@ -1539,21 +1542,30 @@ namespace umbraco.cms.businesslogic.web
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void saveXml(XmlNode x)
         {
-            bool exists = (SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId=@nodeId",
-                                            SqlHelper.CreateParameter("@nodeId", Id)) != 0);
-            string sql = exists ? "UPDATE cmsContentXml SET xml = @xml WHERE nodeId=@nodeId"
-                                : "INSERT INTO cmsContentXml(nodeId, xml) VALUES (@nodeId, @xml)";
-            SqlHelper.ExecuteNonQuery(sql,
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@xml", x.OuterXml));
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                bool exists = (sqlHelper.ExecuteScalar<int>(
+                                   "SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId=@nodeId",
+                                   sqlHelper.CreateParameter("@nodeId", Id)) != 0);
+                string sql = exists ? "UPDATE cmsContentXml SET xml = @xml WHERE nodeId=@nodeId"
+                                    : "INSERT INTO cmsContentXml(nodeId, xml) VALUES (@nodeId, @xml)";
+           
+                sqlHelper.ExecuteNonQuery(sql,
+                    sqlHelper.CreateParameter("@nodeId", Id),
+                    sqlHelper.CreateParameter("@xml", x.OuterXml));
+            }
         }
 
         private XmlNode importXml()
         {
             XmlDocument xmlDoc = new XmlDocument();
-            XmlReader xmlRdr = SqlHelper.ExecuteXmlReader(string.Format(
-                                                       "select xml from cmsContentXml where nodeID = {0}", Id));
-            xmlDoc.Load(xmlRdr);
+
+            var xmlStr = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                "select xml from cmsContentXml where nodeID = @nodeId", new {nodeId = Id});
+
+            if (xmlStr.IsNullOrWhiteSpace()) return null;
+
+            xmlDoc.LoadXml(xmlStr);
 
             return xmlDoc.FirstChild;
         }

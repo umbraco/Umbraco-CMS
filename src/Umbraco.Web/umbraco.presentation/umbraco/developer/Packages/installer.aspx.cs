@@ -26,7 +26,8 @@ namespace umbraco.presentation.developer.packages
     /// <summary>
     /// Summary description for packager.
     /// </summary>
-    public partial class Installer : UmbracoEnsuredPage
+    [Obsolete("This should not be used and will be removed in v8, this is kept here only for backwards compat reasons, this page should never be rendered/used")]
+    public class Installer : UmbracoEnsuredPage
     {
         public Installer()
         {

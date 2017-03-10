@@ -707,6 +707,35 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Path_Is_Set_Correctly_On_Update_With_Master_Template_Removal()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var parent = new Template("parent", "parent");
+                var child1 = new Template("child1", "child1");
+
+                child1.MasterTemplateAlias = parent.Alias;
+                child1.MasterTemplateId = new Lazy<int>(() => parent.Id);               
+
+                repository.AddOrUpdate(parent);
+                repository.AddOrUpdate(child1);
+                unitOfWork.Commit();
+
+                //Act
+                child1.SetMasterTemplate(null);
+                repository.AddOrUpdate(child1);
+                unitOfWork.Commit();
+
+                //Assert
+                Assert.AreEqual(string.Format("-1,{0}", child1.Id), child1.Path);
+
+            }
+        }
+
 
         [TearDown]
         public override void TearDown()

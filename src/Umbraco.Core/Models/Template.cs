@@ -26,10 +26,15 @@ namespace Umbraco.Core.Models
         private string _masterTemplateAlias;
         private Lazy<int> _masterTemplateId;
 
-        private static readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
-        private static readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, Lazy<int>>(x => x.MasterTemplateId);
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Alias);
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Name);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
+            public readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, Lazy<int>>(x => x.MasterTemplateId);
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Alias);
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Name);
+        }
 
         public Template(string name, string alias)
             : this(name, alias, (Func<File, string>) null)
@@ -53,57 +58,27 @@ namespace Umbraco.Core.Models
         public Lazy<int> MasterTemplateId
         {
             get { return _masterTemplateId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _masterTemplateId = value;
-                    return _masterTemplateId;
-                }, _masterTemplateId, MasterTemplateIdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _masterTemplateId, Ps.Value.MasterTemplateIdSelector); }
         }
 
         public string MasterTemplateAlias
         {
             get { return _masterTemplateAlias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _masterTemplateAlias = value;
-                    return _masterTemplateAlias;
-                }, _masterTemplateAlias, MasterTemplateAliasSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _masterTemplateAlias, Ps.Value.MasterTemplateAliasSelector); }
         }
 
         [DataMember]
         public new string Name
         {
             get { return _name; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
-                
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         [DataMember]
         public new string Alias
         {
             get { return _alias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _alias = value.ToCleanString(CleanStringType.UnderscoreAlias);
-                    return _alias;
-                }, _alias, AliasSelector);
-                
-            }
+            set { SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.UnderscoreAlias), ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>

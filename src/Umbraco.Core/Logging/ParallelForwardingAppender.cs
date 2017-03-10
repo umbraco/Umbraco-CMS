@@ -1,9 +1,9 @@
+using log4net.Core;
+using log4net.Util;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using log4net.Core;
-using log4net.Util;
 
 namespace Umbraco.Core.Logging
 {
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Logging
     /// An asynchronous appender based on <see cref="BlockingCollection{T}"/>
     /// </summary>
     /// <remarks>
-    /// Based on https://github.com/cjbhaines/Log4Net.Async
+    /// Borrowed from https://github.com/cjbhaines/Log4Net.Async - will reference Nuget packages directly in v8
     /// </remarks>
     public class ParallelForwardingAppender : AsyncForwardingAppenderBase, IDisposable
     {
@@ -22,11 +22,11 @@ namespace Umbraco.Core.Logging
         private CancellationTokenSource _loggingCancelationTokenSource;
         private CancellationToken _loggingCancelationToken;
         private Task _loggingTask;
-        private Double _shutdownFlushTimeout = 1;
-        private TimeSpan _shutdownFlushTimespan = TimeSpan.FromSeconds(1);
+        private Double _shutdownFlushTimeout = 2;
+        private TimeSpan _shutdownFlushTimespan = TimeSpan.FromSeconds(2);
         private static readonly Type ThisType = typeof(ParallelForwardingAppender);
-        private volatile bool _shutDownRequested;
-        private int? _bufferSize = DefaultBufferSize;
+        private volatile bool shutDownRequested;
+        private int? bufferSize = DefaultBufferSize;
 
         #endregion Private Members
 
@@ -37,8 +37,8 @@ namespace Umbraco.Core.Logging
         /// </summary>
         public override int? BufferSize
         {
-            get { return _bufferSize; }
-            set { _bufferSize = value; }
+            get { return bufferSize; }
+            set { bufferSize = value; }
         }
 
         public int BufferEntryCount
@@ -67,7 +67,12 @@ namespace Umbraco.Core.Logging
 
         protected override string InternalLoggerName
         {
-            get { return "ParallelForwardingAppender"; }
+            get
+            {
+                {
+                    return "ParallelForwardingAppender";
+                }
+            }
         }
 
         #endregion Properties
@@ -83,7 +88,7 @@ namespace Umbraco.Core.Logging
 
         private void StartForwarding()
         {
-            if (_shutDownRequested)
+            if (shutDownRequested)
             {
                 return;
             }
@@ -111,7 +116,7 @@ namespace Umbraco.Core.Logging
 
         private void CompleteSubscriberTask()
         {
-            _shutDownRequested = true;
+            shutDownRequested = true;
             if (_loggingEvents == null || _loggingEvents.IsAddingCompleted)
             {
                 return;
@@ -154,7 +159,7 @@ namespace Umbraco.Core.Logging
             loggingEvent.Fix = Fix;
             //In the case where blocking on a full collection, and the task is subsequently completed, the cancellation token
             //will prevent the entry from attempting to add to the completed collection which would result in an exception.
-            _loggingEvents.Add(new LoggingEventContext(loggingEvent), _loggingCancelationToken);
+            _loggingEvents.Add(new LoggingEventContext(loggingEvent, HttpContext), _loggingCancelationToken);
         }
 
         protected override void Append(LoggingEvent[] loggingEvents)
@@ -187,6 +192,7 @@ namespace Umbraco.Core.Logging
                 //This call blocks until an item is available or until adding is completed
                 foreach (var entry in _loggingEvents.GetConsumingEnumerable(_loggingCancelationToken))
                 {
+                    HttpContext = entry.HttpContext;
                     ForwardLoggingEvent(entry.LoggingEvent, ThisType);
                 }
             }

@@ -1,6 +1,7 @@
 using log4net.Core;
 using log4net.Util;
 using System;
+using System.ComponentModel;
 using System.Runtime.Remoting.Messaging;
 using System.Security.Principal;
 using System.Threading;
@@ -12,7 +13,11 @@ namespace Umbraco.Core.Logging
     /// <summary>
     /// Based on https://github.com/cjbhaines/Log4Net.Async
     /// which is based on code by Chris Haines http://cjbhaines.wordpress.com/2012/02/13/asynchronous-log4net-appenders/
+    /// This is an old/deprecated logger and has been superceded by ParallelForwardingAppender which is included in Umbraco and 
+    /// also by AsyncForwardingAppender in the Log4Net.Async library.
 	/// </summary>
+	[Obsolete("This is superceded by the ParallelForwardingAppender, this will be removed in v8")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 	public class AsynchronousRollingFileAppender : RollingFileAppender
 	{
 		private RingBuffer<LoggingEvent> pendingAppends;
@@ -198,79 +203,4 @@ namespace Umbraco.Core.Logging
         }
     }
 
-    internal interface IQueue<T>
-    {
-        void Enqueue(T item);
-        bool TryDequeue(out T ret);
-    }
-
-    internal class RingBuffer<T> : IQueue<T>
-    {
-        private readonly object lockObject = new object();
-        private readonly T[] buffer;
-        private readonly int size;
-        private int readIndex = 0;
-        private int writeIndex = 0;
-        private bool bufferFull = false;
-
-        public int Size { get { return size; } }
-
-        public event Action<object, EventArgs> BufferOverflow;
-
-        public RingBuffer(int size)
-        {
-            this.size = size;
-            buffer = new T[size];
-        }
-
-        public void Enqueue(T item)
-        {
-            var bufferWasFull = false;
-            lock (lockObject)
-            {
-                buffer[writeIndex] = item;
-                writeIndex = (++writeIndex) % size;
-                if (bufferFull)
-                {
-                    bufferWasFull = true;
-                    readIndex = writeIndex;
-                }
-                else if (writeIndex == readIndex)
-                {
-                    bufferFull = true;
-                }
-            }
-
-            if (bufferWasFull)
-            {
-                if (BufferOverflow != null)
-                {
-                    BufferOverflow(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        public bool TryDequeue(out T ret)
-        {
-            if (readIndex == writeIndex && !bufferFull)
-            {
-                ret = default(T);
-                return false;
-            }
-            lock (lockObject)
-            {
-                if (readIndex == writeIndex && !bufferFull)
-                {
-                    ret = default(T);
-                    return false;
-                }
-
-                ret = buffer[readIndex];
-                buffer[readIndex] = default(T);
-                readIndex = (++readIndex) % size;
-                bufferFull = false;
-                return true;
-            }
-        }
-    }
 }

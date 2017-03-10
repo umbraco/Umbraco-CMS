@@ -34,6 +34,12 @@ namespace Umbraco.Core
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;
+        private DateTime? _connectionLastChecked = null;
+
+        /// <summary>
+        /// The number of minutes to throttle the checks to CanConnect
+        /// </summary>
+        private const int ConnectionCheckMinutes = 1;
 
         [Obsolete("Use the constructor specifying all dependencies instead")]
         public DatabaseContext(IDatabaseFactory factory)
@@ -110,12 +116,27 @@ namespace Umbraco.Core
         {
             get
             {
-                if (IsDatabaseConfigured == false) return false;
-                var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
-                LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
-                return canConnect;
+                if (IsDatabaseConfigured == false)
+                    return false;
+
+                //Don't check again if the timeout period hasn't elapsed
+                //this ensures we don't keep checking the connection too many times in a row like during startup.
+                //Do check if the _connectionLastChecked is null which means we're just initializing or it could 
+                //not connect last time it was checked.
+                if ((_connectionLastChecked.HasValue && (DateTime.Now - _connectionLastChecked.Value).TotalMinutes > ConnectionCheckMinutes)
+                    || _connectionLastChecked.HasValue == false)
+                {
+                    var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
+                    LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
+
+                    _connectionLastChecked = canConnect == false ? null : (DateTime?) DateTime.Now;
+                    return canConnect;
+                }
+
+                return _connectionLastChecked.HasValue;
             }
         }
+
 
         /// <summary>
         /// Gets the configured umbraco db connection string.
@@ -135,7 +156,7 @@ namespace Umbraco.Core
                 if (string.IsNullOrEmpty(_providerName) == false)
                     return _providerName;
 
-                _providerName = "System.Data.SqlClient";
+                _providerName = Constants.DatabaseProviders.SqlServer;
                 if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
                 {
                     if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName) == false)
@@ -174,7 +195,7 @@ namespace Umbraco.Core
         /// </summary>
         public void ConfigureEmbeddedDatabaseConnection()
         {
-            const string providerName = "System.Data.SqlServerCe.4.0";
+            const string providerName = Constants.DatabaseProviders.SqlCe;
 
             var connectionString = GetEmbeddedDatabaseConnectionString();
             SaveConnectionString(connectionString, providerName);
@@ -182,15 +203,10 @@ namespace Umbraco.Core
             var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
-                var engine = new SqlCeEngine(connectionString);
-                engine.CreateDatabase();
-
-                // SD: Pretty sure this should be in a using clause but i don't want to cause unknown side-effects here
-                // since it's been like this for quite some time
-                //using (var engine = new SqlCeEngine(connectionString))
-                //{
-                //    engine.CreateDatabase();    
-                //}
+                using (var engine = new SqlCeEngine(connectionString))
+                {
+                    engine.CreateDatabase();
+                }
             }
 
             Initialize(providerName);
@@ -212,10 +228,10 @@ namespace Umbraco.Core
         {
             var provider = DbConnectionExtensions.DetectProviderFromConnectionString(connectionString);
             var databaseProvider = provider.ToString();
-            var providerName = "System.Data.SqlClient";
+            var providerName = Constants.DatabaseProviders.SqlServer;
             if (databaseProvider.ToLower().Contains("mysql"))
             {
-                providerName = "MySql.Data.MySqlClient";
+                providerName = Constants.DatabaseProviders.MySql;
             }
             SaveConnectionString(connectionString, providerName);
             Initialize(string.Empty);
@@ -240,10 +256,10 @@ namespace Umbraco.Core
         
         public string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
         {
-            providerName = "System.Data.SqlClient";
+            providerName = Constants.DatabaseProviders.SqlServer;
             if (databaseProvider.ToLower().Contains("mysql"))
             {
-                providerName = "MySql.Data.MySqlClient";
+                providerName = Constants.DatabaseProviders.MySql;
                 return string.Format("Server={0}; Database={1};Uid={2};Pwd={3}", server, databaseName, user, password);
             }
             if (databaseProvider.ToLower().Contains("azure"))
@@ -260,7 +276,7 @@ namespace Umbraco.Core
         /// <param name="databaseName">Name of the database</param>
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
-            const string providerName = "System.Data.SqlClient";
+            const string providerName = Constants.DatabaseProviders.SqlServer;
             var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
@@ -373,7 +389,7 @@ namespace Umbraco.Core
             var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
             if (databaseSettings != null && string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) == false && string.IsNullOrWhiteSpace(databaseSettings.ProviderName) == false)
             {
-                var providerName = "System.Data.SqlClient";
+                var providerName = Constants.DatabaseProviders.SqlServer;
                 string connString = null;
                 if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
                 {
@@ -381,8 +397,7 @@ namespace Umbraco.Core
                     connString = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
                 }
                 Initialize(providerName, connString);
-
-                DetermineSqlServerVersion();
+                
             }
             else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName]) == false)
             {
@@ -395,8 +410,8 @@ namespace Umbraco.Core
                 else if (legacyConnString.ToLowerInvariant().Contains("tcp:"))
                 {
                     //Must be sql azure
-                    SaveConnectionString(legacyConnString, "System.Data.SqlClient");
-                    Initialize("System.Data.SqlClient");
+                    SaveConnectionString(legacyConnString, Constants.DatabaseProviders.SqlServer);
+                    Initialize(Constants.DatabaseProviders.SqlServer);
                 }
                 else if (legacyConnString.ToLowerInvariant().Contains("datalayer=mysql"))
                 {
@@ -407,20 +422,19 @@ namespace Umbraco.Core
                     foreach (var variable in legacyConnString.Split(';').Where(x => x.ToLowerInvariant().StartsWith("datalayer") == false))
                         connectionStringWithoutDatalayer = string.Format("{0}{1};", connectionStringWithoutDatalayer, variable);
 
-                    SaveConnectionString(connectionStringWithoutDatalayer, "MySql.Data.MySqlClient");
-                    Initialize("MySql.Data.MySqlClient");
+                    SaveConnectionString(connectionStringWithoutDatalayer, Constants.DatabaseProviders.MySql);
+                    Initialize(Constants.DatabaseProviders.MySql);
                 }
                 else
                 {
                     //Must be sql
-                    SaveConnectionString(legacyConnString, "System.Data.SqlClient");
-                    Initialize("System.Data.SqlClient");
+                    SaveConnectionString(legacyConnString, Constants.DatabaseProviders.SqlServer);
+                    Initialize(Constants.DatabaseProviders.SqlServer);
                 }
 
                 //Remove the legacy connection string, so we don't end up in a loop if something goes wrong.
                 GlobalSettings.RemoveSetting(GlobalSettings.UmbracoConnectionName);
-
-                DetermineSqlServerVersion();
+                
             }
             else
             {
@@ -465,49 +479,6 @@ namespace Umbraco.Core
             Initialize(providerName);
         }
 
-        /// <summary>
-        /// Set the lazy resolution of determining the SQL server version if that is the db type we're using
-        /// </summary>
-        private void DetermineSqlServerVersion()
-        {
-
-            var sqlServerSyntax = SqlSyntax as SqlServerSyntaxProvider;
-            if (sqlServerSyntax != null)
-            {
-                //this will not execute now, it is lazy so will only execute when we need to actually know
-                // the sql server version.
-                sqlServerSyntax.VersionName = new Lazy<SqlServerVersionName>(() =>
-                {
-                    try
-                    {
-                        var database = this._factory.CreateDatabase();
-
-                        var version = database.ExecuteScalar<string>("SELECT SERVERPROPERTY('productversion')");
-                        var firstPart = version.Split('.')[0];
-                        switch (firstPart)
-                        {
-                            case "11":
-                                return SqlServerVersionName.V2012;
-                            case "10":
-                                return SqlServerVersionName.V2008;
-                            case "9":
-                                return SqlServerVersionName.V2005;
-                            case "8":
-                                return SqlServerVersionName.V2000;
-                            case "7":
-                                return SqlServerVersionName.V7;
-                            default:
-                                return SqlServerVersionName.Other;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        return SqlServerVersionName.Invalid;
-                    }
-                });
-            }
-        }
-
         internal DatabaseSchemaResult ValidateDatabaseSchema()
         {
             if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
@@ -517,7 +488,7 @@ namespace Umbraco.Core
             {
 
                 if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted
-                    && ProviderName == "MySql.Data.MySqlClient")
+                    && ProviderName == Constants.DatabaseProviders.MySql)
                 {
                     throw new InvalidOperationException("Cannot use MySql in Medium Trust configuration");
                 }
@@ -625,13 +596,8 @@ namespace Umbraco.Core
 
                 var installedSchemaVersion = new SemVersion(schemaResult.DetermineInstalledVersion());
 
-                var installedMigrationVersion = new SemVersion(0);
-                //we cannot check the migrations table if it doesn't exist, this will occur when upgrading to 7.3
-                if (schemaResult.ValidTables.Any(x => x.InvariantEquals("umbracoMigration")))
-                {
-                    installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);    
-                }
-
+                var installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);    
+                
                 var targetVersion = UmbracoVersion.Current;
                 
                 //In some cases - like upgrading from 7.2.6 -> 7.3, there will be no migration information in the database and therefore it will
@@ -731,7 +697,7 @@ namespace Umbraco.Core
         private Attempt<Result> CheckReadyForInstall()
         {
             if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted
-                    && ProviderName == "MySql.Data.MySqlClient")
+                    && ProviderName == Constants.DatabaseProviders.MySql)
             {
                 throw new InvalidOperationException("Cannot use MySql in Medium Trust configuration");
             }
@@ -780,7 +746,7 @@ namespace Umbraco.Core
         {
             var dbIsSqlCe = false;
             if (databaseSettings != null && databaseSettings.ProviderName != null)
-                dbIsSqlCe = databaseSettings.ProviderName == "System.Data.SqlServerCe.4.0";
+                dbIsSqlCe = databaseSettings.ProviderName == Constants.DatabaseProviders.SqlCe;
             var sqlCeDatabaseExists = false;
             if (dbIsSqlCe)
             {

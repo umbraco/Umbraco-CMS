@@ -13,6 +13,8 @@
 	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/ReplacePattern/@EntryValue">$var$ == false</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/SearchPattern/@EntryValue">!$var$</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/Severity/@EntryValue">SUGGESTION</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=2DA32DA040A7D74599ABE288C7224CF0/Comment/@EntryValue">Disposable construction</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=2DA32DA040A7D74599ABE288C7224CF0/Severity/@EntryValue">HINT</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=37A0B37A0ABAA34AA5CB32A93653C4FE/@KeyIndexDefined">False</s:Boolean>
 	
 	

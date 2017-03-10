@@ -72,7 +72,7 @@
                         </div>
 
                         <div>
-                            {{layout.name}}<br />
+                            {{layout.label || layout.name}}<br />
                             <i class="icon-delete red"></i>
                             <a class="btn btn-small btn-link" href ng-click="deleteLayout($index)">
                                 <localize key="general_delete" />

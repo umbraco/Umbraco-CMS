@@ -9,6 +9,9 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Logging
 {
+    /// <summary>
+    /// Borrowed from https://github.com/cjbhaines/Log4Net.Async - will reference Nuget packages directly in v8
+    /// </summary>
     [TestFixture]
     public class RingBufferTest
     {

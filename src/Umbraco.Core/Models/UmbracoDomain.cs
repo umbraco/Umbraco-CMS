@@ -24,51 +24,34 @@ namespace Umbraco.Core.Models
         private int? _languageId;
         private string _domainName;
 
-        private static readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.RootContentId);
-        private static readonly PropertyInfo DefaultLanguageSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.LanguageId);
-        private static readonly PropertyInfo DomainNameSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, string>(x => x.DomainName);
-        
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.RootContentId);
+            public readonly PropertyInfo DefaultLanguageSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.LanguageId);
+            public readonly PropertyInfo DomainNameSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, string>(x => x.DomainName);
+        }
 
         [DataMember]
         public int? LanguageId
         {
             get { return _languageId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _languageId = value;
-                    return _languageId;
-                }, _languageId, DefaultLanguageSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _languageId, Ps.Value.DefaultLanguageSelector); }
         }
 
         [DataMember]
         public string DomainName
         {
             get { return _domainName; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _domainName = value;
-                    return _domainName;
-                }, _domainName, DomainNameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _domainName, Ps.Value.DomainNameSelector); }
         }
 
         [DataMember]
         public int? RootContentId
         {
             get { return _contentId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _contentId = value;
-                    return _contentId;
-                }, _contentId, ContentSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _contentId, Ps.Value.ContentSelector); }
         }
 
         public bool IsWildcard

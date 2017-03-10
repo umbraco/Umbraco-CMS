@@ -17,7 +17,7 @@ namespace Umbraco.Core.ObjectResolution
     /// for when there is some processing overhead (i.e. Type finding in assemblies) to return the Types used to instantiate the instances. 
     /// In some these cases we don't want to have to type-find during application startup, only when we need to resolve the instances.</para>
     /// <para>Important notes about this resolver: it does not support Insert or Remove and therefore does not support any ordering unless 
-    /// the types are marked with the WeightedPluginAttribute.</para>
+    /// the types are marked with the WeightAttribute.</para>
     /// </remarks>
     public abstract class LazyManyObjectsResolverBase<TResolver, TResolved> : ManyObjectsResolverBase<TResolver, TResolved>
         where TResolved : class

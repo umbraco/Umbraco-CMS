@@ -9,7 +9,7 @@
 (function() {
    "use strict";
 
-   function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper) {
+   function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper) {
 
       var vm = this;
 
@@ -21,6 +21,7 @@
       vm.mediaDetailsTooltip = {};
       vm.itemsWithoutFolders = [];
       vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
+      vm.acceptedMediatypes = [];
 
       vm.dragEnter = dragEnter;
       vm.dragLeave = dragLeave;
@@ -35,6 +36,14 @@
 
       function activate() {
           vm.itemsWithoutFolders = filterOutFolders($scope.items);
+
+          //no need to make another REST/DB call if this data is not used when we are browsing the bin
+          if ($scope.entityType === 'media' && !vm.isRecycleBin) {
+            mediaTypeHelper.getAllowedImagetypes(vm.nodeId).then(function (types) {
+                vm.acceptedMediatypes = types;
+            });
+          }
+
       }
 
       function filterOutFolders(items) {

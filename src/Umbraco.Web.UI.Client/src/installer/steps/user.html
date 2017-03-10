@@ -10,14 +10,14 @@
 			<div class="pull-right">
 				<div class="control-group">
 					<label class="control-label" for="name">Name</label>
-					    <div class="controls">
-							<input type="text" id="name" name="name" placeholder="Full name" required ng-model="installer.current.model.name" />
-						</div>
+					<div class="controls">
+						<input type="text" id="name" name="name" placeholder="Full name" required ng-model="installer.current.model.name" />
+					</div>
 				</div>
 
 				<div class="control-group">
 					<label class="control-label" for="email">Email</label>
-					    <div class="controls">
+					<div class="controls">
 						<input type="text" id="email" name="email" placeholder="you@example.com" required ng-model="installer.current.model.email" val-email />
 						<small class="inline-help">Your email will be used as your login</small>
 					</div>
@@ -46,17 +46,15 @@
 
 				<div class="control-group">
 					<div class="controls">
-						<label class="checkbox" for="subscribeToNewsLetter">
+						<label class="checkbox">
 							<input type="checkbox" id="subscribeToNewsLetter" name="subscribeToNewsLetter"
-							ng-model="installer.current.model.subscribeToNewsLetter"  /> Keep me updated on Umbraco Versions, Security Bulletins and Community News</label>
+							       ng-model="installer.current.model.subscribeToNewsLetter" /> Keep me updated on Umbraco Versions, Security Bulletins and Community News</label>
 					</div>
 				</div>
 
 				<div class="control-group" ng-class="{disabled:myForm.$invalid}">	
 					<div class="controls">
-
-						<input type="submit" ng-disabled="myForm.$invalid"  value="Install" class="btn btn-success" />
-						
+						<input type="submit" ng-disabled="myForm.$invalid"  value="Install" class="btn btn-success" />	
 						<a href class="btn btn-neutral control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Customize</a>
 					</div>
 				</div>

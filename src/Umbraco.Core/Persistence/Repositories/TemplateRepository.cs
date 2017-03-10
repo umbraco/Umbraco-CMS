@@ -241,7 +241,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 }
-
+                else
+                {
+                    //this means that the master template has been removed, so we need to reset the template's
+                    //path to be at the root
+                    entity.Path = string.Concat("-1,", entity.Id);
+                }
             }
 
             //Get TemplateDto from db to get the Primary key of the entity

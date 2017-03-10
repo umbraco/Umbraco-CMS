@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -27,6 +29,33 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        [Test]
+        public void Get_Paged_Children_With_Media_Type_Filter()
+        {
+            var mediaService = ServiceContext.MediaService;
+            var mediaType1 = MockedContentTypes.CreateImageMediaType("Image2");
+            ServiceContext.ContentTypeService.Save(mediaType1);
+            var mediaType2 = MockedContentTypes.CreateImageMediaType("Image3");
+            ServiceContext.ContentTypeService.Save(mediaType2);
+
+            for (int i = 0; i < 10; i++)
+            {
+                var m1 = MockedMedia.CreateMediaImage(mediaType1, -1);
+                mediaService.Save(m1);
+                var m2 = MockedMedia.CreateMediaImage(mediaType2, -1);
+                mediaService.Save(m2);
+            }
+
+            long total;
+            var result = ServiceContext.MediaService.GetPagedChildren(-1, 0, 11, out total, "SortOrder", Direction.Ascending, true, null, new[] {mediaType1.Id, mediaType2.Id});
+            Assert.AreEqual(11, result.Count());
+            Assert.AreEqual(20, total);
+
+            result = ServiceContext.MediaService.GetPagedChildren(-1, 1, 11, out total, "SortOrder", Direction.Ascending, true, null, new[] { mediaType1.Id, mediaType2.Id });
+            Assert.AreEqual(9, result.Count());
+            Assert.AreEqual(20, total);
         }
 
         [Test]
@@ -81,6 +110,19 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Cannot_Save_Media_With_Empty_Name()
+        {
+            // Arrange
+            var mediaService = ServiceContext.MediaService;
+            var mediaType = MockedContentTypes.CreateVideoMediaType();
+            ServiceContext.ContentTypeService.Save(mediaType);
+            var media = mediaService.CreateMedia(string.Empty, -1, "video");
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => mediaService.Save(media));
+        }
+
+        [Test]
         public void Ensure_Content_Xml_Created()
         {
             var mediaService = ServiceContext.MediaService;
@@ -95,6 +137,40 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
 
+        }
+
+        [Test]
+        public void Can_Get_Media_By_Path()
+        {
+            var mediaService = ServiceContext.MediaService;
+            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            ServiceContext.ContentTypeService.Save(mediaType);
+
+            var media = MockedMedia.CreateMediaImage(mediaType, -1);
+            mediaService.Save(media);
+
+            var mediaPath = "/media/test-image.png";
+            var resolvedMedia = mediaService.GetMediaByPath(mediaPath);
+            
+            Assert.IsNotNull(resolvedMedia);
+            Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString() == mediaPath);
+        }
+
+        [Test]
+        public void Can_Get_Media_With_Crop_By_Path()
+        {
+            var mediaService = ServiceContext.MediaService;
+            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            ServiceContext.ContentTypeService.Save(mediaType);
+
+            var media = MockedMedia.CreateMediaImageWithCrop(mediaType, -1);
+            mediaService.Save(media);
+
+            var mediaPath = "/media/test-image.png";
+            var resolvedMedia = mediaService.GetMediaByPath(mediaPath);
+
+            Assert.IsNotNull(resolvedMedia);
+            Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString().Contains(mediaPath));
         }
 
         private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()

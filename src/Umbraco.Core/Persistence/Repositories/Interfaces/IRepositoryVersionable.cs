@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="serializer">The serializer to convert TEntity to Xml</param>
         /// <param name="groupSize">Structures will be rebuilt in chunks of this size</param>
         /// <param name="contentTypeIds"></param>
-        void RebuildXmlStructures(Func<TEntity, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null);
+        void RebuildXmlStructures(Func<TEntity, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null);
 
         /// <summary>
         /// Get the total count of entities
@@ -34,11 +34,19 @@ namespace Umbraco.Core.Persistence.Repositories
         int CountDescendants(int parentId, string contentTypeAlias = null);
 
         /// <summary>
-        /// Gets a list of all versions for an <see cref="TEntity"/>.
+        /// Gets a list of all versions for an <see cref="TEntity"/> ordered so latest is first
         /// </summary>
         /// <param name="id">Id of the <see cref="TEntity"/> to retrieve versions from</param>
         /// <returns>An enumerable list of the same <see cref="TEntity"/> object with different versions</returns>
-        IEnumerable<TEntity> GetAllVersions(int id);
+        IEnumerable<TEntity> GetAllVersions(int id);        
+
+        /// <summary>
+        /// Gets a list of all version Ids for the given content item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        IEnumerable<Guid> GetVersionIds(int id, int maxRows);
 
         /// <summary>
         /// Gets a specific version of an <see cref="TEntity"/>.
@@ -59,5 +67,16 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="id">Id of the <see cref="TEntity"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         void DeleteVersions(int id, DateTime versionDate);
+
+        /// <summary>
+        /// Gets paged content descendants as XML by path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="orderBy"></param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>
+        IEnumerable<XElement> GetPagedXmlEntriesByPath(string path, long pageIndex, int pageSize, string[] orderBy, out long totalRecords);
     }
 }

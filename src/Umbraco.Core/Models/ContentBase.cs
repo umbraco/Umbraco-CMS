@@ -81,19 +81,24 @@ namespace Umbraco.Core.Models
             _additionalData = new Dictionary<string, object>();
 		}
 
-	    private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ParentId);
-        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
-        private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.Level);
-        private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Path);
-        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.CreatorId);
-        private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
-        private static readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
-        private readonly static PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
+            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ParentId);
+            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
+            public readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.Level);
+            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Path);
+            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.CreatorId);
+            public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
+            public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
+            public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
+        }        
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(PropertyCollectionSelector);
+            OnPropertyChanged(Ps.Value.PropertyCollectionSelector);
         }
 
         /// <summary>
@@ -114,7 +119,7 @@ namespace Umbraco.Core.Models
             set
             {
                 _parentId = new Lazy<int>(() => value);
-                OnPropertyChanged(ParentIdSelector);
+                OnPropertyChanged(Ps.Value.ParentIdSelector);
             }
         }
 
@@ -125,14 +130,7 @@ namespace Umbraco.Core.Models
         public virtual string Name
         {
             get { return _name; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -142,14 +140,7 @@ namespace Umbraco.Core.Models
         public virtual int SortOrder
         {
             get { return _sortOrder; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _sortOrder = value;
-                    return _sortOrder;
-                }, _sortOrder, SortOrderSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
@@ -159,14 +150,7 @@ namespace Umbraco.Core.Models
         public virtual int Level
         {
             get { return _level; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _level = value;
-                    return _level;
-                }, _level, LevelSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector); }
         }
 
         /// <summary>
@@ -176,14 +160,7 @@ namespace Umbraco.Core.Models
         public virtual string Path //Setting this value should be handled by the class not the user
         {
             get { return _path; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _path = value;
-                    return _path;
-                }, _path, PathSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector); }
         }
 
         /// <summary>
@@ -193,14 +170,7 @@ namespace Umbraco.Core.Models
         public virtual int CreatorId
         {
             get { return _creatorId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _creatorId = value;
-                    return _creatorId;
-                }, _creatorId, CreatorIdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
         }
         
         /// <summary>
@@ -212,14 +182,7 @@ namespace Umbraco.Core.Models
         public virtual bool Trashed //Setting this value should be handled by the class not the user
         {
             get { return _trashed; }
-            internal set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _trashed = value;
-                    return _trashed;
-                }, _trashed, TrashedSelector);
-            }
+            internal set { SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector); }
         }
 
         /// <summary>
@@ -244,14 +207,7 @@ namespace Umbraco.Core.Models
                 }
                 return _contentTypeId;
             }
-            protected set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _contentTypeId = value;
-                    return _contentTypeId;
-                }, _contentTypeId, DefaultContentTypeIdSelector);
-            }
+            protected set { SetPropertyValueAndDetectChanges(value, ref _contentTypeId, Ps.Value.DefaultContentTypeIdSelector); }
         }
 
         /// <summary>

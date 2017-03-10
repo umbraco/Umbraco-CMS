@@ -81,7 +81,7 @@ namespace Umbraco.Web
         /// Use focal point, to generate an output image using the focal point instead of the predefined crop
         /// </param>
         /// <param name="useCropDimensions">
-        /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters>.
+        /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters.
         /// </param>
         /// <param name="cacheBuster">
         /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
@@ -302,7 +302,11 @@ namespace Umbraco.Web
                     }
                 }
 
-                if (quality != null)
+                var hasFormat = furtherOptions != null && furtherOptions.InvariantContains("&format=");
+
+                //Only put quality here, if we don't have a format specified. 
+                //Otherwise we need to put quality at the end to avoid it being overridden by the format.
+                if (quality != null && hasFormat == false)
                 {
                     imageProcessorUrl.Append("&quality=" + quality);
                 }
@@ -349,6 +353,12 @@ namespace Umbraco.Web
                 if (furtherOptions != null)
                 {
                     imageProcessorUrl.Append(furtherOptions);
+                }
+
+                //If furtherOptions contains a format, we need to put the quality after the format.
+                if (quality != null && hasFormat)
+                {
+                    imageProcessorUrl.Append("&quality=" + quality);
                 }
 
                 if (cacheBusterValue != null)

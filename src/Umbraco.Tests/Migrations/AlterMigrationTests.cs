@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -45,11 +46,11 @@ namespace Umbraco.Tests.Migrations
             Assert.That(context.Expressions.Any(), Is.True);
 
             //Console output
-            Console.WriteLine("Number of expressions in context: {0}", context.Expressions.Count);
-            Console.WriteLine("");
+            Debug.Print("Number of expressions in context: {0}", context.Expressions.Count);
+            Debug.Print("");
             foreach (var expression in context.Expressions)
             {
-                Console.WriteLine(expression.ToString());
+                Debug.Print(expression.ToString());
             }
         }
     }

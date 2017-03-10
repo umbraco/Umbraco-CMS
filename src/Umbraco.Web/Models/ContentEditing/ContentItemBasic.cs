@@ -25,6 +25,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "published")]
         public bool Published { get; set; }
 
+        [DataMember(Name = "hasPublishedVersion")]
+        public bool HasPublishedVersion { get; set; }
+
         [DataMember(Name = "owner")]
         public UserBasic Owner { get; set; }
 

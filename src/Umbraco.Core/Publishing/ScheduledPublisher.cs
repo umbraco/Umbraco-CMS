@@ -17,8 +17,15 @@ namespace Umbraco.Core.Publishing
             _contentService = contentService;
         }
 
-        public void CheckPendingAndProcess()
+        /// <summary>
+        /// Processes scheduled operations
+        /// </summary>
+        /// <returns>
+        /// Returns the number of items successfully completed
+        /// </returns>
+        public int CheckPendingAndProcess()
         {
+            var counter = 0;
             foreach (var d in _contentService.GetContentForRelease())
             {
                 try
@@ -32,9 +39,13 @@ namespace Umbraco.Core.Publishing
                             LogHelper.Error<ScheduledPublisher>("Could not published the document (" + d.Id + ") based on it's scheduled release, status result: " + result.Result.StatusType, result.Exception);
                         }
                         else
-                        {                            
+                        {
                             LogHelper.Warn<ScheduledPublisher>("Could not published the document (" + d.Id + ") based on it's scheduled release. Status result: " + result.Result.StatusType);
                         }
+                    }
+                    else
+                    {
+                        counter++;
                     }
                 }
                 catch (Exception ee)
@@ -48,7 +59,11 @@ namespace Umbraco.Core.Publishing
                 try
                 {
                     d.ExpireDate = null;
-                    _contentService.UnPublish(d, (int)d.GetWriterProfile().Id);
+                    var result = _contentService.UnPublish(d, (int)d.GetWriterProfile().Id);
+                    if (result)
+                    {
+                        counter++;
+                    }
                 }
                 catch (Exception ee)
                 {
@@ -56,6 +71,8 @@ namespace Umbraco.Core.Publishing
                     throw;
                 }
             }
+
+            return counter;
         }
     }
 }

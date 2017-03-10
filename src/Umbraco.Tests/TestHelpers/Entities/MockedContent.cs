@@ -6,9 +6,18 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContent
     {
+        public static Content CreateBasicContent(IContentType contentType)
+        {
+            var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+           
+            content.ResetDirtyProperties(false);
+
+            return content;
+        }
+
         public static Content CreateSimpleContent(IContentType contentType)
         {
-            var content = new Content("Home", -1, contentType) { Language = "en-US", Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+            var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
             object obj =
                 new
                     {
@@ -26,7 +35,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         public static Content CreateSimpleContent(IContentType contentType, string name, int parentId)
         {
-            var content = new Content(name, parentId, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0 };
+            var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0 };
             object obj =
                 new
                 {
@@ -44,7 +53,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
 		public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent)
 		{
-			var content = new Content(name, parent, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0 };
+			var content = new Content(name, parent, contentType) { CreatorId = 0, WriterId = 0 };
 			object obj =
 				new
 				{
@@ -62,7 +71,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
         {
-            var content = new Content(name, parentId, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0};
+            var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0};
             object obj =
                 new
                 {
@@ -79,9 +88,24 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return content;
         }
 
+        public static Content CreateSimpleContentWithSpecialDatabaseTypes(IContentType contentType, string name, int parentId, string decimalValue, string intValue, DateTime datetimeValue)
+        {
+            var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0 };
+            object obj = new
+            {
+                decimalProperty = decimalValue,
+                intProperty = intValue,
+                datetimeProperty = datetimeValue
+            };
+
+            content.PropertyValues(obj);
+            content.ResetDirtyProperties(false);
+            return content;
+        }
+
         public static Content CreateAllTypesContent(IContentType contentType, string name, int parentId)
         {
-            var content = new Content("Random Content Name", parentId, contentType) { Language = "en-US", Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+            var content = new Content("Random Content Name", parentId, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
 
             content.SetValue("isTrue", true);
             content.SetValue("number", 42);
@@ -115,7 +139,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             for (int i = 0; i < amount; i++)
             {
                 var name = "Textpage No-" + i;
-                var content = new Content(name, parentId, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0 };
+                var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0 };
                 object obj =
                     new
                     {

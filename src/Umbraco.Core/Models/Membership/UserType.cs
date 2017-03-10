@@ -20,9 +20,14 @@ namespace Umbraco.Core.Models.Membership
         private string _name;
         private IEnumerable<string> _permissions;
 
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UserType, string>(x => x.Name);
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<UserType, string>(x => x.Alias);
-        private static readonly PropertyInfo PermissionsSelector = ExpressionHelper.GetPropertyInfo<UserType, IEnumerable<string>>(x => x.Permissions);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UserType, string>(x => x.Name);
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<UserType, string>(x => x.Alias);
+            public readonly PropertyInfo PermissionsSelector = ExpressionHelper.GetPropertyInfo<UserType, IEnumerable<string>>(x => x.Permissions);
+        }
 
         [DataMember]
         public string Alias
@@ -30,11 +35,10 @@ namespace Umbraco.Core.Models.Membership
             get { return _alias; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _alias = value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
-                    return _alias;
-                }, _alias, AliasSelector);
+                SetPropertyValueAndDetectChanges(
+                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), 
+                    ref _alias, 
+                    Ps.Value.AliasSelector);                
             }
         }
 
@@ -42,14 +46,7 @@ namespace Umbraco.Core.Models.Membership
         public string Name
         {
             get { return _name; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -64,11 +61,7 @@ namespace Umbraco.Core.Models.Membership
             get { return _permissions; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _permissions = value;
-                    return _permissions;
-                }, _permissions, PermissionsSelector,
+                SetPropertyValueAndDetectChanges(value, ref _permissions, Ps.Value.PermissionsSelector,
                     //Custom comparer for enumerable
                     new DelegateEqualityComparer<IEnumerable<string>>(
                         (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),

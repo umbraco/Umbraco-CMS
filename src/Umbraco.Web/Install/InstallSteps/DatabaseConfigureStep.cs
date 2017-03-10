@@ -61,8 +61,11 @@ namespace Umbraco.Web.Install.InstallSteps
             }
             else
             {
+                var password = database.Password.Replace("&", "&amp;").Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;").Replace("'", "''");
+                password = string.Format("'{0}'", password);
+
                 dbContext.ConfigureDatabaseConnection(
-                    database.Server, database.DatabaseName, database.Login, database.Password,
+                    database.Server, database.DatabaseName, database.Login, password,
                     database.DatabaseType.ToString());
             }
         }

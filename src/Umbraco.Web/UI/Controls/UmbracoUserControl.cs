@@ -123,8 +123,9 @@ namespace Umbraco.Web.UI.Controls
         }
 
         /// <summary>
-        /// Returns the legacy SqlHelper
+        /// Unused, please do not use
         /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected ISqlHelper SqlHelper
         {
             get { return global::umbraco.BusinessLogic.Application.SqlHelper; }

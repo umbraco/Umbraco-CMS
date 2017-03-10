@@ -114,7 +114,8 @@ namespace Umbraco.Core.Sync
             // - contain a scheme
             // - end or not with a slash, it will be taken care of
             // eg "http://www.mysite.com/umbraco"
-            var registrar = ServerRegistrarResolver.Current.Registrar as IServerRegistrar2;
+            var resolver = ServerRegistrarResolver.HasCurrent ? ServerRegistrarResolver.Current : null;
+            var registrar = resolver == null ? null : resolver.Registrar as IServerRegistrar2;
             url = registrar == null ? null : registrar.GetCurrentServerUmbracoApplicationUrl();
             if (url.IsNullOrWhiteSpace() == false)
             {
@@ -142,7 +143,8 @@ namespace Umbraco.Core.Sync
                 ? ":" + request.ServerVariables["SERVER_PORT"]
                 : "";
 
-            var ssl = GlobalSettings.UseSSL ? "s" : ""; // force, whatever the first request
+            var useSsl = GlobalSettings.UseSSL || port == "443";
+            var ssl = useSsl ? "s" : ""; // force, whatever the first request
             var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
             appContext._umbracoApplicationUrl = url.TrimEnd('/');

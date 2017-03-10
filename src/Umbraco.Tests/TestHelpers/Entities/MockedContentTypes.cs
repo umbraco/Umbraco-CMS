@@ -7,6 +7,13 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContentTypes
     {
+        /// <summary>
+        /// Creates a content type without any properties
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <param name="name"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
         public static ContentType CreateBasicContentType(string alias = "basePage", string name = "Base Page",
             ContentType parent = null)
         {
@@ -412,7 +419,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Integer) { Alias = Constants.Conventions.Media.Width, Name = "Width", Description = "",  Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Integer) { Alias = Constants.Conventions.Media.Height, Name = "Height", Description = "",  Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Integer) { Alias = Constants.Conventions.Media.Bytes, Name = "Bytes", Description = "",  Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Integer) { Alias = Constants.Conventions.Media.Extension, Name = "File Extension", Description = "",  Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Nvarchar) { Alias = Constants.Conventions.Media.Extension, Name = "File Extension", Description = "",  Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
 
             mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
 

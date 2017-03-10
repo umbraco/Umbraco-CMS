@@ -27,26 +27,41 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<IMedia,ContentVersionDto>
 
+        public static IMedia BuildEntity(ContentVersionDto dto, IMediaType contentType)
+        {
+            var media = new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, contentType);
+
+            try
+            {
+                media.DisableChangeTracking();
+
+                media.Id = dto.NodeId;
+                media.Key = dto.ContentDto.NodeDto.UniqueId;
+                media.Path = dto.ContentDto.NodeDto.Path;
+                media.CreatorId = dto.ContentDto.NodeDto.UserId.Value;
+                media.Level = dto.ContentDto.NodeDto.Level;
+                media.ParentId = dto.ContentDto.NodeDto.ParentId;
+                media.SortOrder = dto.ContentDto.NodeDto.SortOrder;
+                media.Trashed = dto.ContentDto.NodeDto.Trashed;
+                media.CreateDate = dto.ContentDto.NodeDto.CreateDate;
+                media.UpdateDate = dto.VersionDate;
+                media.Version = dto.VersionId;
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                media.ResetDirtyProperties(false);
+                return media;
+            }
+            finally
+            {
+                media.EnableChangeTracking();
+            }
+
+        }
+
+        [Obsolete("Use the static BuildEntity instead so we don't have to allocate one of these objects everytime we want to map values")]
         public IMedia BuildEntity(ContentVersionDto dto)
         {
-            var media = new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, _contentType)
-                       {
-                           Id = _id,
-                           Key = dto.ContentDto.NodeDto.UniqueId,
-                           Path = dto.ContentDto.NodeDto.Path,
-                           CreatorId = dto.ContentDto.NodeDto.UserId.Value,
-                           Level = dto.ContentDto.NodeDto.Level,
-                           ParentId = dto.ContentDto.NodeDto.ParentId,
-                           SortOrder = dto.ContentDto.NodeDto.SortOrder,
-                           Trashed = dto.ContentDto.NodeDto.Trashed,
-                           CreateDate = dto.ContentDto.NodeDto.CreateDate,
-                           UpdateDate = dto.VersionDate,
-                           Version = dto.VersionId
-                       };
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            media.ResetDirtyProperties(false);
-            return media;
+            return BuildEntity(dto, _contentType);
         }
 
         public ContentVersionDto BuildDto(IMedia entity)

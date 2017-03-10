@@ -27,23 +27,21 @@ namespace umbraco.cms.businesslogic.datatype
 
         public List<Setting<string, string>> GetSettings(int dataTypeNodeID)
         {
-
             string sql = "select * from cmsDataTypePreValues where datatypenodeid = @datatypenodeid";
-            IRecordsReader settingsReader = sqlHelper.ExecuteReader(sql, sqlHelper.CreateParameter("@datatypenodeid", dataTypeNodeID));
-
-            List<Setting<string, string>> settings = new List<Setting<string, string>>();
-
-            while (settingsReader.Read())
+            using (IRecordsReader settingsReader = sqlHelper.ExecuteReader(sql, sqlHelper.CreateParameter("@datatypenodeid", dataTypeNodeID)))
             {
-                Setting<string, string> setting = new Setting<string, string>();
-                setting.Key = settingsReader.GetString("alias");
-                setting.Value = settingsReader.GetString("value");
-                settings.Add(setting);
+                List<Setting<string, string>> settings = new List<Setting<string, string>>();
+
+                while (settingsReader.Read())
+                {
+                    Setting<string, string> setting = new Setting<string, string>();
+                    setting.Key = settingsReader.GetString("alias");
+                    setting.Value = settingsReader.GetString("value");
+                    settings.Add(setting);
+                }
+
+                return settings;
             }
-
-            settingsReader.Dispose();
-
-            return settings;
         }
 
 

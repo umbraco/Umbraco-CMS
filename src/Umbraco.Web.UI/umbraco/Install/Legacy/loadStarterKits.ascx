@@ -42,7 +42,7 @@
         <itemtemplate>
             <li class="span4 add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
                 <div class="thumbnail" style="margin-right: 10px; height: 260px">
-                    <img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>">
+                    <img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>?width=170" alt="<%# ((Package)Container.DataItem).Text %>">
                     
                     <h4><%# ((Package)Container.DataItem).Text %></h4>
                     <%# ((Package)Container.DataItem).Description %>

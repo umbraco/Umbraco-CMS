@@ -15,6 +15,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
@@ -38,41 +39,15 @@ namespace Umbraco.Web.Editors
     public class AuthenticationController : UmbracoApiController
     {
 
-        private BackOfficeUserManager _userManager;
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
-
-        protected BackOfficeUserManager UserManager
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
         {
-            get
-            {
-                if (_userManager == null)
-                {
-                    var mgr = TryGetOwinContext().Result.GetUserManager<BackOfficeUserManager>();
-                    if (mgr == null)
-                    {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeUserManager) + " from the " + typeof(IOwinContext) + " GetUserManager method");
-                    }
-                    _userManager = mgr;
-                }
-                return _userManager;
-            }
+            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager()); }
         }
-
         protected BackOfficeSignInManager SignInManager
         {
-            get
-            {
-                if (_signInManager == null)
-                {
-                    var mgr = TryGetOwinContext().Result.Get<BackOfficeSignInManager>();
-                    if (mgr == null)
-                    {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager) + " from the " + typeof(IOwinContext));
-                    }
-                    _signInManager = mgr;
-                }
-                return _signInManager;
-            }
+            get { return _signInManager ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager()); }
         }
 
         
@@ -240,7 +215,7 @@ namespace Umbraco.Web.Editors
                 if (user != null && user.IsLockedOut == false)
                 {
                     var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
-                    var callbackUrl = ConstuctCallbackUrl(identityUser.Id, code);
+                    var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
 
                     var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
                         //Ensure the culture of the found user is used for the email!
@@ -258,12 +233,11 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        private string ConstuctCallbackUrl(int userId, string code)
+        private string ConstructCallbackUrl(int userId, string code)
         {
-            //get an mvc helper to get the url
+            // Get an mvc helper to get the url
             var http = EnsureHttpContext();
             var urlHelper = new UrlHelper(http.Request.RequestContext);
-
             var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice", 
                 new
                 {
@@ -272,12 +246,10 @@ namespace Umbraco.Web.Editors
                     r = code
                 });
 
-            //TODO: Virtual path?
-
-            return string.Format("{0}://{1}{2}",
-                http.Request.Url.Scheme,
-                http.Request.Url.Host + (http.Request.Url.Port == 80 ? string.Empty : ":" + http.Request.Url.Port),
-                action);
+            // Construct full URL using configured application URL (which will fall back to request)
+            var applicationUri = new Uri(ApplicationContext.UmbracoApplicationUrl);
+            var callbackUri = new Uri(applicationUri, action);
+            return callbackUri.ToString();
         }      
      
         /// <summary>

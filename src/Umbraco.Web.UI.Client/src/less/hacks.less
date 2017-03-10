@@ -173,3 +173,49 @@ iframe, .content-column-body {
 .pa-form + .pa-form {
     margin-top: 10px;
 }
+
+
+// The below adds a default selector to all pre elements to ensure that styles are applied 
+// without having to add the class ".code" to the element. Styles have been created by 
+// combining the various declarations from the Bootstrap code.less file and fixing some mistakes
+// in Bootstrap 2.
+// This fixes issues with the markdown editor preview and should not cause issues with any other editor. 
+
+// Inline code
+// 1: Revert border radius to match look and feel of 7.4+
+code{
+  .border-radius(@baseBorderRadius); // 1
+}
+
+// Blocks of code
+// 1: Wrapping code is unreadable on small devices.
+pre {
+  display: block;
+  padding: (@baseLineHeight - 1) / 2;
+  margin: 0 0 @baseLineHeight / 2;
+  #font > #family > .monospace;
+  font-size: @baseFontSize - 1; // 14px to 13px
+  color: @grayDark;
+  line-height: @baseLineHeight;
+  white-space: pre; // 1
+  overflow-x: auto; // 1
+  background-color: #f5f5f5;
+  border: 1px solid #ccc; // fallback for IE7-8
+  border: 1px solid rgba(0,0,0,.15);
+  .border-radius(@baseBorderRadius);
+
+
+  // Make prettyprint styles more spaced out for readability
+  &.prettyprint {
+    margin-bottom: @baseLineHeight;
+  }
+
+  // Account for some code outputs that place code tags in pre tags
+  code {
+    padding: 0;
+    white-space: pre; // 1 
+    word-wrap: normal; // 1
+    background-color: transparent;
+    border: 0;
+  }
+}

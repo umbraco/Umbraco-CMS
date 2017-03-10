@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -212,7 +213,12 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(p.Alias, pDto.Alias);
             Assert.AreEqual(p.Id, pDto.Id);
 
-            Assert.IsTrue(p.Value == null ? pDto.Value == string.Empty : pDto.Value == p.Value);
+            if (p.Value == null)
+                Assert.AreEqual(pDto.Value, string.Empty);
+            else if (p.Value is decimal)
+                Assert.AreEqual(pDto.Value, ((decimal) p.Value).ToString(NumberFormatInfo.InvariantInfo));
+            else
+                Assert.AreEqual(pDto.Value, p.Value.ToString());
         }
 
         private void AssertProperty<TPersisted>(ContentItemBasic<ContentPropertyDto, TPersisted> result, Property p)

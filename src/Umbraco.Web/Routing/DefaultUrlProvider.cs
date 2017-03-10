@@ -52,7 +52,11 @@ namespace Umbraco.Web.Routing
             // will not use cache if previewing
             var route = umbracoContext.ContentCache.GetRouteById(id);
 
+            return GetUrlFromRoute(route, umbracoContext, id, current, mode);
+        }
 
+        internal string GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
+        {
             if (string.IsNullOrWhiteSpace(route))
             {
                 LogHelper.Debug<DefaultUrlProvider>(
@@ -61,21 +65,13 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
-            if (route.StartsWith("err/"))
-            {
-                LogHelper.Debug<DefaultUrlProvider>(
-                    "Page with nodeId={0} has a colliding url with page with nodeId={1}.",
-                    () => id, () => route.Substring(4));
-                return "#err-" + route.Substring(4);
-            }
-
             var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
 
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
-            var domainUri = pos == 0 
+            var domainUri = pos == 0
                 ? null
                 : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
 
@@ -110,9 +106,6 @@ namespace Umbraco.Web.Routing
                     () => id);
                 return null;
             }
-
-            if (route.StartsWith("err/"))
-                return null;
 
             var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
 

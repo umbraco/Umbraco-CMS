@@ -28,29 +28,44 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<IMedia,ContentVersionDto>
 
-        public IMember BuildEntity(MemberDto dto)
+        public static IMember BuildEntity(MemberDto dto, IMemberType contentType)
         {
             var member = new Member(
-                dto.ContentVersionDto.ContentDto.NodeDto.Text, 
-                dto.Email,dto.LoginName,dto.Password, _contentType)
+                dto.ContentVersionDto.ContentDto.NodeDto.Text,
+                dto.Email, dto.LoginName, dto.Password, contentType);
+
+            try
             {
-                Id = _id,
-                Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId,
-                Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
-                CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value,
-                Level = dto.ContentVersionDto.ContentDto.NodeDto.Level,
-                ParentId = dto.ContentVersionDto.ContentDto.NodeDto.ParentId,
-                SortOrder = dto.ContentVersionDto.ContentDto.NodeDto.SortOrder,
-                Trashed = dto.ContentVersionDto.ContentDto.NodeDto.Trashed,
-                CreateDate = dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                UpdateDate = dto.ContentVersionDto.VersionDate,
-                Version = dto.ContentVersionDto.VersionId
-            };
-            member.ProviderUserKey = member.Key;
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            member.ResetDirtyProperties(false);
-            return member;
+                member.DisableChangeTracking();
+
+                member.Id = dto.NodeId;
+                member.Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId;
+                member.Path = dto.ContentVersionDto.ContentDto.NodeDto.Path;
+                member.CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value;
+                member.Level = dto.ContentVersionDto.ContentDto.NodeDto.Level;
+                member.ParentId = dto.ContentVersionDto.ContentDto.NodeDto.ParentId;
+                member.SortOrder = dto.ContentVersionDto.ContentDto.NodeDto.SortOrder;
+                member.Trashed = dto.ContentVersionDto.ContentDto.NodeDto.Trashed;
+                member.CreateDate = dto.ContentVersionDto.ContentDto.NodeDto.CreateDate;
+                member.UpdateDate = dto.ContentVersionDto.VersionDate;
+                member.Version = dto.ContentVersionDto.VersionId;
+
+                member.ProviderUserKey = member.Key;
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                member.ResetDirtyProperties(false);
+                return member;
+            }
+            finally
+            {
+                member.EnableChangeTracking();
+            }
+        }
+
+        [Obsolete("Use the static BuildEntity instead so we don't have to allocate one of these objects everytime we want to map values")]
+        public IMember BuildEntity(MemberDto dto)
+        {
+            return BuildEntity(dto, _contentType);
         }
 
         public MemberDto BuildDto(IMember entity)

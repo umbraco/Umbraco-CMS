@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models.Identity
             Culture = Configuration.GlobalSettings.DefaultUILanguage;
         }
 
-        public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager manager)
+        public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager<BackOfficeIdentityUser> manager)
         {
             // NOTE the authenticationType must match the umbraco one
             // defined in CookieAuthenticationOptions.AuthenticationType

@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using umbraco.BusinessLogic; // ApplicationBase
+// ApplicationBase
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic; // SaveEventArgs
 using umbraco.cms.businesslogic.media; // Media
@@ -12,6 +11,8 @@ using umbraco.cms.businesslogic.web; // Documentusing umbraco.cms.businesslogic.
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.relation;
 using umbraco.DataLayer;
+using Umbraco.Core;
+using Application = umbraco.BusinessLogic.Application;
 
 namespace umbraco.editorControls.PickerRelations
 {
@@ -212,7 +213,7 @@ namespace umbraco.editorControls.PickerRelations
 		private static void DeleteRelations(RelationType relationType, int contentNodeId, bool reverseIndexing, string instanceIdentifier)
 		{
 			//if relationType is bi-directional or a reverse index then we can't get at the relations via the API, so using SQL
-			string getRelationsSql = "SELECT id FROM umbracoRelation WHERE relType = " + relationType.Id.ToString() + " AND ";
+			string getRelationsSql = "SELECT id FROM umbracoRelation WHERE relType = " + relationType.Id + " AND ";
 
 			if (reverseIndexing || relationType.Dual)
 			{
@@ -229,18 +230,16 @@ namespace umbraco.editorControls.PickerRelations
 
 			getRelationsSql += " AND comment = '" + instanceIdentifier + "'";
 
-			using (IRecordsReader relations = uQuery.SqlHelper.ExecuteReader(getRelationsSql))
-			{
-				//clear data
-				Relation relation;
-				while (relations.Read())
-				{
-					relation = new Relation(relations.GetInt("id"));
+		    var relationIds = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+		        getRelationsSql);
+		    foreach (var relationId in relationIds)
+		    {
+                var relation = new Relation(relationId);
 
-					// TODO: [HR] check to see if an instance identifier is used
-					relation.Delete();
-				}
-			}
+                // TODO: [HR] check to see if an instance identifier is used
+                relation.Delete();
+            }
+            
 		}
 
 		/// <summary>

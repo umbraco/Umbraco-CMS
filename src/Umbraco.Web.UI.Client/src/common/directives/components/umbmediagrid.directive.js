@@ -138,6 +138,22 @@ Use this directive to generate a thumbnail grid of media items.
                 if (!item.isFolder) {
                     item.thumbnail = mediaHelper.resolveFile(item, true);
                     item.image = mediaHelper.resolveFile(item, false);
+
+                    var fileProp = _.find(item.properties, function (v) {
+                        return (v.alias === "umbracoFile");
+                    });
+
+                    if (fileProp && fileProp.value) {
+                        item.file = fileProp.value;
+                    }
+
+                    var extensionProp = _.find(item.properties, function (v) {
+                        return (v.alias === "umbracoExtension");
+                    });
+
+                    if (extensionProp && extensionProp.value) {
+                        item.extension = extensionProp.value;
+                    }
                 }
             }
 

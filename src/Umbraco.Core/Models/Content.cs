@@ -76,14 +76,19 @@ namespace Umbraco.Core.Models
             _contentType = contentType;
         }
 
-        private static readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
-        private static readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
-        private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
-        private static readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
-        private static readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
-        private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
-        private static readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
-        private static readonly PropertyInfo PermissionsChangedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.PermissionsChanged);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
+            public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
+            public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
+            public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
+            public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
+            public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
+            public readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
+            public readonly PropertyInfo PermissionsChangedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.PermissionsChanged);
+        }
 
         /// <summary>
         /// Gets or sets the template used by the Content.
@@ -97,14 +102,7 @@ namespace Umbraco.Core.Models
         public virtual ITemplate Template
         {
             get { return _template; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _template = value;
-                    return _template;
-                }, _template, TemplateSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector); }
         }
 
         /// <summary>
@@ -142,14 +140,7 @@ namespace Umbraco.Core.Models
         public bool Published
         {
             get { return _published; }
-            internal set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _published = value;
-                    return _published;
-                }, _published, PublishedSelector);
-            }
+            internal set { SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector); }
         }
 
         /// <summary>
@@ -160,14 +151,7 @@ namespace Umbraco.Core.Models
         public string Language
         {
             get { return _language; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _language = value;
-                    return _language;
-                }, _language, LanguageSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector); }
         }
 
         /// <summary>
@@ -177,14 +161,7 @@ namespace Umbraco.Core.Models
         public DateTime? ReleaseDate
         {
             get { return _releaseDate; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _releaseDate = value;
-                    return _releaseDate;
-                }, _releaseDate, ReleaseDateSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _releaseDate, Ps.Value.ReleaseDateSelector); }
         }
 
         /// <summary>
@@ -194,14 +171,7 @@ namespace Umbraco.Core.Models
         public DateTime? ExpireDate
         {
             get { return _expireDate; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _expireDate = value;
-                    return _expireDate;
-                }, _expireDate, ExpireDateSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector); }
         }
 
         /// <summary>
@@ -211,14 +181,7 @@ namespace Umbraco.Core.Models
         public virtual int WriterId
         {
             get { return _writer; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _writer = value;
-                    return _writer;
-                }, _writer, WriterSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _writer, Ps.Value.WriterSelector); }
         }
 
         /// <summary>
@@ -231,14 +194,7 @@ namespace Umbraco.Core.Models
         internal string NodeName
         {
             get { return _nodeName; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _nodeName = value;
-                    return _nodeName;
-                }, _nodeName, NodeNameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector); }
         }
 
         /// <summary>
@@ -248,14 +204,7 @@ namespace Umbraco.Core.Models
         internal bool PermissionsChanged
         {
             get { return _permissionsChanged; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _permissionsChanged = value;
-                    return _permissionsChanged;
-                }, _permissionsChanged, PermissionsChangedSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _permissionsChanged, Ps.Value.PermissionsChangedSelector); }
         }
 
         /// <summary>

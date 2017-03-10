@@ -62,7 +62,7 @@ namespace Umbraco.Web.Install
         {
             errorReport = new List<string>();
             bool succes = true;
-            foreach (string file in PermissionFiles)
+            foreach (string file in files)
             {
                 bool result = OpenFileForWrite(IOHelper.MapPath(file));
                 if (result == false)

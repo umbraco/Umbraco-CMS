@@ -323,6 +323,15 @@ namespace Umbraco.Web
             LogHelper.Debug<UmbracoModule>("Response status: Redirect={0}, Is404={1}, StatusCode={2}",
                 () => pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
                 () => pcr.Is404 ? "true" : "false", () => pcr.ResponseStatusCode);
+            
+            if(pcr.Cacheability != default(HttpCacheability))
+                response.Cache.SetCacheability(pcr.Cacheability);
+
+            foreach (var cacheExtension in pcr.CacheExtensions)
+                response.Cache.AppendCacheExtension(cacheExtension);
+
+            foreach (var header in pcr.Headers)
+                response.AppendHeader(header.Key, header.Value);
 
             if (pcr.IsRedirect)
             {
@@ -515,9 +524,9 @@ namespace Umbraco.Web
                             "Total milliseconds for umbraco request to process: {0}", () => DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
 					}
 
-                    OnEndRequest(new EventArgs());
+                    OnEndRequest(new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));
 
-					DisposeHttpContextItems(httpContext);
+                    DisposeHttpContextItems(httpContext);
 				};
 
 		}
@@ -527,18 +536,19 @@ namespace Umbraco.Web
 
 		}
 
-		#endregion
+        #endregion
 
         #region Events
-        internal static event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
+
+        public static event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
         private void OnRouteAttempt(RoutableAttemptEventArgs args)
         {
             if (RouteAttempt != null)
                 RouteAttempt(this, args);
         }
 
-        internal static event EventHandler<EventArgs> EndRequest;
-        private void OnEndRequest(EventArgs args)
+        public static event EventHandler<UmbracoRequestEventArgs> EndRequest;
+        private void OnEndRequest(UmbracoRequestEventArgs args)
         {
             if (EndRequest != null)
                 EndRequest(this, args);

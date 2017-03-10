@@ -61,7 +61,7 @@ namespace Umbraco.Web.PropertyEditors
                                                 new Field(
                                                     string.Format("{0}.{1}", field.Name, rowName), str, Field.Store.YES, Field.Index.ANALYZED));
                                         }
-                                        
+
                                     }
                                 }
 
@@ -78,16 +78,26 @@ namespace Umbraco.Web.PropertyEditors
                                     e.Document.Add(
                                         new Field(
                                             field.Name,
-                                            sb.ToString(), Field.Store.YES, Field.Index.ANALYZED));                                    
+                                            sb.ToString(), Field.Store.YES, Field.Index.ANALYZED));
                                 }
                             }
+                        }
+                        catch (InvalidCastException)
+                        {
+                            //swallow...on purpose, there's a chance that this isn't the json format we are looking for
+                            // and we don't want that to affect the website. 
                         }
                         catch (JsonException)
                         {
                             //swallow...on purpose, there's a chance that this isn't json and we don't want that to affect 
                             // the website. 
                         }
+                        catch (ArgumentException)
+                        {
+                            //swallow on purpose to prevent this error:
+                            // Can not add Newtonsoft.Json.Linq.JValue to Newtonsoft.Json.Linq.JObject.
 
+                        }
                     }
                 }
             }

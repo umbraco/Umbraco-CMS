@@ -17,13 +17,23 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IDictionaryTranslation BuildEntity(LanguageTextDto dto)
         {
-            var item = new DictionaryTranslation(dto.LanguageId, dto.Value, _uniqueId) 
-                                            {Id = dto.PrimaryKey};
+            var item = new DictionaryTranslation(dto.LanguageId, dto.Value, _uniqueId);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            item.ResetDirtyProperties(false);
-            return item;
+            try
+            {
+                item.DisableChangeTracking();
+
+                item.Id = dto.PrimaryKey;
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                item.ResetDirtyProperties(false);
+                return item;
+            }
+            finally
+            {
+                item.EnableChangeTracking();
+            }
         }
 
         public LanguageTextDto BuildDto(IDictionaryTranslation entity)

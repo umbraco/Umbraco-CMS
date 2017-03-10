@@ -12,7 +12,7 @@ namespace UmbracoExamine.Config
         public LazyIndexCriteria(
             IndexSet set,
             IDataService svc,
-            IEnumerable<StaticField> indexFieldPolicies)
+            StaticFieldCollection indexFieldPolicies)
         {
             if (set == null) throw new ArgumentNullException("set");
             if (indexFieldPolicies == null) throw new ArgumentNullException("indexFieldPolicies");
@@ -35,8 +35,9 @@ namespace UmbracoExamine.Config
                     foreach (var u in userProps)
                     {
                         var field = new IndexField() { Name = u };
-                        var policy = indexFieldPolicies.FirstOrDefault(x => x.Name == u);
-                        if (policy != null)
+
+                        StaticField policy;
+                        if (indexFieldPolicies.TryGetValue(u, out policy))
                         {
                             field.Type = policy.Type;
                             field.EnableSorting = policy.EnableSorting;
@@ -55,8 +56,9 @@ namespace UmbracoExamine.Config
                     foreach (var s in sysProps)
                     {
                         var field = new IndexField() { Name = s };
-                        var policy = indexFieldPolicies.FirstOrDefault(x => x.Name == s);
-                        if (policy != null)
+
+                        StaticField policy;
+                        if (indexFieldPolicies.TryGetValue(s, out policy))
                         {
                             field.Type = policy.Type;
                             field.EnableSorting = policy.EnableSorting;

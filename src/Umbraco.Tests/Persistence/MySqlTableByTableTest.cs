@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence
             base.Initialize();
 
             _database = new Database("Server = 169.254.120.3; Database = testdb; Uid = umbraco; Pwd = umbraco",
-                                     "MySql.Data.MySqlClient");
+                                     Constants.DatabaseProviders.MySql);
         }
 
         [TearDown]

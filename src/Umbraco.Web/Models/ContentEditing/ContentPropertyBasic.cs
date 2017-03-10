@@ -10,6 +10,12 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "property", Namespace = "")]
     public class ContentPropertyBasic
     {
+        /// <summary>
+        /// This is the cmsPropertyData ID
+        /// </summary>
+        /// <remarks>
+        /// This is not really used for anything
+        /// </remarks>
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
         public int Id { get; set; }

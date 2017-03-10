@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Security;
 
@@ -123,6 +124,11 @@ namespace Umbraco.Core.Services
         private IUser CreateUserWithIdentity(string username, string email, string passwordValue, IUserType userType)
         {
             if (userType == null) throw new ArgumentNullException("userType");
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentException("Cannot create user with empty username.");
+            }
 
             //TODO: PUT lock here!!
 
@@ -311,6 +317,15 @@ namespace Umbraco.Core.Services
                     return;
             }
 
+            if (string.IsNullOrWhiteSpace(entity.Username))
+            {
+                throw new ArgumentException("Cannot save user with empty username.");
+            }
+            if (string.IsNullOrWhiteSpace(entity.Name))
+            {
+                throw new ArgumentException("Cannot save user with empty name.");
+            }
+
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
@@ -352,6 +367,14 @@ namespace Umbraco.Core.Services
             {
                 foreach (var member in entities)
                 {
+                    if (string.IsNullOrWhiteSpace(member.Username))
+                    {
+                        throw new ArgumentException("Cannot save user with empty username.");
+                    }
+                    if (string.IsNullOrWhiteSpace(member.Name))
+                    {
+                        throw new ArgumentException("Cannot save user with empty name.");
+                    }
                     repository.AddOrUpdate(member);
                 }
                 //commit the whole lot in one go
@@ -503,6 +526,15 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
                 return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
+            }
+        }
+
+        internal IEnumerable<IUser> GetNextUsers(int id, int count)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = (UserRepository) RepositoryFactory.CreateUserRepository(uow))
+            {
+                return repository.GetNextUsers(id, count);
             }
         }
 

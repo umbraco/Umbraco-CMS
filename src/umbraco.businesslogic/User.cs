@@ -29,13 +29,7 @@ namespace umbraco.BusinessLogic
         
         private readonly Hashtable _notifications = new Hashtable();
         private bool _notificationsInitialized = false;
-
-        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+        
         internal User(IUser user)
         {
             UserEntity = user;
@@ -184,9 +178,10 @@ namespace umbraco.BusinessLogic
         /// <returns>
         /// 	<c>true</c> if this user is admin; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("Use Umbraco.Core.Models.IsAdmin extension method instead", false)]
         public bool IsAdmin()
         {
-            return UserType.Alias == "admin";
+            return UserEntity.IsAdmin();
         }
 
         [Obsolete("Do not use this method to validate credentials, use the user's membership provider to do authentication. This method will not work if the password format is 'Encrypted'")]
@@ -303,19 +298,22 @@ namespace umbraco.BusinessLogic
             if (checkForUmbracoConsoleAccess)
                 consoleCheckSql = "and userNoConsole = 0 ";
 
-            object tmp = SqlHelper.ExecuteScalar<object>(
-                "select id from umbracoUser where userDisabled = 0 " + consoleCheckSql + " and userLogin = @login and userPassword = @pw", 
-                SqlHelper.CreateParameter("@login", lname), 
-                SqlHelper.CreateParameter("@pw", passw)
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                object tmp = sqlHelper.ExecuteScalar<object>(
+                    "select id from umbracoUser where userDisabled = 0 " + consoleCheckSql + " and userLogin = @login and userPassword = @pw",
+                    sqlHelper.CreateParameter("@login", lname),
+                    sqlHelper.CreateParameter("@pw", passw)
                 );
 
-            // Logging
-            if (tmp == null)
-            {
-				LogHelper.Info<User>("Login: '" + lname + "' failed, from IP: " + System.Web.HttpContext.Current.Request.UserHostAddress);
+                // Logging
+                if (tmp == null)
+                {
+                    LogHelper.Info<User>("Login: '" + lname + "' failed, from IP: " + System.Web.HttpContext.Current.Request.UserHostAddress);
+                }
+
+                return (tmp != null);
             }
-                
-            return (tmp != null);
         }
 
         /// <summary>

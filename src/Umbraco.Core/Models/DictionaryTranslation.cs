@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         private string _value;
         //note: this will be memberwise cloned
         private int _languageId;
-
+        
         public DictionaryTranslation(ILanguage language, string value)
         {
             if (language == null) throw new ArgumentNullException("language");
@@ -50,8 +50,13 @@ namespace Umbraco.Core.Models
             Key = uniqueId;
         }
 
-        private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, ILanguage>(x => x.Language);
-        private static readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, string>(x => x.Value);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, ILanguage>(x => x.Language);
+            public readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, string>(x => x.Value);
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="Language"/> for the translation
@@ -79,12 +84,8 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _language = value;
-                    _languageId = _language == null ? -1 : _language.Id;
-                    return _language;
-                }, _language, LanguageSelector);
+                SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector);
+                _languageId = _language == null ? -1 : _language.Id;                
             }
         }
 
@@ -100,14 +101,7 @@ namespace Umbraco.Core.Models
         public string Value
         {
             get { return _value; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _value = value;
-                    return _value;
-                }, _value, ValueSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector); }
         }
 
         public override object DeepClone()

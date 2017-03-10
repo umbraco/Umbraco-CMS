@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
@@ -93,6 +96,25 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
+        /// <summary>
+        /// Gets all XML entries found in the cmsContentXml table based on the given path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>
+        /// <remarks>
+        /// If -1 is passed, then this will return all content xml entries, otherwise will return all descendents from the path
+        /// </remarks>
+        IEnumerable<XElement> GetPagedXmlEntries(string path, long pageIndex, int pageSize, out long totalRecords);
+
+        /// <summary>
+        /// This builds the Xml document used for the XML cache
+        /// </summary>
+        /// <returns></returns>
+        XmlDocument BuildXmlCache();
+
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
@@ -237,7 +259,7 @@ namespace Umbraco.Core.Services
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
@@ -251,7 +273,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
@@ -269,11 +291,34 @@ namespace Umbraco.Core.Services
             string orderBy, Direction orderDirection, bool orderBySystemField, string filter);
 
         /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter"></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
+
+        /// <summary>
         /// Gets a collection of an <see cref="IContent"/> objects versions by its Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetVersions(int id);
+
+        /// <summary>
+        /// Gets a list of all version Ids for the given content item ordered so latest is first
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        IEnumerable<Guid> GetVersionIds(int id, int maxRows);
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects, which reside at the first level / root

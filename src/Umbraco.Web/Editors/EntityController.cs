@@ -4,29 +4,16 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Web.Http;
-using System.Web.Http.ModelBinding;
 using AutoMapper;
-using ClientDependency.Core;
-using Examine.LuceneEngine;
-using Examine.LuceneEngine.Providers;
-using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
-using Umbraco.Web.WebApi.Filters;
-using umbraco.cms.businesslogic.packager;
 using Constants = Umbraco.Core.Constants;
 using Examine;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
 using Umbraco.Web.Dynamics;
-using umbraco;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Xml;
 
@@ -222,6 +209,17 @@ namespace Umbraco.Web.Editors
             return GetResultForChildren(id, type);
         }
 
+        /// <summary>
+        /// Get paged descendant entities by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type)
         {
             return GetResultForAncestors(id, type);
@@ -614,7 +612,7 @@ namespace Umbraco.Web.Editors
                     .Select(Mapper.Map<EntityBasic>);
 
                 // entities are in "some" order, put them back in order
-                var xref = entities.ToDictionary(x => x.Id);
+                var xref = entities.ToDictionary(x => x.Key);
                 var result = keysArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;

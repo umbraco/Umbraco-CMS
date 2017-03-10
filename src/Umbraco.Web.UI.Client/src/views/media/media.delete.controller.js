@@ -10,8 +10,12 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
 
     $scope.performDelete = function() {
 
+        // stop from firing again on double-click
+        if ($scope.busy) { return false; }
+
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
+        $scope.busy = true;
 
         mediaResource.deleteById($scope.currentNode.id).then(function () {
             $scope.currentNode.loading = false;
@@ -45,6 +49,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
         }, function (err) {
 
             $scope.currentNode.loading = false;
+            $scope.busy = false;
 
             //check if response is ysod
             if (err.status && err.status >= 500) {

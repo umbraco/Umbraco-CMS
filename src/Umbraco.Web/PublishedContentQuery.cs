@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
+using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
@@ -56,6 +58,13 @@ namespace Umbraco.Web
                 : _typedContentQuery.TypedContent(id);
         }
 
+        public IPublishedContent TypedContent(Guid id)
+        {
+            return _typedContentQuery == null
+                ? TypedDocumentById(id, _contentCache)
+                : _typedContentQuery.TypedContent(id);
+        }
+
         public IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
             return _typedContentQuery == null
@@ -64,6 +73,13 @@ namespace Umbraco.Web
         }
         
         public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
+        {
+            return _typedContentQuery == null
+                ? TypedDocumentsByIds(_contentCache, ids)
+                : _typedContentQuery.TypedContent(ids);
+        }
+
+        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<Guid> ids)
         {
             return _typedContentQuery == null
                 ? TypedDocumentsByIds(_contentCache, ids)
@@ -97,7 +113,14 @@ namespace Umbraco.Web
                 ? DocumentById(id, _contentCache, DynamicNull.Null)
                 : _dynamicContentQuery.Content(id);
         }
-        
+
+        public dynamic Content(Guid id)
+        {
+            return _dynamicContentQuery == null
+                ? DocumentById(id, _contentCache, DynamicNull.Null)
+                : _dynamicContentQuery.Content(id);
+        }
+
         public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
             return _dynamicContentQuery == null
@@ -113,6 +136,13 @@ namespace Umbraco.Web
         }
         
         public dynamic Content(IEnumerable<int> ids)
+        {
+            return _dynamicContentQuery == null
+                ? DocumentByIds(_contentCache, ids.ToArray())
+                : _dynamicContentQuery.Content(ids);
+        }
+
+        public dynamic Content(IEnumerable<Guid> ids)
         {
             return _dynamicContentQuery == null
                 ? DocumentByIds(_contentCache, ids.ToArray())
@@ -150,7 +180,7 @@ namespace Umbraco.Web
                 ? TypedDocumentById(id, _mediaCache)
                 : _typedContentQuery.TypedMedia(id);
         }
-        
+
         public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
         {
             return _typedContentQuery == null
@@ -196,6 +226,15 @@ namespace Umbraco.Web
             return doc;
         }
 
+        private IPublishedContent TypedDocumentById(Guid id, ContextualPublishedCache cache)
+        {
+            // todo: in v8, implement in a more efficient way
+            var legacyXml = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
+            var xpath = legacyXml ? "//node [@key=$guid]" : "//* [@isDoc and @key=$guid]";
+            var doc = cache.GetSingleByXPath(xpath, new XPathVariable("guid", id.ToString()));
+            return doc;
+        }
+
         private IPublishedContent TypedDocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
         {
             var doc = cache.GetSingleByXPath(xpath, vars);
@@ -211,6 +250,12 @@ namespace Umbraco.Web
 
         private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<int> ids)
         {
+            return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
+        }
+
+        private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<Guid> ids)
+        {
+            // todo: in v8, implement in a more efficient way
             return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
         }
 
@@ -239,6 +284,14 @@ namespace Umbraco.Web
                        : new DynamicPublishedContent(doc).AsDynamic();
         }
 
+        private dynamic DocumentById(Guid id, ContextualPublishedCache cache, object ifNotFound)
+        {
+            var doc = TypedDocumentById(id, cache);
+            return doc == null
+                       ? ifNotFound
+                       : new DynamicPublishedContent(doc).AsDynamic();
+        }
+
         private dynamic DocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedCache cache, object ifNotFound)
         {
             var doc = cache.GetSingleByXPath(xpath, vars);
@@ -256,6 +309,15 @@ namespace Umbraco.Web
         }
 
         private dynamic DocumentByIds(ContextualPublishedCache cache, IEnumerable<int> ids)
+        {
+            var dNull = DynamicNull.Null;
+            var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
+                           .Where(x => TypeHelper.IsTypeAssignableFrom<DynamicNull>(x) == false)
+                           .Cast<DynamicPublishedContent>();
+            return new DynamicPublishedContentList(nodes);
+        }
+
+        private dynamic DocumentByIds(ContextualPublishedCache cache, IEnumerable<Guid> ids)
         {
             var dNull = DynamicNull.Null;
             var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))

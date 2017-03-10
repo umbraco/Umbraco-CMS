@@ -24,12 +24,17 @@ namespace Umbraco.Core.Models
             _taskType = taskType;
         }
 
-        private static readonly PropertyInfo ClosedSelector = ExpressionHelper.GetPropertyInfo<Task, bool>(x => x.Closed);
-        private static readonly PropertyInfo TaskTypeSelector = ExpressionHelper.GetPropertyInfo<Task, TaskType>(x => x.TaskType);
-        private static readonly PropertyInfo EntityIdSelector = ExpressionHelper.GetPropertyInfo<Task, int>(x => x.EntityId);
-        private static readonly PropertyInfo OwnerUserIdSelector = ExpressionHelper.GetPropertyInfo<Task, int>(x => x.OwnerUserId);
-        private static readonly PropertyInfo AssigneeUserIdSelector = ExpressionHelper.GetPropertyInfo<Task, int>(x => x.AssigneeUserId);
-        private static readonly PropertyInfo CommentSelector = ExpressionHelper.GetPropertyInfo<Task, string>(x => x.Comment);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ClosedSelector = ExpressionHelper.GetPropertyInfo<Task, bool>(x => x.Closed);
+            public readonly PropertyInfo TaskTypeSelector = ExpressionHelper.GetPropertyInfo<Task, TaskType>(x => x.TaskType);
+            public readonly PropertyInfo EntityIdSelector = ExpressionHelper.GetPropertyInfo<Task, int>(x => x.EntityId);
+            public readonly PropertyInfo OwnerUserIdSelector = ExpressionHelper.GetPropertyInfo<Task, int>(x => x.OwnerUserId);
+            public readonly PropertyInfo AssigneeUserIdSelector = ExpressionHelper.GetPropertyInfo<Task, int>(x => x.AssigneeUserId);
+            public readonly PropertyInfo CommentSelector = ExpressionHelper.GetPropertyInfo<Task, string>(x => x.Comment);
+        }
 
         /// <summary>
         /// Gets or sets a boolean indicating whether the task is closed
@@ -38,14 +43,7 @@ namespace Umbraco.Core.Models
         public bool Closed
         {
             get { return _closed; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _closed = value;
-                    return _closed;
-                }, _closed, ClosedSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _closed, Ps.Value.ClosedSelector); }
         }
 
         /// <summary>
@@ -55,14 +53,7 @@ namespace Umbraco.Core.Models
         public TaskType TaskType
         {
             get { return _taskType; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _taskType = value;
-                    return _taskType;
-                }, _taskType, TaskTypeSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _taskType, Ps.Value.TaskTypeSelector); }
         }
 
         /// <summary>
@@ -72,14 +63,7 @@ namespace Umbraco.Core.Models
         public int EntityId
         {
             get { return _entityId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _entityId = value;
-                    return _entityId;
-                }, _entityId, EntityIdSelector);                
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _entityId, Ps.Value.EntityIdSelector); }
         }
 
         /// <summary>
@@ -89,14 +73,7 @@ namespace Umbraco.Core.Models
         public int OwnerUserId
         {
             get { return _ownerUserId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _ownerUserId = value;
-                    return _ownerUserId;
-                }, _ownerUserId, OwnerUserIdSelector);    
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _ownerUserId, Ps.Value.OwnerUserIdSelector); }
         }
 
         /// <summary>
@@ -106,14 +83,7 @@ namespace Umbraco.Core.Models
         public int AssigneeUserId
         {
             get { return _assigneeUserId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _assigneeUserId = value;
-                    return _assigneeUserId;
-                }, _assigneeUserId, AssigneeUserIdSelector);    
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _assigneeUserId, Ps.Value.AssigneeUserIdSelector); }
         }
 
         /// <summary>
@@ -123,14 +93,7 @@ namespace Umbraco.Core.Models
         public string Comment
         {
             get { return _comment; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _comment = value;
-                    return _comment;
-                }, _comment, CommentSelector);    
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _comment, Ps.Value.CommentSelector); }
         }
 
     }

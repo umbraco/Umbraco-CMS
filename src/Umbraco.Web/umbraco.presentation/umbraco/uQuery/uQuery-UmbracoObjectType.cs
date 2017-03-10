@@ -1,4 +1,5 @@
 ﻿using System;
+using umbraco.BusinessLogic;
 using Umbraco.Core;
 
 namespace umbraco
@@ -151,9 +152,11 @@ namespace umbraco
 		/// <returns>an UmbracoObjectType Enum value</returns>
 		public static UmbracoObjectType GetUmbracoObjectType(int id)
 		{
-			return uQuery.GetUmbracoObjectType(
-						uQuery.SqlHelper.ExecuteScalar<Guid>(
-							string.Concat("SELECT nodeObjectType FROM umbracoNode WHERE id = ", id)));
+		    using (var sqlHelper = Application.SqlHelper)
+		    {
+		        var guid = sqlHelper.ExecuteScalar<Guid>(string.Concat("SELECT nodeObjectType FROM umbracoNode WHERE id = ", id));
+		        return GetUmbracoObjectType(guid);
+		    }
 		}
 
 		/// <summary>

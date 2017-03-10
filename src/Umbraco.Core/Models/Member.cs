@@ -109,10 +109,15 @@ namespace Umbraco.Core.Models
             IsApproved = true;
         }
 
-        private static readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
-        private static readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
-        private static readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
-        private static readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
+            public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
+            public readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
+            public readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
+        }
 
         /// <summary>
         /// Gets or sets the Username
@@ -121,14 +126,7 @@ namespace Umbraco.Core.Models
         public string Username
         {
             get { return _username; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _username = value;
-                    return _username;
-                }, _username, UsernameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _username, Ps.Value.UsernameSelector); }
         }
 
         /// <summary>
@@ -138,14 +136,7 @@ namespace Umbraco.Core.Models
         public string Email
         {
             get { return _email; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _email = value;
-                    return _email;
-                }, _email, EmailSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
         }
 
         /// <summary>
@@ -155,14 +146,7 @@ namespace Umbraco.Core.Models
         public string RawPasswordValue
         {
             get { return _rawPasswordValue; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _rawPasswordValue = value;
-                    return _rawPasswordValue;
-                }, _rawPasswordValue, PasswordSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector); }
         }
 
         /// <summary>
@@ -490,14 +474,7 @@ namespace Umbraco.Core.Models
             {
                 return _providerUserKey;
             }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _providerUserKey = value;
-                    return _providerUserKey;
-                }, _providerUserKey, ProviderUserKeySelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _providerUserKey, Ps.Value.ProviderUserKeySelector); }
         }
 
       

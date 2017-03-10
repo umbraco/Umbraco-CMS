@@ -13,6 +13,7 @@ namespace Umbraco.Core.Models.Identity
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<IUser, BackOfficeIdentityUser>()
+                .ForMember(user => user.LastLoginDateUtc, expression => expression.MapFrom(user => user.LastLoginDate.ToUniversalTime()))
                 .ForMember(user => user.Email, expression => expression.MapFrom(user => user.Email))
                 .ForMember(user => user.Id, expression => expression.MapFrom(user => user.Id))
                 .ForMember(user => user.LockoutEndDateUtc, expression => expression.MapFrom(user => user.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null))                

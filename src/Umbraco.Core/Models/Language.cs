@@ -21,8 +21,13 @@ namespace Umbraco.Core.Models
             IsoCode = isoCode;
         }
 
-        private static readonly PropertyInfo IsoCodeSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.IsoCode);
-        private static readonly PropertyInfo CultureNameSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.CultureName);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo IsoCodeSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.IsoCode);
+            public readonly PropertyInfo CultureNameSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.CultureName);
+        }
 
         /// <summary>
         /// Gets or sets the Iso Code for the Language
@@ -31,14 +36,7 @@ namespace Umbraco.Core.Models
         public string IsoCode
         {
             get { return _isoCode; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _isoCode = value;
-                    return _isoCode;
-                }, _isoCode, IsoCodeSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _isoCode, Ps.Value.IsoCodeSelector); }
         }
 
         /// <summary>
@@ -48,14 +46,7 @@ namespace Umbraco.Core.Models
         public string CultureName
         {
             get { return _cultureName; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _cultureName = value;
-                    return _cultureName;
-                }, _cultureName, CultureNameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _cultureName, Ps.Value.CultureNameSelector); }
         }
 
         /// <summary>

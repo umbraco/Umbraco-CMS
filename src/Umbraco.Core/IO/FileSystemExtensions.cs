@@ -41,11 +41,7 @@ namespace Umbraco.Core.IO
         {
             using (var file = fs.OpenFile(path))
             {
-                using (var sr = new StreamReader(file))
-                {
-                    var str = sr.ReadToEnd();
-                    return str.Length;
-                }
+                return file.Length;
             }
         }
 

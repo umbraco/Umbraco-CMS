@@ -6,20 +6,60 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
     /// <summary>
-    /// Represents an SqlSyntaxProvider for Sql Server
+    /// Represents an SqlSyntaxProvider for Sql Server.
     /// </summary>
-    [SqlSyntaxProviderAttribute("System.Data.SqlClient")]
+    [SqlSyntaxProvider(Constants.DatabaseProviders.SqlServer)]
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
-        public SqlServerSyntaxProvider()
-        {
-            
-        }
-
         /// <summary>
         /// Gets/sets the version of the current SQL server instance
         /// </summary>
-        internal Lazy<SqlServerVersionName> VersionName { get; set; }
+        internal SqlServerVersionName GetVersionName(Database database)
+        {
+            if (_versionName.HasValue)
+                return _versionName.Value;
+
+            try
+            {
+                var version = database.ExecuteScalar<string>("SELECT SERVERPROPERTY('productversion')");
+                var firstPart = version.Split('.')[0];
+                switch (firstPart)
+                {
+                    case "13":
+                        _versionName = SqlServerVersionName.V2016;
+                        break;
+                    case "12":
+                        _versionName = SqlServerVersionName.V2014;
+                        break;
+                    case "11":
+                        _versionName = SqlServerVersionName.V2012;
+                        break;
+                    case "10":
+                        _versionName = SqlServerVersionName.V2008;
+                        break;
+                    case "9":
+                        _versionName = SqlServerVersionName.V2005;
+                        break;
+                    case "8":
+                        _versionName = SqlServerVersionName.V2000;
+                        break;
+                    case "7":
+                        _versionName = SqlServerVersionName.V7;
+                        break;
+                    default:
+                        _versionName = SqlServerVersionName.Other;
+                        break;
+                }
+            }
+            catch (Exception)
+            {
+                _versionName = SqlServerVersionName.Invalid;
+            }
+
+            return _versionName.Value;
+        }
+
+        private SqlServerVersionName? _versionName;
 
         /// <summary>
         /// SQL Server stores default values assigned to columns as constraints, it also stores them with named values, this is the only
@@ -30,7 +70,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             var items = db.Fetch<dynamic>("SELECT TableName = t.Name,ColumnName = c.Name,dc.Name,dc.[Definition] FROM sys.tables t INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id");
             return items.Select(x => new Tuple<string, string, string, string>(x.TableName, x.ColumnName, x.Name, x.Definition));
-        } 
+        }
 
         public override IEnumerable<string> GetTablesInSchema(Database db)
         {
@@ -75,9 +115,9 @@ from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id
    inner join sys.all_columns as AC on IC.[object_id] = AC.[object_id] and IC.[column_id] = AC.[column_id] 
 WHERE I.name NOT LIKE 'PK_%'
 order by T.name, I.name");
-            return items.Select(item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, 
+            return items.Select(item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME,
                 item.UNIQUE == 1)).ToList();
-            
+
         }
 
         public override bool DoesTableExist(Database db, string tableName)
@@ -104,6 +144,11 @@ order by T.name, I.name");
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;
         }
 
+        public override Sql SelectTop(Sql sql, int top)
+        {
+            return new Sql(sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
+        }
+
         private static string GetIdentityString(ColumnDefinition column)
         {
             return "IDENTITY(1,1)";
@@ -114,7 +159,7 @@ order by T.name, I.name");
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";                
+                    return "NEWID()";
                 case SystemMethods.CurrentDateTime:
                     return "GETDATE()";
                 //case SystemMethods.NewSequentialId:
@@ -131,11 +176,11 @@ order by T.name, I.name");
             get { return "ALTER TABLE [{0}] DROP CONSTRAINT [DF_{0}_{1}]"; }
         }
 
-        
+
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
         public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}', 'COLUMN'"; } }
 
-        
+
     }
 }

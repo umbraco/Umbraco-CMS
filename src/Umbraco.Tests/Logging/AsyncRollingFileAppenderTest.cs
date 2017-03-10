@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -160,7 +161,7 @@ namespace Umbraco.Tests.Logging
             // Assert
             var logsPerSecond = logCount / testDuration.TotalSeconds;
 
-            Console.WriteLine("{0} messages logged in {1}s => {2}/s", logCount, testDuration.TotalSeconds, logsPerSecond);
+            Debug.Print("{0} messages logged in {1}s => {2}/s", logCount, testDuration.TotalSeconds, logsPerSecond);
             Assert.That(logsPerSecond, Is.GreaterThan(1000), "Must log at least 1000 messages per second");
         }
     }

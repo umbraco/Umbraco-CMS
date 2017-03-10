@@ -261,8 +261,17 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_SpecifiedCropModeTest()
         {
-            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode:ImageCropMode.Max);
-            Assert.AreEqual(mediaPath + "?mode=max&width=300&height=150", urlString);
+            var urlStringMin = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Min);
+            var urlStringBoxPad = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.BoxPad);
+            var urlStringPad = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Pad);
+            var urlStringMax = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Max);
+            var urlStringStretch = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Stretch);
+            
+            Assert.AreEqual(mediaPath + "?mode=min&width=300&height=150", urlStringMin);
+            Assert.AreEqual(mediaPath + "?mode=boxpad&width=300&height=150", urlStringBoxPad);
+            Assert.AreEqual(mediaPath + "?mode=pad&width=300&height=150", urlStringPad);
+            Assert.AreEqual(mediaPath + "?mode=max&width=300&height=150", urlStringMax);
+            Assert.AreEqual(mediaPath + "?mode=stretch&width=300&height=150", urlStringStretch);
         }
 
         /// <summary>

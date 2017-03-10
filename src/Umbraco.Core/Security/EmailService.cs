@@ -17,7 +17,7 @@ namespace Umbraco.Core.Security
 
                 //TODO: This check could be nicer but that is the way it is currently
                 mailMessage.IsBodyHtml = message.Body.IsNullOrWhiteSpace() == false 
-                    && message.Body.Contains("<") && message.Body.Contains("/>");
+                    && message.Body.Contains("<") && message.Body.Contains("</");
 
                 await client.SendMailAsync(mailMessage);
             }

@@ -51,14 +51,16 @@ namespace Umbraco.Tests.TestHelpers
             var connectionString = string.Format(@"Data Source={0}", databaseDataPath);
 
             //Create the Sql CE database
-            var engine = new SqlCeEngine(connectionString);
-            if (File.Exists(databaseDataPath) == false)
-                engine.CreateDatabase();
+            using (var engine = new SqlCeEngine(connectionString))
+            {
+                if (File.Exists(databaseDataPath) == false)
+                    engine.CreateDatabase();
+            }
 
             var syntaxProvider = new SqlCeSyntaxProvider();
             SqlSyntaxContext.SqlSyntaxProvider = syntaxProvider;
 
-            _database = new UmbracoDatabase(connectionString, "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
+            _database = new UmbracoDatabase(connectionString, Constants.DatabaseProviders.SqlCe, Mock.Of<ILogger>());
 
             // First remove anything in the database
             var creation = new DatabaseSchemaCreation(_database, Mock.Of<ILogger>(), syntaxProvider);
