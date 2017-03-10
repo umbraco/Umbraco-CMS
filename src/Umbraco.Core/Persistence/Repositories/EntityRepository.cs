@@ -456,31 +456,31 @@ namespace Umbraco.Core.Persistence.Repositories
             else
             {
                 columns.AddRange(new List<object>
-            {
-                "umbracoNode.id",
-                "umbracoNode.trashed",
-                "umbracoNode.parentID",
-                "umbracoNode.nodeUser",
-                "umbracoNode.level",
-                "umbracoNode.path",
-                "umbracoNode.sortOrder",
-                "umbracoNode.uniqueID",
-                "umbracoNode.text",
-                "umbracoNode.nodeObjectType",
-                "umbracoNode.createDate",
-                "COUNT(parent.parentID) as children"
-            };
-
-            if (isContent || isMedia)
-            {
-                if (isContent)
                 {
-                    //only content has/needs this info
-                    columns.Add("published.versionId as publishedVersion");
-                    columns.Add("document.versionId as newestVersion");
-                    columns.Add("contentversion.id as versionId");
-                }
-                
+                    "umbracoNode.id",
+                    "umbracoNode.trashed",
+                    "umbracoNode.parentID",
+                    "umbracoNode.nodeUser",
+                    "umbracoNode.level",
+                    "umbracoNode.path",
+                    "umbracoNode.sortOrder",
+                    "umbracoNode.uniqueID",
+                    "umbracoNode.text",
+                    "umbracoNode.nodeObjectType",
+                    "umbracoNode.createDate",
+                    "COUNT(parent.parentID) as children"
+                });
+
+                if (isContent || isMedia)
+                {
+                    if (isContent)
+                    {
+                        //only content has/needs this info
+                        columns.Add("published.versionId as publishedVersion");
+                        columns.Add("document.versionId as newestVersion");
+                        columns.Add("contentversion.id as versionId");
+                    }
+
                     columns.Add("contenttype.alias");
                     columns.Add("contenttype.icon");
                     columns.Add("contenttype.thumbnail");
@@ -508,10 +508,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         .On("umbracoNode.id = published.nodeId");
                 }
 
-                entitySql.LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType");
-                }
-
-                entitySql.LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType");
+                entitySql.LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType");                
             }
 
             if (isCount == false)
