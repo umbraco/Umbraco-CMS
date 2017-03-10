@@ -15,9 +15,9 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    [PropertyValueType(typeof(JArray))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
+    [PropertyValueType(typeof(JArray))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]    
     public class LegacyRelatedLinksEditorValueConvertor : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
