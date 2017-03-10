@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using Umbraco.Core.Models;
-using Umbraco.Core;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -187,10 +182,12 @@ namespace Umbraco.Core.Persistence.Repositories
             bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
 
             var sql = GetFullSqlForEntityType(key, isContent, isMedia, objectTypeId);
-            
+
+            var factory = new UmbracoEntityFactory();
+
             if (isMedia)
             {
-                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
+                //for now treat media differently and include all property data too  
                 var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
                     new UmbracoEntityRelator().Map, sql);
 
@@ -198,14 +195,16 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var nodeDto = _work.Database.FirstOrDefault<dynamic>(sql);
-                if (nodeDto == null)
-                    return null;
 
-                var factory = new UmbracoEntityFactory();
-                var entity = factory.BuildEntityFromDynamic(nodeDto);
-
-                return entity;
+                //query = read forward data reader, do not load everything into mem
+                var dtos = _work.Database.Query<dynamic>(sql);
+                var collection = new EntityDefinitionCollection();
+                foreach (var dto in dtos)
+                {
+                    collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
+                }
+                var found = collection.FirstOrDefault();
+                return found != null ? found.BuildFromDynamic() : null;                
             }
             
             
@@ -230,28 +229,29 @@ namespace Umbraco.Core.Persistence.Repositories
             bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
 
             var sql = GetFullSqlForEntityType(id, isContent, isMedia, objectTypeId);
-            
+
+            var factory = new UmbracoEntityFactory();
+
             if (isMedia)
             {
-                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
+                //for now treat media differently and include all property data too  
                 var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
                     new UmbracoEntityRelator().Map, sql);
 
                 return entities.FirstOrDefault();
             }
             else
-            {
-                var nodeDto = _work.Database.FirstOrDefault<dynamic>(sql);
-                if (nodeDto == null)
-                    return null;
-
-                var factory = new UmbracoEntityFactory();
-                var entity = factory.BuildEntityFromDynamic(nodeDto);
-
-                return entity;
+            {                
+                //query = read forward data reader, do not load everything into mem
+                var dtos = _work.Database.Query<dynamic>(sql);
+                var collection = new EntityDefinitionCollection();
+                foreach (var dto in dtos)
+                {
+                    collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
+                }
+                var found = collection.FirstOrDefault();
+                return found != null ? found.BuildFromDynamic() : null;
             }
-
-            
         }
 
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
@@ -288,21 +288,21 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (isMedia)
             {
-                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
+                //for now treat media differently and include all property data too                
                 var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
                     new UmbracoEntityRelator().Map, sql);
-                foreach (var entity in entities)
-                {
-                    yield return entity;
-                }
+                return entities;
             }
             else
             {
-                var dtos = _work.Database.Fetch<dynamic>(sql);
-                foreach (var entity in dtos.Select(dto => factory.BuildEntityFromDynamic(dto)))
+                //query = read forward data reader, do not load everything into mem
+                var dtos = _work.Database.Query<dynamic>(sql);
+                var collection = new EntityDefinitionCollection();
+                foreach (var dto in dtos)
                 {
-                    yield return entity;
+                    collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
                 }
+                return collection.Select(x => x.BuildFromDynamic()).ToList();                
             }
         }
 
@@ -347,7 +347,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 });
 
-                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
+                //for now treat media differently and include all property data too    
                 var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
                     new UmbracoEntityRelator().Map, mediaSql);
                 return entities;
@@ -356,8 +356,15 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //use dynamic so that we can get ALL properties from the SQL so we can chuck that data into our AdditionalData
                 var finalSql = entitySql.Append(GetGroupBy(isContent, false));
-                var dtos = _work.Database.Fetch<dynamic>(finalSql);
-                return dtos.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
+
+                //query = read forward data reader, do not load everything into mem
+                var dtos = _work.Database.Query<dynamic>(finalSql);
+                var collection = new EntityDefinitionCollection();
+                foreach (var dto in dtos)
+                {
+                    collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
+                }
+                return collection.Select(x => x.BuildFromDynamic()).ToList();
             }
         }
 
@@ -449,30 +456,31 @@ namespace Umbraco.Core.Persistence.Repositories
             else
             {
                 columns.AddRange(new List<object>
-                {
-                    "umbracoNode.id",
-                    "umbracoNode.trashed",
-                    "umbracoNode.parentID",
-                    "umbracoNode.nodeUser",
-                    "umbracoNode.level",
-                    "umbracoNode.path",
-                    "umbracoNode.sortOrder",
-                    "umbracoNode.uniqueID",
-                    "umbracoNode.text",
-                    "umbracoNode.nodeObjectType",
-                    "umbracoNode.createDate",
-                    "COUNT(parent.parentID) as children"
-                });
+            {
+                "umbracoNode.id",
+                "umbracoNode.trashed",
+                "umbracoNode.parentID",
+                "umbracoNode.nodeUser",
+                "umbracoNode.level",
+                "umbracoNode.path",
+                "umbracoNode.sortOrder",
+                "umbracoNode.uniqueID",
+                "umbracoNode.text",
+                "umbracoNode.nodeObjectType",
+                "umbracoNode.createDate",
+                "COUNT(parent.parentID) as children"
+            };
 
-                if (isContent || isMedia)
+            if (isContent || isMedia)
+            {
+                if (isContent)
                 {
-                    if (isContent)
-                    {
-                        //only content has this info
-                        columns.Add("published.versionId as publishedVersion");
-                        columns.Add("document.versionId as newestVersion");
-                    }
-
+                    //only content has/needs this info
+                    columns.Add("published.versionId as publishedVersion");
+                    columns.Add("document.versionId as newestVersion");
+                    columns.Add("contentversion.id as versionId");
+                }
+                
                     columns.Add("contenttype.alias");
                     columns.Add("contenttype.icon");
                     columns.Add("contenttype.thumbnail");
@@ -485,18 +493,22 @@ namespace Umbraco.Core.Persistence.Repositories
             var entitySql = new Sql()
                 .Select(columns.ToArray())
                 .From("umbracoNode umbracoNode");
-                
+
             if (isContent || isMedia)
             {
                 entitySql.InnerJoin("cmsContent content").On("content.nodeId = umbracoNode.id");
 
                 if (isContent)
                 {
-                    //only content has this info
-                    entitySql
+                    //only content has/needs this info
+                    entitySql                        
                         .InnerJoin("cmsDocument document").On("document.nodeId = umbracoNode.id")
+                        .InnerJoin("cmsContentVersion contentversion").On("contentversion.VersionId = document.versionId")
                         .LeftJoin("(SELECT nodeId, versionId FROM cmsDocument WHERE published = 1) as published")
                         .On("umbracoNode.id = published.nodeId");
+                }
+
+                entitySql.LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType");
                 }
 
                 entitySql.LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType");
@@ -546,7 +558,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected virtual Sql GetBaseWhere(Func<bool, bool, Action<Sql>, Sql> baseQuery, bool isContent, bool isMedia, Guid key)
         {
             var sql = baseQuery(isContent, isMedia, null)
-                .Where("umbracoNode.uniqueID = @UniqueID", new { UniqueID = key });
+                .Where("umbracoNode.uniqueID = @UniqueID", new {UniqueID = key});
 
             if (isContent)
             {
@@ -609,13 +621,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     columns.Add("published.versionId");
                     columns.Add("document.versionId");
+                    columns.Add("contentversion.id");
                 }
                 columns.Add("contenttype.alias");
                 columns.Add("contenttype.icon");
                 columns.Add("contenttype.thumbnail");
-                columns.Add("contenttype.isContainer");
+                columns.Add("contenttype.isContainer");                
             }
-            
+
             var sql = new Sql()
                 .GroupBy(columns.ToArray());
 
@@ -626,7 +639,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return sql;
         }
-        
+
         #endregion
 
         /// <summary>
@@ -652,33 +665,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return _work.Database.ExecuteScalar<int>(sql) > 0;
         }
 
-        #region umbracoNode POCO - Extends NodeDto
-        [TableName("umbracoNode")]
-        [PrimaryKey("id")]
-        [ExplicitColumns]
-        internal class UmbracoEntityDto : NodeDto
-        {
-            [Column("children")]
-            public int Children { get; set; }
-
-            [Column("publishedVersion")]
-            public Guid PublishedVersion { get; set; }
-
-            [Column("newestVersion")]
-            public Guid NewestVersion { get; set; }
-
-            [Column("alias")]
-            public string Alias { get; set; }
-
-            [Column("icon")]
-            public string Icon { get; set; }
-
-            [Column("thumbnail")]
-            public string Thumbnail { get; set; }
-
-            [ResultColumn]
-            public List<UmbracoPropertyDto> UmbracoPropertyDtos { get; set; }
-        }
+        #region private classes
         
         [ExplicitColumns]
         internal class UmbracoPropertyDto
@@ -760,6 +747,99 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 // Return the now populated previous UmbracoEntity (or null if first time through)
                 return prev;
+            }
+        }
+
+        private class EntityDefinitionCollection : KeyedCollection<int, EntityDefinition>
+        {
+            protected override int GetKeyForItem(EntityDefinition item)
+            {
+                return item.Id;
+            }
+
+            /// <summary>
+            /// if this key already exists if it does then we need to check
+            /// if the existing item is 'older' than the new item and if that is the case we'll replace the older one
+            /// </summary>
+            /// <param name="item"></param>
+            /// <returns></returns>
+            public bool AddOrUpdate(EntityDefinition item)
+            {
+                if (Dictionary == null)
+                {
+                    base.Add(item);
+                    return true;
+                }
+
+                var key = GetKeyForItem(item);
+                EntityDefinition found;
+                if (TryGetValue(key, out found))
+                {
+                    //it already exists and it's older so we need to replace it
+                    if (item.VersionId > found.VersionId)
+                    {
+                        var currIndex = Items.IndexOf(found);
+                        if (currIndex == -1)
+                            throw new IndexOutOfRangeException("Could not find the item in the list: " + found.Id);
+
+                        //replace the current one with the newer one
+                        SetItem(currIndex, item);
+                        return true;
+                    }
+                    //could not add or update
+                    return false;
+                }
+
+                base.Add(item);
+                return true;
+            }
+
+            private bool TryGetValue(int key, out EntityDefinition val)
+            {
+                if (Dictionary == null)
+                {
+                    val = null;
+                    return false;
+                }
+                return Dictionary.TryGetValue(key, out val);
+            }
+        }
+
+        private class EntityDefinition
+        {
+            private readonly UmbracoEntityFactory _factory;
+            private readonly dynamic _entity;
+            private readonly bool _isContent;
+            private readonly bool _isMedia;
+
+            public EntityDefinition(UmbracoEntityFactory factory, dynamic entity, bool isContent, bool isMedia)
+            {
+                _factory = factory;
+                _entity = entity;
+                _isContent = isContent;
+                _isMedia = isMedia;
+            }
+
+            public IUmbracoEntity BuildFromDynamic()
+            {
+                return _factory.BuildEntityFromDynamic(_entity);
+            }
+
+            public int Id
+            {
+                get { return _entity.id; }
+            }
+
+            public int VersionId
+            {
+                get
+                {
+                    if (_isContent || _isMedia)
+                    {
+                        return _entity.versionId;
+                    }
+                    return _entity.id;
+                }
             }
         }
         #endregion

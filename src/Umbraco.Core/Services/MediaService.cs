@@ -261,6 +261,29 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public int CountNotTrashed(string contentTypeAlias = null)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateMediaRepository(uow))
+            using (var mediaTypeRepository = RepositoryFactory.CreateMediaTypeRepository(uow))
+            {
+                var mediaTypeId = 0;
+                if (contentTypeAlias.IsNullOrWhiteSpace() == false)
+                {
+                    var mediaType = mediaTypeRepository.Get(contentTypeAlias);
+                    if (mediaType == null) return 0;
+                    mediaTypeId = mediaType.Id;
+                }
+
+                var query = Query<IMedia>.Builder.Where(media => media.Trashed == false);
+                if (mediaTypeId > 0)
+                {
+                    query.Where(media => media.ContentTypeId == mediaTypeId);
+                }
+                return repository.Count(query);
+            }
+        }
+
         public int Count(string contentTypeAlias = null)
         {
             using (var uow = UowProvider.GetUnitOfWork(commit: true))
@@ -449,6 +472,25 @@ namespace Umbraco.Core.Services
         public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
             string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
         {
+            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter, null);
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalChildren">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search text filter</param>
+        /// <param name="contentTypeFilter">A list of content type Ids to filter the list by</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter, int[] contentTypeFilter)
+        {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
 
@@ -459,6 +501,11 @@ namespace Umbraco.Core.Services
                 var query = Query<IMedia>.Builder;
                 // always check for a parent - else it will also get decendants (and then you should use the GetPagedDescendants method)
                 query.Where(x => x.ParentId == id);
+
+                if (contentTypeFilter != null && contentTypeFilter.Length > 0)
+                {
+                    query.Where(x => contentTypeFilter.Contains(x.ContentTypeId));
+                }
 
                 IQuery<IMedia> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)

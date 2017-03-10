@@ -49,6 +49,13 @@ namespace Umbraco.Tests.Persistence
 		}
 
         [Test]
+        public void Database_Connection()
+        {
+            var db = _dbContext.Database;
+            Assert.IsNull(db.Connection);
+        }
+
+        [Test]
         public void Can_Verify_Single_Database_Instance()
         {
 			var db1 = _dbContext.Database;

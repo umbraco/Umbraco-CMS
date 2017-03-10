@@ -198,6 +198,7 @@
     <Compile Include="Configuration\BaseRest\ExtensionElement.cs" />
     <Compile Include="Configuration\BaseRest\ExtensionElementCollection.cs" />
     <Compile Include="Configuration\BaseRest\MethodElement.cs" />
+    <Compile Include="Configuration\ContentXmlStorage.cs" />
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
     <Compile Include="Configuration\Dashboard\AccessItem.cs" />
     <Compile Include="Configuration\Dashboard\AccessType.cs" />
@@ -552,6 +553,7 @@
     <Compile Include="Persistence\PocoDataDataReader.cs" />
     <Compile Include="Persistence\Querying\CachedExpression.cs" />
     <Compile Include="Persistence\Querying\QueryExtensions.cs" />
+    <Compile Include="Persistence\Querying\SqlExpressionExtensions.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
