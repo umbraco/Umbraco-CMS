@@ -19,17 +19,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPickerAlias);
+                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPickerAlias)
+                    || propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPicker2Alias);
             }
             return false;
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
-            var intAttempt = source.TryConvertTo<int>();
-            if (intAttempt.Success)
-                return intAttempt.Result;
-
+            var attemptConvertInt = source.TryConvertTo<int>();
+            if (attemptConvertInt.Success)
+                return attemptConvertInt.Result;
+            var attemptConvertUdi = source.TryConvertTo<Udi>();
+            if (attemptConvertUdi.Success)
+                return attemptConvertUdi.Result;
             return null;
         }
 
@@ -40,11 +43,36 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             if (UmbracoContext.Current != null)
             {
-                var membershipHelper = new MembershipHelper(UmbracoContext.Current);
-                return membershipHelper.GetById((int) source);
+                IPublishedContent member;
+                switch (propertyType.PropertyEditorAlias)
+                {
+                    case Constants.PropertyEditors.MemberPickerAlias:
+                        int sourceInt;
+                        if (int.TryParse(source.ToString(), out sourceInt))
+                        {
+                            var membershipHelper = new MembershipHelper(UmbracoContext.Current);
+                            member = membershipHelper.GetById((int)source);
+                            return member;
+                        }
+                        break;
+                    case Constants.PropertyEditors.MemberPicker2Alias:
+                        GuidUdi sourceUdi;
+                        if (GuidUdi.TryParse(source.ToString(), out sourceUdi))
+                        {
+                            var helper = new UmbracoHelper(UmbracoContext.Current);
+                            var memberAttempt = ApplicationContext.Current.Services.EntityService.GetIdForKey(sourceUdi.Guid, UmbracoObjectTypes.Member);
+                            if (memberAttempt.Success)
+                            {
+                                member = helper.TypedMember(memberAttempt.Result);
+                                return member;
+                            }
+                        }
+                        break;
+                }
+
             }
 
-            return null;
+            return source;
         }
 
     }

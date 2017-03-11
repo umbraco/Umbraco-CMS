@@ -37,10 +37,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            // ** Value converter disabled as not sure if we want to convert the legacy media picker or not **
-            return false;
+            // ** not sure if we want to convert the legacy media picker or not **
+            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias))
+                return false;
 
-            //return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias);
+            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPicker2Alias);
         }
 
         /// <summary>
@@ -62,10 +63,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             var attemptConvertInt = source.TryConvertTo<int>();
             if (attemptConvertInt.Success)
-            {
                 return attemptConvertInt.Result;
-            }
-
+            var attemptConvertUdi = source.TryConvertTo<Udi>();
+            if (attemptConvertUdi.Success)
+                return attemptConvertUdi.Result;
             return null;
         }
 
@@ -93,12 +94,18 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             if (UmbracoContext.Current != null)
             {
-                return UmbracoContext.Current.MediaCache.GetById((int)source);
+                GuidUdi sourceUdi;
+                if (GuidUdi.TryParse(source.ToString(), out sourceUdi))
+                {
+                    var helper = new UmbracoHelper(UmbracoContext.Current);
+                    var mediaAttempt = ApplicationContext.Current.Services.EntityService.GetIdForKey(sourceUdi.Guid, UmbracoObjectTypes.Media);
+                    if (mediaAttempt.Success)
+                    {
+                        return helper.TypedMedia(mediaAttempt.Result);
+                    }
+                }
             }
-
-            return null;
+            return source;
         }
-
-        
     }
 }

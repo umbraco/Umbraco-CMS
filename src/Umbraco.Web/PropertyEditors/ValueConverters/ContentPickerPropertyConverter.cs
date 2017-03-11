@@ -51,7 +51,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias);
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias)
+                    || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPicker2Alias);
             }
             return false;
         }
@@ -75,10 +76,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             var attemptConvertInt = source.TryConvertTo<int>();
             if (attemptConvertInt.Success)
-            {
                 return attemptConvertInt.Result;
-            }
-
+            var attemptConvertUdi = source.TryConvertTo<Udi>();
+            if (attemptConvertUdi.Success)
+                return attemptConvertUdi.Result;
             return null;
         }
 
@@ -108,11 +109,29 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
                 {
-                    var content = UmbracoContext.Current.ContentCache.GetById((int)source);
-                    return content;
+                    IPublishedContent content;
+                    switch (propertyType.PropertyEditorAlias)
+                    {
+                        case Constants.PropertyEditors.ContentPickerAlias:
+                            int sourceInt;
+                            if (int.TryParse(source.ToString(), out sourceInt))
+                            {
+                                content = UmbracoContext.Current.ContentCache.GetById(sourceInt);
+                                return content;
+                            }
+                            break;
+                        case Constants.PropertyEditors.ContentPicker2Alias:
+                            GuidUdi sourceUdi;
+                            if (GuidUdi.TryParse(source.ToString(), out sourceUdi))
+                            {
+                                var helper = new UmbracoHelper(UmbracoContext.Current);
+                                content = helper.TypedContent(sourceUdi.Guid);
+                                return content;
+                            }
+                            break;
+                    }
                 }
             }
-
             return source;
         }
 
@@ -135,6 +154,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             return source.ToString();
         }
-        
+
     }
 }
