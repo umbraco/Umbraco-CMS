@@ -19,7 +19,6 @@
             $scope.hasError = false;
 
             $scope.internal = function($event) {
-
                $scope.currentEditLink = null;
 
                $scope.contentPickerOverlay = {};
@@ -44,14 +43,14 @@
                $event.preventDefault();
             };
 
-            $scope.selectInternal = function($event, link) {
-
+            $scope.selectInternal = function ($event, link) {
                $scope.currentEditLink = link;
 
                $scope.contentPickerOverlay = {};
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
+               $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
 
@@ -224,10 +223,10 @@
 
             function select(data) {
                 if ($scope.currentEditLink != null) {
-                    $scope.currentEditLink.internal = data.id;
+                    $scope.currentEditLink.internal = $scope.model.config.idType === "udi" ? data.udi : data.id;
                     $scope.currentEditLink.internalName = data.name;
                     $scope.currentEditLink.internalIcon = iconHelper.convertFromLegacyIcon(data.icon);
-                    $scope.currentEditLink.link = data.id;
+                    $scope.currentEditLink.link = $scope.model.config.idType === "udi" ? data.udi : data.id;
                 } else {
                     $scope.newInternal = $scope.model.config.idType === "udi" ? data.udi : data.id;
                     $scope.newInternalName = data.name;
