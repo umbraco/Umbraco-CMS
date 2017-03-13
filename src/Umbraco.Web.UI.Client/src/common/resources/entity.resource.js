@@ -152,12 +152,14 @@ function entityResource($q, $http, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "entityApiBaseUrl",
-                       "GetById",
-                       [{ id: id}, {type: type }])),
-               'Failed to retrieve entity data for id ' + id);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "entityApiBaseUrl",
+                        "GetById",
+                        [{ id: id }, { type: type }]),
+                    //http configuration - in this case we don't want the interceptor to handle 404s
+                    { umbIgnoreStatus: [404] }),
+                'Failed to retrieve entity data for id ' + id);
         },
 
         /**
