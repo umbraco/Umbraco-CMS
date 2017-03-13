@@ -1,9 +1,9 @@
-﻿using System;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Extensions;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -56,16 +56,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         }
                         break;
                     case Constants.PropertyEditors.MemberPicker2Alias:
-                        GuidUdi sourceUdi;
-                        if (GuidUdi.TryParse(source.ToString(), out sourceUdi))
+                        Udi udi;
+                        if (Udi.TryParse(source.ToString(), out udi))
                         {
-                            var helper = new UmbracoHelper(UmbracoContext.Current);
-                            var memberAttempt = ApplicationContext.Current.Services.EntityService.GetIdForKey(sourceUdi.Guid, UmbracoObjectTypes.Member);
-                            if (memberAttempt.Success)
-                            {
-                                member = helper.TypedMember(memberAttempt.Result);
+                            member = udi.ToPublishedContent();
+                            if (member != null)
                                 return member;
-                            }
                         }
                         break;
                 }

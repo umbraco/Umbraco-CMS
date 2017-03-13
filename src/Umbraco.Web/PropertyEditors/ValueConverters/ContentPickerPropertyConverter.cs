@@ -16,6 +16,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Extensions;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -121,12 +122,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             }
                             break;
                         case Constants.PropertyEditors.ContentPicker2Alias:
-                            GuidUdi sourceUdi;
-                            if (GuidUdi.TryParse(source.ToString(), out sourceUdi))
+                            Udi udi;
+                            if (Udi.TryParse(source.ToString(), out udi))
                             {
-                                var helper = new UmbracoHelper(UmbracoContext.Current);
-                                content = helper.TypedContent(sourceUdi.Guid);
-                                return content;
+                                content = udi.ToPublishedContent();
+                                if (content != null)
+                                    return content;
                             }
                             break;
                     }

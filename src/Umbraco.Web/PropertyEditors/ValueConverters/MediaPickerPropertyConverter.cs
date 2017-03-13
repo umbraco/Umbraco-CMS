@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Extensions;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -92,19 +93,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 return null;
             }
 
-            if (UmbracoContext.Current != null)
+            Udi udi;
+            if (Udi.TryParse(source.ToString(), out udi))
             {
-                GuidUdi sourceUdi;
-                if (GuidUdi.TryParse(source.ToString(), out sourceUdi))
-                {
-                    var helper = new UmbracoHelper(UmbracoContext.Current);
-                    var mediaAttempt = ApplicationContext.Current.Services.EntityService.GetIdForKey(sourceUdi.Guid, UmbracoObjectTypes.Media);
-                    if (mediaAttempt.Success)
-                    {
-                        return helper.TypedMedia(mediaAttempt.Result);
-                    }
-                }
+                var media = udi.ToPublishedContent();
+                if (media != null)
+                    return media;
             }
+
             return source;
         }
     }

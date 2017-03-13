@@ -17,6 +17,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.Extensions;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -165,24 +166,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
                         if (udis.Length > 0)
                         {
-                            var objectType = UmbracoObjectTypes.Unknown;
-
                             foreach (var udi in udis)
                             {
-                                GuidUdi sourceUdi;
-                                if (GuidUdi.TryParse(udi.ToString(), out sourceUdi))
-                                {
-                                    var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-                                    var multiNodeTreePickerItem =
-                                        GetPublishedContent(sourceUdi.Guid, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent)
-                                        ?? GetPublishedContent(sourceUdi.Guid, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia)
-                                        ?? GetPublishedContent(sourceUdi.Guid, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
-
-                                    if (multiNodeTreePickerItem != null)
-                                    {
-                                        multiNodeTreePicker.Add(multiNodeTreePickerItem);
-                                    }
-                                }
+                                var item = udi.ToPublishedContent();
+                                if (item != null)
+                                    multiNodeTreePicker.Add(item);
                             }
                         }
                         //TODO: Get rid of this Yield thing
@@ -219,38 +207,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 // if we found the content, assign the expected type to the actual type so we don't have to keep looking for other types of content
                 actualType = expectedType;
-            }
-            return content;
-        }
-
-        /// <summary>
-        /// Attempt to get an IPublishedContent instance based on ID and content type
-        /// </summary>
-        /// <param name="sourceUdi">The element UDI's Guid</param>
-        /// <param name="actualType">The type of content being requested</param>
-        /// <param name="expectedType">The type of content expected/supported by <paramref name="contentFetcher"/></param>
-        /// <param name="contentFetcher">A function to fetch content of type <paramref name="expectedType"/></param>
-        /// <returns>The requested content, or null if either it does not exist or <paramref name="actualType"/> does not match <paramref name="expectedType"/></returns>
-        private IPublishedContent GetPublishedContent(Guid sourceUdi, ref UmbracoObjectTypes actualType, UmbracoObjectTypes expectedType, Func<int, IPublishedContent> contentFetcher)
-        {
-            // is the actual type supported by the content fetcher?
-            if (actualType != UmbracoObjectTypes.Unknown && actualType != expectedType)
-            {
-                // no, return null
-                return null;
-            }
-
-            // attempt to get the content
-            IPublishedContent content = null;
-            var contentAttempt = ApplicationContext.Current.Services.EntityService.GetIdForKey(sourceUdi, expectedType);
-            if (contentAttempt.Success)
-            {
-                content = contentFetcher(contentAttempt.Result);
-                if (content != null)
-                {
-                    // if we found the content, assign the expected type to the actual type so we don't have to keep looking for other types of content
-                    actualType = expectedType;
-                }
             }
             return content;
         }
