@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Web;
 using log4net;
@@ -62,12 +63,34 @@ namespace Umbraco.Core.Logging
         
 		public void Error(Type callingType, string message, Exception exception)
 		{
-			var logger = LogManager.GetLogger(callingType);
-			if (logger != null)
-				logger.Error((message), exception);
+            var logger = LogManager.GetLogger(callingType);
+		    if (logger == null) return;
+
+		    if (IsTimeoutThreadAbortException(exception))
+		    {
+		        message += "\r\nThe thread has been aborted, because the request has timed out.";
+		    }
+
+		    logger.Error(message, exception);
 		}
 
-		public void Warn(Type callingType, string message, params Func<object>[] formatItems)
+        private static bool IsTimeoutThreadAbortException(Exception exception)
+        {
+            var abort = exception as ThreadAbortException;
+            if (abort == null) return false;
+
+            if (abort.ExceptionState == null) return false;
+
+            var stateType = abort.ExceptionState.GetType();
+            if (stateType.FullName != "System.Web.HttpApplication+CancelModuleException") return false;
+
+            var timeoutField = stateType.GetField("_timeout", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (timeoutField == null) return false;
+
+            return (bool) timeoutField.GetValue(abort.ExceptionState);
+        }
+
+        public void Warn(Type callingType, string message, params Func<object>[] formatItems)
 		{
 			var logger = LogManager.GetLogger(callingType);
 			if (logger == null || logger.IsWarnEnabled == false) return;
