@@ -77,13 +77,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                         openMiniListView(node);
                     }
                     initTree();
-                },
-                function(response) {
-                    if (response.status === 404) {
-                        //doesn't exist anymore so reset
-                        dialogOptions.startNodeId = null;
-                        initTree();
-                    }
                 });
         }
         else {
