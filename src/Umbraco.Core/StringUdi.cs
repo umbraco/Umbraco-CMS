@@ -1,10 +1,12 @@
 using System;
+using System.ComponentModel;
 
 namespace Umbraco.Core
 {
     /// <summary>
     /// Represents a string-based entity identifier.
     /// </summary>
+    [TypeConverter(typeof(UdiTypeConverter))]
     public class StringUdi : Udi
     {
         /// <summary>
