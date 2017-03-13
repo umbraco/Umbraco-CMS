@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Legacy media property editor that stores Integer Ids
     /// </summary>
-    [Obsolete("This editor is obsolete, use ContentPickerPropertyEditor2 instead which stores UDI")]
+    [Obsolete("This editor is obsolete, use ContentPicker2PropertyEditor instead which stores UDI")]
     [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "(Obsolete) Media Picker", PropertyEditorValueTypes.Integer, "mediapicker", Group = "media", Icon = "icon-picture", IsDeprecated = true)]
     public class MediaPickerPropertyEditor : MediaPicker2PropertyEditor
     {

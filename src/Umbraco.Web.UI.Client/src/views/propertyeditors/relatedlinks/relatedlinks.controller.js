@@ -26,6 +26,7 @@
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
+               $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
 
@@ -228,7 +229,7 @@
                     $scope.currentEditLink.internalIcon = iconHelper.convertFromLegacyIcon(data.icon);
                     $scope.currentEditLink.link = data.id;
                 } else {
-                    $scope.newInternal = data.id;
+                    $scope.newInternal = $scope.model.config.idType === "udi" ? data.udi : data.id;
                     $scope.newInternalName = data.name;
                     $scope.newInternalIcon = iconHelper.convertFromLegacyIcon(data.icon);
                 }
