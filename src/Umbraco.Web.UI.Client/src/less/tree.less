@@ -377,12 +377,15 @@ div.locked:before{
 .umb-actions a {
 	white-space: nowrap;
 	display: block;
-	font-size: 14px;
+	font-size: 15px;
 	color: @black;
-	padding: 8px 25px 8px 20px;
+	padding: 9px 25px 9px 20px;
 	text-decoration: none;
 	cursor: pointer;
+	display: flex;
+    align-items: center;
 }
+
 .umb-actions a:hover, .umb-actions a:focus,
 .umb-actions li.selected {
 	color: @black !important;
@@ -393,11 +396,10 @@ div.locked:before{
 	display: inline-block;
 	vertical-align: middle;
 	padding-left: 15px;
-	padding-top: 2px;
 }
+
 .umb-actions i {
 	color: @gray-6;
-	margin-top: 2px;
 	font-size: 18px;
 	vertical-align: middle;
 	color: @gray-3;
@@ -430,15 +432,16 @@ div.locked:before{
 	display: block;
 	clear: right;
 	line-height: 14px;
-	color: @gray-7;
+	color: @gray-6;
 	white-space: normal;
+	margin-top: 2px;
 }
 .umb-actions-child li a:hover .menuLabel small {
 	text-decoration: none !important
 }
 .umb-actions-child i {
-	font-size: 32px;
-    min-width: 32px;
+	font-size: 30px;
+    min-width: 30px;
     text-align: center;
     line-height: 24px; /* set line-height to ensure all icons use same line-height */
 }
