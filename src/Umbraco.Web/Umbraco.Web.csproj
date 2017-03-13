@@ -402,9 +402,13 @@
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
     <Compile Include="Profiling\WebProfilerProvider.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
+    <Compile Include="PropertyEditors\ContentPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePreValueEditor.cs" />
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
