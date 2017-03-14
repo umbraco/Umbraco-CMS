@@ -289,11 +289,14 @@ namespace Umbraco.Core
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string RelatedLinks = "71B8AD1A-8DC2-425C-B6B8-FAA158075E63";
+            
+            [Obsolete("This is an obsoleted picker, use RelatedLinks2Alias instead")]
+            public const string RelatedLinksAlias = "Umbraco.RelatedLinks";
 
             /// <summary>
-            /// Alias for the Related Links datatype.
+            /// Alias for the Related Links property editor.
             /// </summary>
-            public const string RelatedLinksAlias = "Umbraco.RelatedLinks";
+            public const string RelatedLinks2Alias = "Umbraco.RelatedLinks2";
 
             /// <summary>
             /// Guid for the Slider datatype.

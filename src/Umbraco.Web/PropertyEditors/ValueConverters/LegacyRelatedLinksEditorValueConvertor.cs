@@ -20,11 +20,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]    
     public class LegacyRelatedLinksEditorValueConvertor : PropertyValueConverterBase
     {
+        private static readonly string[] MatchingEditors = new string[]
+        {
+            Constants.PropertyEditors.RelatedLinksAlias,
+            Constants.PropertyEditors.RelatedLinks2Alias
+        };
+
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters == false)
             {
-                return Constants.PropertyEditors.RelatedLinksAlias.Equals(propertyType.PropertyEditorAlias);
+                return MatchingEditors.Contains(propertyType.PropertyEditorAlias);
             }
             return false;
         }
@@ -50,9 +56,23 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             {
                                 if (type == "internal")
                                 {
-                                    var linkId = a.Value<int>("link");
-                                    var link = helper.NiceUrl(linkId);
-                                    a["link"] = link;
+                                    switch (propertyType.PropertyEditorAlias)
+                                    {
+                                        case Constants.PropertyEditors.RelatedLinksAlias:
+                                            var intLinkId = a.Value<int>("link");
+                                            var intLink = helper.NiceUrl(intLinkId);
+                                            a["link"] = intLink;
+                                            break;
+                                        case Constants.PropertyEditors.RelatedLinks2Alias:
+                                            var strLinkId = a.Value<string>("link");
+                                            var udiLinkId = strLinkId.TryConvertTo<GuidUdi>();
+                                            if (udiLinkId)
+                                            {
+                                                var udiLink = helper.UrlProvider.GetUrl(udiLinkId.Result.Guid);
+                                                a["link"] = udiLink;
+                                            }
+                                            break;
+                                    }                                    
                                 }
                             }
                         }    

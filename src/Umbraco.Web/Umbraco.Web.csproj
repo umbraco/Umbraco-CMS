@@ -405,6 +405,7 @@
     <Compile Include="PropertyEditors\MediaPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
