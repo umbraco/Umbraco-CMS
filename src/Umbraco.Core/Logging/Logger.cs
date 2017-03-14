@@ -7,6 +7,8 @@ using System.Threading;
 using System.Web;
 using log4net;
 using log4net.Config;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Diagnostics;
 
 namespace Umbraco.Core.Logging
 {
@@ -57,21 +59,39 @@ namespace Umbraco.Core.Logging
 		internal ILog LoggerFor(object getTypeFromInstance)
 		{
 			if (getTypeFromInstance == null) throw new ArgumentNullException("getTypeFromInstance");
-			
+
 			return LogManager.GetLogger(getTypeFromInstance.GetType());
 		}
-        
+
 		public void Error(Type callingType, string message, Exception exception)
 		{
             var logger = LogManager.GetLogger(callingType);
 		    if (logger == null) return;
 
+		    var dump = false;
+
 		    if (IsTimeoutThreadAbortException(exception))
 		    {
 		        message += "\r\nThe thread has been aborted, because the request has timed out.";
+		        dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort;
 		    }
 
-		    logger.Error(message, exception);
+            if (dump)
+		    {
+                try
+                {
+                    var dumped = MiniDump.Dump(withException: true);
+                    message += dumped
+                        ? "\r\nA minidump was created in App_Data/MiniDump"
+                        : "\r\nFailed to create a minidump";
+                }
+                catch (Exception e)
+                {
+                    message += string.Format("\r\nFailed to create a minidump ({0}: {1})", e.GetType().FullName, e.Message);
+                }
+            }
+
+            logger.Error(message, exception);
 		}
 
         private static bool IsTimeoutThreadAbortException(Exception exception)
@@ -105,7 +125,7 @@ namespace Umbraco.Core.Logging
 			if (showHttpTrace && HttpContext.Current != null)
 			{
 				HttpContext.Current.Trace.Warn(callingType.Name, string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()));
-			}	
+			}
 
 			var logger = LogManager.GetLogger(callingType);
 			if (logger == null || logger.IsWarnEnabled == false) return;
@@ -122,7 +142,7 @@ namespace Umbraco.Core.Logging
             var logger = LogManager.GetLogger(callingType);
             if (logger == null || logger.IsWarnEnabled == false) return;
             var executedParams = formatItems.Select(x => x.Invoke()).ToArray();
-            logger.WarnFormat((message) + ". Exception: " + e, executedParams);		
+            logger.WarnFormat((message) + ". Exception: " + e, executedParams);
 		}
 
 		/// <summary>
