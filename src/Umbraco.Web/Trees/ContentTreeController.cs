@@ -84,11 +84,10 @@ namespace Umbraco.Web.Trees
                 var isContainer = e.IsContainer();   // && (queryStrings.Get("isDialog") != "true");
 
                 var node = CreateTreeNode(
-                    e.Id.ToInvariantString(),
+                    entity,
+                    Constants.ObjectTypes.DocumentGuid,
                     parentId,
-                    queryStrings,
-                    e.Name,
-                    entity.ContentTypeIcon,
+                    queryStrings,                    
                     entity.HasChildren && (isContainer == false));
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);

@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Templates
 {
@@ -39,11 +40,51 @@ namespace Umbraco.Web.Templates
         /// Parses the string looking for the {localLink} syntax and updates them to their correct links.
         /// </summary>
         /// <param name="text"></param>
+        /// <param name="urlProvider"></param>
         /// <returns></returns>
-        public static string ParseInternalLinks(string text)
+        public static string ParseInternalLinks(string text, UrlProvider urlProvider)
         {
-            //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable, better yet, pass in urlprovider, routing context, separately
+            if (urlProvider == null) throw new ArgumentNullException("urlProvider");
 
+            // Parse internal links
+            var tags = LocalLinkPattern.Matches(text);
+            foreach (Match tag in tags)
+            {
+                if (tag.Groups.Count > 0)
+                {
+                    var id = tag.Groups[1].Value; //.Remove(tag.Groups[1].Value.Length - 1, 1);
+
+                    //The id could be an int or a UDI
+                    Udi udi;
+                    if (Udi.TryParse(id, out udi))
+                    {
+                        var guidUdi = udi as GuidUdi;
+                        if (guidUdi != null)
+                        {
+                            var newLink = urlProvider.GetUrl(guidUdi.Guid);
+                            text = text.Replace(tag.Value, "href=\"" + newLink);
+                        }
+                    }
+                    int intId;
+                    if (int.TryParse(id, out intId))
+                    {
+                        var newLink = urlProvider.GetUrl(intId);
+                        text = text.Replace(tag.Value, "href=\"" + newLink);
+                    }                    
+                }
+            }
+
+            return text;
+        }
+
+        /// <summary>
+        /// Parses the string looking for the {localLink} syntax and updates them to their correct links.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        [Obsolete("Use the overload specifying all dependencies instead")]
+        public static string ParseInternalLinks(string text)
+        {   
             //don't attempt to proceed without a context as we cannot lookup urls without one
             if (UmbracoContext.Current == null || UmbracoContext.Current.RoutingContext == null)
             {
@@ -51,22 +92,14 @@ namespace Umbraco.Web.Templates
             }
 
             var urlProvider = UmbracoContext.Current.UrlProvider;
-
-            // Parse internal links
-            var tags = Regex.Matches(text, @"href=""[/]?(?:\{|\%7B)localLink:([0-9]+)(?:\}|\%7D)", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-            foreach (Match tag in tags)
-                if (tag.Groups.Count > 0)
-                {
-                    var id = tag.Groups[1].Value; //.Remove(tag.Groups[1].Value.Length - 1, 1);
-                    var newLink = urlProvider.GetUrl(int.Parse(id));
-                    text = text.Replace(tag.Value, "href=\"" + newLink);
-                }
-
-            return text;
+            return ParseInternalLinks(text, urlProvider);
         }
-
+        
         // static compiled regex for faster performance
-        private readonly static Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
+        private static readonly Regex LocalLinkPattern = new Regex(@"href=""[/]?(?:\{|\%7B)localLink:([a-zA-Z0-9-://]+)(?:\}|\%7D)",
+            RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+        private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
         /// <summary>

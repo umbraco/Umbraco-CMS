@@ -594,6 +594,7 @@
     <Compile Include="Plugins\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="VersionExtensionTests.cs" />
+    <Compile Include="Web\TemplateUtilitiesTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="XmlExtensionsTests.cs" />
     <Compile Include="XmlHelperTests.cs" />

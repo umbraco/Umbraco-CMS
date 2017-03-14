@@ -672,8 +672,17 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                     //locallink detection, we do this here, to avoid poluting the dialogservice
                     //so the dialog service can just expect to get a node-like structure
-                    if(currentTarget.url.indexOf("localLink:") > 0){
-                        currentTarget.id = currentTarget.url.substring(currentTarget.url.indexOf(":")+1,currentTarget.url.length-1);
+                    if (currentTarget.url.indexOf("localLink:") > 0) {
+                        var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, currentTarget.url.length - 1);
+                        //we need to check if this is an INT or a UDI
+                        var parsedIntId = parseInt(linkId, 10);
+                        if (isNaN(parsedIntId)) {
+                            //it's a UDI
+                            currentTarget.udi = linkId;
+                        }
+                        else {
+                            currentTarget.id = linkId;
+                        }                        
                     }
                 }
 
@@ -747,7 +756,14 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
             //if we have an id, it must be a locallink:id, aslong as the isMedia flag is not set
             if(target.id && (angular.isUndefined(target.isMedia) || !target.isMedia)){
-                href = "/{localLink:" + target.id + "}";
+                if (target.udi) {
+                    href = "/{localLink:" + target.udi + "}";
+                }
+                else {
+                    //This shouldn't happen! but just in case we'll leave this here
+                    href = "/{localLink:" + target.id + "}";
+                }
+
                 insertLink();
                 return;
             }

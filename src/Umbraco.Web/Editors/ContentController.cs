@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
@@ -35,7 +36,8 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the content application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
+    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
+    [ContentControllerConfiguration]
     public class ContentController : ContentControllerBase
     {
         /// <summary>
@@ -53,6 +55,18 @@ namespace Umbraco.Web.Editors
         public ContentController(UmbracoContext umbracoContext)
                 : base(umbracoContext)
         {
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class ContentControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi))));
+            }
         }
 
         /// <summary>
@@ -160,6 +174,34 @@ namespace Umbraco.Web.Editors
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "application/json");
             return response;
+        }
+
+        /// <summary>
+        /// Gets the Url for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public HttpResponseMessage GetNiceUrl(Guid id)
+        {
+            var url = Umbraco.UrlProvider.GetUrl(id);
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(url, Encoding.UTF8, "application/json");
+            return response;
+        }
+
+        /// <summary>
+        /// Gets the Url for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public HttpResponseMessage GetNiceUrl(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetNiceUrl(guidUdi.Guid);
+            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);            
         }
 
         /// <summary>
