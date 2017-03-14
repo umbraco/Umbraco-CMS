@@ -152,12 +152,12 @@ function entityResource($q, $http, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "entityApiBaseUrl",
-                       "GetById",
-                       [{ id: id}, {type: type }])),
-               'Failed to retrieve entity data for id ' + id);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "entityApiBaseUrl",
+                        "GetById",
+                        [{ id: id }, { type: type }])),
+                'Failed to retrieve entity data for id ' + id);
         },
 
         /**

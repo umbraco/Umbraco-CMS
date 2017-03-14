@@ -361,7 +361,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.ContentPicker2Alias, DataTypeDatabaseType.Integer) { Alias = "contentPicker", Name = "Content Picker", Mandatory = false, SortOrder = 16, DataTypeDefinitionId = 1046 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.MediaPicker2Alias, DataTypeDatabaseType.Integer) { Alias = "mediaPicker", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeDefinitionId = 1048 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.MemberPicker2Alias, DataTypeDatabaseType.Integer) { Alias = "memberPicker", Name = "Member Picker", Mandatory = false, SortOrder = 18, DataTypeDefinitionId = 1047 });            
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.RelatedLinksAlias, DataTypeDatabaseType.Ntext) { Alias = "relatedLinks", Name = "Related Links", Mandatory = false, SortOrder = 21, DataTypeDefinitionId = 1040 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.RelatedLinks2Alias, DataTypeDatabaseType.Ntext) { Alias = "relatedLinks", Name = "Related Links", Mandatory = false, SortOrder = 21, DataTypeDefinitionId = 1050 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.TagsAlias, DataTypeDatabaseType.Ntext) { Alias = "tags", Name = "Tags", Mandatory = false, SortOrder = 22, DataTypeDefinitionId = 1041 });
 
             //contentCollection.Add(new PropertyType(Constants.PropertyEditors.UltraSimpleEditorAlias, DataTypeDatabaseType.Ntext) { Alias = "simpleEditor", Name = "Ultra Simple Editor", Mandatory = false, SortOrder = 19, DataTypeDefinitionId = 1038 });
