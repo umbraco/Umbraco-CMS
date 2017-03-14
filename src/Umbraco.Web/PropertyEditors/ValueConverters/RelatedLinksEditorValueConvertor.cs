@@ -16,6 +16,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.Extensions;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 
@@ -54,7 +55,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias);
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias) 
+                    || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinks2Alias);
             }
             return false;
         }
@@ -83,22 +85,46 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var sourceString = source.ToString();
 
-            var relatedLinksData = JsonConvert.DeserializeObject<IEnumerable<RelatedLinkData>>(sourceString);
+            var relatedLinksData = JsonConvert.DeserializeObject<IEnumerable<RelatedLink>>(sourceString);
             var relatedLinks = new List<RelatedLink>();
 
             foreach (var linkData in relatedLinksData)
             {
-                var relatedLink = new RelatedLink()
+                var relatedLink = new RelatedLink
                 {
                     Caption = linkData.Caption,
                     NewWindow = linkData.NewWindow,
                     IsInternal = linkData.IsInternal,
                     Type = linkData.Type,
-                    Id = linkData.Internal,
                     Link = linkData.Link
                 };
-                relatedLink = CreateLink(relatedLink);
 
+                switch (propertyType.PropertyEditorAlias)
+                {
+                    case Constants.PropertyEditors.RelatedLinksAlias:
+                        int contentId;
+                        if (int.TryParse(relatedLink.Link, out contentId))
+                        {
+                            relatedLink.Id = contentId;
+                            relatedLink = CreateLink(relatedLink);
+                        }
+                        break;
+                    case Constants.PropertyEditors.RelatedLinks2Alias:
+                        var strLinkId = linkData.Link;
+                        var udiAttempt = strLinkId.TryConvertTo<Udi>();
+                        if (udiAttempt.Success)
+                        {
+                            var content = udiAttempt.Result.ToPublishedContent();
+                            if (content != null)
+                            {
+                                relatedLink.Id = content.Id;
+                                relatedLink = CreateLink(relatedLink);
+                                relatedLink.Content = content;
+                            }
+                        }
+                        break;
+                }
+                
                 if (relatedLink.IsDeleted == false)
                 {
                     relatedLinks.Add(relatedLink);
@@ -137,18 +163,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
 
             return link;
-        }
-
-        internal class RelatedLinkData : RelatedLinkBase
-        {
-            [JsonProperty("internal")]
-            public int? Internal { get; set; }
-            [JsonProperty("edit")]
-            public bool Edit { get; set; }
-            [JsonProperty("internalName")]
-            public string InternalName { get; set; }
-            [JsonProperty("title")]
-            public string Title { get; set; }
         }
     }
 }
