@@ -65,11 +65,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                             break;
                                         case Constants.PropertyEditors.RelatedLinks2Alias:
                                             var strLinkId = a.Value<string>("link");
-                                            var udiLinkId = strLinkId.TryConvertTo<GuidUdi>();
-                                            if (udiLinkId)
+                                            var udiAttempt = strLinkId.TryConvertTo<Udi>();
+                                            if (udiAttempt)
                                             {
-                                                var udiLink = helper.UrlProvider.GetUrl(udiLinkId.Result.Guid);
-                                                a["link"] = udiLink;
+                                                var content = udiAttempt.Result.ToPublishedContent();
+                                                a["link"] = helper.NiceUrl(content.Id);
                                             }
                                             break;
                                     }                                    
