@@ -26,6 +26,7 @@
     
     <umb:JsInclude runat="server" FilePath="lib/bootstrap/js/bootstrap.2.3.2.min.js" PathNameAlias="UmbracoRoot" Priority="10" />
     <umb:JsInclude runat="server" FilePath="lib/umbraco/compat.js" PathNameAlias="UmbracoRoot" Priority="10" />
+    <umb:JsInclude runat="server" FilePath="lib/jquery-migrate/jquery-migrate.min.js" PathNameAlias="UmbracoRoot" Priority="10" />
 
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>

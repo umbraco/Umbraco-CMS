@@ -12,6 +12,7 @@ namespace Umbraco.Web.UI.Bundles
     [ClientDependency(ClientDependencyType.Javascript, "Tree/jquery.tree.checkbox.js", "UmbracoClient", Priority = 3, Group = 10)]
     [ClientDependency(ClientDependencyType.Javascript, "Tree/NodeDefinition.js", "UmbracoClient", Priority = 4, Group = 10)]
     [ClientDependency(ClientDependencyType.Javascript, "Tree/UmbracoTree.js", "UmbracoClient", Priority = 5, Group = 10)]
+    [ClientDependency(ClientDependencyType.Javascript, "lib/jquery-migrate/jquery-migrate.min.js", "UmbracoRoot", Priority = 5, Group = 10)]
     public class JsUmbracoTree : Control
     {
     }
