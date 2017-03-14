@@ -25,6 +25,7 @@ namespace Umbraco.Web.Routing
         public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (routingSettings == null) throw new ArgumentNullException("routingSettings");
 
             _umbracoContext = umbracoContext;
             _urlProviders = urlProviders;

@@ -46,7 +46,7 @@ namespace Umbraco.Web.Editors
                     //This is a special case, we'll accept a String here so that we can get page members when the special "all-members" 
                     //id is passed in eventually we'll probably want to support GUID + Udi too
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPagedChildren", "id", typeof(int), typeof(string)),
-
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPath", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
@@ -153,7 +153,36 @@ namespace Umbraco.Web.Editors
 
             return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
-        
+
+        /// <summary>
+        /// Gets the path for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public IEnumerable<int> GetPath(Guid id, UmbracoEntityTypes type)
+        {
+            var foundContent = GetResultForKey(id, type);
+
+            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+        }
+
+        /// <summary>
+        /// Gets the path for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public IEnumerable<int> GetPath(Udi id, UmbracoEntityTypes type)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetPath(guidUdi.Guid, type);
+            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);            
+        }
+
         /// <summary>
         /// Gets the url of an entity
         /// </summary>

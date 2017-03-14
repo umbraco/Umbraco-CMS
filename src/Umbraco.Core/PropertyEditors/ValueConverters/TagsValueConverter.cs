@@ -80,7 +80,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     .PreValuesAsDictionary.FirstOrDefault(
                         x => string.Equals(x.Key, "storageType", StringComparison.InvariantCultureIgnoreCase)).Value;
 
-            if (storageType.Value.InvariantEquals("Json"))
+            if (storageType != null && storageType.Value.InvariantEquals("Json"))
             {
                 return true;
             }
