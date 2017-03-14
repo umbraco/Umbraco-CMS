@@ -11,10 +11,14 @@ build_script:
     CD build
 
     SET "release="
+    
+    SET "comment="
 
     FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
+    
+    FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED comment SET "comment=%%i"
 
-    ECHO AppVeyor Build %release% build%APPVEYOR_BUILD_NUMBER%
+    ECHO AppVeyor Build %release% %comment% %APPVEYOR_BUILD_NUMBER%
     
     SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
     
@@ -22,7 +26,7 @@ build_script:
 
     XCOPY "%SRC%\Umbraco.Tests\unit-test-log4net.CI.config" "%SRC%\Umbraco.Tests\unit-test-log4net.config" /Y
     
-    build.bat -integration -release:%release% -comment:build%APPVEYOR_BUILD_NUMBER% -nugetfolder:%PACKAGES%
+    build.bat -integration -build:%APPVEYOR_BUILD_NUMBER% -tests -nugetfolder:%PACKAGES%
     
 test:
   assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
