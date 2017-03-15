@@ -19,7 +19,7 @@ label small, .guiDialogTiny {
 label.control-label, .control-label {
   padding: 0 10px 0 0 !important;
   font-weight: bold;
-  color: @black;
+  color: @gray-2;
 }
 
 
@@ -483,7 +483,7 @@ input[type="checkbox"][readonly] {
 // Error
 .show-validation.ng-invalid .control-group.error,
 .show-validation.ng-invalid .umb-panel-header-content-wrapper {
-    .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
+    .formFieldState(@formErrorText, @formErrorBorder, @formErrorBackground);
 }
 
 //val-highlight directive styling
