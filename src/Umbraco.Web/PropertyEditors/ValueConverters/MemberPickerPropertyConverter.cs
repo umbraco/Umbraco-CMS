@@ -44,28 +44,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (UmbracoContext.Current != null)
             {
                 IPublishedContent member;
-                switch (propertyType.PropertyEditorAlias)
+                if (source is int)
                 {
-                    case Constants.PropertyEditors.MemberPickerAlias:
-                        int sourceInt;
-                        if (int.TryParse(source.ToString(), out sourceInt))
-                        {
-                            var membershipHelper = new MembershipHelper(UmbracoContext.Current);
-                            member = membershipHelper.GetById((int)source);
-                            return member;
-                        }
-                        break;
-                    case Constants.PropertyEditors.MemberPicker2Alias:
-                        Udi udi;
-                        if (Udi.TryParse(source.ToString(), out udi))
-                        {
-                            member = udi.ToPublishedContent();
-                            if (member != null)
-                                return member;
-                        }
-                        break;
+                    var membershipHelper = new MembershipHelper(UmbracoContext.Current);
+                    member = membershipHelper.GetById((int)source);
+                    if (member != null)
+                        return member;
                 }
-
+                else
+                {
+                    var sourceUdi = source as Udi;
+                    member = sourceUdi.ToPublishedContent();
+                    if (member != null)
+                        return member;
+                }
             }
 
             return source;

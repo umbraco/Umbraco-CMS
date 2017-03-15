@@ -55,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias) 
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias)
                     || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinks2Alias);
             }
             return false;
@@ -99,32 +99,28 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     Link = linkData.Link
                 };
 
-                switch (propertyType.PropertyEditorAlias)
+                int contentId;
+                if (int.TryParse(relatedLink.Link, out contentId))
                 {
-                    case Constants.PropertyEditors.RelatedLinksAlias:
-                        int contentId;
-                        if (int.TryParse(relatedLink.Link, out contentId))
-                        {
-                            relatedLink.Id = contentId;
-                            relatedLink = CreateLink(relatedLink);
-                        }
-                        break;
-                    case Constants.PropertyEditors.RelatedLinks2Alias:
-                        var strLinkId = linkData.Link;
-                        var udiAttempt = strLinkId.TryConvertTo<Udi>();
-                        if (udiAttempt.Success)
-                        {
-                            var content = udiAttempt.Result.ToPublishedContent();
-                            if (content != null)
-                            {
-                                relatedLink.Id = content.Id;
-                                relatedLink = CreateLink(relatedLink);
-                                relatedLink.Content = content;
-                            }
-                        }
-                        break;
+                    relatedLink.Id = contentId;
+                    relatedLink = CreateLink(relatedLink);
                 }
-                
+                else
+                {
+                    var strLinkId = linkData.Link;
+                    var udiAttempt = strLinkId.TryConvertTo<Udi>();
+                    if (udiAttempt.Success)
+                    {
+                        var content = udiAttempt.Result.ToPublishedContent();
+                        if (content != null)
+                        {
+                            relatedLink.Id = content.Id;
+                            relatedLink = CreateLink(relatedLink);
+                            relatedLink.Content = content;
+                        }
+                    }
+                }
+
                 if (relatedLink.IsDeleted == false)
                 {
                     relatedLinks.Add(relatedLink);

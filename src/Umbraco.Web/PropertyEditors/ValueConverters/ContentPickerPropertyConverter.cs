@@ -111,25 +111,19 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
                 {
                     IPublishedContent content;
-                    switch (propertyType.PropertyEditorAlias)
+                    if (source is int)
                     {
-                        case Constants.PropertyEditors.ContentPickerAlias:
-                            int sourceInt;
-                            if (int.TryParse(source.ToString(), out sourceInt))
-                            {
-                                content = UmbracoContext.Current.ContentCache.GetById(sourceInt);
-                                return content;
-                            }
-                            break;
-                        case Constants.PropertyEditors.ContentPicker2Alias:
-                            Udi udi;
-                            if (Udi.TryParse(source.ToString(), out udi))
-                            {
-                                content = udi.ToPublishedContent();
-                                if (content != null)
-                                    return content;
-                            }
-                            break;
+                        var sourceInt = (int)source;
+                        content = UmbracoContext.Current.ContentCache.GetById(sourceInt);
+                        if(content != null)
+                            return content;
+                    }
+                    else
+                    {
+                        var sourceUdi = source as Udi;
+                        content = sourceUdi.ToPublishedContent();
+                        if (content != null)
+                            return content;
                     }
                 }
             }
