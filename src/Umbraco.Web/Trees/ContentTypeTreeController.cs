@@ -47,7 +47,7 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement",
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentTypeGuid, id, queryStrings, "icon-item-arrangement",
                             //NOTE: Since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to. 
                             //We need this check to keep supporting sites where childs have already been created.
                             dt.HasChildren());

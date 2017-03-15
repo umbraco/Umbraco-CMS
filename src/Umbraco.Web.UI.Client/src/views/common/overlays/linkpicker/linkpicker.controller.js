@@ -26,17 +26,21 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	        $scope.model.target = dialogOptions.currentTarget;
 
 	        //if we have a node ID, we fetch the current node to build the form data
-	        if ($scope.model.target.id) {
+	        if ($scope.model.target.id || $scope.model.target.udi) {
 
-	            if (!$scope.model.target.path) {
-	                entityResource.getPath($scope.model.target.id, "Document").then(function (path) {
+                //will be either a udi or an int
+                var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
+
+                if (!$scope.model.target.path) {
+                    
+                    entityResource.getPath(id, "Document").then(function (path) {
 	                    $scope.model.target.path = path;
 	                    //now sync the tree to this path
 	                    $scope.dialogTreeEventHandler.syncTree({ path: $scope.model.target.path, tree: "content" });
 	                });
 	            }
 
-	            contentResource.getNiceUrl($scope.model.target.id).then(function (url) {
+                contentResource.getNiceUrl(id).then(function (url) {
 	                $scope.model.target.url = url;
 	            });
 	        }
@@ -63,7 +67,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 	            $scope.currentNode = args.node;
 	            $scope.currentNode.selected = true;
-	            $scope.model.target.id = args.node.id;
+                $scope.model.target.id = args.node.id;
+                $scope.model.target.udi = args.node.udi;
 	            $scope.model.target.name = args.node.name;
 
 	            if (args.node.id < 0) {
@@ -116,7 +121,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 					submit: function(model) {
 						var media = model.selectedImages[0];
 
-						$scope.model.target.id = media.id;
+                        $scope.model.target.id = media.id;
+                        $scope.model.target.udi = media.udi;
 						$scope.model.target.isMedia = true;
 						$scope.model.target.name = media.name;
 						$scope.model.target.url = mediaHelper.resolveFile(media);
