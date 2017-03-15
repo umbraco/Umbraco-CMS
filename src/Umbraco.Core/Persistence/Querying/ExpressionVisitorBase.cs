@@ -546,7 +546,7 @@ namespace Umbraco.Core.Persistence.Querying
                         && methodArgs.Length == 1 
                         && methodArgs[0].NodeType == ExpressionType.MemberAccess
                         && TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type))
-                    {                        
+                    {
                         goto case "SqlIn";
                     }
 

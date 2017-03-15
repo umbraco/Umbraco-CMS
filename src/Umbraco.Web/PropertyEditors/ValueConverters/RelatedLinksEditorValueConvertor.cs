@@ -15,6 +15,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 
@@ -23,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// <summary>
     /// The related links property value converter.
     /// </summary>
-    [DefaultPropertyValueConverter]
+    [DefaultPropertyValueConverter(typeof(LegacyRelatedLinksEditorValueConvertor), typeof(JsonValueConverter))]
     [PropertyValueType(typeof(RelatedLinks))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.ContentCache)]
     public class RelatedLinksPropertyConverter : PropertyValueConverterBase

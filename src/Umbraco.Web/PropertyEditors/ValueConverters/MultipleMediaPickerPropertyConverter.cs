@@ -17,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -24,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// <summary>
     /// The multiple media picker property value converter.
     /// </summary>
-    [DefaultPropertyValueConverter]
+    [DefaultPropertyValueConverter(typeof(MustBeStringValueConverter))]
     public class MultipleMediaPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
         private readonly IDataTypeService _dataTypeService;

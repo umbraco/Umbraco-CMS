@@ -20,7 +20,7 @@
             select-result-callback="selectResult">
         </umb-tree-search-results>
 
-        <div ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
+        <div ng-if="treeReady" ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
             <umb-tree
                 section="{{section}}"
                 treealias="{{treeAlias}}"

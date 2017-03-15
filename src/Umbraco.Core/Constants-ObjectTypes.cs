@@ -90,6 +90,11 @@ namespace Umbraco.Core
             public const string Media = "B796F64C-1F99-4FFB-B886-4BF4BC011A9C";
 
             /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public static readonly Guid MediaGuid = new Guid(Media);
+
+            /// <summary>
             /// Guid for the Media Recycle Bin.
             /// </summary>
             public const string MediaRecycleBin = "CF3D8E34-1C1C-41e9-AE56-878B57B32113";
@@ -147,6 +152,11 @@ namespace Umbraco.Core
             /// Guid for a Template object.
             /// </summary>
             public const string Template = "6FBDE604-4178-42CE-A10B-8A2600A2F07D";
+
+            /// <summary>
+            /// Guid for a Template object.
+            /// </summary>
+            public static readonly Guid TemplateTypeGuid = new Guid(Template);
 
             /// <summary>
             /// Guid for a Lock object.

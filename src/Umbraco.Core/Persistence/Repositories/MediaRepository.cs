@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateMediaFromDto(dto, dto.VersionId, sql);
+            var content = CreateMediaFromDto(dto, sql);
 
             return content;
         }
@@ -94,6 +94,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId, SqlSyntax)
+                //TODO: IF we want to enable querying on content type information this will need to be joined
+                //.InnerJoin<ContentTypeDto>(SqlSyntax)
+                //.On<ContentDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId, SqlSyntax);
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId, SqlSyntax);
             return sql;
         }
@@ -161,25 +164,27 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             // fetch returns a list so it's ok to iterate it in this method
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sqlFull);
-            var content = new IMedia[dtos.Count];
-            var defs = new List<DocumentDefinition>();
+            
+            //This is a tuple list identifying if the content item came from the cache or not
+            var content = new List<Tuple<IMedia, bool>>();
+            var defs = new DocumentDefinitionCollection();
 
             //track the looked up content types, even though the content types are cached
             // they still need to be deep cloned out of the cache and we don't want to add
             // the overhead of deep cloning them on every item in this loop
             var contentTypes = new Dictionary<int, IMediaType>();
 
-            for (var i = 0; i < dtos.Count; i++)
+            foreach (var dto in dtos)
             {
-                var dto = dtos[i];
-
                 // if the cache contains the item, use it
                 if (withCache)
                 {
                     var cached = IsolatedCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
-                    if (cached != null)
+                    //only use this cached version if the dto returned is the same version - this is just a safety check, media doesn't 
+                    //store different versions, but just in case someone corrupts some data we'll double check to be sure.
+                    if (cached != null && cached.Version == dto.VersionId)
                     {
-                        content[i] = cached;
+                        content.Add(new Tuple<IMedia, bool>(cached, true));
                         continue;
                     }
                 }
@@ -197,39 +202,34 @@ namespace Umbraco.Core.Persistence.Repositories
                     contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
                     contentTypes[dto.ContentDto.ContentTypeId] = contentType;
                 }
-                
-                content[i] = MediaFactory.BuildEntity(dto, contentType);
 
-                // need properties
-                defs.Add(new DocumentDefinition(
-                    dto.NodeId,
-                    dto.VersionId,
-                    dto.VersionDate,
-                    dto.ContentDto.NodeDto.CreateDate,
-                    contentType
-                ));
+                // track the definition and if it's successfully added or updated then processed
+                if (defs.AddOrUpdate(new DocumentDefinition(dto, contentType)))
+                {
+                    content.Add(new Tuple<IMedia, bool>(MediaFactory.BuildEntity(dto, contentType), false));
+                }
             }
 
             // load all properties for all documents from database in 1 query
             var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
-            // assign
-            var dtoIndex = 0;
-            foreach (var def in defs)
+            // assign property data
+            foreach (var contentItem in content)
             {
-                // move to corresponding item (which has to exist)
-                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
+                var cc = contentItem.Item1;
+                var fromCache = contentItem.Item2;
 
-                // complete the item
-                var cc = content[dtoIndex];
-                cc.Properties = propertyData[cc.Id];
+                //if this has come from cache, we do not need to build up it's structure
+                if (fromCache) continue;
+
+                cc.Properties = propertyData[cc.Version];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
                 cc.ResetDirtyProperties(false);
             }
 
-            return content;
+            return content.Select(x => x.Item1).ToArray();
         }
 
         public override IMedia GetByVersion(Guid versionId)
@@ -243,7 +243,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateMediaFromDto(dto, versionId, sql);
+            var content = CreateMediaFromDto(dto, sql);
 
             return content;
         }
@@ -263,10 +263,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 // get the next group of nodes
                 var query = GetBaseQuery(false);
                 if (contentTypeIdsA.Length > 0)
-                    query = query
-                        .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+                {
+                    query = query.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+                }
                 query = query
                     .Where<NodeDto>(x => x.NodeId > baseId, SqlSyntax)
+                    .Where<NodeDto>(x => x.Trashed == false, SqlSyntax)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
                 var sql = SqlSyntax.SelectTop(query, groupSize);
                 var xmlItems = ProcessQuery(sql, new PagingSqlQuery(sql))
@@ -290,7 +292,38 @@ namespace Umbraco.Core.Persistence.Repositories
                         Logger.Error<MediaRepository>("Could not rebuild XML for nodeId=" + xmlItem.NodeId, e);
                     }
                 }
-                baseId = xmlItems.Last().NodeId;
+                baseId = xmlItems[xmlItems.Count - 1].NodeId;
+            }
+
+            //now delete the items that shouldn't be there
+            var allMediaIds = Database.Fetch<int>(GetBaseQuery(BaseQueryType.Ids).Where<NodeDto>(x => x.Trashed == false, SqlSyntax));
+            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
+            var xmlIdsQuery = new Sql()
+                .Select("DISTINCT cmsContentXml.nodeId")
+                .From<ContentXmlDto>(SqlSyntax)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+                
+            if (contentTypeIdsA.Length > 0)
+            {
+                xmlIdsQuery.InnerJoin<ContentDto>(SqlSyntax)
+                    .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>(SqlSyntax)
+                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIdsA, SqlSyntax);
+            }
+
+            xmlIdsQuery.Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType, SqlSyntax);
+            
+            var allXmlIds = Database.Fetch<int>(xmlIdsQuery);
+
+            var toRemove = allXmlIds.Except(allMediaIds).ToArray();
+            if (toRemove.Length > 0)
+            {
+                foreach (var idGroup in toRemove.InGroupsOf(2000))
+                {
+                    Database.Execute("DELETE FROM cmsContentXml WHERE nodeId IN (@ids)", new { ids = idGroup });
+                }
             }
         }
 
@@ -526,20 +559,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Private method to create a media object from a ContentDto
         /// </summary>
         /// <param name="dto"></param>
-        /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>
-        private IMedia CreateMediaFromDto(ContentVersionDto dto, Guid versionId, Sql docSql)
+        private IMedia CreateMediaFromDto(ContentVersionDto dto, Sql docSql)
         {
             var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
             
             var media = MediaFactory.BuildEntity(dto, contentType);
 
-            var docDef = new DocumentDefinition(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
+            var docDef = new DocumentDefinition(dto, contentType);
 
             var properties = GetPropertyCollection(new PagingSqlQuery(docSql), new[] { docDef });
 
-            media.Properties = properties[dto.NodeId];
+            media.Properties = properties[dto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

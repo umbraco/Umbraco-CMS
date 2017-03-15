@@ -159,6 +159,7 @@
     <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />
+    <Compile Include="Issues\U9560.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Persistence\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\PetaPocoExpressionsTests.cs" />
     <Compile Include="Persistence\Repositories\LockedRepositoryTests.cs" />
+    <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
@@ -592,6 +594,7 @@
     <Compile Include="Plugins\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="VersionExtensionTests.cs" />
+    <Compile Include="Web\TemplateUtilitiesTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="XmlExtensionsTests.cs" />
     <Compile Include="XmlHelperTests.cs" />

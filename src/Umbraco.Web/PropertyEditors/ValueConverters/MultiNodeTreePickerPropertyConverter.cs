@@ -16,6 +16,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -23,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// <summary>
     /// The multi node tree picker property editor value converter.
     /// </summary>
-    [DefaultPropertyValueConverter]
+    [DefaultPropertyValueConverter(typeof(MustBeStringValueConverter))]
     [PropertyValueType(typeof(IEnumerable<IPublishedContent>))]
     [PropertyValueCache(PropertyCacheValue.Object, PropertyCacheLevel.ContentCache)]
     [PropertyValueCache(PropertyCacheValue.Source, PropertyCacheLevel.Content)]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -21,7 +22,6 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -36,11 +36,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.Initialize();
 
             CreateTestData();
+
+            VersionableRepositoryBase<int, IContent>.ThrowOnWarning = true;
         }
 
         [TearDown]
         public override void TearDown()
         {
+            VersionableRepositoryBase<int, IContent>.ThrowOnWarning = false;
+
             base.TearDown();
         }
 
@@ -65,6 +69,131 @@ namespace Umbraco.Tests.Persistence.Repositories
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository);
             var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
+        }
+
+        [Test]
+        public void Get_Always_Returns_Latest_Version()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            IContent content1;
+
+            var versions = new List<Guid>();
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
+
+                //save version
+                contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+                versions.Add(content1.Version);
+
+                //publish version
+                content1.ChangePublishedState(PublishedState.Published);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+                versions.Add(content1.Version);
+
+                //change something and make a pending version
+                content1.Name = "new name";
+                content1.ChangePublishedState(PublishedState.Saved);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+                versions.Add(content1.Version);
+            }
+
+            // Assert
+            Assert.AreEqual(3, versions.Distinct().Count());
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var content = repository.GetByQuery(new Query<IContent>().Where(c => c.Id == content1.Id)).ToArray()[0];
+                Assert.AreEqual(versions[2], content.Version);
+
+                content = repository.Get(content1.Id);
+                Assert.AreEqual(versions[2], content.Version);
+
+                foreach (var version in versions)
+                {
+                    content = repository.GetByVersion(version);
+                    Assert.IsNotNull(content);
+                    Assert.AreEqual(version, content.Version);
+                }
+            }
+        }
+
+        [Test]
+        public void Deal_With_Corrupt_Duplicate_Newest_Published_Flags()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            IContent content1;
+
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
+                
+                contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
+                repository.AddOrUpdate(content1);                
+                unitOfWork.Commit();                
+            }
+
+            var versionDtos = new List<ContentVersionDto>();
+
+            //Now manually corrupt the data
+            var versions = new[] { Guid.NewGuid(), Guid.NewGuid() };
+            for (var index = 0; index < versions.Length; index++)
+            {
+                var version = versions[index];
+                var versionDate = DateTime.Now.AddMinutes(index);
+                var versionDto = new ContentVersionDto
+                {
+                    NodeId = content1.Id,
+                    VersionDate = versionDate,
+                    VersionId = version
+                };
+                this.DatabaseContext.Database.Insert(versionDto);
+                versionDtos.Add(versionDto);
+                this.DatabaseContext.Database.Insert(new DocumentDto
+                {
+                    Newest = true,
+                    NodeId = content1.Id,
+                    Published = true,
+                    Text = content1.Name,
+                    VersionId = version,
+                    WriterUserId = 0,
+                    UpdateDate = versionDate,
+                    TemplateId = content1.Template == null || content1.Template.Id <= 0 ? null : (int?) content1.Template.Id
+                });
+            }
+
+            // Assert
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var content = repository.GetByQuery(new Query<IContent>().Where(c => c.Id == content1.Id)).ToArray();
+                Assert.AreEqual(1, content.Length);
+                Assert.AreEqual(content[0].Version, versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionId);
+                Assert.AreEqual(content[0].UpdateDate.ToString(CultureInfo.InvariantCulture), versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionDate.ToString(CultureInfo.InvariantCulture));
+
+                var contentItem = repository.GetByVersion(content1.Version);
+                Assert.IsNotNull(contentItem);
+
+                contentItem = repository.Get(content1.Id);
+                Assert.IsNotNull(contentItem);
+                Assert.AreEqual(contentItem.UpdateDate.ToString(CultureInfo.InvariantCulture), versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionDate.ToString(CultureInfo.InvariantCulture));
+                Assert.AreEqual(contentItem.Version, versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionId);
+
+                var allVersions = repository.GetAllVersions(content[0].Id);
+                var allKnownVersions = versionDtos.Select(x => x.VersionId).Union(new[]{ content1.Version }).ToArray();
+                Assert.IsTrue(allKnownVersions.ContainsAll(allVersions.Select(x => x.Version)));
+                Assert.IsTrue(allVersions.Select(x => x.Version).ContainsAll(allKnownVersions));
+            }
         }
 
         /// <summary>
@@ -219,6 +348,62 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10);
+
+                Assert.AreEqual(100, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
+        }
+
+        [Test]
+        public void Rebuild_All_Xml_Structures_Ensure_Orphaned_Are_Removed()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                //delete all xml
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+
+                var contentType1 = MockedContentTypes.CreateSimpleContentType("Textpage1", "Textpage1");
+                contentTypeRepository.AddOrUpdate(contentType1);
+                var allCreated = new List<IContent>();
+
+                for (var i = 0; i < 100; i++)
+                {
+                    //These will be non-published so shouldn't show up
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                for (var i = 0; i < 100; i++)
+                {
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
+                    c1.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                unitOfWork.Commit();
+
+                //now create some versions of this content - this shouldn't affect the xml structures saved
+                for (int i = 0; i < allCreated.Count; i++)
+                {
+                    allCreated[i].Name = "blah" + i;
+                    repository.AddOrUpdate(allCreated[i]);
+                }
+                unitOfWork.Commit();
+
+                //Add some extra orphaned rows that shouldn't be there
+                var notPublished = MockedContent.CreateSimpleContent(contentType1);
+                repository.AddOrUpdate(notPublished);
+                unitOfWork.Commit();
+                //Force add it
+                unitOfWork.Database.Insert(new ContentXmlDto
+                {
+                    NodeId = notPublished.Id,
+                    Xml = "<test></test>"
+                });
 
                 repository.RebuildXmlStructures(media => new XElement("test"), 10);
 
