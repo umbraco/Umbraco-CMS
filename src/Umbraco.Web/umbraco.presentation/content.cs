@@ -181,12 +181,12 @@ namespace umbraco
             var e = new RefreshContentEventArgs();
             FireBeforeRefreshContent(e);
 
-            if (!e.Cancel)
+            if (e.Cancel) return;
+
+            using (var safeXml = GetSafeXmlWriter())
             {
-                using (var safeXml = GetSafeXmlWriter())
-                {
-                    safeXml.Xml = LoadContentFromDatabase();
-                }
+                safeXml.Xml = LoadContentFromDatabase();
+                safeXml.AcceptChanges();
             }
         }
 
@@ -295,21 +295,20 @@ namespace umbraco
             var e = new DocumentCacheEventArgs();
             FireBeforeUpdateDocumentCache(d, e);
 
-            if (!e.Cancel)
+            if (e.Cancel) return;
+
+            // lock the xml cache so no other thread can write to it at the same time
+            // note that some threads could read from it while we hold the lock, though
+            using (var safeXml = GetSafeXmlWriter())
             {
-                // lock the xml cache so no other thread can write to it at the same time
-                // note that some threads could read from it while we hold the lock, though
-                using (var safeXml = GetSafeXmlWriter())
-                {
-                    safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
-                    safeXml.AcceptChanges();
-                }
-
-                var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(cachedFieldKeyStart);
-
-                FireAfterUpdateDocumentCache(d, e);
+                safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
+                safeXml.AcceptChanges();
             }
+
+            var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(cachedFieldKeyStart);
+
+            FireAfterUpdateDocumentCache(d, e);
         }
 
         internal virtual void UpdateSortOrder(int contentId)
@@ -370,14 +369,9 @@ namespace umbraco
         [Obsolete("This is not used and will be removed from the codebase in future versions")]
         public virtual void UpdateDocumentCache(List<Document> Documents)
         {
-            // We need to lock content cache here, because we cannot allow other threads
-            // making changes at the same time, they need to be queued
-            int parentid = Documents[0].Id;
-
-
             using (var safeXml = GetSafeXmlWriter())
             {
-                foreach (Document d in Documents)
+                foreach (var d in Documents)
                 {
                     safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
                 }
