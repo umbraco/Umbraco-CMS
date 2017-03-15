@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Web
                 {
                     return Attempt.Succeed(1234);
                 });
-            
+
             //setup a mock url provider which we'll use fo rtesting
             var testUrlProvider = new Mock<IUrlProvider>();
             testUrlProvider.Setup(x => x.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>()))
@@ -58,13 +58,12 @@ namespace Umbraco.Tests.Web
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 //pass in the custom url provider
                 new[]{ testUrlProvider.Object },
-                false))
+                true))
             {
                 var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider);
 
                 Assert.AreEqual(result, output);
             }
-
         }
     }
 }
