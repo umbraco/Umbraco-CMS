@@ -1,9 +1,9 @@
-﻿using System;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Extensions;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -19,17 +19,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPickerAlias);
+                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPickerAlias)
+                    || propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPicker2Alias);
             }
             return false;
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
-            var intAttempt = source.TryConvertTo<int>();
-            if (intAttempt.Success)
-                return intAttempt.Result;
-
+            var attemptConvertInt = source.TryConvertTo<int>();
+            if (attemptConvertInt.Success)
+                return attemptConvertInt.Result;
+            var attemptConvertUdi = source.TryConvertTo<Udi>();
+            if (attemptConvertUdi.Success)
+                return attemptConvertUdi.Result;
             return null;
         }
 
@@ -40,11 +43,24 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             if (UmbracoContext.Current != null)
             {
-                var membershipHelper = new MembershipHelper(UmbracoContext.Current);
-                return membershipHelper.GetById((int) source);
+                IPublishedContent member;
+                if (source is int)
+                {
+                    var membershipHelper = new MembershipHelper(UmbracoContext.Current);
+                    member = membershipHelper.GetById((int)source);
+                    if (member != null)
+                        return member;
+                }
+                else
+                {
+                    var sourceUdi = source as Udi;
+                    member = sourceUdi.ToPublishedContent();
+                    if (member != null)
+                        return member;
+                }
             }
 
-            return null;
+            return source;
         }
 
     }
