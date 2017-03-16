@@ -15,6 +15,7 @@ namespace Umbraco.Web.Models
         public bool IsInternal { get; set; }
         [JsonProperty("type")]
         public RelatedLinkType Type { get; set; }
+        [JsonIgnore]
         public IPublishedContent Content { get; set; }
     }
 }
