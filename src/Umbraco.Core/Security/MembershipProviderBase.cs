@@ -324,6 +324,13 @@ namespace Umbraco.Core.Security
                 throw new MembershipPasswordException("Change password canceled due to password validation failure.");
             }
 
+            //Special case to allow changing password without validating existing credentials
+            //This is used during installation only
+            if (AllowManuallyChangingPassword == false && ApplicationContext.Current.IsConfigured == false && oldPassword == "default")
+            {
+                return PerformChangePassword(username, oldPassword, newPassword);
+            }
+
             if (AllowManuallyChangingPassword == false)
             {
                 if (ValidateUser(username, oldPassword) == false) return false;
