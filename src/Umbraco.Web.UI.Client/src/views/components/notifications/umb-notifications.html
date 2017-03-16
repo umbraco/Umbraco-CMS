@@ -2,7 +2,7 @@
     <ul class="umb-notifications__notifications">
         <li ng-repeat="notification in notifications"
             class="alert alert-block alert-{{notification.type}} umb-notifications__notification animated -half-second fadeIn"
-            ng-class="{'-extra-padding': notification.type === 'form'}">
+            ng-class="{'-no-border -extra-padding': notification.type === 'form'}">
 
             <a class='close -align-right' ng-click="removeNotification($index)" prevent-default href>&times;</a>
 

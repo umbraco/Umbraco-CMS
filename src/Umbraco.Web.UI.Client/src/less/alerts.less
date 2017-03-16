@@ -7,10 +7,10 @@
 // -------------------------
 
 .alert {
-  padding: 5px 35px 5px 14px;
+  padding: 8px 35px 8px 14px;
   margin-bottom: @baseLineHeight;
   background-color: @warningBackground;
-  border-left: 2px solid @warningBorder;
+  border: 1px solid @warningBorder;
   .border-radius(@baseBorderRadius);
 }
 .alert,
@@ -44,36 +44,31 @@
   border-color: @successBorder;
   color: @successText;
 }
-
 .alert-success h4 {
   color: @successText;
 }
-
 .alert-danger,
 .alert-error {
   background-color: @errorBackground;
   border-color: @errorBorder;
   color: @errorText;
 }
-
 .alert-danger h4,
 .alert-error h4 {
   color: @errorText;
 }
-
 .alert-info {
   background-color: @infoBackground;
   border-color: @infoBorder;
   color: @infoText;
 }
-
 .alert-info h4 {
   color: @infoText;
 }
 
 .alert-form {
   background-color: @gray-10;
-  border-color: @gray-7;
+  border: 1px solid @gray-3 !important;
   color: @gray-3;
 }
 
@@ -82,10 +77,7 @@
 }
 
 .alert-form h4 {
-  color: @gray-1;
-  margin-bottom: 5px;
-  font-weight: bold;
-  font-size: 16px;
+  color: @gray-3;
 }
 
 

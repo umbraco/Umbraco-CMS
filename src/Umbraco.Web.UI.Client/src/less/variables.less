@@ -310,21 +310,21 @@
 
 // alerts
 // -------------------------
-@warningText:             @black;
-@warningBackground:       @yellow-washed;
-@warningBorder:           @yellow;
+@warningText:             @white;
+@warningBackground:       @orange;
+@warningBorder:           transparent;
 
-@errorText:               @black;
-@errorBackground:         @red-washed;
-@errorBorder:             @red;
+@errorText:               @white;
+@errorBackground:         @red-d1;
+@errorBorder:             transparent;
 
-@successText:             @black;
-@successBackground:       @green-washed;
-@successBorder:           @green;
+@successText:             @white;
+@successBackground:       @green-d1;
+@successBorder:           transparent;
 
-@infoText:                @black;
-@infoBackground:          @turquoise-washed;
-@infoBorder:              @turquoise;
+@infoText:                @white;
+@infoBackground:          @turquoise-d1;
+@infoBorder:              transparent;
 
 // SD: Had to duplicate the above but prefix with 'form' inversed colors
 // because we cannot share the above alert colors with forms otherwise we end up with white
@@ -332,21 +332,21 @@
 
 // Form states
 // -------------------------
-@formWarningText:             @black;
-@formWarningBackground:       @yellow-washed;
-@formWarningBorder:           @yellow;
+@formWarningText:             @warningBackground;
+@formWarningBackground:       lighten(@warningBackground, 38%);
+@formWarningBorder:           darken(spin(@warningBackground, -10), 3%);
 
-@formErrorText:               @black;
-@formErrorBackground:         @red-washed;
-@formErrorBorder:             @red;
+@formErrorText:               @errorBackground;
+@formErrorBackground:         lighten(@errorBackground, 55%);
+@formErrorBorder:             darken(spin(@errorBackground, -10), 3%);
 
-@formSuccessText:             @black;
-@formSuccessBackground:       @green-washed;
-@formSuccessBorder:           @green;
+@formSuccessText:             @successBackground;
+@formSuccessBackground:       lighten(@successBackground, 48%);
+@formSuccessBorder:           darken(spin(@successBackground, -10), 5%);
 
-@formInfoText:                @black;
-@formInfoBackground:          @turquoise-washed;
-@formInfoBorder:              @turquoise;
+@formInfoText:                @infoBackground;
+@formInfoBackground:          lighten(@infoBackground, 41%);
+@formInfoBorder:              darken(spin(@infoBackground, -10), 7%);
 
 
 // Tooltips and popovers
