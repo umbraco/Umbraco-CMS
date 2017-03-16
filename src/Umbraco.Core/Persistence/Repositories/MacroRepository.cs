@@ -114,13 +114,14 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private static Sql GetBaseQuery()
+        private Sql GetBaseQuery()
         {
             var sql = new Sql();
             sql.Select("*")
                .From<MacroDto>()
                .LeftJoin<MacroPropertyDto>()
-               .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
+               .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro)
+               .OrderBy<MacroDto>(x => x.UniqueId, SqlSyntax);
             return sql;
         }
 

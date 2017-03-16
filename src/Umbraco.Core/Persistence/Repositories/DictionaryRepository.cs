@@ -96,7 +96,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Select("*")
                    .From<DictionaryDto>(SqlSyntax)
                    .LeftJoin<LanguageTextDto>(SqlSyntax)
-                   .On<DictionaryDto, LanguageTextDto>(SqlSyntax, left => left.UniqueId, right => right.UniqueId);
+                   .On<DictionaryDto, LanguageTextDto>(SqlSyntax, left => left.UniqueId, right => right.UniqueId)
+                   .OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
             }
             return sql;
         }

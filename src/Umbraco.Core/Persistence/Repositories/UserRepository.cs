@@ -96,13 +96,14 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private static Sql GetBaseQuery(string columns)
+        private Sql GetBaseQuery(string columns)
         {
             var sql = new Sql();
             sql.Select(columns)
                       .From<UserDto>()
                       .LeftJoin<User2AppDto>()
-                      .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
+                      .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId)
+                      .OrderBy<UserDto>(x => x.Id, SqlSyntax);
             return sql;
         }
 
