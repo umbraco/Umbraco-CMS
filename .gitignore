@@ -142,4 +142,3 @@ build/ui-docs.zip
 build/csharp-docs.zip
 build/msbuild.log
 .vs/
-/src/Umbraco.Web.UI/js
