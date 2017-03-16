@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -51,6 +53,30 @@ namespace Umbraco.Tests.IO
         }
 
         [Test]
+        public void Media_Fs_Safe_Delete()
+        {
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes("test"));
+            var virtPath = fs.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
+            fs.AddFile(virtPath, ms);
+
+            // ~/media/1234/file.txt exists
+            var physPath = IOHelper.MapPath(Path.Combine("media", virtPath));
+            Assert.IsTrue(File.Exists(physPath));
+
+            // ~/media/1234/file.txt is gone
+            fs.DeleteMediaFiles(new [] { virtPath });
+            Assert.IsFalse(File.Exists(physPath));
+
+            // ~/media/1234 is gone
+            physPath = Path.GetDirectoryName(physPath);
+            Assert.IsFalse(Directory.Exists(physPath));
+
+            // ~/media exists
+            physPath = Path.GetDirectoryName(physPath);
+            Assert.IsTrue(Directory.Exists(physPath));
+        }
+
         public void Singleton_Typed_File_System()
         {
             var fs1 = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();

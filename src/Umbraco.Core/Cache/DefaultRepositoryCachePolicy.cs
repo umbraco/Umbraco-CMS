@@ -22,12 +22,12 @@ namespace Umbraco.Core.Cache
     {
         private static readonly TEntity[] EmptyEntities = new TEntity[0]; // const
         private readonly RepositoryCachePolicyOptions _options;
-       
+
         public DefaultRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options)
             : base(cache)
-        {            
+        {
             if (options == null) throw new ArgumentNullException("options");
-            _options = options;         
+            _options = options;
         }
 
         public override IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope)
@@ -244,9 +244,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void ClearAll()
         {
-            // fixme the cache should NOT contain anything else so we can clean all, can't we?
             Cache.ClearAllCache();
-            //Cache.ClearCacheByKeySearch(GetEntityTypeCacheKey());
         }
     }
 }

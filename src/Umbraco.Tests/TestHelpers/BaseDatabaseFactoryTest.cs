@@ -63,9 +63,8 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            // fixme - in theory we should not need this
-            // it's done in base.Initialize() and no idea why we do things
-            // in this order here... not going to change it now though...
+            // we probably don't need this here, as it's done in base.Initialize() already,
+            // but these test classes are all weird, not going to change it now - v8
             SafeCallContext.Clear();
 
             _dbFactory = new DefaultDatabaseFactory(
@@ -105,7 +104,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the db context
                 new DatabaseContext(scopeProvider, Logger, SqlSyntax, GetDbProviderName()),
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), new FileUnitOfWorkProvider(scopeProvider), CacheHelper, Logger, evtMsgs),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), CacheHelper, Logger, evtMsgs),
                 CacheHelper,
                 ProfilingLogger)
             {
@@ -355,7 +354,7 @@ namespace Umbraco.Tests.TestHelpers
                     onFail(ex);
             }
         }
-        
+
         protected DatabaseContext DatabaseContext
         {
             get { return ApplicationContext.DatabaseContext; }

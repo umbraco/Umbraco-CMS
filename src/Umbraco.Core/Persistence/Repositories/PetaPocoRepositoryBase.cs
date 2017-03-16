@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories
 		/// </summary>
 		protected internal new IScopeUnitOfWork UnitOfWork
 		{
-			get { return (IScopeUnitOfWork)base.UnitOfWork; }
+			get { return base.UnitOfWork; }
 		}
 
 		protected UmbracoDatabase Database
@@ -74,11 +74,6 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 Database.Execute(delete, new { Id = GetEntityId(entity) });
             }
-        }
-
-        protected virtual TId GetEntityId(TEntity entity)
-        {
-            return (TId)(object)entity.Id;
         }
     }
 }

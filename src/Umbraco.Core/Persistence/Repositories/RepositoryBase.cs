@@ -13,10 +13,10 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal abstract class RepositoryBase : DisposableObject
     {
-        private readonly IUnitOfWork _work;
+        private readonly IScopeUnitOfWork _work;
         private readonly CacheHelper _globalCache;
 
-        protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
+        protected RepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
         {
             if (work == null) throw new ArgumentNullException("work");
             if (cache == null) throw new ArgumentNullException("cache");
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Returns the Unit of Work added to the repository
         /// </summary>
-        protected internal IUnitOfWork UnitOfWork
+        protected internal IScopeUnitOfWork UnitOfWork
         {
             get { return _work; }
         }
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class RepositoryBase<TId, TEntity> : RepositoryBase, IRepositoryQueryable<TId, TEntity>, IUnitOfWorkRepository
         where TEntity : class, IAggregateRoot
     {
-        protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
+        protected RepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (_isolatedCache != null) return _isolatedCache;
 
-                var scope = ((ScopeUnitOfWork) UnitOfWork).Scope; // fixme cast!
+                var scope = UnitOfWork.Scope;
                 IsolatedRuntimeCache provider;
                 switch (scope.RepositoryCacheMode)
                 {
@@ -179,14 +179,17 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (GlobalCache == CacheHelper.NoCache)
                     return _cachePolicy = NoRepositoryCachePolicy<TEntity, TId>.Instance;
                 
+                // create the cache policy using IsolatedCache which is either global
+                // or scoped depending on the repository cache mode for the current scope
                 _cachePolicy = CreateCachePolicy(IsolatedCache);
-                var scope = ((ScopeUnitOfWork) UnitOfWork).Scope; // fixme cast!
+                var scope = UnitOfWork.Scope;
                 switch (scope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
                         break;
                     case RepositoryCacheMode.Scoped:
-                        _cachePolicy = _cachePolicy.Scoped(GetIsolatedCache(GlobalCache.IsolatedRuntimeCache), scope);
+                        var globalIsolatedCache = GetIsolatedCache(GlobalCache.IsolatedRuntimeCache);
+                        _cachePolicy = _cachePolicy.Scoped(globalIsolatedCache, scope);
                         break;
                     default:
                         throw new Exception("oops: cache mode.");

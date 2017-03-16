@@ -173,7 +173,6 @@ namespace Umbraco.Core
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
                 new PetaPocoUnitOfWorkProvider(scopeProvider),
-                new FileUnitOfWorkProvider(scopeProvider),
                 ApplicationCache,
                 ProfilingLogger.Logger,
                 msgFactory);

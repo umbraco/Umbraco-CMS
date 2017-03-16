@@ -4,8 +4,6 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Tests.Logging
 {
-    // FIXME how come some C# 6 features are working here ?!
-
     public class ConsoleLogger : ILogger
     {
         public void Error(Type callingType, string message, Exception exception)

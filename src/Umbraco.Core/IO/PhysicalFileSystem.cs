@@ -155,7 +155,9 @@ namespace Umbraco.Core.IO
             if (directory == null) throw new InvalidOperationException("Could not get directory.");
             Directory.CreateDirectory(directory); // ensure it exists
 
-            if (stream.CanSeek) // fixme - what else?
+            // if can seek, be safe and go back to start, else...
+            // hope that the stream hasn't been read already
+            if (stream.CanSeek)
                 stream.Seek(0, 0);
 
             using (var destination = (Stream) File.Create(fullPath))
@@ -286,7 +288,9 @@ namespace Umbraco.Core.IO
             var opath = path;
             path = EnsureDirectorySeparatorChar(path);
 
-            // fixme - this part should go!
+            // TODO in v8 this should be cleaned up
+            // the first part should probably removed
+
             // not sure what we are doing here - so if input starts with a (back) slash,
             // we assume it's not a FS relative path and we try to convert it... but it
             // really makes little sense?
