@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -12,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.Extensions;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -20,8 +18,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]    
     public class LegacyRelatedLinksEditorValueConvertor : PropertyValueConverterBase
     {
-        private static readonly string[] MatchingEditors = new string[]
-        {
+        private static readonly string[] MatchingEditors = {
             Constants.PropertyEditors.RelatedLinksAlias,
             Constants.PropertyEditors.RelatedLinks2Alias
         };
@@ -65,11 +62,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                             break;
                                         case Constants.PropertyEditors.RelatedLinks2Alias:
                                             var strLinkId = a.Value<string>("link");
-                                            var udiLinkId = strLinkId.TryConvertTo<GuidUdi>();
-                                            if (udiLinkId)
+                                            var udiAttempt = strLinkId.TryConvertTo<Udi>();
+                                            if (udiAttempt)
                                             {
-                                                var udiLink = helper.UrlProvider.GetUrl(udiLinkId.Result.Guid);
-                                                a["link"] = udiLink;
+                                                var content = udiAttempt.Result.ToPublishedContent();
+                                                a["link"] = helper.NiceUrl(content.Id);
                                             }
                                             break;
                                     }                                    
@@ -103,8 +100,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var d = new XmlDocument();
                     var e = d.CreateElement("links");
                     d.AppendChild(e);
-
-                    var values = (IEnumerable<string>)source;
+                    
                     foreach (dynamic link in obj)
                     {
                         var ee = d.CreateElement("link");

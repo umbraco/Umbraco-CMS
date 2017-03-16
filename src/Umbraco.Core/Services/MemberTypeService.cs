@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -18,7 +16,6 @@ namespace Umbraco.Core.Services
 
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
-
         public MemberTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
@@ -28,7 +25,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMemberType> GetAll(params int[] ids)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberTypeRepository(uow);
                 return repository.GetAll(ids);
@@ -42,7 +39,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMemberType"/></returns>
         public IMemberType Get(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberTypeRepository(uow);
                 return repository.Get(id);
@@ -56,7 +53,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMemberType"/></returns>
         public IMemberType Get(Guid key)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberTypeRepository(uow);
                 return repository.Get(key);
@@ -70,7 +67,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMemberType"/></returns>
         public IMemberType Get(string alias)
         {
-            using (var uow = UowProvider.GetUnitOfWork(commit: true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberTypeRepository(uow);
                 return repository.Get(alias);
@@ -97,10 +94,10 @@ namespace Umbraco.Core.Services
                     var repository = RepositoryFactory.CreateMemberTypeRepository(uow);
                     memberType.CreatorId = userId;
                     repository.AddOrUpdate(memberType);
+                    uow.Commit(); // flush, so that the db contains the saved value
 
-                    uow.Commit(); // fixme double?
                     UpdateContentXmlStructure(memberType);
-                    uow.Commit();
+                    uow.Commit(); // actually commit uow
 
                     uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberType>(memberType, false));
                 }
@@ -126,13 +123,10 @@ namespace Umbraco.Core.Services
                         memberType.CreatorId = userId;
                         repository.AddOrUpdate(memberType);
                     }
-
-                    uow.Commit(); // fixme double?
+                    uow.Commit(); // flush, so that the db contains the saved values
 
                     UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
-
-                    //save it all in one go
-                    uow.Commit();
+                    uow.Commit(); // actually commit uow
 
                     uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberType>(asArray, false));
                 }

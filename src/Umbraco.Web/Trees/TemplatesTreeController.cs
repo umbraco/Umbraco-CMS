@@ -48,13 +48,14 @@ namespace Umbraco.Web.Trees
             nodes.AddRange(found.Select(template => CreateTreeNode(
                 template.Id.ToString(CultureInfo.InvariantCulture),
                 //TODO: Fix parent ID stuff for templates
-                "-1",   
+                "-1",
                 queryStrings,
                 template.Name,
                 template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
-                template.IsMasterTemplate, 
-                GetEditorPath(template, queryStrings)
-                )));
+                template.IsMasterTemplate,
+                GetEditorPath(template, queryStrings),
+                Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.TemplateTypeGuid), template.Key)
+            )));
 
             return nodes;
         }

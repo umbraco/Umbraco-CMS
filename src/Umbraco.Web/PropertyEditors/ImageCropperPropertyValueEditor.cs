@@ -2,17 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -28,9 +21,9 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class ImageCropperPropertyValueEditor : PropertyValueEditorWrapper
     {
-        private MediaFileSystem _mediaFileSystem;
+        private readonly MediaFileSystem _mediaFileSystem;
 
-        public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped, MediaFileSystem mediaFileSystem) 
+        public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped, MediaFileSystem mediaFileSystem)
             : base(wrapped)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -39,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
         /// </summary>
-           
+
         public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             var val = base.ConvertDbToEditor(property, propertyType, dataTypeService);
@@ -61,12 +54,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The converted value.</returns>
         /// <remarks>
         /// <para>The <paramref name="currentValue"/> is used to re-use the folder, if possible.</para>
-        /// <para>FIXME this is ?!
-        /// This is value passed in from the editor. We normally don't care what the editorValue.Value is set to because
-        /// we are more interested in the files collection associated with it, however we do care about the value if we 
-        /// are clearing files. By default the editorValue.Value will just be set to the name of the file (but again, we
-        /// just ignore this and deal with the file collection in editorValue.AdditionalData.ContainsKey("files") )
-        /// </para>
+        /// <para>editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file - but
+        /// it is editorValue.AdditionalData["files"] that is used to determine the actual file that has been uploaded.</para>
         /// </remarks>
         public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
@@ -179,8 +168,8 @@ namespace Umbraco.Web.PropertyEditors
 
             return filepath;
         }
-        
-        public override string ConvertDbToString(Property property, PropertyType propertyType, Core.Services.IDataTypeService dataTypeService)
+
+        public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             if (property.Value == null || string.IsNullOrEmpty(property.Value.ToString()))
                return null;
@@ -193,7 +182,7 @@ namespace Umbraco.Web.PropertyEditors
             // more magic here ;-(
             var config = dataTypeService.GetPreValuesByDataTypeId(propertyType.DataTypeDefinitionId).FirstOrDefault();
             var crops = string.IsNullOrEmpty(config) ? "[]" : config;
-            var newVal = "{src: '" + val + "', crops: " + crops + "}"; 
+            var newVal = "{src: '" + val + "', crops: " + crops + "}";
             return newVal;
         }
     }

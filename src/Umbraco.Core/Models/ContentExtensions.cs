@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.IO;
-using Umbraco.Core.Media;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -42,7 +41,7 @@ namespace Umbraco.Core.Models
         /// * The item exists and is published
         /// * A call to ContentService.Save is made
         /// * The item has not been modified whatsoever apart from changing it's published status from published to saved
-        /// 
+        ///
         /// In this case, there is no reason to make any database changes at all
         /// </remarks>
         internal static bool RequiresSaving(this IContent entity)
@@ -62,7 +61,7 @@ namespace Umbraco.Core.Models
         /// * The item exists and is published
         /// * A call to ContentService.Save is made
         /// * The item has not been modified whatsoever apart from changing it's published status from published to saved
-        /// 
+        ///
         /// In this case, there is no reason to make any database changes at all
         /// </remarks>
         internal static bool RequiresSaving(this IContent entity, PublishedState publishedState)
@@ -70,7 +69,7 @@ namespace Umbraco.Core.Models
             var publishedChanged = entity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
             //check if any user prop has changed
             var propertyValueChanged = entity.IsAnyUserPropertyDirty();
-            
+
             //We need to know if any other property apart from Published was changed here
             //don't create a new version if the published state has changed to 'Save' but no data has actually been changed
             if (publishedChanged && entity.Published == false && propertyValueChanged == false)
@@ -302,9 +301,9 @@ namespace Umbraco.Core.Models
             return content.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                           .Contains(recycleBinId.ToInvariantString());
         }
-        
+
         /// <summary>
-        /// Removes characters that are not valide XML characters from all entity properties 
+        /// Removes characters that are not valide XML characters from all entity properties
         /// of type string. See: http://stackoverflow.com/a/961504/5018
         /// </summary>
         /// <returns></returns>
@@ -456,7 +455,7 @@ namespace Umbraco.Core.Models
         /// <param name="value">The uploaded <see cref="HttpPostedFileBase"/>.</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
         {
-            // ensure we get the filename without the path in IE in intranet mode 
+            // ensure we get the filename without the path in IE in intranet mode
             // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
             var filename = value.FileName;
             var pos = filename.LastIndexOf(@"\", StringComparison.InvariantCulture);
@@ -468,10 +467,10 @@ namespace Umbraco.Core.Models
             if (pos > 0)
                 filename = filename.Substring(pos + 1);
 
-            // get a safe filename - should this be done by MediaHelper?
+            // get a safe & clean filename
             filename = IOHelper.SafeFileName(filename);
             if (string.IsNullOrWhiteSpace(filename)) return;
-            filename = filename.ToLower(); // fixme - er... why?
+            filename = filename.ToLower();
 
             FileSystemProviderManager.Current.MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, value.InputStream);
         }
@@ -513,10 +512,10 @@ namespace Umbraco.Core.Models
         {
             if (filename == null || filestream == null) return;
 
-            // get a safe filename - should this be done by MediaHelper?
+            // get a safe & clean filename
             filename = IOHelper.SafeFileName(filename);
             if (string.IsNullOrWhiteSpace(filename)) return;
-            filename = filename.ToLower(); // fixme - er... why?
+            filename = filename.ToLower();
 
             FileSystemProviderManager.Current.MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, filestream);
         }
@@ -548,7 +547,7 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region User/Profile methods
-        
+
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this media item.
         /// </summary>
@@ -623,7 +622,7 @@ namespace Umbraco.Core.Models
         ///// <param name="tagGroup"></param>
         ///// <returns></returns>
         ///// <remarks>
-        ///// The tags returned are only relavent for published content & saved media or members 
+        ///// The tags returned are only relavent for published content & saved media or members
         ///// </remarks>
         //public static IEnumerable<ITag> GetTags(this IContentBase content, string propertyTypeAlias, string tagGroup = "default")
         //{

@@ -16,6 +16,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	    private readonly IsolationLevel _isolationLevel;
         private readonly IScopeProvider _scopeProvider;
         private bool _completeScope;
+        private readonly bool _readOnly;
         private IScope _scope;
         private Guid _key;
 
@@ -29,11 +30,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </summary>
         /// <param name="scopeProvider"></param>
         /// <param name="isolationLevel"></param>
-        /// <param name="commit"></param>
+        /// <param name="readOnly"></param>
         /// <remarks>
         /// This should normally not be used directly and should be created with the UnitOfWorkProvider
         /// </remarks>
-        internal ScopeUnitOfWork(IScopeProvider scopeProvider, IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool commit = false)
+        internal ScopeUnitOfWork(IScopeProvider scopeProvider, IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool readOnly = false)
         {
             _scopeProvider = scopeProvider;
             _isolationLevel = isolationLevel;
@@ -43,7 +44,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             // be false by default
             // if set to true... the UnitOfWork is "auto-commit" which means that even in the case of
             // an exception, the scope would still be completed - ppl should use it with great care!
-            _completeScope = commit;
+            _completeScope = _readOnly = readOnly;
         }
 
 		/// <summary>
@@ -53,6 +54,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
 		public void RegisterAdded(IEntity entity, IUnitOfWorkRepository repository)
 		{
+            if (_readOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
+
             _operations.Enqueue(new Operation
             {
                 Entity = entity,
@@ -68,7 +72,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
 		public void RegisterChanged(IEntity entity, IUnitOfWorkRepository repository)
 		{
-		    _operations.Enqueue(
+            if (_readOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
+
+            _operations.Enqueue(
 		        new Operation
 		        {
 		            Entity = entity,
@@ -84,7 +91,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
 		public void RegisterRemoved(IEntity entity, IUnitOfWorkRepository repository)
 		{
-		    _operations.Enqueue(
+            if (_readOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
+
+            _operations.Enqueue(
 		        new Operation
 		        {
 		            Entity = entity,
@@ -115,6 +125,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         internal void Commit(Action<UmbracoDatabase> transactionCompleting)
         {
             // this happens in a scope-managed transaction
+
+            if (_readOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
 
             // in case anything goes wrong
             _completeScope = false;

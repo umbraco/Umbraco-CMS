@@ -342,13 +342,13 @@ namespace Umbraco.Tests.Services
         public void Get_Descendants()
         {
             // Arrange
-            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentTypeService = (ContentTypeService) ServiceContext.ContentTypeService;
             var hierarchy = CreateContentTypeHierarchy();
             contentTypeService.Save(hierarchy, 0); //ensure they are saved!
             var master = hierarchy.First();
 
             //Act
-            var descendants = master.Descendants(contentTypeService);
+            var descendants = contentTypeService.GetDescendants(master);
 
             //Assert
             Assert.AreEqual(10, descendants.Count());
@@ -358,13 +358,13 @@ namespace Umbraco.Tests.Services
         public void Get_Descendants_And_Self()
         {
             // Arrange
-            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentTypeService = (ContentTypeService) ServiceContext.ContentTypeService;
             var hierarchy = CreateContentTypeHierarchy();
             contentTypeService.Save(hierarchy, 0); //ensure they are saved!
             var master = hierarchy.First();
 
             //Act
-            var descendants = master.DescendantsAndSelf(contentTypeService);
+            var descendants = new[] {master}.Concat(contentTypeService.GetDescendants(master));
 
             //Assert
             Assert.AreEqual(11, descendants.Count());

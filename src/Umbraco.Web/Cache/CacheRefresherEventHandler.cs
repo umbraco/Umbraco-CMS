@@ -26,219 +26,189 @@ namespace Umbraco.Web.Cache
     [Weight(int.MinValue)]
     public class CacheRefresherEventHandler : ApplicationEventHandler
     {
+        public CacheRefresherEventHandler()
+        { }
+
+        public CacheRefresherEventHandler(bool supportUnbinding)
+        {
+            if (supportUnbinding)
+                _unbinders = new List<Action>();
+        }
+
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             LogHelper.Info<CacheRefresherEventHandler>("Initializing Umbraco internal event handlers for cache refreshing");
 
-            //bind to application tree events
-            ApplicationTreeService.Deleted += ApplicationTreeService_Deleted;
-            ApplicationTreeService.Updated += ApplicationTreeService_Updated;
-            ApplicationTreeService.New += ApplicationTreeService_New;
+            // bind to application tree events
+            Bind(() => ApplicationTreeService.Deleted += ApplicationTreeService_Deleted,
+                 () => ApplicationTreeService.Deleted -= ApplicationTreeService_Deleted);
+            Bind(() => ApplicationTreeService.Updated += ApplicationTreeService_Updated,
+                 () => ApplicationTreeService.Updated -= ApplicationTreeService_Updated);
+            Bind(() => ApplicationTreeService.New += ApplicationTreeService_New,
+                 () => ApplicationTreeService.New -= ApplicationTreeService_New);
 
-            //bind to application events
-            SectionService.Deleted += SectionService_Deleted;
-            SectionService.New += SectionService_New;
+            // bind to application events
+            Bind(() => SectionService.Deleted += SectionService_Deleted,
+                 () => SectionService.Deleted -= SectionService_Deleted);
+            Bind(() => SectionService.New += SectionService_New,
+                 () => SectionService.New -= SectionService_New);
 
-            //bind to user / user type events
-            UserService.SavedUserType += UserService_SavedUserType;
-            UserService.DeletedUserType += UserService_DeletedUserType;
-            UserService.SavedUser += UserService_SavedUser;
-            UserService.DeletedUser += UserService_DeletedUser;
+            // bind to user and user type events
+            Bind(() => UserService.SavedUserType += UserService_SavedUserType,
+                 () => UserService.SavedUserType -= UserService_SavedUserType);
+            Bind(() => UserService.DeletedUserType += UserService_DeletedUserType,
+                 () => UserService.DeletedUserType -= UserService_DeletedUserType);
+            Bind(() => UserService.SavedUser += UserService_SavedUser,
+                 () => UserService.SavedUser -= UserService_SavedUser);
+            Bind(() => UserService.DeletedUser += UserService_DeletedUser,
+                 () => UserService.DeletedUser -= UserService_DeletedUser);
 
-            //Bind to dictionary events
+            // bind to dictionary events
+            Bind(() => LocalizationService.DeletedDictionaryItem += LocalizationService_DeletedDictionaryItem,
+                 () => LocalizationService.DeletedDictionaryItem -= LocalizationService_DeletedDictionaryItem);
+            Bind(() => LocalizationService.SavedDictionaryItem += LocalizationService_SavedDictionaryItem,
+                 () => LocalizationService.SavedDictionaryItem -= LocalizationService_SavedDictionaryItem);
 
-            LocalizationService.DeletedDictionaryItem += LocalizationService_DeletedDictionaryItem;
-            LocalizationService.SavedDictionaryItem += LocalizationService_SavedDictionaryItem;
+            // bind to data type events
+            Bind(() => DataTypeService.Deleted += DataTypeService_Deleted,
+                 () => DataTypeService.Deleted -= DataTypeService_Deleted);
+            Bind(() => DataTypeService.Saved += DataTypeService_Saved,
+                 () => DataTypeService.Saved -= DataTypeService_Saved);
 
-            //Bind to data type events
-            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
+            // bind to stylesheet events
+            Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
+                 () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
+            Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
+                 () => FileService.DeletedStylesheet -= FileService_DeletedStylesheet);
 
-            DataTypeService.Deleted += DataTypeService_Deleted;
-            DataTypeService.Saved += DataTypeService_Saved;
+            // bind to domain events
+            Bind(() => DomainService.Saved += DomainService_Saved,
+                 () => DomainService.Saved -= DomainService_Saved);
+            Bind(() => DomainService.Deleted += DomainService_Deleted,
+                 () => DomainService.Deleted -= DomainService_Deleted);
 
-            //Bind to stylesheet events
+            // bind to language events
+            Bind(() => LocalizationService.SavedLanguage += LocalizationService_SavedLanguage,
+                 () => LocalizationService.SavedLanguage -= LocalizationService_SavedLanguage);
+            Bind(() => LocalizationService.DeletedLanguage += LocalizationService_DeletedLanguage,
+                 () => LocalizationService.DeletedLanguage -= LocalizationService_DeletedLanguage);
 
-            FileService.SavedStylesheet += FileService_SavedStylesheet;
-            FileService.DeletedStylesheet += FileService_DeletedStylesheet;
+            // bind to content type events
+            Bind(() => ContentTypeService.SavedContentType += ContentTypeService_SavedContentType,
+                 () => ContentTypeService.SavedContentType -= ContentTypeService_SavedContentType);
+            Bind(() => ContentTypeService.SavedMediaType += ContentTypeService_SavedMediaType,
+                 () => ContentTypeService.SavedMediaType -= ContentTypeService_SavedMediaType);
+            Bind(() => ContentTypeService.DeletedContentType += ContentTypeService_DeletedContentType,
+                 () => ContentTypeService.DeletedContentType -= ContentTypeService_DeletedContentType);
+            Bind(() => ContentTypeService.DeletedMediaType += ContentTypeService_DeletedMediaType,
+                 () => ContentTypeService.DeletedMediaType -= ContentTypeService_DeletedMediaType);
+            Bind(() => MemberTypeService.Saved += MemberTypeService_Saved,
+                 () => MemberTypeService.Saved -= MemberTypeService_Saved);
+            Bind(() => MemberTypeService.Deleted += MemberTypeService_Deleted,
+                 () => MemberTypeService.Deleted -= MemberTypeService_Deleted);
 
-            //Bind to domain events
+            // bind to permission events
+            // we should wrap legacy permissions so we can get rid of this
+            // fixme - the method names here (PermissionNew...) are not supported
+            // by the event handling mechanism for scopes and deploy, and not sure
+            // how to fix with the generic repository
+            Bind(() => Permission.New += PermissionNew,
+                 () => Permission.New -= PermissionNew);
+            Bind(() => Permission.Updated += PermissionUpdated,
+                 () => Permission.Updated -= PermissionUpdated);
+            Bind(() => Permission.Deleted += PermissionDeleted,
+                 () => Permission.Deleted -= PermissionDeleted);
+            Bind(() => PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions,
+                 () => PermissionRepository<IContent>.AssignedPermissions -= CacheRefresherEventHandler_AssignedPermissions);
 
-            DomainService.Saved += DomainService_Saved;
-            DomainService.Deleted += DomainService_Deleted;
+            // bind to template events
+            Bind(() => FileService.SavedTemplate += FileService_SavedTemplate,
+                 () => FileService.SavedTemplate -= FileService_SavedTemplate);
+            Bind(() => FileService.DeletedTemplate += FileService_DeletedTemplate,
+                 () => FileService.DeletedTemplate -= FileService_DeletedTemplate);
 
-            //Bind to language events
+            // bind to macro events
+            Bind(() => MacroService.Saved += MacroService_Saved,
+                 () => MacroService.Saved -= MacroService_Saved);
+            Bind(() => MacroService.Deleted += MacroService_Deleted,
+                 () => MacroService.Deleted -= MacroService_Deleted);
 
-            LocalizationService.SavedLanguage += LocalizationService_SavedLanguage;
-            LocalizationService.DeletedLanguage += LocalizationService_DeletedLanguage;
+            // bind to member events
+            Bind(() => MemberService.Saved += MemberService_Saved,
+                 () => MemberService.Saved -= MemberService_Saved);
+            Bind(() => MemberService.Deleted += MemberService_Deleted,
+                 () => MemberService.Deleted -= MemberService_Deleted);
+            Bind(() => MemberGroupService.Saved += MemberGroupService_Saved,
+                 () => MemberGroupService.Saved -= MemberGroupService_Saved);
+            Bind(() => MemberGroupService.Deleted += MemberGroupService_Deleted,
+                 () => MemberGroupService.Deleted -= MemberGroupService_Deleted);
 
-            //Bind to content type events
+            // bind to media events
+            Bind(() => MediaService.Saved += MediaService_Saved,
+                 () => MediaService.Saved -= MediaService_Saved);
+            Bind(() => MediaService.Deleted += MediaService_Deleted,
+                 () => MediaService.Deleted -= MediaService_Deleted);
+            Bind(() => MediaService.Moved += MediaService_Moved,
+                 () => MediaService.Moved -= MediaService_Moved);
+            Bind(() => MediaService.Trashed += MediaService_Trashed,
+                 () => MediaService.Trashed -= MediaService_Trashed);
+            Bind(() => MediaService.EmptiedRecycleBin += MediaService_EmptiedRecycleBin,
+                 () => MediaService.EmptiedRecycleBin -= MediaService_EmptiedRecycleBin);
 
-            ContentTypeService.SavedContentType += ContentTypeService_SavedContentType;
-            ContentTypeService.SavedMediaType += ContentTypeService_SavedMediaType;
-            ContentTypeService.DeletedContentType += ContentTypeService_DeletedContentType;
-            ContentTypeService.DeletedMediaType += ContentTypeService_DeletedMediaType;
-            MemberTypeService.Saved += MemberTypeService_Saved;
-            MemberTypeService.Deleted += MemberTypeService_Deleted;
+            // bind to content events
+            // this is for unpublished content syncing across servers (primarily for examine)
+            Bind(() => ContentService.Saved += ContentService_Saved,
+                 () => ContentService.Saved -= ContentService_Saved);
+            Bind(() => ContentService.Deleted += ContentService_Deleted,
+                 () => ContentService.Deleted -= ContentService_Deleted);
+            Bind(() => ContentService.Copied += ContentService_Copied,
+                 () => ContentService.Copied -= ContentService_Copied);
+            // the Move method of the content service fires Saved/Published events during its
+            // execution so we don't need to listen to moved - this will probably change in due time
+            //Bind(() => ContentService.Moved += ContentServiceMoved,
+            //     () => ContentService.Moved -= ContentServiceMoved);
+            Bind(() => ContentService.Trashed += ContentService_Trashed,
+                 () => ContentService.Trashed -= ContentService_Trashed);
+            Bind(() => ContentService.EmptiedRecycleBin += ContentService_EmptiedRecycleBin,
+                 () => ContentService.EmptiedRecycleBin -= ContentService_EmptiedRecycleBin);
+            Bind(() => ContentService.Published += ContentService_Published,
+                 () => ContentService.Published -= ContentService_Published);
+            Bind(() => ContentService.UnPublished += ContentService_UnPublished,
+                 () => ContentService.UnPublished -= ContentService_UnPublished);
 
-            //Bind to permission events
+            // bind to public access events
+            Bind(() => PublicAccessService.Saved += PublicAccessService_Saved,
+                 () => PublicAccessService.Saved -= PublicAccessService_Saved);
+            Bind(() => PublicAccessService.Deleted += PublicAccessService_Deleted,
+                 () => PublicAccessService.Deleted -= PublicAccessService_Deleted);
 
-            //TODO: Wrap legacy permissions so we can get rid of this
-            Permission.New += PermissionNew;
-            Permission.Updated += PermissionUpdated;
-            Permission.Deleted += PermissionDeleted;
-            PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions;
+            // bind to relation type events
+            Bind(() => RelationService.SavedRelationType += RelationService_SavedRelationType,
+                 () => RelationService.SavedRelationType -= RelationService_SavedRelationType);
+            Bind(() => RelationService.DeletedRelationType += RelationService_DeletedRelationType,
+                 () => RelationService.DeletedRelationType -= RelationService_DeletedRelationType);
+        }
 
-            //Bind to template events
+        private List<Action> _unbinders;
 
-            FileService.SavedTemplate += FileService_SavedTemplate;
-            FileService.DeletedTemplate += FileService_DeletedTemplate;
+        private void Bind(Action binder, Action unbinder)
+        {
+            // bind now
+            binder();
 
-            //Bind to macro events
-
-            MacroService.Saved += MacroService_Saved;
-            MacroService.Deleted += MacroService_Deleted;
-
-            //Bind to member events
-
-            MemberService.Saved += MemberService_Saved;
-            MemberService.Deleted += MemberService_Deleted;
-            MemberGroupService.Saved += MemberGroupService_Saved;
-            MemberGroupService.Deleted += MemberGroupService_Deleted;
-
-            //Bind to media events
-
-            MediaService.Saved += MediaService_Saved;
-            MediaService.Deleted += MediaService_Deleted;
-            MediaService.Moved += MediaService_Moved;
-            MediaService.Trashed += MediaService_Trashed;
-            MediaService.EmptiedRecycleBin += MediaService_EmptiedRecycleBin;
-
-            //Bind to content events - this is for unpublished content syncing across servers (primarily for examine)
-
-            ContentService.Saved += ContentService_Saved;
-            ContentService.Deleted += ContentService_Deleted;
-            ContentService.Copied += ContentService_Copied;
-            //TODO: The Move method of the content service fires Saved/Published events during its execution so we don't need to listen to moved
-            //ContentService.Moved += ContentServiceMoved;
-            ContentService.Trashed += ContentService_Trashed;
-            ContentService.EmptiedRecycleBin += ContentService_EmptiedRecycleBin;
-
-            ContentService.Published += ContentService_Published;
-            ContentService.UnPublished += ContentService_UnPublished;
-
-            //public access events
-            PublicAccessService.Saved += PublicAccessService_Saved;
-            PublicAccessService.Deleted += PublicAccessService_Deleted;
-
-            RelationService.SavedRelationType += RelationService_SavedRelationType;
-            RelationService.DeletedRelationType += RelationService_DeletedRelationType;
+            // abd register unbinder for later, if needed
+            if (_unbinders == null) return;
+            _unbinders.Add(unbinder);
         }
 
         // for tests
-        internal void Destroy()
+        internal void Unbind()
         {
-            //bind to application tree events
-            ApplicationTreeService.Deleted -= ApplicationTreeService_Deleted;
-            ApplicationTreeService.Updated -= ApplicationTreeService_Updated;
-            ApplicationTreeService.New -= ApplicationTreeService_New;
-
-            //bind to application events
-            SectionService.Deleted -= SectionService_Deleted;
-            SectionService.New -= SectionService_New;
-
-            //bind to user / user type events
-            UserService.SavedUserType -= UserService_SavedUserType;
-            UserService.DeletedUserType -= UserService_DeletedUserType;
-            UserService.SavedUser -= UserService_SavedUser;
-            UserService.DeletedUser -= UserService_DeletedUser;
-
-            //Bind to dictionary events
-
-            LocalizationService.DeletedDictionaryItem -= LocalizationService_DeletedDictionaryItem;
-            LocalizationService.SavedDictionaryItem -= LocalizationService_SavedDictionaryItem;
-
-            //Bind to data type events
-            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
-
-            DataTypeService.Deleted -= DataTypeService_Deleted;
-            DataTypeService.Saved -= DataTypeService_Saved;
-
-            //Bind to stylesheet events
-
-            FileService.SavedStylesheet -= FileService_SavedStylesheet;
-            FileService.DeletedStylesheet -= FileService_DeletedStylesheet;
-
-            //Bind to domain events
-
-            DomainService.Saved -= DomainService_Saved;
-            DomainService.Deleted -= DomainService_Deleted;
-
-            //Bind to language events
-
-            LocalizationService.SavedLanguage -= LocalizationService_SavedLanguage;
-            LocalizationService.DeletedLanguage -= LocalizationService_DeletedLanguage;
-
-            //Bind to content type events
-
-            ContentTypeService.SavedContentType -= ContentTypeService_SavedContentType;
-            ContentTypeService.SavedMediaType -= ContentTypeService_SavedMediaType;
-            ContentTypeService.DeletedContentType -= ContentTypeService_DeletedContentType;
-            ContentTypeService.DeletedMediaType -= ContentTypeService_DeletedMediaType;
-            MemberTypeService.Saved -= MemberTypeService_Saved;
-            MemberTypeService.Deleted -= MemberTypeService_Deleted;
-
-            //Bind to permission events
-
-            //TODO: Wrap legacy permissions so we can get rid of this
-            Permission.New -= PermissionNew;
-            Permission.Updated -= PermissionUpdated;
-            Permission.Deleted -= PermissionDeleted;
-            PermissionRepository<IContent>.AssignedPermissions -= CacheRefresherEventHandler_AssignedPermissions;
-
-            //Bind to template events
-
-            FileService.SavedTemplate -= FileService_SavedTemplate;
-            FileService.DeletedTemplate -= FileService_DeletedTemplate;
-
-            //Bind to macro events
-
-            MacroService.Saved -= MacroService_Saved;
-            MacroService.Deleted -= MacroService_Deleted;
-
-            //Bind to member events
-
-            MemberService.Saved -= MemberService_Saved;
-            MemberService.Deleted -= MemberService_Deleted;
-            MemberGroupService.Saved -= MemberGroupService_Saved;
-            MemberGroupService.Deleted -= MemberGroupService_Deleted;
-
-            //Bind to media events
-
-            MediaService.Saved -= MediaService_Saved;
-            MediaService.Deleted -= MediaService_Deleted;
-            MediaService.Moved -= MediaService_Moved;
-            MediaService.Trashed -= MediaService_Trashed;
-            MediaService.EmptiedRecycleBin -= MediaService_EmptiedRecycleBin;
-
-            //Bind to content events - this is for unpublished content syncing across servers (primarily for examine)
-
-            ContentService.Saved -= ContentService_Saved;
-            ContentService.Deleted -= ContentService_Deleted;
-            ContentService.Copied -= ContentService_Copied;
-            //TODO: The Move method of the content service fires Saved/Published events during its execution so we don't need to listen to moved
-            //ContentService.Moved -= ContentServiceMoved;
-            ContentService.Trashed -= ContentService_Trashed;
-            ContentService.EmptiedRecycleBin -= ContentService_EmptiedRecycleBin;
-
-            ContentService.Published -= ContentService_Published;
-            ContentService.UnPublished -= ContentService_UnPublished;
-
-            //public access events
-            PublicAccessService.Saved -= PublicAccessService_Saved;
-            PublicAccessService.Deleted -= PublicAccessService_Deleted;
-
-            RelationService.SavedRelationType -= RelationService_SavedRelationType;
-            RelationService.DeletedRelationType -= RelationService_DeletedRelationType;
+            if (_unbinders == null)
+                throw new NotSupportedException();
+            foreach (var unbinder in _unbinders)
+                unbinder();
+            _unbinders = null;
         }
 
         #region Publishing
@@ -247,11 +217,13 @@ namespace Umbraco.Web.Cache
         // events are actually raised, but not when they are handled by HandleEvents, so we have to have
         // these proxy methods that are *not* registered against any event *but* used by HandleEvents.
 
+        // ReSharper disable once UnusedMember.Local
         static void PublishingStrategy_UnPublished(IPublishingStrategy sender, PublishEventArgs<IContent> e)
         {
             ContentService_UnPublished(sender, e);
         }
 
+        // ReSharper disable once UnusedMember.Local
         static void PublishingStrategy_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
         {
             ContentService_Published(sender, e);
@@ -633,8 +605,7 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region User/permissions event handlers
-        
-        //fixme: this isn't named correct
+
         static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
         {
             var userIds = e.SavedEntities.Select(x => x.UserId).Distinct();
@@ -822,7 +793,7 @@ namespace Umbraco.Web.Cache
                 var handler = FindHandler(e);
                 if (handler == null) continue;
 
-                handler.Invoke(null, new object[] { e.Sender, e.Args });
+                handler.Invoke(null, new[] { e.Sender, e.Args });
             }
         }
 
@@ -831,21 +802,24 @@ namespace Umbraco.Web.Cache
         /// </summary>
         private static readonly Lazy<MethodInfo[]> CandidateHandlers = new Lazy<MethodInfo[]>(() =>
         {
-            var candidates =
+            var underscore = new[] { '_' };
 
-               typeof(CacheRefresherEventHandler).GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-               .Where(x => x.Name.Contains("_"))
-               .Select(x => new
-               {
-                   method = x,
-                   nameParts = x.Name.Split(new[] { "_" }, StringSplitOptions.RemoveEmptyEntries),
-                   methodParams = x.GetParameters()
-               })
-               .Where(x => x.nameParts.Length == 2 && x.methodParams.Length == 2 && typeof(EventArgs).IsAssignableFrom(x.methodParams[1].ParameterType))
-               .Select(x => x.method)
-               .ToArray();
+            return typeof (CacheRefresherEventHandler)
+                .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .Select(x =>
+                {
+                    if (x.Name.Contains("_") == false) return null;
 
-            return candidates;
+                    var parts = x.Name.Split(underscore, StringSplitOptions.RemoveEmptyEntries).Length;
+                    if (parts != 2) return null;
+
+                    var parameters = x.GetParameters();
+                    if (parameters.Length != 2) return null;
+                    if (typeof (EventArgs).IsAssignableFrom(parameters[1].ParameterType) == false) return null;
+                    return x;
+                })
+                .WhereNotNull()
+                .ToArray();
         });
 
         /// <summary>
@@ -855,14 +829,9 @@ namespace Umbraco.Web.Cache
 
         internal static MethodInfo FindHandler(IEventDefinition eventDefinition)
         {
-            return FoundHandlers.GetOrAdd(eventDefinition, definition =>
-            {
-                var candidates = CandidateHandlers.Value;
+            var name = eventDefinition.Sender.GetType().Name + "_" + eventDefinition.EventName;
 
-                var found = candidates.FirstOrDefault(x => x.Name == string.Format("{0}_{1}", eventDefinition.Sender.GetType().Name, eventDefinition.EventName));
-
-                return found;
-            });
+            return FoundHandlers.GetOrAdd(eventDefinition, _ => CandidateHandlers.Value.FirstOrDefault(x => x.Name == name));
         }
     }
 }

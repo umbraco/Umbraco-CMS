@@ -302,7 +302,7 @@ namespace Umbraco.Core.IO
         {
             var property = GetProperty(content, propertyTypeAlias);
             var svalue = property.Value as string;
-            var oldpath = svalue == null ? null : GetRelativePath(svalue); // FIXME DELETE?
+            var oldpath = svalue == null ? null : GetRelativePath(svalue);
             if (string.IsNullOrWhiteSpace(oldpath) == false && oldpath != filepath)
                 DeleteFile(oldpath, true);
             property.Value = GetUrl(filepath);
@@ -466,27 +466,6 @@ namespace Umbraco.Core.IO
                         var dir = Path.GetDirectoryName(file);
                         DeleteDirectory(dir, true);
                     }
-
-                    // I don't even understand...
-                    /*
-
-                    var relativeFilePath = GetRelativePath(file); // fixme - should be relative already
-                    if (FileExists(relativeFilePath) == false) return;
-
-                    var parentDirectory = Path.GetDirectoryName(relativeFilePath);
-
-                    // don't want to delete the media folder if not using directories.
-                    if (_contentSection.UploadAllowDirectories && parentDirectory != GetRelativePath("/"))
-                    {
-                        //issue U4-771: if there is a parent directory the recursive parameter should be true
-                        DeleteDirectory(parentDirectory, string.IsNullOrEmpty(parentDirectory) == false);
-                    }
-                    else
-                    {
-                        DeleteFile(file, true);
-                    }
-
-                    */
                 }
                 catch (Exception e)
                 {
@@ -549,7 +528,7 @@ namespace Umbraco.Core.IO
             PropertyType propertyType)
         {
             // get the original image from the original stream
-            if (filestream.CanSeek) filestream.Seek(0, 0); // fixme - what if we cannot seek?
+            if (filestream.CanSeek) filestream.Seek(0, 0);
             using (var image = Image.FromStream(filestream))
             {
                 return GenerateThumbnails(image, filepath, propertyType);
@@ -657,9 +636,6 @@ namespace Umbraco.Core.IO
                 // copy the old image to the new and resize
                 var rect = new Rectangle(0, 0, width, height);
                 graphics.DrawImage(originImage, rect, 0, 0, originImage.Width, originImage.Height, GraphicsUnit.Pixel);
-
-                // copy metadata
-                // fixme - er... no?
 
                 // get an encoder - based upon the file type
                 var extension = (Path.GetExtension(resizedFilepath) ?? "").TrimStart('.').ToLowerInvariant();

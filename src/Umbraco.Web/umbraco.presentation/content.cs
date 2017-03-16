@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -116,7 +117,7 @@ namespace umbraco
         // (not refactoring that part at the moment)
         private static readonly object DbReadSyncLock = new object();
 
-        private const string XmlContextContentItemKey = "UmbracoXmlContextContent";
+        internal const string XmlContextContentItemKey = "UmbracoXmlContextContent";
         private static string _umbracoXmlDiskCacheFileName = string.Empty;
         // internal for SafeXmlReaderWriter
         internal volatile XmlDocument _xmlContent;
@@ -180,12 +181,12 @@ namespace umbraco
             var e = new RefreshContentEventArgs();
             FireBeforeRefreshContent(e);
 
-            if (!e.Cancel)
+            if (e.Cancel) return;
+
+            using (var safeXml = GetSafeXmlWriter())
             {
-                using (var safeXml = GetSafeXmlWriter())
-                {
-                    safeXml.Xml = LoadContentFromDatabase();
-                }
+                safeXml.Xml = LoadContentFromDatabase();
+                safeXml.AcceptChanges();
             }
         }
 
@@ -294,21 +295,20 @@ namespace umbraco
             var e = new DocumentCacheEventArgs();
             FireBeforeUpdateDocumentCache(d, e);
 
-            if (!e.Cancel)
+            if (e.Cancel) return;
+
+            // lock the xml cache so no other thread can write to it at the same time
+            // note that some threads could read from it while we hold the lock, though
+            using (var safeXml = GetSafeXmlWriter())
             {
-                // lock the xml cache so no other thread can write to it at the same time
-                // note that some threads could read from it while we hold the lock, though
-                using (var safeXml = GetSafeXmlWriter())
-                {
-                    safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
-                    safeXml.AcceptChanges();
-                }
-
-                var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(cachedFieldKeyStart);
-
-                FireAfterUpdateDocumentCache(d, e);
+                safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
+                safeXml.AcceptChanges();
             }
+
+            var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(cachedFieldKeyStart);
+
+            FireAfterUpdateDocumentCache(d, e);
         }
 
         internal virtual void UpdateSortOrder(int contentId)
@@ -369,14 +369,9 @@ namespace umbraco
         [Obsolete("This is not used and will be removed from the codebase in future versions")]
         public virtual void UpdateDocumentCache(List<Document> Documents)
         {
-            // We need to lock content cache here, because we cannot allow other threads
-            // making changes at the same time, they need to be queued
-            int parentid = Documents[0].Id;
-
-
             using (var safeXml = GetSafeXmlWriter())
             {
-                foreach (Document d in Documents)
+                foreach (var d in Documents)
                 {
                     safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
                 }
@@ -434,7 +429,7 @@ namespace umbraco
             {
                 XmlNode x;
 
-                //Hack: this is here purely for backwards compat if someone for some reason is using the 
+                //Hack: this is here purely for backwards compat if someone for some reason is using the
                 // ClearDocumentCache(int documentId) method and expecting it to remove the xml
                 if (removeDbXmlEntry)
                 {
@@ -496,13 +491,38 @@ namespace umbraco
 
         #region Protected & Private methods
 
-        // Clear HTTPContext cache if any
-        // internal for SafeXmlReaderWriter
-        internal void ClearContextCache()
+        // this is for tests exclusively until we have a proper accessor in v8
+        internal static Func<IDictionary> HttpContextItemsGetter { get; set; }
+
+        private static IDictionary HttpContextItems
         {
-            // If running in a context very important to reset context cache or else new nodes are missing
-            if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null && UmbracoContext.Current.HttpContext.Items.Contains(XmlContextContentItemKey))
-                UmbracoContext.Current.HttpContext.Items.Remove(XmlContextContentItemKey);
+            get
+            {
+                return HttpContextItemsGetter == null
+                    ? (HttpContext.Current == null ? null : HttpContext.Current.Items)
+                    : HttpContextItemsGetter();
+            }
+        }
+
+        // clear the current xml capture in http context
+        // used when applying changes from SafeXmlReaderWriter,
+        // to force a new capture - so that changes become
+        // visible for the current request
+        private void ClearContextCache()
+        {
+            var items = HttpContextItems;
+            if (items == null || items.Contains(XmlContextContentItemKey)) return;
+            items.Remove(XmlContextContentItemKey);
+        }
+
+        // replaces the current xml capture in http context
+        // used for temp changes from SafeXmlReaderWriter
+        // so the current request immediately sees changes
+        private void SetContextCache(XmlDocument xml)
+        {
+            var items = HttpContextItems;
+            if (items == null) return;
+            items[XmlContextContentItemKey] = xml;
         }
 
         /// <summary>
@@ -573,13 +593,6 @@ namespace umbraco
         {
             get { return XmlFileEnabled && UmbracoConfig.For.UmbracoSettings().Content.XmlContentCheckForDiskChanges; }
         }
-        
-        //fixme: this is not used?
-        // whether _xml is immutable or not (achieved by cloning before changing anything)
-        private static bool XmlIsImmutable
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent; }
-        }
 
         // whether to use the legacy schema
         private static bool UseLegacySchema
@@ -604,13 +617,17 @@ namespace umbraco
         {
             get
             {
-                if (UmbracoContext.Current == null || UmbracoContext.Current.HttpContext == null)
+                var items = HttpContextItems;
+                if (items == null)
                     return XmlContentInternal;
-                var content = UmbracoContext.Current.HttpContext.Items[XmlContextContentItemKey] as XmlDocument;
+
+                // capture or return the current xml in http context
+                // so that it remains stable over the entire request
+                var content = (XmlDocument) items[XmlContextContentItemKey];
                 if (content == null)
                 {
                     content = XmlContentInternal;
-                    UmbracoContext.Current.HttpContext.Items[XmlContextContentItemKey] = content;
+                    items[XmlContextContentItemKey] = content;
                 }
                 return content;
             }
@@ -704,21 +721,25 @@ namespace umbraco
         // gets a locked safe read access to the main xml
         private SafeXmlReaderWriter GetSafeXmlReader()
         {
-            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlContent, (xml, registerXmlChange) =>
-            {
-                SetXmlLocked(xml, registerXmlChange);
-                ClearContextCache();
-            }, false);
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlContent,
+                SetContextCache,
+                (xml, registerXmlChange) =>
+                {
+                    SetXmlLocked(xml, registerXmlChange);
+                    ClearContextCache();
+                }, false);
         }
 
         // gets a locked safe write access to the main xml (cloned)
         private SafeXmlReaderWriter GetSafeXmlWriter()
         {
-            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlContent, (xml, registerXmlChange) =>
-            {
-                SetXmlLocked(xml, registerXmlChange);
-                ClearContextCache();
-            }, true);
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlContent,
+                SetContextCache,
+                (xml, registerXmlChange) =>
+                {
+                    SetXmlLocked(xml, registerXmlChange);
+                    ClearContextCache();
+                }, true);
         }
 
         private static string ChildNodesXPath

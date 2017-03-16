@@ -21,7 +21,9 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, CacheHelper.NoCache, logger, sqlSyntax)
         {
             // managing the cache our own way (no policy etc)
-            // fixme - ServerRegistrationRepository does *not* implement scoped cache at the moment!
+            // note: this means that the ServerRegistrationRepository does *not* implement scoped cache,
+            // and this is because the repository is special and should not participate in scopes
+            // (cleanup in v8)
             _globalCache = globalCache;
         }
 

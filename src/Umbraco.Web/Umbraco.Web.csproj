@@ -317,6 +317,7 @@
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
+    <Compile Include="Extensions\UdiExtensions.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\AcceptableConfiguration.cs" />
     <Compile Include="HealthCheck\Checks\Config\ConfigurationService.cs" />

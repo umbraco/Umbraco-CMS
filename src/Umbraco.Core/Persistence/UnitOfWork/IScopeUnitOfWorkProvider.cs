@@ -18,19 +18,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
         // creates a unit of work
         // support specifying an isolation level
-        // support auto-commit - beware!
-        // fixme - should we be able to specify ALL scope options?
-        // fixme - that isolation level thing is a pain because of the above existing method
-        IScopeUnitOfWork GetUnitOfWork(bool commit);
-        IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel, bool commit = false);
-
-        // creates a readonly unit of work
-        // the readonly unit of work will not accept operations, and will auto-complete
-        // of course it would be a bad idea to use it for anything else than reading
-        // fixme - implement that one FOR REAL not as an extension method
-        // the extension method was a ugly hack
-        // or maybe we want a autocommit flag in the ctor?
-        //IScopeUnitOfWork GetReadOnlyUnitOfWork();
-        //IScopeUnitOfWork GetReadOnlyUnitOfWork(bool autocommit = false);
+        // support auto-commit - but beware! it will be committed, whatever happens
+        // TODO in v8 this should all be merged as one single method with optional args
+        IScopeUnitOfWork GetUnitOfWork(bool readOnly);
+        IScopeUnitOfWork GetUnitOfWork(IsolationLevel isolationLevel, bool readOnly = false);
     }
 }
