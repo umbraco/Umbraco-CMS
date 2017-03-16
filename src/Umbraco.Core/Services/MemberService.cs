@@ -584,12 +584,10 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
             {
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
-                var contents = repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);
-                uow.Commit();
-                return contents;
+                return repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);
             }
         }
 
@@ -1198,7 +1196,7 @@ namespace Umbraco.Core.Services
 
         private IMemberType FindMemberTypeByAlias(string memberTypeAlias)
         {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberTypeRepository(uow);
                 var query = Query<IMemberType>.Builder.Where(x => x.Alias == memberTypeAlias);
@@ -1212,6 +1210,7 @@ namespace Umbraco.Core.Services
 
                 if (contentType == null)
                     throw new Exception(string.Format("MemberType matching the passed in Alias: '{0}' was null", memberTypeAlias));
+
                 uow.Commit();
                 return contentType;
             }
