@@ -395,6 +395,11 @@ namespace umbraco
 
         public virtual void ClearDocumentCache(int documentId)
         {
+            ClearDocumentCache(documentId, true);
+        }
+
+        internal virtual void ClearDocumentCache(int documentId, bool removeDbXmlEntry)
+        {
             // Get the document
             Document d;
             try
@@ -408,7 +413,7 @@ namespace umbraco
                 ClearDocumentXmlCache(documentId);
                 return;
             }
-            ClearDocumentCache(d);
+            ClearDocumentCache(d, removeDbXmlEntry);
         }
 
         /// <summary>
@@ -416,7 +421,8 @@ namespace umbraco
         /// This means the node gets unpublished from the website.
         /// </summary>
         /// <param name="doc">The document</param>
-        internal void ClearDocumentCache(Document doc)
+        /// <param name="removeDbXmlEntry"></param>
+        internal void ClearDocumentCache(Document doc, bool removeDbXmlEntry)
         {
             var e = new DocumentCacheEventArgs();
             FireBeforeClearDocumentCache(doc, e);
@@ -425,8 +431,13 @@ namespace umbraco
             {
                 XmlNode x;
 
-                // remove from xml db cache
-                doc.XmlRemoveFromDB();
+                //Hack: this is here purely for backwards compat if someone for some reason is using the 
+                // ClearDocumentCache(int documentId) method and expecting it to remove the xml
+                if (removeDbXmlEntry)
+                {
+                    // remove from xml db cache
+                    doc.XmlRemoveFromDB();
+                }
 
                 // clear xml cache
                 ClearDocumentXmlCache(doc.Id);
@@ -833,7 +844,6 @@ namespace umbraco
         internal void SaveXmlToFile()
         {
             LogHelper.Info<content>("Save Xml to file...");
-
             try
             {
                 var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
@@ -850,7 +860,7 @@ namespace umbraco
                     Directory.CreateDirectory(directoryName);
 
                 // save
-                using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true))
+                using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     SaveXmlToStream(xml, fs);
                 }

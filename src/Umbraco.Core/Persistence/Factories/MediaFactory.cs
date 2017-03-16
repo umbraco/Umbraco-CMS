@@ -27,15 +27,15 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<IMedia,ContentVersionDto>
 
-        public IMedia BuildEntity(ContentVersionDto dto)
+        public static IMedia BuildEntity(ContentVersionDto dto, IMediaType contentType)
         {
-            var media = new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, _contentType);
+            var media = new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, contentType);
 
             try
             {
                 media.DisableChangeTracking();
 
-                media.Id = _id;
+                media.Id = dto.NodeId;
                 media.Key = dto.ContentDto.NodeDto.UniqueId;
                 media.Path = dto.ContentDto.NodeDto.Path;
                 media.CreatorId = dto.ContentDto.NodeDto.UserId.Value;
@@ -55,6 +55,13 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 media.EnableChangeTracking();
             }
+
+        }
+
+        [Obsolete("Use the static BuildEntity instead so we don't have to allocate one of these objects everytime we want to map values")]
+        public IMedia BuildEntity(ContentVersionDto dto)
+        {
+            return BuildEntity(dto, _contentType);
         }
 
         public ContentVersionDto BuildDto(IMedia entity)

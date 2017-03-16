@@ -10,9 +10,6 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// The password value
         /// </summary>
-        /// <remarks>
-        /// This 
-        /// </remarks>
         [DataMember(Name = "newPassword")]
         public string NewPassword { get; set; }
 

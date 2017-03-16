@@ -28,6 +28,7 @@ using System.Security;
 [assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+[assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
 [assembly: InternalsVisibleTo("umbraco.webservices")]

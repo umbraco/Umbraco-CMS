@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateMemberFromDto(dto, dto.ContentVersionDto.VersionId, sql);
+            var content = CreateMemberFromDto(dto, sql);
 
             return content;
 
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, new PagingSqlQuery(sql));
 
         }
 
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 baseQuery.Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments))
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return ProcessQuery(baseQuery);
+                return ProcessQuery(baseQuery, new PagingSqlQuery(baseQuery));
             }
             else
             {
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sql = translator.Translate()
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return ProcessQuery(sql);
+                return ProcessQuery(sql, new PagingSqlQuery(sql));
             }
 
         }
@@ -107,24 +107,29 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of PetaPocoRepositoryBase<int,IMembershipUser>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql GetBaseQuery(BaseQueryType queryType)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<MemberDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<ContentVersionDto, MemberDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+            sql.Select(queryType == BaseQueryType.Count ? "COUNT(*)" : (queryType == BaseQueryType.Ids ? "cmsMember.nodeId" : "*"))
+                .From<MemberDto>(SqlSyntax)
+                .InnerJoin<ContentVersionDto>(SqlSyntax)
+                .On<ContentVersionDto, MemberDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 //We're joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
                 // the execution plan says it doesn't so we'll go with that and in that case, it might be worth joining the content
                 // types by default on the document and media repo's so we can query by content type there too.
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .InnerJoin<ContentTypeDto>(SqlSyntax)
+                .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId, SqlSyntax);
             return sql;
+        }
 
+        protected override Sql GetBaseQuery(bool isCount)
+        {
+            return GetBaseQuery(isCount ? BaseQueryType.Count : BaseQueryType.FullSingle);
         }
 
         protected override string GetBaseWhereClause()
@@ -380,7 +385,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
-            return ProcessQuery(sql, true);
+            return ProcessQuery(sql, new PagingSqlQuery(sql), true);
         }        
 
         public void RebuildXmlStructures(Func<IMember, XElement> serializer, int groupSize = 200, IEnumerable<int> contentTypeIds = null)
@@ -403,7 +408,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 query = query
                     .Where<NodeDto>(x => x.NodeId > baseId)
                     .OrderBy<NodeDto>(x => x.NodeId, SqlSyntax);
-                var xmlItems = ProcessQuery(SqlSyntax.SelectTop(query, groupSize))
+                var sql = SqlSyntax.SelectTop(query, groupSize);
+                var xmlItems = ProcessQuery(sql, new PagingSqlQuery(sql))
                     .Select(x => new ContentXmlDto { NodeId = x.Id, Xml = serializer(x).ToString() })
                     .ToList();
 
@@ -442,16 +448,16 @@ namespace Umbraco.Core.Persistence.Repositories
             var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
             var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.NodeId);
-            var media = factory.BuildEntity(dto);
+            var member = factory.BuildEntity(dto);
 
-            var properties = GetPropertyCollection(sql, new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) });
+            var properties = GetPropertyCollection(new PagingSqlQuery(sql), new[] { new DocumentDefinition(dto.ContentVersionDto, memberType) });
 
-            media.Properties = properties[dto.NodeId];
+            member.Properties = properties[dto.ContentVersionDto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)media).ResetDirtyProperties(false);
-            return media;
+            ((Entity)member).ResetDirtyProperties(false);
+            return member;
 
         }
 
@@ -535,7 +541,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            return ProcessQuery(sql);
+            return ProcessQuery(sql, new PagingSqlQuery(sql));
 
         }
 
@@ -617,9 +623,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
             }
 
-            return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
+            return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsMember", "nodeId"),
-                sql => ProcessQuery(sql), orderBy, orderDirection, orderBySystemField,
+                (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds), orderBy, orderDirection, orderBySystemField,
                 filterCallback);
         }
 
@@ -659,25 +665,37 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetEntityPropertyNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IMember> ProcessQuery(Sql sql, bool withCache = false)
+        /// <summary>
+        /// This is the underlying method that processes most queries for this repository
+        /// </summary>
+        /// <param name="sqlFull">
+        /// The full SQL to select all member data 
+        /// </param>
+        /// <param name="pagingSqlQuery">
+        /// The Id SQL to just return all member ids - used to process the properties for the member item
+        /// </param>
+        /// <param name="withCache"></param>
+        /// <returns></returns>
+        private IEnumerable<IMember> ProcessQuery(Sql sqlFull, PagingSqlQuery pagingSqlQuery, bool withCache = false)
         {
             // fetch returns a list so it's ok to iterate it in this method
-            var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sqlFull);
 
-            var content = new IMember[dtos.Count];
-            var defs = new List<DocumentDefinition>();
+            //This is a tuple list identifying if the content item came from the cache or not
+            var content = new List<Tuple<IMember, bool>>();
+            var defs = new DocumentDefinitionCollection();
 
-            for (var i = 0; i < dtos.Count; i++)
+            foreach (var dto in dtos)
             {
-                var dto = dtos[i];
-
                 // if the cache contains the item, use it
                 if (withCache)
                 {
                     var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
-                    if (cached != null)
+                    //only use this cached version if the dto returned is the same version - this is just a safety check, members dont 
+                    //store different versions, but just in case someone corrupts some data we'll double check to be sure.
+                    if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)
                     {
-                        content[i] = cached;
+                        content.Add(new Tuple<IMember, bool>(cached, true));
                         continue;
                     }
                 }
@@ -685,60 +703,54 @@ namespace Umbraco.Core.Persistence.Repositories
                 // else, need to fetch from the database
                 // content type repository is full-cache so OK to get each one independently
                 var contentType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
-                var factory = new MemberFactory(contentType, NodeObjectTypeId, dto.NodeId);
-                content[i] = factory.BuildEntity(dto);
 
                 // need properties
-                defs.Add(new DocumentDefinition(
-                    dto.NodeId,
-                    dto.ContentVersionDto.VersionId,
-                    dto.ContentVersionDto.VersionDate,
-                    dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                    contentType
-                ));
+                if (defs.AddOrUpdate(new DocumentDefinition(dto.ContentVersionDto, contentType)))
+                {
+                    content.Add(new Tuple<IMember, bool>(MemberFactory.BuildEntity(dto, contentType), false));
+                }
             }
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(sql, defs);
+            var propertyData = GetPropertyCollection(pagingSqlQuery, defs);
 
-            // assign
-            var dtoIndex = 0;
-            foreach (var def in defs)
+            // assign property data
+            foreach (var contentItem in content)
             {
-                // move to corresponding item (which has to exist)
-                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
+                var cc = contentItem.Item1;
+                var fromCache = contentItem.Item2;
 
-                // complete the item
-                var cc = content[dtoIndex];
-                cc.Properties = propertyData[cc.Id];
+                //if this has come from cache, we do not need to build up it's structure
+                if (fromCache) continue;
+
+                cc.Properties = propertyData[cc.Version];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
-                ((Entity)cc).ResetDirtyProperties(false);
+                cc.ResetDirtyProperties(false);
             }
 
-            return content;
+            return content.Select(x => x.Item1).ToArray();
         }
 
         /// <summary>
         /// Private method to create a member object from a MemberDto
         /// </summary>
         /// <param name="dto"></param>
-        /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>
-        private IMember CreateMemberFromDto(MemberDto dto, Guid versionId, Sql docSql)
+        private IMember CreateMemberFromDto(MemberDto dto, Sql docSql)
         {
             var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
             var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.ContentVersionDto.NodeId);
             var member = factory.BuildEntity(dto);
 
-            var docDef = new DocumentDefinition(dto.ContentVersionDto.NodeId, versionId, member.UpdateDate, member.CreateDate, memberType);
+            var docDef = new DocumentDefinition(dto.ContentVersionDto, memberType);
 
             var properties = GetPropertyCollection(docSql, new[] { docDef });
 
-            member.Properties = properties[dto.ContentVersionDto.NodeId];
+            member.Properties = properties[dto.ContentVersionDto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

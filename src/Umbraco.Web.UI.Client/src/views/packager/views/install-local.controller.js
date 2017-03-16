@@ -34,18 +34,24 @@
                 fields: {},
                 file: file
             }).progress(function (evt) {
+                
+                // hack: in some browsers the progress event is called after success
+                // this prevents the UI from going back to a uploading state
+                if(vm.zipFile.uploadStatus !== "done" && vm.zipFile.uploadStatus !== "error") {
 
-                // set view state to uploading
-                vm.state = 'uploading';
+                    // set view state to uploading
+                    vm.state = 'uploading';
 
-                // calculate progress in percentage
-                var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+                    // calculate progress in percentage
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
 
-                // set percentage property on file
-                vm.zipFile.uploadProgress = progressPercentage;
+                    // set percentage property on file
+                    vm.zipFile.uploadProgress = progressPercentage;
 
-                // set uploading status on file
-                vm.zipFile.uploadStatus = "uploading";
+                    // set uploading status on file
+                    vm.zipFile.uploadStatus = "uploading";
+
+                }
 
             }).success(function (data, status, headers, config) {
 

@@ -18,8 +18,15 @@ namespace umbraco
     /// </summary>
     public class GlobalSettings
     {
-		
-    	/// <summary>
+        /// <summary>
+        /// This returns the string of the MVC Area route.
+        /// </summary>
+        public static string UmbracoMvcArea
+        {
+            get { return Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea; }
+        }
+
+        /// <summary>
         /// Gets the reserved urls from web.config.
         /// </summary>
         /// <value>The reserved urls.</value>
