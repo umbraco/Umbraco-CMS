@@ -73,7 +73,7 @@ namespace Umbraco.Core.Logging
 		    if (IsTimeoutThreadAbortException(exception))
 		    {
 		        message += "\r\nThe thread has been aborted, because the request has timed out.";
-		        dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort;
+		        dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
 		    }
 
             if (dump)
@@ -93,6 +93,15 @@ namespace Umbraco.Core.Logging
 
             logger.Error(message, exception);
 		}
+
+        private static bool IsMonitorEnterThreadAbortException(Exception exception)
+        {
+            var abort = exception as ThreadAbortException;
+            if (abort == null) return false;
+
+            var stacktrace = abort.StackTrace;
+            return stacktrace.Contains("System.Threading.Monitor.ReliableEnter");
+        }
 
         private static bool IsTimeoutThreadAbortException(Exception exception)
         {
