@@ -468,7 +468,7 @@ AND umbracoNode.id <> @id",
                .LeftJoin<DataTypeDto>()
                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
                .Where<PropertyTypeGroupDto>(x => x.ContentTypeNodeId == id)
-               .OrderBy<PropertyTypeGroupDto>(x => x.SortOrder);
+               .OrderBy<PropertyTypeGroupDto>(x => x.SortOrder, SqlSyntax);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
