@@ -173,7 +173,7 @@ namespace UmbracoExamine
                         {
                             long totalContent;
                             var result = _memberService.GetPagedXmlEntries(pIndex, pSize, out totalContent).ToArray();
-                            return new Tuple<long, XElement[]>(totalContent, result);
+                            return new Tuple<long, int, XElement[]>(totalContent, result.Length, result);
                         },
                         i => _memberService.GetById(i));
                 }

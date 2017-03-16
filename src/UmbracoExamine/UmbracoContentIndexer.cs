@@ -479,7 +479,7 @@ namespace UmbracoExamine
                                         filtered.Add(xml);
                                     }
 
-                                    return new Tuple<long, XElement[]>(totalContent, filtered.ToArray());
+                                    return new Tuple<long, int, XElement[]>(totalContent, result.Length, filtered.ToArray());
                                 },
                                 i => _contentService.GetById(i));
                         }
@@ -545,7 +545,7 @@ namespace UmbracoExamine
                             {
                                 long totalMedia;
                                 var result = _mediaService.GetPagedXmlEntries(path, pIndex, pSize, out totalMedia).ToArray();
-                                return new Tuple<long, XElement[]>(totalMedia, result);
+                                return new Tuple<long, int, XElement[]>(totalMedia, result.Length, result);
                             },
                             i => _mediaService.GetById(i));
 
@@ -573,14 +573,15 @@ namespace UmbracoExamine
             string type, 
             int parentId,
             Func<TContentType[]> getContentTypes, 
-            Func<string, int, int, Tuple<long, XElement[]>> getPagedXmlEntries,
+            Func<string, int, int, Tuple<long, int, XElement[]>> getPagedXmlEntries,
             Func<int, IContentBase> getContent)
             where TContentType: IContentTypeComposition
         {
             const int pageSize = 10000;
-            var pageIndex = 0;            
+            var pageIndex = 0;
+            var nonFilteredPageLength = 0;
 
-            XElement[] xElements;
+            XElement[] xElements;            
 
             var contentTypes = getContentTypes();
             var icons = contentTypes.ToDictionary(x => x.Id, y => y.Icon);
@@ -592,7 +593,8 @@ namespace UmbracoExamine
                 {
                     var pagedElements = getPagedXmlEntries("-1", pageIndex, pageSize);
                     total = pagedElements.Item1;
-                    xElements = pagedElements.Item2;
+                    nonFilteredPageLength = pagedElements.Item2;
+                    xElements = pagedElements.Item3;
                 }
                 else
                 {
@@ -604,7 +606,8 @@ namespace UmbracoExamine
                     {
                         var pagedElements = getPagedXmlEntries(parent.Path, pageIndex, pageSize);
                         total = pagedElements.Item1;
-                        xElements = pagedElements.Item2;
+                        nonFilteredPageLength = pagedElements.Item2;
+                        xElements = pagedElements.Item3;
                     }
                 }
 
@@ -626,7 +629,7 @@ namespace UmbracoExamine
 
                 AddNodesToIndex(xElements, type);
                 pageIndex++;
-            } while (xElements.Length == pageSize);
+            } while (nonFilteredPageLength == pageSize);
         }
 
         internal static IEnumerable<XElement> GetSerializedContent(
