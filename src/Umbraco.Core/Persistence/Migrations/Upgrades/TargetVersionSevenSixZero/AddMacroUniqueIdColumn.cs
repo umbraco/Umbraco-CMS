@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -44,7 +43,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
         private static string UpdateMacroGuids(Database database)
         {
             var updates = database.Query<dynamic>("SELECT id, macroAlias FROM cmsMacro")
-                .Select(macro => Tuple.Create((int) macro.id, ((string) macro.macroAlias).ToGuid()))
+                .Select(macro => Tuple.Create((int) macro.id, ("macro____" + (string) macro.macroAlias).ToGuid()))
                 .ToList();
 
             foreach (var update in updates)
@@ -58,7 +57,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             var updates = database.Query<dynamic>(@"SELECT cmsMacroProperty.id id, macroPropertyAlias propertyAlias, cmsMacro.macroAlias macroAlias
 FROM cmsMacroProperty
 JOIN cmsMacro ON cmsMacroProperty.macro=cmsMacro.id")
-                .Select(prop => Tuple.Create((int) prop.id, ((string) prop.macroAlias + "____" + (string) prop.propertyAlias).ToGuid()))
+                .Select(prop => Tuple.Create((int) prop.id, ("macro____" + (string) prop.macroAlias + "____" + (string) prop.propertyAlias).ToGuid()))
                 .ToList();
 
             foreach (var update in updates)

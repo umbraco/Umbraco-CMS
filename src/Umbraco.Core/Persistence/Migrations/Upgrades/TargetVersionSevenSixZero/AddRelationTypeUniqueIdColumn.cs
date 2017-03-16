@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -32,7 +31,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
         private static string UpdateRelationTypeGuids(Database database)
         {
             var updates = database.Query<dynamic>("SELECT id, alias, name FROM umbracoRelationType")
-                .Select(relationType => Tuple.Create((int) relationType.id, ((string) relationType.alias + "____" + (string) relationType.name).ToGuid()))
+                .Select(relationType => Tuple.Create((int) relationType.id, ("relationType____" + (string) relationType.alias + "____" + (string) relationType.name).ToGuid()))
                 .ToList();
 
             foreach (var update in updates)
