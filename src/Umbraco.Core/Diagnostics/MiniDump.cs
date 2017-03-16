@@ -12,6 +12,8 @@ namespace Umbraco.Core.Diagnostics
 
     internal static class MiniDump
     {
+        private static readonly object LockO = new object();
+
         [Flags]
         public enum Option : uint
         {
@@ -75,7 +77,7 @@ namespace Umbraco.Core.Diagnostics
         [DllImport("kernel32.dll", EntryPoint = "GetCurrentThreadId", ExactSpelling = true)]
         private static extern uint GetCurrentThreadId();
 
-        public static bool Write(SafeHandle fileHandle, Option options, bool withException = false)
+        private static bool Write(SafeHandle fileHandle, Option options, bool withException = false)
         {
             var currentProcess = Process.GetCurrentProcess();
             var currentProcessHandle = currentProcess.Handle;
@@ -99,20 +101,34 @@ namespace Umbraco.Core.Diagnostics
 
         public static bool Dump(Option options = Option.WithFullMemory, bool withException = false)
         {
-            // work around "stack trace is not available while minidump debugging",
-            // by making sure a local var (that we can inspect) contains the stack trace.
-            // getting the call stack before it is unwound would require a special exception
-            // filter everywhere in our code = not!
-            var stacktrace = withException ? Environment.StackTrace : string.Empty;
-
-            var filepath = IOHelper.MapPath("~/App_Data/MiniDump");
-            if (Directory.Exists(filepath) == false)
-                Directory.CreateDirectory(filepath);
-
-            var filename = Path.Combine(filepath, string.Format("{0:yyyyMMddTHHmmss}.{1}.dmp", DateTime.UtcNow, Guid.NewGuid().ToString("N").Substring(0, 4)));
-            using (var stream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite, FileShare.Write))
+            lock (LockO)
             {
-                return Write(stream.SafeFileHandle, options, withException);
+                // work around "stack trace is not available while minidump debugging",
+                // by making sure a local var (that we can inspect) contains the stack trace.
+                // getting the call stack before it is unwound would require a special exception
+                // filter everywhere in our code = not!
+                var stacktrace = withException ? Environment.StackTrace : string.Empty;
+
+                var filepath = IOHelper.MapPath("~/App_Data/MiniDump");
+                if (Directory.Exists(filepath) == false)
+                    Directory.CreateDirectory(filepath);
+
+                var filename = Path.Combine(filepath, string.Format("{0:yyyyMMddTHHmmss}.{1}.dmp", DateTime.UtcNow, Guid.NewGuid().ToString("N").Substring(0, 4)));
+                using (var stream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite, FileShare.Write))
+                {
+                    return Write(stream.SafeFileHandle, options, withException);
+                }
+            }
+        }
+
+        public static bool OkToDump()
+        {
+            lock (LockO)
+            {
+                var filepath = IOHelper.MapPath("~/App_Data/MiniDump");
+                if (Directory.Exists(filepath) == false) return true;
+                var count = Directory.GetFiles(filepath, "*.dmp").Length;
+                return count < 8;
             }
         }
     }
