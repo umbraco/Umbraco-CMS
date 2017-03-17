@@ -1,5 +1,5 @@
 # Docker image name for the application
-$ImageName="phila/umbraco"
+$ImageName="umbraco"
 
 # Docker container name
 $ContainerName="umbraco.web"
