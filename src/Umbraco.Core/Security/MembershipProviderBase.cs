@@ -326,7 +326,8 @@ namespace Umbraco.Core.Security
 
             //Special case to allow changing password without validating existing credentials
             //This is used during installation only
-            if (AllowManuallyChangingPassword == false && ApplicationContext.Current.IsConfigured == false && oldPassword == "default")
+            if (AllowManuallyChangingPassword == false && ApplicationContext.Current != null
+                && ApplicationContext.Current.IsConfigured == false && oldPassword == "default")
             {
                 return PerformChangePassword(username, oldPassword, newPassword);
             }
