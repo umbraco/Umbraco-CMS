@@ -936,6 +936,10 @@ namespace Umbraco.Core.Services
                 {
                     definition.ParentId = parentId;
                     _dataTypeService.Save(definition, userId);
+
+                    //TODO: we should be adding these found data types to the list so that their pre-values
+                    // can be processed/synced
+                    dataTypes.Add(dataTypeDefinitionName, definition);
                 }
             }
 
@@ -1039,11 +1043,46 @@ namespace Umbraco.Core.Services
                             key => (string) key.Attribute("Alias"),
                             val => new PreValue((string) val.Attribute("Value")));
 
-                    //save the values with keys
-                    _dataTypeService.SavePreValues(dataTypeDefinition, valuesWithKeys);
+                    //We first need to check if pre-values exist for these data types and if so we 
+                    //want to add any keys that don't exist. If pre-values don't exist at all we'll create the new ones
+                    //We can only merge pre-values that are key based (not array based which are legacy)
+                    var existing = _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
+                    var installAll = true;
+                    if (existing != null)
+                    {
+                        if (existing.IsDictionaryBased) 
+                        {
+                            if (existing.PreValuesAsDictionary.Count > 0)
+                            {
+                                installAll = false;
 
-                    //save the values without keys (this is legacy)
-                    _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithoutKeys);
+                                //we need to check for missing keys
+                                var currentkeys = existing.PreValuesAsDictionary.Keys;
+
+                                var toInstall = valuesWithKeys
+                                    .Where(x => currentkeys.Contains(x.Key) == false)
+                                    .ToDictionary(x => x.Key, x => x.Value);
+
+                                //save the values with keys
+                                _dataTypeService.SavePreValues(dataTypeDefinition, toInstall);
+                            }
+                        }
+                        else if (existing.PreValuesAsArray.Any())
+                        {
+                            installAll = false;
+                        }
+                    }
+
+                    //if this is new just install all of them
+                    if (installAll)
+                    {
+                        //save the values with keys
+                        _dataTypeService.SavePreValues(dataTypeDefinition, valuesWithKeys);
+
+                        //save the values without keys (this is legacy)
+                        _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithoutKeys);
+                    }
+                    
                 }
                 else
                 {
@@ -1678,6 +1717,7 @@ namespace Umbraco.Core.Services
             set { _packageInstallation = value; }
         }
 
+        //TODO: Make this public and part of the interface??
         internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
         {
             if (raiseEvents)
