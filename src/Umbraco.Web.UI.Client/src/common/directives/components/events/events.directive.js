@@ -169,7 +169,7 @@ angular.module('umbraco.directives')
                 }
 
                 // ignore clicks in tinyMCE dropdown(floatpanel)
-                var floatpanel = $(el).parents(".mce-floatpanel");
+                var floatpanel = $(event.target).parents(".mce-floatpanel");
                 if (floatpanel.length === 1) {
                     return;
                 }
