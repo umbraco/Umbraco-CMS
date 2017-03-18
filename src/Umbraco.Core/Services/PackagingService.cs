@@ -934,11 +934,9 @@ namespace Umbraco.Core.Services
                 }
                 else
                 {
+                    //This is really the only thing we can merge safely
                     definition.ParentId = parentId;
-                    _dataTypeService.Save(definition, userId);
-
-                    //TODO: we should be adding these found data types to the list so that their pre-values
-                    // can be processed/synced
+                    
                     dataTypes.Add(dataTypeDefinitionName, definition);
                 }
             }
