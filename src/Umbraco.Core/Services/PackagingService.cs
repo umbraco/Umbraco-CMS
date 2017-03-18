@@ -1053,16 +1053,22 @@ namespace Umbraco.Core.Services
                             if (existing.PreValuesAsDictionary.Count > 0)
                             {
                                 installAll = false;
-
-                                //we need to check for missing keys
+                                
                                 var currentkeys = existing.PreValuesAsDictionary.Keys;
+                                foreach (var keyValue in valuesWithKeys)
+                                {
+                                    if (currentkeys.Contains(keyValue.Key) == false)
+                                    {
+                                        existing.PreValuesAsDictionary[keyValue.Key] = keyValue.Value;
+                                    }
+                                }
 
-                                var toInstall = valuesWithKeys
-                                    .Where(x => currentkeys.Contains(x.Key) == false)
-                                    .ToDictionary(x => x.Key, x => x.Value);
-
-                                //save the values with keys
-                                _dataTypeService.SavePreValues(dataTypeDefinition, toInstall);
+                                //if there were missing keys, update
+                                if (existing.PreValuesAsDictionary.Count > 0 && currentkeys.Count < existing.PreValuesAsDictionary.Count)
+                                {
+                                    //save the values with keys
+                                    _dataTypeService.SavePreValues(dataTypeDefinition, existing.PreValuesAsDictionary);
+                                }
                             }
                         }
                         else if (existing.PreValuesAsArray.Any())
