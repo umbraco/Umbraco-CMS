@@ -59,7 +59,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 
 	            $scope.currentNode = args.node;
 	            $scope.currentNode.selected = true;
-	            $scope.target.id = args.node.id;
+                $scope.target.id = args.node.id;
+                $scope.target.udi = args.node.udi;
 	            $scope.target.name = args.node.name;
 
 	            if (args.node.id < 0) {
