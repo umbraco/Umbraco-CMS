@@ -10,24 +10,21 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Developer, "partialViewMacros", "Partial View Macro Files", sortOrder: 6)]
 	public class PartialViewMacrosTreeController : FileSystemTreeController
     {
-        protected override string FilePath
+        protected override IFileSystem2 FileSystem
         {
-            get { return SystemDirectories.MacroPartials; }
+            get { return FileSystemProviderManager.Current.MacroPartialsFileSystem; }
         }
 
-        protected override string FileSearchPattern
+        private static readonly string[] ExtensionsStatic = { "cshtml" };
+
+        protected override string[] Extensions
         {
-            get { return "*.cshtml"; }
+            get { return ExtensionsStatic; }
         }
 
         protected override string FileIcon
         {
             get { return "icon-article"; }
-        }
-
-        protected override void OnRenderFileNode(ref TreeNode treeNode)
-        {
-            base.OnRenderFileNode(ref treeNode);
         }
 
         protected override void OnRenderFolderNode(ref TreeNode treeNode)

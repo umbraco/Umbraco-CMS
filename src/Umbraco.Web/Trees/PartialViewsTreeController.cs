@@ -10,23 +10,21 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, "partialViews", "Partial Views", sortOrder: 2)]
 	public class PartialViewsTreeController : FileSystemTreeController
     {
-		protected override string FilePath
+		protected override IFileSystem2 FileSystem
 		{
-			get { return SystemDirectories.PartialViews; }
+			get { return FileSystemProviderManager.Current.PartialViewsFileSystem; }
 		}
 
-		protected override string FileSearchPattern
-		{
-			get { return "*.cshtml"; }
-		}
+        private static readonly string[] ExtensionsStatic = { "cshtml" };
+
+        protected override string[] Extensions
+        {
+            get { return ExtensionsStatic; }
+        }
+
         protected override string FileIcon
         {
             get { return "icon-article"; }
-        }
-
-        protected override void OnRenderFileNode(ref TreeNode treeNode)
-        {
-            base.OnRenderFileNode(ref treeNode);
         }
 
         protected override void OnRenderFolderNode(ref TreeNode treeNode)
