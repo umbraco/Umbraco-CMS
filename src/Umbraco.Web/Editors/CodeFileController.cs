@@ -72,7 +72,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
 
-            // if the parentId is root (-1) then we just need an empty string as we are 
+            // if the parentId is root (-1) then we just need an empty string as we are
             // creating the path below and we don't wan't -1 in the path
             if (parentId == Core.Constants.System.Root.ToInvariantString())
             {
@@ -362,34 +362,32 @@ namespace Umbraco.Web.Editors
                         display.Id = System.Web.HttpUtility.UrlEncode(partialViewMacroResult.Result.Path);
                         return display;
                     }
-                        
+
                     display.AddErrorNotification(
                         Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
                         Services.TextService.Localize("speechBubbles/partialViewErrorText"));
                     break;
 
                 case Core.Constants.Trees.Scripts:
-                    var virtualPath = display.VirtualPath;
-                    var script = Services.FileService.GetScriptByName(display.VirtualPath);
-                    if (script != null)
-                    {
-                        script.Path = display.Name;
-                        display = Mapper.Map(script, display);
-                        display.Path = Url.GetTreePathFromFilePath(script.Path);
-                        display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
-                        return display;
-                        
-                    }
-                    else
-                    {
-                        var fileName = EnsurePartialViewExtension(display.Name, ".js");
-                        script = new Script(virtualPath + fileName);
-                    }
 
+                    var virtualPath = display.VirtualPath ?? string.Empty;
+
+                    // this is all weird, should be using relative paths everywhere!
+                    var relPath = FileSystemProviderManager.Current.ScriptsFileSystem.GetRelativePath(virtualPath);
+
+                    var path = relPath;
+                    if (path.EndsWith(".js") == false)
+                        path += ".js";
+
+                    var script = Services.FileService.GetScriptByName(path) ?? new Script(path);
+                    script.Path = path;
                     script.Content = display.Content;
+                    Services.FileService.SaveScript(script);
 
-                    Services.FileService.SaveScript(script, Security.CurrentUser.Id);
-                    break;
+                    display = Mapper.Map(script, display);
+                    display.Path = Url.GetTreePathFromFilePath(script.Path);
+                    display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
+                    return display;
 
                 default:
                     throw new HttpResponseException(HttpStatusCode.NotFound);
