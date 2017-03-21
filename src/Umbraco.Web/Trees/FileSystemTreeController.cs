@@ -58,12 +58,16 @@ namespace Umbraco.Web.Trees
             });
 
             foreach (var file in files)
-            {
-                var name = Path.GetFileName(file);
-                var node = CreateTreeNode(HttpUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
-                OnRenderFileNode(ref node);
-                if (node != null)
-                    nodes.Add(node);
+            {   
+                var withoutExt = Path.GetFileNameWithoutExtension(file);
+                if (withoutExt.IsNullOrWhiteSpace() == false)
+                {
+                    var name = Path.GetFileName(file);
+                    var node = CreateTreeNode(HttpUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
+                    OnRenderFileNode(ref node);
+                    if (node != null)
+                        nodes.Add(node);
+                }
             }
 
             return nodes;
