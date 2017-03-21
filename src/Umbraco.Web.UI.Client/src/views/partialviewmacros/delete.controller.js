@@ -12,10 +12,8 @@ function PartialViewMacrosDeleteController($scope, codefileResource, treeService
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
-
-        var virtualPath = $scope.currentNode.parentId + $scope.currentNode.name;
-
-        codefileResource.deleteByPath('partialViewMacros', virtualPath)
+        
+        codefileResource.deleteByPath('partialViewMacros', $scope.currentNode.id)
             .then(function() {
                 $scope.currentNode.loading = false;
                 //get the root node before we remove it

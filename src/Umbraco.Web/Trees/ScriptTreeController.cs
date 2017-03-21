@@ -7,14 +7,16 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, "scripts", "Scripts", sortOrder: 4)]
     public class ScriptTreeController : FileSystemTreeController
     {
-        protected override string FilePath
+        protected override IFileSystem2 FileSystem
         {
-            get { return SystemDirectories.Scripts; }
+            get { return FileSystemProviderManager.Current.ScriptsFileSystem; }
         }
 
-        protected override string FileSearchPattern
+        private static readonly string[] ExtensionsStatic = { "js" };
+
+        protected override string[] Extensions
         {
-            get { return "*.js"; }
+            get { return ExtensionsStatic; }
         }
         protected override string FileIcon
         {
@@ -25,11 +27,6 @@ namespace Umbraco.Web.Trees
         {
             //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
             treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
-        }
-
-        protected override void OnRenderFileNode(ref TreeNode treeNode)
-        {
-            base.OnRenderFileNode(ref treeNode);
         }
     }
 }
