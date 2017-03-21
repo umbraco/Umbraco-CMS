@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,9 +19,11 @@ using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors
 {
+    //TODO: Put some exception filters in our webapi to return 404 instead of 500 when we throw ArgumentNullException
+    // ref: https://www.exceptionnotfound.net/the-asp-net-web-api-exception-handling-pipeline-a-guided-tour/
     [PluginController("UmbracoApi")]
     [PrefixlessBodyModelValidator]
-    [UmbracoApplicationAuthorizeAttribute(Core.Constants.Applications.Settings)]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
 
@@ -33,6 +36,9 @@ namespace Umbraco.Web.Editors
         [ValidationFilter]
         public HttpResponseMessage PostCreate(string type, CodeFileDisplay display)
         {
+            if (display == null) throw new ArgumentNullException("display");
+            if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
+
             switch (type)
             {
                 case Core.Constants.Trees.PartialViews:
@@ -67,10 +73,9 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public CodeFileDisplay PostCreateContainer(string type, string parentId, string name)
         {
-            if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(name))
-            {
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
-            }
+            if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
+            if (string.IsNullOrWhiteSpace(parentId)) throw new ArgumentException("Value cannot be null or whitespace.", "parentId");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
 
             // if the parentId is root (-1) then we just need an empty string as we are
             // creating the path below and we don't wan't -1 in the path
@@ -120,10 +125,8 @@ namespace Umbraco.Web.Editors
         /// <returns>The file and its contents from the virtualPath</returns>
         public CodeFileDisplay GetByPath(string type, string virtualPath)
         {
-            if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(virtualPath))
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
+            if (string.IsNullOrWhiteSpace(virtualPath)) throw new ArgumentException("Value cannot be null or whitespace.", "virtualPath");
 
             virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
 
@@ -139,7 +142,7 @@ namespace Umbraco.Web.Editors
                         display.Id = System.Web.HttpUtility.UrlEncode(view.Path);
                         return display;
                     }
-                    return null;
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
 
                 case Core.Constants.Trees.PartialViewMacros:
                     var viewMacro = Services.FileService.GetPartialViewMacro(virtualPath);
@@ -151,7 +154,7 @@ namespace Umbraco.Web.Editors
                         display.Id = System.Web.HttpUtility.UrlEncode(viewMacro.Path);
                         return display;
                     }
-                    return null;
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
 
                 case Core.Constants.Trees.Scripts:
                     var script = Services.FileService.GetScriptByName(virtualPath);
@@ -163,7 +166,7 @@ namespace Umbraco.Web.Editors
                         display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
                         return display;
                     }
-                    return null;
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -176,10 +179,7 @@ namespace Umbraco.Web.Editors
         /// <returns>Returns a list of <see cref="SnippetDisplay"/> if a correct type is sent</returns>
         public IEnumerable<SnippetDisplay> GetSnippets(string type)
         {
-            if (string.IsNullOrWhiteSpace(type))
-            {
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
-            }
+            if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
 
             IEnumerable<string> snippets;
             switch (type)
@@ -209,15 +209,10 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <param name="snippetName"></param>
         /// <returns></returns>
-        public CodeFileDisplay GetScaffold(string type, string id = null, string snippetName = null)
+        public CodeFileDisplay GetScaffold(string type, string id, string snippetName = null)
         {
-            if (string.IsNullOrWhiteSpace(type))
-            {
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
-            }
-
-            if (id.IsNullOrWhiteSpace())
-                id = string.Empty;
+            if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
+            if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Value cannot be null or whitespace.", "id");
 
             CodeFileDisplay codeFileDisplay;
 
@@ -246,15 +241,15 @@ namespace Umbraco.Web.Editors
             // Make sure that the root virtual path ends with '/'
             codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.EnsureEndsWith("/");
 
-            if (id.IsNullOrWhiteSpace() == false && id != Core.Constants.System.Root.ToInvariantString())
+            if (id != Core.Constants.System.Root.ToInvariantString())
             {
                 codeFileDisplay.VirtualPath += id.TrimStart("/").EnsureEndsWith("/");
+                //if it's not new then it will have a path, otherwise it won't
+                codeFileDisplay.Path = Url.GetTreePathFromFilePath(id);
             }
 
-            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.TrimStart("~");
-            codeFileDisplay.Path = Url.GetTreePathFromFilePath(id);
+            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.TrimStart("~");            
             codeFileDisplay.FileType = type;
-
             return codeFileDisplay;
         }
 
@@ -268,52 +263,52 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage Delete(string type, string virtualPath)
         {
-            if (string.IsNullOrWhiteSpace(type) == false && string.IsNullOrWhiteSpace(virtualPath) == false)
+            if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
+            if (string.IsNullOrWhiteSpace(virtualPath)) throw new ArgumentException("Value cannot be null or whitespace.", "virtualPath");
+            
+            virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
+
+            switch (type)
             {
-                virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
+                case Core.Constants.Trees.PartialViews:
+                    if (IsDirectory(virtualPath, SystemDirectories.PartialViews))
+                    {
+                        Services.FileService.DeletePartialViewFolder(virtualPath);
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    if (Services.FileService.DeletePartialView(virtualPath, Security.CurrentUser.Id))
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View or folder found with the specified path");
 
-                switch (type)
-                {
-                    case Core.Constants.Trees.PartialViews:
-                        if (IsDirectory(virtualPath, SystemDirectories.PartialViews))
-                        {
-                            Services.FileService.DeletePartialViewFolder(virtualPath);
-                            return Request.CreateResponse(HttpStatusCode.OK);
-                        }
-                        if (Services.FileService.DeletePartialView(virtualPath, Security.CurrentUser.Id))
-                        {
-                            return Request.CreateResponse(HttpStatusCode.OK);
-                        }
-                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View or folder found with the specified path");
+                case Core.Constants.Trees.PartialViewMacros:
+                    if (IsDirectory(virtualPath, SystemDirectories.MacroPartials))
+                    {
+                        Services.FileService.DeletePartialViewMacroFolder(virtualPath);
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    if (Services.FileService.DeletePartialViewMacro(virtualPath, Security.CurrentUser.Id))
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro or folder found with the specified path");
 
-                    case Core.Constants.Trees.PartialViewMacros:
-                        if (IsDirectory(virtualPath, SystemDirectories.MacroPartials))
-                        {
-                            Services.FileService.DeletePartialViewMacroFolder(virtualPath);
-                            return Request.CreateResponse(HttpStatusCode.OK);
-                        }
-                        if (Services.FileService.DeletePartialViewMacro(virtualPath, Security.CurrentUser.Id))
-                        {
-                            return Request.CreateResponse(HttpStatusCode.OK);
-                        }
-                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro or folder found with the specified path");
+                case Core.Constants.Trees.Scripts:
+                    if (IsDirectory(virtualPath, SystemDirectories.Scripts))
+                    {
+                        Services.FileService.DeleteScriptFolder(virtualPath);
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    if (Services.FileService.GetScriptByName(virtualPath) != null)
+                    {
+                        Services.FileService.DeleteScript(virtualPath, Security.CurrentUser.Id);
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
-                    case Core.Constants.Trees.Scripts:
-                        if (IsDirectory(virtualPath, SystemDirectories.Scripts))
-                        {
-                            Services.FileService.DeleteScriptFolder(virtualPath);
-                            return Request.CreateResponse(HttpStatusCode.OK);
-                        }
-                        if (Services.FileService.GetScriptByName(virtualPath) != null)
-                        {
-                            Services.FileService.DeleteScript(virtualPath, Security.CurrentUser.Id);
-                            return Request.CreateResponse(HttpStatusCode.OK);
-                        }
-                        return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
-
-                    default:
-                        return Request.CreateResponse(HttpStatusCode.NotFound);
-                }
+                default:
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -326,14 +321,11 @@ namespace Umbraco.Web.Editors
         /// <returns>The updated CodeFileDisplay model</returns>
         public CodeFileDisplay PostSave(CodeFileDisplay display)
         {
+            if (display == null) throw new ArgumentNullException("display");
+
             if (ModelState.IsValid == false)
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
-            }
-
-            if (display == null || string.IsNullOrWhiteSpace(display.FileType))
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
             switch (display.FileType)
@@ -370,24 +362,20 @@ namespace Umbraco.Web.Editors
 
                 case Core.Constants.Trees.Scripts:
 
-                    var virtualPath = display.VirtualPath ?? string.Empty;
-
-                    // this is all weird, should be using relative paths everywhere!
-                    var relPath = FileSystemProviderManager.Current.ScriptsFileSystem.GetRelativePath(virtualPath);
-
-                    var path = relPath;
-                    if (path.EndsWith(".js") == false)
-                        path += ".js";
-
-                    var script = Services.FileService.GetScriptByName(path) ?? new Script(path);
-                    script.Path = path;
-                    script.Content = display.Content;
-                    Services.FileService.SaveScript(script);
-
-                    display = Mapper.Map(script, display);
-                    display.Path = Url.GetTreePathFromFilePath(script.Path);
-                    display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
+                    var scriptResult = CreateOrUpdateScript(display);
+                    display = Mapper.Map(scriptResult, display);
+                    display.Path = Url.GetTreePathFromFilePath(scriptResult.Path);
+                    display.Id = System.Web.HttpUtility.UrlEncode(scriptResult.Path);
                     return display;
+
+                    //display.AddErrorNotification(
+                    //    Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
+                    //    Services.TextService.Localize("speechBubbles/partialViewErrorText"));
+
+                    break;
+
+
+                    
 
                 default:
                     throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -396,11 +384,86 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        /// <summary>
+        /// Create or Update a Script
+        /// </summary>
+        /// <param name="display"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// It's important to note that Scripts are DIFFERENT from cshtml files since scripts use IFileSystem and cshtml files
+        /// use a normal file system because they must exist on a real file system for ASP.NET to work.
+        /// </remarks>
+        private Script CreateOrUpdateScript(CodeFileDisplay display)
+        {
+            //must always end with the correct extension
+            display.Name = EnsureCorrectFileExtension(display.Name, ".js");
+
+            var virtualPath = display.VirtualPath ?? string.Empty;
+            // this is all weird, should be using relative paths everywhere!
+            var relPath = FileSystemProviderManager.Current.ScriptsFileSystem.GetRelativePath(virtualPath);
+
+            if (relPath.EndsWith(".js") == false)
+            {
+                //this would typically mean it's new
+                relPath = relPath.IsNullOrWhiteSpace()
+                    ? relPath + display.Name
+                    : relPath.EnsureEndsWith('/') + display.Name;
+            }            
+
+            var script = Services.FileService.GetScriptByName(relPath);
+            if (script != null)
+            {
+                // might need to find the path
+                var orgPath = script.OriginalPath.Substring(0, script.OriginalPath.IndexOf(script.Name));
+                script.Path = orgPath + display.Name;
+
+                script.Content = display.Content;
+                //try/catch? since this doesn't return an Attempt?
+                Services.FileService.SaveScript(script, Security.CurrentUser.Id);
+            }
+            else
+            {
+                script = new Script(relPath);
+                script.Content = display.Content;
+                Services.FileService.SaveScript(script, Security.CurrentUser.Id);
+            }
+
+            return script;
+        }
+
         private Attempt<IPartialView> CreateOrUpdatePartialView(CodeFileDisplay display)
         {
+            return CreateOrUpdatePartialView(display, SystemDirectories.MacroPartials,
+                Services.FileService.GetPartialView, Services.FileService.SavePartialView, Services.FileService.CreatePartialView);            
+        }
+        
+        private Attempt<IPartialView> CreateOrUpdatePartialViewMacro(CodeFileDisplay display)
+        {
+            return CreateOrUpdatePartialView(display, SystemDirectories.MacroPartials,
+                Services.FileService.GetPartialViewMacro, Services.FileService.SavePartialViewMacro, Services.FileService.CreatePartialViewMacro);           
+        }
+
+        /// <summary>
+        /// Helper method to take care of persisting partial views or partial view macros - so we're not duplicating the same logic
+        /// </summary>
+        /// <param name="display"></param>
+        /// <param name="systemDirectory"></param>
+        /// <param name="getView"></param>
+        /// <param name="saveView"></param>
+        /// <param name="createView"></param>
+        /// <returns></returns>
+        private Attempt<IPartialView> CreateOrUpdatePartialView(
+            CodeFileDisplay display, string systemDirectory,
+            Func<string, IPartialView> getView,
+            Func<IPartialView, int, Attempt<IPartialView>> saveView,
+            Func<IPartialView, string, int, Attempt<IPartialView>> createView)
+        {
+            //must always end with the correct extension
+            display.Name = EnsureCorrectFileExtension(display.Name, ".cshtml");
+
             Attempt<IPartialView> partialViewResult;
-            string virtualPath = NormalizeVirtualPath(display.VirtualPath, SystemDirectories.PartialViews);
-            var view = Services.FileService.GetPartialView(virtualPath);
+            var virtualPath = NormalizeVirtualPath(display.VirtualPath, systemDirectory);
+            var view = getView(virtualPath);
             if (view != null)
             {
                 // might need to find the path
@@ -408,14 +471,13 @@ namespace Umbraco.Web.Editors
                 view.Path = orgPath + display.Name;
 
                 view.Content = display.Content;
-                partialViewResult = Services.FileService.SavePartialView(view, Security.CurrentUser.Id);
+                partialViewResult = saveView(view, Security.CurrentUser.Id);
             }
             else
             {
-                var fileName = EnsurePartialViewExtension(display.Name, ".cshtml");
-                view = new PartialView(virtualPath + fileName);
+                view = new PartialView(virtualPath + display.Name);
                 view.Content = display.Content;
-                partialViewResult = Services.FileService.CreatePartialView(view, display.Snippet, Security.CurrentUser.Id);
+                partialViewResult = createView(view, display.Snippet, Security.CurrentUser.Id);
             }
 
             return partialViewResult;
@@ -435,29 +497,7 @@ namespace Umbraco.Web.Editors
             return virtualPath;
         }
 
-        private Attempt<IPartialView> CreateOrUpdatePartialViewMacro(CodeFileDisplay display)
-        {
-            Attempt<IPartialView> partialViewMacroResult;
-            var virtualPath = display.VirtualPath ?? string.Empty;
-            var viewMacro = Services.FileService.GetPartialViewMacro(virtualPath);
-            if (viewMacro != null)
-            {
-                viewMacro.Content = display.Content;
-                viewMacro.Path = display.Name;
-                partialViewMacroResult = Services.FileService.SavePartialViewMacro(viewMacro, Security.CurrentUser.Id);
-            }
-            else
-            {
-                var fileName = EnsurePartialViewExtension(display.Name, ".cshtml");
-                viewMacro = new PartialView(virtualPath + fileName);
-                viewMacro.Content = display.Content;
-                partialViewMacroResult = Services.FileService.CreatePartialViewMacro(viewMacro, display.Snippet, Security.CurrentUser.Id);
-            }
-
-            return partialViewMacroResult;
-        }
-
-        private string EnsurePartialViewExtension(string value, string extension)
+        private string EnsureCorrectFileExtension(string value, string extension)
         {
             if (value.EndsWith(extension) == false)
                 value += extension;
