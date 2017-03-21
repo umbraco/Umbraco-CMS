@@ -725,6 +725,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         insertLinkInEditor: function(editor, target, anchorElm) {
 
             var href = target.url;
+            // We want to use the Udi. If it is set, we use it, else fallback to id, and finally to null
+            var id = target.udi ? target.udi : (target.id ? target.id : null);
 
             function insertLink() {
                 if (anchorElm) {
@@ -733,7 +735,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         title: target.name,
                         target: target.target ? target.target : null,
                         rel: target.rel ? target.rel : null,
-                        'data-id': target.id ? target.id : null
+                        'data-id': id
                     });
 
                     editor.selection.select(anchorElm);
@@ -744,7 +746,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         title: target.name,
                         target: target.target ? target.target : null,
                         rel: target.rel ? target.rel : null,
-                        'data-id': target.id ? target.id : null
+                        'data-id': id
                     });
                 }
             }
@@ -755,14 +757,9 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
             }
 
             //if we have an id, it must be a locallink:id, aslong as the isMedia flag is not set
-            if(target.id && (angular.isUndefined(target.isMedia) || !target.isMedia)){
-                if (target.udi) {
-                    href = "/{localLink:" + target.udi + "}";
-                }
-                else {
-                    //This shouldn't happen! but just in case we'll leave this here
-                    href = "/{localLink:" + target.id + "}";
-                }
+            if(id && (angular.isUndefined(target.isMedia) || !target.isMedia)){
+                
+                href = "/{localLink:" + id + "}";
 
                 insertLink();
                 return;
