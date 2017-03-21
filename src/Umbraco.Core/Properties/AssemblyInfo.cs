@@ -47,5 +47,9 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("Umbraco.Deploy.UI")]
 [assembly: InternalsVisibleTo("Umbraco.Deploy.Cloud")]
 
+[assembly: InternalsVisibleTo("Umbraco.Forms.Core")]
+[assembly: InternalsVisibleTo("Umbraco.Forms.Core.Providers")]
+[assembly: InternalsVisibleTo("Umbraco.Forms.Web")]
+
 //allow this to be mocked in our unit tests
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

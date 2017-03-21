@@ -218,11 +218,11 @@ namespace Umbraco.Core.IO
             var normPath = NormPath(path);
             var shadows = Nodes.Where(kvp => IsChild(normPath, kvp.Key)).ToArray();
             var files = filter != null ? _fs.GetFiles(path, filter) : _fs.GetFiles(path);
-            var regexFilter = FilterToRegex(filter);
+            var wildcard = filter == null ? null : new WildcardExpression(filter);
             return files
                 .Except(shadows.Where(kvp => (kvp.Value.IsFile && kvp.Value.IsDelete) || kvp.Value.IsDir)
                     .Select(kvp => kvp.Key))
-                .Union(shadows.Where(kvp => kvp.Value.IsFile && kvp.Value.IsExist && FilterByRegex(kvp.Key, regexFilter)).Select(kvp => kvp.Key))
+                .Union(shadows.Where(kvp => kvp.Value.IsFile && kvp.Value.IsExist && (wildcard == null || wildcard.IsMatch(kvp.Key))).Select(kvp => kvp.Key))
                 .Distinct();
         }
 
@@ -326,32 +326,65 @@ namespace Umbraco.Core.IO
             _sfs.AddFile(path, physicalPath, overrideIfExists, copy);
             Nodes[normPath] = new ShadowNode(false, false);
         }
-        
-        /// <summary>
-        /// Helper function for filtering keys by Regex if a filter is specified.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="regexFilter"></param>
-        /// <returns></returns>
-        internal static bool FilterByRegex(string input, string regexFilter)
-        {
-            if (regexFilter == null) return true;
-            return regexFilter != string.Empty && Regex.IsMatch(input, regexFilter);
-        }
 
-        /// <summary>
-        /// Transforms a filter pattern into a Regex pattern
-        /// </summary>
-        /// <param name="pattern"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Appending '$' only if not containing wildcard is stupid and broken.
-        /// It is however what seems to be what they're doing in .NET so we need to match the functionality.
-        /// </remarks>
-        internal static string FilterToRegex(string pattern)
+        // copied from System.Web.Util.Wildcard internal
+        internal class WildcardExpression
         {
-            if (pattern == null) return null;
-            return "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + (pattern.Contains("*") ? string.Empty : "$");
+            private readonly string _pattern;
+            private readonly bool _caseInsensitive;
+            private Regex _regex;
+
+            private static Regex metaRegex = new Regex("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]");
+            private static Regex questRegex = new Regex("\\?");
+            private static Regex starRegex = new Regex("\\*");
+            private static Regex commaRegex = new Regex(",");
+            private static Regex slashRegex = new Regex("(?=/)");
+            private static Regex backslashRegex = new Regex("(?=[\\\\:])");
+
+            public WildcardExpression(string pattern, bool caseInsensitive = true)
+            {
+                _pattern = pattern;
+                _caseInsensitive = caseInsensitive;
+            }
+
+            private void EnsureRegex(string pattern)
+            {
+                if (_regex != null) return;
+
+                var options = RegexOptions.None;
+
+                // match right-to-left (for speed) if the pattern starts with a *
+
+                if (pattern.Length > 0 && pattern[0] == '*')
+                    options = RegexOptions.RightToLeft | RegexOptions.Singleline;
+                else
+                    options = RegexOptions.Singleline;
+
+                // case insensitivity
+
+                if (_caseInsensitive)
+                    options |= RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+
+                // Remove regex metacharacters
+
+                pattern = metaRegex.Replace(pattern, "\\$0");
+
+                // Replace wildcard metacharacters with regex codes
+
+                pattern = questRegex.Replace(pattern, ".");
+                pattern = starRegex.Replace(pattern, ".*");
+                pattern = commaRegex.Replace(pattern, "\\z|\\A");
+
+                // anchor the pattern at beginning and end, and return the regex
+
+                _regex = new Regex("\\A" + pattern + "\\z", options);
+            }
+
+            public bool IsMatch(string input)
+            {
+                EnsureRegex(_pattern);
+                return _regex.IsMatch(input);
+            }
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core;
 
+[assembly: PreApplicationStartMethod(typeof(BindingRedirects), "Initialize")]
+
 namespace Umbraco.Core
 {
     /// <summary>
