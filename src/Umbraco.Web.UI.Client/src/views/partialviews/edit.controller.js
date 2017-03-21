@@ -58,20 +58,25 @@
                     });
                 });
 
-                vm.page.saveButtonState = "success";
-                vm.partialView = saved;
+                //check if the name changed, if so we need to redirect
+                if (vm.partialView.id !== saved.id) {
+                    contentEditingHelper.redirectToRenamedContent(saved.id);
+                }
+                else {
+                    vm.page.saveButtonState = "success";
+                    vm.partialView = saved;
 
-                //sync state
-                editorState.set(vm.partialView);
+                    //sync state
+                    editorState.set(vm.partialView);
 
-                // normal tree sync
-                navigationService.syncTree({ tree: "partialViews", path: vm.partialView.path, forceReload: true }).then(function (syncArgs) {
-                    vm.page.menu.currentNode = syncArgs.node;
-                });
+                    // normal tree sync
+                    navigationService.syncTree({ tree: "partialViews", path: vm.partialView.path, forceReload: true }).then(function (syncArgs) {
+                        vm.page.menu.currentNode = syncArgs.node;
+                    });
 
-                // clear $dirty state on form
-                setFormState("pristine");
-
+                    // clear $dirty state on form
+                    setFormState("pristine");
+                }
             }, function (err) {
 
                 vm.page.saveButtonState = "error";
@@ -247,18 +252,18 @@
                 }
 
                 codefileResource.getScaffold("partialViews", $routeParams.id, snippet).then(function (partialView) {
-                    ready(partialView);
+                    ready(partialView, false);
                 });
                 
             } else {
                 codefileResource.getByPath('partialViews', $routeParams.id).then(function (partialView) {
-                    ready(partialView);
+                    ready(partialView, true);
                 });
             }
 
         }
 
-        function ready(partialView) {
+        function ready(partialView, syncTree) {
 
         	vm.page.loading = false;
             vm.partialView = partialView;
@@ -266,9 +271,11 @@
             //sync state
             editorState.set(vm.partialView);
 
-            navigationService.syncTree({ tree: "partialViews", path: vm.partialView.path, forceReload: true }).then(function (syncArgs) {
-                vm.page.menu.currentNode = syncArgs.node;
-            });
+            if (syncTree) {
+                navigationService.syncTree({ tree: "partialViews", path: vm.partialView.path, forceReload: true }).then(function (syncArgs) {
+                    vm.page.menu.currentNode = syncArgs.node;
+                });
+            }
 
             // ace configuration
             vm.aceOption = {

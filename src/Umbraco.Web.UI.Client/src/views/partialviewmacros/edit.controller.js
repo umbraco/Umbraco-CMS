@@ -48,20 +48,25 @@
                     });
                 });
 
-                vm.page.saveButtonState = "success";
-                vm.partialViewMacro = saved;
+                //check if the name changed, if so we need to redirect
+                if (vm.partialViewMacro.id !== saved.id) {
+                    contentEditingHelper.redirectToRenamedContent(saved.id);
+                }
+                else {
+                    vm.page.saveButtonState = "success";
+                    vm.partialViewMacro = saved;
 
-                //sync state
-                editorState.set(vm.partialViewMacro);
+                    //sync state
+                    editorState.set(vm.partialViewMacro);
 
-                // normal tree sync
-                navigationService.syncTree({ tree: "partialViewMacros", path: vm.partialViewMacro.path, forceReload: true }).then(function (syncArgs) {
-                    vm.page.menu.currentNode = syncArgs.node;
-                });
+                    // normal tree sync
+                    navigationService.syncTree({ tree: "partialViewMacros", path: vm.partialViewMacro.path, forceReload: true }).then(function (syncArgs) {
+                        vm.page.menu.currentNode = syncArgs.node;
+                    });
 
-                // clear $dirty state on form
-                setFormState("pristine");
-
+                    // clear $dirty state on form
+                    setFormState("pristine");
+                }
             }, function (err) {
 
                 vm.page.saveButtonState = "error";
@@ -237,26 +242,29 @@
                 }
 
                 codefileResource.getScaffold("partialViewMacros", $routeParams.id, snippet).then(function (partialViewMacro) {
-                    ready(partialViewMacro);
+                    ready(partialViewMacro, false);
                 });
 
             } else {
                 codefileResource.getByPath('partialViewMacros', $routeParams.id).then(function (partialViewMacro) {
-                    ready(partialViewMacro);
+                    ready(partialViewMacro, true);
                 });
             }
         }
 
-        function ready(partialViewMacro) {
+        function ready(partialViewMacro, syncTree) {
 
         	vm.page.loading = false;
             vm.partialViewMacro = partialViewMacro;
 
             //sync state
             editorState.set(vm.partialViewMacro);
-            navigationService.syncTree({ tree: "partialViewMacros", path: vm.partialViewMacro.virtualPath, forceReload: true }).then(function (syncArgs) {
-                vm.page.menu.currentNode = syncArgs.node;
-            });
+
+            if (syncTree) {
+                navigationService.syncTree({ tree: "partialViewMacros", path: vm.partialViewMacro.path, forceReload: true }).then(function (syncArgs) {
+                    vm.page.menu.currentNode = syncArgs.node;
+                });
+            }
 
             // ace configuration
             vm.aceOption = {

@@ -55,16 +55,22 @@
                     notificationsService.success(header, message);
                 });
 
-                vm.page.saveButtonState = "success";
-                vm.script = saved;
+                //check if the name changed, if so we need to redirect
+                if (vm.script.id !== saved.id) {
+                    contentEditingHelper.redirectToRenamedContent(saved.id);
+                }
+                else {
+                    vm.page.saveButtonState = "success";
+                    vm.script = saved;
 
-                //sync state
-                editorState.set(vm.script);
-                
-                // sync tree
-                navigationService.syncTree({ tree: "scripts", path: vm.script.virtualPath, forceReload: true }).then(function (syncArgs) {
-                    vm.page.menu.currentNode = syncArgs.node;
-                });
+                    //sync state
+                    editorState.set(vm.script);
+
+                    // sync tree
+                    navigationService.syncTree({ tree: "scripts", path: vm.script.path, forceReload: true }).then(function (syncArgs) {
+                        vm.page.menu.currentNode = syncArgs.node;
+                    });
+                }
 
             }, function (err) {
 
@@ -90,17 +96,17 @@
 
             if ($routeParams.create) {
                 codefileResource.getScaffold("scripts", $routeParams.id).then(function (script) {
-                    ready(script);
+                    ready(script, false);
                 });
             } else {
                 codefileResource.getByPath('scripts', $routeParams.id).then(function (script) {
-                    ready(script);
+                    ready(script, true);
                 });
             }
 
         }
 
-        function ready(script) {
+        function ready(script, syncTree) {
 
             vm.page.loading = false;
 
@@ -109,9 +115,11 @@
             //sync state
             editorState.set(vm.script);
 
-            navigationService.syncTree({ tree: "scripts", path: vm.script.virtualPath, forceReload: true }).then(function (syncArgs) {
-                vm.page.menu.currentNode = syncArgs.node;
-            });
+            if (syncTree) {
+                navigationService.syncTree({ tree: "scripts", path: vm.script.path, forceReload: true }).then(function (syncArgs) {
+                    vm.page.menu.currentNode = syncArgs.node;
+                });
+            }
 
             vm.aceOption = {
                 mode: "javascript",
