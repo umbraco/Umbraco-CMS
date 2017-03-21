@@ -41,6 +41,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
+                //must be sorted this way for the relator to work
                 .OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
 
             var dto = Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql).FirstOrDefault();
@@ -64,6 +65,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("cmsDictionary.pk in (@ids)", new { ids = ids });
             }
 
+            //must be sorted this way for the relator to work
+            sql.OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+
             return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
                     .Select(dto => ConvertFromDto(dto));
         }
@@ -73,6 +77,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IDictionaryItem>(sqlClause, query);
             var sql = translator.Translate();
+            //must be sorted this way for the relator to work
             sql.OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
 
             return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
@@ -94,10 +99,9 @@ namespace Umbraco.Core.Persistence.Repositories
             else
             {
                 sql.Select("*")
-                   .From<DictionaryDto>(SqlSyntax)
-                   .LeftJoin<LanguageTextDto>(SqlSyntax)
-                   .On<DictionaryDto, LanguageTextDto>(SqlSyntax, left => left.UniqueId, right => right.UniqueId)
-                   .OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+                    .From<DictionaryDto>(SqlSyntax)
+                    .LeftJoin<LanguageTextDto>(SqlSyntax)
+                    .On<DictionaryDto, LanguageTextDto>(SqlSyntax, left => left.UniqueId, right => right.UniqueId);
             }
             return sql;
         }
@@ -271,6 +275,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
                         var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query<IDictionaryItem>.Builder);
                         var sql = translator.Translate();
+
+                        //must be sorted this way for the relator to work
                         sql.OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
 
                         return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
@@ -298,6 +304,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override IEnumerable<DictionaryDto> PerformFetch(Sql sql)
             {
+                //must be sorted this way for the relator to work
+                sql.OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+
                 return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql);
             }
 
@@ -350,6 +359,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override IEnumerable<DictionaryDto> PerformFetch(Sql sql)
             {
+                //must be sorted this way for the relator to work
+                sql.OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+
                 return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql);
             }
 

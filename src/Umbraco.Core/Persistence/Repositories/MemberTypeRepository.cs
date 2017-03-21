@@ -46,7 +46,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
                 sql.Where(statement);
             }
-            sql.OrderByDescending<NodeDto>(x => x.NodeId, SqlSyntax);
+
+            //must be sorted this way for the relator to work
+            sql.OrderBy<MemberTypeReadOnlyDto>(x => x.UniqueId, SqlSyntax);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -62,7 +64,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var subquery = translator.Translate();
             var sql = GetBaseQuery(false)
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
+                //must be sorted this way for the relator to work
+                .OrderBy<MemberTypeReadOnlyDto>(x => x.UniqueId, SqlSyntax);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
