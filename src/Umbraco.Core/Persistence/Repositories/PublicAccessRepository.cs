@@ -40,7 +40,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             
             var factory = new PublicAccessEntryFactory();
+
             //MUST be ordered by this GUID ID for the AccessRulesRelator to work
+            sql.OrderBy<AccessDto>(dto => dto.Id, SqlSyntax);
+
             var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
             return dtos.Select(factory.BuildEntity);
         }
@@ -52,7 +55,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var factory = new PublicAccessEntryFactory();
+            
             //MUST be ordered by this GUID ID for the AccessRulesRelator to work
+            sql.OrderBy<AccessDto>(dto => dto.Id, SqlSyntax);
+
             var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
             return dtos.Select(factory.BuildEntity);
         }
@@ -63,9 +69,8 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Select("*")
                 .From<AccessDto>(SqlSyntax)
                 .LeftJoin<AccessRuleDto>(SqlSyntax)
-                .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId)
-                //MUST be ordered by this GUID ID for the AccessRulesRelator to work
-                .OrderBy<AccessDto>(dto => dto.Id, SqlSyntax);
+                .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
+                
 
             return sql;
         }

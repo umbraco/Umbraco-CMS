@@ -37,6 +37,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private IMacro GetBySql(Sql sql)
         {
+            //must be sorted this way for the relator to work
+            sql.OrderBy<MacroDto>(x => x.Id, SqlSyntax);
+
             var macroDto = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql).FirstOrDefault();
             if (macroDto == null)
                 return null;
@@ -68,7 +71,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private IEnumerable<IMacro> GetAllNoIds()
         {
-            var sql = GetBaseQuery(false);
+            var sql = GetBaseQuery(false)
+                //must be sorted this way for the relator to work
+                .OrderBy<MacroDto>(x => x.Id, SqlSyntax);
+
             return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql))
                 .ToArray();// we don't want to re-iterate again!
         }
@@ -92,6 +98,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IMacro>(sqlClause, query);
             var sql = translator.Translate();
 
+            //must be sorted this way for the relator to work
+            sql.OrderBy<MacroDto>(x => x.Id, SqlSyntax);
+
             var dtos = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql);
 
             foreach (var dto in dtos)
@@ -114,13 +123,13 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private static Sql GetBaseQuery()
+        private Sql GetBaseQuery()
         {
             var sql = new Sql();
             sql.Select("*")
-               .From<MacroDto>()
-               .LeftJoin<MacroPropertyDto>()
-               .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
+                .From<MacroDto>()
+                .LeftJoin<MacroPropertyDto>()
+                .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
             return sql;
         }
 
