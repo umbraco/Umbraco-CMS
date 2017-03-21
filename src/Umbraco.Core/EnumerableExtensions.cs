@@ -295,22 +295,5 @@ namespace Umbraco.Core
             return list1Groups.Count == list2Groups.Count
                && list1Groups.All(g => g.Count() == list2Groups[g.Key].Count());
         }
-
-        ///<summary>
-        /// Returns the items of the given enumerable as a pure enumerable.
-        /// <remarks>
-        /// When quering lists using methods such as <see cref="M:List.Where"/>, the result, despite appearing to look like and quack like an 
-        /// <see cref="T:Enumerable{T}"/> the type is actually an instance of <see cref="T:System.Linq.Enumerable.WhereEnumerableIterator"/>
-        /// </remarks>
-        /// </summary>
-        ///<param name="source">The item to find.</param>
-        ///<returns>The index of the first matching item, or -1 if the item was not found.</returns>
-        internal static IEnumerable<T> Yield<T>(this IEnumerable<T> source)
-        {
-            foreach (var element in source)
-            {
-                yield return element;
-            }
-        }
     }
 }
