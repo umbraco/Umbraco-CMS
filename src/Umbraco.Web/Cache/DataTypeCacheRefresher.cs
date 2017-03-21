@@ -5,6 +5,8 @@ using Umbraco.Core.Cache;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 
 
 namespace Umbraco.Web.Cache
@@ -110,6 +112,10 @@ namespace Umbraco.Web.Cache
                 
                 PublishedContentType.ClearDataType(payload.Id);
             });
+
+            TagsValueConverter.ClearCaches();
+            MultipleMediaPickerPropertyConverter.ClearCaches();
+            SliderValueConverter.ClearCaches();
 
             base.Refresh(jsonPayload);
         }

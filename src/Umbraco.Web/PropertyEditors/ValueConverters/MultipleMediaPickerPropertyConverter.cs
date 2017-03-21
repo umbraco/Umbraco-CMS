@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -223,13 +224,26 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public bool IsMultipleDataType(int dataTypeId)
         {
-            // ** This must be cached (U4-8862) **
-            var multiPickerPreValue =
-                _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId)
-                    .PreValuesAsDictionary.FirstOrDefault(
-                        x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase)).Value;
+            // GetPreValuesCollectionByDataTypeId is cached at repository level;
+            // still, the collection is deep-cloned so this is kinda expensive,
+            // better to cache here + trigger refresh in DataTypeCacheRefresher
 
-            return multiPickerPreValue != null && multiPickerPreValue.Value.TryConvertTo<bool>().Result;
+            return Storages.GetOrAdd(dataTypeId, id =>
+            {
+                var preValue = _dataTypeService.GetPreValuesCollectionByDataTypeId(id)
+                    .PreValuesAsDictionary
+                    .FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase))
+                    .Value;
+
+                return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
+            });
+        }
+
+        private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();
+
+        internal static void ClearCaches()
+        {
+            Storages.Clear();
         }
     }
 }
