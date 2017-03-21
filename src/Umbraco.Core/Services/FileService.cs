@@ -868,7 +868,7 @@ namespace Umbraco.Core.Services
                 if (partialView == null)
                 {
                     uow.Commit();
-                    return true;
+                    return false;
                 }
 
                 if (uow.Events.DispatchCancelable(DeletingPartialView, this, new DeleteEventArgs<IPartialView>(partialView)))
