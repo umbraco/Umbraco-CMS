@@ -22,6 +22,14 @@
                 action="toggleSortingMode();">
             </umb-button>
 
+            <umb-button ng-if="sortingMode !== false"
+                        type="button"
+                        button-style="link"
+                        label-key="general_showSortOrdinals"
+                        icon="icon-poker-chip"
+                        action="toggleSortOrderOverride();">
+            </umb-button>
+
         </umb-editor-sub-header-content-right>
 
     </umb-editor-sub-header>
@@ -187,6 +195,7 @@
                                     <i class="icon icon-navigation" ng-if="!property.inherited"></i>
                                     <span class="umb-group-builder__property-meta-label">{{ property.label }}</span>
                                     <span class="umb-group-builder__property-meta-alias">({{ property.alias }})</span>
+                                    <span ng-show="showSortOrdinals"><input name="propertySortOrder" type="number" class="umb-group-builder__group-sort-value" ng-model="property.sortOrder" ng-disabled="property.inherited" /></span>
                                 </div>
 
                             </div>
