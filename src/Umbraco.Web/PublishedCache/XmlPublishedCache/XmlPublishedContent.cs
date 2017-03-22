@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -315,9 +316,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 	    private void InitializeNode()
 	    {
-            InitializeNode(_xmlNode, UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema, _isPreviewing, 
-                out _id, out _key, out _template, out _sortOrder, out _name, out _writerName, 
-                out _urlName, out _creatorName, out _creatorId, out _writerId, out _docTypeAlias, out _docTypeId, out _path, 
+            InitializeNode(_xmlNode, UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema, _isPreviewing,
+                out _id, out _key, out _template, out _sortOrder, out _name, out _writerName,
+                out _urlName, out _creatorName, out _creatorId, out _writerId, out _docTypeAlias, out _docTypeId, out _path,
                 out _version, out _createDate, out _updateDate, out _level, out _isDraft, out _contentType, out _properties,
                 PublishedContentType.Get);
 
@@ -345,7 +346,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             //return if this is null
             if (xmlNode == null)
-            {   
+            {
 		        return;
 		    }
 
@@ -407,8 +408,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
 		    //dictionary to store the property node data
-            var propertyNodes = new Dictionary<string, XmlNode>();                     
-            
+            var propertyNodes = new Dictionary<string, XmlNode>();
+
             foreach (XmlNode n in xmlNode.ChildNodes)
             {
                 var e = n as XmlElement;
@@ -432,7 +433,20 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    }
 
             //lookup the content type and create the properties collection
-            contentType = getPublishedContentType(PublishedItemType.Content, docTypeAlias);
+            try
+            {
+                contentType = getPublishedContentType(PublishedItemType.Content, docTypeAlias);
+
+            }
+            catch (Exception e)
+            {
+                if (e.TargetSite.Name == "CreatePublishedContentType")
+                {
+                    content.Instance.RefreshContentFromDatabase();
+                    throw new Exception(string.Format("The content cache failed to find a content type with alias \"{0}\". This usually indicates that the content cache is corrupt; the content cache has been rebuilt in an attempt to self-fix the issue.", docTypeAlias));
+                }
+                throw;
+            }
             properties = new Dictionary<string, IPublishedProperty>(StringComparer.OrdinalIgnoreCase);
 
             //fill in the property collection
