@@ -21,13 +21,27 @@
 		</div>
 
 		<div ng-hide="success">
-            <umb-tree section="media"
-                      hideheader="false"
-                      hideoptions="true"
-                      isdialog="true"
-                      eventhandler="dialogTreeEventHandler"
-                      enablecheckboxes="true">
-            </umb-tree>
+            
+			<div ng-hide="miniListView">
+				<umb-tree
+					section="media"
+					hideheader="false"
+					hideoptions="true"
+					isdialog="true"
+					eventhandler="dialogTreeEventHandler"
+					enablelistviewexpand="true"
+					enablecheckboxes="true">
+				</umb-tree>
+			</div>
+
+			<umb-mini-list-view
+				ng-if="miniListView"
+				node="miniListView"
+				entity-type="Media"
+				on-select="selectListViewNode(node)"
+				on-close="closeMiniListView()">
+			</umb-mini-list-view>
+
 		</div>
 	</div>
 </div>
