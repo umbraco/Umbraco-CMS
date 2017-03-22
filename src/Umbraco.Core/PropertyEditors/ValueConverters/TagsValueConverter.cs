@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 
@@ -74,18 +77,26 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// </returns>
         private bool JsonStorageType(int dataTypeId)
         {
-            // ** This must be cached (U4-8862) **
-            var storageType =
-                _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId)
-                    .PreValuesAsDictionary.FirstOrDefault(
-                        x => string.Equals(x.Key, "storageType", StringComparison.InvariantCultureIgnoreCase)).Value;
+            // GetPreValuesCollectionByDataTypeId is cached at repository level;
+            // still, the collection is deep-cloned so this is kinda expensive,
+            // better to cache here + trigger refresh in DataTypeCacheRefresher
 
-            if (storageType != null && storageType.Value.InvariantEquals("Json"))
+            return Storages.GetOrAdd(dataTypeId, id =>
             {
-                return true;
-            }
+                var preValue = _dataTypeService.GetPreValuesCollectionByDataTypeId(id)
+                    .PreValuesAsDictionary
+                    .FirstOrDefault(x => string.Equals(x.Key, "storageType", StringComparison.InvariantCultureIgnoreCase))
+                    .Value;
 
-            return false;
+                return preValue != null && preValue.Value.InvariantEquals("json");
+            });
+        }
+
+        private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();
+
+        internal static void ClearCaches()
+        {
+            Storages.Clear();
         }
     }
 }

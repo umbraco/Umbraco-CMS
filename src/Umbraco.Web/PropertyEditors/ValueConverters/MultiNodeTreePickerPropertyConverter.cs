@@ -132,7 +132,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         if (nodeIds.Length > 0)
                         {
                             var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-
                             var objectType = UmbracoObjectTypes.Unknown;
 
                             foreach (var nodeId in nodeIds)
@@ -148,8 +147,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                 }
                             }
                         }
-                        //TODO: Get rid of this Yield thing
-                        return multiNodeTreePicker.Yield().Where(x => x != null);
+
+                        return multiNodeTreePicker;
                     }
 
                     // return the first nodeId as this is one of the excluded properties that expects a single id
@@ -170,11 +169,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             {
                                 var item = udi.ToPublishedContent();
                                 if (item != null)
+                                {
                                     multiNodeTreePicker.Add(item);
+                                }
                             }
                         }
-                        //TODO: Get rid of this Yield thing
-                        return multiNodeTreePicker.Yield().Where(x => x != null);
+
+                        return multiNodeTreePicker;
                     }
 
                     // return the first nodeId as this is one of the excluded properties that expects a single id

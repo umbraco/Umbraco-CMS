@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -88,13 +89,26 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// </returns>
         private bool IsRangeDataType(int dataTypeId)
         {
-            // ** This must be cached (U4-8862) **            
-            var enableRange =
-                _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId)
-                    .PreValuesAsDictionary.FirstOrDefault(
-                        x => string.Equals(x.Key, "enableRange", StringComparison.InvariantCultureIgnoreCase)).Value;
+            // GetPreValuesCollectionByDataTypeId is cached at repository level;
+            // still, the collection is deep-cloned so this is kinda expensive,
+            // better to cache here + trigger refresh in DataTypeCacheRefresher
 
-            return enableRange != null && enableRange.Value.TryConvertTo<bool>().Result;
+            return Storages.GetOrAdd(dataTypeId, id =>
+            {
+                var preValue = _dataTypeService.GetPreValuesCollectionByDataTypeId(id)
+                    .PreValuesAsDictionary
+                    .FirstOrDefault(x => string.Equals(x.Key, "enableRange", StringComparison.InvariantCultureIgnoreCase))
+                    .Value;
+
+                return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
+            });
+        }
+
+        private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();
+
+        internal static void ClearCaches()
+        {
+            Storages.Clear();
         }
     }
 }
