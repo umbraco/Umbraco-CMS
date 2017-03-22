@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetChildren", "id", typeof(int), typeof(Guid), typeof(Udi), typeof(string))));
             }
         }
@@ -122,7 +123,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the media item by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -139,6 +140,43 @@ namespace Umbraco.Web.Editors
                 return null;
             }
             return Mapper.Map<IMedia, MediaItemDisplay>(foundContent);
+        }
+
+        /// <summary>
+        /// Gets the media item by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [EnsureUserPermissionForMedia("id")]
+        public MediaItemDisplay GetById(Guid id)
+        {
+            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+                //HandleContentNotFound will throw an exception
+                return null;
+            }
+            return Mapper.Map<IMedia, MediaItemDisplay>(foundContent);
+        }
+
+        /// <summary>
+        /// Gets the media item by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [EnsureUserPermissionForMedia("id")]
+        public MediaItemDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetById(guidUdi.Guid);
+            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         /// <summary>
