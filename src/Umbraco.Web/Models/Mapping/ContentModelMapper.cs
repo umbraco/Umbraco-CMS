@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.MapFrom(content => content.ContentType.IsContainer))
                 .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
-                .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(content, applicationContext)))
+                .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => ((Content)content).PublishedDate))
                 .ForMember(display => display.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
                 .ForMember(display => display.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(display => display.Urls,
@@ -220,26 +220,6 @@ namespace Umbraco.Web.Models.Mapping
                         docTypeProperty.View = "urllist";
                     }
                 });
-        }
-
-        /// <summary>
-        /// Gets the published date value for the IContent object
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="applicationContext"></param>
-        /// <returns></returns>
-        private static DateTime? GetPublishedDate(IContent content, ApplicationContext applicationContext)
-        {
-            if (content.Published)
-            {
-                return content.UpdateDate;
-            }
-            if (content.HasPublishedVersion)
-            {
-                var published = applicationContext.Services.ContentService.GetPublishedVersion(content.Id);
-                return published.UpdateDate;
-            }
-            return null;
         }
 
         /// <summary>

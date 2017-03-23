@@ -19,5 +19,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("newest")]
         public bool Newest { get; set; }
+
+        [Column("updateDate")]
+        public DateTime VersionDate { get; set; }
     }
 }
