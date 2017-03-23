@@ -518,7 +518,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     NodeId = dto.NodeId,
                     Published = true               
                 };
-                ((Content)entity).PublishedVersionGuid = dto.VersionId;
+                ((Content) entity).PublishedVersionGuid = dto.VersionId;
+                ((Content) entity).PublishedDate = dto.UpdateDate;
             }
 
             entity.ResetDirtyProperties();
@@ -693,19 +694,21 @@ namespace Umbraco.Core.Persistence.Repositories
                     NodeId = dto.NodeId,
                     Published = true
                 };
-                ((Content)entity).PublishedVersionGuid = dto.VersionId;
+                ((Content) entity).PublishedVersionGuid = dto.VersionId;
+                ((Content) entity).PublishedDate = dto.UpdateDate;
             }
             else if (publishedStateChanged)
             {
                 dto.DocumentPublishedReadOnlyDto = new DocumentPublishedReadOnlyDto
                 {
-                    VersionId = default(Guid),
-                    VersionDate = default(DateTime),
+                    VersionId = default (Guid),
+                    VersionDate = default (DateTime),
                     Newest = false,
                     NodeId = dto.NodeId,
                     Published = false
                 };
-                ((Content)entity).PublishedVersionGuid = default(Guid);
+                ((Content) entity).PublishedVersionGuid = default(Guid);
+                ((Content) entity).PublishedDate = default (DateTime);
             }
 
             entity.ResetDirtyProperties();
