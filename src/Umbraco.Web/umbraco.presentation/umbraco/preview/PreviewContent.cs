@@ -202,13 +202,15 @@ namespace umbraco.presentation.preview
             {
                 file.Delete();
             }
-            catch (Exception ex)
+            catch (IOException)
             {
                 // for *some* reason deleting the file can fail,
                 // and it will work later on (long-lasting locks, etc),
                 // so just ignore the exception
-
-                //LogHelper.Error<PreviewContent>(string.Format("Couldn't delete preview set: {0} - User {1}", file.Name, userId), ex);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<PreviewContent>(string.Format("Couldn't delete preview set: {0} - User {1}", file.Name, userId), ex);
             }
         }
 
