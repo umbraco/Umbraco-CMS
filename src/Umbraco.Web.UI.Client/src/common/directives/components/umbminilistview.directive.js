@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MiniListViewDirective(entityResource) {
+    function MiniListViewDirective(entityResource, iconHelper) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -18,6 +18,11 @@
             }
 
             function open(node) {
+
+                // convert legacy icon for node
+                if(node && node.icon) {
+                    node.icon = iconHelper.convertFromLegacyIcon(node.icon);
+                }
 
                 goingForward = true;
 
@@ -58,6 +63,11 @@
                         // update children
                         miniListView.children = data.items;
                         _.each(miniListView.children, function(c) {
+                            // convert legacy icon for node
+                            if(c.icon) {
+                                c.icon = iconHelper.convertFromLegacyIcon(c.icon);
+                            }
+                            // set published state for content
                             if (c.metaData) {
                                 c.hasChildren = c.metaData.HasChildren;
                                 if(scope.entityType === "Document") {
