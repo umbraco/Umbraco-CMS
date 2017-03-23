@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.MapFrom(content => content.ContentType.IsContainer))
                 .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
-                .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => ((Content)content).PublishedDate))
+                .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(content)))
                 .ForMember(display => display.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
                 .ForMember(display => display.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(display => display.Urls,
@@ -73,6 +73,12 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
                 .ForMember(dto => dto.Icon, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore());
+        }
+
+        private static DateTime? GetPublishedDate(IContent content)
+        {
+            var date = ((Content) content).PublishedDate;
+            return date == default (DateTime) ? (DateTime?) null : date;
         }
 
         /// <summary>
