@@ -5,6 +5,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -69,6 +70,16 @@ namespace Umbraco.Core.Services
 
             return toUpdate;
 
+        }
+
+        internal bool HasContainerInPath(string contentPath)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                // can use same repo for both content and media
+                var repository = (ContentTypeRepository) RepositoryFactory.CreateContentTypeRepository(uow);
+                return repository.HasContainerInPath(contentPath);
+            }
         }
     }
 }

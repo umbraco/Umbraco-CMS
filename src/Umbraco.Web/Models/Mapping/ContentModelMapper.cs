@@ -86,31 +86,9 @@ namespace Umbraco.Web.Models.Mapping
         private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService,
             ILocalizedTextService localizedText, IContentTypeService contentTypeService)
         {
-            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
-            //TODO: Fix this shorthand .Ancestors() lookup, at least have an overload to use the current
-            if (content.HasIdentity)
-            {
-                var ancesctorListView = content.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
-                display.IsChildOfListView = ancesctorListView != null;
-            }
-            else
-            {
-                //it's new so it doesn't have a path, so we need to look this up by it's parent + ancestors
-                var parent = content.Parent();
-                if (parent == null)
-                {
-                    display.IsChildOfListView = false;
-                }
-                else if (parent.ContentType.IsContainer)
-                {
-                    display.IsChildOfListView = true;
-                }
-                else
-                {
-                    var ancesctorListView = parent.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
-                    display.IsChildOfListView = ancesctorListView != null;
-                }
-            }
+            // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            var parent = content.Parent();
+            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || ((ContentTypeService) contentTypeService).HasContainerInPath(parent.Path));
 
             //map the tree node url
             if (HttpContext.Current != null)
