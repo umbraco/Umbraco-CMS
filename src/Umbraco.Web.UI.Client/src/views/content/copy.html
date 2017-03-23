@@ -1,26 +1,28 @@
 <div ng-controller="Umbraco.Editors.Content.CopyController">
-    <div class="umb-dialog-body form-horizontal">
+    <div class="umb-dialog-body form-horizontal" ng-cloak>
         <div class="umb-pane">
+
+            <div ng-show="error">
+                <div class="alert alert-error">
+                    <div><strong>{{error.errorMsg}}</strong></div>
+                    <div>{{error.data.message}}</div>
+                </div>
+            </div>
+
+            <div ng-show="success">
+                <div class="alert alert-success">
+                    <strong>{{currentNode.name}}</strong> was copied to
+                    <strong>{{target.name}}</strong>
+                </div>
+                <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
+            </div>
+
             <p class="abstract" ng-hide="success">
                 Choose where to copy <strong>{{currentNode.name}}</strong> to in the tree structure below
             </p>
 
             <div class="umb-loader-wrapper" ng-show="busy">
                 <div class="umb-loader"></div>
-            </div>
-
-            <div ng-show="error">
-                <h5 class="text-error">{{error.errorMsg}}</h5>
-                <p class="text-error">{{error.data.message}}</p>
-            </div>
-
-            <div class="alert alert-success" ng-show="success">
-                <p>
-                    <strong>{{currentNode.name}}</strong> was copied to
-                    <strong>{{target.name}}</strong>
-                </p>
-
-                <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
             </div>
 
             <div ng-hide="success">
