@@ -207,7 +207,11 @@ namespace Umbraco.Web.Trees
                 return false;
             }
 
-            IContent content = Services.ContentService.GetById(entity.Id);
+            var content = Services.ContentService.GetById(entity.Id);
+            if (content == null)
+            {
+                return false;
+            }
             return Security.CurrentUser.HasPathAccess(content);
         }
 

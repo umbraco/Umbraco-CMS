@@ -308,7 +308,7 @@ namespace Umbraco.Web.Trees
         {
             IUmbracoEntity entity;
 
-            Guid idGuid = Guid.Empty;
+            Guid idGuid;
             int idInt;
             Udi idUdi;
 
