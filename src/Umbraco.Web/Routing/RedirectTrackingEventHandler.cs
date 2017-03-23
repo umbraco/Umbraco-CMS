@@ -295,8 +295,7 @@ namespace Umbraco.Web.Routing
         private static bool IsNotRoute(string route)
         {
             // null if content not found
-            // err/- if collision or anomaly or ...
-            return route == null || route.StartsWith("err/");
+            return route == null;
         }
 
         // gets a value indicating whether server is 'slave'

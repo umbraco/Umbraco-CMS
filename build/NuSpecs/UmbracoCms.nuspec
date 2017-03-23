@@ -17,7 +17,8 @@
     <dependencies>
       <dependency id="UmbracoCms.Core" version="[$version$]" />
       <dependency id="Newtonsoft.Json" version="[6.0.8, 10.0.0)" />
-      <dependency id="Umbraco.ModelsBuilder" version="[3.0.4, 4.0.0)" />
+      <dependency id="Umbraco.ModelsBuilder" version="[3.0.5, 4.0.0)" />
+      <dependency id="ImageProcessor.Web.Config" version="[2.3.0, 3.0.0)" />	  
     </dependencies>
   </metadata>
   <files>
@@ -43,6 +44,8 @@
     <file src="tools\trees.config.install.xdt" target="Content\config\trees.config.install.xdt" />
     <file src="tools\umbracoSettings.config.install.xdt" target="Content\config\umbracoSettings.config.install.xdt" />
     <file src="tools\Views.Web.config.install.xdt" target="Views\Web.config.install.xdt" />
+    <file src="tools\processing.config.install.xdt" target="Content\Config\imageprocessor\processing.config.install.xdt" />
+    <file src="tools\cache.config.install.xdt" target="Content\Config\imageprocessor\cache.config.install.xdt" />
     <file src="build\**" target="build" />
   </files>
 </package>

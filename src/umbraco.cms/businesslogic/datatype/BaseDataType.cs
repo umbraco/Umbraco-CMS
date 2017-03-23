@@ -14,12 +14,7 @@ namespace umbraco.cms.businesslogic.datatype
 		private int _datatypedefinitionid;
 		private string _datafield = "";
 		private DBTypes _DBType;
-
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+        
 		public BaseDataType()
 		{}
 
@@ -48,7 +43,8 @@ namespace umbraco.cms.businesslogic.datatype
 			}
 			set {
 				_DBType = value;
-				 SqlHelper.ExecuteNonQuery("update cmsDataType set  dbType = '" + value.ToString() + "' where nodeId = @datadefinitionid", SqlHelper.CreateParameter("@datadefinitionid",_datatypedefinitionid));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("update cmsDataType set  dbType = '" + value.ToString() + "' where nodeId = @datadefinitionid", sqlHelper.CreateParameter("@datadefinitionid",_datatypedefinitionid));
 			}
 		}
 		// Umbraco legacy - get the datafield - the columnname of the cmsPropertyData table
@@ -61,10 +57,13 @@ namespace umbraco.cms.businesslogic.datatype
             {
                 if (_datafield == "")
                 {
-                    string dbtypestr = SqlHelper.ExecuteScalar<string>("select dbType from cmsDataType where nodeId = @datadefinitionid", SqlHelper.CreateParameter("@datadefinitionid", _datatypedefinitionid));
-                    DBTypes DataTypeSQLType = GetDBType(dbtypestr);
-                    _DBType = DataTypeSQLType;
-                    _datafield = GetDataFieldName(_DBType);
+                    using (var sqlHelper = Application.SqlHelper)
+                    { 
+                        string dbtypestr = sqlHelper.ExecuteScalar<string>("select dbType from cmsDataType where nodeId = @datadefinitionid", sqlHelper.CreateParameter("@datadefinitionid", _datatypedefinitionid));
+                        DBTypes DataTypeSQLType = GetDBType(dbtypestr);
+                        _DBType = DataTypeSQLType;
+                        _datafield = GetDataFieldName(_DBType);
+                    }
                 }
                 return _datafield;
             }            

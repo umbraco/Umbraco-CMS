@@ -15,8 +15,8 @@
     <key alias="disable">Deaktywuj</key>
     <key alias="emptyTrashcan">Opróżnij kosz</key>
     <key alias="exportDocumentType">Eksportuj typ dokumentu</key>
-    <key alias="exportDocumentTypeAsCode">TRANSLATE ME: 'Export to .NET'</key>
-    <key alias="exportDocumentTypeAsCode-Full">TRANSLATE ME: 'Export to .NET'</key>
+    <key alias="exportDocumentTypeAsCode">Ekspo .NET'</key>
+    <key alias="exportDocumentTypeAsCode-Full">Eksportuj do .NET'</key>
     <key alias="importDocumentType">Importuj typ dokumentu</key>
     <key alias="importPackage">Importuj zbiór</key>
     <key alias="liveEdit">Edytuj na stronie</key>
@@ -118,7 +118,7 @@
   </area>
   <area alias="dashboard">
     <key alias="browser">Przeglądaj swoją stronę</key>
-    <key alias="dontShowAgain">TRANSLATE ME: '- Hide'</key>
+    <key alias="dontShowAgain">- Ukryj</key>
     <key alias="nothinghappens">Jeśli Umbraco się nie otwiera, prawdopodbnie musisz zezwolić tej stronie na otwieranie wyskakujących okienek</key>
     <key alias="openinnew">zostało otwarte w nowym oknie</key>
     <key alias="restart">Restartuj</key>
@@ -168,7 +168,7 @@
     <key alias="confirmEmptyTrashcan">Proszę zaznaczyć, aby potwierdzić usunięcie %0% elementów.</key>
     <key alias="confirmlogout">Jesteś pewny?</key>
     <key alias="confirmSure">Jesteś pewny?</key>
-    <key alias="cut">TRANSLATE ME: 'Cut'</key>
+    <key alias="cut">Wytnij</key>
     <key alias="editdictionary">Edytuj element słownika</key>
     <key alias="editlanguage">Edytuj język</key>
     <key alias="insertAnchor">Wstaw link wewnętrzny</key>
@@ -183,7 +183,7 @@
     <key alias="linkinternal">Link wewnętrzny:</key>
     <key alias="linklocaltip">Kiedy używasz odnośników lokalnych, wstaw znak "#" na początku linku</key>
     <key alias="linknewwindow">Otworzyć w nowym oknie?</key>
-    <key alias="macroContainerSettings">TRANSLATE ME: 'Macro Settings'</key>
+    <key alias="macroContainerSettings">Ustawienia Makra</key>
     <key alias="macroDoesNotHaveProperties">To makro nie posiada żadnych właściwości, które można edytować</key>
     <key alias="paste">Wklej</key>
     <key alias="permissionsEdit">Edytuj Uprawnienia dla</key>
@@ -192,7 +192,7 @@
     <key alias="recycleBinWarning">Usunięcie elementów z kosza powoduje ich trwałe i nieodwracalne skasowanie</key>
     <key alias="regexSearchError"><![CDATA[Serwis <a target='_blank' href='http://regexlib.com'>regexlib.com</a> aktulanie nie jest dostępny, na co nie mamy wpływu. Bardzo przepraszamy za te utrudnienia.]]></key>
     <key alias="regexSearchHelp">Przeszukaj dla wyrażeń regularnych aby dodać regułę sprawdzającą do formularza. Np. 'email' 'url'</key>
-    <key alias="removeMacro">TRANSLATE ME: 'Remove Macro'</key>
+    <key alias="removeMacro">Usuń Makro</key>
     <key alias="requiredField">Pole wymagane</key>
     <key alias="sitereindexed">Strona została przeindeksowana</key>
     <key alias="siterepublished">Cache strony zostało odświeżone. Cała opublikowana zawartość jest teraz aktualna. Natomiast cała nieopublikowana zawartość ciągle nie jest widoczna</key>
@@ -222,7 +222,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
   <area alias="editdatatype">
     <key alias="addPrevalue">Dodaj wartość</key>
     <key alias="dataBaseDatatype">Typ bazydanych</key>
-    <key alias="guid">TRANSLATE ME: 'Data Editor GUID'</key>
+    <key alias="guid">Edytor GUID</key>
     <key alias="renderControl">Renderuj kontrolkę</key>
     <key alias="rteButtons">Przyciski</key>
     <key alias="rteEnableAdvancedSettings">Włącz ustawienia zaawansowane dla</key>
@@ -235,7 +235,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Dane zostały zapisane, lecz wystąpiły błędy które musisz poprawić przed publikacją strony:</key>
     <key alias="errorChangingProviderPassword">Bieżący dostawca Membership nie obsługuje zmiany hasła (EnablePasswordRetrieval musi mieć wartość true)</key>
-    <key alias="errorExistsWithoutTab">TRANSLATE ME: '%0% already exists'</key>
+    <key alias="errorExistsWithoutTab">%0% już istnieje</key>
     <key alias="errorHeader">Wystąpiły błędy:</key>
     <key alias="errorHeaderWithoutTab">Wystąpiły błędy:</key>
     <key alias="errorInPasswordFormat">Hasło powinno mieć minimum %0% znaków, i zawierać co najmniej %1% niealfanumeryczny znak</key>
@@ -308,7 +308,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="language">Język</key>
     <key alias="layout">układ</key>
     <key alias="loading">Ładowanie</key>
-    <key alias="locked">TRANSLATE ME: 'Locked'</key>
+    <key alias="locked">Zablokowany</key>
     <key alias="login">Zaloguj</key>
     <key alias="logoff">Wyloguj</key>
     <key alias="logout">Wyloguj</key>
@@ -332,7 +332,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="recycleBin">Kosz</key>
     <key alias="remaining">Pozostało</key>
     <key alias="rename">Zmień nazwę</key>
-    <key alias="renew">TRANSLATE ME: 'Renew'</key>
+    <key alias="renew">Odnów</key>
     <key alias="retry">Ponów próbę</key>
     <key alias="rights">Uprawnienia</key>
     <key alias="search">Szukaj</key>
@@ -341,7 +341,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="showPageOnSend">Pokaż stronę "wyślij"</key>
     <key alias="size">Rozmiar</key>
     <key alias="sort">Sortuj</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Zatwierdź</key>
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Szukaj</key>
     <key alias="up">W górę</key>
@@ -356,8 +356,8 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="welcome">Witaj...</key>
     <key alias="width">Szerokość</key>
     <key alias="yes">Tak</key>
-    <key alias="reorder">Reorder</key>
-    <key alias="reorderDone">I am done reordering</key>
+    <key alias="reorder">Zmień kolejność</key>
+    <key alias="reorderDone">Kolejność została zmieniona</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Kolor tła</key>
@@ -786,7 +786,7 @@ Miłego dnia!]]></key>
   <area alias="user">
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Pole kategorii</key>
-    <key alias="changePassword">TRANSLATE ME: 'Change Your Password'</key>
+    <key alias="changePassword">Zmień hasło!</key>
     <key alias="changePasswordDescription">TRANSLATE ME: 'You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button'</key>
     <key alias="contentChannel">Zawartość</key>
     <key alias="descriptionField">Opis</key>
@@ -800,10 +800,10 @@ Miłego dnia!]]></key>
     <key alias="modules">Sekcje</key>
     <key alias="noConsole">Wyłącz dostęp do Umbraco</key>
     <key alias="password">Hasło</key>
-    <key alias="passwordChanged">TRANSLATE ME: 'Your password has been changed!'</key>
-    <key alias="passwordConfirm">TRANSLATE ME: 'Please confirm the new password'</key>
-    <key alias="passwordEnterNew">TRANSLATE ME: 'Enter your new password'</key>
-    <key alias="passwordIsBlank">TRANSLATE ME: 'Your new password cannot be blank!'</key>
+    <key alias="passwordChanged">Twoje hasło zostało zmienione!</key>
+    <key alias="passwordConfirm">Proszę potwierdź nowe hasło!</key>
+    <key alias="passwordEnterNew">Wprowadź nowe hasło</key>
+    <key alias="passwordIsBlank">Nowe hasło nie może byc puste!</key>
     <key alias="passwordIsDifferent">TRANSLATE ME: 'There was a difference between the new password and the confirmed password. Please try again!'</key>
     <key alias="passwordMismatch">TRANSLATE ME: 'The confirmed password doesn't match the new password!'</key>
     <key alias="permissionReplaceChildren">Zastąp prawa dostępu dla węzłów potomnych</key>

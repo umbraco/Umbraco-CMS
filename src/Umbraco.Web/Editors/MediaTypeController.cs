@@ -11,6 +11,11 @@ using System.Net;
 using System.Net.Http;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Services;
+using Umbraco.Core.Models.EntityBase;
+using System;
+using System.ComponentModel;
+using System.Web.Http.Controllers;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Editors
 {
@@ -24,8 +29,21 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [EnableOverrideAuthorization]
+    [MediaTypeControllerControllerConfigurationAttribute]
     public class MediaTypeController : ContentTypeControllerBase
     {
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class MediaTypeControllerControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAllowedChildren", "contentId", typeof(int), typeof(Guid), typeof(string))));
+            }
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -49,6 +67,7 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.CountContentTypes();
         }
 
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public MediaTypeDisplay GetById(int id)
         {
             var ct = Services.ContentTypeService.GetMediaType(id);
@@ -169,7 +188,7 @@ namespace Umbraco.Web.Editors
 
 
         /// <summary>
-        /// Returns the allowed child content type objects for the content item id passed in
+        /// Returns the allowed child content type objects for the content item id passed in - based on an INT id
         /// </summary>
         /// <param name="contentId"></param>
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
@@ -211,6 +230,40 @@ namespace Umbraco.Web.Editors
             }
 
             return basics;
+        }
+
+        /// <summary>
+        /// Returns the allowed child content type objects for the content item id passed in - based on a GUID id
+        /// </summary>
+        /// <param name="contentId"></param>
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public IEnumerable<ContentTypeBasic> GetAllowedChildren(Guid contentId)
+        {
+            var entity = ApplicationContext.Services.EntityService.GetByKey(contentId);
+            if (entity != null)
+            {
+                return GetAllowedChildren(entity.Id);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+        
+        [Obsolete("Do not use this method, use either the overload with INT or GUID instead, this will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]        
+        public IEnumerable<ContentTypeBasic> GetAllowedChildren(string contentId)
+        {
+            foreach (var type in new[] { typeof(int), typeof(Guid) })
+            {
+                var parsed = contentId.TryConvertTo(type);
+                if (parsed)
+                {
+                    //oooh magic! will auto select the right overload
+                    return GetAllowedChildren((dynamic)parsed.Result);
+                }                    
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         /// <summary>

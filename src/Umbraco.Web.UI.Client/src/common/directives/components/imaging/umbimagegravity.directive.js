@@ -118,9 +118,13 @@ angular.module("umbraco.directives")
                             $timeout(function(){
                                 setDimensions();
                             });
-							var offsetX = $overlay[0].offsetLeft;
-							var offsetY = $overlay[0].offsetTop;
-                            calculateGravity(offsetX, offsetY);
+							// Make sure we can find the offset values for the overlay(dot) before calculating
+							// fixes issue with resize event when printing the page (ex. hitting ctrl+p inside the rte)
+							if($overlay.is(':visible')) {
+								var offsetX = $overlay[0].offsetLeft;
+								var offsetY = $overlay[0].offsetTop;
+								calculateGravity(offsetX, offsetY);
+							}
                         });
                     });
 

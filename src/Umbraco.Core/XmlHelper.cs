@@ -35,7 +35,7 @@ namespace Umbraco.Core
                 return;
             }
             if (n.Attributes[name] == null)
-            {                
+            {
                 var a = xml.CreateAttribute(name);
                 a.Value = value;
                 n.Attributes.Append(a);
@@ -155,7 +155,7 @@ namespace Umbraco.Core
             elt = null;
             return false;
         }
-        
+
         /// <summary>
         /// Sorts the children of a parentNode.
         /// </summary>
@@ -163,7 +163,7 @@ namespace Umbraco.Core
         /// <param name="childNodesXPath">An XPath expression to select children of <paramref name="parentNode"/> to sort.</param>
         /// <param name="orderBy">A function returning the value to order the nodes by.</param>
         internal static void SortNodes(
-            XmlNode parentNode, 
+            XmlNode parentNode,
             string childNodesXPath,
             Func<XmlNode, int> orderBy)
         {
@@ -227,7 +227,7 @@ namespace Umbraco.Core
         /// <param name="node">The child node to sort.</param>
         /// <param name="orderBy">A function returning the value to order the nodes by.</param>
         /// <returns>A value indicating whether sorting was needed.</returns>
-        /// <remarks>Assuming all nodes but <paramref name="node"/> are sorted, this will move the node to 
+        /// <remarks>Assuming all nodes but <paramref name="node"/> are sorted, this will move the node to
         /// the right position without moving all the nodes (as SortNodes would do) - should improve perfs.</remarks>
         internal static bool SortNode(
             XmlNode parentNode,
@@ -413,6 +413,25 @@ namespace Umbraco.Core
                 return child;
             }
             return AddTextNode(xd, name, value);
+        }
+
+        /// <summary>
+        /// Sets or creates an Xml node from its inner Xml.
+        /// </summary>
+        /// <param name="xd">The xmldocument.</param>
+        /// <param name="parent">The node to set or create the child text node on</param>
+        /// <param name="name">The node name.</param>
+        /// <param name="value">The node inner Xml.</param>
+        /// <returns>a XmlNode</returns>
+        public static XmlNode SetInnerXmlNode(XmlDocument xd, XmlNode parent, string name, string value)
+        {
+            if (xd == null) throw new ArgumentNullException("xd");
+            if (parent == null) throw new ArgumentNullException("parent");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+
+            var child = parent.SelectSingleNode(name) ?? xd.CreateNode(XmlNodeType.Element, name, "");
+            child.InnerXml = value;
+            return child;
         }
 
         /// <summary>

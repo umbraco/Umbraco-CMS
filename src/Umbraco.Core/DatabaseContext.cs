@@ -34,6 +34,12 @@ namespace Umbraco.Core
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;
+        private DateTime? _connectionLastChecked = null;
+
+        /// <summary>
+        /// The number of minutes to throttle the checks to CanConnect
+        /// </summary>
+        private const int ConnectionCheckMinutes = 1;
 
         [Obsolete("Use the constructor specifying all dependencies instead")]
         public DatabaseContext(IDatabaseFactory factory)
@@ -110,12 +116,27 @@ namespace Umbraco.Core
         {
             get
             {
-                if (IsDatabaseConfigured == false) return false;
-                var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
-                LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
-                return canConnect;
+                if (IsDatabaseConfigured == false)
+                    return false;
+
+                //Don't check again if the timeout period hasn't elapsed
+                //this ensures we don't keep checking the connection too many times in a row like during startup.
+                //Do check if the _connectionLastChecked is null which means we're just initializing or it could 
+                //not connect last time it was checked.
+                if ((_connectionLastChecked.HasValue && (DateTime.Now - _connectionLastChecked.Value).TotalMinutes > ConnectionCheckMinutes)
+                    || _connectionLastChecked.HasValue == false)
+                {
+                    var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
+                    LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
+
+                    _connectionLastChecked = canConnect == false ? null : (DateTime?) DateTime.Now;
+                    return canConnect;
+                }
+
+                return _connectionLastChecked.HasValue;
             }
         }
+
 
         /// <summary>
         /// Gets the configured umbraco db connection string.
@@ -174,7 +195,7 @@ namespace Umbraco.Core
         /// </summary>
         public void ConfigureEmbeddedDatabaseConnection()
         {
-            const string providerName = "System.Data.SqlServerCe.4.0";
+            const string providerName = Constants.DatabaseProviders.SqlCe;
 
             var connectionString = GetEmbeddedDatabaseConnectionString();
             SaveConnectionString(connectionString, providerName);
@@ -182,15 +203,10 @@ namespace Umbraco.Core
             var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
-                var engine = new SqlCeEngine(connectionString);
-                engine.CreateDatabase();
-
-                // SD: Pretty sure this should be in a using clause but i don't want to cause unknown side-effects here
-                // since it's been like this for quite some time
-                //using (var engine = new SqlCeEngine(connectionString))
-                //{
-                //    engine.CreateDatabase();    
-                //}
+                using (var engine = new SqlCeEngine(connectionString))
+                {
+                    engine.CreateDatabase();
+                }
             }
 
             Initialize(providerName);

@@ -10,7 +10,7 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-	[WeightedPlugin(1000)]
+	[Weight(1000)]
     public class ImageThumbnailProvider : AbstractThumbnailProvider
     {        
         protected override IEnumerable<string> SupportedExtensions

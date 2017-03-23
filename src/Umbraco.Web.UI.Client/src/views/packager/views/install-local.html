@@ -37,10 +37,8 @@
                             - <localize key="media_orClickHereToUpload">or click here to choose files</localize>
                         </div>
                         
-                        <div class="umb-info-local-item text-error" ng-if="vm.zipFile.uploadStatus === 'error'">
-                            {{vm.zipFile.serverErrorMessage}}
-                        </div>
                     </div>
+                    
                 </div>
 
 
@@ -51,6 +49,41 @@
 
             </form>
         </div>
+    </div>
+
+    <div ng-if="vm.state === 'uploading'">
+
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <a class="umb-package-details__back-link" href="" ng-click="vm.state = 'upload'">&larr; Upload another package</a>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
+
+        <div class="umb-packages-view-wrapper">
+
+            <div class="flex items-center justify-center">
+                <div class="umb-info-local-items">
+                    <div class="umb-package-icon">
+                        <i ng-if="!vm.localPackage.iconUrl" class="icon-box"></i>
+                    </div>
+                    <div class="umb-package-info">
+
+                        <h4 class="umb-info-local-item"><strong>Uploading package</strong></h4>
+
+                        <umb-progress-bar
+                            percentage="{{vm.zipFile.uploadProgress}}">
+                        </umb-progress-bar>
+
+                        <div class="umb-info-local-item text-error mt3" ng-if="vm.zipFile.uploadStatus === 'error'">
+                            {{ vm.zipFile.serverErrorMessage }}
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
     <div ng-if="vm.state === 'packageDetails'">
@@ -124,6 +157,19 @@
                             </div>
                             <div class="umb-info-local-item text-info">
                                 <p>{{vm.installState.status}}</p>
+                            </div>
+
+
+
+                            <div class="umb-info-local-item text-info"
+                                 ng-show="vm.installCompleted">
+                              
+                                <button type="button"
+                                       
+                                        class="btn btn-success flex-inline mt3"
+                                        ng-click="vm.reloadPage()">
+                                    Finish
+                                </button>
                             </div>
 
                         </div>

@@ -141,7 +141,7 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            if (container.ContainedObjectType != containerObjectType)
+            if (container.ContainerObjectType != containerObjectType)
             {
                 var ex = new InvalidOperationException("Not a " + objectTypeName + " container.");
                 return OperationStatus.Exception(evtMsgs, ex);
@@ -719,8 +719,13 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the ContentType</param>
         public void Save(IContentType contentType, int userId = 0)
         {
-	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this))
-				return;
+            if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this))
+                return;
+
+            if (string.IsNullOrWhiteSpace(contentType.Name))
+            {
+                throw new ArgumentException("Cannot save content type with empty name.");
+            }
 
             using (new WriteLock(Locker))
             {
@@ -799,7 +804,7 @@ namespace Umbraco.Core.Services
                     // of a different type, move them to the recycle bin, then permanently delete the content items.
                     // The main problem with this is that for every content item being deleted, events are raised...
                     // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
-                    
+
                     var deletedContentTypes = new List<IContentType>() {contentType};
                     deletedContentTypes.AddRange(contentType.Descendants().OfType<IContentType>());
 
@@ -807,7 +812,7 @@ namespace Umbraco.Core.Services
                     {
                         _contentService.DeleteContentOfType(deletedContentType.Id);
                     }
-                    
+
                     repository.Delete(contentType);
                     uow.Commit();
 

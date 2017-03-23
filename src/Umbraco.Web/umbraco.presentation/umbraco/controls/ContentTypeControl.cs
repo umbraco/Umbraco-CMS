@@ -2,6 +2,7 @@ using System;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Collections;
+using System.ComponentModel;
 using System.IO;
 using Umbraco.Core.IO;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace umbraco.controls
 	/// <summary>
 	/// Summary description for ContentTypeControl.
 	/// </summary>
+	[Obsolete("No longer used, will be removed in v8")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
 	public class ContentTypeControl : uicontrols.TabView
 	{
 		public event System.EventHandler OnSave;

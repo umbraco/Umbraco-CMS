@@ -30,6 +30,7 @@
         vm.openLightbox = openLightbox;
         vm.closeLightbox = closeLightbox;
         vm.search = search;
+        vm.installCompleted = false;
 
         var currSort = "Latest";
         //used to cancel any request in progress if another one needs to take it's place
@@ -215,10 +216,8 @@
                             localStorageService.set("packageInstallUri", result.postInstallationPath);
                         }
 
-                        //reload on next digest (after cookie)
-                        $timeout(function() {
-                            window.location.reload(true);
-                        });
+                        vm.installState.status = localizationService.localize("packager_installStateCompleted");
+                        vm.installCompleted = true;
 
                     },
                     error);
@@ -275,6 +274,13 @@
         function search(searchQuery) {
             vm.loading = true;
             searchDebounced();
+        }
+
+        vm.reloadPage = function () {
+            //reload on next digest (after cookie)
+            $timeout(function () {
+                window.location.reload(true);
+            });
         }
 
         init();

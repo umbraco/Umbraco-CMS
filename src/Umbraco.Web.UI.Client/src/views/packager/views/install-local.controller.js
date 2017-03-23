@@ -12,6 +12,7 @@
             status: "",
             progress:0
         };
+        vm.installCompleted = false;
         vm.zipFile = {
             uploadStatus: "idle",
             uploadProgress: 0,
@@ -33,15 +34,24 @@
                 fields: {},
                 file: file
             }).progress(function (evt) {
+                
+                // hack: in some browsers the progress event is called after success
+                // this prevents the UI from going back to a uploading state
+                if(vm.zipFile.uploadStatus !== "done" && vm.zipFile.uploadStatus !== "error") {
 
-                // calculate progress in percentage
-                var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+                    // set view state to uploading
+                    vm.state = 'uploading';
 
-                // set percentage property on file
-                vm.zipFile.uploadProgress = progressPercentage;
+                    // calculate progress in percentage
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
 
-                // set uploading status on file
-                vm.zipFile.uploadStatus = "uploading";
+                    // set percentage property on file
+                    vm.zipFile.uploadProgress = progressPercentage;
+
+                    // set uploading status on file
+                    vm.zipFile.uploadStatus = "uploading";
+
+                }
 
             }).success(function (data, status, headers, config) {
 
@@ -134,10 +144,10 @@
                             localStorageService.set("packageInstallUri", "installed");
                         }
 
-                        //reload on next digest (after cookie)
-                        $timeout(function () {
-                            $window.location.reload(true);
-                        });
+                        vm.installState.status = localizationService.localize("packager_installStateCompleted");
+                        vm.installCompleted = true;
+                        
+                        
 
                     },
                     installError);
@@ -146,6 +156,13 @@
         function installError() {
             //This will return a rejection meaning that the promise change above will stop
             return $q.reject();
+        }
+
+        vm.reloadPage = function() {
+            //reload on next digest (after cookie)
+            $timeout(function () {
+                $window.location.reload(true);
+            });
         }
     }
 

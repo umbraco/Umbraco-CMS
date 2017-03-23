@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -215,6 +216,17 @@ namespace Umbraco.Tests.Services
             result1 = macroService.GetById(result1.Id);
             Assert.AreEqual(2, result1.Properties.Count());
 
+        }
+
+        [Test]
+        public void Cannot_Save_Macro_With_Empty_Name()
+        {
+            // Arrange
+            var macroService = ServiceContext.MacroService;
+            var macro = new Macro("test", string.Empty, scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => macroService.Save(macro));
         }
 
         //[Test]

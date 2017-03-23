@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Security;
 using Umbraco.Core.Models;
 using umbraco;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Routing
@@ -62,34 +65,45 @@ namespace Umbraco.Web.Routing
             {
                 urls.Add(ui.Text("content", "getUrlException", umbracoContext.Security.CurrentUser));
             }
-            else if (url.StartsWith("#err-"))
+            else
             {
-                // route error, report
-                var id = int.Parse(url.Substring(5));
-                var o = umbracoContext.ContentCache.GetById(id);
-                string s;
-                if (o == null)
+                // test for collisions
+                var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
+                if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(UmbracoContext.Current.CleanedUmbracoUrl);
+                var pcr = new PublishedContentRequest(uri, UmbracoContext.Current.RoutingContext, UmbracoConfig.For.UmbracoSettings().WebRouting, s => Roles.Provider.GetRolesForUser(s));
+                pcr.Engine.TryRouteRequest();
+
+                if (pcr.HasPublishedContent == false)
                 {
-                    s = "(unknown)";
+                    urls.Add(ui.Text("content", "routeError", "(error)", umbracoContext.Security.CurrentUser));
+                }
+                else if (pcr.PublishedContent.Id != content.Id)
+                {
+                    var o = pcr.PublishedContent;
+                    string s;
+                    if (o == null)
+                    {
+                        s = "(unknown)";
+                    }
+                    else
+                    {
+                        var l = new List<string>();
+                        while (o != null)
+                        {
+                            l.Add(o.Name);
+                            o = o.Parent;
+                        }
+                        l.Reverse();
+                        s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
+
+                    }
+                    urls.Add(ui.Text("content", "routeError", s, umbracoContext.Security.CurrentUser));
                 }
                 else
                 {
-                    var l = new List<string>();
-                    while (o != null)
-                    {
-                        l.Add(o.Name);
-                        o = o.Parent;
-                    }
-                    l.Reverse();
-                    s = "/" + string.Join("/", l) + " (id=" + id + ")";
-
+                    urls.Add(url);
+                    urls.AddRange(urlProvider.GetOtherUrls(content.Id));
                 }
-                urls.Add(ui.Text("content", "routeError", s, umbracoContext.Security.CurrentUser));
-            }
-            else
-            {
-                urls.Add(url);
-                urls.AddRange(urlProvider.GetOtherUrls(content.Id));
             }
             return urls;
         }

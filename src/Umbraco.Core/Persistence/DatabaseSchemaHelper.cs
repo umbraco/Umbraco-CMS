@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence
 
         public void CreateTable(bool overwrite, Type modelType)
         {
-            var tableDefinition = DefinitionFactory.GetTableDefinition(modelType);
+            var tableDefinition = DefinitionFactory.GetTableDefinition(_syntaxProvider, modelType);
             var tableName = tableDefinition.Name;
 
             string createSql = _syntaxProvider.Format(tableDefinition);

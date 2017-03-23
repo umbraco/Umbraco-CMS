@@ -77,9 +77,13 @@ namespace umbraco
 
         #region Properties
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
-            get { return umbraco.BusinessLogic.Application.SqlHelper; }
+            get { return Application.SqlHelper; }
         }
 
         #endregion
@@ -1275,8 +1279,9 @@ namespace umbraco
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<preValues/>");
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
-                SqlHelper.CreateParameter("@dataTypeId", DataTypeId)))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader("Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
+                sqlHelper.CreateParameter("@dataTypeId", DataTypeId)))
             {
                 while (dr.Read())
                 {
@@ -1298,8 +1303,9 @@ namespace umbraco
         {
             try
             {
-                return SqlHelper.ExecuteScalar<string>("select [value] from cmsDataTypePreValues where id = @id",
-                                                       SqlHelper.CreateParameter("@id", Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    return sqlHelper.ExecuteScalar<string>("select [value] from cmsDataTypePreValues where id = @id",
+                        sqlHelper.CreateParameter("@id", Id));
             }
             catch
             {

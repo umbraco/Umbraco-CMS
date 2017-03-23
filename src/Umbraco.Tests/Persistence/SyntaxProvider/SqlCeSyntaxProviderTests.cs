@@ -51,7 +51,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var sqlSyntax = new SqlCeSyntaxProvider();
 
             var type = typeof (NodeDto);
-            var definition = DefinitionFactory.GetTableDefinition(type);
+            var definition = DefinitionFactory.GetTableDefinition(sqlSyntax, type);
 
             string create = sqlSyntax.Format(definition);
             string primaryKey = sqlSyntax.FormatPrimaryKey(definition);

@@ -491,6 +491,43 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Cannot_Create_User_With_Empty_Username()
+        {
+            // Arrange
+            var userService = ServiceContext.UserService;
+            var userType = userService.GetUserTypeByAlias("admin");
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io", userType));
+        }
+
+        [Test]
+        public void Cannot_Save_User_With_Empty_Username()
+        {
+            // Arrange
+            var userService = ServiceContext.UserService;
+            var userType = userService.GetUserTypeByAlias("admin");
+            var user = userService.CreateUserWithIdentity("John Doe", "john@umbraco.io", userType);
+            user.Username = string.Empty;
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => userService.Save(user));
+        }
+
+        [Test]
+        public void Cannot_Save_User_With_Empty_Name()
+        {
+            // Arrange
+            var userService = ServiceContext.UserService;
+            var userType = userService.GetUserTypeByAlias("admin");
+            var user = userService.CreateUserWithIdentity("John Doe", "john@umbraco.io", userType);
+            user.Name = string.Empty;
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => userService.Save(user));
+        }
+
+        [Test]
         public void Get_By_Profile_Username()
         {
             // Arrange

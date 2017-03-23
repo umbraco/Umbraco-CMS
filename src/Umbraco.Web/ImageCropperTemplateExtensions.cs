@@ -81,7 +81,7 @@ namespace Umbraco.Web
         /// Use focal point, to generate an output image using the focal point instead of the predefined crop
         /// </param>
         /// <param name="useCropDimensions">
-        /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters>.
+        /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters.
         /// </param>
         /// <param name="cacheBuster">
         /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated

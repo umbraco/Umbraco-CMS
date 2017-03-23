@@ -55,41 +55,46 @@ namespace umbraco.cms.businesslogic.propertytype
         {
             if (Id != 0)
             {
-                SqlHelper.ExecuteNonQuery(
-                    @"UPDATE 
-                        cmsPropertyTypeGroup 
-                    SET 
-                        contenttypeNodeId = @contentTypeId,
-                        sortOrder = @sortOrder,                        
-                        text = @name
-                    WHERE
-                        id = @id
-                ",
-                    SqlHelper.CreateParameter("@id", Id),
-                    SqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
-                    SqlHelper.CreateParameter("@sortOrder", SortOrder),
-                    SqlHelper.CreateParameter("@name", Name)
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery(
+                        @"UPDATE 
+                            cmsPropertyTypeGroup 
+                        SET 
+                            contenttypeNodeId = @contentTypeId,
+                            sortOrder = @sortOrder,                        
+                            text = @name
+                        WHERE
+                            id = @id
+                    ",
+                        sqlHelper.CreateParameter("@id", Id),
+                        sqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
+                        sqlHelper.CreateParameter("@sortOrder", SortOrder),
+                        sqlHelper.CreateParameter("@name", Name)
                     );
             }
             else
             {
                 if (SortOrder == -1)
-                    SortOrder = SqlHelper.ExecuteScalar<int>("select count(*) from cmsPropertyTypeGroup where contenttypeNodeId = @nodeId",
-                        SqlHelper.CreateParameter("@nodeId", ContentTypeId)) + 1;
+                    using (var sqlHelper = Application.SqlHelper)
+                        SortOrder = sqlHelper.ExecuteScalar<int>("select count(*) from cmsPropertyTypeGroup where contenttypeNodeId = @nodeId",
+                        sqlHelper.CreateParameter("@nodeId", ContentTypeId)) + 1;
 
-                SqlHelper.ExecuteNonQuery(
-                    @"
-                    INSERT INTO 
-                        cmsPropertyTypeGroup
-                        (contenttypeNodeId, sortOrder, text)
-                    VALUES 
-                        (@contentTypeId, @sortOrder, @name)
-                ",
-                    SqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
-                    SqlHelper.CreateParameter("@sortOrder", SortOrder),
-                    SqlHelper.CreateParameter("@name", Name)
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery(
+                        @"
+                        INSERT INTO 
+                            cmsPropertyTypeGroup
+                            (contenttypeNodeId, sortOrder, text)
+                        VALUES 
+                            (@contentTypeId, @sortOrder, @name)
+                    ",
+                        sqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
+                        sqlHelper.CreateParameter("@sortOrder", SortOrder),
+                        sqlHelper.CreateParameter("@name", Name)
                     );
-                Id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM [cmsPropertyTypeGroup]");
+
+                using (var sqlHelper = Application.SqlHelper)
+                    Id = sqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM [cmsPropertyTypeGroup]");
 
             }
         }
@@ -106,12 +111,14 @@ namespace umbraco.cms.businesslogic.propertytype
             foreach (var ptg in GetPropertyTypeGroups())
                 ptg.Delete();
 
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsPropertyTypeGroup WHERE id = @id", SqlHelper.CreateParameter("@id", Id));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("DELETE FROM cmsPropertyTypeGroup WHERE id = @id", sqlHelper.CreateParameter("@id", Id));
         }
 
         internal void Load()
         {
-            using (var dr = SqlHelper.ExecuteReader(@" SELECT contenttypeNodeId, sortOrder, text FROM cmsPropertyTypeGroup WHERE id = @id", SqlHelper.CreateParameter("@id", Id)))
+            using (var sqlHelper = Application.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader(@" SELECT contenttypeNodeId, sortOrder, text FROM cmsPropertyTypeGroup WHERE id = @id", sqlHelper.CreateParameter("@id", Id)))
             {
                 if (dr.Read())
                 {
@@ -132,7 +139,8 @@ namespace umbraco.cms.businesslogic.propertytype
         public static IEnumerable<PropertyTypeGroup> GetPropertyTypeGroupsFromContentType(int contentTypeId)
         {
             var ptgs = new List<PropertyTypeGroup>();
-            using (var dr = SqlHelper.ExecuteReader(@" SELECT id FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @contentTypeId", SqlHelper.CreateParameter("@contentTypeId", contentTypeId)))
+            using (var sqlHelper = Application.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader(@" SELECT id FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @contentTypeId", sqlHelper.CreateParameter("@contentTypeId", contentTypeId)))
             {
                 while (dr.Read())
                 {
@@ -144,9 +152,9 @@ namespace umbraco.cms.businesslogic.propertytype
         }
 
         /// <summary>
-        /// Gets the SQL helper.
+        /// Unused, please do not use
         /// </summary>
-        /// <value>The SQL helper.</value>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }

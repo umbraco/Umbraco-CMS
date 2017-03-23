@@ -3,6 +3,7 @@ using System.Collections;
 using System.Configuration.Provider;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -30,6 +31,8 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
+using System.Text.RegularExpressions;
+using System.Text;
 
 namespace umbraco.cms.presentation.user
 {
@@ -43,11 +46,16 @@ namespace umbraco.cms.presentation.user
             CurrentApp = DefaultApps.users.ToString();
         }
         protected HtmlTable macroProperties;
-        protected TextBox uname = new TextBox();
-        protected TextBox lname = new TextBox();
+        protected TextBox uname = new TextBox() { ID = "uname" };
+        protected RequiredFieldValidator unameValidator = new RequiredFieldValidator();
+        protected TextBox lname = new TextBox() { ID = "lname" };
+        protected RequiredFieldValidator lnameValidator = new RequiredFieldValidator();
+        protected CustomValidator lnameCustomValidator = new CustomValidator();
         protected PlaceHolder passw = new PlaceHolder();
         protected CheckBoxList lapps = new CheckBoxList();
-        protected TextBox email = new TextBox();
+        protected TextBox email = new TextBox() { ID = "email" };
+        protected RequiredFieldValidator emailValidator = new RequiredFieldValidator();
+        protected CustomValidator emailCustomValidator = new CustomValidator();
         protected DropDownList userType = new DropDownList();
         protected DropDownList userLanguage = new DropDownList();
         protected CheckBox NoConsole = new CheckBox();
@@ -148,8 +156,7 @@ namespace umbraco.cms.presentation.user
                 contentPicker.Value = "-1";
 
             content.Controls.Add(contentPicker);
-
-
+            
             // Add password changer
             var passwordChanger = (passwordChanger)LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
@@ -173,10 +180,20 @@ namespace umbraco.cms.presentation.user
             passw.Controls.Add(passwordChanger);
             passw.Controls.Add(validatorContainer);
 
-            pp.addProperty(ui.Text("user", "username", UmbracoUser), uname);
-            pp.addProperty(ui.Text("user", "loginname", UmbracoUser), lname);
+            var validationSummary = new ValidationSummary
+            {
+                ID = "validationSummary",
+                DisplayMode = ValidationSummaryDisplayMode.BulletList,
+                CssClass = "error"
+            };
+
+            pp.addProperty(validationSummary);
+
+            pp.addProperty(ui.Text("user", "username", UmbracoUser), uname, unameValidator);
+            pp.addProperty(ui.Text("user", "loginname", UmbracoUser), lname, lnameValidator, lnameCustomValidator);
             pp.addProperty(ui.Text("user", "password", UmbracoUser), passw);
-            pp.addProperty(ui.Text("email", UmbracoUser), email);
+
+            pp.addProperty(ui.Text("general", "email", UmbracoUser), email, emailValidator, emailCustomValidator);
             pp.addProperty(ui.Text("user", "usertype", UmbracoUser), userType);
             pp.addProperty(ui.Text("user", "language", UmbracoUser), userLanguage);
 
@@ -213,11 +230,55 @@ namespace umbraco.cms.presentation.user
             save.Text = ui.Text("save");
             save.ButtonType = MenuButtonType.Primary;
 
-            sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
+            sectionValidator.ServerValidate += SectionValidator_OnServerValidate;
             sectionValidator.ControlToValidate = lapps.ID;
             sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", UmbracoUser), UmbracoUser);
             sectionValidator.CssClass = "error";
             sectionValidator.Style.Add("color", "red");
+
+            unameValidator.ControlToValidate = uname.ID;
+            unameValidator.Display = ValidatorDisplay.Dynamic;
+            unameValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", UmbracoUser);
+            unameValidator.CssClass = "error";
+            unameValidator.Style.Add("color", "red");
+            unameValidator.Style.Add("margin-left", "5px");
+            unameValidator.Style.Add("line-height", "28px");
+
+            lnameValidator.ControlToValidate = lname.ID;
+            lnameValidator.Display = ValidatorDisplay.Dynamic;
+            lnameValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", UmbracoUser);
+            lnameValidator.CssClass = "error";
+            lnameValidator.Style.Add("color", "red");
+            lnameValidator.Style.Add("margin-left", "5px");
+            lnameValidator.Style.Add("line-height", "28px");
+
+            lnameCustomValidator.ServerValidate += LnameCustomValidator_OnServerValidate;
+            lnameCustomValidator.Display = ValidatorDisplay.Dynamic;
+            lnameCustomValidator.ControlToValidate = lname.ID;
+            var localizedLname = ui.Text("user", "loginname", UmbracoUser);
+            lnameCustomValidator.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", localizedLname, UmbracoUser);
+            lnameCustomValidator.CssClass = "error";
+            lnameCustomValidator.Style.Add("color", "red");
+            lnameCustomValidator.Style.Add("margin-left", "5px");
+            lnameCustomValidator.Style.Add("line-height", "28px");
+
+            emailValidator.ControlToValidate = email.ID;
+            emailValidator.Display = ValidatorDisplay.Dynamic;
+            emailValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", UmbracoUser);
+            emailValidator.CssClass = "error";
+            emailValidator.Style.Add("color", "red");
+            emailValidator.Style.Add("margin-left", "5px");
+            emailValidator.Style.Add("line-height", "28px");
+
+            emailCustomValidator.ServerValidate += EmailCustomValidator_OnServerValidate;
+            emailCustomValidator.Display = ValidatorDisplay.Dynamic;
+            emailCustomValidator.ControlToValidate = email.ID;
+            var localizedEmail = ui.Text("general", "email", UmbracoUser);
+            emailCustomValidator.ErrorMessage = ui.Text("errorHandling", "errorRegExpWithoutTab", localizedEmail, UmbracoUser);
+            emailCustomValidator.CssClass = "error";
+            emailCustomValidator.Style.Add("color", "red");
+            emailCustomValidator.Style.Add("margin-left", "5px");
+            emailCustomValidator.Style.Add("line-height", "28px");
 
             SetupForm();
             SetupChannel();
@@ -227,8 +288,18 @@ namespace umbraco.cms.presentation.user
                 .SyncTree(UID.ToString(), IsPostBack);
         }
 
+        private void LnameCustomValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            var usersWithLoginName = ApplicationContext.Services.UserService.GetByUsername(lname.Text);
+            args.IsValid = usersWithLoginName == null || usersWithLoginName.Id == u.Id;
+        }
 
-        void sectionValidator_ServerValidate(object source, ServerValidateEventArgs args)
+        private void EmailCustomValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            args.IsValid = MembershipProviderBase.IsEmailValid(email.Text.Trim());
+        }
+
+        private void SectionValidator_OnServerValidate(object source, ServerValidateEventArgs args)
         {
             args.IsValid = false;
 
@@ -250,13 +321,14 @@ namespace umbraco.cms.presentation.user
             }
 
             // Populate dropdowns
-            foreach (DocumentType dt in DocumentType.GetAllAsList())
-                cDocumentType.Items.Add(
-                    new ListItem(dt.Text, dt.Alias)
-                    );
+            var allContentTypes = Services.ContentTypeService.GetAllContentTypes().ToList();
+            foreach (var dt in allContentTypes)
+            {
+                cDocumentType.Items.Add(new ListItem(dt.Name, dt.Alias));
+            }
 
             // populate fields
-            ArrayList fields = new ArrayList();
+            var fields = new ArrayList();
             cDescription.ID = "cDescription";
             cCategories.ID = "cCategories";
             cExcerpt.ID = "cExcerpt";
@@ -264,9 +336,9 @@ namespace umbraco.cms.presentation.user
             cCategories.Items.Add(new ListItem(ui.Text("choose"), ""));
             cExcerpt.Items.Add(new ListItem(ui.Text("choose"), ""));
 
-            foreach (PropertyType pt in PropertyType.GetAll())
+            foreach (var pt in allContentTypes.SelectMany(x => x.PropertyTypes).OrderBy(x => x.Name))
             {
-                if (!fields.Contains(pt.Alias))
+                if (fields.Contains(pt.Alias) == false)
                 {
                     cDescription.Items.Add(new ListItem(string.Format("{0} ({1})", pt.Name, pt.Alias), pt.Alias));
                     cCategories.Items.Add(new ListItem(string.Format("{0} ({1})", pt.Name, pt.Alias), pt.Alias));
@@ -531,7 +603,9 @@ namespace umbraco.cms.presentation.user
             }
             else
             {
-                ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.error, 
+                    ui.Text("speechBubbles", "validationFailedHeader", UmbracoUser), 
+                    ui.Text("speechBubbles", "validationFailedMessage", UmbracoUser));
             }
         }
 

@@ -84,9 +84,10 @@ namespace Umbraco.Web.UI.Controls
             get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
         }
 
-		/// <summary>
-		/// Returns the legacy SqlHelper
-		/// </summary>
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
 		protected ISqlHelper SqlHelper
 		{
 			get { return Application.SqlHelper; }

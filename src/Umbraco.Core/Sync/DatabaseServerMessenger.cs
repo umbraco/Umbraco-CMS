@@ -29,7 +29,6 @@ namespace Umbraco.Core.Sync
     public class DatabaseServerMessenger : ServerMessengerBase
     {
         private readonly ApplicationContext _appContext;
-        private readonly DatabaseServerMessengerOptions _options;
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly ILogger _logger;
@@ -41,6 +40,7 @@ namespace Umbraco.Core.Sync
         private bool _released;
         private readonly ProfilingLogger _profilingLogger;
 
+        protected DatabaseServerMessengerOptions Options { get; private set; }
         protected ApplicationContext ApplicationContext { get { return _appContext; } }
 
         public DatabaseServerMessenger(ApplicationContext appContext, bool distributedEnabled, DatabaseServerMessengerOptions options)
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Sync
             if (options == null) throw new ArgumentNullException("options");
 
             _appContext = appContext;
-            _options = options;
+            Options = options;
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
             _profilingLogger = appContext.ProfilingLogger;
@@ -115,7 +115,17 @@ namespace Umbraco.Core.Sync
                     {
                         _released = true; // no more syncs
                     }
-                    _syncIdle.WaitOne(); // wait for pending sync
+
+                    // wait a max of 5 seconds and then return, so that we don't block
+                    // the entire MainDom callbacks chain and prevent the AppDomain from
+                    // properly releasing MainDom - a timeout here means that one refresher
+                    // is taking too much time processing, however when it's done we will
+                    // not update lastId and stop everything
+                    var idle =_syncIdle.WaitOne(5000);
+                    if (idle == false)
+                    {
+                        _logger.Warn<DatabaseServerMessenger>("The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
+                    }
                 },
                 weight);
 
@@ -154,14 +164,16 @@ namespace Umbraco.Core.Sync
                 else
                 {
                     //check for how many instructions there are to process
+                    //TODO: In 7.6 we need to store the count of instructions per row since this is not affective because there can be far more than one (if not thousands)
+                    // of instructions in a single row.
                     var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
-                    if (count > _options.MaxProcessingInstructionCount)
+                    if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
                         _logger.Warn<DatabaseServerMessenger>("The instruction count ({0}) exceeds the specified MaxProcessingInstructionCount ({1})."
                             + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
                             + " to the latest found in the database and maintain cache updates based on that Id.",
-                            () => count, () => _options.MaxProcessingInstructionCount);
+                            () => count, () => Options.MaxProcessingInstructionCount);
 
                         coldboot = true;
                     }
@@ -179,8 +191,8 @@ namespace Umbraco.Core.Sync
                         SaveLastSynced(maxId);
 
                     // execute initializing callbacks
-                    if (_options.InitializingCallbacks != null)
-                        foreach (var callback in _options.InitializingCallbacks)
+                    if (Options.InitializingCallbacks != null)
+                        foreach (var callback in Options.InitializingCallbacks)
                             callback();
                 }
 
@@ -198,12 +210,14 @@ namespace Umbraco.Core.Sync
                 if (_syncing)
                     return;
 
+                //Don't continue if we are released
                 if (_released)
                     return;
 
-                if ((DateTime.UtcNow - _lastSync).TotalSeconds <= _options.ThrottleSeconds)
+                if ((DateTime.UtcNow - _lastSync).TotalSeconds <= Options.ThrottleSeconds)
                     return;
 
+                //Set our flag and the lock to be in it's original state (i.e. it can be awaited)
                 _syncing = true;
                 _syncIdle.Reset();
                 _lastSync = DateTime.UtcNow;
@@ -215,7 +229,8 @@ namespace Umbraco.Core.Sync
                 {
                     ProcessDatabaseInstructions();
 
-                    if ((DateTime.UtcNow - _lastPruned).TotalSeconds <= _options.PruneThrottleSeconds)
+                    //Check for pruning throttling
+                    if ((_released || (DateTime.UtcNow - _lastPruned).TotalSeconds <= Options.PruneThrottleSeconds))
                         return;
 
                     _lastPruned = _lastSync;
@@ -231,7 +246,12 @@ namespace Umbraco.Core.Sync
             }
             finally
             {
-                _syncing = false;
+                lock (_locko)
+                {
+                    //We must reset our flag and signal any waiting locks
+                    _syncing = false;
+                }
+
                 _syncIdle.Set();
             }
         }
@@ -255,13 +275,17 @@ namespace Umbraco.Core.Sync
             //
             // FIXME not true if we're running on a background thread, assuming we can?
 
+
             var sql = new Sql().Select("*")
                 .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax)
                 .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
                 .OrderBy<CacheInstructionDto>(dto => dto.Id, _appContext.DatabaseContext.SqlSyntax);
 
-            var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
-            if (dtos.Count <= 0) return;
+            //only retrieve the top 100 (just in case there's tons)
+            // even though MaxProcessingInstructionCount is by default 1000 we still don't want to process that many
+            // rows in one request thread since each row can contain a ton of instructions (until 7.5.5 in which case
+            // a row can only contain MaxProcessingInstructionCount)
+            var topSql = _appContext.DatabaseContext.SqlSyntax.SelectTop(sql, 100);
 
             // only process instructions coming from a remote server, and ignore instructions coming from
             // the local server as they've already been processed. We should NOT assume that the sequence of
@@ -269,8 +293,22 @@ namespace Umbraco.Core.Sync
             var localIdentity = LocalIdentity;
 
             var lastId = 0;
-            foreach (var dto in dtos)
+
+            //tracks which ones have already been processed to avoid duplicates
+            var processed = new HashSet<RefreshInstruction>();
+
+            //It would have been nice to do this in a Query instead of Fetch using a data reader to save
+            // some memory however we cannot do thta because inside of this loop the cache refreshers are also
+            // performing some lookups which cannot be done with an active reader open
+            foreach (var dto in _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(topSql))
             {
+                //If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
+                // continue processing anything otherwise we'll hold up the app domain shutdown
+                if (_released)
+                {
+                    break;
+                }
+
                 if (dto.OriginIdentity == localIdentity)
                 {
                     // just skip that local one but update lastId nevertheless
@@ -291,25 +329,67 @@ namespace Umbraco.Core.Sync
                     continue;
                 }
 
-                // execute remote instructions & update lastId
-                try
-                {
-                    NotifyRefreshers(jsonA);
-                    lastId = dto.Id;
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<DatabaseServerMessenger>(
-                        string.Format("DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({0}: \"{1}\"). Instruction is being skipped/ignored", dto.Id, dto.Instructions), ex);
+                var instructionBatch = GetAllInstructions(jsonA);
 
-                    //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
-                    // will be thrown over and over. The only thing we can do is ignore and move on.
-                    lastId = dto.Id;
+                //process as per-normal
+                var success = ProcessDatabaseInstructions(instructionBatch, dto, processed, ref lastId);
+
+                //if they couldn't be all processed (i.e. we're shutting down) then exit
+                if (success == false)
+                {
+                    _logger.Info<DatabaseServerMessenger>("The current batch of instructions was not processed, app is shutting down");
+                    break;
                 }
+
             }
 
             if (lastId > 0)
                 SaveLastSynced(lastId);
+        }
+
+        /// <summary>
+        /// Processes the instruction batch and checks for errors
+        /// </summary>
+        /// <param name="instructionBatch"></param>
+        /// <param name="dto"></param>
+        /// <param name="processed">
+        /// Tracks which instructions have already been processed to avoid duplicates
+        /// </param>
+        /// <param name="lastId"></param>
+        /// <returns>
+        /// returns true if all instructions in the batch were processed, otherwise false if they could not be due to the app being shut down
+        /// </returns>
+        private bool ProcessDatabaseInstructions(IReadOnlyCollection<RefreshInstruction> instructionBatch, CacheInstructionDto dto, HashSet<RefreshInstruction> processed, ref int lastId)
+        {
+            // execute remote instructions & update lastId
+            try
+            {
+                var result = NotifyRefreshers(instructionBatch, processed);
+                if (result)
+                {
+                    //if all instructions we're processed, set the last id
+                    lastId = dto.Id;
+                }
+                return result;
+            }
+            //catch (ThreadAbortException ex)
+            //{
+            //    //This will occur if the instructions processing is taking too long since this is occuring on a request thread.
+            //    // Or possibly if IIS terminates the appdomain. In any case, we should deal with this differently perhaps...
+            //}
+            catch (Exception ex)
+            {
+                _logger.Error<DatabaseServerMessenger>(
+                    string.Format("DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions (id: {0}, instruction count: {1}). Instruction is being skipped/ignored", dto.Id, instructionBatch.Count), ex);
+
+                //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
+                // will be thrown over and over. The only thing we can do is ignore and move on.
+                lastId = dto.Id;
+                return false;
+            }
+
+            ////if this is returned it will not be saved
+            //return -1;
         }
 
         /// <summary>
@@ -322,7 +402,7 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void PruneOldInstructions()
         {
-            var pruneDate = DateTime.UtcNow.AddDays(-_options.DaysToRetainInstructions);
+            var pruneDate = DateTime.UtcNow.AddDays(-Options.DaysToRetainInstructions);
 
             // using 2 queries is faster than convoluted joins
 
@@ -459,8 +539,14 @@ namespace Umbraco.Core.Sync
             return jsonRefresher;
         }
 
-        private static void NotifyRefreshers(IEnumerable<JToken> jsonArray)
+        /// <summary>
+        /// Parses out the individual instructions to be processed
+        /// </summary>
+        /// <param name="jsonArray"></param>
+        /// <returns></returns>
+        private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken> jsonArray)
         {
+            var result = new List<RefreshInstruction>();
             foreach (var jsonItem in jsonArray)
             {
                 // could be a JObject in which case we can convert to a RefreshInstruction,
@@ -469,35 +555,64 @@ namespace Umbraco.Core.Sync
                 if (jsonObj != null)
                 {
                     var instruction = jsonObj.ToObject<RefreshInstruction>();
-                    switch (instruction.RefreshType)
-                    {
-                        case RefreshMethodType.RefreshAll:
-                            RefreshAll(instruction.RefresherId);
-                            break;
-                        case RefreshMethodType.RefreshByGuid:
-                            RefreshByGuid(instruction.RefresherId, instruction.GuidId);
-                            break;
-                        case RefreshMethodType.RefreshById:
-                            RefreshById(instruction.RefresherId, instruction.IntId);
-                            break;
-                        case RefreshMethodType.RefreshByIds:
-                            RefreshByIds(instruction.RefresherId, instruction.JsonIds);
-                            break;
-                        case RefreshMethodType.RefreshByJson:
-                            RefreshByJson(instruction.RefresherId, instruction.JsonPayload);
-                            break;
-                        case RefreshMethodType.RemoveById:
-                            RemoveById(instruction.RefresherId, instruction.IntId);
-                            break;
-                    }
-
+                    result.Add(instruction);
                 }
                 else
                 {
-                    var jsonInnerArray = (JArray) jsonItem;
-                    NotifyRefreshers(jsonInnerArray); // recurse
+                    var jsonInnerArray = (JArray)jsonItem;
+                    result.AddRange(GetAllInstructions(jsonInnerArray)); // recurse
                 }
             }
+            return result;
+        }
+
+        /// <summary>
+        /// executes the instructions against the cache refresher instances
+        /// </summary>
+        /// <param name="instructions"></param>
+        /// <param name="processed"></param>
+        /// <returns>
+        /// Returns true if all instructions were processed, otherwise false if the processing was interupted (i.e. app shutdown)
+        /// </returns>
+        private bool NotifyRefreshers(IEnumerable<RefreshInstruction> instructions, HashSet<RefreshInstruction> processed)
+        {
+            foreach (var instruction in instructions)
+            {
+                //Check if the app is shutting down, we need to exit if this happens.
+                if (_released)
+                {
+                    return false;
+                }
+
+                //this has already been processed
+                if (processed.Contains(instruction))
+                    continue;
+
+                switch (instruction.RefreshType)
+                {
+                    case RefreshMethodType.RefreshAll:
+                        RefreshAll(instruction.RefresherId);
+                        break;
+                    case RefreshMethodType.RefreshByGuid:
+                        RefreshByGuid(instruction.RefresherId, instruction.GuidId);
+                        break;
+                    case RefreshMethodType.RefreshById:
+                        RefreshById(instruction.RefresherId, instruction.IntId);
+                        break;
+                    case RefreshMethodType.RefreshByIds:
+                        RefreshByIds(instruction.RefresherId, instruction.JsonIds);
+                        break;
+                    case RefreshMethodType.RefreshByJson:
+                        RefreshByJson(instruction.RefresherId, instruction.JsonPayload);
+                        break;
+                    case RefreshMethodType.RemoveById:
+                        RemoveById(instruction.RefresherId, instruction.IntId);
+                        break;
+                }
+
+                processed.Add(instruction);
+            }
+            return true;
         }
 
         private static void RefreshAll(Guid uniqueIdentifier)

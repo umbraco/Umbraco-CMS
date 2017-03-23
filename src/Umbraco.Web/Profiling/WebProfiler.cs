@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Web;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
@@ -14,22 +15,23 @@ namespace Umbraco.Web.Profiling
     /// </summary>    
     internal class WebProfiler : IProfiler
     {
-        private StartupWebProfilerProvider _startupWebProfilerProvider;
+        private const string BootRequestItemKey = "Umbraco.Web.Profiling.WebProfiler__isBootRequest";
+        private WebProfilerProvider _provider;
+        private int _first;
 
         /// <summary>
         /// Constructor
         /// </summary>        
         internal WebProfiler()
         {
-            //setup some defaults
+            // create our own provider, which can provide a profiler even during boot
+            // MiniProfiler's default cannot because there's no HttpRequest in HttpContext
+            _provider = new WebProfilerProvider();
+
+            // settings
             MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
             MiniProfiler.Settings.StackMaxLength = 5000;
-
-            //At this point we know that we've been constructed during app startup, there won't be an HttpRequest in the HttpContext 
-            // since it hasn't started yet. So we need to do some hacking to enable profiling during startup.
-            _startupWebProfilerProvider = new StartupWebProfilerProvider();
-            //this should always be the case during startup, we'll need to set a custom profiler provider
-            MiniProfiler.Settings.ProfilerProvider = _startupWebProfilerProvider;
+            MiniProfiler.Settings.ProfilerProvider = _provider;
 
             //Binds to application events to enable the MiniProfiler with a real HttpRequest
             UmbracoApplicationBase.ApplicationInit += UmbracoApplicationApplicationInit;
@@ -57,43 +59,33 @@ namespace Umbraco.Web.Profiling
             }
         }
 
-        /// <summary>
-        /// Handle the begin request event
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void UmbracoApplicationEndRequest(object sender, EventArgs e)
-        {
-            if (_startupWebProfilerProvider != null)
-            {
-                Stop();
-                _startupWebProfilerProvider = null;
-            }
-            else if (CanPerformProfilingAction(sender))
-            {
-                Stop();
-            }
-        }
-
-        /// <summary>
-        /// Handle the end request event
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         void UmbracoApplicationBeginRequest(object sender, EventArgs e)
         {
-            if (_startupWebProfilerProvider != null)
+            // if this is the first request, notify our own provider that this request is the boot request
+            var first = Interlocked.Exchange(ref _first, 1) == 0;
+            if (first)
             {
-                _startupWebProfilerProvider.BootComplete();
+                _provider.BeginBootRequest();
+                ((HttpApplication)sender).Context.Items[BootRequestItemKey] = true;
+                // and no need to start anything, profiler is already there
             }
-
-            if (CanPerformProfilingAction(sender))
-            {
+            // else start a profiler, the normal way
+            else if (ShouldProfile(sender))
                 Start();
-            }
         }
 
-        private bool CanPerformProfilingAction(object sender)
+        void UmbracoApplicationEndRequest(object sender, EventArgs e)
+        {
+            // if this is the boot request, or if we should profile this request, stop
+            // (the boot request is always profiled, no matter what)
+            var isBootRequest = ((HttpApplication)sender).Context.Items[BootRequestItemKey] != null; // fixme perfs
+            if (isBootRequest)
+                _provider.EndBootRequest();
+            if (isBootRequest || ShouldProfile(sender))
+                Stop();
+        }
+
+        private bool ShouldProfile(object sender)
         {
             if (GlobalSettings.DebugMode == false) 
                 return false;
@@ -108,10 +100,10 @@ namespace Umbraco.Web.Profiling
                 return false;
 
             if (string.IsNullOrEmpty(request.Result.QueryString["umbDebug"]))
-                return true;
+                return false;
 
             if (request.Result.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
-                return true;
+                return false;
 
             return true;
         }
