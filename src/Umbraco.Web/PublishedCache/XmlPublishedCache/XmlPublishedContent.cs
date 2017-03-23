@@ -438,14 +438,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 contentType = getPublishedContentType(PublishedItemType.Content, docTypeAlias);
 
             }
-            catch (Exception e)
+            catch (InvalidOperationException e)
             {
-                if (e.TargetSite.Name == "CreatePublishedContentType")
-                {
-                    content.Instance.RefreshContentFromDatabase();
-                    throw new Exception(string.Format("The content cache failed to find a content type with alias \"{0}\". This usually indicates that the content cache is corrupt; the content cache has been rebuilt in an attempt to self-fix the issue.", docTypeAlias));
-                }
-                throw;
+                content.Instance.RefreshContentFromDatabase();
+                
+
+                throw new InvalidOperationException(
+                    string.Format("{0}. This usually indicates that the content cache is corrupt; the content cache has been rebuilt in an attempt to self-fix the issue.", 
+                    //keep the original message but don't use this as an inner exception because we want the above message to be displayed, if we use the inner exception
+                    //we can keep the stack trace but the header message will be the original message and the one we really want to display will be hidden below the fold.
+                    e.Message));
             }
             properties = new Dictionary<string, IPublishedProperty>(StringComparer.OrdinalIgnoreCase);
 
