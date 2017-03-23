@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ScriptsEditController($scope, $routeParams, $timeout, appState, editorState, navigationService, assetsService, codefileResource, contentEditingHelper, notificationsService, localizationService, templateHelper) {
+    function ScriptsEditController($scope, $routeParams, $timeout, appState, editorState, navigationService, assetsService, codefileResource, contentEditingHelper, notificationsService, localizationService, templateHelper, angularHelper) {
 
         var vm = this;
         var currentPosition = null;
@@ -169,8 +169,28 @@
                         });
                     }
 
+                    vm.editor.on("change", changeAceEditor);
+
             	}
             }
+
+            function changeAceEditor() {
+                setFormState("dirty");
+            }
+
+            function setFormState(state) {
+                
+                // get the current form
+                var currentForm = angularHelper.getCurrentForm($scope);
+
+                // set state
+                if(state === "dirty") {
+                    currentForm.$setDirty();
+                } else if(state === "pristine") {
+                    currentForm.$setPristine();
+                }
+            }
+
 
         }
 

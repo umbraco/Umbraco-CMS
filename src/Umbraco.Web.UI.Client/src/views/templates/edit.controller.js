@@ -264,6 +264,7 @@
                     //change on blur, focus
                     vm.editor.on("blur", persistCurrentLocation);
                     vm.editor.on("focus", persistCurrentLocation);
+                    vm.editor.on("change", changeAceEditor);
             	}
             }
             
@@ -630,6 +631,10 @@
 
         function persistCurrentLocation() {
             vm.currentPosition = vm.editor.getCursorPosition();
+        }
+
+        function changeAceEditor() {
+            setFormState("dirty");
         }
 
         function setFormState(state) {
