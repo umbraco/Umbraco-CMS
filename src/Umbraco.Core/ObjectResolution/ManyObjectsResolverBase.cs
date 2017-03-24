@@ -22,6 +22,7 @@ namespace Umbraco.Core.ObjectResolution
         private readonly string _httpContextKey;
         private readonly List<Type> _instanceTypes = new List<Type>();
         private IEnumerable<TResolved> _sortedValues;
+        private readonly Func<HttpContextBase> _httpContextGetter;
 
         private int _defaultPluginWeight = 100;
 
@@ -42,12 +43,7 @@ namespace Umbraco.Core.ObjectResolution
             if (logger == null) throw new ArgumentNullException("logger");
             CanResolveBeforeFrozen = false;
             if (scope == ObjectLifetimeScope.HttpRequest)
-            {
-                if (HttpContext.Current == null)
-                    throw new InvalidOperationException("Use alternative constructor accepting a HttpContextBase object in order to set the lifetime scope to HttpRequest when HttpContext.Current is null");
-
-                CurrentHttpContext = new HttpContextWrapper(HttpContext.Current);
-            }
+                _httpContextGetter = () => new HttpContextWrapper(HttpContext.Current);
 
             ServiceProvider = serviceProvider;
             Logger = logger;
@@ -84,7 +80,7 @@ namespace Umbraco.Core.ObjectResolution
             LifetimeScope = ObjectLifetimeScope.HttpRequest;
             _httpContextKey = GetType().FullName;
             ServiceProvider = serviceProvider;
-            CurrentHttpContext = httpContext;
+            _httpContextGetter = () => httpContext;
             _instanceTypes = new List<Type>();
 
             InitializeAppInstances();
@@ -160,7 +156,7 @@ namespace Umbraco.Core.ObjectResolution
         /// Gets or sets the <see cref="HttpContextBase"/> used to initialize this object, if any.
         /// </summary>
         /// <remarks>If not null, then <c>LifetimeScope</c> will be <c>ObjectLifetimeScope.HttpRequest</c>.</remarks>
-        protected HttpContextBase CurrentHttpContext { get; private set; }
+        protected HttpContextBase CurrentHttpContext { get { return _httpContextGetter == null ? null : _httpContextGetter(); } }
 
         /// <summary>
         /// Returns the service provider used to instantiate objects
@@ -196,7 +192,7 @@ namespace Umbraco.Core.ObjectResolution
         /// <summary>
         /// Gets or sets the default type weight.
         /// </summary>
-        /// <remarks>Determines the weight of types that do not have a <c>WeightAttribute</c> set on 
+        /// <remarks>Determines the weight of types that do not have a <c>WeightAttribute</c> set on
         /// them, when calling <c>GetSortedValues</c>.</remarks>
         protected virtual int DefaultPluginWeight
         {
@@ -276,7 +272,7 @@ namespace Umbraco.Core.ObjectResolution
         /// Removes a type.
         /// </summary>
         /// <param name="value">The type to remove.</param>
-        /// <exception cref="InvalidOperationException">the resolver does not support removing types, or 
+        /// <exception cref="InvalidOperationException">the resolver does not support removing types, or
         /// the type is not a valid type for the resolver.</exception>
         public virtual void RemoveType(Type value)
         {
@@ -296,7 +292,7 @@ namespace Umbraco.Core.ObjectResolution
         /// Removes a type.
         /// </summary>
         /// <typeparam name="T">The type to remove.</typeparam>
-        /// <exception cref="InvalidOperationException">the resolver does not support removing types, or 
+        /// <exception cref="InvalidOperationException">the resolver does not support removing types, or
         /// the type is not a valid type for the resolver.</exception>
         public void RemoveType<T>()
             where T : TResolved
@@ -309,7 +305,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <param name="types">The types to add.</param>
         /// <remarks>The types are appended at the end of the list.</remarks>
-        /// <exception cref="InvalidOperationException">the resolver does not support adding types, or 
+        /// <exception cref="InvalidOperationException">the resolver does not support adding types, or
         /// a type is not a valid type for the resolver, or a type is already in the collection of types.</exception>
         protected void AddTypes(IEnumerable<Type> types)
         {
@@ -336,7 +332,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <param name="value">The type to add.</param>
         /// <remarks>The type is appended at the end of the list.</remarks>
-        /// <exception cref="InvalidOperationException">the resolver does not support adding types, or 
+        /// <exception cref="InvalidOperationException">the resolver does not support adding types, or
         /// the type is not a valid type for the resolver, or the type is already in the collection of types.</exception>
         public virtual void AddType(Type value)
         {
@@ -362,7 +358,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <typeparam name="T">The type to add.</typeparam>
         /// <remarks>The type is appended at the end of the list.</remarks>
-        /// <exception cref="InvalidOperationException">the resolver does not support adding types, or 
+        /// <exception cref="InvalidOperationException">the resolver does not support adding types, or
         /// the type is not a valid type for the resolver, or the type is already in the collection of types.</exception>
         public void AddType<T>()
             where T : TResolved
@@ -404,7 +400,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <param name="index">The zero-based index at which the type should be inserted.</param>
         /// <param name="value">The type to insert.</param>
-        /// <exception cref="InvalidOperationException">the resolver does not support inserting types, or 
+        /// <exception cref="InvalidOperationException">the resolver does not support inserting types, or
         /// the type is not a valid type for the resolver, or the type is already in the collection of types.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is out of range.</exception>
         public virtual void InsertType(int index, Type value)
@@ -430,7 +426,7 @@ namespace Umbraco.Core.ObjectResolution
         /// Inserts a type at the beginning of the list.
         /// </summary>
         /// <param name="value">The type to insert.</param>
-        /// <exception cref="InvalidOperationException">the resolver does not support inserting types, or 
+        /// <exception cref="InvalidOperationException">the resolver does not support inserting types, or
         /// the type is not a valid type for the resolver, or the type is already in the collection of types.</exception>
         public virtual void InsertType(Type value)
         {
@@ -464,7 +460,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <param name="existingType">The existing type before which to insert.</param>
         /// <param name="value">The type to insert.</param>
-        /// <exception cref="InvalidOperationException">the resolver does not support inserting types, or 
+        /// <exception cref="InvalidOperationException">the resolver does not support inserting types, or
         /// one of the types is not a valid type for the resolver, or the existing type is not in the collection,
         /// or the new type is already in the collection of types.</exception>
         public virtual void InsertTypeBefore(Type existingType, Type value)
@@ -498,7 +494,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <typeparam name="TExisting">The existing type before which to insert.</typeparam>
         /// <typeparam name="T">The type to insert.</typeparam>
-        /// <exception cref="InvalidOperationException">the resolver does not support inserting types, or 
+        /// <exception cref="InvalidOperationException">the resolver does not support inserting types, or
         /// one of the types is not a valid type for the resolver, or the existing type is not in the collection,
         /// or the new type is already in the collection of types.</exception>
         public void InsertTypeBefore<TExisting, T>()
