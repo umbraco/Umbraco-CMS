@@ -489,6 +489,8 @@
     <key alias="searchResults">Søgeresultater</key>
     <key alias="reorder">Sorter</key>
     <key alias="reorderDone">Afslut sortering</key>
+    <key alias="showOrdinals">Show Ordinals</key>
+    <key alias="hideOrdinals">Hide Ordinals</key>
     <key alias="preview">Eksempel</key>
     <key alias="changePassword">Skift kodeord</key>
     <key alias="to">til</key>

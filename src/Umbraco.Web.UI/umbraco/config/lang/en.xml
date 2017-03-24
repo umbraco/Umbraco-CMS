@@ -514,6 +514,8 @@
     <key alias="searchResults">Search results</key>
     <key alias="reorder">Reorder</key>
     <key alias="reorderDone">I am done reordering</key>
+    <key alias="showOrdinals">Show Ordinals</key>
+    <key alias="hideOrdinals">Hide Ordinals</key>
     <key alias="preview">Preview</key>
     <key alias="changePassword">Change password</key>
     <key alias="to">to</key>

@@ -509,6 +509,8 @@
     <key alias="searchResults">Résultats de recherche</key>
     <key alias="reorder">Réorganiser</key>
     <key alias="reorderDone">J'ai fini de réorganiser</key>
+    <key alias="showOrdinals">Show Ordinals</key>
+    <key alias="hideOrdinals">Hide Ordinals</key>
     <key alias="preview">Prévisualiser</key>
     <key alias="changePassword">Modifier le mot de passe</key>
     <key alias="to">vers</key>

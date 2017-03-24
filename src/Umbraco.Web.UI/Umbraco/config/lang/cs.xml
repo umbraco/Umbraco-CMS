@@ -428,6 +428,8 @@
     <key alias="searchResults">Výsledky hledání</key>
     <key alias="reorder">Reorder</key>
     <key alias="reorderDone">I am done reordering</key>
+    <key alias="showOrdinals">Show Ordinals</key>
+    <key alias="hideOrdinals">Hide Ordinals</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>

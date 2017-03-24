@@ -519,6 +519,8 @@
     <key alias="searchResults">Zoekresultaten</key>
     <key alias="reorder">Herschik</key>
     <key alias="reorderDone">Ik ben klaar met herschikken</key>
+    <key alias="showOrdinals">Show Ordinals</key>
+    <key alias="hideOrdinals">Hide Ordinals</key>
     <key alias="preview">Voorvertoning</key>
     <key alias="changePassword">Wachtwoord veranderen</key>
     <key alias="to">naar</key>
