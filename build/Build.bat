@@ -1,4 +1,4 @@
-@ECHO OFF
+::@ECHO OFF
 
 :: UMBRACO CORE BUILD FILE
 ::
@@ -129,10 +129,25 @@ ECHO ################################################################
 ECHO Building Umbraco Core %VERSION%
 ECHO ################################################################
 
+ECHO.
+ECHO Locate MsBuild
+
 SET MSBUILDPATH=C:\Program Files (x86)\MSBuild\14.0\Bin
-SET MSBUILD="%MSBUILDPATH%\MsBuild.exe"
+IF EXIST "%MSBUILDPATH%\MsBuild.exe" GOTO :msbuild
+
+SET MSBUILDPATH=C:\Program Files (x86)\MSBuild\15.0\Bin
+IF EXIST "%MSBUILDPATH%\MsBuild.exe" GOTO :msbuild
+
+ECHO Could not locate MsBuild.exe
+GOTO :error
+
+:msbuild
+
 SET PATH="%MSBUILDPATH%";%PATH%
 SET NUGET=%CD%\..\src\.nuget\NuGet.exe
+SET MSBUILD="%MSBUILDPATH%\MsBuild.exe"
+
+ECHO Found MsBuild at %MSBUILDPATH%
 
 ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %RELEASE%
 
