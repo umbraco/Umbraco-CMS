@@ -1,21 +1,31 @@
-Umbraco Core Build Flow
+Umbraco Core Build
 --
 
 Core can be entirely built, including running the grunt/gulp UI build and creating the NuGet packages, from the `build.bat` script.
 
 ## Script Usage 
 
+### Parameters
+
 This script accepts the following parameters:
 
- - release:*number* : the release number, e.g. "6.0.0" or "1.20.4".
- - comment:*comment* : the release comment, e.g. "alpha002" or "beta001".
- - build:*number* : the build number, e.g. "6689". This number should only be specified on the integration server when continuously building Core and/or releasing nightlies.
- - nugetfolder:*folder* : the location where NuGet packages should be restored and read from. The default value is `src/packages`.
- - integration : the script should not pause on errors. 
- - nugetpkg: : the script should create the NuGet packages.
- - tests: the script should build the tests projects.
+`release:<release>` - the release number, e.g. "6.0.0" or "1.20.4".
 
-The script tries to read the release number and comment from the `UmbracoVersion.txt` file, then it overrides these values with those specified as arguments, if any, then it updates the `UmbracoVersion.txt` file again. That file does therefore not need to be edited manually.
+`comment:<comment>` - the release comment, e.g. "alpha002" or "beta001".
+
+`build:<number>` - the build number, e.g. "6689". This number should only be specified on the integration server when continuously building Core and/or releasing nightlies.
+
+`nugetfolder:<folder>` - the location where NuGet packages should be restored and read from. The default value is `src/packages`.
+
+`integration` - the script should not pause on errors.
+
+`nugetpkg` - the script should create the NuGet packages.
+
+`tests` - the script should build the tests projects.
+
+### Usage
+
+The script tries to read the release number and comment from the `Version.txt` file, then it overrides these values with those specified as arguments, if any, then it updates the `Version.txt` file again. That file does therefore not need to be edited manually.
  
 The release number, comment and build number are used to produce the final SemVer version of the build, e.g. "6.0.0", "1.20.4-beta001", "7.5.12+6689", "8.0.0-alpha045+6689".
  
@@ -27,16 +37,16 @@ Whenever commits are pushed to the GitHub repository, AppVeyor triggers a test b
 build -build:%APPVEYOR_BUILD_NUMBER% -tests -integration -nugetfolder:%PACKAGES%
 ```
  
-Thus reusing the release number and comment from `UmbracoVersion.txt` to compile everything, including tests. These tests are then executed.
+Thus reusing the release number and comment from `Version.txt` to compile everything, including tests. These tests are then executed.
 
 ## Development Releases
 
-In order to bump the version number, do: 
+In order to bump the version number, do e.g.: 
 ```
 build -release:7.6.0 -comment:beta001 -nugetpkg
 ```
 
-This will rebuild the version on your local environment, just to make sure it all works. Git should then report that `UmbracoVersion.txt`, `??` and `??` have been updated. Commit these files with a message reading "Version 7.6.0-alpha075" and tag this commit with "dev-7.6-alpha075".
+This will rebuild the version on your local environment, just to make sure it all works. Git should then report that `Version.txt`, `??` and `??` have been updated. Commit these files with a message reading "Version 7.6.0-alpha075" and tag this commit with "dev-7.6-alpha075".
 
 So you end up with one commit looking like:
 ```
@@ -52,7 +62,7 @@ In order to bump the version number, do:
 build -release:7.6.0
 ```
 
-This will rebuild the version on your local environment, just to make sure it all works. Git should then report that `UmbracoVersion.txt`, `??` and `??` have been updated. Commit these files with a message reading "Version 7.6.0" and tag this commit with "release-7.6.0".
+This will rebuild the version on your local environment, just to make sure it all works. Git should then report that `Version.txt`, `??` and `??` have been updated. Commit these files with a message reading "Version 7.6.0" and tag this commit with "release-7.6.0".
 
 So you end up with one commit looking like:
 ```
@@ -65,6 +75,10 @@ AppVeyor uses a copy of the `appveyor-release-script.cmd`. Keep them in sync. Th
 ```
 build -integration -nugetfolder:%PACKAGES% -nugetpkg
 ```
+
+## Dependencies
+
+Before you build, it is important to check the nuspec files for dependencies, and compare with packages.config, so that they are sync. Could we automate this?
 
 ## Notes
 

@@ -13,19 +13,19 @@
 ::   nugetpkg: create nuget package eg -nugetpkg
 ::   tests: build the tests eg -tests
 ::
-:: the script tries to read from UmbracoVersion.txt
+:: the script tries to read from Version.txt
 :: but release and comment can be overriden by args
-:: and in any case, the script updates UmbracoVersion.txt
+:: and in any case, the script updates Version.txt
 ::
 
 SET RELEASE=
 SET COMMENT=
 SET BUILD=
 
-:: Try to get the version and comment from UmbracoVersion.txt lines 2 and 3
-IF EXIST UmbracoVersion.txt (
-    FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED RELEASE SET RELEASE=%%i
-    FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED COMMENT SET COMMENT=%%i
+:: Try to get the version and comment from Version.txt lines 2 and 3
+IF EXIST Version.txt (
+    FOR /F "skip=1 delims=" %%i IN (Version.txt) DO IF NOT DEFINED RELEASE SET RELEASE=%%i
+    FOR /F "skip=2 delims=" %%i IN (Version.txt) DO IF NOT DEFINED COMMENT SET COMMENT=%%i
 )
 
 :: process args
@@ -110,13 +110,13 @@ GOTO processArgs
 
 IF [%RELEASE%] EQU [] (
     ECHO Could not determine release
-    ECHO Release is determined by the 'release' arg, or the UmbracoVersion.txt file
+    ECHO Release is determined by the 'release' arg, or the Version.txt file
     GOTO error 
 )
 
-ECHO # Usage: on line 2 put the release version, on line 3 put the version comment (example: beta)> UmbracoVersion.txt
-ECHO %RELEASE%>> UmbracoVersion.txt
-ECHO %COMMENT%>> UmbracoVersion.txt
+ECHO # Usage: on line 2 put the release version, on line 3 put the version comment (example: beta)> Version.txt
+ECHO %RELEASE%>> Version.txt
+ECHO %COMMENT%>> Version.txt
 
 
 :: run

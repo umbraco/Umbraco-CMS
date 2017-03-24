@@ -14,9 +14,9 @@ build_script:
     
     SET "comment="
 
-    FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
+    FOR /F "skip=1 delims=" %%i IN (Version.txt) DO IF NOT DEFINED release SET "release=%%i"
     
-    FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED comment SET "comment=%%i"
+    FOR /F "skip=2 delims=" %%i IN (Version.txt) DO IF NOT DEFINED comment SET "comment=%%i"
 
     ECHO AppVeyor Build %release% %comment% %APPVEYOR_BUILD_NUMBER%
     
