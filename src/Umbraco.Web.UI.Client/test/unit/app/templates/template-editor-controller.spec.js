@@ -49,7 +49,11 @@
                     setValue: function() {},
                     focus: function() {},
                     clearSelection: function() {},
-                    navigateFileStart: function() {}
+                    navigateFileStart: function() {},
+                    commands: {
+                        bindKey: function() {},
+                        addCommands: function() {}
+                    }
                 };
 
                 controller = createController();
@@ -107,7 +111,10 @@
                         getInsertPartialSnippet: function() { return ""; },
                         getQuerySnippet: function() { return ""; },
                         getRenderBodySnippet: function() { return ""; },
-                        getRenderSectionSnippet: function() { return ""; }
+                        getRenderSectionSnippet: function() { return ""; },
+                        getGeneralShortcuts: function() { return ""; },
+                        getEditorShortcuts: function() { return ""; },
+                        getTemplateEditorShortcuts: function() { return ""; }
                     }
                 });
             }
