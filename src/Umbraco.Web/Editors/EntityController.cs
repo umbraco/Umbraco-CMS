@@ -5,30 +5,17 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Web.Http;
-using System.Web.Http.ModelBinding;
 using AutoMapper;
-using ClientDependency.Core;
-using Examine.LuceneEngine;
-using Examine.LuceneEngine.Providers;
-using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
 using System.Net.Http;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
-using Umbraco.Web.WebApi.Filters;
-using umbraco.cms.businesslogic.packager;
 using Constants = Umbraco.Core.Constants;
 using Examine;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
 using Umbraco.Web.Dynamics;
-using umbraco;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
@@ -59,7 +46,7 @@ namespace Umbraco.Web.Editors
                     //This is a special case, we'll accept a String here so that we can get page members when the special "all-members" 
                     //id is passed in eventually we'll probably want to support GUID + Udi too
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPagedChildren", "id", typeof(int), typeof(string)),
-
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPath", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
@@ -166,7 +153,36 @@ namespace Umbraco.Web.Editors
 
             return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
-        
+
+        /// <summary>
+        /// Gets the path for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public IEnumerable<int> GetPath(Guid id, UmbracoEntityTypes type)
+        {
+            var foundContent = GetResultForKey(id, type);
+
+            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+        }
+
+        /// <summary>
+        /// Gets the path for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public IEnumerable<int> GetPath(Udi id, UmbracoEntityTypes type)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetPath(guidUdi.Guid, type);
+            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);            
+        }
+
         /// <summary>
         /// Gets the url of an entity
         /// </summary>

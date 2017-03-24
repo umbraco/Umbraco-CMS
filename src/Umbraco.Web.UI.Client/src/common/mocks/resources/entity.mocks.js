@@ -51,6 +51,10 @@ angular.module('umbraco.mocks').
                   .respond(returnEntitybyIds);
 
               $httpBackend
+                  .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetByIds'))
+                  .respond(returnEntitybyIds);
+
+              $httpBackend
                   .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetAncestors'))
                   .respond(returnEntitybyIds);
 

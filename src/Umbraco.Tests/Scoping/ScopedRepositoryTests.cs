@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Scoping
         public void Teardown()
         {
             if (_cacheHandler != null)
-                _cacheHandler.Destroy();
+                _cacheHandler.Unbind();
             _cacheHandler = null;
 
             ServerRegistrarResolver.Reset();
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(user.Id, globalCached.Id);
             Assert.AreEqual("name", globalCached.Name);
 
-            _cacheHandler = new CacheRefresherEventHandler();
+            _cacheHandler = new CacheRefresherEventHandler(true);
             _cacheHandler.OnApplicationStarted(null, ApplicationContext);
 
             Assert.IsNull(scopeProvider.AmbientScope);
@@ -171,7 +171,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(lang.Id, globalCached.Id);
             Assert.AreEqual("fr-FR", globalCached.IsoCode);
 
-            _cacheHandler = new CacheRefresherEventHandler();
+            _cacheHandler = new CacheRefresherEventHandler(true);
             _cacheHandler.OnApplicationStarted(null, ApplicationContext);
 
             Assert.IsNull(scopeProvider.AmbientScope);
@@ -263,7 +263,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual("item-key", globalCached.ItemKey);
 
-            _cacheHandler = new CacheRefresherEventHandler();
+            _cacheHandler = new CacheRefresherEventHandler(true);
             _cacheHandler.OnApplicationStarted(null, ApplicationContext);
 
             Assert.IsNull(scopeProvider.AmbientScope);

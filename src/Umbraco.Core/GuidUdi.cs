@@ -1,10 +1,12 @@
 using System;
+using System.ComponentModel;
 
 namespace Umbraco.Core
 {
     /// <summary>
     /// Represents a guid-based entity identifier.
     /// </summary>
+    [TypeConverter(typeof(UdiTypeConverter))]
     public class GuidUdi : Udi
     {
         /// <summary>

@@ -119,7 +119,7 @@ angular.module("umbraco")
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
             };
 
-            $scope.clickHandler = function(image, event, index) {
+            $scope.clickHandler = function (image, event, index) {
                 if (image.isFolder) {
                     if ($scope.disableFolderSelect) {
                         $scope.gotoFolder(image);
@@ -179,27 +179,49 @@ angular.module("umbraco")
                 $scope.activeDrag = false;
             };
 
+            function ensureWithinStartNode(node) {
+                // make sure that last opened node is on the same path as start node
+                var nodePath = node.path.split(",");
+
+                if (nodePath.indexOf($scope.startNodeId.toString()) !== -1) {
+                    $scope.gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder" });
+                    return true;
+                }
+                else {
+                    $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+                    return false;
+                }
+            }
+
+            function gotoStartNode(err) {
+                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+            }
+
             //default root item
             if (!$scope.target) {
                 if ($scope.lastOpenedNode && $scope.lastOpenedNode !== -1) {
                     entityResource.getById($scope.lastOpenedNode, "media")
-                        .then(function(node) {
-                                // make sure that las opened node is on the same path as start node
-                                var nodePath = node.path.split(",");
-
-                                if (nodePath.indexOf($scope.startNodeId.toString()) !== -1) {
-                                    $scope
-                                        .gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder" });
-                                } else {
-                                    $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
-                                }
-                            },
-                            function(err) {
-                                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
-                            });
-                } else {
-                    $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+                        .then(ensureWithinStartNode, gotoStartNode);
                 }
+                else {
+                    gotoStartNode();
+                }
+            }
+            else {
+                //if a target is specified, go look it up - generally this target will just contain ids not the actual full
+                //media object so we need to look it up
+                var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
+                var altText = $scope.target.altText;
+                mediaResource.getById(id)
+                    .then(function (node) {
+                        $scope.target = node;
+                        if (ensureWithinStartNode(node)) {
+                            selectImage(node);
+                            $scope.target.url = mediaHelper.resolveFile(node);
+                            $scope.target.altText = altText;
+                            $scope.openDetailsDialog();
+                        }
+                    }, gotoStartNode);
             }
 
             $scope.openDetailsDialog = function() {
@@ -308,15 +330,19 @@ angular.module("umbraco")
                     var folderImage = $scope.images[folderImageIndex];
                     var imageIsSelected = false;
 
-                    for (var selectedImageIndex = 0;
-                        selectedImageIndex < $scope.model.selectedImages.length;
-                        selectedImageIndex++) {
-                        var selectedImage = $scope.model.selectedImages[selectedImageIndex];
+                    if ($scope.model && angular.isArray($scope.model.selectedImages)) {
+                        for (var selectedImageIndex = 0;
+                            selectedImageIndex < $scope.model.selectedImages.length;
+                            selectedImageIndex++) {
+                            var selectedImage = $scope.model.selectedImages[selectedImageIndex];
 
-                        if (folderImage.key === selectedImage.key) {
-                            imageIsSelected = true;
+                            if (folderImage.key === selectedImage.key) {
+                                imageIsSelected = true;
+                            }
                         }
                     }
+                    
+
                     if (imageIsSelected) {
                         folderImage.selected = true;
                     }

@@ -237,6 +237,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.AreEqual("test-path-1.js", script.Path);
             Assert.AreEqual("/scripts/test-path-1.js", script.VirtualPath);
 
+            //ensure you can prefix the same path as the root path name
+            script = new Script("scripts/path-2/test-path-2.js") { Content = "// script" };
+            repository.AddOrUpdate(script);
+            unitOfWork.Commit();
+            Assert.IsTrue(_fileSystem.FileExists("scripts/path-2/test-path-2.js"));
+            Assert.AreEqual("scripts\\path-2\\test-path-2.js", script.Path); 
+            Assert.AreEqual("/scripts/scripts/path-2/test-path-2.js", script.VirtualPath);
+
             script = new Script("path-2/test-path-2.js") { Content = "// script" };
             repository.AddOrUpdate(script);
             unitOfWork.Commit();

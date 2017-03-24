@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Persistence
                 //assign the db context
                 dbContext,
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), new FileUnitOfWorkProvider(scopeProvider), cacheHelper, _logger, evtMsgs),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), cacheHelper, _logger, evtMsgs),
                 cacheHelper,
                 new ProfilingLogger(_logger, Mock.Of<IProfiler>()))
                 {

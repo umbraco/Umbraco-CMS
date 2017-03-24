@@ -300,10 +300,6 @@
       <Project>{D7636876-0756-43CB-A192-138C6F0D5E42}</Project>
       <Name>umbraco.providers</Name>
     </ProjectReference>
-    <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.7\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
@@ -321,6 +317,7 @@
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
+    <Compile Include="Extensions\UdiExtensions.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\AcceptableConfiguration.cs" />
     <Compile Include="HealthCheck\Checks\Config\ConfigurationService.cs" />
@@ -402,9 +399,14 @@
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
     <Compile Include="Profiling\WebProfilerProvider.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
+    <Compile Include="PropertyEditors\ContentPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePreValueEditor.cs" />
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />

@@ -198,6 +198,8 @@
     <Compile Include="Configuration\BaseRest\ExtensionElement.cs" />
     <Compile Include="Configuration\BaseRest\ExtensionElementCollection.cs" />
     <Compile Include="Configuration\BaseRest\MethodElement.cs" />
+    <Compile Include="Configuration\ContentXmlStorage.cs" />
+    <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
     <Compile Include="Configuration\Dashboard\AccessItem.cs" />
     <Compile Include="Configuration\Dashboard\AccessType.cs" />
@@ -218,7 +220,6 @@
     <Compile Include="Configuration\Dashboard\SectionElement.cs" />
     <Compile Include="Configuration\Dashboard\TabCollection.cs" />
     <Compile Include="Configuration\Dashboard\TabElement.cs" />
-    <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
@@ -322,6 +323,7 @@
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
+    <Compile Include="Diagnostics\MiniDump.cs" />
     <Compile Include="Deploy\ArtifactBase.cs" />
     <Compile Include="Deploy\ArtifactDependency.cs" />
     <Compile Include="Deploy\ArtifactDependencyCollection.cs" />
@@ -697,7 +699,6 @@
     <Compile Include="Models\ContentPreviewEntity.cs" />
     <Compile Include="Models\ContentTypeBase.cs" />
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
-    <Compile Include="Models\ContentTypeExtensions.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
     <Compile Include="Models\ContentXmlEntity.cs" />
     <Compile Include="Models\DeepCloneHelper.cs" />
@@ -1195,7 +1196,6 @@
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviders.cs" />
     <Compile Include="Persistence\TransactionType.cs" />
     <Compile Include="Persistence\UmbracoDatabase.cs" />
-    <Compile Include="Persistence\UnitOfWork\FileUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWorkProvider.cs" />

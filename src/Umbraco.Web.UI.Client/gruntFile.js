@@ -11,17 +11,17 @@ module.exports = function (grunt) {
     //TODO: Too much watching, this brings windows to it's knees when in dev mode
     //run by the watch task
     grunt.registerTask('watch-js', ['jshint:dev', 'concat', 'copy:app', 'copy:mocks', 'copy:canvasdesigner', 'copy:vs', 'karma:unit']);
-    grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'copy:canvasdesigner', 'copy:assets', 'copy:vs']);
+    grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:nonodes', 'recess:canvasdesigner', 'postcss', 'copy:canvasdesigner', 'copy:assets', 'copy:vs']);
     grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
     grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
     grunt.registerTask('watch-canvasdesigner', ['copy:canvasdesigner', 'concat:canvasdesignerJs', 'copy:vs']);
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
     //triggered from grunt
-    grunt.registerTask('build', ['concat', 'recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
+    grunt.registerTask('build', ['concat', 'recess:build', 'recess:installer', 'recess:nonodes', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
 
     //triggered from grunt dev vs or grunt vs
-    grunt.registerTask('build-dev', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'postcss', 'bower-install-simple', 'bower', 'copy']);
+    grunt.registerTask('build-dev', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'recess:nonodes', 'postcss', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -287,6 +287,16 @@ module.exports = function (grunt) {
                 files: {
                     '<%= distdir %>/assets/css/<%= pkg.name %>.css':
                     ['<%= src.less %>']
+                },
+                options: {
+                    compile: true,
+                    compress: true
+                }
+            },
+            nonodes: {
+                files: {
+                    '<%= distdir %>/assets/css/nonodes.style.min.css':
+                    ['src/less/pages/nonodes.less']
                 },
                 options: {
                     compile: true,

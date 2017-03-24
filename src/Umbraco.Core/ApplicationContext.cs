@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -163,7 +161,9 @@ namespace Umbraco.Core
     	/// </summary>
     	public static ApplicationContext Current { get; internal set; }
 
-        // fixme
+        /// <summary>
+        /// Gets the scope provider.
+        /// </summary>
         internal IScopeProvider ScopeProvider { get { return _databaseContext == null ? null : _databaseContext.ScopeProvider; } }
 
 		/// <summary>

@@ -874,18 +874,15 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Don't use! Only used internally to support the legacy events", false)]
         internal IEnumerable<Attempt<PublishStatus>> PublishWithSubs(int userId, bool includeUnpublished)
         {
-            PublishEventArgs e = new PublishEventArgs();
+            var e = new PublishEventArgs();
             FireBeforePublish(e);
 
-            IEnumerable<Attempt<PublishStatus>> publishedResults = Enumerable.Empty<Attempt<PublishStatus>>();
+            if (e.Cancel) return Enumerable.Empty<Attempt<PublishStatus>>();
 
-            if (!e.Cancel)
-            {
-                publishedResults = ApplicationContext.Current.Services.ContentService
-                    .PublishWithChildrenWithStatus(ContentEntity, userId, includeUnpublished);
+            var publishedResults = ApplicationContext.Current.Services.ContentService
+                .PublishWithChildrenWithStatus(ContentEntity, userId, includeUnpublished);
 
-                FireAfterPublish(e);
-            }
+            FireAfterPublish(e);
 
             return publishedResults;
         }
@@ -893,7 +890,6 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Don't use! Only used internally to support the legacy events", false)]
         internal Attempt<PublishStatus> SaveAndPublish(int userId)
         {
-            var result = Attempt.Fail(new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent, new EventMessages()));
             foreach (var property in GenericProperties)
             {
                 ContentEntity.SetValue(property.PropertyType.Alias, property.Value);
@@ -901,32 +897,28 @@ namespace umbraco.cms.businesslogic.web
 
             var saveArgs = new SaveEventArgs();
             FireBeforeSave(saveArgs);
+            if (saveArgs.Cancel) return Attempt.Fail(new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent, new EventMessages()));
 
-            if (!saveArgs.Cancel)
-            {
-                var publishArgs = new PublishEventArgs();
-                FireBeforePublish(publishArgs);
+            var publishArgs = new PublishEventArgs();
+            FireBeforePublish(publishArgs);
+            if (publishArgs.Cancel) return Attempt.Fail(new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent, new EventMessages()));
 
-                if (!publishArgs.Cancel)
-                {
-                    //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
-                    result = ApplicationContext.Current.Services.ContentService
-                        .SaveAndPublishWithStatus(ContentEntity, userId);
-                    base.VersionDate = ContentEntity.UpdateDate;
-                    this.UpdateDate = ContentEntity.UpdateDate;
+            //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
+            var result = ApplicationContext.Current.Services.ContentService
+                .SaveAndPublishWithStatus(ContentEntity, userId);
+            VersionDate = ContentEntity.UpdateDate;
+            UpdateDate = ContentEntity.UpdateDate;
 
-                    //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
-                    // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone
-                    // has bound to those events, I suppose we'll need to keep this here.
-                    base.Save();
+            //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
+            // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone
+            // has bound to those events, I suppose we'll need to keep this here.
+            base.Save();
 
-                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
-                    FireAfterSave(saveArgs);
+            //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
+            FireAfterSave(saveArgs);
 
-                    //Now we need to fire the After publish event
-                    FireAfterPublish(publishArgs);
-                }
-            }
+            //Now we need to fire the After publish event
+            FireAfterPublish(publishArgs);
 
             return result;
         }

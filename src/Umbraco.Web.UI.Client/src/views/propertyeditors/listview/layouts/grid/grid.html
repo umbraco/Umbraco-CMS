@@ -51,7 +51,7 @@
       </umb-file-dropzone>
 
       <umb-folder-grid
-         ng-if="folders.length > 0 && !vm.isRecycleBin"
+         ng-if="folders.length > 0"
          folders="folders"
          on-click="vm.selectFolder"
          on-click-name="vm.goToItem">
