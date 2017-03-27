@@ -8,8 +8,15 @@
             return "@Umbraco.GetDictionaryValue(\"" + nodeName + "\")";
         }
 
-        function getInsertPartialSnippet(nodeName) {
-            return "@Html.Partial(\"" + nodeName + "\")";
+        function getInsertPartialSnippet(parentId, nodeName) {
+
+            var partialViewName = nodeName.replace(".cshtml", "");
+
+            if(parentId) {
+                partialViewName = parentId + "/" + partialViewName;
+            }
+
+            return "@Html.Partial(\"" + partialViewName + "\")";
         }
 
         function getQuerySnippet(queryExpression) {

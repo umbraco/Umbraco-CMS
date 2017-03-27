@@ -23,9 +23,32 @@ describe('service: templateHelper', function () {
 
     describe('getInsertPartialSnippet', function () {
 
-        it('should return the snippet for inserting a partial', function () {
-            var snippet = '@Html.Partial("nodeName")';
-            expect(templateHelper.getInsertPartialSnippet("nodeName")).toBe(snippet);
+        it('should return the snippet for inserting a partial from the root', function () {
+            var parentId = "";
+            var nodeName = "Footer.cshtml";
+            var snippet = '@Html.Partial("Footer")';
+            expect(templateHelper.getInsertPartialSnippet(parentId, nodeName)).toBe(snippet);
+        });
+
+        it('should return the snippet for inserting a partial from a folder', function () {
+            var parentId = "Folder";
+            var nodeName = "Footer.cshtml";
+            var snippet = '@Html.Partial("Folder/Footer")';
+            expect(templateHelper.getInsertPartialSnippet(parentId, nodeName)).toBe(snippet);
+        });
+
+        it('should return the snippet for inserting a partial from a nested folder', function () {
+            var parentId = "Folder/NestedFolder";
+            var nodeName = "Footer.cshtml";
+            var snippet = '@Html.Partial("Folder/NestedFolder/Footer")';
+            expect(templateHelper.getInsertPartialSnippet(parentId, nodeName)).toBe(snippet);
+        });
+
+        it('should return the snippet for inserting a partial from a folder with spaces in its name', function () {
+            var parentId = "Folder with spaces";
+            var nodeName = "Footer.cshtml";
+            var snippet = '@Html.Partial("Folder with spaces/Footer")';
+            expect(templateHelper.getInsertPartialSnippet(parentId, nodeName)).toBe(snippet);
         });
         
     });
