@@ -156,7 +156,16 @@ namespace Umbraco.Core.ObjectResolution
         /// Gets or sets the <see cref="HttpContextBase"/> used to initialize this object, if any.
         /// </summary>
         /// <remarks>If not null, then <c>LifetimeScope</c> will be <c>ObjectLifetimeScope.HttpRequest</c>.</remarks>
-        protected HttpContextBase CurrentHttpContext { get { return _httpContextGetter == null ? null : _httpContextGetter(); } }
+        protected HttpContextBase CurrentHttpContext
+        {
+            get
+            {
+                var context = _httpContextGetter == null ? null : _httpContextGetter();
+                if (context == null)
+                    throw new InvalidOperationException("Cannot use this resolver with lifetime 'HttpRequest' when there is no current HttpContext. Either use the ctor accepting an HttpContextBase, or use the resolver from within a request exclusively.");
+                return context;
+            }
+        }
 
         /// <summary>
         /// Returns the service provider used to instantiate objects
