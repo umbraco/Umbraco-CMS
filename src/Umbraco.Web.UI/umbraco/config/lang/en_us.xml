@@ -972,7 +972,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="dictionaryItemSaved">Dictionary item saved</key>
     <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
     <key alias="editContentPublishedHeader">Content published</key>
-    <key alias="editContentPublishedText">and visible at the website</key>
+    <key alias="editContentPublishedText">and visible on the website</key>
     <key alias="editContentSavedHeader">Content saved</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
     <key alias="editContentSendToPublish">Sent For Approval</key>
