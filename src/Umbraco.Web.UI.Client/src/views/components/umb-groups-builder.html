@@ -87,7 +87,7 @@
 
                     <ng-form name="groupSortOrderForm">
                         <div class="umb-group-builder__group-sort-order" ng-if="sortingMode">
-                            <input name="groupSortOrder" type="number" class="umb-group-builder__group-sort-value" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue(tab)" required />
+                            <input name="groupSortOrder" type="number" class="umb-editor-tiny" style="margin-bottom: 0;" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue(tab)" required />
                             <div class="umb-validation-label -arrow-left" ng-if="groupSortOrderForm.groupSortOrder.$error.required && tab.showSortOrderMissing"><localize key="required"></localize></div>
                             <div class="umb-validation-label -arrow-left" ng-if="!tab.showSortOrderMissing" val-msg-for="groupSortOrder" val-toggle-msg="required"><localize key="required"></localize></div>
                         </div>
