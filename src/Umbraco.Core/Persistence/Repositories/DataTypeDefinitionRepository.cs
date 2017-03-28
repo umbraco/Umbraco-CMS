@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cache, logger, sqlSyntax)
         {
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);            
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -276,47 +276,33 @@ AND umbracoNode.id <> @id",
 
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
-            var cached = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
-            if (cached != null && cached.Any())
-            {
-                //return from the cache, ensure it's a cloned result
-                return (PreValueCollection)cached.First().DeepClone();
-            }
-
-            return GetAndCachePreValueCollection(dataTypeId);
+            var collection = GetCachedPreValueCollection(dataTypeId);
+            return collection;
         }
 
-        internal static string GetCacheKeyRegex(int preValueId)
-        {
-            return CacheKeys.DataTypePreValuesCacheKey + @"[-\d]+-([\d]*,)*" + preValueId + @"(?!\d)[,\d$]*";
-        }
-
+        /// <summary>
+        /// Gets a specific PreValue by its Id
+        /// </summary>
+        /// <param name="preValueId">Id of the PreValue to retrieve the value from</param>
+        /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int preValueId)
         {
-            //We need to see if we can find the cached PreValueCollection based on the cache key above
+            var collections = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_");
 
-            var cached = RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
-            if (cached != null && cached.Any())
-            {
-                //return from the cache
-                var collection = cached.First();
-				var preVal = collection.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
-				return preVal.Value.Value;
-            }
+            var preValue = collections.SelectMany(x => x.FormatAsDictionary().Values).FirstOrDefault(x => x.Id == preValueId);
+            if (preValue != null)
+                return preValue.Value;
 
-            //go and find the data type id for the pre val id passed in
-
-            var dto = Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @preValueId", new { preValueId = preValueId });
+            var dto = Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @preValueId", new { preValueId });
             if (dto == null)
-            {
                 return string.Empty;
-            }
-            // go cache the collection
-            var preVals = GetAndCachePreValueCollection(dto.DataTypeNodeId);
 
-            //return the single value for this id
-            var pv = preVals.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
-            return pv.Value.Value;
+            var collection = GetCachedPreValueCollection(dto.DataTypeNodeId);
+            if (collection == null)
+                return string.Empty;
+
+            preValue = collection.FormatAsDictionary().Values.FirstOrDefault(x => x.Id == preValueId);
+            return preValue == null ? string.Empty : preValue.Value;
         }
 
         public void AddOrUpdatePreValues(int dataTypeId, IDictionary<string, PreValue> values)
@@ -441,40 +427,28 @@ AND umbracoNode.id <> @id",
 
                 sortOrder++;
             }
-
         }
 
-        private string GetPrefixedCacheKey(int dataTypeId)
+        private static string GetPrefixedCacheKey(int dataTypeId)
         {
-            return CacheKeys.DataTypePreValuesCacheKey + dataTypeId + "-";
+            return CacheKeys.DataTypePreValuesCacheKey + "_" + dataTypeId;
         }
 
-        private PreValueCollection GetAndCachePreValueCollection(int dataTypeId)
+        private PreValueCollection GetCachedPreValueCollection(int datetypeId)
         {
-            //go get the data
-            var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = dataTypeId });
-            var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
-            var collection = PreValueConverter.ConvertToPreValuesCollection(list);
-
-            //now create the cache key, this needs to include all pre-value ids so that we can use this cached item in the GetPreValuesAsString method
-            //the key will be: "UmbracoPreValDATATYPEID-CSVOFPREVALIDS
-
-            var key = GetPrefixedCacheKey(dataTypeId)
-                      + string.Join(",", collection.FormatAsDictionary().Select(x => x.Value.Id).ToArray());
-
-            //store into cache
-            RuntimeCache.InsertCacheItem(key, () => collection,
-                //30 mins
-                new TimeSpan(0, 0, 30),
-                //sliding is true
-                true);
-
-            return collection;
+            var key = GetPrefixedCacheKey(datetypeId);
+            return RuntimeCache.GetCacheItem<PreValueCollection>(key, () =>
+            {
+                var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = datetypeId });
+                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
+                var collection = PreValueConverter.ConvertToPreValuesCollection(list);
+                return collection;
+            }, TimeSpan.FromMinutes(20), isSliding: true);
         }
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
-         
+
 
             var sql = new Sql();
             sql.Select("*")
@@ -576,7 +550,7 @@ AND umbracoNode.id <> @id",
                 }
 
                 //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
-                // in reality there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // in reality there is no need to check the uniqueness of this alias because the only way that this code executes is
                 // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
                 // must have unique aliases by definition, so there is no need for this additional check
 
@@ -596,10 +570,10 @@ AND umbracoNode.id <> @id",
                 {
                     throw new InvalidOperationException("Cannot update a pre value for a data type that has no identity");
                 }
-                
+
                 //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
                 // this causes issues when sorting the pre-values (http://issues.umbraco.org/issue/U4-5670) but in reality
-                // there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // there is no need to check the uniqueness of this alias because the only way that this code executes is
                 // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
                 // must have unique aliases by definition, so there is no need for this additional check
 
@@ -614,7 +588,7 @@ AND umbracoNode.id <> @id",
                 Database.Update(dto);
             }
 
-            
+
         }
 
         internal static class PreValueConverter
