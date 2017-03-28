@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.ObjectResolution;
@@ -17,11 +19,13 @@ namespace Umbraco.Core.PropertyEditors
     internal class ParameterEditorResolver : LazyManyObjectsResolverBase<ParameterEditorResolver, IParameterEditor>
     {
         private readonly ManifestBuilder _builder;
+        private readonly IContentSection _contentSection;
         
         public ParameterEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
             : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
         {
             _builder = builder;
+            _contentSection = UmbracoConfig.For.UmbracoSettings().Content;
         }
 
         /// <summary>
@@ -31,20 +35,27 @@ namespace Umbraco.Core.PropertyEditors
         {
             get
             {
-                //This will by default include all property editors and parameter editors but we need to filter this
-                //list to ensure that none of the property editors that do not have the IsParameterEditor flag set to true 
-                //are filtered.
-                var filtered = Values.Select(x => x as PropertyEditor)
-                                     .WhereNotNull()
-                                     .Where(x => x.IsParameterEditor == false);
-                
-                return Values
-                    //exclude the non parameter editor c# property editors
-                    .Except(filtered)
-                    //include the manifest parameter editors
-                    .Union(_builder.ParameterEditors)
-                    //include the manifest prop editors that are parameter editors
+                // all property editors and parameter editors
+                // except property editors where !IsParameterEditor
+                var values = Values
+                    .Where(x => x is PropertyEditor == false || ((PropertyEditor) x).IsParameterEditor);
+
+                // union all manifest parameter editors
+                values = values
+                    .Union(_builder.ParameterEditors);
+
+                // union all manifest property editors where IsParameterEditor
+                values = values
                     .Union(_builder.PropertyEditors.Where(x => x.IsParameterEditor));
+
+                if (_contentSection.ShowDeprecatedPropertyEditors == false)
+                {
+                    // except deprecated property editors
+                    values = values
+                        .Where(x => x is PropertyEditor == false || ((PropertyEditor) x).IsDeprecated == false);
+                }
+
+                return values;
             }
         }
 
