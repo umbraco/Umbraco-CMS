@@ -277,7 +277,7 @@ AND umbracoNode.id <> @id",
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
             var collection = GetCachedPreValueCollection(dataTypeId);
-            return collection == null ? null : (PreValueCollection) collection.DeepClone();
+            return collection;
         }
 
         public string GetPreValueAsString(int preValueId)
