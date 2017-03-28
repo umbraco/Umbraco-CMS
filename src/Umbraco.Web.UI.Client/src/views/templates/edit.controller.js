@@ -308,7 +308,7 @@
                             break;
 
                         case "partial":
-                            var code = templateHelper.getInsertPartialSnippet(model.insert.node.name);
+                            var code = templateHelper.getInsertPartialSnippet(model.insert.node.parentId, model.insert.node.name);
                             insert(code);
                             break;
                             
@@ -419,8 +419,8 @@
                 show: true,
                 title: localizationService.localize("template_insertPartialView"),
                 select: function(node){
-
-                    var code = templateHelper.getInsertPartialSnippet(node.name);
+                    
+                    var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
                     insert(code);
 
                     vm.partialItemOverlay.show = false;
