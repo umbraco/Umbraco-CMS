@@ -69,7 +69,7 @@ namespace Umbraco.Web.Models.Mapping
             // Adapted from ContentModelMapper
             //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             var parent = media.Parent();
-            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || ((ContentTypeService) contentTypeService).HasContainerInPath(parent.Path));
+            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));
 			
             //map the tree node url
             if (HttpContext.Current != null)

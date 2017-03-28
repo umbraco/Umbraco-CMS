@@ -88,7 +88,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             var parent = content.Parent();
-            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || ((ContentTypeService) contentTypeService).HasContainerInPath(parent.Path));
+            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));
 
             //map the tree node url
             if (HttpContext.Current != null)
@@ -214,6 +214,7 @@ namespace Umbraco.Web.Models.Mapping
             }
             if (content.HasPublishedVersion)
             {
+                //TODO: This is horribly inneficient
                 var published = applicationContext.Services.ContentService.GetPublishedVersion(content.Id);
                 return published.UpdateDate;
             }

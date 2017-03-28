@@ -72,12 +72,17 @@ namespace Umbraco.Core.Services
 
         }
 
-        internal bool HasContainerInPath(string contentPath)
+        /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        public bool HasContainerInPath(string contentPath)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 // can use same repo for both content and media
-                var repository = (ContentTypeRepository) RepositoryFactory.CreateContentTypeRepository(uow);
+                var repository = RepositoryFactory.CreateContentTypeRepository(uow);
                 return repository.HasContainerInPath(contentPath);
             }
         }

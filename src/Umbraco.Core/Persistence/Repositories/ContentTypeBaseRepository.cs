@@ -1251,7 +1251,12 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
             return test;
         }
 
-        internal bool HasContainerInPath(string contentPath)
+        /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        public bool HasContainerInPath(string contentPath)
         {
             var ids = contentPath.Split(',').Select(int.Parse);
             var sql = new Sql(@"SELECT COUNT(pk) FROM cmsContentType
