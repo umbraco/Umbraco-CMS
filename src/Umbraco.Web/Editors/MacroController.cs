@@ -10,6 +10,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Editors
 {
@@ -29,7 +30,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// Note that ALL logged in users have access to this method because editors will need to isnert macros into rte (content/media/members) and it's used for 
+        /// Note that ALL logged in users have access to this method because editors will need to isnert macros into rte (content/media/members) and it's used for
         /// inserting into templates/views/etc... it doesn't expose any sensitive data.
         /// </remarks>
         public IEnumerable<MacroParameter> GetMacroParameters(int macroId)
@@ -50,9 +51,9 @@ namespace Umbraco.Web.Editors
         /// <param name="pageId"></param>
         /// <param name="macroParams">
         /// To send a dictionary as a GET parameter the query should be structured like:
-        /// 
+        ///
         /// ?macroAlias=Test&pageId=3634&macroParams[0].key=myKey&macroParams[0].value=myVal&macroParams[1].key=anotherKey&macroParams[1].value=anotherVal
-        /// 
+        ///
         /// </param>
         /// <returns></returns>
         [HttpGet]
@@ -129,6 +130,26 @@ namespace Umbraco.Web.Editors
                 "text/html");
             return result;
         }
-        
+
+        [HttpPost]
+        public HttpResponseMessage CreatePartialViewMacroWithFile(CreatePartialViewMacroWithFileModel model)
+        {
+            var macro = new Macro
+            {
+
+                Alias = model.Filename,
+                Name = model.Filename, // will be "aliased"
+                ScriptPath = "~/Views/MacroPartials/" + model.Parent + "/" + model.Filename + ".cshtml"
+            };
+
+            Services.MacroService.Save(macro); // may throw
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        public class CreatePartialViewMacroWithFileModel
+        {
+            public string Parent { get; set; }
+            public string Filename { get; set; }
+        }
     }
 }
