@@ -64,7 +64,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var url = HealthCheckContext.HttpContext.Request.Url;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var useSsl = GlobalSettings.UseSSL || HealthCheckContext.HttpContext.Request.ServerVariables["SERVER_PORT"] == "443";
+            var serverVariables = HealthCheckContext.HttpContext.Request.ServerVariables;
+            var useSsl = GlobalSettings.UseSSL || serverVariables["SERVER_PORT"] == "443";
             var address = string.Format("http{0}://{1}:{2}", useSsl ? "s" : "", url.Host.ToLower(), url.Port);
             var request = WebRequest.Create(address);
             request.Method = "GET";
