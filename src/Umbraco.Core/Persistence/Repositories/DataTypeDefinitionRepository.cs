@@ -280,6 +280,11 @@ AND umbracoNode.id <> @id",
             return collection;
         }
 
+        /// <summary>
+        /// Gets a specific PreValue by its Id
+        /// </summary>
+        /// <param name="preValueId">Id of the PreValue to retrieve the value from</param>
+        /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int preValueId)
         {
             var collections = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_");
