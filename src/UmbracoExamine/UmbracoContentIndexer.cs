@@ -36,6 +36,7 @@ namespace UmbracoExamine
         private readonly IUserService _userService;
         private readonly IContentTypeService _contentTypeService;
         private readonly EntityXmlSerializer _serializer = new EntityXmlSerializer();
+        private const int PageSize = 2;
 
         #region Constructors
 
@@ -407,8 +408,7 @@ namespace UmbracoExamine
         {
             if (SupportedTypes.Contains(type) == false)
                 return;
-
-            const int pageSize = 10000;
+            
             var pageIndex = 0;
 
             DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
@@ -498,13 +498,13 @@ namespace UmbracoExamine
                                 IContent[] descendants;
                                 if (SupportUnpublishedContent)
                                 {
-                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "umbracoNode.id").ToArray();
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, PageSize, out total, "umbracoNode.id").ToArray();
                                 }
                                 else
                                 {
                                     //get all paged records but order by level ascending, we need to do this because we need to track which nodes are not published so that we can determine
                                     // which descendent nodes are implicitly not published
-                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null).ToArray();
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, PageSize, out total, "level", Direction.Ascending, true, (string)null).ToArray();
                                 }
 
                                 // need to store decendants count before filtering, in order for loop to work correctly
@@ -528,7 +528,7 @@ namespace UmbracoExamine
                                     content, notPublished).WhereNotNull(), type);
 
                                 pageIndex++;
-                            } while (currentPageSize == pageSize);
+                            } while (currentPageSize == PageSize);
                         }
 
                         break;
@@ -579,7 +579,6 @@ namespace UmbracoExamine
             Func<int, IContentBase> getContent)
             where TContentType: IContentTypeComposition
         {
-            const int pageSize = 10000;
             var pageIndex = 0;
 
             var contentTypes = getContentTypes();
@@ -593,7 +592,7 @@ namespace UmbracoExamine
 
                 if (parentId == -1)
                 {
-                    var pagedElements = getPagedXmlEntries("-1", pageIndex, pageSize);
+                    var pagedElements = getPagedXmlEntries("-1", pageIndex, PageSize);
                     xElements = pagedElements.Item1;
                     more = pagedElements.Item2;
                 }
@@ -604,7 +603,7 @@ namespace UmbracoExamine
                 }
                 else
                 {
-                    var pagedElements = getPagedXmlEntries(parent.Path, pageIndex, pageSize);
+                    var pagedElements = getPagedXmlEntries(parent.Path, pageIndex, PageSize);
                     xElements = pagedElements.Item1;
                     more = pagedElements.Item2;
                 }
