@@ -3,18 +3,19 @@
 //   Umbraco
 // </copyright>
 // <summary>
-//  The legacy media picker value converter
+//  The media picker 2 value converter
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Extensions;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -25,6 +26,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MediaPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
+        private readonly IDataTypeService _dataTypeService;
+
+        //TODO: Remove this ctor in v8 since the other one will use IoC
+        public MediaPickerPropertyConverter()
+            : this(ApplicationContext.Current.Services.DataTypeService)
+        {
+        }
+
+        public MediaPickerPropertyConverter(IDataTypeService dataTypeService)
+        {
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            _dataTypeService = dataTypeService;
+        }
+
         public Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
             return IsMultipleDataType(propertyType.DataTypeId) ? typeof(IEnumerable<IPublishedContent>) : typeof(IPublishedContent);
@@ -61,32 +76,21 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        private bool IsMultipleDataType(int dataTypeId)
+        public bool IsMultipleDataType(int dataTypeId)
         {
-            var multipleItems = false;
+            // GetPreValuesCollectionByDataTypeId is cached at repository level;
+            // still, the collection is deep-cloned so this is kinda expensive,
+            // better to cache here + trigger refresh in DataTypeCacheRefresher
 
-            try
+            return Storages.GetOrAdd(dataTypeId, id =>
             {
-                var dts = ApplicationContext.Current.Services.DataTypeService;
+                var preValue = _dataTypeService.GetPreValuesCollectionByDataTypeId(id)
+                    .PreValuesAsDictionary
+                    .FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase))
+                    .Value;
 
-                var multiPickerPreValues =
-                    dts.GetPreValuesCollectionByDataTypeId(dataTypeId).PreValuesAsDictionary;
-
-                var multiPickerPreValue = multiPickerPreValues.FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase)).Value;
-
-                var attemptConvert = multiPickerPreValue.Value.TryConvertTo<bool>();
-
-                if (attemptConvert.Success)
-                {
-                    multipleItems = attemptConvert.Result;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error<MediaPickerPropertyConverter>(string.Format("Error finding multipleItems data type prevalue on data type Id {0}", dataTypeId), ex);
-            }
-
-            return multipleItems;
+                return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
+            });
         }
 
         /// <summary>
@@ -174,6 +178,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
 
             return source;
+        }
+
+        private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();
+
+        internal static void ClearCaches()
+        {
+            Storages.Clear();
         }
     }
 }
