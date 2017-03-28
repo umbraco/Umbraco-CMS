@@ -1259,7 +1259,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         public bool HasContainerInPath(string contentPath)
         {
             var ids = contentPath.Split(',').Select(int.Parse);
-            var sql = new Sql(@"SELECT COUNT(pk) FROM cmsContentType
+            var sql = new Sql(@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN cmsContent ON cmsContentType.nodeId=cmsContent.contentType 
 WHERE cmsContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
             return Database.ExecuteScalar<int>(sql) > 0;
