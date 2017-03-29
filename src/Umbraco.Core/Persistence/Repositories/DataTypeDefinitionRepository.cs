@@ -287,7 +287,7 @@ AND umbracoNode.id <> @id",
         /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int preValueId)
         {
-            var collections = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_");
+            var collections = GlobalCache.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_");
 
             var preValue = collections.SelectMany(x => x.FormatAsDictionary().Values).FirstOrDefault(x => x.Id == preValueId);
             if (preValue != null)
@@ -437,7 +437,7 @@ AND umbracoNode.id <> @id",
         private PreValueCollection GetCachedPreValueCollection(int datetypeId)
         {
             var key = GetPrefixedCacheKey(datetypeId);
-            return RuntimeCache.GetCacheItem<PreValueCollection>(key, () =>
+            return GlobalCache.RuntimeCache.GetCacheItem<PreValueCollection>(key, () =>
             {
                 var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = datetypeId });
                 var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
