@@ -36,11 +36,11 @@
                 </div>
 
                 <umb-control-group label="Enter a file name" hide-label="false">
-                    <input type="text" name="fileName" ng-model="vm.fileName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+                    <input type="text" name="fileName" ng-model="vm.fileName" class="umb-textstring textstring input-block-level" umb-auto-focus required no-dirty-check />
 
                     <div>
                         <label class="checkbox">
-                            <input type="checkbox" name="createMacro" ng-model="vm.createMacro" ng-true-value="true" ng-false-value="false"/>
+                            <input type="checkbox" name="createMacro" ng-model="vm.createMacro" ng-true-value="true" ng-false-value="false" no-dirty-check/>
                             Create corresponding macro
                         </label>
                     </div>
@@ -71,7 +71,7 @@
                 </div>
 
                 <umb-control-group label="Enter a folder name" hide-label="false">
-                    <input type="text" name="folderName" ng-model="vm.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+                    <input type="text" name="folderName" ng-model="vm.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required no-dirty-check />
                 </umb-control-group>
 
                 <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
