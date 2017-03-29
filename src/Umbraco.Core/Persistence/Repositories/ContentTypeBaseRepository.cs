@@ -1250,5 +1250,19 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
             while (aliases.Contains(test = alias + i)) i++;
             return test;
         }
+
+        /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        public bool HasContainerInPath(string contentPath)
+        {
+            var ids = contentPath.Split(',').Select(int.Parse);
+            var sql = new Sql(@"SELECT COUNT(*) FROM cmsContentType
+INNER JOIN cmsContent ON cmsContentType.nodeId=cmsContent.contentType 
+WHERE cmsContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
     }
 }

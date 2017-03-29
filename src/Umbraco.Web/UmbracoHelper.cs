@@ -1389,10 +1389,15 @@ namespace Umbraco.Web
 			return test ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
 		}
 
-		#endregion
+        #endregion
 
         #region Prevalues
 
+        /// <summary>
+        /// Gets a specific PreValue by its Id
+        /// </summary>
+        /// <param name="id">Id of the PreValue to retrieve the value from</param>
+        /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int id)
         {
             return DataTypeService.GetPreValueAsString(id);
