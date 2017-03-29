@@ -81,7 +81,7 @@
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLoginInfo = externalLoginInfo;
         $scope.resetPasswordCodeInfo = resetPasswordCodeInfo;
-        $scope.backgroundImage = "assets/img/installer.jpg";
+        $scope.backgroundImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;
 
         $scope.activateKonamiMode = function () {
             if ($cookies.konamiLogin == "1") {
