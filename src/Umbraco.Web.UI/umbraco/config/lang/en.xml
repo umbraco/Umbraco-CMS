@@ -201,6 +201,7 @@
     <key alias="newDataType">New data type</key>
     <key alias="newJavascriptFile">New javascript file</key>
     <key alias="newEmptyPartialView">New empty partial view</key>
+    <key alias="newPartialViewMacro">New partial view macro</key>
     <key alias="newPartialViewFromSnippet">New partial view from snippet</key>
     <key alias="newEmptyPartialViewMacro">New empty partial view macro</key>
     <key alias="newPartialViewMacroFromSnippet">New partial view macro from snippet</key>
