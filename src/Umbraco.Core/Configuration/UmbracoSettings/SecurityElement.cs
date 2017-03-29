@@ -34,6 +34,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement<string>("authCookieDomain", null); }
         }
 
+
+        [ConfigurationProperty("loginBackgroundImage")]
+        internal InnerTextConfigurationElement<string> LoginBackgroundImage
+        {
+            get { return GetOptionalTextElement("loginBackgroundImage", string.Empty); }
+        }
+
         bool ISecuritySection.KeepUserLoggedIn
         {
             get { return KeepUserLoggedIn; }
@@ -57,6 +64,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string ISecuritySection.AuthCookieDomain
         {
             get { return AuthCookieDomain; }
+        }
+        string ISecuritySection.LoginBackgroundImage
+        {
+            get { return LoginBackgroundImage; }
         }
     }
 }
