@@ -72,6 +72,9 @@ namespace Umbraco.Core.Persistence.Factories
                 content.PublishedVersionGuid = publishedDto == null
                     ? (dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId)
                     : publishedDto.VersionId;
+                content.PublishedDate = publishedDto == null
+                    ? (dto.DocumentPublishedReadOnlyDto == null ? default(DateTime) : dto.DocumentPublishedReadOnlyDto.VersionDate)
+                    : publishedDto.VersionDate;
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946

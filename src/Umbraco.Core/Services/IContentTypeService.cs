@@ -11,6 +11,13 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentTypeService : IService
     {
+        /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        bool HasContainerInPath(string contentPath);
+
         int CountContentTypes();
         int CountMediaTypes();
 

@@ -513,11 +513,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 dto.DocumentPublishedReadOnlyDto = new DocumentPublishedReadOnlyDto
                 {
                     VersionId = dto.VersionId,
+                    VersionDate = dto.UpdateDate,
                     Newest = true,
                     NodeId = dto.NodeId,
-                    Published = true
+                    Published = true               
                 };
-                ((Content)entity).PublishedVersionGuid = dto.VersionId;
+                ((Content) entity).PublishedVersionGuid = dto.VersionId;
+                ((Content) entity).PublishedDate = dto.UpdateDate;
             }
 
             entity.ResetDirtyProperties();
@@ -688,22 +690,26 @@ namespace Umbraco.Core.Persistence.Repositories
                 dto.DocumentPublishedReadOnlyDto = new DocumentPublishedReadOnlyDto
                 {
                     VersionId = dto.VersionId,
+                    VersionDate = dto.UpdateDate,
                     Newest = true,
                     NodeId = dto.NodeId,
                     Published = true
                 };
-                ((Content)entity).PublishedVersionGuid = dto.VersionId;
+                ((Content) entity).PublishedVersionGuid = dto.VersionId;
+                ((Content) entity).PublishedDate = dto.UpdateDate;
             }
             else if (publishedStateChanged)
             {
                 dto.DocumentPublishedReadOnlyDto = new DocumentPublishedReadOnlyDto
                 {
-                    VersionId = default(Guid),
+                    VersionId = default (Guid),
+                    VersionDate = default (DateTime),
                     Newest = false,
                     NodeId = dto.NodeId,
                     Published = false
                 };
-                ((Content)entity).PublishedVersionGuid = default(Guid);
+                ((Content) entity).PublishedVersionGuid = default(Guid);
+                ((Content) entity).PublishedDate = default (DateTime);
             }
 
             entity.ResetDirtyProperties();
@@ -975,7 +981,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             }            
 
             //order by update date DESC, if there is corrupted published flags we only want the latest!
-            var publishedSql = new Sql(@"SELECT cmsDocument.nodeId, cmsDocument.published, cmsDocument.versionId, cmsDocument.newest
+            var publishedSql = new Sql(@"SELECT cmsDocument.nodeId, cmsDocument.published, cmsDocument.versionId, cmsDocument.updateDate, cmsDocument.newest
 FROM cmsDocument INNER JOIN cmsContentVersion ON cmsContentVersion.VersionId = cmsDocument.versionId
 WHERE cmsDocument.published = 1 AND cmsDocument.nodeId IN 
 (" + parsedOriginalSql + @")
