@@ -81,6 +81,7 @@
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLoginInfo = externalLoginInfo;
         $scope.resetPasswordCodeInfo = resetPasswordCodeInfo;
+        $scope.backgroundImage = "assets/img/installer.jpg";
 
         $scope.activateKonamiMode = function () {
             if ($cookies.konamiLogin == "1") {
