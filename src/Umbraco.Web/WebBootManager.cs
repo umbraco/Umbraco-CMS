@@ -579,6 +579,15 @@ namespace Umbraco.Web
             // is complete and cancel this current event so the rebuild process doesn't start right now.
             args.Cancel = true;
             IndexesToRebuild.Add((BaseIndexProvider)args.Indexer);
+
+            //check if the index is rebuilding due to an error and log it
+            if (args.IsHealthy == false)
+            {
+                var baseIndex = args.Indexer as BaseIndexProvider;
+                var name = baseIndex != null ? baseIndex.Name : "[UKNOWN]";
+
+                ProfilingLogger.Logger.Error<WebBootManager>(string.Format("The index {0} is rebuilding due to being unreadable/corrupt", name), args.UnhealthyException);
+            }
         }
     }
 }
