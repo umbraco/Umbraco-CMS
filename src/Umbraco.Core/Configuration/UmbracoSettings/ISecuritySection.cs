@@ -11,7 +11,5 @@
         string AuthCookieName { get; }
 
         string AuthCookieDomain { get; }
-
-        string LoginBackgroundImage { get; }
     }
 }

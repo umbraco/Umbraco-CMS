@@ -394,10 +394,10 @@ namespace Umbraco.Web.Editors
                             },
                             {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
                             {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
-                            { "allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
-                            { "loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Security.LoginBackgroundImage},
-                                        }
-    },
+                            {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
+                            {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
+                        }
+                    },
                     {
                         "umbracoPlugins", new Dictionary<string, object>
                         {
