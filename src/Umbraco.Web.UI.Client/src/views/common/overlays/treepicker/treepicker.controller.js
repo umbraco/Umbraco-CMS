@@ -10,6 +10,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         $scope.treeAlias = dialogOptions.treeAlias;
         $scope.multiPicker = dialogOptions.multiPicker;
         $scope.hideHeader = true;
+        // if you need to load a not initialized tree set this value to false - default is true
+        $scope.onlyInitialized = dialogOptions.onlyInitialized;
         $scope.searchInfo = {
             searchFromId: dialogOptions.startNodeId,
             searchFromName: null,

@@ -175,6 +175,7 @@ namespace Umbraco.Web.Mvc
         public IModelBinder GetBinder(Type modelType)
         {
             // can bind to RenderModel (exact type match)
+            // You might be tempted to change this to IRenderModel but do not change this: http://issues.umbraco.org/issue/U4-8216
             if (modelType == typeof(RenderModel)) return this;
 
             // can bind to RenderModel<TContent> (exact generic type match)
