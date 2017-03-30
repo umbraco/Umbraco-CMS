@@ -348,8 +348,8 @@
       <Name>umbraco.providers</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.5.96, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.5\lib\Umbraco.ModelsBuilder.dll</HintPath>
+    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.6.97, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.6\lib\Umbraco.ModelsBuilder.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
