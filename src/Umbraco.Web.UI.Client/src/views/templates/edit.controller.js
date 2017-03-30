@@ -419,6 +419,12 @@
                 multiPicker: false,
                 show: true,
                 title: localizationService.localize("template_insertPartialView"),
+                filter: function(i) {
+                    if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
+                        return true;
+                    }
+                },
+                filterCssClass: "not-allowed",
                 select: function(node){
                     
                     var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
