@@ -131,9 +131,8 @@ namespace Umbraco.Core.Packaging
                 {
                     foreach (var zipArchiveEntry in zipArchive.Entries)
                     {
-                        FileAttributes attr = File.GetAttributes(zipArchiveEntry.FullName);
 
-                        if(attr.HasFlag(FileAttributes.Directory)) continue;
+                        if(zipArchiveEntry.Name.IsNullOrWhiteSpace() && zipArchiveEntry.FullName.EndsWith("/")) continue;
 
                         if (files.Contains(zipArchiveEntry.Name))
                         {
@@ -158,8 +157,7 @@ namespace Umbraco.Core.Packaging
                 {
                     foreach (var zipArchiveEntry in zipArchive.Entries)
                     {
-                        FileAttributes attr = File.GetAttributes(zipArchiveEntry.FullName);
-                        if(attr.HasFlag(FileAttributes.Directory) && skipsDirectories)
+                        if(zipArchiveEntry.Name.IsNullOrWhiteSpace() && zipArchiveEntry.FullName.EndsWith("/") && skipsDirectories)
                             continue;
                         if(entryFunc(zipArchiveEntry) == false)
                             break;
