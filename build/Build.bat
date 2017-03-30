@@ -1,4 +1,4 @@
-::@ECHO OFF
+@ECHO OFF
 
 :: UMBRACO CORE BUILD FILE
 ::
@@ -130,12 +130,38 @@ ECHO Building Umbraco Core %VERSION%
 ECHO ################################################################
 
 ECHO.
-ECHO Locate MsBuild
+ECHO Locate MsBuild version 14.x or 15.x
 
-SET MSBUILDPATH=C:\Program Files (x86)\MSBuild\14.0\Bin
-IF EXIST "%MSBUILDPATH%\MsBuild.exe" GOTO :msbuild
+SET VSWHERE=%CD%\..\tools\VsWhere\vswhere.exe
+SET VSPATH=
+SET VSVERS=
+SET VSMAJOR=
+SET VSMAJORMINOR=
+FOR /f "usebackq tokens=1* delims=: " %%i IN (`"%VSWHERE%" -legacy -latest` ) DO (
+  IF /i "%%i"=="installationPath" SET VSPATH=%%j
+  IF /i "%%i"=="installationVersion" SET VSVERS=%%j
+)
 
-SET MSBUILDPATH=C:\Program Files (x86)\MSBuild\15.0\Bin
+IF [%VSVERS%] NEQ [] (
+	FOR /f "tokens=1,2 delims=." %%i IN ("%VSVERS%") DO (
+		SET VSMAJOR=%%i
+		SET VSMAJORMINOR=%%i.%%j
+	)
+)
+
+IF [%VSVERS%] NEQ [] (
+	ECHO Found VisualStudio version %VSMAJORMINOR%
+	
+	IF [%VSMAJOR%] EQU [15] (
+		SET MSBUILDPATH="%VSPATH%\MSBuild\%VSMAJORMINOR%\Bin"
+	)
+	
+	IF [%VSMAJOR%] EQU [14] (
+		SET MSBUILDPATH="c:\Program Files (x86)\MSBuild\%VSMAJOR%\Bin"
+	)
+)
+
+SET MSBUILDPATH=%MSBUILDPATH:"=%
 IF EXIST "%MSBUILDPATH%\MsBuild.exe" GOTO :msbuild
 
 ECHO Could not locate MsBuild.exe
@@ -147,7 +173,8 @@ SET PATH="%MSBUILDPATH%";%PATH%
 SET NUGET=%CD%\..\src\.nuget\NuGet.exe
 SET MSBUILD="%MSBUILDPATH%\MsBuild.exe"
 
-ECHO Found MsBuild at %MSBUILDPATH%
+ECHO Found MsBuild version %VSMAJORMINOR%
+ECHO at %MSBUILDPATH%
 
 ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %RELEASE%
 
