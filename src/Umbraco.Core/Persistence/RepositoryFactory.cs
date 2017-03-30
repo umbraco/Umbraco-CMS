@@ -49,7 +49,12 @@ namespace Umbraco.Core.Persistence
                 _cacheHelper.IsolatedRuntimeCache.CacheFactory = type =>
                 {
                     var cache = origFactory(type);
-                    return new DeepCloneRuntimeCacheProvider(cache);
+
+                    //if the result is already a DeepCloneRuntimeCacheProvider then return it, otherwise
+                    //wrap the result with a DeepCloneRuntimeCacheProvider
+                    return cache is DeepCloneRuntimeCacheProvider 
+                        ? cache 
+                        : new DeepCloneRuntimeCacheProvider(cache);
                 };
             }
 

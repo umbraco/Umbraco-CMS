@@ -117,7 +117,7 @@ namespace UmbracoExamine
                 if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
                 {
                     var field = new IndexField { Name = "_searchEmail" };
-                    
+
                     StaticField policy;
                     if (IndexFieldPolicies.TryGetValue("_searchEmail", out policy))
                     {
@@ -173,7 +173,8 @@ namespace UmbracoExamine
                         {
                             long totalContent;
                             var result = _memberService.GetPagedXmlEntries(pIndex, pSize, out totalContent).ToArray();
-                            return new Tuple<long, XElement[]>(totalContent, result);
+                            var more = result.Length == pSize;
+                            return Tuple.Create(result, more);
                         },
                         i => _memberService.GetById(i));
                 }
@@ -219,7 +220,7 @@ namespace UmbracoExamine
             {
                 stopwatch.Stop();
             }
-            
+
             DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}, took {1}ms", type, stopwatch.ElapsedMilliseconds));
         }
 

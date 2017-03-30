@@ -1,45 +1,40 @@
 (function () {
     "use strict";
 
-    function PartialViewMacrosCreateController($scope, codefileResource, $location, navigationService, formHelper, localizationService, appState) {
+    function PartialViewMacrosCreateController($scope, codefileResource, macroResource, $location, navigationService, formHelper, localizationService, appState) {
 
         var vm = this;
         var node = $scope.dialogOptions.currentNode;
         var localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
         vm.snippets = [];
-        vm.showSnippets = false;
-        vm.creatingFolder = false;
+        vm.snippet = "Empty";
+        vm.createMacro = false;
         vm.createFolderError = "";
         vm.folderName = "";
+        vm.fileName = "";
 
-        vm.createPartialViewMacro = createPartialViewMacro;
+        vm.creatingFolder = false;
+        vm.creatingFile = false;
+
         vm.showCreateFolder = showCreateFolder;
+        vm.showCreateFile = showCreateFile;
         vm.createFolder = createFolder;
-        vm.showCreateFromSnippet = showCreateFromSnippet;
+        vm.createFile = createFile;
 
         function onInit() {
             codefileResource.getSnippets('partialViewMacros')
-                .then(function(snippets) {
+                .then(function (snippets) {
                     vm.snippets = snippets;
                 });
         }
 
-        function createPartialViewMacro(selectedSnippet) {
-
-            var snippet = null;
-
-            if(selectedSnippet && selectedSnippet.fileName) {
-                snippet = selectedSnippet.fileName;
-            }
-
-            $location.path("/developer/partialviewmacros/edit/" + node.id).search("create", "true").search("snippet", snippet);
-            navigationService.hideMenu();
-
-        }
-
         function showCreateFolder() {
             vm.creatingFolder = true;
+        }
+
+        function showCreateFile() {
+            vm.creatingFile = true;
         }
 
         function createFolder(form) {
@@ -75,11 +70,32 @@
                 });
             }
         }
-        
-        function showCreateFromSnippet() {
-            vm.showSnippets = true;
+
+        function createFile(form) {
+            if (formHelper.submitForm({ scope: $scope, formCtrl: form, statusMessage: 'create file' })) {
+
+                if (vm.createMacro) {
+                    var path = decodeURIComponent(node.id);
+                    macroResource.createPartialViewMacroWithFile(path, vm.fileName).then(function(created) {
+                        $location.path("/developer/partialviewmacros/edit/" + node.id).search("create", "true").search("name", vm.fileName).search("snippet", vm.snippet);
+                        navigationService.hideMenu();
+                    }, function(err) {
+                        vm.createFileError = err;
+
+                        //show any notifications
+                        if (angular.isArray(err.data.notifications)) {
+                            for (var i = 0; i < err.data.notifications.length; i++) {
+                                notificationsService.showNotification(err.data.notifications[i]);
+                            }
+                        }
+                    });
+                } else {
+                    $location.path("/developer/partialviewmacros/edit/" + node.id).search("create", "true").search("name", vm.fileName).search("snippet", vm.snippet);
+                    navigationService.hideMenu();
+                }
+            }
         }
-        
+
         onInit();
 
     }

@@ -48,12 +48,22 @@ namespace Umbraco.Web.HealthCheck
             return healthCheckGroups;
         }
 
+        [HttpGet]
         public object GetStatus(Guid id)
         {
             var check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == id);
             if (check == null) throw new InvalidOperationException("No health check found with ID " + id);
 
-            return check.GetStatus();
+            try
+            {
+                //Core.Logging.LogHelper.Debug<HealthCheckController>("Running health check: " + check.Name);
+                return check.GetStatus();
+            }
+            catch (Exception e)
+            {
+                Core.Logging.LogHelper.Error<HealthCheckController>("Exception in health check: " + check.Name, e);
+                throw;
+            }
         }
 
         [HttpPost]

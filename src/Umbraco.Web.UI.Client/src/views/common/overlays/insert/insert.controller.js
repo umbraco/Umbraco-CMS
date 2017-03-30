@@ -104,13 +104,18 @@
         function openPartialOverlay() {
             vm.partialItemOverlay = {
                 view: "treepicker",
-                section: "settings", 
+                section: "settings",
                 treeAlias: "partialViews",
                 entityType: "partialView",
                 multiPicker: false,
-                show: true,
+                filter: function(i) {
+                    if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
+                        return true;
+                    }
+                },
+                filterCssClass: "not-allowed",
                 title: localizationService.localize("template_insertPartialView"),
-
+                show: true,
                 select: function(node){
                     
                     $scope.model.insert = {

@@ -264,6 +264,7 @@
                     //change on blur, focus
                     vm.editor.on("blur", persistCurrentLocation);
                     vm.editor.on("focus", persistCurrentLocation);
+                    vm.editor.on("change", changeAceEditor);
             	}
             }
             
@@ -308,7 +309,7 @@
                             break;
 
                         case "partial":
-                            var code = templateHelper.getInsertPartialSnippet(model.insert.node.name);
+                            var code = templateHelper.getInsertPartialSnippet(model.insert.node.parentId, model.insert.node.name);
                             insert(code);
                             break;
                             
@@ -418,9 +419,15 @@
                 multiPicker: false,
                 show: true,
                 title: localizationService.localize("template_insertPartialView"),
+                filter: function(i) {
+                    if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
+                        return true;
+                    }
+                },
+                filterCssClass: "not-allowed",
                 select: function(node){
-
-                    var code = templateHelper.getInsertPartialSnippet(node.name);
+                    
+                    var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
                     insert(code);
 
                     vm.partialItemOverlay.show = false;
@@ -630,6 +637,10 @@
 
         function persistCurrentLocation() {
             vm.currentPosition = vm.editor.getCursorPosition();
+        }
+
+        function changeAceEditor() {
+            setFormState("dirty");
         }
 
         function setFormState(state) {

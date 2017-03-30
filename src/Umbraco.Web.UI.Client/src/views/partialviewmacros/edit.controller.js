@@ -26,7 +26,7 @@
         /* Functions bound to view model */
 
         function save() {
-            
+
             vm.page.saveButtonState = "busy";
             vm.partialViewMacro.content = vm.editor.getValue();
 
@@ -70,7 +70,7 @@
             }, function (err) {
 
                 vm.page.saveButtonState = "error";
-                
+
                 localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
                     localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
                         notificationsService.error(headerValue, msgValue);
@@ -104,7 +104,7 @@
                         	var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
                         	insert(code);
                             break;
-                            
+
                         case "umbracoField":
                             insert(model.insert.umbracoField);
                             break;
@@ -169,7 +169,7 @@
                     vm.pageFieldOverlay.show = false;
                     vm.pageFieldOverlay = null;
                     // focus editor
-                    vm.editor.focus();                    
+                    vm.editor.focus();
                 }
             };
         }
@@ -212,7 +212,7 @@
 
                     var code = templateHelper.getQuerySnippet(model.result.queryExpression);
                     insert(code);
-                    
+
                     vm.queryBuilderOverlay.show = false;
                     vm.queryBuilderOverlay = null;
                 },
@@ -222,7 +222,7 @@
                     vm.queryBuilderOverlay.show = false;
                     vm.queryBuilderOverlay = null;
                     // focus editor
-                    vm.editor.focus();   
+                    vm.editor.focus();
                 }
             };
         }
@@ -232,9 +232,9 @@
         function init() {
             //we need to load this somewhere, for now its here.
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
-            
+
             if ($routeParams.create) {
-                
+
                 var snippet = "Empty";
 
                 if($routeParams.snippet) {
@@ -242,6 +242,9 @@
                 }
 
                 codefileResource.getScaffold("partialViewMacros", $routeParams.id, snippet).then(function (partialViewMacro) {
+                    if ($routeParams.name) {
+                        partialViewMacro.name = $routeParams.name;
+                    }
                     ready(partialViewMacro, false);
                 });
 
@@ -276,7 +279,7 @@
                 },
                 onLoad: function(_editor) {
                     vm.editor = _editor;
-                    
+
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
                     // else set the cursor at the bottom of the code editor
@@ -291,6 +294,8 @@
                     //change on blur, focus
                     vm.editor.on("blur", persistCurrentLocation);
                     vm.editor.on("focus", persistCurrentLocation);
+                    vm.editor.on("change", changeAceEditor);
+
             	}
             }
 
@@ -309,8 +314,12 @@
             vm.currentPosition = vm.editor.getCursorPosition();
         }
 
+        function changeAceEditor() {
+            setFormState("dirty");
+        }
+
         function setFormState(state) {
-            
+
             // get the current form
             var currentForm = angularHelper.getCurrentForm($scope);
 
@@ -322,7 +331,7 @@
             }
         }
 
-    
+
         init();
 
     }

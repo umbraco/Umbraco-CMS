@@ -183,6 +183,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement("EnablePropertyValueConverters", false); }
         }
 
+        [ConfigurationProperty("loginBackgroundImage")]
+        internal InnerTextConfigurationElement<string> LoginBackgroundImage
+        {
+            get { return GetOptionalTextElement("loginBackgroundImage", string.Empty); }
+        }
+
         string IContentSection.NotificationEmailAddress
         {
             get { return Notifications.NotificationEmailAddress; }
@@ -335,6 +341,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.EnablePropertyValueConverters
         {
             get { return EnablePropertyValueConverters; }
+        }
+
+        string IContentSection.LoginBackgroundImage
+        {
+            get { return LoginBackgroundImage; }
         }
     }
 }

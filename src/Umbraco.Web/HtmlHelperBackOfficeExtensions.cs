@@ -47,7 +47,8 @@ namespace Umbraco.Web
                         ""externalLoginsUrl"": """ + externalLoginsUrl + @"""
                     },
                     ""umbracoSettings"": {
-                        ""allowPasswordReset"": " + (UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset ? "true" : "false") + @"
+                        ""allowPasswordReset"": " + (UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset ? "true" : "false") + @",
+                        ""loginBackgroundImage"": """ + UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage + @"""
                     },
                     ""application"": {
                         ""applicationPath"": """ + html.ViewContext.HttpContext.Request.ApplicationPath + @""",

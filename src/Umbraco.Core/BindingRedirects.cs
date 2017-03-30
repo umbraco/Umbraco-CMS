@@ -17,9 +17,12 @@ namespace Umbraco.Core
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }
 
-        private static readonly Regex Log4NetAssemblyPattern = new Regex("log4net, Version=([\\d\\.]+?), Culture=neutral, PublicKeyToken=null", RegexOptions.Compiled);
+        private static readonly Regex Log4NetAssemblyPattern = new Regex("log4net, Version=([\\d\\.]+?), Culture=neutral, PublicKeyToken=null");
         private const string Log4NetReplacement = "log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a";
-        
+
+        private static readonly Regex HtmlAgilityAssemblyPattern = new Regex("HtmlAgilityPack, Version=([\\d\\.]+?), Culture=neutral, PublicKeyToken=bd319b19eaf3b43a");
+        private const string HtmlAgilityReplacement = "HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a";
+
         /// <summary>
         /// This is used to do an assembly binding redirect via code - normally required due to signature changes in assemblies
         /// </summary>
@@ -28,11 +31,16 @@ namespace Umbraco.Core
         /// <returns></returns>
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            //log4net:
-            // Use regex to match and replace 
+            //log4net:            
             if (Log4NetAssemblyPattern.IsMatch(args.Name) && args.Name != Log4NetReplacement)
             {
                 return Assembly.Load(Log4NetAssemblyPattern.Replace(args.Name, Log4NetReplacement));
+            }
+
+            //HtmlAgility:            
+            if (HtmlAgilityAssemblyPattern.IsMatch(args.Name) && args.Name != HtmlAgilityReplacement)
+            {
+                return Assembly.Load(HtmlAgilityAssemblyPattern.Replace(args.Name, HtmlAgilityReplacement));
             }
 
             //AutoMapper:
