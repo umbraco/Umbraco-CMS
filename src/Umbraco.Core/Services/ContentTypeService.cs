@@ -297,7 +297,7 @@ namespace Umbraco.Core.Services
                 repo.Delete(container);
                 uow.Commit();
 
-                uow.Events.Dispatch(DeletedContentTypeContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs));
+                uow.Events.Dispatch(DeletedContentTypeContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs), "DeletedContentTypeContainer");
 
                 return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
