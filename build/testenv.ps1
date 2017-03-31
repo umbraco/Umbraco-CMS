@@ -1,4 +1,4 @@
-[CmdletBinding()]
+
 $value = $Env:TESTVALUE
 if ($value -ne "kawabu")
 {
