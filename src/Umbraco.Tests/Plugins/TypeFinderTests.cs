@@ -26,11 +26,11 @@ using Umbraco.Web.BaseRest;
 
 namespace Umbraco.Tests.Plugins
 {
-    
+
     /// <summary>
 	/// Tests for typefinder
 	/// </summary>
-	[TestFixture]	
+	[TestFixture]
 	public class TypeFinderTests
 	{
 		/// <summary>
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Plugins
 		{
 		    _assemblies = new[]
 			    {
-			        this.GetType().Assembly, 
+			        this.GetType().Assembly,
 			        typeof(ApplicationStartupHandler).Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Plugins
         [Test]
         public void Find_Classes_Of_Type()
         {
-            var typesFound = TypeFinder.FindClassesOfType<IApplicationStartupHandler>(_assemblies);            
+            var typesFound = TypeFinder.FindClassesOfType<IApplicationStartupHandler>(_assemblies);
             var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationStartupHandler>(_assemblies);
 
             Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.Plugins
                     }
                 }
             }
-            
+
         }
 
         [Ignore]
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Plugins
                     }
                 }
             }
-            
+
         }
 
         public class MyTag : ITag
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Plugins
 
         public class MySuperTag : MyTag
         {
-            
+
         }
 
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Plugins
             /// This is a modified version of: http://www.dominicpettifer.co.uk/Blog/44/how-to-get-a-reference-to-all-assemblies-in-the--bin-folder
             /// </summary>
             /// <remarks>
-            /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been 
+            /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been
             /// loaded in the CLR, not all assemblies.
             /// See these threads:
             /// http://issues.umbraco.org/issue/U5-198
@@ -329,8 +329,8 @@ namespace Umbraco.Tests.Plugins
                             }
                             catch (SecurityException)
                             {
-                                //we will just ignore this because this will fail 
-                                //in medium trust for system assemblies, we get an exception but we just want to continue until we get to 
+                                //we will just ignore this because this will fail
+                                //in medium trust for system assemblies, we get an exception but we just want to continue until we get to
                                 //an assembly that is ok.
                             }
                         }
@@ -347,9 +347,9 @@ namespace Umbraco.Tests.Plugins
                             }
                             catch (SecurityException)
                             {
-                                //we will just ignore this because if we are trying to do a call to: 
+                                //we will just ignore this because if we are trying to do a call to:
                                 // AssemblyName.ReferenceMatchesDefinition(a.GetName(), assemblyName)))
-                                //in medium trust for system assemblies, we get an exception but we just want to continue until we get to 
+                                //in medium trust for system assemblies, we get an exception but we just want to continue until we get to
                                 //an assembly that is ok.
                             }
                         }
@@ -361,7 +361,7 @@ namespace Umbraco.Tests.Plugins
             }
 
             /// <summary>
-            /// Return a list of found local Assemblies excluding the known assemblies we don't want to scan 
+            /// Return a list of found local Assemblies excluding the known assemblies we don't want to scan
             /// and exluding the ones passed in and excluding the exclusion list filter, the results of this are
             /// cached for perforance reasons.
             /// </summary>
@@ -429,7 +429,7 @@ namespace Umbraco.Tests.Plugins
                     "RouteDebugger,",
                     "SqlCE4Umbraco,",
                     "umbraco.datalayer,",
-                    "umbraco.interfaces,",										
+                    "umbraco.interfaces,",
 					"umbraco.providers,",
 					"Umbraco.Web.UI,",
                     "umbraco.webservices",
@@ -631,5 +631,5 @@ namespace Umbraco.Tests.Plugins
         }
 	}
 
-    
+
 }

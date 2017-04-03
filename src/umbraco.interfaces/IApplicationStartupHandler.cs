@@ -14,6 +14,6 @@ namespace umbraco.interfaces
 	/// and bind to any custom events in the OnApplicationInitialized method.
 	/// </remarks>
 	[Obsolete("This interface is obsolete, use IApplicationEventHandler or ApplicationEventHandler instead")]
-	public interface IApplicationStartupHandler
+	public interface IApplicationStartupHandler : IDiscoverable
     { }
 }
