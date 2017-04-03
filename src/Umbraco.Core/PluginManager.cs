@@ -277,7 +277,7 @@ namespace Umbraco.Core
                         uniqInfos.Add(info.FullName);
                         hashCombiner.AddFileSystemItem(info);
                     }
-                }
+                } 
 
                 return ConvertHashToInt64(hashCombiner.GetCombinedHashCode());
             }
@@ -449,10 +449,7 @@ namespace Umbraco.Core
             // at the moment we write the cache to disk every time we update it. ideally we defer the writing
             // since all the updates are going to happen in a row when Umbraco starts. that being said, the
             // file is small enough, so it is not a priority.
-            WriteCache();
-            var dir = Path.GetDirectoryName(filePath);
-            if (Directory.Exists(dir) == false)
-                Directory.CreateDirectory(dir);
+            WriteCache();            
         }
 
         #endregion
