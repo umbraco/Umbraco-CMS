@@ -533,11 +533,11 @@ namespace Umbraco.Web
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.ResolveThumbnailProviders());
+                () => PluginManager.ResolveThumbnailProviders());
 
             ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.ResolveImageUrlProviders());
+                () => PluginManager.ResolveImageUrlProviders());
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
                 new DefaultCultureDictionaryFactory());
