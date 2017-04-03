@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using umbraco.interfaces;
 using Umbraco.Core;
 
 namespace Umbraco.Core.Deploy
@@ -8,7 +9,7 @@ namespace Umbraco.Core.Deploy
     /// <summary>
     /// Connects to an Umbraco service.
     /// </summary>
-    public interface IServiceConnector
+    public interface IServiceConnector : IDiscoverable
     {
         /// <summary>
         /// Gets an artifact.
