@@ -41,10 +41,9 @@
                 redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
-                
                 // create macro if needed
                 if($routeParams.create && $routeParams.nomacro !== "true") {
-                    macroResource.createPartialViewMacroWithFile(saved.path, saved.name).then(function(created) {
+                    macroResource.createPartialViewMacroWithFile(saved.virtualPath, saved.name).then(function(created) {
                         completeSave(saved);
                     }, function(err) {
                         //show any notifications
