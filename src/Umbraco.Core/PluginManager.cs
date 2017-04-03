@@ -681,10 +681,10 @@ namespace Umbraco.Core
             if (scan)
             {
                 // either we have to rescan, or we could not find the cache file:
-                // report (only once) and scan and update the cache file
+                // report (only once) and scan and update the cache file - this variable is purely used to check if we need to log
                 if (_reportedChange == false)
                 {
-                    _logger.Logger.Debug<PluginManager>("Assemblies changes detected, need to rescan everything.");
+                    _logger.Logger.Debug<PluginManager>("Assembly changes detected, need to rescan everything.");
                     _reportedChange = true;
                 }
             }
@@ -747,7 +747,11 @@ namespace Umbraco.Core
                 if (added)
                 {
                     _types[listKey] = typeList;
-                    UpdateCache();
+                    //if we are scanning then update the cache file
+                    if (scan)
+                    {
+                        UpdateCache();
+                    }
                 }
 
                 _logger.Logger.Debug<PluginManager>("Resolved {0}, caching ({1}).", () => ResolvedName(baseType, attributeType), () => added.ToString().ToLowerInvariant());
