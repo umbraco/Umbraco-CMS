@@ -342,13 +342,35 @@ namespace Umbraco.Core
         /// <remarks>Fails if the cache is missing or corrupt in any way.</remarks>
         internal Attempt<IEnumerable<string>> TryGetCached(Type baseType, Type attributeType)
         {
-            var cache = _runtimeCache.GetCacheItem<Dictionary<Tuple<string, string>, IEnumerable<string>>>(CacheKey, ReadCache, TimeSpan.FromMinutes(4));
+            var cache = _runtimeCache.GetCacheItem<Dictionary<Tuple<string, string>, IEnumerable<string>>>(CacheKey, ReadCacheSafe, TimeSpan.FromMinutes(4));
 
             IEnumerable<string> types;
             cache.TryGetValue(Tuple.Create(baseType == null ? string.Empty : baseType.FullName, attributeType == null ? string.Empty : attributeType.FullName), out types);
             return types == null
                 ? Attempt<IEnumerable<string>>.Fail()
                 : Attempt.Succeed(types);
+        }
+
+        internal Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCacheSafe()
+        {
+            try
+            {
+                return ReadCache();
+            }
+            catch
+            {
+                try
+                {
+                    var filePath = GetPluginListFilePath();
+                    File.Delete(filePath);
+                }
+                catch
+                {
+                    // on-purpose, does not matter
+                }
+            }
+
+            return new Dictionary<Tuple<string, string>, IEnumerable<string>>();
         }
 
         internal Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCache()
