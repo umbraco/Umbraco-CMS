@@ -1,4 +1,3 @@
-using System.Runtime.Remoting;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,6 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Services;
-using Umbraco.Tests.CodeFirst.TestModels.Composition;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -1418,6 +1416,38 @@ namespace Umbraco.Tests.Services
 
             var descriptionPropertyTypeReloaded = propertyGroupReloaded.PropertyTypes["description"];
             Assert.That(descriptionPropertyTypeReloaded.PropertyGroupId.IsValueCreated, Is.False);
+        }
+
+        [Test]
+        public void Empty_Description_Is_Always_Null_After_Saving_Content_Type()
+        {
+            var service = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Description = null;
+            service.Save(contentType);
+
+            var contentType2 = MockedContentTypes.CreateBasicContentType("basePage2", "Base Page 2");
+            contentType2.Description = string.Empty;
+            service.Save(contentType2);
+
+            Assert.IsNull(contentType.Description);
+            Assert.IsNull(contentType2.Description);
+        }
+
+        [Test]
+        public void Empty_Description_Is_Always_Null_After_Saving_Media_Type()
+        {
+            var service = ServiceContext.ContentTypeService;
+            var mediaType = MockedContentTypes.CreateSimpleMediaType("mediaType", "Media Type");
+            mediaType.Description = null;
+            service.Save(mediaType);
+
+            var mediaType2 = MockedContentTypes.CreateSimpleMediaType("mediaType2", "Media Type 2");
+            mediaType2.Description = string.Empty;
+            service.Save(mediaType2);
+
+            Assert.IsNull(mediaType.Description);
+            Assert.IsNull(mediaType2.Description);
         }
 
         private ContentType CreateComponent()

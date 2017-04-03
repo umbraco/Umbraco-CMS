@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -89,6 +87,8 @@ namespace Umbraco.Core.Services
                 using (var repository = RepositoryFactory.CreateMemberTypeRepository(uow))
                 {
                     memberType.CreatorId = userId;
+                    if (memberType.Description == string.Empty)
+                        memberType.Description = null;
                     repository.AddOrUpdate(memberType);
 
                     uow.Commit();
@@ -114,6 +114,8 @@ namespace Umbraco.Core.Services
                     foreach (var memberType in asArray)
                     {
                         memberType.CreatorId = userId;
+                        if (memberType.Description == string.Empty)
+                            memberType.Description = null;
                         repository.AddOrUpdate(memberType);
                     }
 
