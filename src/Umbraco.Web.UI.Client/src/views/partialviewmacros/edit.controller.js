@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function partialViewMacrosEditController($scope, $routeParams, codefileResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper) {
+    function partialViewMacrosEditController($scope, $routeParams, codefileResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper, macroResource) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -41,32 +41,23 @@
                 redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
-
-                localizationService.localize("speechBubbles_partialViewSavedHeader").then(function (headerValue) {
-                    localizationService.localize("speechBubbles_partialViewSavedText").then(function(msgValue) {
-                        notificationsService.success(headerValue, msgValue);
+                
+                // create macro if needed
+                if($routeParams.create && $routeParams.nomacro !== "true") {
+                    macroResource.createPartialViewMacroWithFile(saved.path, saved.name).then(function(created) {
+                        completeSave(saved);
+                    }, function(err) {
+                        //show any notifications
+                        if (angular.isArray(err.data.notifications)) {
+                            for (var i = 0; i < err.data.notifications.length; i++) {
+                                notificationsService.showNotification(err.data.notifications[i]);
+                            }
+                        }
                     });
-                });
-
-                //check if the name changed, if so we need to redirect
-                if (vm.partialViewMacro.id !== saved.id) {
-                    contentEditingHelper.redirectToRenamedContent(saved.id);
+                } else {
+                    completeSave(saved);
                 }
-                else {
-                    vm.page.saveButtonState = "success";
-                    vm.partialViewMacro = saved;
 
-                    //sync state
-                    editorState.set(vm.partialViewMacro);
-
-                    // normal tree sync
-                    navigationService.syncTree({ tree: "partialViewMacros", path: vm.partialViewMacro.path, forceReload: true }).then(function (syncArgs) {
-                        vm.page.menu.currentNode = syncArgs.node;
-                    });
-
-                    // clear $dirty state on form
-                    setFormState("pristine");
-                }
             }, function (err) {
 
                 vm.page.saveButtonState = "error";
@@ -78,6 +69,36 @@
                 });
 
             });
+
+        }
+
+        function completeSave(saved) {
+
+            localizationService.localize("speechBubbles_partialViewSavedHeader").then(function (headerValue) {
+                localizationService.localize("speechBubbles_partialViewSavedText").then(function (msgValue) {
+                    notificationsService.success(headerValue, msgValue);
+                });
+            });
+
+            //check if the name changed, if so we need to redirect
+            if (vm.partialViewMacro.id !== saved.id) {
+                contentEditingHelper.redirectToRenamedContent(saved.id);
+            }
+            else {
+                vm.page.saveButtonState = "success";
+                vm.partialViewMacro = saved;
+
+                //sync state
+                editorState.set(vm.partialViewMacro);
+
+                // normal tree sync
+                navigationService.syncTree({ tree: "partialViewMacros", path: vm.partialViewMacro.path, forceReload: true }).then(function (syncArgs) {
+                    vm.page.menu.currentNode = syncArgs.node;
+                });
+
+                // clear $dirty state on form
+                setFormState("pristine");
+            }
 
         }
 
