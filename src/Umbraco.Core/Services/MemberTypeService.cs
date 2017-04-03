@@ -93,6 +93,8 @@ namespace Umbraco.Core.Services
 
                     var repository = RepositoryFactory.CreateMemberTypeRepository(uow);
                     memberType.CreatorId = userId;
+                    if (memberType.Description == string.Empty)
+                        memberType.Description = null;
                     repository.AddOrUpdate(memberType);
                     uow.Commit(); // flush, so that the db contains the saved value
 
@@ -121,6 +123,8 @@ namespace Umbraco.Core.Services
                     foreach (var memberType in asArray)
                     {
                         memberType.CreatorId = userId;
+                        if (memberType.Description == string.Empty)
+                            memberType.Description = null;
                         repository.AddOrUpdate(memberType);
                     }
                     uow.Commit(); // flush, so that the db contains the saved values
