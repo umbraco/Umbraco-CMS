@@ -1,0 +1,68 @@
+﻿
+.umb-examine {
+	display: flex;
+	flex-wrap: wrap;
+	margin-left: -10px;
+	margin-right: -10px;
+}
+
+.umb-examine-details-group-title {
+	background-color: @grayLighter;
+	padding: 10px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-radius: 3px 3px 3px 3px;
+    border: 1px solid @grayLight;
+    margin-top:10px;
+    .umb-era-button
+    {
+        display:inline-block;
+    }
+    .umb-load-indicator
+    {
+        position: relative;
+        left: -15px;
+    }
+}
+
+.umb-examine-details-group-title.active
+{
+   background-color: @blue;
+   border: 1px solid @blue;
+   border-radius: 3px 3px 0 0;
+   .umb-examine-details-group-name
+   {
+       color:@white;
+   }
+}
+.umb-examine-details-group-title:hover {
+	border: 1px solid @blue;
+}
+
+.umb-examine-details-group-name {
+	font-size: 16px;
+	color: @black;
+	font-weight: bold;
+    padding: 10px 0px;
+    cursor: pointer;
+}
+
+.umb-examine-details-group-details
+{
+    border: 1px solid @grayLight;
+    border-top: 0;
+}
+
+
+.umb-examine-details-group-actions
+{
+    padding:22px;
+    background:@grayLighter;
+    border-bottom: 1px solid @grayLight;
+}
+
+.umb-examine-details-group-action-results
+{
+    padding:30px;
+}

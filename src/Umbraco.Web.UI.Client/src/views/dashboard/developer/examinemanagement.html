@@ -1,176 +1,183 @@
 <div id="examineManagement" ng-controller="Umbraco.Dashboard.ExamineMgmtController">
 
-    <h3>Examine Management</h3>
+    <h2>Examine Management</h2>
+    <p>Aspects of your examine set up can be viewed from this screen as well as common maintenance task such as rebuilding or optimising you indexes. For more information on examine please have a look at the <a href="https://our.umbraco.org/documentation/reference/searching/Examine/" target="_blank">documentation</a></p>
+    
+    <h3>Indexers</h3>
+    <p>An indexer in Examine is the object that performs the storing of the data into the index. From here you can check the status of the indexes defined in your examine config and perform common maintenance tasks.</p>
+    <div class="umb-examine-details" ng-repeat="indexer in indexerDetails">
+        <div class="umb-examine-details-group-title" ng-class="{active : indexer.showProperties}">
 
-    <div ng-show="loading">
-        Loading...
+            <div class="umb-examine-details-group-name" ng-click="toggleDetails(indexer)">
+                <i ng-class="indexer.showProperties ? 'icon-navigation-down' : 'icon-navigation-right'"></i>
+                {{indexer.name | splitOnUpperCase}}
+            </div>
+
+            <div ng-show="indexer.isProcessing">
+                <umb-load-indicator></umb-load-indicator>
+            </div>
+
+            <div ng-show="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)">
+                <button class="umb-era-button" ng-class="indexer.showProperties ? '-white' : '-blue'" type="button" ng-click="optimizeIndex(indexer)" ng-show="indexer.documentCount > 0">
+                    Optimize index
+                </button>
+                <button class="umb-era-button" ng-class="indexer.showProperties ? '-white' : '-blue'" type="button" ng-click="rebuildIndex(indexer)">
+                    Rebuild Index
+                </button>
+            </div>
+
+        </div>
+        <div class="umb-examine-details-group-details" ng-show="indexer.showProperties">
+            <div class="umb-examine-details-group-actions">
+
+                <ul class="nav nav-tabs umb-nav-tabs">
+
+                    <li ng-class="{active : isTabSet(indexer, 'showTools')}">
+                        <a href="" ng-click="setTab(indexer, 'showTools')">Index Information & Tools</a>
+                    </li>
+
+                    <li ng-class="{active : isTabSet(indexer, 'showNodeTypes')}">
+                        <a href="" ng-click="setTab(indexer, 'showNodeTypes')" ng-show="indexer.indexCriteria.IncludeNodeTypes.length > 0 || indexer.indexCriteria.ExcludeNodeTypes.length > 0 || indexer.indexCriteria.ParentNodeId">Node Types</a>
+                    </li>
+
+                    <li ng-class="{active : isTabSet(indexer, 'showSystemFields')}">
+                        <a href="" ng-click="setTab(indexer, 'showSystemFields')" ng-show="indexer.indexCriteria.StandardFields.length > 0">System Fields</a>
+                    </li>
+
+                    <li ng-class="{active : isTabSet(indexer, 'showUserFields')}">
+                        <a href="" ng-click="setTab(indexer, 'showUserFields')" ng-show="indexer.indexCriteria.UserFields.length > 0">User Fields</a>
+                    </li>
+
+                    <li ng-class="{active : isTabSet(indexer, 'showProviderProperties')}">
+                        <a href="" ng-click="setTab(indexer, 'showProviderProperties')">Provider Properties</a>
+                    </li>
+                </ul>
+
+            </div>
+            <div class="umb-examine-details-group-action-results">
+                <table ng-show="isTabSet(indexer, 'showTools') && indexer.isLuceneIndex" class="table table-bordered table-condensed">
+                    <caption>&nbsp;</caption>
+                    <tr>
+                        <th>Documents in index</th>
+                        <td>{{indexer.documentCount}}</td>
+                    </tr>
+                    <tr>
+                        <th>Fields in index</th>
+                        <td>{{indexer.fieldCount}}</td>
+                    </tr>
+                    <tr>
+                        <th>Has deletions?</th>
+                        <td>
+                            <span>{{indexer.deletionCount > 0}}</span>
+                            (<span>{{indexer.deletionCount}}</span>)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Optimized?</th>
+                        <td>
+                            <span>{{indexer.isOptimized}}</span>
+                        </td>
+                    </tr>
+
+                </table>
+                <table ng-show="isTabSet(indexer, 'showNodeTypes')" class="table table-bordered table-condensed">
+                    <tr ng-show="indexer.indexCriteria.IncludeNodeTypes.length > 0">
+                        <th>Include node types</th>
+                        <td>{{indexer.indexCriteria.IncludeNodeTypes | json}}</td>
+                    </tr>
+                    <tr ng-show="indexer.indexCriteria.ExcludeNodeTypes.length > 0">
+                        <th>Exclude node types</th>
+                        <td>{{indexer.indexCriteria.ExcludeNodeTypes | json}}</td>
+                    </tr>
+                    <tr ng-show="indexer.indexCriteria.ParentNodeId">
+                        <th>Parent node id</th>
+                        <td>{{indexer.indexCriteria.ParentNodeId}}</td>
+                    </tr>
+                </table>
+                <table ng-show="isTabSet(indexer, 'showSystemFields')" class="table table-bordered table-condensed">
+                    <caption>&nbsp;</caption>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Enable sorting</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="field in indexer.indexCriteria.StandardFields">
+                            <th>{{field.Name}}</th>
+                            <td>{{field.EnableSorting}}</td>
+                            <td>{{field.Type}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table ng-show="isTabSet(indexer, 'showUserFields')" class="table table-bordered table-condensed">
+                    <caption>&nbsp;</caption>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Enable sorting</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="field in indexer.indexCriteria.UserFields">
+                            <th>{{field.Name}}</th>
+                            <td>{{field.EnableSorting}}</td>
+                            <td>{{field.Type}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table ng-show="isTabSet(indexer, 'showProviderProperties')" class="table table-bordered table-condensed">
+                    <caption>&nbsp;</caption>
+                    <tr ng-repeat="(key, val) in indexer.providerProperties track by $index">
+                        <th>{{key | splitOnUpperCase}}</th>
+                        <td>{{val}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <h4>Indexers</h4>
+    <h3>Searchers</h3>
+    <p>A searcher in Examine is the object that performs the searching of data that is stored in the index. From here you can check the searches that have been defined in your examine config.</p>
+    <div class="provider" ng-repeat="searcher in searcherDetails">
+        <div class="umb-examine-details-group-title" ng-class="{active : searcher.showProperties}">
 
-    <ul ng-hide="loading">
-        <li class="provider" ng-repeat="indexer in indexerDetails">
+            <div class="umb-examine-details-group-name" ng-click="toggleDetails(searcher)">
+                <i ng-class="searcher.showProperties ? 'icon-navigation-down' : 'icon-navigation-right'"></i>
+                {{searcher.name | splitOnUpperCase}}
+            </div>
 
-            <a class="btn-link -underline" href="" ng-click="toggle(indexer, 'showProperties')">
-                {{indexer.name}}
-            </a>
+        </div>
+        <div class="umb-examine-details-group-details" ng-show="searcher.showProperties">
+            <div class="umb-examine-details-group-actions">
 
-            <ul ng-show="indexer.showProperties">
+                <ul class="nav nav-tabs umb-nav-tabs">
 
-                <li>
+                    <li ng-class="{active : isTabSet(searcher, 'showTools')}">
+                        <a href="" ng-click="setTab(searcher, 'showTools')">Search Tools</a>
+                    </li>
 
-                    <a href="" ng-click="toggle(indexer, 'showTools')">Index info & tools</a>
+                    <li ng-class="{active : isTabSet(searcher, 'showProviderProperties')}">
+                        <a href="" ng-click="setTab(searcher, 'showProviderProperties')">Provider Properties</a>
+                    </li>
 
-                    <div ng-show="indexer.showTools && indexer.isLuceneIndex">
-                        <div>
-                            <br />
-                            <div ng-show="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)" class="btn-group">
+                </ul>
 
-                                <button type="button" class="btn btn-warning" ng-click="rebuildIndex(indexer)">Rebuild index</button>
-                                <button type="button" class="btn btn-warning" ng-click="optimizeIndex(indexer)" ng-show="indexer.documentCount > 0">Optimize index</button>
-                            </div>
-
-                            <div ng-show="indexer.isProcessing" class="umb-loader-wrapper" ng-show="actionInProgress">
-                                <div class="umb-loader"></div>
-                            </div>
-
-                            <div class="error" ng-show="indexer.processingAttempts >= 100">
-                                The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation
-                            </div>
-                        </div>
-                        <table class="table table-bordered table-condensed">
-                            <caption>&nbsp;</caption>
-                            <tr>
-                                <th>Documents in index</th>
-                                <td>{{indexer.documentCount}}</td>
-                            </tr>
-                            <tr>
-                                <th>Fields in index</th>
-                                <td>{{indexer.fieldCount}}</td>
-                            </tr>
-                            <tr>
-                                <th>Has deletions?</th>
-                                <td>
-                                    <span>{{indexer.deletionCount > 0}}</span>
-                                    (<span>{{indexer.deletionCount}}</span>)
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Optimized?</th>
-                                <td>
-                                    <span>{{indexer.isOptimized}}</span>
-                                </td>
-                            </tr>
-
-                        </table>
-                    </div>
-                </li>
-
-                <li ng-show="indexer.indexCriteria.IncludeNodeTypes.length > 0 || indexer.indexCriteria.ExcludeNodeTypes.length > 0 || indexer.indexCriteria.ParentNodeId">
-                    <a href="" ng-click="toggle(indexer, 'showNodeTypes')">Node types</a>
-                    <table ng-show="indexer.showNodeTypes" class="table table-bordered table-condensed">
-                        <tr ng-show="indexer.indexCriteria.IncludeNodeTypes.length > 0">
-                            <th>Include node types</th>
-                            <td>{{indexer.indexCriteria.IncludeNodeTypes | json}}</td>
-                        </tr>
-                        <tr ng-show="indexer.indexCriteria.ExcludeNodeTypes.length > 0">
-                            <th>Exclude node types</th>
-                            <td>{{indexer.indexCriteria.ExcludeNodeTypes | json}}</td>
-                        </tr>
-                        <tr ng-show="indexer.indexCriteria.ParentNodeId">
-                            <th>Parent node id</th>
-                            <td>{{indexer.indexCriteria.ParentNodeId}}</td>
-                        </tr>
-                    </table>
-                </li>
-
-                <li ng-show="indexer.indexCriteria.StandardFields.length > 0">
-                    <a href="" ng-click="toggle(indexer, 'showSystemFields')">System fields</a>
-                    <table ng-show="indexer.showSystemFields" class="table table-bordered table-condensed">
-                        <caption>&nbsp;</caption>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Enable sorting</th>
-                                <th>Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="field in indexer.indexCriteria.StandardFields">
-                                <th>{{field.Name}}</th>
-                                <td>{{field.EnableSorting}}</td>
-                                <td>{{field.Type}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </li>
-
-                <li ng-show="indexer.indexCriteria.UserFields.length > 0">
-                    <a href="" ng-click="toggle(indexer, 'showUserFields')">User fields</a>
-                    <table ng-show="indexer.showUserFields" class="table table-bordered table-condensed">
-                        <caption>&nbsp;</caption>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Enable sorting</th>
-                                <th>Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="field in indexer.indexCriteria.UserFields">
-                                <th>{{field.Name}}</th>
-                                <td>{{field.EnableSorting}}</td>
-                                <td>{{field.Type}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </li>
-
-                <li>
-                    <a href="" ng-click="toggle(indexer, 'showProviderProperties')">Provider properties</a>
-                    <table ng-show="indexer.showProviderProperties" class="table table-bordered table-condensed">
-                        <caption>&nbsp;</caption>
-                        <tr ng-repeat="(key, val) in indexer.providerProperties track by $index">
-                            <th>{{key}}</th>
-                            <td>{{val}}</td>
-                        </tr>
-                    </table>
-                </li>
-            </ul>
-        </li>
-
-
-
-    </ul>
-
-    <h4>Searchers</h4>
-
-    <ul ng-hide="loading">
-        <li class="provider" ng-repeat="searcher in searcherDetails">
-            <a class="btn-link -underline" href="" ng-click="toggle(searcher, 'showProperties')">
-                {{searcher.name}}
-            </a>
-
-            <ul ng-show="searcher.showProperties">
-
-                <li class="search-tools">
-
-                    <a href="" ng-click="toggle(searcher, 'showTools')">Search tools</a>
-
-                    <div ng-show="searcher.showTools">
-                        <a class="hide" href="" ng-click="closeSearch(searcher)" ng-show="searcher.isSearching">Hide search results</a>
-
-                        <br />
-
-                        <form>
-
-                            <div class="row form-search">
-                                <div class="span8 input-append">
-                                    <input type="text" class="search-query" ng-model="searcher.searchText" no-dirty-check />
-                                    <button type="button" class="btn btn-info" ng-click="search(searcher)" ng-disabled="searcher.isProcessing">Search</button>
-                                </div>
-                            </div>
-                            <div class="row">
+            </div>
+            <div class="umb-examine-details-group-action-results">
+                <div ng-show="isTabSet(searcher, 'showTools')">
+                    <form>
+                        <div class="row form-search">
+                            <span class="span4">
+                                <i class="icon-search"></i>
+                                <input type="text" class="umb-search-field search-query search-input" ng-keypress="($event.which === 13)?search(searcher):0" ng-model="searcher.searchText" no-dirty-check />
+                            </span>
+                            <span class="span1">
+                                <button type="button" class="umb-era-button umb-button--s -blue" ng-click="search(searcher)" ng-disabled="searcher.isProcessing">Search</button>
+                            </span>
+                            <span class="span3 offset1">
                                 <label for="{{searcher.name}}-textSearch" class="radio inline">
                                     <input type="radio" name="searchType" id="{{searcher.name}}-textSearch" value="text" ng-model="searcher.searchType" no-dirty-check />
                                     Text Search
@@ -179,56 +186,44 @@
                                     <input type="radio" name="searchType" id="{{searcher.name}}-luceneSearch" value="lucene" ng-model="searcher.searchType" no-dirty-check />
                                     Lucene Search
                                 </label>
-                            </div>
-
-
-                        </form>
-
-                        <div class="search-results" ng-show="searcher.isSearching">
-
-                            <div ng-show="indexer.isProcessing" class="umb-loader-wrapper" ng-show="indexer.isProcessing">
-                                <div class="umb-loader"></div>
-                            </div>
-
-                            <table ng-hide="searcher.isProcessing" class="table table-bordered table-condensed">
-                                <thead>
-                                    <tr>
-                                        <th class="score">Score</th>
-                                        <th class="id">Id</th>
-                                        <th>Values</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="result in searcher.searchResults">
-                                        <td>{{result.Score}}</td>
-                                        <td>{{result.Id}}</td>
-                                        <td>
-                                            <span ng-repeat="(key,val) in result.Fields track by $index">
-                                                <span class=""><em>{{key}}</em>:</span>
-                                                <span class="text-info">{{val}}</span>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            </span>
                         </div>
+                    </form>
+
+                    <div class="search-results" ng-show="searcher.isSearching">
+
+                        <table ng-hide="searcher.isProcessing" class="table table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="score">Score</th>
+                                    <th class="id">Id</th>
+                                    <th>Values</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="result in searcher.searchResults">
+                                    <td>{{result.Score}}</td>
+                                    <td>{{result.Id}}</td>
+                                    <td>
+                                        <span ng-repeat="(key,val) in result.Fields track by $index">
+                                            <span class=""><em>{{key}}</em>:</span>
+                                            <span class="text-info">{{val}}</span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </li>
+                </div>
+                <table ng-show="isTabSet(searcher, 'showProviderProperties')" class="table table-bordered table-condensed">
+                    <caption>&nbsp;</caption>
+                    <tr ng-repeat="(key, val) in searcher.providerProperties track by $index">
+                        <th>{{key | splitOnUpperCase}}</th>
+                        <td>{{val}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
 
-                <li>
-                    <a href="" ng-click="toggle(searcher, 'showProviderProperties')">Provider properties</a>
-                    <table ng-show="searcher.showProviderProperties" class="table table-bordered table-condensed">
-                        <caption>&nbsp;</caption>
-                        <tr ng-repeat="(key, val) in searcher.providerProperties track by $index">
-                            <th>{{key}}</th>
-                            <td>{{val}}</td>
-                        </tr>
-                    </table>
-                </li>
-
-            </ul>
-
-        </li>
-    </ul>
-
+    </div>
 </div>
