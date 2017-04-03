@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     /// Older corrupted dbs might have multiple published flags for a content item, this shouldn't be possible
     /// so we need to clear the content flag on the older version
     /// </summary>
-    [Migration("7.3.0", 18, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 18, Constants.System.UmbracoMigrationName)]
     public class CleanUpCorruptedPublishedFlags : MigrationBase
     {
         public CleanUpCorruptedPublishedFlags(ISqlSyntaxProvider sqlSyntax, ILogger logger)

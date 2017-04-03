@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             if (ValidTables.Any(x => x.InvariantEquals("umbracoMigration")))
             {
-                var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
+                var allMigrations = migrationEntryService.GetAll(Constants.System.UmbracoMigrationName);
                  mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
             }
 
@@ -134,6 +134,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoRedirectUrl"))))
             {
                 return new Version(7, 4, 0);
+            }
+
+            //if the error indicates a problem with the column cmsMacroProperty.uniquePropertyId then it is not version 7.6 since that is when it is added
+            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cmsMacroProperty,uniquePropertyId"))))
+            {
+                return new Version(7, 5, 0);
             }
 
             return UmbracoVersion.Current;

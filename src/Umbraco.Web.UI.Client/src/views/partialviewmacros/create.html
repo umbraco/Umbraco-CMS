@@ -1,0 +1,90 @@
+<div ng-controller="Umbraco.Editors.PartialViewMacros.CreateController as vm" ng-cloak>
+
+    <div class="umbracoDialog umb-dialog-body with-footer">
+
+        <div class="umb-pane" ng-if="!vm.creatingFolder && !vm.creatingFile">
+
+            <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+
+            <!-- Main options -->
+            <ul class="umb-actions umb-actions-child">
+                <li>
+                    <a href="" ng-click="vm.showCreateFile()" umb-auto-focus>
+                        <i class="large icon-article"></i>
+                        <span class="menu-label"><localize key="create_newPartialViewMacro">New partial view macro</localize></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="" ng-click="vm.showCreateFolder()">
+                        <i class="large icon-folder"></i>
+                        <span class="menu-label"><localize key="general_folder"></localize></span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+
+        <!-- Create file -->
+        <div class="umb-pane" ng-if="vm.creatingFile">
+            <form novalidate name="createFileForm"
+                    ng-submit="vm.createFile(createFileForm)"
+                    val-form-manager>
+
+                <div ng-show="vm.createFileError">
+                    <h5 class="text-error">{{vm.createFileError.errorMsg}}</h5>
+                    <p class="text-error">{{vm.createFileError.data.message}}</p>
+                </div>
+
+                <umb-control-group label="Enter a file name" hide-label="false">
+                    <input type="text" name="fileName" ng-model="vm.fileName" class="umb-textstring textstring input-block-level" umb-auto-focus required no-dirty-check />
+
+                    <div>
+                        <label class="checkbox">
+                            <input type="checkbox" name="createMacro" ng-model="vm.createMacro" ng-true-value="true" ng-false-value="false" no-dirty-check/>
+                            Create corresponding macro
+                        </label>
+                    </div>
+                </umb-control-group>
+
+                <umb-control-group label="Select a snippet (or create an empty file)" hide-label="false">
+
+                    <select name="snippet"
+                            class="umb-editor umb-dropdown"
+                            ng-model="vm.snippet"
+                            ng-options="snippet.fileName as snippet.name for snippet in vm.snippets"></select>
+
+                </umb-control-group>
+
+                <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+            </form>
+        </div>
+
+        <!-- Create folder -->
+        <div class="umb-pane" ng-if="vm.creatingFolder">
+            <form novalidate name="createFolderForm"
+                    ng-submit="vm.createFolder(createFolderForm)"
+                    val-form-manager>
+
+                <div ng-show="vm.createFolderError">
+                    <h5 class="text-error">{{vm.createFolderError.errorMsg}}</h5>
+                    <p class="text-error">{{vm.createFolderError.data.message}}</p>
+                </div>
+
+                <umb-control-group label="Enter a folder name" hide-label="false">
+                    <input type="text" name="folderName" ng-model="vm.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required no-dirty-check />
+                </umb-control-group>
+
+                <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Dialog footer -->
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <button class="btn" ng-click="nav.hideDialog(true)">
+            <localize key="buttons_somethingElse">Do something else</localize>
+        </button>
+    </div>
+
+</div>

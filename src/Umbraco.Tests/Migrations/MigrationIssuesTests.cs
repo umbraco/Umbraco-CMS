@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Migrations
                 logger,
                 new SemVersion(7, 4, 0),
                 new SemVersion(7, 5, 0),
-                GlobalSettings.UmbracoMigrationName,
+                Constants.System.UmbracoMigrationName,
 
                 //pass in explicit migrations
                 new DeleteRedirectUrlTable(SqlSyntax, logger),
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Migrations
             Assert.IsTrue(upgraded);
         }
 
-        [Migration("7.5.0", 99, GlobalSettings.UmbracoMigrationName)]
+        [Migration("7.5.0", 99, Constants.System.UmbracoMigrationName)]
         public class DeleteRedirectUrlTable : MigrationBase
         {
             public DeleteRedirectUrlTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)

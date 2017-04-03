@@ -6,7 +6,7 @@
 }
 
 .umb-content-grid__item {
-   background: @grayLighter;
+   background: @gray-10;
    flex: 0 1 200px;
    cursor: pointer;
    position: relative;
@@ -19,7 +19,7 @@
 }
 
 .umb-content-grid__icon-container {
-   background: lighten(@grayLight, 7%);
+   background: @gray-9;
    height: 75px;
    display: flex;
    align-items: center;
@@ -30,11 +30,11 @@
 .umb-content-grid__icon[class^="icon-"],
 .umb-content-grid__icon[class*=" icon-"] {
    font-size: 40px;
-   color: lighten(@gray, 20%);
+   color: @gray-6;
 }
 
 .umb-content-grid__icon.-light {
-   color: @grayLight;
+   color: @gray-8;
 }
 
 
@@ -46,10 +46,10 @@
 .umb-content-grid__item-name {
    font-weight: bold;
    margin-bottom: 10px;
-   color: black;
+   color: @black;
    padding-bottom: 10px;
    line-height: 1.4em;
-   border-bottom: 1px solid @grayLight;
+   border-bottom: 1px solid @gray-8;
    display: inline-block;
 }
 
@@ -58,18 +58,18 @@
 }
 
 .umb-content-grid__item-name.-light {
-   color: @grayLight;
+   color: @gray-8;
 }
 
 .umb-content-grid__details-list {
    list-style: none;
    margin-bottom: 0;
    margin-left: 0;
-   font-size: 11px;
+   font-size: 12px;
 }
 
 .umb-content-grid__details-list.-light {
-   color: @grayLight;
+   color: @gray-8;
 }
 
 .umb-content-grid__details-label {
@@ -85,16 +85,16 @@
    position: absolute;
    top: 10px;
    right: 10px;
-   border: 1px solid #ffffff;
-   width: 25px;
-   height: 25px;
-   background: @blue;
+   border: 2px solid @white;
+   width: 26px;
+   height: 26px;
+   background: @green;
    border-radius: 50px;
    box-sizing: border-box;
    display: flex;
    justify-content: center;
    align-items: center;
-   color: #ffffff;
+   color: @white;
    cursor: pointer;
 }
 
@@ -108,7 +108,7 @@
 .umb-content-grid__no-items {
    font-size: 16px;
    font-weight: bold;
-   color: @grayLight;
+   color: @gray-8;
    padding-top: 50px;
    padding-bottom: 50px;
 }

@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
                             },
                             {
                                 "treeApplicationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                    controller => controller.GetApplicationTrees(null, null, null))
+                                    controller => controller.GetApplicationTrees(null, null, null, true))
                             },
                             {
                                 "contentTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
@@ -333,6 +333,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetAllTags(null))
                             },
                             {
+                                "templateApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateController>(
+                                    controller => controller.GetById(0))
+                            },
+                            {
                                 "memberTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
                                     controller => controller.GetNodes("-1", null))
                             },
@@ -359,6 +363,14 @@ namespace Umbraco.Web.Editors
                             {
                                 "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                     controller => controller.GetAllHealthChecks())
+                            },
+                            {
+                                "templateQueryApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
+                                    controller => controller.PostTemplateQuery(null))
+                            },
+                            {
+                                "codeFileApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CodeFileController>(
+                                    controller => controller.GetByPath("", ""))
                             }
                         }
                     },
@@ -383,6 +395,7 @@ namespace Umbraco.Web.Editors
                             {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
                             {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                             {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
+                            {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
                         }
                     },
                     {
@@ -429,7 +442,7 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
-        
+
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -462,7 +475,7 @@ namespace Umbraco.Web.Editors
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed
-                    TempData[TokenPasswordResetCode] = new ValidatePasswordResetCodeModel {UserId = userId, ResetCode = resetCode};
+                    TempData[TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
                     return RedirectToLocal(Url.Action("Default", "BackOffice"));
                 }
             }
@@ -503,7 +516,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>       
         private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(
-            Func<ActionResult> defaultResponse, 
+            Func<ActionResult> defaultResponse,
             Func<ActionResult> externalSignInResponse)
         {
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
@@ -513,7 +526,7 @@ namespace Umbraco.Web.Editors
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             foreach (var tempDataTokenName in TempDataTokenNames)
-            {                
+            {
                 if (TempData[tempDataTokenName] != null)
                 {
                     ViewData[tempDataTokenName] = TempData[tempDataTokenName];
@@ -696,7 +709,7 @@ namespace Umbraco.Web.Editors
 
             return app;
         }
-        
+
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {

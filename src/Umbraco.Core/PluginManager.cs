@@ -450,6 +450,9 @@ namespace Umbraco.Core
             // since all the updates are going to happen in a row when Umbraco starts. that being said, the
             // file is small enough, so it is not a priority.
             WriteCache();
+            var dir = Path.GetDirectoryName(filePath);
+            if (Directory.Exists(dir) == false)
+                Directory.CreateDirectory(dir);
         }
 
         #endregion

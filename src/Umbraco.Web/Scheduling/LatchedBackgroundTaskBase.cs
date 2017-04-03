@@ -7,11 +7,11 @@ namespace Umbraco.Web.Scheduling
 {
     internal abstract class LatchedBackgroundTaskBase : DisposableObject, ILatchedBackgroundTask
     {
-        private readonly ManualResetEventSlim _latch;
+        private TaskCompletionSource<bool> _latch;
 
         protected LatchedBackgroundTaskBase()
         {
-            _latch = new ManualResetEventSlim(false);
+            _latch = new TaskCompletionSource<bool>();
         }
 
         /// <summary>
@@ -29,24 +29,24 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         public abstract bool IsAsync { get; }
 
-        public WaitHandle Latch
+        public Task Latch
         {
-            get { return _latch.WaitHandle; }
+            get { return _latch.Task; }
         }
 
         public bool IsLatched
         {
-            get { return _latch.IsSet == false; }
+            get { return _latch.Task.IsCompleted == false; }
         }
 
         protected void Release()
         {
-            _latch.Set();
+            _latch.SetResult(true);
         }
 
         protected void Reset()
         {
-            _latch.Reset();
+            _latch = new TaskCompletionSource<bool>();
         }
 
         public abstract bool RunsOnShutdown { get; }
@@ -56,8 +56,6 @@ namespace Umbraco.Web.Scheduling
         // remain active
 
         protected override void DisposeResources()
-        {
-            _latch.Dispose();
-        }
+        { }
     }
 }

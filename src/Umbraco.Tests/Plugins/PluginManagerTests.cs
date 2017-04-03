@@ -308,7 +308,7 @@ AnotherContentFinder
         public void Resolves_Trees()
         {
             var trees = _manager.ResolveTrees();
-            Assert.AreEqual(39, trees.Count());
+            Assert.AreEqual(37, trees.Count());
         }
 
         [Test]

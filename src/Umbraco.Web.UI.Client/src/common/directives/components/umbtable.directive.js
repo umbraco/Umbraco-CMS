@@ -1,7 +1,7 @@
 (function () {
    'use strict';
 
-   function TableDirective() {
+   function TableDirective(iconHelper) {
 
       function link(scope, el, attr, ctrl) {
 
@@ -41,6 +41,10 @@
             if (scope.onSort) {
                scope.onSort(field, allow, isSystem);
             }
+         };
+
+         scope.getIcon = function (entry) {
+             return iconHelper.convertFromLegacyIcon(entry.icon);
          };
 
       }

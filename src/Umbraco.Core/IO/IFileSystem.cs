@@ -4,9 +4,6 @@ using System.IO;
 
 namespace Umbraco.Core.IO
 {
-    //TODO: There is no way to create a directory here without creating a file in a directory and then deleting it
-    //TODO: Should probably implement a rename?
-
 	public interface IFileSystem
     {
         IEnumerable<string> GetDirectories(string path);
@@ -16,7 +13,7 @@ namespace Umbraco.Core.IO
         void DeleteDirectory(string path, bool recursive);
 
         bool DirectoryExists(string path);
-        
+
         void AddFile(string path, Stream stream);
 
         void AddFile(string path, Stream stream, bool overrideIfExists);
@@ -31,7 +28,6 @@ namespace Umbraco.Core.IO
 
         bool FileExists(string path);
 
-
         string GetRelativePath(string fullPathOrUrl);
 
         string GetFullPath(string path);
@@ -41,5 +37,22 @@ namespace Umbraco.Core.IO
         DateTimeOffset GetLastModified(string path);
 
         DateTimeOffset GetCreated(string path);
+    }
+
+    // this should be part of IFileSystem but we don't want to change the interface
+    public interface IFileSystem2 : IFileSystem
+    {
+        long GetSize(string path);
+
+        bool CanAddPhysical { get; }
+
+        void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false);
+
+        // TODO: implement these
+        //
+        //void CreateDirectory(string path);
+        //
+        //// move or rename, directory or file
+        //void Move(string source, string target);
     }
 }

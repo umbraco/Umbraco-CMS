@@ -18,8 +18,15 @@ namespace umbraco
     /// </summary>
     public class GlobalSettings
     {
-		
-    	/// <summary>
+        /// <summary>
+        /// This returns the string of the MVC Area route.
+        /// </summary>
+        public static string UmbracoMvcArea
+        {
+            get { return Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea; }
+        }
+
+        /// <summary>
         /// Gets the reserved urls from web.config.
         /// </summary>
         /// <value>The reserved urls.</value>
@@ -79,7 +86,7 @@ namespace umbraco
         /// Gets the database connection string
         /// </summary>
         /// <value>The database connection string.</value>
-        [Obsolete("Use System.ConfigurationManager.ConnectionStrings to get the connection with the key Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName instead")]
+        [Obsolete("Use System.ConfigurationManager.ConnectionStrings to get the connection with the key Constants.System.UmbracoConnectionName instead")]
         public static string DbDSN
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.DbDsn; }
@@ -359,7 +366,7 @@ namespace umbraco
         {
 			get
 			{
-                var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
                 var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
 
 				if (HttpContext.Current != null)

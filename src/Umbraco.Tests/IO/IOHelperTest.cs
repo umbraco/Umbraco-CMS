@@ -56,5 +56,14 @@ namespace Umbraco.Tests.IO
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.WebServices, true), IOHelper.MapPath(SystemDirectories.WebServices, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Xslt, true), IOHelper.MapPath(SystemDirectories.Xslt, false));
         }
+
+        [Test]
+        public void EnsurePathIsApplicationRootPrefixed()
+        {
+            //Assert
+            Assert.AreEqual("~/Views/Template.cshtml", IOHelper.EnsurePathIsApplicationRootPrefixed("Views/Template.cshtml"));
+            Assert.AreEqual("~/Views/Template.cshtml", IOHelper.EnsurePathIsApplicationRootPrefixed("/Views/Template.cshtml"));
+            Assert.AreEqual("~/Views/Template.cshtml", IOHelper.EnsurePathIsApplicationRootPrefixed("~/Views/Template.cshtml"));
+        }
     }
 }

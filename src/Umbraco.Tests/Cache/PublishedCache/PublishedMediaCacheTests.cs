@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
             base.FreezeResolution();
         }
-        
+
         [Test]
 		public void Get_Root_Docs()
 		{
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			var mRoot2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot2", mType, user, -1);
 			var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot1.Id);
 			var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot2.Id);
-			
+
 			var ctx = GetUmbracoContext("/test", 1234);
             var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application), ctx);
 			var roots = cache.GetAtRoot();
@@ -125,7 +125,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 				{
 					child1, child2
 				});
-			
+
 			Assert.AreEqual(2, dicDoc.Children.Count());
 			Assert.AreEqual(222333, dicDoc.Children.ElementAt(0).Id);
 			Assert.AreEqual(444555, dicDoc.Children.ElementAt(1).Id);
@@ -187,7 +187,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 		private XmlDocument GetMediaXml()
 		{
 			var xml = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
 <!ELEMENT CustomDocument ANY>
@@ -195,12 +195,12 @@ namespace Umbraco.Tests.Cache.PublishedCache
 ]>
 <root id=""-1"">
 	<Image id=""2000"" parentID=""-1"" level=""1"" writerID=""22"" creatorID=""33"" nodeType=""2044"" template=""0"" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Image1"" urlName=""image1"" writerName=""Shannon"" creatorName=""Shannon2"" path=""-1,2000"" isDoc="""">
-		<file><![CDATA[/media/1234/image1.png]]></file>		
+		<file><![CDATA[/media/1234/image1.png]]></file>
 		<Image id=""2001"" parentID=""2000"" level=""2"" writerID=""22"" creatorID=""33"" nodeType=""2044"" template=""0"" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Image1"" urlName=""image1"" writerName=""Shannon"" creatorName=""Shannon2"" path=""-1,2000,2001"" isDoc="""">
-			<file><![CDATA[/media/1234/image1.png]]></file>		
+			<file><![CDATA[/media/1234/image1.png]]></file>
 		</Image>
 		<Image id=""2002"" parentID=""2000"" level=""2"" writerID=""22"" creatorID=""33"" nodeType=""2044"" template=""0"" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Image1"" urlName=""image1"" writerName=""Shannon"" creatorName=""Shannon2"" path=""-1,2000,2002"" isDoc="""">
-			<file><![CDATA[/media/1234/image1.png]]></file>		
+			<file><![CDATA[/media/1234/image1.png]]></file>
 		</Image>
 	</Image>
 </root>";
@@ -210,8 +210,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			return xmlDoc;
 		}
 
-		private Dictionary<string, string> GetDictionary(			
-			int id, 
+		private Dictionary<string, string> GetDictionary(
+			int id,
             Guid key,
 			int parentId,
 			string idKey,
@@ -241,13 +241,13 @@ namespace Umbraco.Tests.Cache.PublishedCache
 					{"parentID", parentId.ToString()}
 				};
 		}
-		
+
 		private PublishedMediaCache.DictionaryPublishedContent GetDictionaryDocument(
 			string idKey = "id",
 			string templateKey = "template",
 			string nodeNameKey = "nodeName",
 			string nodeTypeAliasKey = "nodeTypeAlias",
-			string pathKey = "path", 
+			string pathKey = "path",
 			int idVal = 1234,
             Guid keyVal = default(Guid),
 			int parentIdVal = 321,
@@ -265,12 +265,12 @@ namespace Umbraco.Tests.Cache.PublishedCache
 						a => null,
 					//we're not going to test this so ignore
 						(dd, n) => new List<IPublishedContent>(),
-						(dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)), 
+						(dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)),
                         null,
 						false),
 				//callback to get the children
 				(dd, n) => children,
-				(dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)), 
+				(dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)),
                 null,
 				false);
 			return dicDoc;
@@ -300,7 +300,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			if (!updateDateVal.HasValue)
 				updateDateVal = DateTime.Parse("2012-01-03");
 
-			DoAssert((IPublishedContent)dicDoc, idVal, keyVal, templateIdVal, sortOrderVal, urlNameVal, nodeTypeAliasVal, nodeTypeIdVal, writerNameVal, 
+			DoAssert((IPublishedContent)dicDoc, idVal, keyVal, templateIdVal, sortOrderVal, urlNameVal, nodeTypeAliasVal, nodeTypeIdVal, writerNameVal,
 				creatorNameVal, writerIdVal, creatorIdVal, pathVal, createDateVal, updateDateVal, levelVal);
 
 			//now validate the parentId that has been parsed, this doesn't exist on the IPublishedContent
@@ -345,9 +345,9 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			Assert.AreEqual(createDateVal.Value, doc.CreateDate);
 			Assert.AreEqual(updateDateVal.Value, doc.UpdateDate);
 			Assert.AreEqual(levelVal, doc.Level);
-			
+
 		}
 
-		
+
 	}
 }

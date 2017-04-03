@@ -29,7 +29,7 @@ namespace Umbraco.Web.Scheduling
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
-        {            
+        {
             if (_appContext == null) return true; // repeat...
 
             switch (_appContext.GetCurrentServerRole())
@@ -70,19 +70,27 @@ namespace Umbraco.Web.Scheduling
             var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
 
             using (DisposableTimer.DebugDuration<ScheduledPublishing>(
-                () => string.Format("Scheduled publishing executing @ {0}", url), 
+                () => string.Format("Scheduled publishing executing @ {0}", url),
                 () => "Scheduled publishing complete"))
-            {                
+            {
                 try
-                {   
+                {
                     using (var wc = new HttpClient())
                     {
                         var request = new HttpRequestMessage(HttpMethod.Post, url)
                         {
                             Content = new StringContent(string.Empty)
                         };
-                        //pass custom the authorization header
-                        request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
+
+                        // running on a background task, requires its own (safe) scope
+                        // (GetAuthenticationHeaderValue uses UserService to load the current user, hence requires a database)
+                        // (might not need a scope but we don't know really)
+                        using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
+                        {
+                            //pass custom the authorization header
+                            request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
+                            scope.Complete();
+                        }
 
                         var result = await wc.SendAsync(request, token);
                     }
@@ -100,7 +108,7 @@ namespace Umbraco.Web.Scheduling
         {
             get { return true; }
         }
-    
+
         public override bool RunsOnShutdown
         {
             get { return false; }

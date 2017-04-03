@@ -300,23 +300,30 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Get an entity via an id that can be either an integer or a Guid
+        /// Get an entity via an id that can be either an integer, Guid or UDI
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         internal IUmbracoEntity GetEntityFromId(string id)
         {
             IUmbracoEntity entity;
-            Guid idGuid = Guid.Empty;
+
+            Guid idGuid;
             int idInt;
+            Udi idUdi;
+
             if (Guid.TryParse(id, out idGuid))
             {
                 entity = Services.EntityService.GetByKey(idGuid, UmbracoObjectType);
-
             }
             else if (int.TryParse(id, out idInt))
             {
                 entity = Services.EntityService.Get(idInt, UmbracoObjectType);
+            }
+            else if (Udi.TryParse(id, out idUdi))
+            {
+                var guidUdi = idUdi as GuidUdi;
+                entity = guidUdi != null ? Services.EntityService.GetByKey(guidUdi.Guid, UmbracoObjectType) : null;
             }
             else
             {

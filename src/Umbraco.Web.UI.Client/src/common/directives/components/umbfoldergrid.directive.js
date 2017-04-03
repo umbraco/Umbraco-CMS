@@ -87,7 +87,8 @@ Use this directive to generate a list of folders presented as a flexbox grid.
 
          scope.clickFolder = function(folder, $event, $index) {
             if(scope.onClick) {
-               scope.onClick(folder, $event, $index);
+                scope.onClick(folder, $event, $index);
+                $event.stopPropagation();
             }
          };
 

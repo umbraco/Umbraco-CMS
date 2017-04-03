@@ -9,6 +9,13 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IContentTypeRepository : IContentTypeCompositionRepository<IContentType>
     {
         /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        bool HasContainerInPath(string contentPath);
+
+        /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
         /// </summary>
         /// <param name="query"></param>

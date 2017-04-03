@@ -40,7 +40,7 @@ namespace Umbraco.Core.Services
         private readonly ILocalizationService _localizationService;
         private readonly IEntityService _entityService;
         private readonly RepositoryFactory _repositoryFactory;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
         private readonly IUserService _userService;
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
             IEntityService entityService,
             IUserService userService,
             RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider uowProvider)
+            IScopeUnitOfWorkProvider uowProvider)
         {
             _logger = logger;
             _contentService = contentService;
@@ -793,8 +793,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
-            using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
+            using (var uow = _uowProvider.GetUnitOfWork())
             {
+                var repository = _repositoryFactory.CreateContentTypeRepository(uow);
                 var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
                 var types = repository.GetByQuery(query).ToArray();
 
@@ -808,7 +809,7 @@ namespace Umbraco.Core.Services
                 if (contentType == null)
                     throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
                                                       contentTypeAlias));
-
+                uow.Commit();
                 return contentType;
             }
         }
@@ -1715,6 +1716,24 @@ namespace Umbraco.Core.Services
         #region Package Building
         #endregion
 
+        /// <summary>
+        /// This method can be used to trigger the 'ImportedPackage' event when a package is installed by something else but this service.
+        /// </summary>
+        /// <param name="args"></param>
+        internal static void OnImportedPackage(ImportPackageEventArgs<InstallationSummary> args)
+        {
+            ImportedPackage.RaiseEvent(args, null);
+        }
+
+        /// <summary>
+        /// This method can be used to trigger the 'UninstalledPackage' event when a package is uninstalled by something else but this service.
+        /// </summary>
+        /// <param name="args"></param>
+        internal static void OnUninstalledPackage(UninstallPackageEventArgs<UninstallationSummary> args)
+        {
+            UninstalledPackage.RaiseEvent(args, null);
+        }
+
         #region Event Handlers
         /// <summary>
         /// Occurs before Importing Content
@@ -1875,9 +1894,14 @@ namespace Umbraco.Core.Services
         internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
 
         /// <summary>
-        /// Occurs after a apckage is imported
+        /// Occurs after a package is imported
         /// </summary>
         internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
+
+        /// <summary>
+        /// Occurs after a package is uninstalled
+        /// </summary>
+        internal static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs<UninstallationSummary>> UninstalledPackage;
 
         #endregion
     }
