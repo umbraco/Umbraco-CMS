@@ -142,9 +142,9 @@
 
 
 // Disabled this to keep consistency throughout the backoffice UI. Untill a better solution is thought up, this will do.
-@baseBorderRadius:      0px; // 2px;
-@borderRadiusLarge:     0px; // 6px;
-@borderRadiusSmall:     0px; // 3px;
+@baseBorderRadius:      3px; // 2px;
+@borderRadiusLarge:     3px; // 6px;
+@borderRadiusSmall:     3px; // 3px;
 
 
 // Tables
@@ -186,7 +186,7 @@
 // -------------------------
 @inputBackground:               @white;
 @inputBorder:                   @gray-7;
-@inputBorderRadius:             @baseBorderRadius;
+@inputBorderRadius:             0;
 @inputDisabledBackground:       @gray-10;
 @formActionsBackground:         @gray-9;
 @inputHeight:                   @baseLineHeight + 10px; // base line-height + 8px vertical padding + 2px top/bottom border
@@ -196,7 +196,7 @@
 // Tabs
 // -------------------------
 
-@tabsBorderRadius:				0px;
+@tabsBorderRadius:				@baseBorderRadius;
 
 // Dropdowns
 // -------------------------
