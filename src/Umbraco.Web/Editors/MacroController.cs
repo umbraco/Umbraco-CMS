@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -134,12 +135,17 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage CreatePartialViewMacroWithFile(CreatePartialViewMacroWithFileModel model)
         {
+            if (model == null) throw new ArgumentNullException("model");
+            if (string.IsNullOrWhiteSpace(model.Filename)) throw new ArgumentException("Filename cannot be null or whitespace", "model.Filename");
+            if (string.IsNullOrWhiteSpace(model.VirtualPath)) throw new ArgumentException("VirtualPath cannot be null or whitespace", "model.VirtualPath");
+
+            var macroName = model.Filename.TrimEnd(".cshtml");
+
             var macro = new Macro
             {
-
-                Alias = model.Filename,
-                Name = model.Filename, // will be "aliased"
-                ScriptPath = "~/Views/MacroPartials/" + model.Parent + "/" + model.Filename + ".cshtml"
+                Alias = macroName.ToSafeAlias(),
+                Name = macroName,
+                ScriptPath = model.VirtualPath.EnsureStartsWith("~")
             };
 
             Services.MacroService.Save(macro); // may throw
@@ -148,8 +154,8 @@ namespace Umbraco.Web.Editors
 
         public class CreatePartialViewMacroWithFileModel
         {
-            public string Parent { get; set; }
             public string Filename { get; set; }
+            public string VirtualPath { get; set; }
         }
     }
 }

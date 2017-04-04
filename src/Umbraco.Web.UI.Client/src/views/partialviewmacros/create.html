@@ -2,61 +2,56 @@
 
     <div class="umbracoDialog umb-dialog-body with-footer">
 
-        <div class="umb-pane" ng-if="!vm.creatingFolder && !vm.creatingFile">
-
-            <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+        <div class="umb-pane" ng-if="!vm.creatingFolder">
 
             <!-- Main options -->
-            <ul class="umb-actions umb-actions-child">
-                <li>
-                    <a href="" ng-click="vm.showCreateFile()" umb-auto-focus>
-                        <i class="large icon-article"></i>
-                        <span class="menu-label"><localize key="create_newPartialViewMacro">New partial view macro</localize></span>
-                    </a>
-                </li>
-                <li>
-                    <a href="" ng-click="vm.showCreateFolder()">
-                        <i class="large icon-folder"></i>
-                        <span class="menu-label"><localize key="general_folder"></localize></span>
-                    </a>
-                </li>
-            </ul>
+            <div ng-if="!vm.showSnippets">
 
-        </div>
+                <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
-        <!-- Create file -->
-        <div class="umb-pane" ng-if="vm.creatingFile">
-            <form novalidate name="createFileForm"
-                    ng-submit="vm.createFile(createFileForm)"
-                    val-form-manager>
+                <ul class="umb-actions umb-actions-child">
+                    <li>
+                        <a href="" ng-click="vm.createFile()" umb-auto-focus>
+                            <i class="large icon-article"></i>
+                            <span class="menu-label"><localize key="create_newPartialViewMacro">New partial view macro</localize></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="vm.createFileWithoutMacro()">
+                            <i class="large icon-article"></i>
+                            <span class="menu-label"><localize key="create_newPartialViewMacroNoMacro">New partial view macro (without macro)</localize></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="vm.showCreateFromSnippet()">
+                            <i class="large icon-article"></i>
+                            <span class="menu-label"><localize key="create_newPartialViewMacroFromSnippet">>New partial view macro from snippet</localize></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="vm.showCreateFolder()">
+                            <i class="large icon-folder"></i>
+                            <span class="menu-label"><localize key="general_folder"></localize></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-                <div ng-show="vm.createFileError">
-                    <h5 class="text-error">{{vm.createFileError.errorMsg}}</h5>
-                    <p class="text-error">{{vm.createFileError.data.message}}</p>
-                </div>
+            <!-- Snippets list -->
+            <div ng-if="vm.showSnippets">
 
-                <umb-control-group label="Enter a file name" hide-label="false">
-                    <input type="text" name="fileName" ng-model="vm.fileName" class="umb-textstring textstring input-block-level" umb-auto-focus required no-dirty-check />
+                <h5>Select snippet</h5>
 
-                    <div>
-                        <label class="checkbox">
-                            <input type="checkbox" name="createMacro" ng-model="vm.createMacro" ng-true-value="true" ng-false-value="false" no-dirty-check/>
-                            Create corresponding macro
-                        </label>
-                    </div>
-                </umb-control-group>
+                <ul class="umb-actions umb-actions-child">
+                    <li ng-repeat="snippet in vm.snippets">
+                        <a href="" ng-click="vm.createFileFromSnippet(snippet)" style="padding-top: 6px; padding-bottom: 6px;">
+                            <i class="icon-article" style="font-size: 20px;"></i>
+                            <span class="menu-label" style="margin-left: 0; padding-left: 5px;">{{ snippet.name }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-                <umb-control-group label="Select a snippet (or create an empty file)" hide-label="false">
-
-                    <select name="snippet"
-                            class="umb-editor umb-dropdown"
-                            ng-model="vm.snippet"
-                            ng-options="snippet.fileName as snippet.name for snippet in vm.snippets"></select>
-
-                </umb-control-group>
-
-                <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
-            </form>
         </div>
 
         <!-- Create folder -->

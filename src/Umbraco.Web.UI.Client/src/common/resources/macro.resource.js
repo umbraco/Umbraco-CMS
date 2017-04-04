@@ -62,14 +62,14 @@ function macroResource($q, $http, umbRequestHelper) {
          * @param {} filename
          * @returns {}
          */
-        createPartialViewMacroWithFile: function(parent, filename) {
+        createPartialViewMacroWithFile: function(virtualPath, filename) {
 
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "macroApiBaseUrl",
                         "CreatePartialViewMacroWithFile"), {
-                            parent: parent,
+                            virtualPath: virtualPath,
                             filename: filename
                         }
                 ),
