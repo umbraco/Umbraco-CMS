@@ -284,6 +284,13 @@
     <key alias="noMediaTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа медиа-материалов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы медиа-материалов"</strong>.]]></key>
     <key alias="updateData">Выберите тип и заголовок</key>
     <key alias="documentTypeWithoutTemplate">Тип документа без сопоставленного шаблона</key>
+    <key alias="newJavascriptFile">Новый файл javascript</key>
+    <key alias="newEmptyPartialView">Новое пустое частичное представление</key>
+    <key alias="newPartialViewMacro">Новый макрос-представление</key>
+    <key alias="newPartialViewFromSnippet">Новое частичное представление по образцу</key>
+    <key alias="newEmptyPartialViewMacro">Новый пустой макрос-представление</key>
+    <key alias="newPartialViewMacroFromSnippet">Новый макрос-представление по образцу</key>
+    <key alias="newPartialViewMacroNoMacro">Новый макрос-представление (без регистрации макроса)</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Обзор сайта</key>
