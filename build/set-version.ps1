@@ -1,3 +1,12 @@
+#
+# set-version
+#  updates the various files (SolutionInfo.cs...)
+#  with the supplied version infos
+#
+#  release: eg 7.6.0
+#  comment: eg alpha074, or missing
+#  build: eg 1234, or missing
+#
 param (
   [parameter(mandatory=$true)]
   [string]
@@ -16,26 +25,10 @@ param (
   #[switch][alias("sw")]$p5 = $false
 )
 
-# functions 
+# import build module
+import-module ".\build-module.psm1"
 
-function loadSemVer($pwd) {
-  $semverlib = [System.IO.Path]::Combine($pwd, "..", "src\packages\Semver.2.0.4\lib\net452\Semver.dll")
-  if (-not (test-path $semverlib)) {
-    write-error "Missing packages\Semver.2.0.4\lib\net452\Semver.dll."
-    exit 1
-  }
-  [Reflection.Assembly]::LoadFile("d:\d\Umbraco 7.6\src\packages\Semver.2.0.4\lib\net452\Semver.dll")
-}
-
-function repl($pwd, $filename, $source, $replacement) {
-  $filepath = [System.IO.Path]::Combine($pwd, $filename)
-  $text = [System.IO.File]::ReadAllText($filepath)
-  $text = [System.Text.RegularExpressions.Regex]::Replace($text, $source, $replacement)
-  [System.IO.File]::WriteAllText($filepath, $text)
-}
-
-# set version
-
+# validate params and get version string
 $release = $release.Trim()
 $version = $release
 if ($version -eq "") {
@@ -49,44 +42,84 @@ if ($comment -ne "") {
 if ($build -ne 0) {
   $version = "$version+$build"
 }
+write "Text version: $version"
 
-write "Text $version"
-
-loadSemVer($pwd)
+# semver-parse the version string
+# just to ensure that it can be parsed
+loadSemVer
 $semver = [SemVer.SemVersion]::Parse($version)
+write "Sem version:  $semver"
 
+# obtain the file version from the semver
 $filever = "" + $semver.Major + "." + $semver.Minor + "." + $semver.Patch
 if ($build -ne 0) {
   $filever = "$filever.$build"
 }
-
-write "Sem version:  $semver"
 write "File version: $filever"
 
-$year = [System.DateTime]::Now.ToString("yyyy")
-
-repl $pwd "..\src\Umbraco.Core\Configuration\UmbracoVersion.cs" `
+# edit files and set the proper versions and dates
+write "Update UmbracoVersion.cs"
+fileReplace "..\src\Umbraco.Core\Configuration\UmbracoVersion.cs" `
   "(\d+)\.(\d+)\.(\d+)(.(\d+))?" `
-  "$filever"
-  
-repl $pwd "..\src\Umbraco.Core\Configuration\UmbracoVersion.cs" `
+  "$filever" 
+fileReplace "..\src\Umbraco.Core\Configuration\UmbracoVersion.cs" `
   "CurrentComment { get { return `"(.+)`"" `
   "CurrentComment { get { return `"$comment`""
-  
-repl $pwd "..\src\SolutionInfo.cs" `
+write "Update SolutionInfo.cs"
+fileReplace "..\src\SolutionInfo.cs" `
   "AssemblyFileVersion\(`"(.+)?`"\)" `
   "AssemblyFileVersion(`"$filever`")"
-  
-repl $pwd "..\src\SolutionInfo.cs" `
+fileReplace "..\src\SolutionInfo.cs" `
   "AssemblyInformationalVersion\(`"(.+)?`"\)" `
   "AssemblyInformationalVersion(`"$semver`")"
-  
-repl $pwd "..\src\SolutionInfo.cs" `
+$year = [System.DateTime]::Now.ToString("yyyy")
+fileReplace "..\src\SolutionInfo.cs" `
   "AssemblyCopyright\(`"Copyright © Umbraco (\d{4})`"\)" `
   "AssemblyCopyright(`"Copyright © Umbraco $year`")"
  
-# that one is in build.proj *but* there's no such //x:UmbracoVersion in the file?!
-#<XmlPoke XmlInputPath=".\NuSpecs\build\UmbracoCms.props"
-#	Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
-#	Query="//x:UmbracoVersion"
-#	Value="$(ReleaseSemVersion)" />
+# edit csproj and set IIS Expres port number
+# this is a raw copy of ReplaceIISExpressPortNumber.exe
+# it probably can be achieved in a much nicer way - l8tr
+$source = @"
+using System;
+using System.IO;
+using System.Xml;
+using System.Globalization;
+
+namespace Umbraco
+{
+  public static class PortUpdater
+  {
+    public static void Update(string path, string release)
+    {
+      XmlDocument xmlDocument = new XmlDocument();
+      string fullPath = Path.GetFullPath(path);
+      xmlDocument.Load(fullPath);
+      int result = 1;
+      int.TryParse(release.Replace(`".`", `"`"), out result);
+      while (result < 1024)
+        result *= 10;
+      XmlNode xmlNode1 = xmlDocument.GetElementsByTagName(`"IISUrl`").Item(0);
+      if (xmlNode1 != null)
+        xmlNode1.InnerText = `"http://localhost:`" + (object) result;
+      XmlNode xmlNode2 = xmlDocument.GetElementsByTagName(`"DevelopmentServerPort`").Item(0);
+      if (xmlNode2 != null)
+        xmlNode2.InnerText = result.ToString((IFormatProvider) CultureInfo.InvariantCulture);
+      xmlDocument.Save(fullPath);
+    }
+  }
+}
+"@
+
+$assem = (
+  "System.Xml",
+  "System.IO",
+  "System.Globalization"
+)
+
+write "Update Umbraco.Web.UI.csproj"
+add-type -referencedAssemblies $assem -typeDefinition $source -language CSharp
+$csproj = fullPath "..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
+[Umbraco.PortUpdater]::Update($csproj, $release)
+
+# eof
