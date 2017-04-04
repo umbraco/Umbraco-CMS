@@ -1431,6 +1431,7 @@ namespace Umbraco.Core.Services
             _mediaFileSystem.DeleteFile(filepath, true);
         }
 
+        [Obsolete("This should no longer be used, thumbnail generation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public void GenerateThumbnails(string filepath, PropertyType propertyType)
         {
             using (var filestream = _mediaFileSystem.OpenFile(filepath))

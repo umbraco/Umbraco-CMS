@@ -6,10 +6,11 @@
 //     the code is regenerated. 
 // </auto-generated>
 //------------------------------------------------------------------------------
+using System;
 
 namespace umbraco.presentation.umbraco.dialogs {
-    
-    
+
+    [Obsolete("This is no longer used and will be removed in future versions")]
     public partial class mediaPicker {
         
         /// <summary>
