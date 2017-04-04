@@ -468,12 +468,7 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the media.</param>
         void DeleteMediaFile(string filepath);
 
-        /// <summary>
-        /// Generates thumbnails.
-        /// </summary>
-        /// <param name="filepath">The filesystem-relative path to the original image.</param>
-        /// <param name="propertyType">The property type.</param>
-        /// <remarks>This should be obsoleted, we should not generate thumbnails.</remarks>
+        [Obsolete("This should no longer be used, thumbnail generation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         void GenerateThumbnails(string filepath, PropertyType propertyType);
     }
 }
