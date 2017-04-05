@@ -45,19 +45,21 @@ namespace Umbraco.Core.Media
                         return new Size(width, height);
                     }
                 }
+
+
+                //we have no choice but to try to read in via GDI
+                using (var image = Image.FromStream(imageStream))
+                {
+
+                    var fileWidth = image.Width;
+                    var fileHeight = image.Height;
+                    return new Size(fileWidth, fileHeight);
+                }
             }
             catch (Exception)
             {
                 //We will just swallow, just means we can't read exif data, we don't want to log an error either
-            }
-
-            //we have no choice but to try to read in via GDI
-            using (var image = Image.FromStream(imageStream))
-            {
-
-                var fileWidth = image.Width;
-                var fileHeight = image.Height;
-                return new Size(fileWidth, fileHeight);
+                return new Size(0, 0);
             }
 
         }

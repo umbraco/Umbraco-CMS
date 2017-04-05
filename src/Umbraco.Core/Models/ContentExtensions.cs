@@ -546,39 +546,46 @@ namespace Umbraco.Core.Models
             {
                 //get the original image from the original stream
                 if (fileStream.CanSeek) fileStream.Seek(0, 0);
-                using (var originalImage = Image.FromStream(fileStream))
+                try
                 {
-                    var additionalSizes = new List<int>();
-
-                    //Look up Prevalues for this upload datatype - if it is an upload datatype - get additional configured sizes
-                    if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
+                    using (var originalImage = Image.FromStream(fileStream))
                     {
-                        //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
-                        var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
-                        var thumbnailSizes = values.FirstOrDefault();
-                        //Additional thumbnails configured as prevalues on the DataType
-                        if (thumbnailSizes != null)
+                        var additionalSizes = new List<int>();
+
+                        //Look up Prevalues for this upload datatype - if it is an upload datatype - get additional configured sizes
+                        if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
                         {
-							foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
+                            //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
+                            var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
+                            var thumbnailSizes = values.FirstOrDefault();
+                            //Additional thumbnails configured as prevalues on the DataType
+                            if (thumbnailSizes != null)
                             {
-                                int thumbSize;
-                                if (thumb != "" && int.TryParse(thumb, out thumbSize))
+                                foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
                                 {
-                                    additionalSizes.Add(thumbSize);
+                                    int thumbSize;
+                                    if (thumb != "" && int.TryParse(thumb, out thumbSize))
+                                    {
+                                        additionalSizes.Add(thumbSize);
+                                    }
                                 }
                             }
                         }
+
+                        ImageHelper.GenerateMediaThumbnails(fs, fileName, extension, originalImage, additionalSizes);
+
+                        //while the image is still open, we'll check if we need to auto-populate the image properties
+                        if (uploadFieldConfigNode != null)
+                        {
+                            content.SetValue(uploadFieldConfigNode.WidthFieldAlias, originalImage.Width.ToString(CultureInfo.InvariantCulture));
+                            content.SetValue(uploadFieldConfigNode.HeightFieldAlias, originalImage.Height.ToString(CultureInfo.InvariantCulture));
+                        }
+
                     }
-
-                    ImageHelper.GenerateMediaThumbnails(fs, fileName, extension, originalImage, additionalSizes);
-
-                    //while the image is still open, we'll check if we need to auto-populate the image properties
-                    if (uploadFieldConfigNode != null)
-                    {
-                        content.SetValue(uploadFieldConfigNode.WidthFieldAlias, originalImage.Width.ToString(CultureInfo.InvariantCulture));
-                        content.SetValue(uploadFieldConfigNode.HeightFieldAlias, originalImage.Height.ToString(CultureInfo.InvariantCulture));
-                    }
-
+                }
+                catch (Exception e)
+                {
+                    //We will just swallow, just means we can't read image from stream e.g. SVG
                 }
             }
 
