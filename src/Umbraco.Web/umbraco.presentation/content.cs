@@ -823,8 +823,15 @@ namespace umbraco
             catch (Exception e)
             {
                 // if something goes wrong remove the file
-                DeleteXmlFile();
-
+                try
+                {
+                    DeleteXmlFile();
+                }
+                catch
+                {
+                    // don't make it worse: could be that we failed to write because we cannot
+                    // access the file, in which case we won't be able to delete it either
+                }
                 LogHelper.Error<content>("Failed to save Xml to file.", e);
             }
         }
@@ -886,7 +893,15 @@ namespace umbraco
             catch (Exception e)
             {
                 LogHelper.Error<content>("Failed to load Xml from file.", e);
-                DeleteXmlFile();
+                try
+                {
+                    DeleteXmlFile();
+                }
+                catch
+                {
+                    // don't make it worse: could be that we failed to read because we cannot
+                    // access the file, in which case we won't be able to delete it either
+                }
                 return null;
             }
         }

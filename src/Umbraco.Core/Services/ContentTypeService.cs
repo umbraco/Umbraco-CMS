@@ -19,14 +19,15 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ContentTypeService : ContentTypeServiceBase, IContentTypeService
     {
-	    private readonly IContentService _contentService;
+        private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
 
         //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
-        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService, IMediaService mediaService)
+        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
+            IMediaService mediaService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (contentService == null) throw new ArgumentNullException("contentService");
@@ -210,7 +211,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetMediaTypeContainers(IMediaType mediaType)
         {
-            var ancestorIds = mediaType.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = mediaType.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();
@@ -425,7 +426,7 @@ namespace Umbraco.Core.Services
 
             clone.Name = name;
 
-            var compositionAliases = clone.CompositionAliases().Except(new[] { alias }).ToList();
+            var compositionAliases = clone.CompositionAliases().Except(new[] {alias}).ToList();
             //remove all composition that is not it's current alias
             foreach (var a in compositionAliases)
             {
@@ -712,7 +713,7 @@ namespace Umbraco.Core.Services
             var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x.Id == y.Id, x => x.Id);
             var dependencies = new HashSet<IContentTypeComposition>(compositions, comparer);
             var stack = new Stack<IContentTypeComposition>();
-            indirectReferences.ForEach(stack.Push);//Push indirect references to a stack, so we can add recursively
+            indirectReferences.ForEach(stack.Push); //Push indirect references to a stack, so we can add recursively
             while (stack.Count > 0)
             {
                 var indirectReference = stack.Pop();
@@ -770,6 +771,8 @@ namespace Umbraco.Core.Services
 
                     ValidateLocked(contentType); // throws if invalid
                     contentType.CreatorId = userId;
+                    if (contentType.Description == string.Empty)
+                        contentType.Description = null;
                     repository.AddOrUpdate(contentType);
 
                     uow.Commit();
@@ -812,6 +815,8 @@ namespace Umbraco.Core.Services
                     foreach (var contentType in asArray)
                     {
                         contentType.CreatorId = userId;
+                        if (contentType.Description == string.Empty)
+                            contentType.Description = null;
                         repository.AddOrUpdate(contentType);
                     }
 
@@ -1233,6 +1238,8 @@ namespace Umbraco.Core.Services
 
                     ValidateLocked(mediaType); // throws if invalid
                     mediaType.CreatorId = userId;
+                    if (mediaType.Description == string.Empty)
+                        mediaType.Description = null;
                     repository.AddOrUpdate(mediaType);
                     uow.Commit();
 
@@ -1274,6 +1281,8 @@ namespace Umbraco.Core.Services
                     foreach (var mediaType in asArray)
                     {
                         mediaType.CreatorId = userId;
+                        if (mediaType.Description == string.Empty)
+                            mediaType.Description = null;
                         repository.AddOrUpdate(mediaType);
                     }
 
@@ -1452,40 +1461,40 @@ namespace Umbraco.Core.Services
         /// </summary>
         public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IContentType>> DeletingContentType;
 
-		/// <summary>
-		/// Occurs after Delete
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IContentType>> DeletedContentType;
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IContentType>> DeletedContentType;
 
-		/// <summary>
-		/// Occurs before Delete
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IMediaType>> DeletingMediaType;
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IMediaType>> DeletingMediaType;
 
-		/// <summary>
-		/// Occurs after Delete
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IMediaType>> DeletedMediaType;
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IMediaType>> DeletedMediaType;
 
         /// <summary>
         /// Occurs before Save
         /// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IContentType>> SavingContentType;
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IContentType>> SavingContentType;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IContentType>> SavedContentType;
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IContentType>> SavedContentType;
 
-		/// <summary>
-		/// Occurs before Save
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IMediaType>> SavingMediaType;
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IMediaType>> SavingMediaType;
 
-		/// <summary>
-		/// Occurs after Save
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IMediaType>> SavedMediaType;
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IMediaType>> SavedMediaType;
 
         /// <summary>
         /// Occurs before Move

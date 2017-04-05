@@ -35,35 +35,38 @@ namespace umbraco.cms.businesslogic.Files
         #endregion
 
         #region Static Methods
-
-        //MB: Do we really need all these overloads? looking through the code, only one of them is actually used
-
+        
+        [Obsolete("This is no longer used and will be removed in future versions")]
         public static UmbracoFile Save(HttpPostedFile file, string path)
         {
             return new UmbracoFile(UmbracoMediaFile.Save(file.InputStream, path));
         }
 
+        [Obsolete("This is no longer used and will be removed in future versions")]
         public static UmbracoFile Save(HttpPostedFileBase file, string path)
         {
             return new UmbracoFile(UmbracoMediaFile.Save(file.InputStream, path));
         }
 
+        [Obsolete("This is no longer used and will be removed in future versions")]
         public static UmbracoFile Save(Stream inputStream, string path)
         {
             return new UmbracoFile(UmbracoMediaFile.Save(inputStream, path));
         }
 
+        [Obsolete("This is no longer used and will be removed in future versions")]
         public static UmbracoFile Save(byte[] file, string relativePath)
         {
             return new UmbracoFile(UmbracoMediaFile.Save(new MemoryStream(file), relativePath));
         }
 
+        [Obsolete("This is no longer used and will be removed in future versions")]
         public static UmbracoFile Save(HttpPostedFile file)
         {
             return new UmbracoFile(UmbracoMediaFile.Save(file));
         }
 
-        //filebase overload...
+        [Obsolete("This is no longer used and will be removed in future versions")]
         public static UmbracoFile Save(HttpPostedFileBase file)
         {
             return new UmbracoFile(UmbracoMediaFile.Save(file));
@@ -118,11 +121,13 @@ namespace umbraco.cms.businesslogic.Files
             return new System.Tuple<int, int>(size.Width, size.Height);
         }
 
+        [Obsolete("This is no longer used and will be removed in future versions")]
         public string Resize(int width, int height)
         {
             return _mediaFile.Resize(width, height);
         }
 
+        [Obsolete("This is no longer used and will be removed in future versions")]
         public string Resize(int maxWidthHeight, string fileNameAddition)
         {
             return _mediaFile.Resize(maxWidthHeight, fileNameAddition);

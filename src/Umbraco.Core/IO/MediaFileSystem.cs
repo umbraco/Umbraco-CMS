@@ -31,6 +31,7 @@ namespace Umbraco.Core.IO
         private long _folderCounter;
         private bool _folderCounterInitialized;
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         private static readonly Dictionary<int, string> DefaultSizes = new Dictionary<int, string>
         {
             { 100, "thumb" },
@@ -263,7 +264,7 @@ namespace Umbraco.Core.IO
             var filename = Path.GetFileName(sourcepath);
             var filepath = GetMediaPath(filename, content.Key, propertyType.Key);
             this.CopyFile(sourcepath, filepath);
-            CopyThumbnails(sourcepath, filepath);
+            
             return filepath;
         }
 
@@ -312,29 +313,17 @@ namespace Umbraco.Core.IO
             }
         }
 
-        // sets a file for the FileUpload property editor
-        // ie generates thumbnails and populates autofill properties
+        /// <summary>
+        /// Sets a file for the FileUpload property editor and populates autofill properties
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="property"></param>
+        /// <param name="filepath"></param>
+        /// <param name="filestream"></param>
         private void SetUploadFile(IContentBase content, Property property, string filepath, Stream filestream)
-        {
-            // check if file is an image (and supports resizing and thumbnails etc)
-            var extension = Path.GetExtension(filepath);
-            var isImage = IsImageFile(extension);
-
-            // specific stuff for images (thumbnails etc)
-            if (isImage)
-            {
-                using (var image = Image.FromStream(filestream))
-                {
-                    // use one image for all
-                    GenerateThumbnails(image, filepath, property.PropertyType);
-                    _uploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream, image);
-                }
-            }
-            else
-            {
-                // will use filepath for extension, and filestream for length
-                _uploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream);
-            }
+        {            
+            // will use filepath for extension, and filestream for length
+            _uploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream);
         }
 
         #endregion
@@ -401,6 +390,7 @@ namespace Umbraco.Core.IO
 
         // note: this does not find 'custom' thumbnails?
         // will find _thumb and _big-thumb but NOT _custom?
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public IEnumerable<string> GetThumbnails(string path)
         {
             var parentDirectory = Path.GetDirectoryName(path);
@@ -421,12 +411,14 @@ namespace Umbraco.Core.IO
             DeleteThumbnails(path);
         }
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public void DeleteThumbnails(string path)
         {
             GetThumbnails(path)
                 .ForEach(x => base.DeleteFile(x));
         }
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public void CopyThumbnails(string sourcePath, string targetPath)
         {
             var targetPathBase = Path.GetDirectoryName(targetPath) ?? "";
@@ -479,6 +471,7 @@ namespace Umbraco.Core.IO
 
         #region GenerateThumbnails
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public IEnumerable<ResizedImage> GenerateThumbnails(
             Image image,
             string filepath,
@@ -500,6 +493,7 @@ namespace Umbraco.Core.IO
             return GenerateThumbnails(image, filepath, additionalSizes);
         }
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public IEnumerable<ResizedImage> GenerateThumbnails(
             Image image,
             string filepath,
@@ -522,6 +516,7 @@ namespace Umbraco.Core.IO
                 .ToList(); // now
         }
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public IEnumerable<ResizedImage> GenerateThumbnails(
             Stream filestream,
             string filepath,
@@ -535,6 +530,7 @@ namespace Umbraco.Core.IO
             }
         }
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public IEnumerable<ResizedImage> GenerateThumbnails(
             Image image,
             string filepath,
@@ -556,16 +552,19 @@ namespace Umbraco.Core.IO
 
         #region GenerateResized - Generate at resized filepath derived from origin filepath
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public ResizedImage GenerateResized(Image originImage, string originFilepath, string sizeName, int maxWidthHeight)
         {
             return GenerateResized(originImage, originFilepath, sizeName, maxWidthHeight, -1, -1);
         }
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public ResizedImage GenerateResized(Image originImage, string originFilepath, string sizeName, int fixedWidth, int fixedHeight)
         {
             return GenerateResized(originImage, originFilepath, sizeName, -1, fixedWidth, fixedHeight);
         }
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public ResizedImage GenerateResized(Image originImage, string originFilepath, string sizeName, int maxWidthHeight, int fixedWidth, int fixedHeight)
         {
             if (string.IsNullOrWhiteSpace(sizeName))
@@ -581,16 +580,19 @@ namespace Umbraco.Core.IO
 
         #region GenerateResizedAt - Generate at specified resized filepath
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public ResizedImage GenerateResizedAt(Image originImage, string resizedFilepath, int maxWidthHeight)
         {
             return GenerateResizedAt(originImage, resizedFilepath, maxWidthHeight, -1, -1);
         }
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public ResizedImage GenerateResizedAt(Image originImage, int fixedWidth, int fixedHeight, string resizedFilepath)
         {
             return GenerateResizedAt(originImage, resizedFilepath, -1, fixedWidth, fixedHeight);
         }
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public ResizedImage GenerateResizedAt(Image originImage, string resizedFilepath, int maxWidthHeight, int fixedWidth, int fixedHeight)
         {
             // target dimensions
@@ -699,6 +701,7 @@ namespace Umbraco.Core.IO
 
         #region Inner classes
 
+        [Obsolete("This should no longer be used, image manipulation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
         public class ResizedImage
         {
             public ResizedImage()
