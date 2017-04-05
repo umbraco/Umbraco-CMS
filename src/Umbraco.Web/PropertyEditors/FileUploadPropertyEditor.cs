@@ -30,16 +30,7 @@ namespace Umbraco.Web.PropertyEditors
             baseEditor.Validators.Add(new UploadFileTypeValidator());
             return new FileUploadPropertyValueEditor(baseEditor, MediaFileSystem);
         }
-
-        /// <summary>
-        /// Creates the corresponding preValue editor.
-        /// </summary>
-        /// <returns>The corresponding preValue editor.</returns>
-        protected override PreValueEditor CreatePreValueEditor()
-        {
-            return new FileUploadPreValueEditor();
-        }
-
+        
         /// <summary>
         /// Gets a value indicating whether a property is an upload field.
         /// </summary>
@@ -143,100 +134,7 @@ namespace Umbraco.Web.PropertyEditors
                 else
                     MediaFileSystem.UploadAutoFillProperties.Populate(content, autoFillConfig, MediaFileSystem.GetRelativePath(svalue));
             }
-        }
-
-        /// <summary>
-        /// A custom pre-val editor to ensure that the data is stored how the legacy data was stored in
-        /// </summary>
-        internal class FileUploadPreValueEditor : ValueListPreValueEditor
-        {
-            public FileUploadPreValueEditor()
-            {
-                var field = Fields.First();
-                field.Description = "Enter a max width/height for each thumbnail";
-                field.Name = "Add thumbnail size";
-                //need to have some custom validation happening here
-                field.Validators.Add(new ThumbnailListValidator());
-            }
-
-            /// <summary>
-            /// Format the persisted value to work with our multi-val editor.
-            /// </summary>
-            /// <param name="defaultPreVals"></param>
-            /// <param name="persistedPreVals"></param>
-            /// <returns></returns>
-            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
-            {
-                var result = new List<PreValue>();
-
-                //the pre-values just take up one field with a semi-colon delimiter so we'll just parse
-                var dictionary = persistedPreVals.FormatAsDictionary();
-                if (dictionary.Any())
-                {
-                    //there should only be one val
-                    var delimited = dictionary.First().Value.Value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    var i = 0;
-                    result.AddRange(delimited.Select(x => new PreValue(i++, x)));
-                }
-
-                //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
-                return new Dictionary<string, object> { { "items", result.ToDictionary(x => x.Id, PreValueAsDictionary) } };
-            }
-
-            private IDictionary<string, object> PreValueAsDictionary(PreValue preValue)
-            {
-                return new Dictionary<string, object> { { "value", preValue.Value }, { "sortOrder", preValue.SortOrder } };
-            }
-            /// <summary>
-            /// Take the posted values and convert them to a semi-colon separated list so that its backwards compatible
-            /// </summary>
-            /// <param name="editorValue"></param>
-            /// <param name="currentValue"></param>
-            /// <returns></returns>
-            public override IDictionary<string, PreValue> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
-            {
-                var result = base.ConvertEditorToDb(editorValue, currentValue);
-
-                //this should just be a dictionary of values, we want to re-format this so that it is just one value in the dictionary that is
-                // semi-colon delimited
-                var values = result.Select(item => item.Value.Value).ToList();
-
-                result.Clear();
-                result.Add("thumbs", new PreValue(string.Join(";", values)));
-                return result;
-            }
-
-            internal class ThumbnailListValidator : IPropertyValidator
-            {
-                public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
-                {
-                    var json = value as JArray;
-                    if (json == null) yield break;
-
-                    //validate each item which is a json object
-                    for (var index = 0; index < json.Count; index++)
-                    {
-                        var i = json[index];
-                        var jItem = i as JObject;
-                        if (jItem == null || jItem["value"] == null) continue;
-
-                        //NOTE: we will be removing empty values when persisting so no need to validate
-                        var asString = jItem["value"].ToString();
-                        if (asString.IsNullOrWhiteSpace()) continue;
-
-                        int parsed;
-                        if (int.TryParse(asString, out parsed) == false)
-                        {
-                            yield return new ValidationResult("The value " + asString + " is not a valid number", new[]
-                            {
-                                //we'll make the server field the index number of the value so it can be wired up to the view
-                                "item_" + index.ToInvariantString()
-                            });
-                        }
-                    }
-                }
-            }
-        }
+        }        
 
         #region Application event handler, used to bind to events on startup
 
