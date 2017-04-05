@@ -50,7 +50,7 @@ function rmf($file)
 # copies a file, creates target dir if needed
 function cpf($source, $target)
 {
-  new-item -itemType file -path $target -force
+  $ignore = new-item -itemType file -path $target -force
   cp -force $source $target
 }
 
@@ -68,7 +68,7 @@ function cprf($source, $select, $target, $filter)
   $files |
     foreach {
       if ($_.PsIsContainer) {
-        new-item -itemType directory -path "$target\$($_.RelativeName)" -force
+        $ignore = new-item -itemType directory -path "$target\$($_.RelativeName)" -force
       }
       else {
         cpf $_.FullName "$target\$($_.RelativeName)"

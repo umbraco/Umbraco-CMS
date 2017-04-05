@@ -5,6 +5,7 @@
 #
 # see set-psdebug -trace 0/1/2
 # use &echoargs to debug & commands
+# ./build-packages | out-file build-packages.log
 
 # fixme
 #  first thing, we need to restore NuGet!
@@ -153,14 +154,14 @@ cprf "$src\packages\SqlServerCE.4.0.0.1" "*.*" "$temp\WebApp\bin" `
 # copy Belle
 write "Copy Belle"
 
-cprf "$src\Umbraco.Web.UI.Client\build\belle" "*.*" "$temp\WebApp\umbraco" `
-  { -not $_.RelativeName -eq "index.html" }
+cprf "$src\Umbraco.Web.UI.Client\build\belle" "*" "$temp\WebApp\umbraco" `
+  { -not ($_.RelativeName -eq "index.html") }
 
 # zip webapp
 write "Zip WebApp"
 
-&$zip a -r "$build\UmbracoCms.AllBinaries.$version.zip" "$temp\bin\*"  -x!dotLess.Core.dll #| out-null
-&$zip a -r "$build\UmbracoCms.$version.zip" "$temp\WebApp\*" -x!dotLess.Core.dll -x![Content_Types].xml #| out-null
+&$zip a -r "$build\UmbracoCms.AllBinaries.$version.zip" "$temp\bin\*"  -x!dotless.Core.dll #| out-null
+&$zip a -r "$build\UmbracoCms.$version.zip" "$temp\WebApp\*" -x!dotless.Core.dll -x!Content_Types.xml #| out-null
 
 # prepare and zip WebPI
 write "Zip WebPI"
