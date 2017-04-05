@@ -47,6 +47,35 @@ function rmf($file)
   remove-item $file -force -errorAction SilentlyContinue
 }
 
+# copies a file, creates target dir if needed
+function cpf($source, $target)
+{
+  new-item -itemType file -path $target -force
+  cp -force $source $target
+}
+
+# copies files to a directory
+function cprf($source, $select, $target, $filter)
+{
+  $files = ls -r "$source\$select"
+  $files | foreach {
+    $relative = $_.FullName.SubString($source.Length+1)
+    $_ | add-member -memberType NoteProperty -name RelativeName -value $relative
+  }
+  if ($filter -ne $null) {
+    $files = $files | where $filter 
+  }
+  $files |
+    foreach {
+      if ($_.PsIsContainer) {
+        new-item -itemType directory -path "$target\$($_.RelativeName)" -force
+      }
+      else {
+        cpf $_.FullName "$target\$($_.RelativeName)"
+      }
+    }
+}
+
 # loads the semver dll
 function loadSemVer() {
   $semverlib = fullPath("..\src\packages\Semver.2.0.4\lib\net452\Semver.dll")
@@ -66,7 +95,7 @@ function fileReplace($filename, $source, $replacement) {
 }
 
 # finds msbuild
-function findMsBuild($vswhere) {
+function findVisualStudio($vswhere) {
   $vsPath = ""
   $vsVer = ""
   &$vswhere | foreach {

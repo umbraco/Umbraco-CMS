@@ -2,6 +2,9 @@
 # to the whole build.proj dance
 # then do the build.bat thing too
 # or - use VSO to build the nuget packages?
+#
+# see set-psdebug -trace 0/1/2
+# use &echoargs to debug & commands
 
 # fixme
 #  first thing, we need to restore NuGet!
@@ -20,11 +23,15 @@ $build = $pwd
 $temp = "$build\_BuildOutput"
 $src = $(fullpath "..\src")
 
+write "Build: $build"
+write "Temp: $temp"
+write "Src: $src"
+
 # tools
 $zip = $(fullpath "..\tools\7zip\7za.exe")
 $nuget = "$src\.nuget\NuGet.exe"
 $vswhere = $(fullpath "..\tools\VsWhere\vswhere.exe")
-$vs = findVs($vswhere)
+$vs = findVisualStudio($vswhere)
 
 # get version
 $version = $env:UMBRACO_VERSION
@@ -35,8 +42,8 @@ if ($version -eq "" -or $version -eq $null) {
 $release = $env:UMBRACO_RELEASE
 $comment = $env:UMBRACO_COMMENT
 if ($comment -eq $null) { $comment = "" }
-$build = $env:UMBRACO_BUILD
-if ($build -eq $null) { $build = "" }
+$buildno = $env:UMBRACO_BUILD
+if ($buildno -eq $null) { $buildno = "" }
 write "Version $version"
 
 # clear
@@ -56,8 +63,8 @@ rmf "$build\webpihash.txt"
 write "Making sure we have a web.config"
 
 $webUi = "$src\Umbraco.Web.UI"
-if (-not test-path "$webUi\web.config") {
-  cp "$webUi\web.Template.config" "$webUi\web.config"
+if (-not (test-path "$webUi\web.config")) {
+  cpf "$webUi\web.Template.config" "$webUi\web.config"
 }
 
 # compile
@@ -68,15 +75,19 @@ if (-not $vso) {
     $toolsVersion = "15.0"
   }
   
+  write "Compile"
+  # fixme logger and stuff?!
+  # beware of the weird double \\ at the end of paths
+  # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
   &$vs.MsBuild "$src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" `
     /p:WarningLevel=0 `
     /p:Configuration=$buildConfiguration `
     /p:UseWPP_CopyWebApplication=True `
     /p:PipelineDependsOnBuild=False `
-    /p:OutDir="$temp\bin\" `
-    /p:WebProjectOutputDir="$temp\WebApp\" `
+    /p:OutDir=$temp\bin\\ `
+    /p:WebProjectOutputDir=$temp\WebApp\\ `
     /p:Verbosity=minimal `
-    /t:Clean;Rebuild `
+    /t:Clean`;Rebuild `
     /tv:$toolsVersion
 }
 
@@ -87,10 +98,25 @@ if (-not $vso) {
 #  rename _BuildOutput to _build.temp
 #  are we building there?
 
+# cleanup build
+write "Clean build"
+
+ls -r "$temp\bin\*.dll.config" | rm
+ls -r "$temp\WebApp\bin\*.dll.config" | rm
+
 # cleanup presentation
 write "Cleanup presentation"
 
 rmrf "$temp\WebApp\umbraco.presentation"
+
+# create directories
+write "Create directories"
+
+mkdir "$temp\Configs"
+mkdir "$temp\Configs\Lang"
+mkdir "$temp\WebApp\App_Data"
+#mkdir "$temp\WebApp\Media"
+#mkdir "$temp\WebApp\Views"
 
 # copy various files
 write "Copy xml documentation"
@@ -99,19 +125,19 @@ cp -force "$temp\bin\*.xml" "$temp\WebApp\bin"
 
 write "Copy transformed configs and langs"
 
-cp -force "$temp\WebApp\config\*.config"
-cp -force "$temp\WebApp\config\*.js" "$temp\Configs")
-cp -force "$temp\WebApp\config\lang\*.xml" "$temp\Configs\Lang")
-cp -force "$temp\WebApp\web.config" "$temp\Configs\web.config.transform")
+cprf "$temp\WebApp\config" "*.config" "$temp\Configs"
+cprf "$temp\WebApp\config" "*.js" "$temp\Configs"
+cprf "$temp\WebApp\config\lang" "*.xml" "$temp\Configs\Lang"
+cpf "$temp\WebApp\web.config" "$temp\Configs\web.config.transform"
 
 write "Copy transformed web.config"
 
-cp -force "$src\Umbraco.Web.UI\web.$buildConfiguration.Config.transformed" "$temp\WebApp\web.config"
+cpf "$src\Umbraco.Web.UI\web.$buildConfiguration.Config.transformed" "$temp\WebApp\web.config"
 
 # offset the modified timestamps on all umbraco dlls, as WebResources
 # break if date is in the future, which, due to timezone offsets can happen.
 write "Offset dlls timestamps"
-ls "$temp\**\*.dll" | foreach {
+ls -r "$temp\*.dll" | foreach {
   $_.CreationTime = $_.CreationTime.AddHours(-11)
   $_.LastWriteTime = $_.LastWriteTime.AddHours(-11)
 }
@@ -119,36 +145,22 @@ ls "$temp\**\*.dll" | foreach {
 # copy libs
 write "Copy SqlCE libraries"
 
-$cpbase = "$src\packages\SqlServerCE.4.0.0.1"
-ls "$cpbase\**\*.*" |
-  where { -not $_.Extension.StartsWith(".nu") -and -not $_.FullName.SubString($cpbase.Length+1).StartsWith("lib\") } | 
-  foreach {
-    cp $_ -destination "$temp\bin\$($_.FullName.SubString($cpbase.Length+1))"
-    cp $_ -destination "$temp\WebApp\$($_.FullName.SubString($cpbase.Length1+))"
-  }
+cprf "$src\packages\SqlServerCE.4.0.0.1" "*.*" "$temp\bin" `
+  { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") }
+cprf "$src\packages\SqlServerCE.4.0.0.1" "*.*" "$temp\WebApp\bin" `
+  { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") }
         
 # copy Belle
 write "Copy Belle"
 
-$cpbase = "$src\Umbraco.Web.UI.Client\build\belle"
-ls "$cpbase\**\*.*" |
-  where { -not $_.FullName.SubString($cpbase.Length+1) -eq "index.html" } |
-  foreach {
-    cp $_ -destination "$temp\WebApp\umbraco\$($_.FullName.SubString($cpbase.Length+1))"
-  }
-
-# create system folders
-write "Create system folders"
-
-mkdir "$temp\WepApp\App_Data"
-mkdir "$temp\WepApp\Media"
-mkdir "$temp\WepApp\Views"
+cprf "$src\Umbraco.Web.UI.Client\build\belle" "*.*" "$temp\WebApp\umbraco" `
+  { -not $_.RelativeName -eq "index.html" }
 
 # zip webapp
 write "Zip WebApp"
 
-&$zip a -r "$build\UmbracoCms.AllBinaries.$version.zip" "$temp\bin\*"  -x!dotLess.Core.dll | out-null
-&$zip a -r "$build\UmbracoCms.$version.zip" "$temp\WebApp\*" -x!dotLess.Core.dll -x![Content_Types].xml | out-null
+&$zip a -r "$build\UmbracoCms.AllBinaries.$version.zip" "$temp\bin\*"  -x!dotLess.Core.dll #| out-null
+&$zip a -r "$build\UmbracoCms.$version.zip" "$temp\WebApp\*" -x!dotLess.Core.dll -x![Content_Types].xml #| out-null
 
 # prepare and zip WebPI
 write "Zip WebPI"
@@ -157,21 +169,14 @@ rmrf "$temp\WebPi"
 mkdir "$temp\WebPi"
 mkdir "$temp\WebPi\umbraco"
 
-$cpbase = "$temp\WebApp"
-ls "$cpbase\*" | foreach {
-  cp $_ -destination "$temp\WebPi\umbraco\$_.FullName.SubString($cpbase.Length+1)"
-}
-
-$cpbase = "$src\WebPi"
-ls "$cpbase\**\*.*" | foreach {
-  cp $_ -destination "$temp\WebPi\$_.FullName.SubString($cpbase.Length+1)"
-}
+cprf "$temp\WebApp" "*" "$temp\WebPi\umbraco"
+cprf "$src\WebPi" "*" "$temp\WebPi"
     
-&$zip a -r "$build\UmbracoCms.WebPI.$version.zip" "$temp\WebPi\*" -x!dotLess.Core.dll | out-null
+&$zip a -r "$build\UmbracoCms.WebPI.$version.zip" "$temp\WebPi\*" -x!dotLess.Core.dll #| out-null
   
 # clear
 write "Delete build folder"
-rmrf "$temp"
+#rmrf "$temp"
 
 # hash the webpi file
 write "Hash the WebPI file"
@@ -181,21 +186,24 @@ write $hash | out-file "$build\webpihash.txt" -encoding ascii
 
 # setting node_modules folder to hidden to prevent VS13 from
 # crashing on it while loading the websites project (still needed?)
+# use get-item -force 'cos it might be hidden already
 write "Set hidden attribute on node_modules"
 
-$dir = get-item "$src\Umbraco.Web.UI.Client\node_modules"
+$dir = get-item -force "$src\Umbraco.Web.UI.Client\node_modules"
 $dir.Attributes = $dir.Attributes -bor ([System.IO.FileAttributes]::Hidden)
 
 # add Web.config transform files to the NuGet package
 write "Add web.config transforms to NuGet package"
+
 mv "$temp\WebApp\Views\Web.config" "$temp\WebApp\Views\Web.config.transform"
-mv "$temp\WebApp\Xslt\Web.config" "$temp\WebApp\Xslt\Web.config.transform"
+# that one does not exist in .bat build either?
+#mv "$temp\WebApp\Xslt\Web.config" "$temp\WebApp\Xslt\Web.config.transform"
 
 # create NuGet packages
 if (-not $vso)
 {
   write "Create NuGet packages"
-  
+
   &$nuget Pack "$build\NuSpecs\UmbracoCms.Core.nuspec" -Version $version -Symbols -Verbosity quiet
   &$nuget Pack "$build\NuSpecs\UmbracoCms.nuspec" -Version $version -Verbosity quiet
 }
