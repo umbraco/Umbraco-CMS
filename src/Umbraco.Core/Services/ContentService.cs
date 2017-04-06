@@ -1124,9 +1124,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         public bool UnPublish(IContent content, int userId = 0)
         {
-            var attempt = ((IContentServiceOperations) this).UnPublish(content, userId);
-            LogHelper.Debug<ContentService>(string.Format("Result of unpublish attempt: {0}", attempt.Result.StatusType));
-            return attempt.Success;
+            return ((IContentServiceOperations)this).UnPublish(content, userId).Success;
         }
 
         /// <summary>
