@@ -612,8 +612,14 @@ namespace Umbraco.Web.Editors
             }
 
             //get the string json from the request
-            int parentId; bool entityFound;
+            int parentId; bool entityFound; GuidUdi parentUdi;
             string currentFolderId = result.FormData["currentFolder"];
+            // test for udi
+            if (GuidUdi.TryParse(currentFolderId, out parentUdi))
+            {
+                currentFolderId = parentUdi.Guid.ToString(); 
+            }
+
             if (int.TryParse(currentFolderId, out parentId) == false)
             {
                 // if a guid then try to look up the entity
