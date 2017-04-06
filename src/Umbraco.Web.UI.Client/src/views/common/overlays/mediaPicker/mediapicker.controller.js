@@ -61,6 +61,7 @@ angular.module("umbraco")
 
             $scope.submitFolder = function() {
                 if ($scope.newFolderName) {
+                    $scope.creatingFolder = true;
                     mediaResource
                         .addFolder($scope.newFolderName, $scope.currentFolder.id)
                         .then(function(data) {
@@ -69,7 +70,7 @@ angular.module("umbraco")
                                 cacheKey: "__media", //this is the main media tree cache key
                                 childrenOf: data.parentId //clear the children of the parent
                             });
-
+                            $scope.creatingFolder = false;
                             $scope.gotoFolder(data);
                             $scope.showFolderInput = false;
                             $scope.newFolderName = "";
