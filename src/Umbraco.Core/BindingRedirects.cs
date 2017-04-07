@@ -7,7 +7,7 @@ using Umbraco.Core;
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Manages any assembly binding redirects that cannot be done via config
+    /// Manages any assembly binding redirects that cannot be done via config (i.e. unsigned --> signed assemblies)
     /// </summary>
     internal class BindingRedirects
     {
@@ -18,11 +18,8 @@ namespace Umbraco.Core
         }
 
         private static readonly Regex Log4NetAssemblyPattern = new Regex("log4net, Version=([\\d\\.]+?), Culture=neutral, PublicKeyToken=null");
-        private const string Log4NetReplacement = "log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a";
-
-        private static readonly Regex HtmlAgilityAssemblyPattern = new Regex("HtmlAgilityPack, Version=([\\d\\.]+?), Culture=neutral, PublicKeyToken=bd319b19eaf3b43a");
-        private const string HtmlAgilityReplacement = "HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a";
-
+        private const string Log4NetReplacement = "log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a";
+        
         /// <summary>
         /// This is used to do an assembly binding redirect via code - normally required due to signature changes in assemblies
         /// </summary>
@@ -36,13 +33,7 @@ namespace Umbraco.Core
             {
                 return Assembly.Load(Log4NetAssemblyPattern.Replace(args.Name, Log4NetReplacement));
             }
-
-            //HtmlAgility:            
-            if (HtmlAgilityAssemblyPattern.IsMatch(args.Name) && args.Name != HtmlAgilityReplacement)
-            {
-                return Assembly.Load(HtmlAgilityAssemblyPattern.Replace(args.Name, HtmlAgilityReplacement));
-            }
-
+            
             //AutoMapper:
             // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
             // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stackoverflow
