@@ -2,7 +2,7 @@
 using System.Linq;
 using Umbraco.Core.Logging;
 
-namespace Umbraco.Tests.Logging
+namespace Umbraco.Tests.TestHelpers
 {
     public class ConsoleLogger : ILogger
     {

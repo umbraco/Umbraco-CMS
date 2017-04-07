@@ -229,7 +229,7 @@ namespace Umbraco.Web.Editors
 
             long total;
             var children = Services.MediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out total, "Name", Direction.Ascending, true, null, folderTypes.ToArray());
-            
+
             return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(total, pageNumber, pageSize)
             {
                 Items = children.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>)
@@ -344,7 +344,7 @@ namespace Umbraco.Web.Editors
                     return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
                 }
             }
-            
+
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
@@ -370,7 +370,7 @@ namespace Umbraco.Web.Editors
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        } 
+        }
         #endregion
 
         /// <summary>
@@ -612,8 +612,14 @@ namespace Umbraco.Web.Editors
             }
 
             //get the string json from the request
-            int parentId; bool entityFound;
+            int parentId; bool entityFound; GuidUdi parentUdi;
             string currentFolderId = result.FormData["currentFolder"];
+            // test for udi
+            if (GuidUdi.TryParse(currentFolderId, out parentUdi))
+            {
+                currentFolderId = parentUdi.Guid.ToString();
+            }
+
             if (int.TryParse(currentFolderId, out parentId) == false)
             {
                 // if a guid then try to look up the entity
