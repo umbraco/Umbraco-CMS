@@ -536,7 +536,23 @@ module.exports = function (grunt) {
                             ]
                         },
                         'ace-builds': {
-                           files: ['src-min-noconflict/**']
+                           files: [
+                                'src-min-noconflict/ace.js',
+                                
+                                'src-min-noconflict/ext-language_tools.js',
+                                'src-min-noconflict/ext-searchbox.js',
+                                'src-min-noconflict/ext-settings_menu.js',
+
+                                'src-min-noconflict/snippets/text.js',
+                                'src-min-noconflict/snippets/javascript.js',
+                                
+                                'src-min-noconflict/theme-chrome.js',
+                                
+                                'src-min-noconflict/mode-razor.js',
+                                'src-min-noconflict/mode-javascript.js',
+                                
+                                'src-min-noconflict/worker-javascript.js',
+                            ]
                        }
                     }
                 }
