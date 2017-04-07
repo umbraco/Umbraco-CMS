@@ -28,7 +28,7 @@ namespace Umbraco.Core.Publishing
         {
             var counter = 0;
             var contentForRelease = _contentService.GetContentForRelease().ToArray();
-            if (contentForRelease.Any())
+            if (contentForRelease.Length > 0)
                 LogHelper.Debug<ScheduledPublisher>(string.Format("There's {0} item(s) of content to be published", contentForRelease.Length));
             foreach (var d in contentForRelease)
             {
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Publishing
             }
 
             var contentForExpiration = _contentService.GetContentForExpiration().ToArray();
-            if (contentForExpiration.Any())
+            if (contentForExpiration.Length > 0)
                 LogHelper.Debug<ScheduledPublisher>(string.Format("There's {0} item(s) of content to be unpublished", contentForExpiration.Length));
             foreach (var d in contentForExpiration)
             {
