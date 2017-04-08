@@ -36,7 +36,7 @@ namespace UmbracoExamine
         private readonly IUserService _userService;
         private readonly IContentTypeService _contentTypeService;
         private readonly EntityXmlSerializer _serializer = new EntityXmlSerializer();
-        private const int PageSize = 2;
+        private const int PageSize = 10000;
 
         #region Constructors
 
