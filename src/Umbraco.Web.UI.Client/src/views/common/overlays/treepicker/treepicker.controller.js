@@ -22,6 +22,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         $scope.model.selection = [];
 
+        //Used for toggling an empty-state message
+        //Some trees can have no items (dictionary & forms email templates)
+        $scope.hasItems = true;
+        $scope.emptyStateMessage = dialogOptions.emptyStateMessage;
+
+
         //TODO: I don't think this is used or called anywhere!!
         $scope.init = function (contentType) {
 
@@ -149,6 +155,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         //gets the tree object when it loads
         function treeLoadedHandler(ev, args) {
+            //args.tree contains children (args.tree.root.children)
+            $scope.hasItems = args.tree.root.children.length > 0;
+
             tree = args.tree;
         }
 
