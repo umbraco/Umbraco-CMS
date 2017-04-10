@@ -393,6 +393,7 @@
                 multiPicker: false,
                 show: true,
                 title: localizationService.localize("template_insertDictionaryItem"),
+                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
                 select: function(node){
                     var code = templateHelper.getInsertDictionarySnippet(node.name);
                 	insert(code);
