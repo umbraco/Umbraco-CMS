@@ -384,10 +384,6 @@
         <assemblyIdentity name="System.Net.Http.Formatting" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
       </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="Microsoft.CodeAnalysis.CSharp" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-1.3.1.0" newVersion="1.3.1.0"/>
-      </dependentAssembly>
     </assemblyBinding>
   </runtime>
 
