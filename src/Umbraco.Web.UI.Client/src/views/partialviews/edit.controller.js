@@ -194,6 +194,7 @@
                 multiPicker: false,
                 show: true,
                 title: "Insert dictionary item",
+                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
                 select: function(node){
 
                     var code = templateHelper.getInsertDictionarySnippet(node.name);
