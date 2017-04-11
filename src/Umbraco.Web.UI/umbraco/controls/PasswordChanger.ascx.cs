@@ -4,6 +4,9 @@ using System.Configuration.Provider;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.UI.Umbraco.Controls
 {
@@ -20,9 +23,11 @@ namespace Umbraco.Web.UI.Umbraco.Controls
             umbPasswordChanger_passwordNewConfirm.Text = null;
             //reset the flag always
             IsChangingPasswordField.Value = "false";
-            this.DataBind();
-        } 
 
-       
+            var auth = new HttpContextWrapper(HttpContext.Current).GetUmbracoAuthTicket();
+            ResetPlaceHolder.Visible = ApplicationContext.Current.Services.UserService.GetByUsername(auth.Name).IsAdmin();
+
+            this.DataBind();
+        }
     }
 }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Web.Security;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web
@@ -23,7 +20,7 @@ namespace Umbraco.Web
             return new Dictionary<string, object>
                 {
                     {"minPasswordLength", membershipProvider.MinRequiredPasswordLength},
-                    {"enableReset", membershipProvider.EnablePasswordReset},
+                    {"enableReset", UmbracoContext.Current.Security.CurrentUser.IsAdmin()},
                     {"enablePasswordRetrieval", membershipProvider.EnablePasswordRetrieval},
                     {"requiresQuestionAnswer", membershipProvider.RequiresQuestionAndAnswer},
                     {"allowManuallyChangingPassword", baseProvider != null && baseProvider.AllowManuallyChangingPassword}
