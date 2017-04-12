@@ -210,7 +210,8 @@ namespace umbraco.cms.presentation.developer
 
         protected IEnumerable<IParameterEditor> GetMacroParameterEditors()
         {
-            return ParameterEditorResolver.Current.ParameterEditors;
+            // we need to show the depracated ones for backwards compatibility
+            return ParameterEditorResolver.Current.GetParameterEditors(true);
         }
 
 		public void macroPropertyCreate(object sender, EventArgs e)
