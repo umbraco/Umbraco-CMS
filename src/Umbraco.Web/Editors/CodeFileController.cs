@@ -433,7 +433,7 @@ namespace Umbraco.Web.Editors
 
         private Attempt<IPartialView> CreateOrUpdatePartialView(CodeFileDisplay display)
         {
-            return CreateOrUpdatePartialView(display, SystemDirectories.MacroPartials,
+            return CreateOrUpdatePartialView(display, SystemDirectories.PartialViews,
                 Services.FileService.GetPartialView, Services.FileService.SavePartialView, Services.FileService.CreatePartialView);            
         }
         
