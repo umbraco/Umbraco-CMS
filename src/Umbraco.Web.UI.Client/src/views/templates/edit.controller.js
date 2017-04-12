@@ -616,9 +616,9 @@
 
 
         function insert(str) {
+            vm.editor.focus();
             vm.editor.moveCursorToPosition(vm.currentPosition);
             vm.editor.insert(str);
-            vm.editor.focus();
 
             // set form state to $dirty
             setFormState("dirty");

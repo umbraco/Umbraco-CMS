@@ -5,7 +5,14 @@
         <div class="umb-el-wrap">
             <label class="control-label" for="chooseField">Choose field</label>
             <div class="controls">
-                <select name="chooseField" ng-model="vm.field" ng-options="property for property in vm.properties"></select>
+                <select ng-model="vm.field">
+                    <optgroup localize="label" label="@templateEditor_customFields">
+                        <option ng-repeat="(key, value) in vm.properties" value="{{value}}">{{value}}</option>
+                    </optgroup>
+                    <optgroup localize="label" label="@templateEditor_standardFields">
+                        <option ng-repeat="(key, value) in vm.standardFields" value="{{value}}">{{value}}</option>
+                    </optgroup>
+                </select>
             </div>
         </div>
     </div>
@@ -24,7 +31,14 @@
                 <div class="umb-el-wrap">
                     <label class="control-label" for="altField">Fallback field</label>
                     <div class="controls">
-                        <select name="altField" ng-model="vm.altField" ng-options="property for property in vm.properties"></select>
+                        <select ng-model="vm.altField" >
+                            <optgroup localize="label" label="@templateEditor_customFields">
+                                <option ng-repeat="(key, value) in vm.properties" value="{{value}}">{{value}}</option>
+                            </optgroup>
+                            <optgroup localize="label" label="@templateEditor_standardFields">
+                                <option ng-repeat="(key, value) in vm.standardFields" value="{{value}}">{{value}}</option>
+                            </optgroup>
+                        </select>
                     </div>
                 </div>
             </div>
