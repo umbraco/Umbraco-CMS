@@ -37,8 +37,8 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((property, parameter) =>
                 {
                     //map the view and the config
-
-                    var paramEditor = ParameterEditorResolver.Current.GetByAlias(property.EditorAlias);
+                    // we need to show the depracated ones for backwards compatibility
+                    var paramEditor = ParameterEditorResolver.Current.GetByAlias(property.EditorAlias, true);
                     if (paramEditor == null)
                     {
                         //we'll just map this to a text box

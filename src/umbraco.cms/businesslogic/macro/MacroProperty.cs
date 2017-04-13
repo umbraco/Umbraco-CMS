@@ -101,7 +101,8 @@ namespace umbraco.cms.businesslogic.macro
                 if (_type == null)
                 {
                     //we'll try to create one based on the resolved new parameter editors
-                    var found = ParameterEditorResolver.Current.GetByAlias(ParameterEditorAlias);
+                    // we need to show the depracated ones for backwards compatibility
+                    var found = ParameterEditorResolver.Current.GetByAlias(ParameterEditorAlias, true);
                     if (found == null)
                     {
                         return null;
