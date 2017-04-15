@@ -545,7 +545,7 @@ namespace Umbraco.Core.Models
             if (supportsResizing)
             {
                 //get the original image from the original stream
-                if (fileStream.CanSeek) fileStream.Seek(0, 0);
+                if (fileStream.CanSeek) fileStream.Seek(0, SeekOrigin.Begin);
                 using (var originalImage = Image.FromStream(fileStream))
                 {
                     var additionalSizes = new List<int>();
