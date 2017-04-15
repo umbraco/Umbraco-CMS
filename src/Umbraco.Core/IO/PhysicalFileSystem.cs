@@ -122,7 +122,7 @@ namespace Umbraco.Core.IO
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath)); // ensure it exists
 
             if (stream.CanSeek)
-                stream.Seek(0, 0);
+                stream.Seek(0, SeekOrigin.Begin);
 
             using (var destination = (Stream)File.Create(fullPath))
                 stream.CopyTo(destination);
