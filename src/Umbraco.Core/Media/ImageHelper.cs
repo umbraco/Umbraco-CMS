@@ -227,35 +227,37 @@ namespace Umbraco.Core.Media
                     }
 
                     // Set compresion ratio to 90%
-                    var ep = new EncoderParameters();
-                    ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
-
-                    // Save the new image using the dimensions of the image
-                    var predictableThumbnailName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", maxWidthHeight.ToString(CultureInfo.InvariantCulture));
-                    var predictableThumbnailNameJpg = predictableThumbnailName.Substring(0, predictableThumbnailName.LastIndexOf(".", StringComparison.Ordinal)) + ".jpg";
-                    using (var ms = new MemoryStream())
+                    string newFileName;
+                    using (var ep = new EncoderParameters())
                     {
-                        bp.Save(ms, codec, ep);
-                        ms.Seek(0, 0);
+                        ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
 
-                        fs.AddFile(predictableThumbnailName, ms);
-                        fs.AddFile(predictableThumbnailNameJpg, ms);
-                    }
+                        // Save the new image using the dimensions of the image
+                        var predictableThumbnailName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", maxWidthHeight.ToString(CultureInfo.InvariantCulture));
+                        var predictableThumbnailNameJpg = predictableThumbnailName.Substring(0, predictableThumbnailName.LastIndexOf(".", StringComparison.Ordinal)) + ".jpg";
+                        using (var ms = new MemoryStream())
+                        {
+                            bp.Save(ms, codec, ep);
+                            ms.Seek(0, 0);
 
-                    // TODO: Remove this, this is ONLY here for backwards compatibility but it is essentially completely unusable see U4-5385
-                    var newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", string.Format("{0}x{1}", widthTh, heightTh));
-                    using (var ms = new MemoryStream())
-                    {
-                        bp.Save(ms, codec, ep);
-                        ms.Seek(0, 0);
+                            fs.AddFile(predictableThumbnailName, ms);
+                            fs.AddFile(predictableThumbnailNameJpg, ms);
+                        }
 
-                        fs.AddFile(newFileName, ms);
+                        // TODO: Remove this, this is ONLY here for backwards compatibility but it is essentially completely unusable see U4-5385
+                        newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", string.Format("{0}x{1}", widthTh, heightTh));
+                        using (var ms = new MemoryStream())
+                        {
+                            bp.Save(ms, codec, ep);
+                            ms.Seek(0, 0);
+
+                            fs.AddFile(newFileName, ms);
+                        }
                     }
 
                     return new ResizedImage(widthTh, heightTh, newFileName);
                 }
             }
         }
-
     }
 }
