@@ -19,7 +19,7 @@ namespace Umbraco.Web.HealthCheck
     /// </remarks>
     internal class HealthCheckResolver : LazyManyObjectsResolverBase<HealthCheckResolver, HealthCheck>, IHealthCheckResolver
     {
-        public HealthCheckResolver(ILogger logger, Func<IEnumerable<Type>> lazyTypeList) 
+        public HealthCheckResolver(ILogger logger, Func<IEnumerable<Type>> lazyTypeList)
             : base(new HealthCheckServiceProvider(), logger, lazyTypeList, ObjectLifetimeScope.HttpRequest)
         {
         }
@@ -51,7 +51,7 @@ namespace Umbraco.Web.HealthCheck
                         new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current)
                     });
                 }
-                    
+
                 //use normal ctor
                 return Activator.CreateInstance(serviceType);
             }

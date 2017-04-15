@@ -30,7 +30,7 @@ namespace Umbraco.Core.Publishing
         /// Publishes a single piece of Content
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to publish</param>
-        /// <param name="userId">Id of the User issueing the publish operation</param>        
+        /// <param name="userId">Id of the User issueing the publish operation</param>
         internal Attempt<PublishStatus> PublishInternal(IContent content, int userId)
         {
             var evtMsgs = _eventMessagesFactory.Get();
@@ -99,26 +99,26 @@ namespace Umbraco.Core.Publishing
         /// By default this is set to true which means that it will publish any content item in the list that is completely unpublished and
         /// not visible on the front-end. If set to false, this will only publish content that is live on the front-end but has new versions
         /// that have yet to be published.
-        /// </param>        
+        /// </param>
         /// <returns></returns>
         /// <remarks>
-        /// 
+        ///
         /// This method becomes complex once we start to be able to cancel events or stop publishing a content item in any way because if a
         /// content item is not published then it's children shouldn't be published either. This rule will apply for the following conditions:
         /// * If a document fails to be published, do not proceed to publish it's children if:
         /// ** The document does not have a publish version
         /// ** The document does have a published version but the includeUnpublishedDocuments = false
-        /// 
+        ///
         /// In order to do this, we will order the content by level and begin by publishing each item at that level, then proceed to the next
-        /// level and so on. If we detect that the above rule applies when the document publishing is cancelled we'll add it to the list of 
+        /// level and so on. If we detect that the above rule applies when the document publishing is cancelled we'll add it to the list of
         /// parentsIdsCancelled so that it's children don't get published.
-        /// 
+        ///
         /// Its important to note that all 'root' documents included in the list *will* be published regardless of the rules mentioned
-        /// above (unless it is invalid)!! By 'root' documents we are referring to documents in the list with the minimum value for their 'level'. 
-        /// In most cases the 'root' documents will only be one document since under normal circumstance we only publish one document and 
+        /// above (unless it is invalid)!! By 'root' documents we are referring to documents in the list with the minimum value for their 'level'.
+        /// In most cases the 'root' documents will only be one document since under normal circumstance we only publish one document and
         /// its children. The reason we have to do this is because if a user is publishing a document and it's children, it is implied that
         /// the user definitely wants to publish it even if it has never been published before.
-        /// 
+        ///
         /// </remarks>
         internal IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
             IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true)
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Publishing
 
             //group by levels and iterate over the sorted ascending level.
             //TODO: This will cause all queries to execute, they will not be lazy but I'm not really sure being lazy actually made
-            // much difference because we iterate over them all anyways?? Morten?       
+            // much difference because we iterate over them all anyways?? Morten?
             // Because we're grouping I think this will execute all the queries anyways so need to fetch it all first.
             var fetchedContent = content.ToArray();
 
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Publishing
             var levelGroups = fetchedContent.GroupBy(x => x.Level);
             foreach (var level in levelGroups.OrderBy(x => x.Key))
             {
-                //set the first level flag, used to ensure that all documents at the first level will 
+                //set the first level flag, used to ensure that all documents at the first level will
                 //be published regardless of the rules mentioned in the remarks.
                 if (!firstLevel.HasValue)
                 {
@@ -200,7 +200,10 @@ namespace Umbraco.Core.Publishing
                         _logger.Info<PublishingStrategy>(
                             string.Format("Content '{0}' with Id '{1}' will not be published because some of it's content is not passing validation rules.",
                                           item.Name, item.Id));
-                        statuses.Add(Attempt.Fail(new PublishStatus(item, PublishStatusType.FailedContentInvalid, evtMsgs)));
+                        statuses.Add(Attempt.Fail(new PublishStatus(item, PublishStatusType.FailedContentInvalid, evtMsgs)
+                        {
+                            InvalidProperties = ((ContentBase)item).LastInvalidProperties
+                        }));
 
                         //Does this document apply to our rule to cancel it's children being published?
                         CheckCancellingOfChildPublishing(item, parentsIdsCancelled, includeUnpublishedDocuments);
@@ -272,11 +275,11 @@ namespace Umbraco.Core.Publishing
         /// <param name="includeUnpublishedDocuments"></param>
         /// <remarks>
         /// See remarks on method: PublishWithChildrenInternal
-        /// </remarks> 
+        /// </remarks>
         private void CheckCancellingOfChildPublishing(IContent content, List<int> parentsIdsCancelled, bool includeUnpublishedDocuments)
         {
             //Does this document apply to our rule to cancel it's children being published?
-            //TODO: We're going back to the service layer here... not sure how to avoid this? And this will add extra overhead to 
+            //TODO: We're going back to the service layer here... not sure how to avoid this? And this will add extra overhead to
             // any document that fails to publish...
             var hasPublishedVersion = ApplicationContext.Current.Services.ContentService.HasPublishedVersion(content.Id);
 
@@ -306,8 +309,8 @@ namespace Umbraco.Core.Publishing
             //NOTE: This previously always returned true so I've left it that way. It returned true because (from Morten)...
             // ... if one item couldn't be published it wouldn't be correct to return false.
             // in retrospect it should have returned a list of with Ids and Publish Status
-            // come to think of it ... the cache would still be updated for a failed item or at least tried updated. 
-            // It would call the Published event for the entire list, but if the Published property isn't set to True it 
+            // come to think of it ... the cache would still be updated for a failed item or at least tried updated.
+            // It would call the Published event for the entire list, but if the Published property isn't set to True it
             // wouldn't actually update the cache for that item. But not really ideal nevertheless...
             return true;
         }
@@ -345,7 +348,7 @@ namespace Umbraco.Core.Publishing
             var evtMsgs = _eventMessagesFactory.Get();
 
             //Fire UnPublishing event
-            if (UnPublishing.IsRaisedEventCancelled(                
+            if (UnPublishing.IsRaisedEventCancelled(
                 new PublishEventArgs<IContent>(content, evtMsgs), this))
             {
                 _logger.Info<PublishingStrategy>(
@@ -388,8 +391,8 @@ namespace Umbraco.Core.Publishing
             //NOTE: This previously always returned true so I've left it that way. It returned true because (from Morten)...
             // ... if one item couldn't be published it wouldn't be correct to return false.
             // in retrospect it should have returned a list of with Ids and Publish Status
-            // come to think of it ... the cache would still be updated for a failed item or at least tried updated. 
-            // It would call the Published event for the entire list, but if the Published property isn't set to True it 
+            // come to think of it ... the cache would still be updated for a failed item or at least tried updated.
+            // It would call the Published event for the entire list, but if the Published property isn't set to True it
             // wouldn't actually update the cache for that item. But not really ideal nevertheless...
             return true;
         }
@@ -405,7 +408,7 @@ namespace Umbraco.Core.Publishing
         public override void PublishingFinalized(IContent content)
         {
             var evtMsgs = _eventMessagesFactory.Get();
-            Published.RaiseEvent(                
+            Published.RaiseEvent(
                 new PublishEventArgs<IContent>(content, false, false, evtMsgs), this);
         }
 

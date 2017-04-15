@@ -180,6 +180,7 @@
     <Compile Include="Configuration\BaseRest\ExtensionElementCollection.cs" />
     <Compile Include="Configuration\BaseRest\MethodElement.cs" />
     <Compile Include="Configuration\ContentXmlStorage.cs" />
+    <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
     <Compile Include="Configuration\Dashboard\AccessItem.cs" />
     <Compile Include="Configuration\Dashboard\AccessType.cs" />
@@ -300,6 +301,7 @@
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
+    <Compile Include="Diagnostics\MiniDump.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />

@@ -41,7 +41,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.ProfilingLogger.Logger));
+                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.Services.ContentTypeService, applicationContext.ProfilingLogger.Logger));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
@@ -64,34 +64,12 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
         }
 
-        private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, ILogger logger)
+        private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, IContentTypeService contentTypeService, ILogger logger)
         {
-			// Adapted from ContentModelMapper
-			//map the IsChildOfListView (this is actually if it is a descendant of a list view!)
-            //TODO: Fix this shorthand .Ancestors() lookup, at least have an overload to use the current
-            if (media.HasIdentity)
-            {
-                var ancesctorListView = media.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
-                display.IsChildOfListView = ancesctorListView != null;
-            }
-            else
-            {
-                //it's new so it doesn't have a path, so we need to look this up by it's parent + ancestors
-                var parent = media.Parent();
-                if (parent == null)
-                {
-                    display.IsChildOfListView = false;
-                }
-                else if (parent.ContentType.IsContainer)
-                {
-                    display.IsChildOfListView = true;
-                }
-                else
-                {
-                    var ancesctorListView = parent.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
-                    display.IsChildOfListView = ancesctorListView != null;
-                }
-            }
+            // Adapted from ContentModelMapper
+            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            var parent = media.Parent();
+            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));
 			
             //map the tree node url
             if (HttpContext.Current != null)

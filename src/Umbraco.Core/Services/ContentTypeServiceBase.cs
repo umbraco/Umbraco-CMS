@@ -5,6 +5,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -69,6 +70,21 @@ namespace Umbraco.Core.Services
 
             return toUpdate;
 
+        }
+
+        /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        public bool HasContainerInPath(string contentPath)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                // can use same repo for both content and media
+                var repository = RepositoryFactory.CreateContentTypeRepository(uow);
+                return repository.HasContainerInPath(contentPath);
+            }
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.MapFrom(content => content.ContentType.IsContainer))
                 .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
-                .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(content, applicationContext)))
+                .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(content)))
                 .ForMember(display => display.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
                 .ForMember(display => display.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(display => display.Urls,
@@ -75,6 +75,12 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Alias, expression => expression.Ignore());
         }
 
+        private static DateTime? GetPublishedDate(IContent content)
+        {
+            var date = ((Content) content).PublishedDate;
+            return date == default (DateTime) ? (DateTime?) null : date;
+        }
+
         /// <summary>
         /// Maps the generic tab with custom properties for content
         /// </summary>
@@ -86,31 +92,9 @@ namespace Umbraco.Web.Models.Mapping
         private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService,
             ILocalizedTextService localizedText, IContentTypeService contentTypeService)
         {
-            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
-            //TODO: Fix this shorthand .Ancestors() lookup, at least have an overload to use the current
-            if (content.HasIdentity)
-            {
-                var ancesctorListView = content.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
-                display.IsChildOfListView = ancesctorListView != null;
-            }
-            else
-            {
-                //it's new so it doesn't have a path, so we need to look this up by it's parent + ancestors
-                var parent = content.Parent();
-                if (parent == null)
-                {
-                    display.IsChildOfListView = false;
-                }
-                else if (parent.ContentType.IsContainer)
-                {
-                    display.IsChildOfListView = true;
-                }
-                else
-                {
-                    var ancesctorListView = parent.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
-                    display.IsChildOfListView = ancesctorListView != null;
-                }
-            }
+            // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            var parent = content.Parent();
+            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));
 
             //map the tree node url
             if (HttpContext.Current != null)
@@ -223,26 +207,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         /// <summary>
-        /// Gets the published date value for the IContent object
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="applicationContext"></param>
-        /// <returns></returns>
-        private static DateTime? GetPublishedDate(IContent content, ApplicationContext applicationContext)
-        {
-            if (content.Published)
-            {
-                return content.UpdateDate;
-            }
-            if (content.HasPublishedVersion)
-            {
-                var published = applicationContext.Services.ContentService.GetPublishedVersion(content.Id);
-                return published.UpdateDate;
-            }
-            return null;
-        }
-
-        /// <summary>
+                //TODO: This is horribly inneficient
         /// Creates the list of action buttons allowed for this user - Publish, Send to publish, save, unpublish returned as the button's 'letter'
         /// </summary>
         private class ActionButtonsResolver : ValueResolver<IContent, IEnumerable<char>>
