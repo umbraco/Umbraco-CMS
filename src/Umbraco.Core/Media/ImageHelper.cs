@@ -236,7 +236,7 @@ namespace Umbraco.Core.Media
                     using (var ms = new MemoryStream())
                     {
                         bp.Save(ms, codec, ep);
-                        ms.Seek(0, 0);
+                        ms.Seek(0, SeekOrigin.Begin);
 
                         fs.AddFile(predictableThumbnailName, ms);
                         fs.AddFile(predictableThumbnailNameJpg, ms);
@@ -247,7 +247,7 @@ namespace Umbraco.Core.Media
                     using (var ms = new MemoryStream())
                     {
                         bp.Save(ms, codec, ep);
-                        ms.Seek(0, 0);
+                        ms.Seek(0, SeekOrigin.Begin);
 
                         fs.AddFile(newFileName, ms);
                     }
