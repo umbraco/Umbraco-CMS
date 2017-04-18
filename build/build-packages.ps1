@@ -173,7 +173,7 @@ mkdir "$temp\WebPi\umbraco"
 cprf "$temp\WebApp" "*" "$temp\WebPi\umbraco"
 cprf "$src\WebPi" "*" "$temp\WebPi"
     
-&$zip a -r "$build\UmbracoCms.WebPI.$version.zip" "$temp\WebPi\*" -x!dotLess.Core.dll #| out-null
+&$zip a -r "$build\UmbracoCms.WebPI.$version.zip" "$temp\WebPi\*" -x!dotless.Core.dll #| out-null
   
 # clear
 write "Delete build folder"
