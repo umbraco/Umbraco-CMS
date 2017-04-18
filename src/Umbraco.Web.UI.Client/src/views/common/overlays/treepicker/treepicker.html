@@ -19,8 +19,12 @@
             results="searchInfo.results"
             select-result-callback="selectResult">
         </umb-tree-search-results>
+      
+      <umb-empty-state ng-if="!hasItems && emptyStateMessage" position="center">
+        {{ emptyStateMessage }}
+      </umb-empty-state>
 
-        <div ng-if="treeReady" ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
+      <div ng-if="treeReady" ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
             <umb-tree
                 section="{{section}}"
                 treealias="{{treeAlias}}"

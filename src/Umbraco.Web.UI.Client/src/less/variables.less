@@ -58,6 +58,7 @@
 @red-l3:			    #FFB2B0;
 @red-washed:		    #FFECEB;
 
+@yellow-d2:             #F0AC00;
 @yellow-d1:             #FFC011;
 @yellow:                #FFCE38;
 @yellow-l1:			    #FFD861;
@@ -312,7 +313,7 @@
 // alerts
 // -------------------------
 @warningText:             @white;
-@warningBackground:       @orange;
+@warningBackground:       @yellow-d2;
 @warningBorder:           transparent;
 
 @errorText:               @white;
@@ -326,6 +327,8 @@
 @infoText:                @white;
 @infoBackground:          @turquoise-d1;
 @infoBorder:              transparent;
+
+@alertBorderRadius:       0;
 
 // SD: Had to duplicate the above but prefix with 'form' inversed colors
 // because we cannot share the above alert colors with forms otherwise we end up with white

@@ -393,6 +393,7 @@
                 multiPicker: false,
                 show: true,
                 title: localizationService.localize("template_insertDictionaryItem"),
+                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
                 select: function(node){
                     var code = templateHelper.getInsertDictionarySnippet(node.name);
                 	insert(code);
@@ -616,9 +617,9 @@
 
 
         function insert(str) {
+            vm.editor.focus();
             vm.editor.moveCursorToPosition(vm.currentPosition);
             vm.editor.insert(str);
-            vm.editor.focus();
 
             // set form state to $dirty
             setFormState("dirty");

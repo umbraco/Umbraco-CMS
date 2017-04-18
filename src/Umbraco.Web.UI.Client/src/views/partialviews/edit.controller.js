@@ -194,6 +194,7 @@
                 multiPicker: false,
                 show: true,
                 title: "Insert dictionary item",
+                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
                 select: function(node){
 
                     var code = templateHelper.getInsertDictionarySnippet(node.name);
@@ -375,9 +376,9 @@
         }
 
         function insert(str) {
+            vm.editor.focus();
             vm.editor.moveCursorToPosition(vm.currentPosition);
             vm.editor.insert(str);
-            vm.editor.focus();
 
             // set form state to $dirty
             setFormState("dirty");
