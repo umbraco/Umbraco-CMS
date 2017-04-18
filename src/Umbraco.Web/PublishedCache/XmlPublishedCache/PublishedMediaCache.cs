@@ -174,6 +174,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     // the manager will return the singleton without throwing initialization errors, however if examine isn't configured correctly a null
                     // reference error will occur because the examine settings are null.
                 }
+                catch (AlreadyClosedException)
+                {
+                    //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
+                    //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.                    
+                }
             }
             return null;
         }
