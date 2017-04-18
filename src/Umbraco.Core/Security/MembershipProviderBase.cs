@@ -521,9 +521,9 @@ namespace Umbraco.Core.Security
 
         public override string ResetPassword(string username, string answer)
         {
-            var auth = new HttpContextWrapper(HttpContext.Current).GetUmbracoAuthTicket();
-            var userIsAdmin = ApplicationContext.Current.Services.UserService.GetByUsername(auth.Name).IsAdmin();
-            if (userIsAdmin == false && EnablePasswordReset == false)
+            var canReset = this.CanResetPassword(ApplicationContext.Current.Services.UserService);                
+
+            if (canReset == false)
             {
                 throw new NotSupportedException("Password reset is not supported");
             }

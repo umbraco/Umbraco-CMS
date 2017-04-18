@@ -24,10 +24,12 @@ namespace Umbraco.Web.UI.Umbraco.Controls
             //reset the flag always
             IsChangingPasswordField.Value = "false";
 
-            var auth = new HttpContextWrapper(HttpContext.Current).GetUmbracoAuthTicket();
-            ResetPlaceHolder.Visible = ApplicationContext.Current.Services.UserService.GetByUsername(auth.Name).IsAdmin();
+            var canReset = Provider.CanResetPassword(ApplicationContext.Current.Services.UserService);
+
+            ResetPlaceHolder.Visible = canReset;
 
             this.DataBind();
         }
+
     }
 }

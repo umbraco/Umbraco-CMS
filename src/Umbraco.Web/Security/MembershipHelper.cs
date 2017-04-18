@@ -663,8 +663,8 @@ namespace Umbraco.Web.Security
             //Are we resetting the password??
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
-                var userIsAdmin = UmbracoContext.Current.Security.CurrentUser.IsAdmin();
-                if (userIsAdmin == false && membershipProvider.EnablePasswordReset == false)
+                var canReset = membershipProvider.CanResetPassword(_applicationContext.Services.UserService);
+                if (canReset == false)
                 {
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not enabled", new[] { "resetPassword" }) });
                 }
