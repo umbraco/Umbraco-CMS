@@ -33,8 +33,19 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class SingleMediaPickerPreValueEditor : PreValueEditor
         {
-            [PreValueField("startNodeId", "Start node", "mediapicker")]
-            public int StartNodeId { get; set; }
+            public SingleMediaPickerPreValueEditor()
+            {
+                Fields.Add(new PreValueField()
+                {
+                    Key = "startNodeId",
+                    View = "mediapicker",
+                    Name = "Start node",
+                    Config = new Dictionary<string, object>
+                    {
+                        {"idType", "int"}
+                    }
+                });
+            }
         }
     }
 }

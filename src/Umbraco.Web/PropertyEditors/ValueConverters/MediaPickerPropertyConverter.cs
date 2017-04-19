@@ -100,10 +100,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            // ** not sure if we want to convert the legacy media picker or not **
-            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias))
-                return false;
-
             return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPicker2Alias);
         }
 
