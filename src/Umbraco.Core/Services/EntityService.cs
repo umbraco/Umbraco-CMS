@@ -92,10 +92,10 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
                         case UmbracoObjectTypes.DocumentTypeContainer:
+                        case UmbracoObjectTypes.MemberGroup:
                             return uow.Database.ExecuteScalar<int?>(new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.UniqueId == key));
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
-                        case UmbracoObjectTypes.MemberGroup:
                         case UmbracoObjectTypes.ContentItem:
                         case UmbracoObjectTypes.ContentItemType:
                         case UmbracoObjectTypes.ROOT:
@@ -130,10 +130,10 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DocumentType:
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
+                        case UmbracoObjectTypes.MemberGroup:
                             return uow.Database.ExecuteScalar<Guid?>(new Sql().Select("uniqueID").From<NodeDto>().Where<NodeDto>(dto => dto.NodeId == id));
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
-                        case UmbracoObjectTypes.MemberGroup:
                         case UmbracoObjectTypes.ContentItem:
                         case UmbracoObjectTypes.ContentItemType:
                         case UmbracoObjectTypes.ROOT:
