@@ -26,9 +26,10 @@ namespace Umbraco.Core.Security
         internal static bool CanResetPassword(this MembershipProvider provider, IUserService userService)
         {
             if (provider == null) throw new ArgumentNullException("provider");
-            if (userService == null) throw new ArgumentNullException("userService");
-
+            
             var canReset = provider.EnablePasswordReset;
+
+            if (userService == null) return canReset;
 
             //we need to check for the special case in which a user is an admin - in which acse they can reset the password even if EnablePasswordReset == false
             if (provider.EnablePasswordReset == false)

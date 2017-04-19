@@ -521,7 +521,9 @@ namespace Umbraco.Core.Security
 
         public override string ResetPassword(string username, string answer)
         {
-            var canReset = this.CanResetPassword(ApplicationContext.Current.Services.UserService);                
+            var userService = ApplicationContext.Current == null ? null : ApplicationContext.Current.Services.UserService;
+
+            var canReset = this.CanResetPassword(userService);                
 
             if (canReset == false)
             {
