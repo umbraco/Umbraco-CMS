@@ -1,40 +1,45 @@
 <div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Content.CreateController" ng-cloak>
 	
 	<div class="umb-pane">
-	<h5><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
+	    <h5><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
 
-	<p class="abstract" ng-if="allowedTypes && allowedTypes.length === 0">
-		<localize key="create_noDocumentTypes" />
-	</p>
+	    <div ng-if="allowedTypes && allowedTypes.length === 0">
+	        <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noDocumentTypesWithNoSettingsAccess"/></p>
+	        <div ng-if="hasSettingsAccess">
+                <p class="abstract"><localize key="create_noDocumentTypes" /></p>
+                <a class="btn" href="#settings/documentTypes/edit/{{contentTypeId}}?view=permissions" ng-click="nav.hideNavigation()"><localize key="create_noDocumentTypesEditPermissions" /></a>
+            </div>
+	    </div>
 
-	<ul class="umb-actions umb-actions-child">
+	    <ul class="umb-actions umb-actions-child">
 
-		<li ng-repeat="docType in allowedTypes | orderBy:'name':false">
-		    <a href="#content/content/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+		    <li ng-repeat="docType in allowedTypes | orderBy:'name':false">
+		        <a href="#content/content/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
 		        
-		        <i class="large {{docType.icon}}"></i>
+		            <i class="large {{docType.icon}}"></i>
 
-		        <span class="menu-label">
-		        	{{docType.name}}
-		            <small>
-		                {{docType.description}}
-		            </small>
-		        </span>
-		    </a>
-		</li>
-<!--
-		<li class="add">
-		    <a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
-		        <i class="large icon-add"></i>
-		        <span class="menu-label">
-		            Create a new document type
-		            <small>
-		                Design and configure a new document type
-		            </small>
-		        </span>
-		    </a>
-		</li>	-->
-	</ul>
+		            <span class="menu-label">
+		        	    {{docType.name}}
+		                <small>
+		                    {{docType.description}}
+		                </small>
+		            </span>
+		        </a>
+		    </li>
+	        <!--
+	        <li class="add">
+	            <a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+	                <i class="large icon-add"></i>
+	                <span class="menu-label">
+		                Create a new document type
+		                <small>
+		                    Design and configure a new document type
+		                </small>
+		            </span>
+	            </a>
+	        </li>
+            -->
+	    </ul>
 	</div>		
 </div>
 	

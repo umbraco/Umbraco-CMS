@@ -27,7 +27,6 @@
 			    "name": localizationService.localize("general_design"),
 			    "icon": "icon-document-dashed-line",
 			    "view": "views/mediatypes/views/design/design.html",
-			    "active": true
 			},
 			{
 			    "name": localizationService.localize("general_listView"),
@@ -40,6 +39,20 @@
 			    "view": "views/mediatypes/views/permissions/permissions.html"
 			}
         ];
+
+        // Initialise first loaded page based on page route paramater
+        // i.e. ?view=design|listview|permissions
+        var initialViewSetFromRouteParams = false;
+        if ($routeParams.view) {
+            var initalView = "views/mediatypes/views/" + $routeParams.view + "/" + $routeParams.view + ".html";
+            for (var i = 0; i < vm.page.navigation.length; i++) {
+                if (vm.page.navigation[i].view === initalView) {
+                    vm.page.navigation[i].active = true;
+                    initialViewSetFromRouteParams = true;
+                    break;
+                }
+            }
+        }
 
         vm.page.keyboardShortcutsOverview = [
 			{

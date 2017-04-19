@@ -1,13 +1,16 @@
 <div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Media.CreateController">
 	<div class="umb-pane">
+	    <h5><localize key="create_createUnder">Create under</localize> {{currentNode.name}}</h5>
 
-	<h5><localize key="create_createUnder">Create under</localize> {{currentNode.name}}</h5>
+        <div ng-hide="allowedTypes">
+            <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noMediaTypesWithNoSettingsAccess" /></p>
+            <div ng-if="hasSettingsAccess">
+                <p class="abstract"><localize key="create_noMediaTypes" /></p>
+                <a class="btn" href="#settings/mediaTypes/edit/{{contentTypeId}}?view=permissions" ng-click="nav.hideNavigation()"><localize key="create_noMediaTypesEditPermissions" /></a>
+            </div>
+        </div>
 
-	<p class="abstract" ng-hide="allowedTypes">
-		<localize key="create_noMediaTypes" />
-	</p>
-
-		<ul class="umb-actions">
+	    <ul class="umb-actions">
 			<li class="action">
 				<ul class="umb-actions-child">
 

@@ -6,10 +6,19 @@
  * @description
  * The controller for the media creation dialog
  */
-function mediaCreateController($scope, $routeParams, mediaTypeResource, iconHelper) {
+function mediaCreateController($scope, $routeParams, mediaTypeResource, iconHelper, authResource, mediaResource) {
     
     mediaTypeResource.getAllowedTypes($scope.currentNode.id).then(function(data) {
         $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
+    });
+
+    authResource.getCurrentUser().then(function (currentUser) {
+        if (currentUser.allowedSections.indexOf("settings") > -1) {
+            $scope.hasSettingsAccess = true;
+            mediaResource.getById($scope.currentNode.id).then(function (data) {
+                $scope.contentTypeId = data.contentTypeId;
+            });
+        }
     });
     
 }

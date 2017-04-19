@@ -32,6 +32,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(display => display.Updater, expression => expression.ResolveUsing(new CreatorResolver()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(display => display.ContentTypeId, expression => expression.MapFrom(content => content.ContentType.Id))
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(display => display.ContentTypeName, expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.IsContainer, expression => expression.MapFrom(content => content.ContentType.IsContainer))
@@ -65,6 +66,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(dto => dto.Trashed, expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(dto => dto.ContentTypeId, expression => expression.MapFrom(content => content.ContentType.Id))
                 .ForMember(dto => dto.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(dto => dto.Alias, expression => expression.Ignore());
 

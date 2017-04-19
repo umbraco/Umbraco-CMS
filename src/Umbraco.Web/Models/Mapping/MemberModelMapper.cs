@@ -64,6 +64,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(display => display.ContentTypeId, expression => expression.MapFrom(content => content.ContentType.Id))
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(display => display.ContentTypeName, expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
@@ -88,6 +89,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(dto => dto.ContentTypeId, expression => expression.MapFrom(content => content.ContentType.Id))
                 .ForMember(dto => dto.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(dto => dto.Email, expression => expression.MapFrom(content => content.Email))
                 .ForMember(dto => dto.Username, expression => expression.MapFrom(content => content.Username))
@@ -119,6 +121,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(member => member.Updater, expression => expression.Ignore())
                 .ForMember(member => member.Trashed, expression => expression.Ignore())
                 .ForMember(member => member.Alias, expression => expression.Ignore())
+                .ForMember(member => member.ContentTypeId, expression => expression.Ignore())
                 .ForMember(member => member.ContentTypeAlias, expression => expression.Ignore())
                 .ForMember(member => member.HasPublishedVersion, expression => expression.Ignore());
 

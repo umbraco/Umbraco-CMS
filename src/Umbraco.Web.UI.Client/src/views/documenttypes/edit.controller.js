@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService) {
+    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService, $location) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -27,8 +27,7 @@
 			{
 			    "name": localizationService.localize("general_design"),
 			    "icon": "icon-document-dashed-line",
-			    "view": "views/documenttypes/views/design/design.html",
-			    "active": true
+			    "view": "views/documenttypes/views/design/design.html"
 			},
 			{
 			    "name": localizationService.localize("general_listView"),
@@ -46,6 +45,24 @@
 			    "view": "views/documenttypes/views/templates/templates.html"
 			}
         ];
+
+        // Initialise first loaded page based on page route paramater
+        // i.e. ?view=design|listview|permissions|templates
+        var initialViewSetFromRouteParams = false;
+        if ($routeParams.view) {
+            var initalView = "views/documenttypes/views/" + $routeParams.view + "/" + $routeParams.view + ".html";
+            for (var i = 0; i < vm.page.navigation.length; i++) {
+                if (vm.page.navigation[i].view === initalView) {
+                    vm.page.navigation[i].active = true;
+                    initialViewSetFromRouteParams = true;
+                    break;
+                }
+            }
+        }
+
+        if (initialViewSetFromRouteParams === false) {
+            vm.page.navigation[0].active = true;
+        }
 
         vm.page.keyboardShortcutsOverview = [
 			{
