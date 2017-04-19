@@ -42,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            return IsMultipleDataType(propertyType.DataTypeId) ? typeof(IEnumerable<IPublishedContent>) : typeof(IPublishedContent);
+            return IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias) ? typeof(IEnumerable<IPublishedContent>) : typeof(IPublishedContent);
         }
 
         public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
@@ -73,10 +73,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <param name="dataTypeId">
         /// The data type id.
         /// </param>
+        /// <param name="propertyEditorAlias"></param>
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        public bool IsMultipleDataType(int dataTypeId)
+        private bool IsMultipleDataType(int dataTypeId, string propertyEditorAlias)
         {
             // GetPreValuesCollectionByDataTypeId is cached at repository level;
             // still, the collection is deep-cloned so this is kinda expensive,
@@ -84,12 +85,29 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             return Storages.GetOrAdd(dataTypeId, id =>
             {
-                var preValue = _dataTypeService.GetPreValuesCollectionByDataTypeId(id)
-                    .PreValuesAsDictionary
-                    .FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase))
-                    .Value;
+                var preVals = _dataTypeService.GetPreValuesCollectionByDataTypeId(id).PreValuesAsDictionary;
 
-                return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
+                if (preVals.ContainsKey("multiPicker"))
+                {
+                    var preValue = preVals
+                        .FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase))
+                        .Value;
+
+                    return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
+                }
+
+                //in some odd cases, the pre-values in the db won't exist but their default pre-values contain this key so check there 
+                var propertyEditor = PropertyEditorResolver.Current.GetByAlias(propertyEditorAlias);
+                if (propertyEditor != null)
+                {
+                    var preValue = propertyEditor.DefaultPreValues
+                        .FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase))
+                        .Value;
+
+                    return preValue != null && preValue.TryConvertTo<bool>().Result;
+                }
+
+                return false;
             });
         }
 
@@ -163,7 +181,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (item != null)
                         mediaItems.Add(item);
                 }
-                if (IsMultipleDataType(propertyType.DataTypeId))
+                if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
                 {
                     return mediaItems;
                 }

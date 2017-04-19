@@ -78,7 +78,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (IsMultipleDataType(propertyType.DataTypeId))
+            if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
             {
                 var nodeIds =
                     source.ToString()
@@ -146,7 +146,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var umbHelper = new UmbracoHelper(UmbracoContext.Current);
 
-            if (IsMultipleDataType(propertyType.DataTypeId))
+            if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
             {
                 var nodeIds = (int[])source;
                 var multiMediaPicker = Enumerable.Empty<IPublishedContent>();
