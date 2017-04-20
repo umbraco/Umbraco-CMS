@@ -1,11 +1,10 @@
-﻿using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveFive
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 {
-    [Migration("7.5.5", 101, Constants.System.UmbracoMigrationName)]
+    [Migration("7.6.0", 101, Constants.System.UmbracoMigrationName)]
     public class AddLockObjects : MigrationBase
     {
         public AddLockObjects(ISqlSyntaxProvider sqlSyntax, ILogger logger)
