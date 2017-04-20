@@ -596,7 +596,7 @@
   <area alias="publicAccess">
     <key alias="paAdvanced">Proteccion basada en roles</key>
     <key alias="paAdvancedHelp"><![CDATA[Si desea controlar el acceso a la página usando autenticación basada en roles,<br /> usando los grupos de miembros de Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Necesita crear un grupo de miembros antes de poder usar <br /> autenticación basada en roles.]]></key>
+    <key alias="paAdvancedNoGroups">Necesita crear un grupo de miembros antes de poder usar autenticación basada en roles</key>
     <key alias="paErrorPage">Página de error</key>
     <key alias="paErrorPageHelp">Usada cuando alguien hace login, pero no tiene acceso</key>
     <key alias="paHowWould">Elija cómo restringir el acceso a esta página</key>

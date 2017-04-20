@@ -598,7 +598,7 @@
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollbaserat lösenordsskydd</key>
     <key alias="paAdvancedHelp"><![CDATA[Välj detta alternativ om du vill skydda sidan med hjälp av rollbaserat lösenordsskydd.<br /> Då används Umbracos medlemsgrupper.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Du måste skapa en medlemsgrupp innan du kan använda <br />rollbaserat lösenordsskydd.]]></key>
+    <key alias="paAdvancedNoGroups">Du måste skapa en medlemsgrupp innan du kan använda rollbaserat lösenordsskydd.</key>
     <key alias="paErrorPage">Sida med felmeddelande</key>
     <key alias="paErrorPageHelp">Används när en användare är inloggad, men saknar rättigheter att se sidan</key>
     <key alias="paHowWould">Välj hur du vill lösenordsskydda sidan</key>
