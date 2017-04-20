@@ -136,7 +136,7 @@
             </cc1:PropertyPanel>
         </div>
 
-        <asp:CustomValidator CssClass="pa-validation-message error" runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
+        <asp:CustomValidator CssClass="alert alert-danger" runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
            <p class="alert">Member name already exists, click <asp:LinkButton runat="server" OnClick="ChangeOnClick" CssClass="btn btn-mini btn-warning">Change</asp:LinkButton> to use a different name or Update to continue</p>
         </asp:CustomValidator>
     </cc1:Pane>
