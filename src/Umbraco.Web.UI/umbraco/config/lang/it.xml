@@ -572,7 +572,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
   <area alias="publicAccess">
     <key alias="paAdvanced"><![CDATA[Protezione basata su ruoli]]></key>
     <key alias="paAdvancedHelp"><![CDATA[Se vuoi controllare gli accessi alla pagina tramite l'autenticazione basata sui ruoli,<br /> usando i gruppi di membri di Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Devi creare un gruppo di membri prima di utilizzare <br />l'autenticazione basata sui ruoli.]]></key>
+    <key alias="paAdvancedNoGroups">Devi creare un gruppo di membri prima di utilizzare l'autenticazione basata sui ruoli</key>
     <key alias="paErrorPage"><![CDATA[Pagina di Errore]]></key>
     <key alias="paErrorPageHelp"><![CDATA[Usato quando qualcuno è connesso, ma non ha accesso]]></key>
     <key alias="paHowWould"><![CDATA[Vuoi restringere l'accesso a questa pagina?]]></key>
