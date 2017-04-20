@@ -533,6 +533,44 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(mediaObjectType, UmbracoObjectTypes.MediaType);
         }
 
+        [Test]
+        public void EntityService_Can_Get_Key_For_Id()
+        {
+            var service = ServiceContext.EntityService;
+            var result = service.GetKeyForId(1060, UmbracoObjectTypes.DocumentType);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
+        }
+
+        [Test]
+        public void EntityService_Cannot_Get_Key_For_Id_With_Incorrect_Object_Type()
+        {
+            var service = ServiceContext.EntityService;
+            var result = service.GetKeyForId(1060, UmbracoObjectTypes.MediaType);
+
+            Assert.IsFalse(result.Success);
+        }
+
+        [Test]
+        public void EntityService_Can_Get_Id_For_Key()
+        {
+            var service = ServiceContext.EntityService;
+            var result = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1060, result.Result);
+        }
+
+        [Test]
+        public void EntityService_Cannot_Get_Id_For_Key_With_Incorrect_Object_Type()
+        {
+            var service = ServiceContext.EntityService;
+            var result = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
+
+            Assert.IsFalse(result.Success);
+        }
+
         private static bool _isSetup = false;
 
         private int folderId;
