@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Events;
@@ -81,28 +80,16 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
                 {
-                    switch (umbracoObjectType)
-                    {
-                        case UmbracoObjectTypes.Document:
-                        case UmbracoObjectTypes.MemberType:
-                        case UmbracoObjectTypes.Media:
-                        case UmbracoObjectTypes.Template:
-                        case UmbracoObjectTypes.MediaType:
-                        case UmbracoObjectTypes.DocumentType:
-                        case UmbracoObjectTypes.Member:
-                        case UmbracoObjectTypes.DataType:
-                        case UmbracoObjectTypes.DocumentTypeContainer:
-                        case UmbracoObjectTypes.MemberGroup:
-                            return uow.Database.ExecuteScalar<int?>(new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.UniqueId == key));
-                        case UmbracoObjectTypes.RecycleBin:
-                        case UmbracoObjectTypes.Stylesheet:
-                        case UmbracoObjectTypes.ContentItem:
-                        case UmbracoObjectTypes.ContentItemType:
-                        case UmbracoObjectTypes.ROOT:
-                        case UmbracoObjectTypes.Unknown:
-                        default:
-                            throw new NotSupportedException();
-                    }
+                    var nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType);
+
+                    var sql = new Sql()
+                        .Select("id")
+                        .From<NodeDto>()
+                        .Where<NodeDto>(
+                            dto =>
+                                dto.UniqueId == key &&
+                                dto.NodeObjectType == nodeObjectType);
+                    return uow.Database.ExecuteScalar<int?>(sql);
                 }                
             });
             return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<int>.Fail();
@@ -120,30 +107,52 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
                 {
-                    switch (umbracoObjectType)
-                    {
-                        case UmbracoObjectTypes.Document:
-                        case UmbracoObjectTypes.MemberType:
-                        case UmbracoObjectTypes.Media:
-                        case UmbracoObjectTypes.Template:
-                        case UmbracoObjectTypes.MediaType:
-                        case UmbracoObjectTypes.DocumentType:
-                        case UmbracoObjectTypes.Member:
-                        case UmbracoObjectTypes.DataType:
-                        case UmbracoObjectTypes.MemberGroup:
-                            return uow.Database.ExecuteScalar<Guid?>(new Sql().Select("uniqueID").From<NodeDto>().Where<NodeDto>(dto => dto.NodeId == id));
-                        case UmbracoObjectTypes.RecycleBin:
-                        case UmbracoObjectTypes.Stylesheet:
-                        case UmbracoObjectTypes.ContentItem:
-                        case UmbracoObjectTypes.ContentItemType:
-                        case UmbracoObjectTypes.ROOT:
-                        case UmbracoObjectTypes.Unknown:
-                        default:
-                            throw new NotSupportedException("Unsupported object type (" + umbracoObjectType + ").");
-                    }
+                    var nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType);
+
+                    var sql = new Sql()
+                        .Select("uniqueID")
+                        .From<NodeDto>()
+                        .Where<NodeDto>(
+                            dto =>
+                                dto.NodeId == id &&
+                                dto.NodeObjectType == nodeObjectType);
+                    return uow.Database.ExecuteScalar<Guid?>(sql);
                 }
             });
             return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<Guid>.Fail();
+        }
+
+        private static Guid GetNodeObjectTypeGuid(UmbracoObjectTypes umbracoObjectType)
+        {
+            switch (umbracoObjectType)
+            {
+                case UmbracoObjectTypes.Document:
+                    return Constants.ObjectTypes.DocumentGuid;
+                case UmbracoObjectTypes.MemberType:
+                    return Constants.ObjectTypes.MemberTypeGuid;
+                case UmbracoObjectTypes.Media:
+                    return Constants.ObjectTypes.MediaGuid;
+                case UmbracoObjectTypes.Template:
+                    return Constants.ObjectTypes.TemplateTypeGuid;
+                case UmbracoObjectTypes.MediaType:
+                    return Constants.ObjectTypes.MediaTypeGuid;
+                case UmbracoObjectTypes.DocumentType:
+                    return Constants.ObjectTypes.DocumentTypeGuid;
+                case UmbracoObjectTypes.Member:
+                    return Constants.ObjectTypes.MemberGuid;
+                case UmbracoObjectTypes.DataType:
+                    return Constants.ObjectTypes.DataTypeGuid;
+                case UmbracoObjectTypes.MemberGroup:
+                    return Constants.ObjectTypes.MemberGroupGuid;
+                case UmbracoObjectTypes.RecycleBin:
+                case UmbracoObjectTypes.Stylesheet:
+                case UmbracoObjectTypes.ContentItem:
+                case UmbracoObjectTypes.ContentItemType:
+                case UmbracoObjectTypes.ROOT:
+                case UmbracoObjectTypes.Unknown:
+                default:
+                    throw new NotSupportedException("Unsupported object type (" + umbracoObjectType + ").");
+            }
         }
 
         public IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true)
