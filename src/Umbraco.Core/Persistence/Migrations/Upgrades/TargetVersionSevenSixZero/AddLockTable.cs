@@ -1,11 +1,10 @@
 ﻿using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveFive
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 {
-    [Migration("7.5.5", 100, Constants.System.UmbracoMigrationName)]
+    [Migration("7.6.0", 100, Constants.System.UmbracoMigrationName)]
     public class AddLockTable : MigrationBase
     {
         public AddLockTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
