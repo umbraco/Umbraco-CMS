@@ -4,12 +4,14 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core;
 
+[assembly: PreApplicationStartMethod(typeof(BindingRedirects), "Initialize")]
+
 namespace Umbraco.Core
 {
     /// <summary>
     /// Manages any assembly binding redirects that cannot be done via config (i.e. unsigned --> signed assemblies)
     /// </summary>
-    internal class BindingRedirects
+    public sealed class BindingRedirects
     {
         public static void Initialize()
         {
