@@ -132,6 +132,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto);
 
+            foreach (var removedRule in entity.RemovedRules)
+            {
+                Database.Delete<AccessRuleDto>("WHERE id=@Id", new { Id = removedRule });
+            }
+
             foreach (var rule in entity.Rules)
             {
                 if (rule.HasIdentity)
@@ -156,10 +161,6 @@ namespace Umbraco.Core.Persistence.Repositories
                     //update the id so HasEntity is correct
                     rule.Id = rule.Key.GetHashCode();
                 }
-            }
-            foreach (var removedRule in entity.RemovedRules)
-            {
-                Database.Delete<AccessRuleDto>("WHERE id=@Id", new {Id = removedRule});
             }
 
             entity.ClearRemovedRules();
