@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService, mediaHelper) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -54,8 +54,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.actionInProgress = false;
    $scope.selection = [];
    $scope.folders = [];   
-   //tracks if we've already loaded the folders for the current node
-   var foldersLoaded = false;
+
    $scope.listViewResultSet = {
       totalPages: 0,
       items: []
@@ -270,18 +269,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             });
          }
 
-         if (!foldersLoaded && $scope.entityType === 'media') {
-            //The folders aren't loaded - we only need to do this once since we're never changing node ids
-            mediaResource.getChildFolders($scope.contentId)
-                    .then(function (folders) {
-                       $scope.folders = folders;
-                       $scope.viewLoaded = true;
-                       foldersLoaded = true;
-                    });
-
-         } else {
-            $scope.viewLoaded = true;
+         if ($scope.entityType === 'media') {
+             $scope.folders = filterOutFiles($scope.listViewResultSet.items)
          }
+         $scope.viewLoaded = true;
 
          //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
          // if you have more than one page and you delete all items on the last page. In this case, we need to reset to the last
@@ -295,6 +286,26 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
       });
    };
+
+   function filterOutFiles(items) {
+
+       var newArray = [];
+
+       if (items && items.length) {
+
+           for (var i = 0; items.length > i; i++) {
+               var item = items[i];
+               var isFolder = !mediaHelper.hasFilePropertyType(item);
+
+               if (isFolder) {
+                   newArray.push(item);
+               }
+           }
+
+       }
+
+       return newArray;
+   }
 
    var searchListView = _.debounce(function () {
       $scope.$apply(function () {

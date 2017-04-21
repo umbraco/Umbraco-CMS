@@ -47,7 +47,6 @@
       }
 
       function filterOutFolders(items) {
-
           var newArray = [];
 
           if(items && items.length ) {

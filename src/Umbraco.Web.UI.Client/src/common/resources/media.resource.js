@@ -420,47 +420,6 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
           * @ngdoc method
-          * @name umbraco.resources.mediaResource#getChildFolders
-          * @methodOf umbraco.resources.mediaResource
-          *
-          * @description
-          * Retrieves all media children with types used as folders.
-          * Uses the convention of looking for media items with mediaTypes ending in
-          * *Folder so will match "Folder", "bannerFolder", "secureFolder" etc,
-          * 
-          * NOTE: This will return a max of 500 folders, if more is required it needs to be paged
-          * 
-          * ##usage
-          * <pre>
-          * mediaResource.getChildFolders(1234)
-          *    .then(function(data) {
-          *        alert('folders');
-          *    });
-          * </pre> 
-          *
-          * @param {int} parentId Id of the media item to query for child folders    
-          * @returns {Promise} resourcePromise object.
-          *
-          */
-        getChildFolders: function (parentId) {
-            if (!parentId) {
-                parentId = -1;
-            }
-
-            //NOTE: This will return a max of 500 folders, if more is required it needs to be paged
-            return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "mediaApiBaseUrl",
-                              "GetChildFolders",
-                            {
-                                id: parentId
-                            })),
-                  'Failed to retrieve child folders for media item ' + parentId);
-        },
-
-        /**
-          * @ngdoc method
           * @name umbraco.resources.mediaResource#emptyRecycleBin
           * @methodOf umbraco.resources.mediaResource
           *
