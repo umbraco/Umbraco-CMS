@@ -137,10 +137,15 @@ namespace Umbraco.Web.Editors
                             foreach (var childTemplate in templateHasChildren)
                             {
                                 //template ID to find
-                                var templateIDInPath = "," + display.Id + ",";
+                                var templateIdInPath = "," + display.Id + ",";
+                                
+                                if (string.IsNullOrEmpty(childTemplate.Path))
+                                {
+                                    continue;
+                                }
 
                                 //Find position in current comma seperate string path (so we get the correct children path)
-                                var positionInPath = childTemplate.Path.IndexOf(templateIDInPath) + templateIDInPath.Length;
+                                var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
 
                                 //Get the substring of the child & any children (descendants it may have too)
                                 var childTemplatePath = childTemplate.Path.Substring(positionInPath);
