@@ -61,9 +61,8 @@
                 // if master template alias has changed move the node to it's new location
                 if(oldMasterTemplateAlias !== vm.template.masterTemplateAlias) {
                 
-                    //Only do this if we are not on the initial create route param - /-1?create=true
-                    if ($routeParams.create === false) {
-
+                    // When creating a new template the id is -1. Make sure We don't remove the root node.
+                    if (vm.page.menu.currentNode.id !== "-1") {
                         // move node to new location in tree
                         //first we need to remove the node that we're working on
                         treeService.removeNode(vm.page.menu.currentNode);
