@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 
         private static string UpdateTemplateGuids(Database database)
         {
-            var updates = database.Query<dynamic>("SELECT id, text FROM umbracoNode WHERE nodeObjectType = @guid", Constants.ObjectTypes.TemplateTypeGuid)
+            var updates = database.Query<dynamic>("SELECT id, text FROM umbracoNode WHERE nodeObjectType = @guid", new { guid = Constants.ObjectTypes.TemplateTypeGuid})
                 .Select(template => Tuple.Create((int) template.id, ("template____" + (string) template.text).ToGuid()))
                 .ToList();
 
