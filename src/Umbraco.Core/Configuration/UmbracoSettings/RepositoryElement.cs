@@ -38,8 +38,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get
             {
                 var prop = Properties["webserviceurl"];
-                var repoUrl = this[prop] as ConfigurationElement;
-                return (repoUrl != null && repoUrl.ElementInformation.IsPresent);
+                return (string) prop.DefaultValue != (string) this[prop];                
             }
         }
     }
