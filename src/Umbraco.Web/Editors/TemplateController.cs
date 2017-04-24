@@ -105,8 +105,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-
-
+            
             if (display.Id > 0)
             {
                 // update
@@ -131,8 +130,34 @@ namespace Umbraco.Web.Editors
                         }else
                         {
                             template.SetMasterTemplate(master);
-                        }
 
+                            //After updating the master - ensure we update the path property if it has any children already assigned
+                            var templateHasChildren = Services.FileService.GetTemplateDescendants(display.Id);
+
+                            foreach (var childTemplate in templateHasChildren)
+                            {
+                                //template ID to find
+                                var templateIdInPath = "," + display.Id + ",";
+                                
+                                if (string.IsNullOrEmpty(childTemplate.Path))
+                                {
+                                    continue;
+                                }
+
+                                //Find position in current comma seperate string path (so we get the correct children path)
+                                var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
+
+                                //Get the substring of the child & any children (descendants it may have too)
+                                var childTemplatePath = childTemplate.Path.Substring(positionInPath);
+
+                                //As we are updating the template to be a child of a master
+                                //Set the path to the master's path + its current template id + the current child path substring
+                                childTemplate.Path = master.Path + "," + display.Id + "," + childTemplatePath;
+
+                                //Save the children with the updated path
+                                Services.FileService.SaveTemplate(childTemplate);
+                            }
+                        }
                     }
                     else
                     {

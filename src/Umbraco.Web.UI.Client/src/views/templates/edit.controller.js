@@ -60,10 +60,13 @@
                 // sync tree
                 // if master template alias has changed move the node to it's new location
                 if(oldMasterTemplateAlias !== vm.template.masterTemplateAlias) {
-
-                    // move node to new location in tree
-                    //first we need to remove the node that we're working on
-                    treeService.removeNode(vm.page.menu.currentNode);
+                
+                    // When creating a new template the id is -1. Make sure We don't remove the root node.
+                    if (vm.page.menu.currentNode.id !== "-1") {
+                        // move node to new location in tree
+                        //first we need to remove the node that we're working on
+                        treeService.removeNode(vm.page.menu.currentNode);
+                    }
                     
                     // update stored alias to the new one so the node won't move again unless the alias is changed again
                     oldMasterTemplateAlias = vm.template.masterTemplateAlias;
