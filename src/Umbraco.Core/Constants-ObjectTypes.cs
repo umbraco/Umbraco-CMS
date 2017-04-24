@@ -125,6 +125,11 @@ namespace Umbraco.Core
             public const string MemberGroup = "366E63B9-880F-4E13-A61C-98069B029728";
 
             /// <summary>
+            /// Guid for a Member Group object.
+            /// </summary>
+            public static readonly Guid MemberGroupGuid = new Guid(MemberGroup);
+
+            /// <summary>
             /// Guid for a Member Type object.
             /// </summary>
             public const string MemberType = "9B5416FB-E72F-45A9-A07B-5A9A2709CE43";

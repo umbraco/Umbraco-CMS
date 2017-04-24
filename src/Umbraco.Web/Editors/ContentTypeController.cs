@@ -103,6 +103,20 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets all the standard fields.
+        /// </summary>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(
+            Constants.Trees.DocumentTypes, Constants.Trees.Content,
+            Constants.Trees.MediaTypes, Constants.Trees.Media,
+            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+        public IEnumerable<string> GetAllStandardFields()
+        {
+            string[] preValuesSource = { "createDate", "creatorName", "level", "nodeType", "nodeTypeAlias", "pageID", "pageName", "parentID", "path", "template", "updateDate", "writerID", "writerName" };
+            return preValuesSource;
+        }
+
+        /// <summary>
         /// Returns the avilable compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>

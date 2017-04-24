@@ -12,6 +12,7 @@
         vm.insertAfter;
         vm.recursive = false;
         vm.properties = [];
+        vm.standardFields = [];
         vm.date = false;
         vm.dateTime = false;
         vm.dateTimeSeparator = "";
@@ -40,6 +41,11 @@
             // Load all fields
             contentTypeResource.getAllPropertyTypeAliases().then(function (array) {
                 vm.properties = array;
+            });
+
+            // Load all standard fields
+            contentTypeResource.getAllStandardFields().then(function (array) {
+                vm.standardFields = array;
             });
             
         }

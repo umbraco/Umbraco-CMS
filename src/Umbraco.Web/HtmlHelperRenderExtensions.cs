@@ -228,13 +228,12 @@ namespace Umbraco.Web
             bool cacheBuster = true,
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
-            bool upScale = true,
-            string backgroundColor = null)
+            bool upScale = true)
         {
             return
                 new HtmlString(mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
                     imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
-                    upScale, backgroundColor));
+                    upScale));
         }
 
         [Obsolete("Use the UrlHelper.GetCropUrl extension instead")]
@@ -253,13 +252,12 @@ namespace Umbraco.Web
             string cacheBusterValue = null,
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
-            bool upScale = true,
-            string backgroundColor = null)
+            bool upScale = true)
         {
             return
                 new HtmlString(imageUrl.GetCropUrl(width, height, imageCropperValue, cropAlias, quality, imageCropMode,
                     imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
-                    upScale, backgroundColor));
+                    upScale));
         }
 
         #endregion

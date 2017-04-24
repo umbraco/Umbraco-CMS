@@ -7,7 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Media picker property editors that stores UDI
     /// </summary>
-    [PropertyEditor(Constants.PropertyEditors.MediaPicker2Alias, "Media Picker", PropertyEditorValueTypes.Text, "mediapicker", Group = "media", Icon = "icon-picture")]
+    [PropertyEditor(Constants.PropertyEditors.MediaPicker2Alias, "Media Picker", PropertyEditorValueTypes.Text, "mediapicker", IsParameterEditor = true, Group = "media", Icon = "icon-picture")]
     public class MediaPicker2PropertyEditor : PropertyEditor
     {
         public MediaPicker2PropertyEditor()

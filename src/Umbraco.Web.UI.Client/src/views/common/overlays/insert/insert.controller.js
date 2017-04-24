@@ -80,6 +80,7 @@
                 multiPicker: false,
                 title: localizationService.localize("template_insertDictionaryItem"),
                 description: localizationService.localize("template_insertDictionaryItemDesc"),
+                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
                 show: true,
                 select: function(node){
 

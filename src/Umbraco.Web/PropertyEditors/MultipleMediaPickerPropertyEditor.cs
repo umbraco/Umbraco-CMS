@@ -13,6 +13,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             //default it to multi picker
             InternalPreValues["multiPicker"] = "1";
+            InternalPreValues["idType"] = "int";
         }
 
         /// <summary>

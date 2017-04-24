@@ -9,6 +9,7 @@ using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Security
 {
@@ -520,7 +521,11 @@ namespace Umbraco.Core.Security
 
         public override string ResetPassword(string username, string answer)
         {
-            if (EnablePasswordReset == false)
+            var userService = ApplicationContext.Current == null ? null : ApplicationContext.Current.Services.UserService;
+
+            var canReset = this.CanResetPassword(userService);                
+
+            if (canReset == false)
             {
                 throw new NotSupportedException("Password reset is not supported");
             }

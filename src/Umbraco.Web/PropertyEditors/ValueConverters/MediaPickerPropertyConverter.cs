@@ -3,18 +3,19 @@
 //   Umbraco
 // </copyright>
 // <summary>
-//  The legacy media picker value converter
+//  The media picker 2 value converter
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Extensions;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -25,9 +26,23 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MediaPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
+        private readonly IDataTypeService _dataTypeService;
+
+        //TODO: Remove this ctor in v8 since the other one will use IoC
+        public MediaPickerPropertyConverter()
+            : this(ApplicationContext.Current.Services.DataTypeService)
+        {
+        }
+
+        public MediaPickerPropertyConverter(IDataTypeService dataTypeService)
+        {
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            _dataTypeService = dataTypeService;
+        }
+
         public Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            return IsMultipleDataType(propertyType.DataTypeId) ? typeof(IEnumerable<IPublishedContent>) : typeof(IPublishedContent);
+            return IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias) ? typeof(IEnumerable<IPublishedContent>) : typeof(IPublishedContent);
         }
 
         public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
@@ -58,35 +73,42 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <param name="dataTypeId">
         /// The data type id.
         /// </param>
+        /// <param name="propertyEditorAlias"></param>
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        private bool IsMultipleDataType(int dataTypeId)
+        private bool IsMultipleDataType(int dataTypeId, string propertyEditorAlias)
         {
-            var multipleItems = false;
+            // GetPreValuesCollectionByDataTypeId is cached at repository level;
+            // still, the collection is deep-cloned so this is kinda expensive,
+            // better to cache here + trigger refresh in DataTypeCacheRefresher
 
-            try
+            return Storages.GetOrAdd(dataTypeId, id =>
             {
-                var dts = ApplicationContext.Current.Services.DataTypeService;
+                var preVals = _dataTypeService.GetPreValuesCollectionByDataTypeId(id).PreValuesAsDictionary;
 
-                var multiPickerPreValues =
-                    dts.GetPreValuesCollectionByDataTypeId(dataTypeId).PreValuesAsDictionary;
-
-                var multiPickerPreValue = multiPickerPreValues.FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase)).Value;
-
-                var attemptConvert = multiPickerPreValue.Value.TryConvertTo<bool>();
-
-                if (attemptConvert.Success)
+                if (preVals.ContainsKey("multiPicker"))
                 {
-                    multipleItems = attemptConvert.Result;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error<MediaPickerPropertyConverter>(string.Format("Error finding multipleItems data type prevalue on data type Id {0}", dataTypeId), ex);
-            }
+                    var preValue = preVals
+                        .FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase))
+                        .Value;
 
-            return multipleItems;
+                    return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
+                }
+
+                //in some odd cases, the pre-values in the db won't exist but their default pre-values contain this key so check there 
+                var propertyEditor = PropertyEditorResolver.Current.GetByAlias(propertyEditorAlias);
+                if (propertyEditor != null)
+                {
+                    var preValue = propertyEditor.DefaultPreValues
+                        .FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase))
+                        .Value;
+
+                    return preValue != null && preValue.TryConvertTo<bool>().Result;
+                }
+
+                return false;
+            });
         }
 
         /// <summary>
@@ -100,10 +122,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            // ** not sure if we want to convert the legacy media picker or not **
-            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias))
-                return false;
-
             return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPicker2Alias);
         }
 
@@ -163,7 +181,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (item != null)
                         mediaItems.Add(item);
                 }
-                if (IsMultipleDataType(propertyType.DataTypeId))
+                if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
                 {
                     return mediaItems;
                 }
@@ -174,6 +192,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
 
             return source;
+        }
+
+        private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();
+
+        internal static void ClearCaches()
+        {
+            Storages.Clear();
         }
     }
 }

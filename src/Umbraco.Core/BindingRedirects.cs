@@ -4,12 +4,14 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core;
 
+[assembly: PreApplicationStartMethod(typeof(BindingRedirects), "Initialize")]
+
 namespace Umbraco.Core
 {
     /// <summary>
     /// Manages any assembly binding redirects that cannot be done via config (i.e. unsigned --> signed assemblies)
     /// </summary>
-    internal class BindingRedirects
+    public sealed class BindingRedirects
     {
         public static void Initialize()
         {
@@ -17,7 +19,7 @@ namespace Umbraco.Core
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }
 
-        private static readonly Regex Log4NetAssemblyPattern = new Regex("log4net, Version=([\\d\\.]+?), Culture=neutral, PublicKeyToken=null");
+        private static readonly Regex Log4NetAssemblyPattern = new Regex("log4net, Version=([\\d\\.]+?), Culture=neutral, PublicKeyToken=\\w+$", RegexOptions.Compiled);
         private const string Log4NetReplacement = "log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a";
         
         /// <summary>

@@ -376,7 +376,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"" + mediaPath + "\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-            var urlString = mediaPath.GetCropUrl(400, 400, cropperJson, imageCropMode: ImageCropMode.Pad, backgroundColor: "fff");
+            var urlString = mediaPath.GetCropUrl(400, 400, cropperJson, imageCropMode: ImageCropMode.Pad, furtherOptions: "&bgcolor=fff");
             Assert.AreEqual(mediaPath + "?mode=pad&width=400&height=400&bgcolor=fff", urlString);
         }
     }

@@ -81,7 +81,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
                 .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
-                .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display, applicationContext.Services.TextService));
+                .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, applicationContext.Services.UserService, member, display, applicationContext.Services.TextService));
 
             //FROM IMember TO MemberBasic
             config.CreateMap<IMember, MemberBasic>()
@@ -139,13 +139,14 @@ namespace Umbraco.Web.Models.Mapping
         /// Maps the generic tab with custom properties for content
         /// </summary>
         /// <param name="memberService"></param>
+        /// <param name="userService"></param>
         /// <param name="member"></param>
         /// <param name="display"></param>
         /// <param name="localizedText"></param>
         /// <remarks>
         /// If this is a new entity and there is an approved field then we'll set it to true by default.
         /// </remarks>
-        private static void MapGenericCustomProperties(IMemberService memberService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
+        private static void MapGenericCustomProperties(IMemberService memberService, IUserService userService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
         {
             var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
@@ -189,7 +190,7 @@ namespace Umbraco.Web.Models.Mapping
                     //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                     View = "changepassword",
                     //initialize the dictionary with the configuration from the default membership provider
-                    Config = new Dictionary<string, object>(membersProvider.GetConfiguration())
+                    Config = new Dictionary<string, object>(membersProvider.GetConfiguration(userService))
                     {
                         //the password change toggle will only be displayed if there is already a password assigned.
                         {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}

@@ -158,7 +158,7 @@ namespace Umbraco.Core.IO
             // if can seek, be safe and go back to start, else...
             // hope that the stream hasn't been read already
             if (stream.CanSeek)
-                stream.Seek(0, 0);
+                stream.Seek(0, SeekOrigin.Begin);
 
             using (var destination = (Stream) File.Create(fullPath))
                 stream.CopyTo(destination);
