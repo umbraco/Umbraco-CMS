@@ -5,7 +5,7 @@ REM Instead we hard-code our versions here
 REM And then we write UmbracoVersion.txt
 
 SET release=7.6.0
-SET comment=alpha074
+SET comment=rc1a
 
 REM build.bat does it now
 REM ECHO # Usage: on line 2 put the release version, on line 3 put the version comment (example: beta)> UmbracoVersion.txt
@@ -13,7 +13,7 @@ REM ECHO %release%>> UmbracoVersion.txt
 REM ECHO %comment%>> UmbracoVersion.txt
 
 :: /skipnuget
-CALL build.bat /release:%release% /comment:%comment%
+CALL build.bat /release:%release% /comment:%comment% /nugetpkg
 IF ERRORLEVEL 1 GOTO error
 
 SET version=%release%
