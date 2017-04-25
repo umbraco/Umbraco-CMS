@@ -49,8 +49,6 @@ namespace Umbraco.Core
                 LogHelper.Error<UmbracoApplicationBase>(msg, exception);
             };
 
-            BindingRedirects.Initialize();
-
             //boot up the application
             GetBootManager()
                 .Initialize()

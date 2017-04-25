@@ -103,11 +103,10 @@
                 <label for="body_rb_advanced">
                     <h4 class="pa-access-header"><%= umbraco.ui.Text("publicAccess", "paAdvanced", base.getUser())%></h4>
                     <p class="pa-access-description"><%= umbraco.ui.Text("publicAccess", "paAdvancedHelp", base.getUser())%></p>
+                    <br />
 
-                    <asp:Panel runat="server" Visible="false" ID="p_noGroupsFound" CssClass="error">
-                        <p>
-                            <%= umbraco.ui.Text("publicAccess", "paAdvancedNoGroups", UmbracoUser)%>
-                        </p>
+                    <asp:Panel runat="server" Visible="false" ID="p_noGroupsFound" CssClass="alert alert-danger">
+                        <span><%= umbraco.ui.Text("publicAccess", "paAdvancedNoGroups", UmbracoUser)%></span>
                     </asp:Panel>
                 </label>
             </div>
@@ -137,7 +136,7 @@
             </cc1:PropertyPanel>
         </div>
 
-        <asp:CustomValidator CssClass="pa-validation-message error" runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
+        <asp:CustomValidator CssClass="alert alert-danger" runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
            <p class="alert">Member name already exists, click <asp:LinkButton runat="server" OnClick="ChangeOnClick" CssClass="btn btn-mini btn-warning">Change</asp:LinkButton> to use a different name or Update to continue</p>
         </asp:CustomValidator>
     </cc1:Pane>

@@ -736,7 +736,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollebaseret beskyttelse</key>
     <key alias="paAdvancedHelp">Hvis du ønsker at kontrollere adgang til siden ved hjælp af rollebaseret godkendelse via Umbracos medlemsgrupper.</key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Du skal oprette en medlemsgruppe før du kan bruge <br />rollebaseret godkendelse]]></key>
+    <key alias="paAdvancedNoGroups">Du skal oprette en medlemsgruppe før du kan bruge rollebaseret godkendelse</key>
     <key alias="paErrorPage">Fejlside</key>
     <key alias="paErrorPageHelp">Brugt når folk er logget ind, men ingen adgang</key>
     <key alias="paHowWould">Vælg hvordan siden skal beskyttes</key>
