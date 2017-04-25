@@ -22,7 +22,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
                     ? database.ExecuteScalar<int?>("select max(LENGTH(LoginName)) from cmsMember")
                     : database.ExecuteScalar<int?>("select max(datalength(LoginName)) from cmsMember");
 
-                if (colLen < 900 == false) return null;
+                if (colLen < 900 == false && colLen != null)
+                {
+                    return null;
+                }
 
                 var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database);
 
