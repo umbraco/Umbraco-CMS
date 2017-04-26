@@ -38,8 +38,23 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get
             {
                 var prop = Properties["webserviceurl"];
-                var repoUrl = this[prop] as ConfigurationElement;
-                return (repoUrl != null && repoUrl.ElementInformation.IsPresent);
+                return (string) prop.DefaultValue != (string) this[prop];                
+            }
+        }
+
+        [ConfigurationProperty("restapiurl", DefaultValue = "https://our.umbraco.org/webapi/packages/v1")]
+        public string RestApiUrl
+        {
+            get { return (string)base["restapiurl"]; }
+            set { base["restapiurl"] = value; }
+        }
+
+        public bool HasCustomRestApiUrl
+        {
+            get
+            {
+                var prop = Properties["restapiurl"];
+                return (string)prop.DefaultValue != (string)this[prop];
             }
         }
     }

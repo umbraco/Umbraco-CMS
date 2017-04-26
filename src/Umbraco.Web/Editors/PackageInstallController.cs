@@ -447,7 +447,7 @@ namespace Umbraco.Web.Editors
                 //our repo guid
                 using (var our = Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66"))
                 {
-                    path = our.fetch(packageGuid, Security.CurrentUser.Id);    
+                    path = our.GetPackageFile(packageGuid, Security.CurrentUser.Id, UmbracoVersion.Current);
                 }
             }
 

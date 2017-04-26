@@ -22,6 +22,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -224,6 +225,9 @@ namespace Umbraco.Web.Editors
                             {"gridConfig", Url.Action("GetGridConfig", "BackOffice")},
                             {"serverVarsJs", Url.Action("Application", "BackOffice")},
                             //API URLs
+                            {
+                                "packagesRestApiBaseUrl", UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault().RestApiUrl
+                            },
                             {
                                 "redirectUrlManagementApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
                                     controller => controller.GetEnableState())
