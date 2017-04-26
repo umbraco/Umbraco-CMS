@@ -124,11 +124,6 @@ namespace Umbraco.Web.Strategies
                 get { return false; }
             }
 
-            public override bool RunsOnShutdown
-            {
-                get { return false; }
-            }
-
             /// <summary>
             /// Runs the background task.
             /// </summary>
@@ -149,11 +144,6 @@ namespace Umbraco.Web.Strategies
 
                     return false; // probably stop if we have an error
                 }
-            }
-
-            public override Task<bool> PerformRunAsync(CancellationToken token)
-            {
-                throw new NotImplementedException();
             }
         }
     }
