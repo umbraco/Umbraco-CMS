@@ -93,7 +93,8 @@ namespace Umbraco.Core.Services
             using (var httpClient = new HttpClient())
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var url = string.Format("{0}/{1}?version={2}&asFile=true", packageRepo.RestApiUrl, packageId, umbracoVersion.ToString(3));
+                //includeHidden = true because we don't care if it's hidden we want to get the file regardless
+                var url = string.Format("{0}/{1}?version={2}&includeHidden=true&asFile=true", packageRepo.RestApiUrl, packageId, umbracoVersion.ToString(3));
                 byte[] bytes;
                 try
                 {
