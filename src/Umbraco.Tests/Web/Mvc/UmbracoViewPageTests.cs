@@ -383,6 +383,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<ILocalizationService>().Object,
                 new PackagingService(
                     new Mock<ILogger>().Object,
+                    new Mock<IScopeUnitOfWorkProvider>().Object,
+                    new TransientMessagesFactory(),
                     new Mock<IContentService>().Object,
                     new Mock<IContentTypeService>().Object,
                     new Mock<IMediaService>().Object,

@@ -10,6 +10,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string WebServiceUrl { get; }
         bool HasCustomWebServiceUrl { get; }
         string RestApiUrl { get; }
-        bool HasCustomRestApiUrl { get; }
     }
 }
