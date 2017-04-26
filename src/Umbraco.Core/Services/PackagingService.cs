@@ -118,7 +118,6 @@ namespace Umbraco.Core.Services
                     using (var fs1 = new FileStream(packageFilePath, FileMode.Create))
                     {
                         fs1.Write(bytes, 0, bytes.Length);
-                        fs1.Close();
                         return "packages\\" + packageId + ".umb";
                     }
                 }
