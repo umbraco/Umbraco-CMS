@@ -292,6 +292,7 @@
     <Compile Include="Configuration\UmbracoSettings\RazorStaticMappingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RepositoriesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\RepositoriesElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\RepositoryConfigExtensions.cs" />
     <Compile Include="Configuration\UmbracoSettings\RepositoryElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTaskElement.cs" />

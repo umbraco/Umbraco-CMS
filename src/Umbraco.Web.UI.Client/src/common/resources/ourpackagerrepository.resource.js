@@ -5,8 +5,7 @@
     **/
 function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
-    //var baseurl = "http://localhost:24292/webapi/packages/v1";
-    var baseurl = "https://our.umbraco.org/webapi/packages/v1";
+    var baseurl = Umbraco.Sys.ServerVariables.umbracoUrls.packagesRestApiBaseUrl;
 
     return {
         
