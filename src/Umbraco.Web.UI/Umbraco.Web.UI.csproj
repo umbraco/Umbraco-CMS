@@ -1784,11 +1784,8 @@
     <Content Include="Umbraco\Images\Umbraco\repository.gif" />
     <Content Include="Umbraco\Images\Umbraco\uploadpackage.gif" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.autocomplete.js" />
-    <Content Include="Umbraco\Developer\Packages\BrowseRepository.aspx" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
-    <Content Include="Umbraco\Developer\Packages\installedPackage.aspx" />
-    <Content Include="Umbraco\Developer\Packages\LoadNitros.ascx" />
     <Content Include="Umbraco\Developer\Packages\SubmitPackage.aspx" />
     <Content Include="Umbraco\Dialogs\about.aspx" />
     <Content Include="Umbraco\Dialogs\AssignDomain.aspx" />
@@ -1802,7 +1799,6 @@
     <Content Include="Umbraco\Dialogs\insertTable.aspx" />
     <Content Include="Umbraco\Dialogs\moveOrCopy.aspx" />
     <Content Include="Umbraco\Dialogs\notifications.aspx" />
-    <Content Include="Umbraco\Developer\Packages\installer.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
     <Content Include="Umbraco\Dialogs\publish.aspx" />
     <Content Include="Umbraco\Dialogs\RegexWs.aspx" />
