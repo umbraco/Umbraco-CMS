@@ -15,10 +15,10 @@ namespace Umbraco.Web.Mvc
     {
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
-            var umbracoContext = UmbracoContext.Current;
-
-            var found = FindContent(requestContext, umbracoContext);
+            var found = FindContent(requestContext, UmbracoContext.Current);
             if (found == null) return new NotFoundHandler();
+            
+            var umbracoContext = UmbracoContext.Current;
             
             umbracoContext.PublishedContentRequest = new PublishedContentRequest(
                 umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext, 
