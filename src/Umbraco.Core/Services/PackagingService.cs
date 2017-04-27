@@ -33,8 +33,9 @@ namespace Umbraco.Core.Services
     /// Represents the Packaging Service, which provides import/export functionality for the Core models of the API
     /// using xml representation. This is primarily used by the Package functionality.
     /// </summary>
-    public class PackagingService : ScopeRepositoryService, IPackagingService
+    public class PackagingService : IPackagingService
     {
+        private readonly ILogger _logger;
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaService _mediaService;
@@ -52,7 +53,6 @@ namespace Umbraco.Core.Services
 
         public PackagingService(
             ILogger logger,
-            IDatabaseUnitOfWorkProvider provider, IEventMessagesFactory eventMessagesFactory,
             IContentService contentService,
             IContentTypeService contentTypeService,
             IMediaService mediaService,
@@ -63,8 +63,9 @@ namespace Umbraco.Core.Services
             IEntityService entityService,
             IUserService userService,
             RepositoryFactory repositoryFactory,
-            IScopeUnitOfWorkProvider uowProvider) : base(provider, repositoryFactory, logger, eventMessagesFactory)
+            IScopeUnitOfWorkProvider uowProvider)
         {
+            _logger = logger;
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
@@ -91,7 +92,7 @@ namespace Umbraco.Core.Services
             var packageRepo = UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault();
 
             using (var httpClient = new HttpClient())
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = _uowProvider.GetUnitOfWork())
             {
                 //includeHidden = true because we don't care if it's hidden we want to get the file regardless
                 var url = string.Format("{0}/{1}?version={2}&includeHidden=true&asFile=true", packageRepo.RestApiUrl, packageId, umbracoVersion.ToString(3));
@@ -130,7 +131,7 @@ namespace Umbraco.Core.Services
 
         private void Audit(IScopeUnitOfWork uow, AuditType type, string message, int userId, int objectId)
         {
-            var auditRepo = RepositoryFactory.CreateAuditRepository(uow);
+            var auditRepo = _repositoryFactory.CreateAuditRepository(uow);
             auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
         }
 
@@ -535,7 +536,7 @@ namespace Umbraco.Core.Services
                         var tryCreateFolder = _contentTypeService.CreateContentTypeContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            Logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
+                            _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
                         }
                         var rootFolderId = tryCreateFolder.Result.Entity.Id;
@@ -569,7 +570,7 @@ namespace Umbraco.Core.Services
             var tryCreateFolder = _contentTypeService.CreateContentTypeContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                Logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
+                _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
                 throw tryCreateFolder.Exception;
             }
             return _contentTypeService.GetContentTypeContainer(tryCreateFolder.Result.Entity.Id);
@@ -675,7 +676,7 @@ namespace Umbraco.Core.Services
                     }
                     else
                     {
-                        Logger.Warn<PackagingService>(
+                        _logger.Warn<PackagingService>(
                             string.Format(
                                 "Packager: Error handling allowed templates. Template with alias '{0}' could not be found.",
                                 alias));
@@ -694,7 +695,7 @@ namespace Umbraco.Core.Services
                 }
                 else
                 {
-                    Logger.Warn<PackagingService>(
+                    _logger.Warn<PackagingService>(
                         string.Format(
                             "Packager: Error handling default template. Default template with alias '{0}' could not be found.",
                             defaultTemplateElement.Value));
@@ -780,7 +781,7 @@ namespace Umbraco.Core.Services
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    Logger.Warn<PackagingService>(
+                    _logger.Warn<PackagingService>(
                         string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with a property editor alias (or legacy control id) '{2}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
                                       property.Element("Name").Value,
                                       dataTypeDefinitionId,
@@ -834,7 +835,7 @@ namespace Umbraco.Core.Services
                 }
                 else
                 {
-                    Logger.Warn<PackagingService>(
+                    _logger.Warn<PackagingService>(
                     string.Format(
                         "Packager: Error handling DocumentType structure. DocumentType with alias '{0}' could not be found and was not added to the structure for '{1}'.",
                         alias, contentType.Alias));
@@ -1038,7 +1039,7 @@ namespace Umbraco.Core.Services
                         var tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            Logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
+                            _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
                         }                        
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -1071,7 +1072,7 @@ namespace Umbraco.Core.Services
             var tryCreateFolder = _dataTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                Logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
+                _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
                 throw tryCreateFolder.Exception;
             }
             return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -1107,7 +1108,7 @@ namespace Umbraco.Core.Services
                 }
                 else
                 {
-                    Logger.Warn<PackagingService>("No data type found with name " + dataTypeDefinitionName + " data type pre-values will not be saved");
+                    _logger.Warn<PackagingService>("No data type found with name " + dataTypeDefinitionName + " data type pre-values will not be saved");
                 }
             }
         }
@@ -1600,7 +1601,7 @@ namespace Umbraco.Core.Services
                 else if (string.IsNullOrEmpty((string)elementCopy.Element("Master")) == false &&
                     templateElements.Any(x => (string)x.Element("Alias") == (string)elementCopy.Element("Master")) == false)
                 {
-                    Logger.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", (string)elementCopy.Element("Alias"), (string)elementCopy.Element("Master")));
+                    _logger.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", (string)elementCopy.Element("Alias"), (string)elementCopy.Element("Master")));
                 }
 
                 var field = new TopologicalSorter.DependencyField<XElement>
