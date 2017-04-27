@@ -13,15 +13,23 @@ namespace Umbraco.Web.Mvc
 {
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
+        /// <summary>
+        /// Returns the UmbracoContext for this route handler
+        /// </summary>
+        /// <remarks>
+        /// By default this uses the UmbracoContext singleton
+        /// </remarks>
+        public virtual UmbracoContext GetUmbracoContext(RequestContext requestContext)
+        {
+            return UmbracoContext.Current;
+        }
+
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
-            //We are passing the singleton of UmbracoContext in here before assigning to a variable
-            //below because we are allowing a work around for FindContent to EnsureContext if necessary,
-            //this is a hack/work around for http://issues.umbraco.org/issue/U4-9384
-            var found = FindContent(requestContext, UmbracoContext.Current);
-            if (found == null) return new NotFoundHandler();
+            var umbracoContext = GetUmbracoContext(requestContext);
             
-            var umbracoContext = UmbracoContext.Current;
+            var found = FindContent(requestContext, umbracoContext);
+            if (found == null) return new NotFoundHandler();
             
             umbracoContext.PublishedContentRequest = new PublishedContentRequest(
                 umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext, 
