@@ -48,14 +48,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (string)base["restapiurl"]; }
             set { base["restapiurl"] = value; }
         }
-
-        public bool HasCustomRestApiUrl
-        {
-            get
-            {
-                var prop = Properties["restapiurl"];
-                return (string)prop.DefaultValue != (string)this[prop];
-            }
-        }
+        
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI.WebControls;
@@ -9,7 +11,9 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -58,7 +62,7 @@ namespace Umbraco.Core.Services
             IEntityService entityService,
             IUserService userService,
             RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider uowProvider)
+            IDatabaseUnitOfWorkProvider uowProvider) 
         {
             _logger = logger;
             _contentService = contentService;
@@ -73,6 +77,61 @@ namespace Umbraco.Core.Services
             _uowProvider = uowProvider;
             _userService = userService;
             _importedContentTypes = new Dictionary<string, IContentType>();
+        }
+
+        /// <summary>
+        /// This will fetch an Umbraco package file from the package repository and return the relative file path to the downloaded package file
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="umbracoVersion"></param>
+        /// /// <param name="userId">The current user id performing the operation</param>
+        /// <returns></returns>
+        public string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId)
+        {
+            var packageRepo = UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault();
+
+            using (var httpClient = new HttpClient())
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                //includeHidden = true because we don't care if it's hidden we want to get the file regardless
+                var url = string.Format("{0}/{1}?version={2}&includeHidden=true&asFile=true", packageRepo.RestApiUrl, packageId, umbracoVersion.ToString(3));
+                byte[] bytes;
+                try
+                {
+                    bytes = httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
+                }
+                catch (HttpRequestException ex)
+                {
+                    throw new ConnectionException("An error occuring downloading the package from " + url, ex);
+                }
+
+                //successfull 
+                if (bytes.Length > 0)
+                {
+                    var packagePath = IOHelper.MapPath(SystemDirectories.Packages);
+
+                    // Check for package directory
+                    if (Directory.Exists(packagePath) == false)
+                        Directory.CreateDirectory(packagePath);
+
+                    var packageFilePath = Path.Combine(packagePath, packageId + ".umb");
+
+                    using (var fs1 = new FileStream(packageFilePath, FileMode.Create))
+                    {
+                        fs1.Write(bytes, 0, bytes.Length);
+                        return "packages\\" + packageId + ".umb";
+                    }
+                }
+
+                Audit(uow, AuditType.PackagerInstall, string.Format("Package {0} fetched from {1}", packageId, packageRepo.Id), userId, -1);
+                return null;
+            }
+        }
+
+        private void Audit(IDatabaseUnitOfWork uow, AuditType type, string message, int userId, int objectId)
+        {
+            var auditRepo = _repositoryFactory.CreateAuditRepository(uow);
+            auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
         }
 
         #region Content

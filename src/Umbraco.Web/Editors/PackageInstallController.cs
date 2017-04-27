@@ -444,11 +444,7 @@ namespace Umbraco.Web.Editors
             string path = Path.Combine("packages", packageGuid + ".umb");
             if (File.Exists(IOHelper.MapPath(Path.Combine(SystemDirectories.Data, path))) == false)
             {
-                //our repo guid
-                using (var our = Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66"))
-                {
-                    path = our.GetPackageFile(packageGuid, Security.CurrentUser.Id, UmbracoVersion.Current);
-                }
+                path = Services.PackagingService.FetchPackageFile(Guid.Parse(packageGuid), UmbracoVersion.Current, Security.GetUserId());                
             }
 
             var model = new LocalPackageInstallModel
