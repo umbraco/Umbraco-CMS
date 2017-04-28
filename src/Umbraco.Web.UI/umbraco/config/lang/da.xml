@@ -940,7 +940,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tab">Faneblad</key>
     <key alias="tabname">Titel på faneblad</key>
     <key alias="tabs">Faneblade</key>
-    <key alias="masterDocumentType">Master Dokumentype</key>
+    <key alias="masterDocumentType">Master Dokumenttype</key>
     <key alias="createMatchingTemplate">Opret matchende skabelon</key>
   </area>
   <area alias="sort">
