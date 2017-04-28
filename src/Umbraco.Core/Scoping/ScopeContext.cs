@@ -74,12 +74,30 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        public void Enlist(string key, Action<bool> action, int priority = 100)
+        // todo: replace with optional parameters when we can break things
+        public T Enlist<T>(string key, Func<T> creator)
+        {
+            return Enlist(key, creator, null, 100);
+        }
+
+        // todo: replace with optional parameters when we can break things
+        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action)
+        {
+            return Enlist(key, creator, action, 100);
+        }
+
+        // todo: replace with optional parameters when we can break things
+        public void Enlist(string key, Action<bool> action)
+        {
+            Enlist<object>(key, null, (completed, item) => action(completed), 100);
+        }
+
+        public void Enlist(string key, Action<bool> action, int priority)
         {
             Enlist<object>(key, null, (completed, item) => action(completed), priority);
         }
 
-        public T Enlist<T>(string key, Func<T> creator = null, Action<bool, T> action = null, int priority = 100)
+        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action, int priority)
         {
             if (_exiting)
                 throw new InvalidOperationException("Cannot enlist now, context is exiting.");
