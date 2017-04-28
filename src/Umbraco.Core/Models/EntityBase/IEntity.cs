@@ -3,6 +3,12 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models.EntityBase
 {
+    public interface IEntityDeleted : IEntity
+    {
+        [DataMember]
+        DateTime? DeletedDate { get; set; }
+    }
+
     /// <summary>
     /// Defines an Entity.
     /// Entities should always have an Id, Created and Modified date
