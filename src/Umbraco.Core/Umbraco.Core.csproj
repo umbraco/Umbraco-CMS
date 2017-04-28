@@ -337,7 +337,7 @@
     <Compile Include="Deploy\IFileTypeCollection.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
-    <Compile Include="Events\ScopeEventDispatcherBase.cs" />
+    <Compile Include="Events\QueuingEventDispatcherBase.cs" />
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
@@ -377,7 +377,7 @@
     <Compile Include="Events\EventNameExtractorResult.cs" />
     <Compile Include="Events\IEventDefinition.cs" />
     <Compile Include="Events\PassThroughEventDispatcher.cs" />
-    <Compile Include="Events\ScopeEventDispatcher.cs" />
+    <Compile Include="Events\QueuingEventDispatcher.cs" />
     <Compile Include="Events\EventMessage.cs" />
     <Compile Include="Events\EventMessages.cs" />
     <Compile Include="Events\ExportEventArgs.cs" />

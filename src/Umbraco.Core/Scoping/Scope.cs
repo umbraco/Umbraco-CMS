@@ -321,7 +321,7 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Events;
-                return _eventDispatcher ?? (_eventDispatcher = new ScopeEventDispatcher());
+                return _eventDispatcher ?? (_eventDispatcher = new QueuingEventDispatcher());
             }
         }
 
@@ -465,6 +465,7 @@ namespace Umbraco.Core.Scoping
                     }
                     finally
                     {
+                        // removes the ambient context (ambient scope already gone)
                         _scopeProvider.SetAmbient(null);
                     }
                 }
