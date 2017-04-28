@@ -159,6 +159,11 @@ namespace Umbraco.Core.Events
                                 allEntities.Add(Tuple.Create(obj, meta));
                             }
                         }
+                        else
+                        {
+                            //Can't retrieve the entity so cant' filter or inspect, just add to the output
+                            result.Add(eventDefinition);                            
+                        }
                     }
                     else
                     {

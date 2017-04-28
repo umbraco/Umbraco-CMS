@@ -20,6 +20,7 @@ namespace Umbraco.Core
             = new ConcurrentDictionary<Type, FieldInfo[]>();
 
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
+        
 
         /// <summary>
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
@@ -39,7 +40,9 @@ namespace Umbraco.Core
                     || genericTypeDef == typeof(ICollection<>)
                     || genericTypeDef == typeof(Collection<>)
                     || genericTypeDef == typeof(IList<>)
-                    || genericTypeDef == typeof(List<>))
+                    || genericTypeDef == typeof(List<>)
+                    //this will occur when Linq is used and we get the odd WhereIterator or DistinctIterators since those are special iterator types
+                    || obj is IEnumerable)
                 {
                     //if it is a IEnumerable<>, IList<T> or ICollection<> we'll use a List<>
                     var genericType = typeof(List<>).MakeGenericType(type.GetGenericArguments());
