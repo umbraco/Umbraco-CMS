@@ -13,12 +13,12 @@ namespace Umbraco.Core.Events
     /// to do with the events when the scope exits and has been completed.</para>
     /// <para>If the scope exits without being completed, events are ignored.</para>
     /// </remarks>
-    public abstract class QueuingEventDispatcherBase : IEventDispatcher
+    public abstract class ScopeEventDispatcherBase : IEventDispatcher
     {
         private List<IEventDefinition> _events;
         private readonly bool _raiseCancelable;
 
-        protected QueuingEventDispatcherBase(bool raiseCancelable)
+        protected ScopeEventDispatcherBase(bool raiseCancelable)
         {
             _raiseCancelable = raiseCancelable;
         }

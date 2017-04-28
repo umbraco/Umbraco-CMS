@@ -321,7 +321,7 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Events;
-                return _eventDispatcher ?? (_eventDispatcher = new QueuingEventDispatcher());
+                return _eventDispatcher ?? (_eventDispatcher = new ScopeEventDispatcher());
             }
         }
 

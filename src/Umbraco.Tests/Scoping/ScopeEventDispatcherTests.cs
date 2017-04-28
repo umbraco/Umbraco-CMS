@@ -183,7 +183,7 @@ namespace Umbraco.Tests.Scoping
 
         public static event TypedEventHandler<ScopeEventDispatcherTests, SaveEventArgs<decimal>> DoThing3;
 
-        public class PassiveEventDispatcher : QueuingEventDispatcherBase
+        public class PassiveEventDispatcher : ScopeEventDispatcherBase
         {
             public PassiveEventDispatcher()
                 : base(false)

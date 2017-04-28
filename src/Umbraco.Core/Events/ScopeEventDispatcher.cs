@@ -6,9 +6,9 @@ namespace Umbraco.Core.Events
     /// An IEventDispatcher that queues events, and raise them when the scope
     /// exits and has been completed.
     /// </summary>
-    internal class QueuingEventDispatcher : QueuingEventDispatcherBase
+    internal class ScopeEventDispatcher : ScopeEventDispatcherBase
     {
-        public QueuingEventDispatcher()
+        public ScopeEventDispatcher()
             : base(true)
         { }
 
