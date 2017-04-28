@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Snippet, exp => exp.Ignore());
 
             config.CreateMap<CodeFileDisplay, IPartialView>()
+                .ForMember(x => x.DeletedDate, exp => exp.Ignore())
                 .ForMember(x => x.Id, exp => exp.Ignore())
                 .ForMember(x => x.Key, exp => exp.Ignore())
                 .ForMember(x => x.Path, exp => exp.Ignore())
@@ -40,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.HasIdentity, exp => exp.Ignore());
 
             config.CreateMap<CodeFileDisplay, Script>()
+                .ForMember(x => x.DeletedDate, exp => exp.Ignore())
                 .ForMember(x => x.Id, exp => exp.Ignore())
                 .ForMember(x => x.Key, exp => exp.Ignore())
                 .ForMember(x => x.Path, exp => exp.Ignore())

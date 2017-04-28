@@ -108,6 +108,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Level, expression => expression.Ignore())
                 .ForMember(x => x.SortOrder, expression => expression.Ignore())
                 .ForMember(x => x.CreateDate, expression => expression.Ignore())
+                .ForMember(x => x.DeletedDate, expression => expression.Ignore())
                 .ForMember(x => x.UpdateDate, expression => expression.Ignore());
 
             //Converts a property editor to a new list of pre-value fields - used when creating a new data type or changing a data type with new pre-vals
