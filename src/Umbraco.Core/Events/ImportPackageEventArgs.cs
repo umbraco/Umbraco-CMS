@@ -4,7 +4,7 @@ using Umbraco.Core.Packaging.Models;
 
 namespace Umbraco.Core.Events
 {
-    internal class ImportPackageEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>, IEquatable<ImportPackageEventArgs<TEntity>>
+    internal class ImportPackageEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<ImportPackageEventArgs<TEntity>>
     {
         private readonly MetaData _packageMetaData;
 
@@ -33,6 +33,7 @@ namespace Umbraco.Core.Events
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
+            //TODO: MetaData for package metadata has no equality operators :/
             return base.Equals(other) && _packageMetaData.Equals(other._packageMetaData);
         }
 

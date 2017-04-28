@@ -158,14 +158,14 @@ namespace Umbraco.Tests.Scoping
             content1.UpdateDate = now.AddMinutes(1);
             var content2 = MockedContent.CreateBasicContent(contentType);
             content2.Id = 123;
-            content1.UpdateDate = now.AddMinutes(2);
+            content2.UpdateDate = now.AddMinutes(2);
             var content3 = MockedContent.CreateBasicContent(contentType);
             content3.Id = 123;
-            content1.UpdateDate = now.AddMinutes(3);
+            content3.UpdateDate = now.AddMinutes(3);
 
             var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
-            {                
+            {                                
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content3));
@@ -180,8 +180,75 @@ namespace Umbraco.Tests.Scoping
                     foreach (var entity in args.SavedEntities)
                     {
                         Assert.AreEqual(content3, entity);
+                        Assert.IsTrue(object.ReferenceEquals(content3, entity));
                     }
                 }
+            }
+        }
+
+        [Test]
+        public void FirstIn()
+        {
+            DoSaveForContent += OnDoThingFail;
+
+            var now = DateTime.Now;
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            var content1 = MockedContent.CreateBasicContent(contentType);
+            content1.Id = 123;
+            content1.UpdateDate = now.AddMinutes(1);
+            var content2 = MockedContent.CreateBasicContent(contentType);
+            content2.Id = 123;
+            content1.UpdateDate = now.AddMinutes(2);
+            var content3 = MockedContent.CreateBasicContent(contentType);
+            content3.Id = 123;
+            content1.UpdateDate = now.AddMinutes(3);
+
+            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
+            {
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content3));
+
+                // events have been queued
+                var events = scope.Events.GetEvents(EventDefinitionFilter.FirstIn).ToArray();
+                Assert.AreEqual(1, events.Length);                
+                Assert.AreEqual(content1, ((SaveEventArgs<IContent>) events[0].Args).SavedEntities.First());
+                Assert.IsTrue(object.ReferenceEquals(content1, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First()));
+                Assert.AreEqual(content1.UpdateDate, ((SaveEventArgs<IContent>) events[0].Args).SavedEntities.First().UpdateDate);
+            }
+        }
+
+        [Test]
+        public void LastIn()
+        {
+            DoSaveForContent += OnDoThingFail;
+
+            var now = DateTime.Now;
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            var content1 = MockedContent.CreateBasicContent(contentType);
+            content1.Id = 123;
+            content1.UpdateDate = now.AddMinutes(1);
+            var content2 = MockedContent.CreateBasicContent(contentType);
+            content2.Id = 123;
+            content2.UpdateDate = now.AddMinutes(2);
+            var content3 = MockedContent.CreateBasicContent(contentType);
+            content3.Id = 123;
+            content3.UpdateDate = now.AddMinutes(3);
+
+            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
+            {
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content3));
+
+                // events have been queued
+                var events = scope.Events.GetEvents(EventDefinitionFilter.LastIn).ToArray();
+                Assert.AreEqual(1, events.Length);
+                Assert.AreEqual(content3, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First());
+                Assert.IsTrue(object.ReferenceEquals(content3, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First()));
+                Assert.AreEqual(content3.UpdateDate, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First().UpdateDate);
             }
         }
 

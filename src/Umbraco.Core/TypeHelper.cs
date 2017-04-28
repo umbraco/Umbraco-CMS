@@ -21,7 +21,6 @@ namespace Umbraco.Core
 
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
         
-
         /// <summary>
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
         /// If it cannot be done, null is returned.

@@ -341,6 +341,7 @@
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
     <Compile Include="Events\SupersedeEventAttribute.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
+    <Compile Include="HashCodeHelper.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
     <Compile Include="OrderedHashSet.cs" />
