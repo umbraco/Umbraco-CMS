@@ -905,7 +905,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="editscript">Rediger script</key>
   </area>
   <area alias="sections">
-    <key alias="concierge">Concierge</key>
+    <key alias="concierge">Portner</key>
     <key alias="content">Indhold</key>
     <key alias="courier">Courier</key>
     <key alias="developer">Udvikler</key>
