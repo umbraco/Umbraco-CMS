@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
+using System.Configuration.Provider;
 using System.Threading.Tasks;
-using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 
@@ -29,7 +28,7 @@ namespace Umbraco.Core.Security
             MembershipProviderBase membershipProvider)
             : base(store)
         {
-            if (options == null) throw new ArgumentNullException("options");;
+            if (options == null) throw new ArgumentNullException("options");
             InitUserManager(this, membershipProvider, options);
         }
 
@@ -140,8 +139,8 @@ namespace Umbraco.Core.Security
         /// <param name="dataProtectionProvider"></param>
         /// <returns></returns>
         protected void InitUserManager(
-            BackOfficeUserManager<T> manager, 
-            MembershipProviderBase membershipProvider, 
+            BackOfficeUserManager<T> manager,
+            MembershipProviderBase membershipProvider,
             IDataProtectionProvider dataProtectionProvider)
         {
             // Configure validation logic for usernames
@@ -164,7 +163,7 @@ namespace Umbraco.Core.Security
 
             //use a custom hasher based on our membership provider
             manager.PasswordHasher = new MembershipPasswordHasher(membershipProvider);
-            
+
             if (dataProtectionProvider != null)
             {
                 manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"));
@@ -238,5 +237,170 @@ namespace Umbraco.Core.Security
         /// Gets/sets the default back office user password checker
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
+
+        //TODO: Call this method (?)
+        public override Task<IdentityResult> SetLockoutEnabledAsync(int userId, bool enabled)
+        {
+            var result = base.SetLockoutEnabledAsync(userId, enabled);
+
+            if (result.Result.Succeeded)
+                OnAuthLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
+                {
+                    AffectedUser = userId
+                });
+
+            return result;
+        }
+
+        public override Task<IdentityResult> AccessFailedAsync(int userId)
+        {
+            var result = base.AccessFailedAsync(userId);
+
+            if (result.Result.Succeeded)
+                OnAuthAccessFailed(new IdentityAuditEventArgs(AuditEvent.AccessFailed)
+                {
+                    AffectedUser = userId
+                });
+
+            return result;
+        }
+
+        //TODO: Call this method (?)
+        public override Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            var result = base.ChangePasswordAsync(userId, currentPassword, newPassword);
+
+            if (result.Result.Succeeded)
+                OnAuthPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
+                {
+                    AffectedUser = userId
+                });
+
+            return result;
+        }
+
+        public override Task<IdentityResult> CreateAsync(T user)
+        {
+            var result = base.CreateAsync(user);
+
+            if (result.Result.Succeeded)
+                OnAuthAccountCreated(new IdentityAuditEventArgs(AuditEvent.AccountCreated)
+                {
+                    AffectedUser = user.Id
+                });
+
+            return result;
+        }
+
+        public override async Task<IdentityResult> ResetAccessFailedCountAsync(int userId)
+        {
+            var user = ApplicationContext.Current.Services.UserService.GetUserById(userId);
+
+            if (user == null)
+            {
+                throw new ProviderException(string.Format("No user with the id {0} found", userId));
+            }
+
+            if (user.FailedPasswordAttempts > 0)
+            {
+                user.FailedPasswordAttempts = 0;
+                ApplicationContext.Current.Services.UserService.Save(user);
+
+                OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
+                {
+                    AffectedUser = userId
+                });
+            }
+
+            return await Task.FromResult(IdentityResult.Success);
+        }
+
+        public override Task<IdentityResult> UpdateAsync(T user)
+        {
+            var result = base.UpdateAsync(user);
+
+            if (result.Result.Succeeded)
+                OnAuthAccountUpdated(new IdentityAuditEventArgs(AuditEvent.AccountUpdated)
+                {
+                    AffectedUser = user.Id
+                });
+
+            return result;
+        }
+
+        /// <summary>
+        /// Clears a lock so that the membership user can be validated.
+        /// </summary>
+        /// <param name="username">The membership user to clear the lock status for.</param>
+        /// <returns>
+        /// true if the membership user was successfully unlocked; otherwise, false.
+        /// </returns>
+        public bool UnlockUser(string username)
+        {
+            var user = ApplicationContext.Current.Services.UserService.GetByUsername(username);
+
+            if (user == null)
+            {
+                throw new ProviderException(string.Format("No user with the username '{0}' found", username));
+            }
+
+            // Non need to update
+            if (user.IsLockedOut == false) return true;
+
+            user.IsLockedOut = false;
+            user.FailedPasswordAttempts = 0;
+
+            ApplicationContext.Current.Services.UserService.Save(user);
+
+            OnAuthUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
+            {
+                AffectedUser = user.Id
+            });
+
+            return true;
+        }
+
+        public static event EventHandler AuthUnlocked;
+        public static event EventHandler AuthLocked;
+        public static event EventHandler AuthAccessFailed;
+        public static event EventHandler AuthPasswordChanged;
+        public static event EventHandler AuthAccountCreated;
+        public static event EventHandler AuthResetAccessFailedCount;
+        public static event EventHandler AuthAccountUpdated;
+
+        protected virtual void OnAuthUnlocked(IdentityAuditEventArgs e)
+        {
+            if (AuthUnlocked != null) AuthUnlocked(this, e);
+        }
+
+        protected virtual void OnAuthLocked(IdentityAuditEventArgs e)
+        {
+            if (AuthLocked != null) AuthLocked(this, e);
+        }
+
+        protected virtual void OnAuthAccessFailed(IdentityAuditEventArgs e)
+        {
+            if (AuthAccessFailed != null) AuthAccessFailed(this, e);
+        }
+
+        protected virtual void OnAuthPasswordChanged(IdentityAuditEventArgs e)
+        {
+            if (AuthPasswordChanged != null) AuthPasswordChanged(this, e);
+        }
+
+        protected virtual void OnAuthAccountCreated(IdentityAuditEventArgs e)
+        {
+            if (AuthAccountCreated != null) AuthAccountCreated(this, e);
+        }
+
+        protected virtual void OnAuthResetAccessFailedCount(IdentityAuditEventArgs e)
+        {
+            if (AuthResetAccessFailedCount != null) AuthResetAccessFailedCount(this, e);
+        }
+
+        protected virtual void OnAuthAccountUpdated(IdentityAuditEventArgs e)
+        {
+            if (AuthAccountUpdated != null) AuthAccountUpdated(this, e);
+        }
     }
 }

@@ -2,16 +2,22 @@
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Web;
 using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Security;
+
 using Umbraco.Core.Services;
+using Umbraco.Core.Auditing;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security.Providers
 {
@@ -450,22 +456,19 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override bool UnlockUser(string username)
         {
-            var member = MemberService.GetByUsername(username);
+            var userManager = GetBackofficeUserManager();
+            return userManager != null && userManager.UnlockUser(username);
+        }
 
-            if (member == null)
-            {
-                throw new ProviderException(string.Format("No member with the username '{0}' found", username));
-            }                
+        internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
+        {
 
-            // Non need to update
-            if (member.IsLockedOut == false) return true;
-
-            member.IsLockedOut = false;
-            member.FailedPasswordAttempts = 0;
-
-            MemberService.Save(member);
-
-            return true;
+            if (HttpContext.Current == null) return null;
+            var owinContext = HttpContext.Current.GetOwinContext();
+            if (owinContext == null) return null;
+            var userManager = owinContext.GetBackOfficeUserManager();
+            if (userManager == null) return null;
+            return userManager;
         }
 
         /// <summary>
@@ -601,10 +604,5 @@ namespace Umbraco.Web.Security.Providers
 
             return authenticated;
         }
-
-
-
-        
-
     }
 }

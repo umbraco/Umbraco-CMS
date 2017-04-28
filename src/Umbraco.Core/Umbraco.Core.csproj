@@ -149,6 +149,7 @@
     <Compile Include="Attempt{T}.cs" />
     <Compile Include="Auditing\Audit.cs" />
     <Compile Include="Auditing\AuditTypes.cs" />
+    <Compile Include="Auditing\IdentityAuditEventArgs.cs" />
     <Compile Include="BindingRedirects.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="CacheHelper.cs" />
