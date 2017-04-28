@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Events
 {
+    [SupersedeEvent(typeof(SaveEventArgs<>))]
+    [SupersedeEvent(typeof(PublishEventArgs<>))]
+    [SupersedeEvent(typeof(MoveEventArgs<>))]
+    [SupersedeEvent(typeof(CopyEventArgs<>))]
     public class DeleteEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>, IEquatable<DeleteEventArgs<TEntity>>, IDeletingMediaFilesEventArgs
 	{
 	    /// <summary>
