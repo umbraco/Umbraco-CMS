@@ -167,7 +167,7 @@ namespace Umbraco.Core
 			}
 			return false;
 		}
-
+        
 		/// <summary>
 		/// Determines whether [is of generic type] [the specified type].
 		/// </summary>

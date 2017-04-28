@@ -4,13 +4,16 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    public class ScopeEventDispatcherTests
+    public class ScopeEventDispatcherTests : BaseUmbracoConfigurationTest
     {
         [SetUp]
         public void Setup()
@@ -79,12 +82,57 @@ namespace Umbraco.Tests.Scoping
                 var events = scope.Events.GetEvents(EventDefinitionFilter.All).ToArray();
 
                 var knownNames = new[] { "DoThing1", "DoThing2", "DoThing3" };
-                var knownArgTypes = new[] { typeof (SaveEventArgs<string>), typeof (SaveEventArgs<int>), typeof (SaveEventArgs<decimal>) };
+                var knownArgTypes = new[] { typeof(SaveEventArgs<string>), typeof(SaveEventArgs<int>), typeof(SaveEventArgs<decimal>) };
 
                 for (var i = 0; i < events.Length; i++)
                 {
                     Assert.AreEqual(knownNames[i], events[i].EventName);
                     Assert.AreEqual(knownArgTypes[i], events[i].Args.GetType());
+                }
+            }
+        }
+
+        /// <summary>
+        /// This will test that when we track events that before we Get the events we normalize all of the
+        /// event entities to be the latest one (most current) found amongst the event so that there is 
+        /// no 'stale' entities in any of the args
+        /// </summary>
+        [Test]
+        public void LatestEntities()
+        {
+            DoThingForContent += OnDoThingFail;
+
+            var now = DateTime.Now;
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            var content1 = MockedContent.CreateBasicContent(contentType);
+            content1.Id = 123;
+            content1.UpdateDate = now.AddMinutes(1);
+            var content2 = MockedContent.CreateBasicContent(contentType);
+            content2.Id = 123;
+            content1.UpdateDate = now.AddMinutes(2);
+            var content3 = MockedContent.CreateBasicContent(contentType);
+            content3.Id = 123;
+            content1.UpdateDate = now.AddMinutes(3);
+
+            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
+            {
+
+                scope.Events.Dispatch(DoThingForContent, this, new SaveEventArgs<IContent>(content1));
+                scope.Events.Dispatch(DoThingForContent, this, new SaveEventArgs<IContent>(content2));
+                scope.Events.Dispatch(DoThingForContent, this, new SaveEventArgs<IContent>(content3));
+
+                // events have been queued
+                var events = scope.Events.GetEvents(EventDefinitionFilter.All).ToArray();
+                Assert.AreEqual(3, events.Length);
+                
+                foreach (var t in events)
+                {
+                    var args = (SaveEventArgs<IContent>)t.Args;
+                    foreach (var entity in args.SavedEntities)
+                    {
+                        Assert.AreEqual(content3, entity);
+                    }
                 }
             }
         }
@@ -176,6 +224,8 @@ namespace Umbraco.Tests.Scoping
         {
             Assert.Fail();
         }
+
+        public static event EventHandler<SaveEventArgs<IContent>> DoThingForContent;
 
         public static event EventHandler<SaveEventArgs<string>> DoThing1;
 
