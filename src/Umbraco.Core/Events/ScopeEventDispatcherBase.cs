@@ -186,6 +186,10 @@ namespace Umbraco.Core.Events
                                     allEntities.Add(Tuple.Create(obj, meta));
                                 }
                             }
+                            else
+                            {
+                                //we don't need to do anything here, we can't cast to IEntity so we cannot filter, so it will just remain in the list
+                            }
                         }
 
                         //remove anything that has been filtered
