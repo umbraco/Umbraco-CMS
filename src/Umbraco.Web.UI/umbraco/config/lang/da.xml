@@ -150,7 +150,7 @@
     <key alias="releaseDate">Udgivelsesdato</key>
     <key alias="unpublishDate">Dato for Fortryd udgivelse</key>
     <key alias="removeDate">Fjern dato</key>
-    <key alias="sortDone">Sorteringrækkefølgen er opdateret</key>
+    <key alias="sortDone">Sorteringsrækkefølgen er opdateret</key>
     <key alias="sortHelp">For at sortere, træk siderne eller klik på en af kolonnehovederne. Du kan vælge flere sider ved at holde "shift" eller "control" nede mens du vælger.</key>
     <key alias="statistics">Statistik</key>
     <key alias="titleOptional">Titel (valgfri)</key>
@@ -184,7 +184,7 @@
     <key alias="updateData">Vælg en type og skriv en titel</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">Dokument type uden skabelon</key>
+    <key alias="documentTypeWithoutTemplate">Dokumenttype uden skabelon</key>
     <key alias="newFolder">Ny mappe</key>
     <key alias="newDataType">Ny datatype</key>
   </area>
@@ -579,13 +579,13 @@
     <key alias="permissionsAffectedFolders">Berørte filer og foldere</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Flere informationer om at opsætte rettigheder for Umbraco her</key>
     <key alias="permissionsAffectedFoldersText">Du er nødt til at give ASP.NET 'modify' rettigheder på følgende filer/foldere</key>
-    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Dine rettighedsinstillinger er næsten perfekte!</strong><br/><br/>Du kan køre Umbraco uden problemer, men du vil ikke være i stand til at installere pakker, som er anbefalet for at få fuldt udbytte af Umbraco.]]></key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Dine rettighedsindstillinger er næsten perfekte!</strong><br/><br/>Du kan køre Umbraco uden problemer, men du vil ikke være i stand til at installere pakker, som er anbefalet for at få fuldt udbytte af Umbraco.]]></key>
     <key alias="permissionsHowtoResolve">Hvorledes besluttes</key>
     <key alias="permissionsHowtoResolveLink">Klik her for at læse tekstversionen</key>
     <key alias="permissionsHowtoResolveText"><![CDATA[Se vores <strong>video tutorials</strong> om at opsætte folderrettigheder for Umbraco eller læs tekstversionen.]]></key>
-    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Dine rettighedsinstillinger kan være et problem!</strong><br/><br/>Du kan afvikle Umbraco uden problemer, men du vil ikke være i stand til at oprette foldere eller installere pakker, hvilket er anbefalet for at få fuldt udbytte af Umbraco.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Dine rettighedsinstillinger er ikke klar til Umbraco!</strong><br/><br/>For at afvikle Umbraco er du nødt til at opdatere dine rettighedsinstillinger.]]></key>
-    <key alias="permissionsPerfect"><![CDATA[<strong>Dine rettighedsinstillinger er perfekte!</strong><br/><br/>Du er nu parat til at afvikle Umbraco og installere pakker!]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Dine rettighedsindstillinger kan være et problem!</strong><br/><br/>Du kan afvikle Umbraco uden problemer, men du vil ikke være i stand til at oprette foldere eller installere pakker, hvilket er anbefalet for at få fuldt udbytte af Umbraco.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Dine rettighedsindstillinger er ikke klar til Umbraco!</strong><br/><br/>For at afvikle Umbraco er du nødt til at opdatere dine rettighedsindstillinger.]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>Dine rettighedsindstillinger er perfekte!</strong><br/><br/>Du er nu parat til at afvikle Umbraco og installere pakker!]]></key>
     <key alias="permissionsResolveFolderIssues">Løser folder problem</key>
     <key alias="permissionsResolveFolderIssuesLink">Følg dette link for mere information om udfordringer med ASP.NET og oprettelse af foldere</key>
     <key alias="permissionsSettingUpPermissions">Sætter folderrettigheder op</key>
@@ -597,7 +597,7 @@
     <key alias="runwayInstalledText"><![CDATA[Du har fundamentet på plads. Vælg hvilke moduler du ønsker at installere ovenpå det.<br/>Dette er vores liste over anbefalede moduler. Kryds dem af du ønsker at installere eller se den <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fulde liste af moduler</a>  ]]></key>
     <key alias="runwayOnlyProUsers">Kun anbefalet for erfarne brugere</key>
     <key alias="runwaySimpleSite">Jeg ønsker at begynder med et simpelt website</key>
-    <key alias="runwaySimpleSiteText"><![CDATA[<p>"Runway" er et simpelt website som stiller nogle basale dokumenttyper og skabeloner til rådighed. Instaleringsprogrammet kan automatisk opsætte Runway for dig, men du kan nemt redigere, udvide eller fjerne det. Det er ikke nødvendigt og du kan sagtens bruge Umbraco uden. Men Runway tilbyder et fundament, som er baseret på 'Best Practices', som får dig igang hurtigere end nogensinde før. Hvis du vælger at installere Runway, kan du efter eget valg vælge de grundlæggende byggesten kaldet 'Runway Modules' til at forbedre dine Runway-sider.</p><p><small><em>Inkluderet med Runway:</em>Home Page, Getting Started page, Installing Modules page.<br /> <em>Valgfri Moduler:</em> Top Navigation, Sitemap, Contact, Gallery. </small></p>]]></key>
+    <key alias="runwaySimpleSiteText"><![CDATA[<p>"Runway" er et simpelt website som stiller nogle basale dokumenttyper og skabeloner til rådighed. Installeringsprogrammet kan automatisk opsætte Runway for dig, men du kan nemt redigere, udvide eller fjerne det. Det er ikke nødvendigt og du kan sagtens bruge Umbraco uden. Men Runway tilbyder et fundament, som er baseret på 'Best Practices', som får dig igang hurtigere end nogensinde før. Hvis du vælger at installere Runway, kan du efter eget valg vælge de grundlæggende byggesten kaldet 'Runway Modules' til at forbedre dine Runway-sider.</p><p><small><em>Inkluderet med Runway:</em>Home Page, Getting Started page, Installing Modules page.<br /> <em>Valgfri Moduler:</em> Top Navigation, Sitemap, Contact, Gallery. </small></p>]]></key>
     <key alias="runwayWhatIsRunway">Hvad er Runway</key>
     <key alias="step1">Skridt 1/5: Acceptér licens</key>
     <key alias="step2">Skridt 2/5: Database-konfiguration</key>
@@ -714,7 +714,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageRepository">Pakke opbevaringsbase</key>
     <key alias="packageUninstallConfirm">Bekræft af-installering</key>
     <key alias="packageUninstalledHeader">Pakken blev fjernet</key>
-    <key alias="packageUninstalledText">Pakken er på succefuld vis blevet fjernet</key>
+    <key alias="packageUninstalledText">Pakken er på succesfuld vis blevet fjernet</key>
     <key alias="packageUninstallHeader">Afinstallér pakke</key>
     <key alias="packageUninstallText">
       <![CDATA[Du kan fjerne markeringen på elementer du ikke ønsker at fjerne, på dette tidspunkt, nedenfor. Når du klikker 'bekræft' vil alle afkrydsede elemenet blive fjernet <br/>
@@ -795,7 +795,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addRows">Tilføj række</key>
     <key alias="addElement">Tilføj indhold</key>
     <key alias="dropElement">Slip indhold</key>
-    <key alias="settingsApplied">Instillinger tilføjet</key>
+    <key alias="settingsApplied">Indstillinger tilføjet</key>
 
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
     <key alias="contentAllowed">Indholdet er tilladt her</key>
@@ -940,7 +940,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tab">Faneblad</key>
     <key alias="tabname">Titel på faneblad</key>
     <key alias="tabs">Faneblade</key>
-    <key alias="masterDocumentType">Master Dokument Type</key>
+    <key alias="masterDocumentType">Master Dokumentype</key>
     <key alias="createMatchingTemplate">Opret matchende skabelon</key>
   </area>
   <area alias="sort">
@@ -1024,7 +1024,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="insertContentAreaPlaceHolder">Indsæt pladsholder for indholdsområde</key>
 
     <key alias="insert">Indsæt</key>
-    <key alias="insertDesc">Hvad vil du indsætte ?</key>
+    <key alias="insertDesc">Hvad vil du indsætte?</key>
 
     <key alias="insertDictionaryItem">Oversættelse</key>
     <key alias="insertDictionaryItemDesc">Indsætter en oversætbar tekst, som skifter efter det sprog, som websitet vises i.</key>
