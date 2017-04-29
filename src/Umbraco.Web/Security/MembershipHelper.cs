@@ -661,13 +661,18 @@ namespace Umbraco.Web.Security
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
             if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
 
-            int userId = -1;
-            var backofficeUserManager = GetBackofficeUserManager();
-            if (backofficeUserManager != null)
+            BackOfficeUserManager<BackOfficeIdentityUser> backofficeUserManager = null;
+            var userId = -1;
+
+            if (membershipProvider.IsUmbracoUsersProvider())
             {
-                var profile = _applicationContext.Services.UserService.GetProfileByUserName(username);
-                if (profile != null)
-                    int.TryParse(profile.Id.ToString(), out userId);
+                backofficeUserManager = GetBackofficeUserManager();
+                if (backofficeUserManager != null)
+                {
+                    var profile = _applicationContext.Services.UserService.GetProfileByUserName(username);
+                    if (profile != null)
+                        int.TryParse(profile.Id.ToString(), out userId);
+                }
             }
 
             //Are we resetting the password??
@@ -689,7 +694,7 @@ namespace Umbraco.Web.Security
                         username,
                         membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
 
-                    if (backofficeUserManager != null && userId >= 0)
+                    if (membershipProvider.IsUmbracoUsersProvider() && backofficeUserManager != null && userId >= 0)
                         backofficeUserManager.RaisePasswordResetEvent(userId);
 
                     //return the generated pword
@@ -889,7 +894,6 @@ namespace Umbraco.Web.Security
 
         internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
         {
-
             if (HttpContext.Current == null) return null;
             var owinContext = HttpContext.Current.GetOwinContext();
             if (owinContext == null) return null;
