@@ -551,6 +551,7 @@ namespace Umbraco.Web.Security.Providers
             }
 
             var authenticated = CheckPassword(password, member.RawPasswordValue);
+            var backofficeUserManager = GetBackofficeUserManager();
 
             if (authenticated == false)
             {
@@ -570,6 +571,9 @@ namespace Umbraco.Web.Security.Providers
                             "Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded",
                             username,
                             GetCurrentRequestIpAddress()));
+
+                    if(backofficeUserManager != null)
+                        backofficeUserManager.RaiseAccountLockedEvent(member.Id);
                 }
                 else
                 {
@@ -582,7 +586,13 @@ namespace Umbraco.Web.Security.Providers
             }
             else
             {
-                member.FailedPasswordAttempts = 0;
+                if (member.FailedPasswordAttempts > 0)
+                {
+                    member.FailedPasswordAttempts = 0;
+                    if (backofficeUserManager != null)
+                        backofficeUserManager.RaiseResetAccessFailedCountEvent(member.Id);
+                }
+
                 member.LastLoginDate = DateTime.Now;
 
                 LogHelper.Info<UmbracoMembershipProviderBase>(
@@ -590,6 +600,9 @@ namespace Umbraco.Web.Security.Providers
                             "Login attempt succeeded for username {0} from IP address {1}",
                             username,
                             GetCurrentRequestIpAddress()));
+
+                if (backofficeUserManager != null)
+                    backofficeUserManager.RaiseLoginSuccessEvent(member.Id);
             }
 
             //don't raise events for this! It just sets the member dates, if we do raise events this will

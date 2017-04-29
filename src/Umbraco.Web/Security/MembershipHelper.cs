@@ -13,6 +13,7 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Security.Providers;
 using MPE = global::Umbraco.Core.Security.MembershipProviderExtensions;
 
@@ -660,6 +661,15 @@ namespace Umbraco.Web.Security
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
             if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
 
+            int userId = -1;
+            var backofficeUserManager = GetBackofficeUserManager();
+            if (backofficeUserManager != null)
+            {
+                var profile = _applicationContext.Services.UserService.GetProfileByUserName(username);
+                if (profile != null)
+                    int.TryParse(profile.Id.ToString(), out userId);
+            }
+
             //Are we resetting the password??
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
@@ -678,6 +688,9 @@ namespace Umbraco.Web.Security
                     var newPass = membershipProvider.ResetPassword(
                         username,
                         membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
+
+                    if (backofficeUserManager != null && userId >= 0)
+                        backofficeUserManager.RaisePasswordResetEvent(userId);
 
                     //return the generated pword
                     return Attempt.Succeed(new PasswordChangedModel { ResetPassword = newPass });
@@ -729,6 +742,10 @@ namespace Umbraco.Web.Security
                 try
                 {
                     var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
+
+                    if (result && backofficeUserManager != null && userId >= 0)
+                           backofficeUserManager.RaisePasswordChangedEvent(userId);
+
                     return result == false
                         ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
                         : Attempt.Succeed(new PasswordChangedModel());
@@ -870,5 +887,15 @@ namespace Umbraco.Web.Security
             return sb.ToString();
         }
 
+        internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
+        {
+
+            if (HttpContext.Current == null) return null;
+            var owinContext = HttpContext.Current.GetOwinContext();
+            if (owinContext == null) return null;
+            var userManager = owinContext.GetBackOfficeUserManager();
+            if (userManager == null) return null;
+            return userManager;
+        }
     }
 }

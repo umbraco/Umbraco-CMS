@@ -238,7 +238,6 @@ namespace Umbraco.Core.Security
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
 
-        //TODO: Call this method (?)
         public override Task<IdentityResult> SetLockoutEnabledAsync(int userId, bool enabled)
         {
             var result = base.SetLockoutEnabledAsync(userId, enabled);
@@ -265,7 +264,6 @@ namespace Umbraco.Core.Security
             return result;
         }
 
-        //TODO: Call this method (?)
         public override Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
             var result = base.ChangePasswordAsync(userId, currentPassword, newPassword);
@@ -313,6 +311,54 @@ namespace Umbraco.Core.Security
             }
 
             return await Task.FromResult(IdentityResult.Success);
+        }
+
+        internal void RaisePasswordChangedEvent(int userId)
+        {
+            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaisePasswordResetEvent(int userId)
+        {
+            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.PasswordReset)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseAccountLockedEvent(int userId)
+        {
+            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseResetAccessFailedCountEvent(int userId)
+        {
+            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseLoginSuccessEvent(int userId)
+        {
+            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.LoginSucces)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseLogoutSuccessEvent(int userId)
+        {
+            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess)
+            {
+                AffectedUser = userId
+            });
         }
 
         public override Task<IdentityResult> UpdateAsync(T user)

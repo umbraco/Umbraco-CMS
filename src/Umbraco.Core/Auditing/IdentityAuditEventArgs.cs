@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Web;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Auditing
@@ -61,11 +59,12 @@ namespace Umbraco.Core.Auditing
         AccountLocked,
         AccountUnlocked,
         LoginSucces,
-        Logout,
+        LogoutSuccess,
         AccessFailed,
         PasswordChanged,
-        AccountCreated,
+        AccountCreated, //not yet being called
         ResetAccessFailedCount,
-        AccountUpdated
+        AccountUpdated,
+        PasswordReset
     }
 }

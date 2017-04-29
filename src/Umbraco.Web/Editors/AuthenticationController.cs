@@ -327,9 +327,27 @@ namespace Umbraco.Web.Editors
                             () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
                             () => TryGetOwinContext().Result.Request.RemoteIpAddress);
 
+            var backofficeUserManager = GetBackofficeUserManager();
+            if (backofficeUserManager != null)
+            {
+                var userId = -1;
+                int.TryParse(User.Identity.GetUserId(), out userId);
+                backofficeUserManager.RaiseLogoutSuccessEvent(userId);
+            }
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
+        internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
+        {
+
+            if (HttpContext.Current == null) return null;
+            var owinContext = HttpContext.Current.GetOwinContext();
+            if (owinContext == null) return null;
+            var userManager = owinContext.GetBackOfficeUserManager();
+            if (userManager == null) return null;
+            return userManager;
+        }
 
         /// <summary>
         /// This is used when the user is auth'd successfully and we need to return an OK with user details along with setting the current Principal in the request
