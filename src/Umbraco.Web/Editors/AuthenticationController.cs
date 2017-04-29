@@ -133,12 +133,18 @@ namespace Umbraco.Web.Editors
             var result = await SignInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
 
+            var backofficeUserManager = GetBackofficeUserManager();
+
             switch (result)
             {
                 case SignInStatus.Success:
 
                     //get the user
                     var user = Security.GetBackOfficeUser(loginModel.Username);
+
+                    if (backofficeUserManager != null)
+                        backofficeUserManager.RaiseLoginSuccessEvent(user.Id);
+
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
 
@@ -172,6 +178,9 @@ namespace Umbraco.Web.Editors
                         twoFactorView = twofactorView,
                         userId = attemptedUser.Id
                     });
+
+                    if (backofficeUserManager != null)
+                        backofficeUserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
 
                     return verifyResponse;
 

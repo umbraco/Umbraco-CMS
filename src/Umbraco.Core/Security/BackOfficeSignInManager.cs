@@ -191,6 +191,8 @@ namespace Umbraco.Core.Security
 
             //track the last login date
             user.LastLoginDateUtc = DateTime.UtcNow;
+            if (user.AccessFailedCount > 0)
+                user.AccessFailedCount = 0;
             await UserManager.UpdateAsync(user);
 
             _logger.WriteCore(TraceEventType.Information, 0,

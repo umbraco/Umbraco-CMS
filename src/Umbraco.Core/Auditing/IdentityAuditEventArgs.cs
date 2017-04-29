@@ -65,6 +65,7 @@ namespace Umbraco.Core.Auditing
         AccountCreated, //not yet being called
         ResetAccessFailedCount,
         AccountUpdated,
-        PasswordReset
+        PasswordReset,
+        LoginRequiresVerification
     }
 }
