@@ -666,7 +666,7 @@ namespace Umbraco.Web.Security
 
             if (membershipProvider.IsUmbracoUsersProvider())
             {
-                backofficeUserManager = GetBackofficeUserManager();
+                backofficeUserManager = _httpContext.GetOwinContext().GetBackOfficeUserManager();
                 if (backofficeUserManager != null)
                 {
                     var profile = _applicationContext.Services.UserService.GetProfileByUserName(username);
@@ -890,16 +890,6 @@ namespace Umbraco.Web.Security
                 sb.Append(s);
             }
             return sb.ToString();
-        }
-
-        internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
-        {
-            if (HttpContext.Current == null) return null;
-            var owinContext = HttpContext.Current.GetOwinContext();
-            if (owinContext == null) return null;
-            var userManager = owinContext.GetBackOfficeUserManager();
-            if (userManager == null) return null;
-            return userManager;
         }
     }
 }

@@ -132,9 +132,7 @@ namespace Umbraco.Web.Editors
 
             var result = await SignInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
-
-            var backofficeUserManager = GetBackofficeUserManager();
-
+            
             switch (result)
             {
                 case SignInStatus.Success:
@@ -142,8 +140,8 @@ namespace Umbraco.Web.Editors
                     //get the user
                     var user = Security.GetBackOfficeUser(loginModel.Username);
 
-                    if (backofficeUserManager != null)
-                        backofficeUserManager.RaiseLoginSuccessEvent(user.Id);
+                    if (UserManager != null)
+                        UserManager.RaiseLoginSuccessEvent(user.Id);
 
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
@@ -179,8 +177,8 @@ namespace Umbraco.Web.Editors
                         userId = attemptedUser.Id
                     });
 
-                    if (backofficeUserManager != null)
-                        backofficeUserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
+                    if (UserManager != null)
+                        UserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
 
                     return verifyResponse;
 
@@ -336,26 +334,14 @@ namespace Umbraco.Web.Editors
                             () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
                             () => TryGetOwinContext().Result.Request.RemoteIpAddress);
 
-            var backofficeUserManager = GetBackofficeUserManager();
-            if (backofficeUserManager != null)
+            if (UserManager != null)
             {
                 var userId = -1;
                 int.TryParse(User.Identity.GetUserId(), out userId);
-                backofficeUserManager.RaiseLogoutSuccessEvent(userId);
+                UserManager.RaiseLogoutSuccessEvent(userId);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
-        }
-
-        internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
-        {
-
-            if (HttpContext.Current == null) return null;
-            var owinContext = HttpContext.Current.GetOwinContext();
-            if (owinContext == null) return null;
-            var userManager = owinContext.GetBackOfficeUserManager();
-            if (userManager == null) return null;
-            return userManager;
         }
 
         /// <summary>

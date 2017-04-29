@@ -462,13 +462,9 @@ namespace Umbraco.Web.Security.Providers
 
         internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
         {
-
-            if (HttpContext.Current == null) return null;
-            var owinContext = HttpContext.Current.GetOwinContext();
-            if (owinContext == null) return null;
-            var userManager = owinContext.GetBackOfficeUserManager();
-            if (userManager == null) return null;
-            return userManager;
+            return HttpContext.Current == null
+                ? null
+                : HttpContext.Current.GetOwinContext().GetBackOfficeUserManager();
         }
 
         /// <summary>
