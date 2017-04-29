@@ -369,6 +369,14 @@ namespace Umbraco.Core.Security
             });
         }
 
+        internal void RaiseCreateUserEvent(int userId)
+        {
+            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.AccountCreated)
+            {
+                AffectedUser = userId
+            });
+        }
+
         public override Task<IdentityResult> UpdateAsync(T user)
         {
             var result = base.UpdateAsync(user);

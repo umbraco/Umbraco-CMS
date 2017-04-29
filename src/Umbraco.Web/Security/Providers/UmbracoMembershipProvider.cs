@@ -181,6 +181,12 @@ namespace Umbraco.Web.Security.Providers
             member.LastPasswordChangeDate = DateTime.Now;
 
             MemberService.Save(member);
+            if (MemberService is UserService)
+            {
+                var backofficeUserManager = GetBackofficeUserManager();
+                if (backofficeUserManager != null)
+                    backofficeUserManager.RaiseCreateUserEvent(member.Id);
+            }
 
             status = MembershipCreateStatus.Success;
             return ConvertToMembershipUser(member);
