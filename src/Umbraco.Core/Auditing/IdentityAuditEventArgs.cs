@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Web;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Auditing
@@ -43,18 +45,14 @@ namespace Umbraco.Core.Auditing
         /// <returns></returns>
         protected int GetCurrentRequestBackofficeUserId()
         {
-            if (HttpContext.Current == null) return 0;
-
-            var authenticationTicket = new HttpContextWrapper(HttpContext.Current).GetUmbracoAuthTicket();
-            if (authenticationTicket != null)
-            {
-                var currentBackofficeUser = ApplicationContext.Current.Services.UserService.GetByUsername(authenticationTicket.Name);
-                if (currentBackofficeUser != null)
-                    return currentBackofficeUser.Id;
-            }
-
-            // couldn't get auth ticket or current user, return default user (0)
-            return 0;
+            var userId = 0;
+            if (HttpContext.Current == null) return userId;
+            var owinContext = HttpContext.Current.GetOwinContext();
+            if (owinContext == null) return userId;
+            var backOfficeIdentity = owinContext.Authentication.User.GetUmbracoIdentity();
+            if (backOfficeIdentity != null)
+                int.TryParse(backOfficeIdentity.Id.ToString(), out userId);
+            return userId;
         }
     }
 
