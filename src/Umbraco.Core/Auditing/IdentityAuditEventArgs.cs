@@ -62,7 +62,7 @@ namespace Umbraco.Core.Auditing
         LogoutSuccess,
         AccessFailed,
         PasswordChanged,
-        AccountCreated, //not yet being called
+        AccountCreated,
         ResetAccessFailedCount,
         AccountUpdated,
         PasswordReset,
