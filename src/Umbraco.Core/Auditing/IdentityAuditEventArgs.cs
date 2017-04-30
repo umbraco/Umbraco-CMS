@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Web;
 using Umbraco.Core.Security;
 
@@ -43,11 +44,8 @@ namespace Umbraco.Core.Auditing
         /// <returns></returns>
         protected int GetCurrentRequestBackofficeUserId()
         {
-            var userId = 0;
-            if (HttpContext.Current == null) return userId;
-            var owinContext = HttpContext.Current.GetOwinContext();
-            if (owinContext == null) return userId;
-            var backOfficeIdentity = owinContext.Authentication.User.GetUmbracoIdentity();
+            var userId = -1;
+            var backOfficeIdentity = Thread.CurrentPrincipal.GetUmbracoIdentity();
             if (backOfficeIdentity != null)
                 int.TryParse(backOfficeIdentity.Id.ToString(), out userId);
             return userId;
