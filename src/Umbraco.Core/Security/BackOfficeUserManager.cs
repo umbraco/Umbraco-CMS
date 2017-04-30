@@ -243,7 +243,7 @@ namespace Umbraco.Core.Security
             var result = base.SetLockoutEnabledAsync(userId, enabled);
 
             if (result.Result.Succeeded)
-                OnAuthLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
+                OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
                 {
                     AffectedUser = userId
                 });
@@ -256,7 +256,7 @@ namespace Umbraco.Core.Security
             var result = base.AccessFailedAsync(userId);
 
             if (result.Result.Succeeded)
-                OnAuthAccessFailed(new IdentityAuditEventArgs(AuditEvent.AccessFailed)
+                OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
                 {
                     AffectedUser = userId
                 });
@@ -269,7 +269,7 @@ namespace Umbraco.Core.Security
             var result = base.ChangePasswordAsync(userId, currentPassword, newPassword);
 
             if (result.Result.Succeeded)
-                OnAuthPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
+                OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
                 {
                     AffectedUser = userId
                 });
@@ -282,7 +282,7 @@ namespace Umbraco.Core.Security
             var result = base.CreateAsync(user);
 
             if (result.Result.Succeeded)
-                OnAuthAccountCreated(new IdentityAuditEventArgs(AuditEvent.AccountCreated)
+                OnAccountCreated(new IdentityAuditEventArgs(AuditEvent.AccountCreated)
                 {
                     AffectedUser = user.Id
                 });
@@ -304,7 +304,7 @@ namespace Umbraco.Core.Security
                 user.FailedPasswordAttempts = 0;
                 ApplicationContext.Current.Services.UserService.Save(user);
 
-                OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
+                OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
                 {
                     AffectedUser = userId
                 });
@@ -315,7 +315,7 @@ namespace Umbraco.Core.Security
 
         internal void RaisePasswordChangedEvent(int userId)
         {
-            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
+            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
             {
                 AffectedUser = userId
             });
@@ -323,7 +323,7 @@ namespace Umbraco.Core.Security
 
         internal void RaisePasswordResetEvent(int userId)
         {
-            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.PasswordReset)
+            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset)
             {
                 AffectedUser = userId
             });
@@ -331,7 +331,7 @@ namespace Umbraco.Core.Security
 
         internal void RaiseAccountLockedEvent(int userId)
         {
-            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
+            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
             {
                 AffectedUser = userId
             });
@@ -339,7 +339,7 @@ namespace Umbraco.Core.Security
 
         internal void RaiseResetAccessFailedCountEvent(int userId)
         {
-            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
+            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
             {
                 AffectedUser = userId
             });
@@ -347,7 +347,7 @@ namespace Umbraco.Core.Security
 
         internal void RaiseLoginSuccessEvent(int userId)
         {
-            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.LoginSucces)
+            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces)
             {
                 AffectedUser = userId
             });
@@ -355,7 +355,7 @@ namespace Umbraco.Core.Security
 
         internal void RaiseLogoutSuccessEvent(int userId)
         {
-            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess)
+            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess)
             {
                 AffectedUser = userId
             });
@@ -363,7 +363,7 @@ namespace Umbraco.Core.Security
 
         internal void RaiseLoginRequiresVerificationEvent(int userId)
         {
-            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification)
+            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification)
             {
                 AffectedUser = userId
             });
@@ -371,7 +371,7 @@ namespace Umbraco.Core.Security
 
         internal void RaiseCreateUserEvent(int userId)
         {
-            OnAuthResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.AccountCreated)
+            OnAccountCreated(new IdentityAuditEventArgs(AuditEvent.AccountCreated)
             {
                 AffectedUser = userId
             });
@@ -382,7 +382,7 @@ namespace Umbraco.Core.Security
             var result = base.UpdateAsync(user);
 
             if (result.Result.Succeeded)
-                OnAuthAccountUpdated(new IdentityAuditEventArgs(AuditEvent.AccountUpdated)
+                OnAccountUpdated(new IdentityAuditEventArgs(AuditEvent.AccountUpdated)
                 {
                     AffectedUser = user.Id
                 });
@@ -414,7 +414,7 @@ namespace Umbraco.Core.Security
 
             ApplicationContext.Current.Services.UserService.Save(user);
 
-            OnAuthUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
+            OnAccounthUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
             {
                 AffectedUser = user.Id
             });
@@ -422,47 +422,71 @@ namespace Umbraco.Core.Security
             return true;
         }
 
-        public static event EventHandler AuthUnlocked;
-        public static event EventHandler AuthLocked;
-        public static event EventHandler AuthAccessFailed;
-        public static event EventHandler AuthPasswordChanged;
-        public static event EventHandler AuthAccountCreated;
-        public static event EventHandler AuthResetAccessFailedCount;
-        public static event EventHandler AuthAccountUpdated;
+        public static event EventHandler AccountCreated;
+        public static event EventHandler AccountLocked;
+        public static event EventHandler AccountUnlocked;
+        public static event EventHandler AccountUpdated;
+        public static event EventHandler LoginFailed;
+        public static event EventHandler LoginRequiresVerification;
+        public static event EventHandler LoginSuccess;
+        public static event EventHandler LogoutSuccess;
+        public static event EventHandler PasswordChanged;
+        public static event EventHandler PasswordReset;
+        public static event EventHandler ResetAccessFailedCount;
 
-        protected virtual void OnAuthUnlocked(IdentityAuditEventArgs e)
+        protected virtual void OnAccountCreated(IdentityAuditEventArgs e)
         {
-            if (AuthUnlocked != null) AuthUnlocked(this, e);
+            if (AccountCreated != null) AccountCreated(this, e);
         }
 
-        protected virtual void OnAuthLocked(IdentityAuditEventArgs e)
+        protected virtual void OnAccountLocked(IdentityAuditEventArgs e)
         {
-            if (AuthLocked != null) AuthLocked(this, e);
+            if (AccountLocked != null) AccountLocked(this, e);
         }
 
-        protected virtual void OnAuthAccessFailed(IdentityAuditEventArgs e)
+        protected virtual void OnAccounthUnlocked(IdentityAuditEventArgs e)
         {
-            if (AuthAccessFailed != null) AuthAccessFailed(this, e);
+            if (AccountUnlocked != null) AccountUnlocked(this, e);
         }
 
-        protected virtual void OnAuthPasswordChanged(IdentityAuditEventArgs e)
+        protected virtual void OnAccountUpdated(IdentityAuditEventArgs e)
         {
-            if (AuthPasswordChanged != null) AuthPasswordChanged(this, e);
+            if (AccountUpdated != null) AccountUpdated(this, e);
         }
 
-        protected virtual void OnAuthAccountCreated(IdentityAuditEventArgs e)
+        protected virtual void OnLoginFailed(IdentityAuditEventArgs e)
         {
-            if (AuthAccountCreated != null) AuthAccountCreated(this, e);
+            if (LoginFailed != null) LoginFailed(this, e);
         }
 
-        protected virtual void OnAuthResetAccessFailedCount(IdentityAuditEventArgs e)
+        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e)
         {
-            if (AuthResetAccessFailedCount != null) AuthResetAccessFailedCount(this, e);
+            if (LoginRequiresVerification != null) LoginRequiresVerification(this, e);
         }
 
-        protected virtual void OnAuthAccountUpdated(IdentityAuditEventArgs e)
+        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e)
         {
-            if (AuthAccountUpdated != null) AuthAccountUpdated(this, e);
+            if (LoginSuccess != null) LoginSuccess(this, e);
+        }
+
+        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e)
+        {
+            if (LogoutSuccess != null) LogoutSuccess(this, e);
+        }
+
+        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e)
+        {
+            if (PasswordChanged != null) PasswordChanged(this, e);
+        }
+
+        protected virtual void OnPasswordReset(IdentityAuditEventArgs e)
+        {
+            if (PasswordReset != null) PasswordReset(this, e);
+        }
+
+        protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e)
+        {
+            if (ResetAccessFailedCount != null) ResetAccessFailedCount(this, e);
         }
     }
 }
