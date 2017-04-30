@@ -34,8 +34,8 @@ namespace Umbraco.Core.Auditing
         /// <returns></returns>
         protected string GetCurrentRequestIpAddress()
         {
-            var owinContext = HttpContext.Current.GetOwinContext();
-            return owinContext == null ? string.Empty : owinContext.Request.RemoteIpAddress;
+            var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
+            return httpContext.GetCurrentRequestIpAddress();
         }
 
         /// <summary>
