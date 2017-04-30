@@ -296,6 +296,7 @@
     <Compile Include="Configuration\UmbracoSettings\RazorStaticMappingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RepositoriesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\RepositoriesElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\RepositoryConfigExtensions.cs" />
     <Compile Include="Configuration\UmbracoSettings\RepositoryElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTaskElement.cs" />
@@ -342,6 +343,7 @@
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
+    <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
     <Compile Include="OrderedHashSet.cs" />
@@ -518,6 +520,8 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddIndexToUser2NodePermission.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddRelationTypeUniqueIdColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddMacroUniqueIdColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\ReduceLoginNameColumnsSize.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\NormalizeTemplateGuids.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemovePropertyDataIdIndex.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemoveUmbracoDeployTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeTwo\EnsureMigrationsTableIdentityIsCorrect.cs" />

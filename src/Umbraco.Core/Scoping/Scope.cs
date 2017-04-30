@@ -465,6 +465,7 @@ namespace Umbraco.Core.Scoping
                     }
                     finally
                     {
+                        // removes the ambient context (ambient scope already gone)
                         _scopeProvider.SetAmbient(null);
                     }
                 }

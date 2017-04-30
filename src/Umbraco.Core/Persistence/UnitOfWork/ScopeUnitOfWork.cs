@@ -160,7 +160,33 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             _key = Guid.NewGuid();
         }
 
-		public object Key
+        public void Flush()
+        {
+            if (_readOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
+
+            while (_operations.Count > 0)
+            {
+                var operation = _operations.Dequeue();
+                switch (operation.Type)
+                {
+                    case TransactionType.Insert:
+                        operation.Repository.PersistNewItem(operation.Entity);
+                        break;
+                    case TransactionType.Delete:
+                        operation.Repository.PersistDeletedItem(operation.Entity);
+                        break;
+                    case TransactionType.Update:
+                        operation.Repository.PersistUpdatedItem(operation.Entity);
+                        break;
+                }
+            }
+
+            _operations.Clear();
+            _key = Guid.NewGuid();
+        }
+
+        public object Key
 		{
 			get { return _key; }
 		}

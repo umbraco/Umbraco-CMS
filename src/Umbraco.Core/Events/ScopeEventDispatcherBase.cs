@@ -4,6 +4,15 @@ using System.Linq;
 
 namespace Umbraco.Core.Events
 {
+    /// <summary>
+    /// An IEventDispatcher that queues events.
+    /// </summary>
+    /// <remarks>
+    /// <para>Can raise, or ignore, cancelable events, depending on option.</para>
+    /// <para>Implementations must override ScopeExitCompleted to define what
+    /// to do with the events when the scope exits and has been completed.</para>
+    /// <para>If the scope exits without being completed, events are ignored.</para>
+    /// </remarks>
     public abstract class ScopeEventDispatcherBase : IEventDispatcher
     {
         private List<IEventDefinition> _events;

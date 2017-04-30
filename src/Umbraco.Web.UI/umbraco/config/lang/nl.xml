@@ -339,6 +339,7 @@
     <key alias="filter">Typ om te filteren...</key>
     <key alias="enterTags">Typ om tags toe te voegen (druk op enter na elke tag)...</key>
 	<key alias="email">Voer jouw email in</key>
+    <key alias="usernameHint">Jouw gebruikersnaam is meestal jouw email</key>
   </area>
 
   <area alias="editcontenttype">

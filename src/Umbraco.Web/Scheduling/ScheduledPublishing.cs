@@ -23,11 +23,6 @@ namespace Umbraco.Web.Scheduling
             _settings = settings;
         }
 
-        public override bool PerformRun()
-        {
-            throw new NotImplementedException();
-        }
-
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
             if (_appContext == null) return true; // repeat...
@@ -107,11 +102,6 @@ namespace Umbraco.Web.Scheduling
         public override bool IsAsync
         {
             get { return true; }
-        }
-
-        public override bool RunsOnShutdown
-        {
-            get { return false; }
         }
     }
 }

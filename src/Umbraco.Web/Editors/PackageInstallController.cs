@@ -58,17 +58,25 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IHttpActionResult Uninstall(int packageId)
         {
-            var pack = InstalledPackage.GetById(packageId);
-            if (pack == null) return NotFound();
-
-            PerformUninstall(pack);
-
-            //now get all other packages by this name since we'll uninstall all versions
-            foreach (var installed in InstalledPackage.GetAllInstalledPackages()
-                .Where(x => x.Data.Name == pack.Data.Name && x.Data.Id != pack.Data.Id))
+            try
             {
-                //remove from teh xml
-                installed.Delete(Security.GetUserId());
+                var pack = InstalledPackage.GetById(packageId);
+                if (pack == null) return NotFound();
+
+                PerformUninstall(pack);
+
+                //now get all other packages by this name since we'll uninstall all versions
+                foreach (var installed in InstalledPackage.GetAllInstalledPackages()
+                    .Where(x => x.Data.Name == pack.Data.Name && x.Data.Id != pack.Data.Id))
+                {
+                    //remove from teh xml
+                    installed.Delete(Security.GetUserId());
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error<PackageInstallController>("Failed to uninstall.", e);
+                throw;
             }
 
             return Ok();
@@ -176,7 +184,7 @@ namespace Umbraco.Web.Editors
             pack.Save();
 
             // uninstall actions
-            //TODO: We should probably report errors to the UI!! 
+            //TODO: We should probably report errors to the UI!!
             // This never happened before though, but we should do something now
             if (pack.Data.Actions.IsNullOrWhiteSpace() == false)
             {
@@ -185,7 +193,7 @@ namespace Umbraco.Web.Editors
                     var actionsXml = new XmlDocument();
                     actionsXml.LoadXml("<Actions>" + pack.Data.Actions + "</Actions>");
 
-                    LogHelper.Debug<installedPackage>("executing undo actions: {0}", () => actionsXml.OuterXml);
+                    LogHelper.Debug<PackageInstallController>("executing undo actions: {0}", () => actionsXml.OuterXml);
 
                     foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
                     {
@@ -196,13 +204,13 @@ namespace Umbraco.Web.Editors
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error<installedPackage>("An error occurred running undo actions", ex);
+                            LogHelper.Error<PackageInstallController>("An error occurred running undo actions", ex);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<installedPackage>("An error occurred running undo actions", ex);
+                    LogHelper.Error<PackageInstallController>("An error occurred running undo actions", ex);
                 }
             }
 
@@ -471,11 +479,7 @@ namespace Umbraco.Web.Editors
             string path = Path.Combine("packages", packageGuid + ".umb");
             if (File.Exists(IOHelper.MapPath(Path.Combine(SystemDirectories.Data, path))) == false)
             {
-                //our repo guid
-                using (var our = Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66"))
-                {
-                    path = our.fetch(packageGuid, Security.CurrentUser.Id);
-                }
+                path = Services.PackagingService.FetchPackageFile(Guid.Parse(packageGuid), UmbracoVersion.Current, Security.GetUserId());
             }
 
             var model = new LocalPackageInstallModel

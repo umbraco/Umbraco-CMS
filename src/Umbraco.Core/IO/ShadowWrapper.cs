@@ -52,9 +52,20 @@ namespace Umbraco.Core.IO
                 try
                 {
                     Directory.Delete(dir, true);
-                    dir = dir.Substring(0, dir.Length - _shadowPath.Length - 1);
-                    if (Directory.EnumerateFileSystemEntries(dir).Any() == false)
-                        Directory.Delete(dir, true);
+
+                    // shadowPath make be path/to/dir, remove each
+                    dir = dir.Replace("/", "\\");
+                    var min = IOHelper.MapPath("~/App_Data/TEMP/ShadowFs").Length;
+                    var pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
+                    while (pos > min)
+                    {
+                        dir = dir.Substring(0, pos);
+                        if (Directory.EnumerateFileSystemEntries(dir).Any() == false)
+                            Directory.Delete(dir, true);
+                        else
+                            break;
+                        pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
+                    }
                 }
                 catch
                 {
