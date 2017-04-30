@@ -329,6 +329,7 @@
     <key alias="filter">Filtrer...</key>
     <key alias="enterTags">Ajouter des tags (appuyer sur enter entre chaque tag)...</key>
     <key alias="email">Entrez votre email</key>
+    <key alias="usernameHint">Votre nom d'utilisateur est généralement votre adresse email</key>
   </area>
 
   <area alias="editcontenttype">
