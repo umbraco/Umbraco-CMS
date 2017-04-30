@@ -343,6 +343,7 @@
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="HashCodeHelper.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
+    <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
     <Compile Include="OrderedHashSet.cs" />
     <Compile Include="Events\UninstallPackageEventArgs.cs" />

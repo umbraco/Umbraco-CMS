@@ -150,7 +150,7 @@ namespace Umbraco.Core.Events
                 var args = eventDefinition.Args as CancellableObjectEventArgs;
                 if (args != null)
                 {
-                    var list = TypeHelper.CreateGenericEnumerableFromOjbect(args.EventObject);
+                    var list = TypeHelper.CreateGenericEnumerableFromObject(args.EventObject);
 
                     if (list == null)
                     {
@@ -248,7 +248,7 @@ namespace Umbraco.Core.Events
 
             foreach (var args in cancelableArgs)
             {
-                var list = TypeHelper.CreateGenericEnumerableFromOjbect(args.EventObject);
+                var list = TypeHelper.CreateGenericEnumerableFromObject(args.EventObject);
                 if (list == null)
                 {
                     //try to find the args entity in the latest entity - based on the equality operators, this will 

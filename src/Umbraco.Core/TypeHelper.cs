@@ -16,18 +16,18 @@ namespace Umbraco.Core
 	{
 	    private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache
             = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
-		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache 
+		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache
             = new ConcurrentDictionary<Type, FieldInfo[]>();
 
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
-        
+
         /// <summary>
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
         /// If it cannot be done, null is returned.
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-	    internal static IList CreateGenericEnumerableFromOjbect(object obj)
+	    internal static IList CreateGenericEnumerableFromObject(object obj)
         {
             var type = obj.GetType();
 
@@ -49,6 +49,7 @@ namespace Umbraco.Core
                     return (IList)Activator.CreateInstance(genericType, obj);
                 }
 	        }
+
 	        if (type.IsArray)
 	        {
                 //if its an array, we'll use a List<>
@@ -85,8 +86,8 @@ namespace Umbraco.Core
             if (assembly.IsAppCodeAssembly() || assembly.IsGlobalAsaxAssembly())
                 return EmptyAssemblies;
 
-            
-            // find all assembly references that are referencing the current type's assembly since we 
+
+            // find all assembly references that are referencing the current type's assembly since we
             // should only be scanning those assemblies because any other assembly will definitely not
             // contain sub type's of the one we're currently looking for
             var name = assembly.GetName().Name;
