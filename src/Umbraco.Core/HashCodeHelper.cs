@@ -44,6 +44,7 @@ namespace Umbraco.Core
                 int hash = 0;
                 foreach (var item in list)
                 {
+                    if (item == null) continue;
                     hash = 31 * hash + item.GetHashCode();
                 }
                 return hash;
@@ -57,6 +58,7 @@ namespace Umbraco.Core
                 int hash = 0;
                 foreach (var item in list)
                 {
+                    if (item == null) continue;
                     hash = 31 * hash + item.GetHashCode();
                 }
                 return hash;
@@ -77,6 +79,7 @@ namespace Umbraco.Core
                 int count = 0;
                 foreach (var item in list)
                 {
+                    if (item == null) continue;
                     hash += item.GetHashCode();
                     count++;
                 }

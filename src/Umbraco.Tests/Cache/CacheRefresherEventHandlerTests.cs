@@ -7,6 +7,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Cache;
+using System.Linq;
 
 namespace Umbraco.Tests.Cache
 {
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<ISectionService, EventArgs>(null, ServiceContext.SectionService, new EventArgs(), "Deleted"),
                 new EventDefinition<ISectionService, EventArgs>(null, ServiceContext.SectionService, new EventArgs(), "New"),
 
-                new EventDefinition<IUserService, SaveEventArgs<IUserType>>(null, ServiceContext.UserService, new SaveEventArgs<IUserType>((IUserType) null)),
+                new EventDefinition<IUserService, SaveEventArgs<IUserType>>(null, ServiceContext.UserService, new SaveEventArgs<IUserType>(Enumerable.Empty<IUserType>())),
                 new EventDefinition<IUserService, DeleteEventArgs<IUserType>>(null, ServiceContext.UserService, new DeleteEventArgs<IUserType>((IUserType) null)),
 
                 new EventDefinition<IUserService, SaveEventArgs<IUser>>(null, ServiceContext.UserService, new SaveEventArgs<IUser>((IUser) null)),
