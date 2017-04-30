@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Events
 {
-    public class PublishEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>, IEquatable<PublishEventArgs<TEntity>>
+    public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<PublishEventArgs<TEntity>>
     {
         /// <summary>
         /// Constructor accepting multiple entities that are used in the publish operation

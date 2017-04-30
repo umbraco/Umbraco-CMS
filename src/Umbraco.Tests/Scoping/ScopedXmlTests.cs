@@ -179,7 +179,9 @@ namespace Umbraco.Tests.Scoping
                     scope.Complete();
             }
 
-            Assert.AreEqual(complete ? 2 : 0, evented);
+            //The reason why there is only 1 event occuring is because we are publishing twice for the same event for the same
+            //object and the scope deduplicates the events (uses the latest)
+            Assert.AreEqual(complete ? 1 : 0, evented);
 
             // this should never change
             Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);

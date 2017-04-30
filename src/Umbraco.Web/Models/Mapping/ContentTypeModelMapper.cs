@@ -48,6 +48,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.Key, expression => expression.Ignore())
                 .ForMember(type => type.CreateDate, expression => expression.Ignore())
                 .ForMember(type => type.UpdateDate, expression => expression.Ignore())
+                .ForMember(type => type.DeletedDate, expression => expression.Ignore())
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore());
 
             config.CreateMap<DocumentTypeSave, IContentType>()
@@ -72,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<MediaTypeSave, IMediaType>()
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity<MediaTypeSave, PropertyTypeBasic, IMediaType>(applicationContext)
-                .ConstructUsing((source) => new MediaType(source.ParentId))                
+                .ConstructUsing((source) => new MediaType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
                     ContentTypeModelMapperExtensions.AfterMapMediaTypeSaveToEntity(source, dest, applicationContext);

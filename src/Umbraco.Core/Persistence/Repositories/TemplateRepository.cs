@@ -311,6 +311,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 var masterpageName = string.Concat(entity.Alias, ".master");
                 _masterpagesFileSystem.DeleteFile(masterpageName);
             }
+
+            entity.DeletedDate = DateTime.Now;
         }
 
         #endregion
