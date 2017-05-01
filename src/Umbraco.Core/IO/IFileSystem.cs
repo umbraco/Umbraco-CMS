@@ -146,5 +146,7 @@ namespace Umbraco.Core.IO
         /// <see cref="DateTimeOffset"/>.
         /// </returns>
         DateTimeOffset GetCreated(string path);
+
+	    string SubFolderIncrement();
     }
 }

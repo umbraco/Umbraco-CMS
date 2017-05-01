@@ -46,7 +46,7 @@ namespace Umbraco.Core.Media
         /// Returns an increment of the numbered media subfolders.
         /// </summary>
         /// <returns>A <see cref="System.Int64"/> value</returns>
-        public long Increment()
+        internal long Increment()
         {
             using (new ReadLock(ClearLock))
             {

@@ -118,7 +118,7 @@ namespace Umbraco.Web.PropertyEditors
                         int subfolderId;
                         var numberedFolder = int.TryParse(subfolder, out subfolderId)
                                                  ? subfolderId.ToString(CultureInfo.InvariantCulture)
-                                                 : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
+                                                 : fs.SubFolderIncrement();
 
                         var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
                                            ? Path.Combine(numberedFolder, name)

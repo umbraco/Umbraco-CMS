@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Core.IO
 {
@@ -301,5 +302,11 @@ namespace Umbraco.Core.IO
         }
 
         #endregion
+
+
+        public string SubFolderIncrement()
+        {
+            return MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
+        }
     }
 }
