@@ -58,22 +58,46 @@
         var attrs = new List<string>();
         JObject cfg = contentItem.config;
 
-        if(cfg != null)
-            foreach (JProperty property in cfg.Properties()) {
-                attrs.Add(property.Name + "='" + property.Value.ToString() + "'");
+        if (cfg != null)
+        {
+            foreach (JProperty property in cfg.Properties())
+            {
+                var propertyValue = string.Empty;
+                if (property.Value is JValue)
+                {
+                    propertyValue = property.Value.ToString();
+                }
+                else if (property.Value is JArray)
+                {
+                    // join multiple values from checkboxlist
+                    var items = (JArray)property.Value;
+                    var values = items.Select(o => o.Type == JTokenType.Object ? o.SelectToken("value") : o.Value<string>())
+                                       .OrderByDescending(x => x);
+                    propertyValue = string.Join(" ", values);
+                }
+
+                attrs.Add(property.Name + "='" + propertyValue + "'");
             }
-                
+        }
+
         JObject style = contentItem.styles;
 
-        if (style != null) { 
-        var cssVals = new List<string>();
-        foreach (JProperty property in style.Properties())
-            cssVals.Add(property.Name + ":" + property.Value.ToString() + ";");
+        if (style != null) {
+            var cssVals = new List<string>();
+            foreach (JProperty property in style.Properties())
+            {
+                var propertyValue = string.Empty;
+                if (property.Value is JValue)
+                {
+                    propertyValue = property.Value.ToString();
+                }
+                cssVals.Add(property.Name + ":" + propertyValue + ";");
+            }
 
-        if (cssVals.Any())
-            attrs.Add("style='" + string.Join(" ", cssVals) + "'");
+            if (cssVals.Any())
+                attrs.Add("style='" + string.Join(" ", cssVals) + "'");
         }
-            
+
         return new MvcHtmlString(string.Join(" ", attrs));
     }
 }
