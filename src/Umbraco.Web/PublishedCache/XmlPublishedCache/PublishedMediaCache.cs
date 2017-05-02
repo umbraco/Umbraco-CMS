@@ -10,6 +10,7 @@ using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.Providers;
 using Lucene.Net.Documents;
+using Lucene.Net.Store;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
@@ -173,6 +174,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     // the manager will return the singleton without throwing initialization errors, however if examine isn't configured correctly a null
                     // reference error will occur because the examine settings are null.
                 }
+                catch (AlreadyClosedException)
+                {
+                    //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
+                    //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.                    
+                }
             }
             return null;
         }
@@ -211,13 +217,23 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     var result = searchProvider.Search(filter.Compile()).FirstOrDefault();
                     if (result != null) return ConvertFromSearchResult(result);
                 }
-                catch (FileNotFoundException ex)
+                catch (Exception ex)
                 {
-                    //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
-                    //See this thread: http://examine.cdodeplex.com/discussions/264341
-                    //Catch the exception here for the time being, and just fallback to GetMedia
-                    //TODO: Need to fix examine in LB scenarios!
-                    LogHelper.Error<PublishedMediaCache>("Could not load data from Examine index for media", ex);
+                    if (ex is FileNotFoundException)
+                    {
+                        //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+                        //See this thread: http://examine.cdodeplex.com/discussions/264341
+                        //Catch the exception here for the time being, and just fallback to GetMedia
+                        //TODO: Need to fix examine in LB scenarios!
+                        LogHelper.Error<PublishedMediaCache>("Could not load data from Examine index for media", ex);
+                    }
+                    else if (ex is AlreadyClosedException)
+                    {
+                        //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
+                        //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
+                        LogHelper.Error<PublishedMediaCache>("Could not load data from Examine index for media, the app domain is most likely in a shutdown state", ex);
+                    }
+                    else throw;
                 }
             }
 
