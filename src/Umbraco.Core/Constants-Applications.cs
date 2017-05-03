@@ -118,6 +118,8 @@
 
             public const string Scripts = "scripts";
 
+            public const string Users = "usersV2";
+
             //TODO: Fill in the rest!
         }
     }

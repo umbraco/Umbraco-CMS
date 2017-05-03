@@ -1370,6 +1370,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="templates">Templates</key>
     <key alias="xslt">XSLT Files</key>
     <key alias="analytics">Analytics</key>
+    <key alias="usersV2">Users</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
