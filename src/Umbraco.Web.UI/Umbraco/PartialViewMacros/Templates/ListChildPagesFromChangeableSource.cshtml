@@ -15,9 +15,9 @@
 @{ var startNodeId = Model.MacroParameters["startNodeId"]; }
 @if (startNodeId != null)
 {
-    @* Get the starting page *@
-    var startNode = Umbraco.Content(startNodeId);
-    var selection = startNode.Children.Where("Visible");
+    @* Get the starting page *@ 
+    var startNode = Umbraco.TypedContent(startNodeId);
+    var selection = startNode.Children.Where(x => x.IsVisible() );
 
     if (selection.Any())
     {

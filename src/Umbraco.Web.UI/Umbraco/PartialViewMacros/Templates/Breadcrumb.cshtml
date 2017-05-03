@@ -7,7 +7,7 @@
     - Finally it outputs the name of the current page (without a link)
 *@
 
-@{ var selection = CurrentPage.Ancestors(); }
+@{ var selection = Model.Content.Ancestors(); }
 
 @if (selection.Any())
 {
@@ -19,6 +19,6 @@
         }
 
         @* Display the current page as the last item in the list *@
-        <li class="active">@CurrentPage.Name</li>
+        <li class="active">@Model.Content.Name</li>
     </ul>
 }
