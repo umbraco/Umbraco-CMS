@@ -1,0 +1,134 @@
+<div ng-controller="Umbraco.Editors.Users.OverviewController as vm" class="clearfix">
+
+    <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
+
+    <form name="usersForm" ng-submit="vm.save()" novalidate val-form-manager>
+
+        <umb-editor-view footer="false">
+
+            <umb-editor-header
+                name="vm.page.name"
+                name-locked="true"
+                hide-icon="true"
+                hide-description="true"
+                hide-alias="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <!--
+                <div class="umb-packages-search">
+                    <input 
+                        class="-full-width-input" 
+                        type="text" name="query" 
+                        placeholder="Search for packages" 
+                        umb-auto-focus ng-model="vm.searchQuery" 
+                        ng-change="vm.search()" 
+                        no-dirty-check>
+                </div>
+                -->
+
+                <!-- Users Overview -->
+                <div ng-if="vm.usersViewState === 'overview'">
+                    <umb-editor-sub-header>
+                        <umb-editor-sub-header-content-right>
+                            <umb-button
+                                button-style="success"
+                                type="button"
+                                action="vm.setUsersViewState('invite')"
+                                label="Invite user">
+                            </umb-button>
+                        </umb-editor-sub-header-content-right>
+                    </umb-editor-sub-header>
+
+                    <div class="umb-users">
+                        <div class="umb-user" ng-repeat="user in vm.users">
+                            <umb-avatar
+                                class="umb-user__avatar"
+                                size="l"
+                                color="secondary"
+                                name="{{user.name}}"
+                                img-src="{{user.avatar}}">
+                            </umb-avatar>
+                            <div class="umb-user__name">{{user.name}}</div>
+                            <div class="umb-user__group">{{user.userGroupName}}</div>
+                            <!--
+                            <umb-badge
+                                size="xs"
+                                ng-if="user.state !== 'active'"
+                                color="{{vm.getUserStateType(user.state)}}">
+                                {{ user.state }}
+                            </umb-badge>
+                            -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invite user -->
+                <div ng-if="vm.usersViewState === 'invite'">
+
+                    <umb-editor-sub-header>
+                        <umb-editor-sub-header-content-left>
+                            <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; Take me back</a>
+                        </umb-editor-sub-header-content-left>
+                    </umb-editor-sub-header>
+
+                    <div class="flex justify-center">
+                        <ng-form style="max-width: 500px;" class="block-form">
+                            <div>
+                                <h3 class="bold" style="margin-bottom: 0;">Invite user</h3>
+                                <p style="line-height: 1.6em; margin-bottom: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+                            </div>
+
+                            <umb-control-group label="Name">
+                                <input type="text"
+                                    localize="placeholder" 
+                                    placeholder="@placeholders_entername" 
+                                    class="input-block-level" 
+                                    ng-model="vm.newUser.name" />
+                            </umb-control-group>
+
+                            <umb-control-group label="Email" description="Aenean ut massa ut augue accumsan pharetra. ">
+                                <input type="email"
+                                    localize="placeholder" 
+                                    placeholder="@placeholders_entername" 
+                                    class="input-block-level" 
+                                    ng-model="vm.newUser.email" />
+                            </umb-control-group>
+
+                            <umb-control-group label="User group">
+                                <select class="input-block-level" ng-model="vm.newUser.group" ng-options="group.id as group.name for group in vm.userGroups" ng-change="setValue()">
+                                    <option value="">Select User group</option>
+                                </select>
+                                <!--
+                                <a href="">Is group missing? Create new group</a>
+                                -->
+                            </umb-control-group>
+
+                            <umb-control-group label="Message">
+                                <textarea type="text"
+                                    class="input-block-level"
+                                    localize="placeholder" 
+                                    placeholder="@placeholders_entername" 
+                                    ng-model="vm.newUser.message"></textarea>
+                            </umb-control-group>
+
+                            <umb-button
+                                button-style="success"
+                                type="button"
+                                action=""
+                                label="Send invite">
+                            </umb-button>
+
+                        </ng-form>
+                    </div>
+
+                </div>
+
+            </umb-editor-container>
+
+        </umb-editor-view>
+
+    </form>
+
+</div>
