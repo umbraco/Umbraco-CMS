@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var deletes = new List<string>
             {
                 FormatDeleteStatement("umbracoUser2NodeNotify", "nodeId"),
-                FormatDeleteStatement("umbracoUser2NodePermission", "nodeId"),
+                FormatDeleteStatement("umbracoUserGroup2NodePermission", "nodeId"),
                 @"DELETE FROM umbracoAccessRule WHERE umbracoAccessRule.accessId IN (
                     SELECT TB1.id FROM umbracoAccess as TB1 
                     INNER JOIN umbracoNode as TB2 ON TB1.nodeId = TB2.id 

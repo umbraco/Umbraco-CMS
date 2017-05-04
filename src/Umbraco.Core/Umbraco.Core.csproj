@@ -448,6 +448,8 @@
     <Compile Include="Models\IServerRegistration.cs" />
     <Compile Include="Models\IXsltFile.cs" />
     <Compile Include="Models\Mapping\MappingExpressionExtensions.cs" />
+    <Compile Include="Models\Membership\UserGroupEntityPermission.cs" />
+    <Compile Include="Models\Membership\IUserGroup.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
     <Compile Include="Models\PartialViewType.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
@@ -478,6 +480,11 @@
     <Compile Include="Models\Rdbms\MigrationDto.cs" />
     <Compile Include="Models\XsltFile.cs" />
     <Compile Include="Models\TemplateOnDisk.cs" />
+    <Compile Include="Models\Rdbms\User2UserGroupDto.cs" />
+    <Compile Include="Models\Rdbms\UserGroup2AppDto.cs" />
+    <Compile Include="Models\Rdbms\UserGroup2NodePermissionDto.cs" />
+    <Compile Include="Models\Rdbms\UserGroupDto.cs" />
+    <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
@@ -492,11 +499,13 @@
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
     <Compile Include="Persistence\Factories\TaskFactory.cs" />
     <Compile Include="Persistence\Factories\TaskTypeFactory.cs" />
+    <Compile Include="Persistence\Factories\UserGroupFactory.cs" />
     <Compile Include="Persistence\LockedRepository.cs" />
     <Compile Include="Persistence\LockingRepository.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
+    <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddLockObjects.cs" />
@@ -512,6 +521,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddUniqueIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\RemoveParentIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Mappers\TaskTypeMapper.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddUserGroupTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddIndexToCmsMemberLoginName.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddIndexesToUmbracoRelationTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddIndexToUmbracoNodePath.cs" />
@@ -561,6 +571,7 @@
     <Compile Include="Persistence\Querying\QueryExtensions.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
+    <Compile Include="Persistence\Relators\UserGroupSectionRelator.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\BaseQueryType.cs" />
     <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
@@ -578,12 +589,14 @@
     <Compile Include="Persistence\Repositories\Interfaces\IXsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IUserGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepository.cs" />
     <Compile Include="Persistence\Repositories\XsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\UserGroupRepository.cs" />
     <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWorkProvider.cs" />
@@ -856,10 +869,8 @@
     <Compile Include="Models\Membership\IMembershipUser.cs" />
     <Compile Include="Models\Membership\IProfile.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
-    <Compile Include="Models\Membership\IUserType.cs" />
     <Compile Include="Models\Membership\User.cs" />
     <Compile Include="Models\Membership\UserGroup.cs" />
-    <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PropertyExtensions.cs" />
     <Compile Include="Models\PublishedItemType.cs" />
     <Compile Include="Models\PublishedState.cs" />
@@ -891,7 +902,6 @@
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\TagFactory.cs" />
     <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
-    <Compile Include="Persistence\Factories\UserSectionFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\RetryingEventArgs.cs" />
     <Compile Include="Persistence\FaultHandling\RetryLimitExceededException.cs" />
@@ -968,7 +978,6 @@
     <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
     <Compile Include="Persistence\Factories\TemplateFactory.cs" />
     <Compile Include="Persistence\Factories\UserFactory.cs" />
-    <Compile Include="Persistence\Factories\UserTypeFactory.cs" />
     <Compile Include="Persistence\IDatabaseFactory.cs" />
     <Compile Include="Persistence\Mappers\BaseMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentMapper.cs" />
@@ -990,7 +999,6 @@
     <Compile Include="Persistence\Mappers\UmbracoEntityMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
-    <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Persistence\Migrations\IMigration.cs" />
     <Compile Include="Persistence\Migrations\IMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\IMigrationExpression.cs" />
@@ -1138,7 +1146,6 @@
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />
     <Compile Include="Persistence\Relators\PropertyTypePropertyGroupRelator.cs" />
-    <Compile Include="Persistence\Relators\UserSectionRelator.cs" />
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeBaseRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepository.cs" />
@@ -1166,7 +1173,6 @@
     <Compile Include="Persistence\Repositories\Interfaces\IStylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IUserRepository.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\IUserTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MediaRepository.cs" />
     <Compile Include="Persistence\Repositories\MediaTypeRepository.cs" />
@@ -1185,7 +1191,6 @@
     <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\UserRepository.cs" />
-    <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\VersionableRepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryFactory.cs" />
     <Compile Include="ObjectResolution\LazyManyObjectsResolverBase.cs" />
@@ -1308,11 +1313,8 @@
     <Compile Include="Models\Rdbms\TaskDto.cs" />
     <Compile Include="Models\Rdbms\TaskTypeDto.cs" />
     <Compile Include="Models\Rdbms\TemplateDto.cs" />
-    <Compile Include="Models\Rdbms\User2AppDto.cs" />
     <Compile Include="Models\Rdbms\User2NodeNotifyDto.cs" />
-    <Compile Include="Models\Rdbms\User2NodePermissionDto.cs" />
     <Compile Include="Models\Rdbms\UserDto.cs" />
-    <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectResolution\WeightAttribute.cs" />
     <Compile Include="Persistence\PetaPoco.cs" />

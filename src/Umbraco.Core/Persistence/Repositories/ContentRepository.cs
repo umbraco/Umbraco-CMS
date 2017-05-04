@@ -182,7 +182,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoRedirectUrl WHERE contentKey IN (SELECT uniqueID FROM umbracoNode WHERE id = @Id)",
                                "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
                                "DELETE FROM umbracoRelation WHERE parentId = @Id",
                                "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
@@ -456,12 +456,12 @@ namespace Umbraco.Core.Persistence.Repositories
             // user's default permissions.
             if (parentPermissions.Any())
             {
-                var userPermissions = (
+                var userGroupPermissions = (
                     from perm in parentPermissions
                     from p in perm.AssignedPermissions
-                    select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
+                    select new EntityPermissionSet.UserGroupPermission(perm.UserGroupId, p)).ToList();
 
-                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
+                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userGroupPermissions));
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content)entity).PermissionsChanged = true;
@@ -837,18 +837,18 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         }
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified user group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>        
-        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <param name="groupIds"></param>        
+        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.AssignEntityPermission(entity, permission, userIds);
+            repo.AssignEntityPermission(entity, permission, groupIds);
         }
 
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        public IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(int entityId)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             return repo.GetPermissionsForEntity(entityId);

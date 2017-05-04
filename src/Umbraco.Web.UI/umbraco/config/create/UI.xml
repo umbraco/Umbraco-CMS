@@ -213,12 +213,12 @@
       <delete assembly="umbraco" type="CreatedPackageTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="userTypes">
-    <header>User Types</header>
+  <nodeType alias="userGroups">
+    <header>User Groups</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
-      <create assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
-      <delete assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
+      <create assembly="umbraco" type="cms.presentation.user.UserGroupTasks" />
+      <delete assembly="umbraco" type="cms.presentation.user.UserGroupTasks" />
     </tasks>
   </nodeType>
   <nodeType alias="partialViews">

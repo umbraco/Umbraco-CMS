@@ -1,55 +1,44 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using umbraco.BusinessLogic.Actions;
+using System.Linq;
+using Umbraco.Core.Models.Membership;
 using System.Collections.Generic;
+using umbraco.BusinessLogic.Actions;
 using umbraco.interfaces;
-using System.Drawing;
-using umbraco.BusinessLogic;
-using umbraco.BasePages;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.user
 {
+    using Umbraco.Web;
 
     /// <summary>
-    /// An object to display the current permissions for a user and a node.
+    /// An object to display the current permissions for a user group and a node.
     /// </summary>
     public partial class NodePermissions : System.Web.UI.UserControl
     {
-
-        protected override void OnInit(EventArgs e) {
-            base.OnInit(e);
-        }
+        private IUserGroup m_umbracoUserGroup;
+        private UserGroupPermissions m_userGroupPermissions;
+        private int[] m_nodeID = { -1 };
+        private string m_clientItemChecked = "void(0);";
+        private bool m_viewOnly = false;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             DataBind();
         }
 
-        private User m_umbracoUser;
-        private int[] m_nodeID = {-1};
-        private UserPermissions m_userPermissions;
-        private string m_clientItemChecked = "void(0);";
-
-        public int UserID
+        public int UserGroupID
         {
-            get { return m_umbracoUser.Id; }
+            get { return m_umbracoUserGroup.Id; }
             set
             {
-                m_umbracoUser = BusinessLogic.User.GetUser(value);
-                m_userPermissions = new UserPermissions(m_umbracoUser);
+                var userService = ApplicationContext.Current.Services.UserService;
+                m_umbracoUserGroup = userService.GetUserGroupById(value);
+                m_userGroupPermissions = new UserGroupPermissions(m_umbracoUserGroup);
             }
         }
 
-        private bool m_viewOnly = false;
-        public bool ViewOnly {
+        public bool ViewOnly
+        {
             get { return m_viewOnly; }
             set { m_viewOnly = value; }
         }
@@ -72,55 +61,55 @@ namespace umbraco.cms.presentation.user
         public override void DataBind()
         {
             base.DataBind();
-            
-            
-            if (m_umbracoUser == null)
-                throw new ArgumentNullException("No User specified");
+
+            if (m_umbracoUserGroup == null)
+                throw new ArgumentNullException("No user group specified");
+
+            //lookup permissions for last node selected
+            var selectedNodeId = m_nodeID[m_nodeID.Length - 1];
 
             //get the logged in user's permissions
-            UserPermissions currUserPermissions = new UserPermissions(UmbracoEnsuredPage.CurrentUser);
-            
-            //lookup permissions for last node selected
-            int selectedNodeId = m_nodeID[m_nodeID.Length - 1];
-            
-            List<IAction> lstCurrUserActions = currUserPermissions.GetExistingNodePermission(selectedNodeId);
-            List<IAction> lstLookupUserActions = m_userPermissions.GetExistingNodePermission(selectedNodeId);
-            
-            List<IAction> lstAllActions = umbraco.BusinessLogic.Actions.Action.GetPermissionAssignable();
+            var userService = ApplicationContext.Current.Services.UserService;
+            var currUserPermissions = userService.GetPermissions(UmbracoContext.Current.Security.CurrentUser, selectedNodeId).Single();
+
+            var lstCurrUserActions = BusinessLogic.Actions.Action.FromString(string.Join(string.Empty, currUserPermissions.AssignedPermissions));
+            var lstLookupGroupActions = m_userGroupPermissions.GetExistingNodePermission(selectedNodeId);
+
+            var lstAllActions = BusinessLogic.Actions.Action.GetPermissionAssignable();
 
             //no node is selected, disable the check boxes
-            if (m_nodeID[0] == -1)
+            if (NodeID[0] == -1)
             {
                 ShowMessage("No node selected");
                 return;
             }
 
             //ensure the current user has access to assign permissions.
-            //if their actions list is null then it means that the node is not published.
-            if (lstCurrUserActions == null || lstCurrUserActions.Contains(ActionRights.Instance))
-                BindExistingPermissions(lstAllActions, lstLookupUserActions);
+            if (lstCurrUserActions.Contains(ActionRights.Instance))
+                BindExistingPermissions(lstAllActions, lstLookupGroupActions);
             else
                 ShowMessage("You do not have access to assign permissions to this node");
 
-            string names = "";
-            foreach (int id in m_nodeID) {
-                if(id > 0)
+            var names = string.Empty;
+            foreach (int id in NodeID)
+            {
+                if (id > 0)
+                {
                     names += new cms.businesslogic.web.Document(id).Text + ", ";
+                }
             }
 
-			lt_names.Text = names.Trim().Trim(',');
+            lt_names.Text = names.Trim().Trim(',');
         }
 
-        private void ShowMessage(string msg)
+        protected void ShowMessage(string msg)
         {
             lblMessage.Visible = true;
             lblMessage.Text = msg;
-            
         }
 
-        private void BindExistingPermissions(List<IAction> allActions, List<IAction> userActions)
+        protected void BindExistingPermissions(List<IAction> allActions, List<IAction> userActions)
         {
-            
             List<AssignedPermission> assignedPermissions = new List<AssignedPermission>();
             foreach (umbraco.interfaces.IAction a in allActions)
             {
@@ -129,17 +118,15 @@ namespace umbraco.cms.presentation.user
                 p.HasPermission = (userActions != null ? userActions.Contains(a) : false);
                 assignedPermissions.Add(p);
             }
-            
+
             rptPermissionsList.DataSource = assignedPermissions;
             rptPermissionsList.DataBind();
-            
-        }        
+        }
 
         protected struct AssignedPermission
         {
             public IAction Permission;
             public bool HasPermission;
         }
-
     }
 }

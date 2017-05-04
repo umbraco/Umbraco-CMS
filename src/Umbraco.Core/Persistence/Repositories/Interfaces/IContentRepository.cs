@@ -49,19 +49,19 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query);
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified user group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds);
+        /// <param name="groupIds"></param>
+        void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds);
 
         /// <summary>
         /// Gets the list of permissions for the content item
         /// </summary>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
+        IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(int entityId);
 
         /// <summary>
         /// Used to add/update published xml for the content item

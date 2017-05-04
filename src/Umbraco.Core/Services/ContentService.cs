@@ -115,13 +115,13 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <param name="groupIds"></param>
+        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> groupIds)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-                repository.AssignEntityPermission(entity, permission, userIds);
+                repository.AssignEntityPermission(entity, permission, groupIds);
                 uow.Commit();
             }
         }
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content)
+        public IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(IContent content)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {

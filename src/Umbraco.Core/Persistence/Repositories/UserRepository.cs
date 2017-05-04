@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
-
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
@@ -23,13 +20,11 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
     {
-        private readonly IUserTypeRepository _userTypeRepository;
         private readonly CacheHelper _cacheHelper;
 
-        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUserTypeRepository userTypeRepository)
+        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cacheHelper, logger, sqlSyntax)
         {
-            _userTypeRepository = userTypeRepository;
             _cacheHelper = cacheHelper;
         }
 
@@ -42,16 +37,28 @@ namespace Umbraco.Core.Persistence.Repositories
             //must be sorted this way for the relator to work
             sql.OrderBy<UserDto>(x => x.Id, SqlSyntax);
 
-            var dto = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql).FirstOrDefault();
+            var dto = Database.Fetch<UserDto>(sql).FirstOrDefault();
             
             if (dto == null)
                 return null;
 
-            var userType = _userTypeRepository.Get(dto.Type);
-            var userFactory = new UserFactory(userType);
+            var userFactory = new UserFactory();
             var user = userFactory.BuildEntity(dto);
-
+            AssociateGroupsWithUser(user);
             return user;
+        }
+
+        private void AssociateGroupsWithUser(IUser user)
+        {
+            if (user != null)
+            {
+                foreach (var group in GetGroupsForUser(user.Id))
+                {
+                    user.AddGroup(group);
+                }
+
+                user.SetGroupsLoaded();
+            }
         }
 
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
@@ -66,8 +73,15 @@ namespace Umbraco.Core.Persistence.Repositories
             //must be sorted this way for the relator to work
             sql.OrderBy<UserDto>(x => x.Id, SqlSyntax);
 
-            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql))
-                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
+            var users = ConvertFromDtos(Database.Fetch<UserDto>(sql))
+                .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
+
+            foreach (var user in users)
+            {
+                AssociateGroupsWithUser(user);
+            }
+
+            return users;
         }
         
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
@@ -79,11 +93,18 @@ namespace Umbraco.Core.Persistence.Repositories
             //must be sorted this way for the relator to work
             sql.OrderBy<UserDto>(x => x.Id, SqlSyntax);
 
-            var dtos = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql)
+            var dtos = Database.Fetch<UserDto>(sql)
                 .DistinctBy(x => x.Id);
 
-            return ConvertFromDtos(dtos)
-                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
+            var users = ConvertFromDtos(dtos)
+                .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
+
+            foreach (var user in users)
+            {
+                AssociateGroupsWithUser(user);
+            }
+
+            return users;
         }
         
         #endregion
@@ -108,9 +129,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(columns)
-                .From<UserDto>()
-                .LeftJoin<User2AppDto>()
-                .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
+                .From<UserDto>();
             return sql;
         }
 
@@ -126,9 +145,8 @@ namespace Umbraco.Core.Persistence.Repositories
                            {
                                "DELETE FROM cmsTask WHERE userId = @Id",
                                "DELETE FROM cmsTask WHERE parentUserId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
+                               "DELETE FROM umbracoUser2UserGroup WHERE userId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
-                               "DELETE FROM umbracoUser2app WHERE " + SqlSyntax.GetQuotedColumnName("user") + "=@Id",
                                "DELETE FROM umbracoUser WHERE id = @Id",
                                "DELETE FROM umbracoExternalLogin WHERE id = @Id"
                            };
@@ -142,7 +160,7 @@ namespace Umbraco.Core.Persistence.Repositories
         
         protected override void PersistNewItem(IUser entity)
         {
-            var userFactory = new UserFactory(entity.UserType);
+            var userFactory = new UserFactory();
 
             //ensure security stamp if non
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
@@ -155,19 +173,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
 
-            foreach (var sectionDto in userDto.User2AppDtos)
-            {
-                //need to set the id explicitly here
-                sectionDto.UserId = id;
-                Database.Insert(sectionDto);
-            }
-
             entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IUser entity)
         {
-            var userFactory = new UserFactory(entity.UserType);
+            var userFactory = new UserFactory();
 
             //ensure security stamp if non
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
@@ -225,38 +236,23 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 Database.Update(userDto, changedCols);
             }
-            
-            //update the sections if they've changed
+
+            //update the groups 
             var user = (User)entity;
-            if (user.IsPropertyDirty("AllowedSections"))
+
+            //first delete all 
+            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId",
+                new { UserId = user.Id });
+
+            //then re-add any associated with the user
+            foreach (var group in user.Groups)
             {
-                //now we need to delete any applications that have been removed
-                foreach (var section in user.RemovedSections)
+                var dto = new User2UserGroupDto
                 {
-                    //we need to manually delete thsi record because it has a composite key
-                    Database.Delete<User2AppDto>("WHERE app=@Section AND " + SqlSyntax.GetQuotedColumnName("user") + "=@UserId",
-                        new { Section = section, UserId = (int)user.Id });
-                }
-
-                //for any that exist on the object, we need to determine if we need to update or insert
-                //NOTE: the User2AppDtos collection wil always be equal to the User.AllowedSections
-                foreach (var sectionDto in userDto.User2AppDtos)
-                {
-                    //if something has been added then insert it
-                    if (user.AddedSections.Contains(sectionDto.AppAlias))
-                    {
-                        //we need to insert since this was added  
-                        Database.Insert(sectionDto);
-                    }
-                    else
-                    {
-                        //we need to manually update this record because it has a composite key
-                        Database.Update<User2AppDto>("SET app=@Section WHERE app=@Section AND " + SqlSyntax.GetQuotedColumnName("user") + "=@UserId",
-                                                     new { Section = sectionDto.AppAlias, UserId = sectionDto.UserId });
-                    }
-                }
-
-                
+                    UserGroupId = group.Id,
+                    UserId = user.Id
+                };
+                Database.Insert(dto);
             }
 
             entity.ResetDirtyProperties();
@@ -289,29 +285,70 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 
-        public IEnumerable<IUser> GetUsersAssignedToSection(string sectionAlias)
+        /// <summary>
+        /// Gets all groups for a given user
+        /// </summary>
+        /// <param name="userId">Id of user</param>
+        /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
+        public IEnumerable<IUserGroup> GetGroupsForUser(int userId)
         {
-            //Here we're building up a query that looks like this, a sub query is required because the resulting structure
-            // needs to still contain all of the section rows per user.
+            var tables = SqlSyntax.GetTablesInSchema(ApplicationContext.Current.DatabaseContext.Database).ToArray();
+            if (tables.InvariantContains("umbracoUserGroup") == false)
+                return new List<IUserGroup>();
 
-            //SELECT *
-            //FROM [umbracoUser]
-            //LEFT JOIN [umbracoUser2app]
-            //ON [umbracoUser].[id] = [umbracoUser2app].[user]
-            //WHERE umbracoUser.id IN (SELECT umbracoUser.id
-            //    FROM [umbracoUser]
-            //    LEFT JOIN [umbracoUser2app]
-            //    ON [umbracoUser].[id] = [umbracoUser2app].[user]
-            //    WHERE umbracoUser2app.app = 'content')
+            var sql = new Sql();
+            sql.Select("*")
+                .From<UserGroupDto>()
+                .LeftJoin<UserGroup2AppDto>()
+                .On<UserGroupDto, UserGroup2AppDto>(left => left.Id, right => right.UserGroupId);
 
-            var sql = GetBaseQuery(false);
-            var innerSql = GetBaseQuery("umbracoUser.id");
-            innerSql.Where("umbracoUser2app.app = " + SqlSyntax.GetQuotedValue(sectionAlias));
-            sql.Where(string.Format("umbracoUser.id IN ({0})", innerSql.SQL));
-            //must be sorted this way for the relator to work
-            sql.OrderBy<UserDto>(x => x.Id, SqlSyntax);
+            var innerSql = new Sql();
+            innerSql.Select("umbracoUserGroup.id")
+                .From<UserGroupDto>()
+                .LeftJoin<User2UserGroupDto>()
+                .On<UserGroupDto, User2UserGroupDto>(left => left.Id, right => right.UserGroupId)
+                .Where("umbracoUser2UserGroup.userId = " + userId);
 
-            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
+            sql.Where(string.Format("umbracoUserGroup.id IN ({0})", innerSql.SQL));
+            var dtos = Database.Fetch<UserGroupDto, UserGroup2AppDto, UserGroupDto>(new UserGroupSectionRelator().Map, sql);
+            return ConvertFromDtos(dtos);
+        }
+
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        public IEnumerable<IUser> GetAllInGroup(int groupId)
+        {
+            return GetAllInOrNotInGroup(groupId, true);
+        }
+
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects not associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        public IEnumerable<IUser> GetAllNotInGroup(int groupId)
+        {
+            return GetAllInOrNotInGroup(groupId, false);
+        }
+
+        private IEnumerable<IUser> GetAllInOrNotInGroup(int groupId, bool include)
+        {
+            var sql = new Sql();
+            sql.Select("*")
+                .From<UserDto>();
+
+            var innerSql = new Sql();
+            innerSql.Select("umbracoUser.id")
+                .From<UserDto>()
+                .LeftJoin<User2UserGroupDto>()
+                .On<UserDto, User2UserGroupDto>(left => left.Id, right => right.UserId)
+                .Where("umbracoUser2UserGroup.userGroupId = " + groupId);
+
+            sql.Where(string.Format("umbracoUser.id {0} ({1})",
+                include ? "IN" : "NOT IN",
+                innerSql.SQL));
+            return ConvertFromDtos(Database.Fetch<UserDto>(sql));
         }
 
         /// <summary>
@@ -375,68 +412,24 @@ namespace Umbraco.Core.Persistence.Repositories
             return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids).OrderBy(x => x.Id);
         }
 
-        /// <summary>
-        /// Returns permissions for a given user for any number of nodes
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="entityIds"></param>
-        /// <returns></returns>        
-        public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
-        {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            return repo.GetUserPermissionsForEntities(userId, entityIds);
-        }
-
-        /// <summary>
-        /// Replaces the same permission set for a single user to any number of entities
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissions"></param>
-        /// <param name="entityIds"></param>
-        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
-        {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.ReplaceUserPermissions(userId, permissions, entityIds);
-        }
-
-        /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permission"></param>
-        /// <param name="entityIds"></param>
-        public void AssignUserPermission(int userId, char permission, params int[] entityIds)
-        {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.AssignUserPermission(userId, permission, entityIds);
-        }
-
         #endregion
 
         private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos)
         {
-            var userTypeIds = dtos.Select(x => Convert.ToInt32(x.Type)).ToArray();
-
-            var allUserTypes = userTypeIds.Length == 0 ? Enumerable.Empty<IUserType>() : _userTypeRepository.GetAll(userTypeIds);
-
             return dtos.Select(dto =>
                 {   
-                    var userType = allUserTypes.Single(x => x.Id == dto.Type);
-
-                    var userFactory = new UserFactory(userType);
+                    var userFactory = new UserFactory();
                     return userFactory.BuildEntity(dto);
                 });
         }
 
-        /// <summary>
-        /// Dispose disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Ensure the unit of work is disposed
-        /// </remarks>
-        protected override void DisposeResources()
+        private IEnumerable<IUserGroup> ConvertFromDtos(IEnumerable<UserGroupDto> dtos)
         {
-            _userTypeRepository.Dispose();
+            return dtos.Select(dto =>
+            {
+                var userGroupFactory = new UserGroupFactory();
+                return userGroupFactory.BuildEntity(dto);
+            });
         }
     }
 }

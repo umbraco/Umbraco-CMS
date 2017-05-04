@@ -22,10 +22,6 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = "0")]
         public bool NoConsole { get; set; }
 
-        [Column("userType")]
-        [ForeignKey(typeof(UserTypeDto))]
-        public short Type { get; set; }
-
         [Column("startStructureID")]
         public int ContentStartId { get; set; }
 
@@ -73,8 +69,5 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("lastLoginDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? LastLoginDate { get; set; }
-        
-        [ResultColumn]
-        public List<User2AppDto> User2AppDtos { get; set; }
     }
 }

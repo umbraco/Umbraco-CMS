@@ -9,11 +9,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
     $.fn.PermissionsEditor = function(opts) {
         return this.each(function() {
             var conf = $.extend({
-                userId: -1,
+                groupId: -1,
                 pPanelSelector: "",
                 replacePChkBoxSelector: ""
             }, opts);
-            new Umbraco.Controls.PermissionsEditor().init($(this), conf.userId, $(conf.pPanelSelector), conf.replacePChkBoxSelector);
+            new Umbraco.Controls.PermissionsEditor().init($(this), conf.groupId, $(conf.pPanelSelector), conf.replacePChkBoxSelector);
         });
     };
     $.fn.PermissionsEditorAPI = function() {
@@ -26,16 +26,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         /// </summary>
         return {
             //private members
-            _userID: -1,
+            _groupId: -1,
             _loadingContent: '<div align="center"><br/><br/><br/><br/><br/><br/><br/><img src="../../umbraco_client/images/progressBar.gif" /></div>',
             _pPanel: null,
             _tree: null,
             _selectedNodes: new Array(),
             _chkReplaceSelector: null,
 
-            init: function(tree, uId, pPanel, chkReplaceSelector) {
+            init: function(tree, gId, pPanel, chkReplaceSelector) {
                 ///<summary>constructor function</summary>
-                this._userID = parseInt(uId);
+                this._groupId = parseInt(gId);
                 this._pPanel = pPanel;
                 this._tree = tree;
                 this._chkReplaceSelector = chkReplaceSelector;
@@ -122,14 +122,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             },
             _showNodePermissions: function(selectedIDs) {
                 var _this = this;
-                umbraco.cms.presentation.user.PermissionsHandler.GetNodePermissions(this._userID, selectedIDs, function(r) { _this._showNodePermissionsCallback(r); });
+                umbraco.cms.presentation.user.PermissionsHandler.GetNodePermissions(this._groupId, selectedIDs, function (r) { _this._showNodePermissionsCallback(r); });
             },
             _showNodePermissionsCallback: function(result) {
                 this._pPanel.html(result);
             },
             _savePermissions: function(nodeIDs, selectedPermissions, replaceChildren) {
                 var _this = this;
-                umbraco.cms.presentation.user.PermissionsHandler.SaveNodePermissions(this._userID, nodeIDs, selectedPermissions, replaceChildren, function(r) { _this._savePermissionsHandler(r) });
+                umbraco.cms.presentation.user.PermissionsHandler.SaveNodePermissions(this._groupId, nodeIDs, selectedPermissions, replaceChildren, function (r) { _this._savePermissionsHandler(r) });
             },
             _savePermissionsHandler: function(result) {
                 if (UmbClientMgr.mainWindow().UmbSpeechBubble != null)

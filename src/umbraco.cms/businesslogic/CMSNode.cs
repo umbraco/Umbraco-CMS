@@ -307,11 +307,12 @@ namespace umbraco.cms.businesslogic
             if (parent != null)
             {
                 IEnumerable<Permission> permissions = Permission.GetNodePermissions(parent);
+                var userService = ApplicationContext.Current.Services.UserService;
                 foreach (Permission p in permissions)
                 {
-                    Permission.MakeNew(User.GetUser(p.UserId), retVal, p.PermissionId);
+                    var userGroup = userService.GetUserGroupById(p.UserGroupId);
+                    Permission.MakeNew(userGroup, retVal, p.PermissionId);
                 }
-
             }
 
             //event

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
@@ -17,7 +18,6 @@ namespace Umbraco.Web.Models.Mapping
         {
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
-                .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
                 .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
@@ -28,7 +28,6 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<BackOfficeIdentityUser, UserDetail>()
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => user.Id))
-                .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserTypeAlias))
                 .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.Culture))
@@ -46,7 +45,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
-                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => new[] {user.UserType.Alias}))
+                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.Select(x => x.Name)))
                 .ForMember(detail => detail.StartContentNode, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaNode, opt => opt.MapFrom(user => user.StartMediaId))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))

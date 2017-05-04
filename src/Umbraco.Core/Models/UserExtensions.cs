@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -80,8 +81,7 @@ namespace Umbraco.Core.Models
             if (media == null) throw new ArgumentNullException("media");
             return HasPathAccess(media.Path, user.StartMediaId, Constants.System.RecycleBinMedia);
         }
-
-
+        
         /// <summary>
         /// Determines whether this user is an admin.
         /// </summary>
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Models
         public static bool IsAdmin(this IUser user)
         {
             if (user == null) throw new ArgumentNullException("user");
-            return user.UserType.Alias == "admin";
+            return user.Groups != null && user.Groups.Any(x => x.Alias == "admin");
         }
     }
 }

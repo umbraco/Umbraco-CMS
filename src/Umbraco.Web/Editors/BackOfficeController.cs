@@ -621,60 +621,49 @@ namespace Umbraco.Web.Editors
                         }
                         else
                         {
-                            var defaultUserType = autoLinkOptions.GetDefaultUserType(UmbracoContext, loginInfo);
-                            var userType = Services.UserService.GetUserTypeByAlias(defaultUserType);
-                            if (userType == null)
+                            if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
+                            if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
+
+                            var autoLinkUser = new BackOfficeIdentityUser
                             {
-                                ViewData[TokenExternalSignInError] = new[] { "Could not auto-link this account, the specified User Type does not exist: " + defaultUserType };
+                                Email = loginInfo.Email,
+                                Name = loginInfo.ExternalIdentity.Name,
+                                AllowedSections = autoLinkOptions.GetDefaultAllowedSections(UmbracoContext, loginInfo),
+                                Culture = autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo),
+                                UserName = loginInfo.Email
+                            };
+
+                            //call the callback if one is assigned
+                            if (autoLinkOptions.OnAutoLinking != null)
+                            {
+                                autoLinkOptions.OnAutoLinking(autoLinkUser, loginInfo);
+                            }
+
+                            var userCreationResult = await UserManager.CreateAsync(autoLinkUser);
+
+                            if (userCreationResult.Succeeded == false)
+                            {
+                                ViewData[TokenExternalSignInError] = userCreationResult.Errors;
                             }
                             else
                             {
-
-                                if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
-                                if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
-
-                                var autoLinkUser = new BackOfficeIdentityUser()
+                                var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
+                                if (linkResult.Succeeded == false)
                                 {
-                                    Email = loginInfo.Email,
-                                    Name = loginInfo.ExternalIdentity.Name,
-                                    UserTypeAlias = userType.Alias,
-                                    AllowedSections = autoLinkOptions.GetDefaultAllowedSections(UmbracoContext, loginInfo),
-                                    Culture = autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo),
-                                    UserName = loginInfo.Email
-                                };
+                                    ViewData[TokenExternalSignInError] = linkResult.Errors;
 
-                                //call the callback if one is assigned
-                                if (autoLinkOptions.OnAutoLinking != null)
-                                {
-                                    autoLinkOptions.OnAutoLinking(autoLinkUser, loginInfo);
-                                }
-
-                                var userCreationResult = await UserManager.CreateAsync(autoLinkUser);
-
-                                if (userCreationResult.Succeeded == false)
-                                {
-                                    ViewData[TokenExternalSignInError] = userCreationResult.Errors;
+                                    //If this fails, we should really delete the user since it will be in an inconsistent state!
+                                    var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
+                                    if (deleteResult.Succeeded == false)
+                                    {
+                                        //DOH! ... this isn't good, combine all errors to be shown
+                                        ViewData[TokenExternalSignInError] = linkResult.Errors.Concat(deleteResult.Errors);
+                                    }
                                 }
                                 else
                                 {
-                                    var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
-                                    if (linkResult.Succeeded == false)
-                                    {
-                                        ViewData[TokenExternalSignInError] = linkResult.Errors;
-
-                                        //If this fails, we should really delete the user since it will be in an inconsistent state!
-                                        var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
-                                        if (deleteResult.Succeeded == false)
-                                        {
-                                            //DOH! ... this isn't good, combine all errors to be shown
-                                            ViewData[TokenExternalSignInError] = linkResult.Errors.Concat(deleteResult.Errors);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        //sign in
-                                        await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
-                                    }
+                                    //sign in
+                                    await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
                                 }
                             }
                         }

@@ -3,15 +3,14 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoUser2NodePermission")]
-    [PrimaryKey("userId", autoIncrement = false)]
+    [TableName("umbracoUserGroup2NodePermission")]
     [ExplicitColumns]
-    internal class User2NodePermissionDto
+    internal class UserGroup2NodePermissionDto
     {
-        [Column("userId")]
-        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodePermission", OnColumns = "userId, nodeId, permission")]
-        [ForeignKey(typeof(UserDto))]
-        public int UserId { get; set; }
+        [Column("userGroupId")]
+        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUserGroup2NodePermission", OnColumns = "userGroupId, nodeId, permission")]
+        [ForeignKey(typeof(UserGroupDto))]
+        public int UserGroupId { get; set; }
 
         [Column("nodeId")]
         [ForeignKey(typeof(NodeDto))]

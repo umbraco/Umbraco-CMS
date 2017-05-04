@@ -644,7 +644,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_New_Content_With_Explicit_User()
         {
-            var user = new User(ServiceContext.UserService.GetUserTypeByAlias("admin"))
+            var user = new User()
             {
                 Name = "Test",
                 Email = "test@test.com",
