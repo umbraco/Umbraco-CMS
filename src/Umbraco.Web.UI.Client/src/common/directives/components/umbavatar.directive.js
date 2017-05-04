@@ -52,15 +52,38 @@ Use this directive to render an avatar.
 
     function AvatarDirective() {
 
+        function link(scope, element, attrs, ctrl) {
+
+            scope.initials = "";
+
+            function onInit() {
+                scope.initials = getNameInitials(scope.name);
+            }
+
+            function getNameInitials(name) {
+                if(name) {
+                    var initials = name.match(/\b\w/g) || [];
+                    initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
+                    return initials;
+                }
+            }
+
+            onInit();
+
+        }
+
         var directive = {
             restrict: 'E',
             replace: true,
             templateUrl: 'views/components/umb-avatar.html',
             scope: {
                 size: "@",
+                name: "@",
+                color: "@",
                 imgSrc: "@",
                 imgSrcset: "@"
-            }
+            },
+            link: link
         };
 
         return directive;
