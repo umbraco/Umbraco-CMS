@@ -612,7 +612,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var repository = RepositoryFactory.CreateUserGroupRepository(uow)
+                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
                 repository.AssignGroupPermission(groupId, permission, entityIds);
                 uow.Commit();
             }
@@ -641,7 +641,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
-                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
+                var repository = RepositoryFactory.CreateUserRepository(uow);
                 return repository.GetGroupsForUser(userId);
             }
         }
@@ -653,9 +653,12 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUserGroup"/></returns>
         public IUserGroup GetUserGroupByAlias(string alias)
         {
-            using (var repository = RepositoryFactory.CreateUserGroupRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
+                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
                 var query = Query<IUserGroup>.Builder.Where(x => x.Alias == alias);
+                var contents = repository.GetByQuery(query);
+                return contents.SingleOrDefault();
             }
         }
 
@@ -682,7 +685,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
-                var repository = RepositoryFactory.CreateUserGroupRepository(uow)
+                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
                 var query = Query<IUserGroup>.Builder.Where(x => x.Name == name);
                 return repository.GetByQuery(query).SingleOrDefault();
             }
@@ -835,7 +838,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<EntityPermission> GetPermissions(IUserGroup group, bool directlyAssignedOnly, params int[] nodeIds)
         {
             
-            using (var uow = UowProvider.GetUnitOfWork();)
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
                 var explicitPermissions = repository.GetPermissionsForEntities(group.Id, nodeIds);
@@ -951,11 +954,11 @@ namespace Umbraco.Core.Services
                 : int.Parse(path);
         }
 
-        private static bool IsNotNullActionPermission(EntityPermission x)
-        {
-            const string NullActionChar = "-";
-            return string.Join(string.Empty, x.AssignedPermissions) != NullActionChar;
-        }
+        //private static bool IsNotNullActionPermission(EntityPermission x)
+        //{
+        //    const string NullActionChar = "-";
+        //    return string.Join(string.Empty, x.AssignedPermissions) != NullActionChar;
+        //}
 
         /// <summary>
         /// Checks in a set of permissions associated with a user for those related to a given nodeId

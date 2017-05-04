@@ -535,11 +535,10 @@ namespace Umbraco.Tests.Services
         public void Cannot_Create_User_With_Empty_Username()
         {
             // Arrange
-            var userService = ServiceContext.UserService;
-            var userType = userService.GetUserTypeByAlias("admin");
+            var userService = ServiceContext.UserService;           
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io", userType));
+            Assert.Throws<ArgumentException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io"));
         }
 
         [Test]
@@ -547,8 +546,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userService = ServiceContext.UserService;
-            var userType = userService.GetUserTypeByAlias("admin");
-            var user = userService.CreateUserWithIdentity("John Doe", "john@umbraco.io", userType);
+            var user = userService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
             user.Username = string.Empty;
 
             // Act & Assert
@@ -560,8 +558,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userService = ServiceContext.UserService;
-            var userType = userService.GetUserTypeByAlias("admin");
-            var user = userService.CreateUserWithIdentity("John Doe", "john@umbraco.io", userType);
+            var user = userService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
             user.Name = string.Empty;
 
             // Act & Assert

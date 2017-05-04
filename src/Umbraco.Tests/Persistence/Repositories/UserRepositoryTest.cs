@@ -28,14 +28,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private UserRepository CreateRepository(IScopeUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
+        private UserRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
-            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, userTypeRepository);
+            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
             return repository;
         }
 
-        private UserGroupRepository CreateUserGroupRepository(IDatabaseUnitOfWork unitOfWork)
+        private UserGroupRepository CreateUserGroupRepository(IScopeUnitOfWork unitOfWork)
         {
             return new UserGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
         }

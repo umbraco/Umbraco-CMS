@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
-using System.Data;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
 {
-    [Migration("7.6.0", 100, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.6.0", 100, Constants.System.UmbracoMigrationName)]
     public class AddUserGroupTables : MigrationBase
     {
         public AddUserGroupTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)

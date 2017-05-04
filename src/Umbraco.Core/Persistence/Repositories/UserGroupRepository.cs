@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly CacheHelper _cacheHelper;
 
-        public UserGroupRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public UserGroupRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cacheHelper, logger, sqlSyntax)
         {
             _cacheHelper = cacheHelper;

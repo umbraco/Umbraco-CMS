@@ -85,7 +85,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               //46, removed: UmbracoDeployChecksumDto
                                                                               //47, removed: UmbracoDeployDependencyDto
                                                                               {48, typeof (RedirectUrlDto) },
-                                                                              {49, typeof (LockDto) }
+                                                                              {49, typeof (LockDto) },
                                                                               {49, typeof (UserGroupDto) },
                                                                               {50, typeof (User2UserGroupDto) },
                                                                               {51, typeof (UserGroup2NodePermissionDto) },

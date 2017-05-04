@@ -20,12 +20,12 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
     {
-        private readonly CacheHelper _cacheHelper;
+        //private readonly CacheHelper _cacheHelper;
 
-        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cacheHelper, logger, sqlSyntax)
         {
-            _cacheHelper = cacheHelper;
+            //_cacheHelper = cacheHelper;
         }
 
         #region Overrides of RepositoryBase<int,IUser>

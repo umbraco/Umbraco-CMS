@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             return repository;
         }
 
-        private UserGroupRepository CreateUserGroupRepository(IDatabaseUnitOfWork unitOfWork)
+        private UserGroupRepository CreateUserGroupRepository(IScopeUnitOfWork unitOfWork)
         {
             return new UserGroupRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);
         }

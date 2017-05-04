@@ -25,6 +25,7 @@ using Umbraco.Core.Models;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 using System.Text.RegularExpressions;
 using System.Text;
+using Umbraco.Core.Security;
 
 namespace umbraco.cms.presentation.user
 {
@@ -62,7 +63,7 @@ namespace umbraco.cms.presentation.user
         protected DropDownList cExcerpt = new DropDownList();
         protected ContentPicker cMediaPicker = new ContentPicker();
         protected ContentPicker cContentPicker = new ContentPicker();
-        protected CustomValidator sectionValidator = new CustomValidator();
+        //protected CustomValidator sectionValidator = new CustomValidator();
 
         protected UpdatePanel pnlGroups = new UpdatePanel();
         protected PlaceHolder pnlGroupControls = new PlaceHolder();
@@ -294,6 +295,17 @@ namespace umbraco.cms.presentation.user
             ClientTools
                 .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadUsers>().Tree.Alias)
                 .SyncTree(UID.ToString(), IsPostBack);
+        }
+
+        private void LnameCustomValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            var usersWithLoginName = ApplicationContext.Services.UserService.GetByUsername(lname.Text);
+            args.IsValid = usersWithLoginName == null || usersWithLoginName.Id == u.Id;
+        }
+
+        private void EmailCustomValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            args.IsValid = MembershipProviderBase.IsEmailValid(email.Text.Trim());
         }
 
         private void BindGroups()

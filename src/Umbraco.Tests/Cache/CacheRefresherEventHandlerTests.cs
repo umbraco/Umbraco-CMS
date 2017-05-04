@@ -32,8 +32,8 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<ISectionService, EventArgs>(null, ServiceContext.SectionService, new EventArgs(), "Deleted"),
                 new EventDefinition<ISectionService, EventArgs>(null, ServiceContext.SectionService, new EventArgs(), "New"),
 
-                new EventDefinition<IUserService, SaveEventArgs<IUserType>>(null, ServiceContext.UserService, new SaveEventArgs<IUserType>(Enumerable.Empty<IUserType>())),
-                new EventDefinition<IUserService, DeleteEventArgs<IUserType>>(null, ServiceContext.UserService, new DeleteEventArgs<IUserType>(Enumerable.Empty<IUserType>())),
+                new EventDefinition<IUserService, SaveEventArgs<IUserGroup>>(null, ServiceContext.UserService, new SaveEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
+                new EventDefinition<IUserService, DeleteEventArgs<IUserGroup>>(null, ServiceContext.UserService, new DeleteEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
 
                 new EventDefinition<IUserService, SaveEventArgs<IUser>>(null, ServiceContext.UserService, new SaveEventArgs<IUser>(Enumerable.Empty<IUser>())),
                 new EventDefinition<IUserService, DeleteEventArgs<IUser>>(null, ServiceContext.UserService, new DeleteEventArgs<IUser>(Enumerable.Empty<IUser>())),

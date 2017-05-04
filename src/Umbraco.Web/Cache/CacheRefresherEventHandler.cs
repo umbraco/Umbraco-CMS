@@ -58,30 +58,12 @@ namespace Umbraco.Web.Cache
                  () => SectionService.Deleted -= SectionService_Deleted);
             Bind(() => SectionService.New += SectionService_New,
                  () => SectionService.New -= SectionService_New);
-            //bind to user / user group events
-            //TODO: FIX THIS
-            UserService.SavedUserGroup += UserServiceSavedUserGroup;
-            UserService.DeletedUserGroup += UserServiceDeletedUserGroup;
-            UserService.SavedUser += UserServiceSavedUser;
-            UserService.DeletedUser += UserServiceDeletedUser;
-
-            //Bind to dictionary events
-
-            LocalizationService.DeletedDictionaryItem += LocalizationServiceDeletedDictionaryItem;
-            LocalizationService.SavedDictionaryItem += LocalizationServiceSavedDictionaryItem;
-
-            //Bind to data type events
-            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
-
-            DataTypeService.Deleted += DataTypeServiceDeleted;
-            DataTypeService.Saved += DataTypeServiceSaved
-            //END FIX THIS
-
+            
             // bind to user and user type events
-            Bind(() => UserService.SavedUserType += UserService_SavedUserType,
-                 () => UserService.SavedUserType -= UserService_SavedUserType);
-            Bind(() => UserService.DeletedUserType += UserService_DeletedUserType,
-                 () => UserService.DeletedUserType -= UserService_DeletedUserType);
+            Bind(() => UserService.SavedUserGroup += UserServiceSavedUserGroup,
+                 () => UserService.SavedUserGroup -= UserServiceSavedUserGroup);
+            Bind(() => UserService.DeletedUserGroup += UserServiceDeletedUserGroup,
+                 () => UserService.DeletedUserGroup -= UserServiceDeletedUserGroup);
             Bind(() => UserService.SavedUser += UserService_SavedUser,
                  () => UserService.SavedUser -= UserService_SavedUser);
             Bind(() => UserService.DeletedUser += UserService_DeletedUser,

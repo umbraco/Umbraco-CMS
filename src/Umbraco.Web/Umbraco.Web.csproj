@@ -443,6 +443,8 @@
     <Compile Include="umbraco.presentation\SafeXmlReaderWriter.cs" />
     <Compile Include="Trees\ScriptTreeController.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\UserGroups.cs" />
     <Compile Include="umbraco.presentation\umbraco\users\EditUserGroup.aspx.cs">
       <DependentUpon>EditUserGroup.aspx</DependentUpon>
