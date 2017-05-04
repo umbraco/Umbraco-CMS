@@ -62,6 +62,15 @@
                             -->
                         </div>
                     </div>
+
+                    <div class="flex justify-center">
+                        <umb-pagination
+                            ng-if="vm.usersPagination.totalPages"
+                            page-number="vm.usersPagination.pageNumber"
+                            total-pages="vm.usersPagination.totalPages">
+                        </umb-pagination>
+                    </div>
+
                 </div>
 
                 <!-- Invite user -->

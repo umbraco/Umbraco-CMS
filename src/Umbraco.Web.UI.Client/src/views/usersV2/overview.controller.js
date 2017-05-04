@@ -10,6 +10,10 @@
         vm.users = [];
         vm.userGroups = [];
         vm.usersViewState = 'overview';
+        vm.usersPagination = {
+            "pageNumber": 1,
+            "totalPages": 5
+        }
 
         vm.save = save;
         vm.setUsersViewState = setUsersViewState;
