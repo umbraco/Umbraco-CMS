@@ -71,16 +71,20 @@
             var deferred = $q.defer();
             var userGroups = [
                 {
-                    "name": "Admin"
+                    "name": "Admin",
+                    "id": 1
                 },
                 {
-                    "name": "Writer"
+                    "name": "Writer",
+                    "id": 2
                 },
                 {
-                    "name": "Editor"
+                    "name": "Editor",
+                    "id": 3
                 },
                 {
-                    "name": "Translator"
+                    "name": "Translator",
+                    "id": 4
                 }
             ];
             deferred.resolve(userGroups);
