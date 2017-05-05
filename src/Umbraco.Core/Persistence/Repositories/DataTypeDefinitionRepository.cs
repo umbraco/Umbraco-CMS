@@ -29,12 +29,12 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax,
+        public DataTypeDefinitionRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax,
             IContentTypeRepository contentTypeRepository)
             : base(work, cache, logger, sqlSyntax)
         {
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.NoCache, logger, sqlSyntax);            
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -237,7 +237,7 @@ AND umbracoNode.id <> @id",
 
             //NOTE: This is a special case, we need to clear the custom cache for pre-values here so they are not stale if devs
             // are querying for them in the Saved event (before the distributed call cache is clearing it)
-            RuntimeCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
+            IsolatedCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
 
             entity.ResetDirtyProperties();
         }
@@ -287,7 +287,7 @@ AND umbracoNode.id <> @id",
         /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int preValueId)
         {
-            var collections = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_");
+            var collections = IsolatedCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_");
 
             var preValue = collections.SelectMany(x => x.FormatAsDictionary().Values).FirstOrDefault(x => x.Id == preValueId);
             if (preValue != null)
@@ -437,7 +437,7 @@ AND umbracoNode.id <> @id",
         private PreValueCollection GetCachedPreValueCollection(int datetypeId)
         {
             var key = GetPrefixedCacheKey(datetypeId);
-            return RuntimeCache.GetCacheItem<PreValueCollection>(key, () =>
+            return IsolatedCache.GetCacheItem<PreValueCollection>(key, () =>
             {
                 var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = datetypeId });
                 var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
@@ -493,10 +493,9 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : PetaPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            public DataTypePreValueRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
                 : base(work, cache, logger, sqlSyntax)
-            {
-            }
+            { }
 
             #region Not implemented (don't need to for the purposes of this repo)
             protected override PreValueEntity PerformGet(int id)

@@ -74,7 +74,11 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<ExamineIndexerModel> GetIndexerDetails()
         {
-            return ExamineManager.Instance.IndexProviderCollection.Select(CreateModel);
+            return ExamineManager.Instance.IndexProviderCollection.Select(CreateModel).OrderBy(x =>
+            {
+                //order by name , but strip the "Indexer" from the end if it exists
+                return x.Name.TrimEnd("Indexer");
+            });
         }
 
         /// <summary>
@@ -99,6 +103,10 @@ namespace Umbraco.Web.WebServices
                         indexerModel.ProviderProperties.Add(p.Name, p.GetValue(searcher, null).ToString());
                     }
                     return indexerModel;
+                }).OrderBy(x =>
+                {
+                    //order by name , but strip the "Searcher" from the end if it exists
+                    return x.Name.TrimEnd("Searcher");
                 }));
             return model;
         }

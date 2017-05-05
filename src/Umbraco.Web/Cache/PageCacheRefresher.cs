@@ -50,7 +50,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         public override void RefreshAll()
         {
-            content.Instance.RefreshContentFromDatabaseAsync();
+            content.Instance.RefreshContentFromDatabase();
             base.RefreshAll();
         }
 

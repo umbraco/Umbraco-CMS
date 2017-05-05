@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Examine;
+using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -17,11 +18,20 @@ namespace Umbraco.Web.Models.Mapping
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<UmbracoEntity, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectTypeId), x.Key))) 
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore());
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .AfterMap((entity, basic) =>
+                {
+                    if (entity.NodeObjectTypeId == Constants.ObjectTypes.MemberGuid && basic.Icon.IsNullOrWhiteSpace())
+                    {
+                        basic.Icon = "icon-user";
+                    }
+                });
 
             config.CreateMap<PropertyType, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.Ignore())
                 .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-box"))
                 .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
@@ -29,6 +39,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<PropertyGroup, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.Ignore())
                 .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-tab"))
                 .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
@@ -38,6 +49,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<IUser, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.Ignore())
                 .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-user"))
                 .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
@@ -46,6 +58,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<ITemplate, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(x => Udi.Create(Constants.UdiEntityType.Template, x.Key)))
                .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-layout"))
                .ForMember(basic => basic.Path, expression => expression.MapFrom(template => template.Path))
                .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
@@ -70,6 +83,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.SortOrder, expression => expression.Ignore());
 
             config.CreateMap<IContentTypeComposition, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.ResolveUsing(new ContentTypeUdiResolver()))
                 .ForMember(basic => basic.Path, expression => expression.MapFrom(x => x.Path))
                 .ForMember(basic => basic.ParentId, expression => expression.MapFrom(x => x.ParentId))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
@@ -77,6 +91,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<SearchResult, EntityBasic>()
                 //default to document icon
+                  .ForMember(x => x.Udi, expression => expression.Ignore())
                   .ForMember(x => x.Icon, expression => expression.Ignore())
                   .ForMember(x => x.Id, expression => expression.MapFrom(result => result.Id))
                   .ForMember(x => x.Name, expression => expression.Ignore())
@@ -87,21 +102,40 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                   .ForMember(x => x.AdditionalData, expression => expression.Ignore())
                   .AfterMap((result, basic) =>
-                      {
+                      {   
+
                           //get the icon if there is one
                           basic.Icon = result.Fields.ContainsKey(UmbracoContentIndexer.IconFieldName) 
                               ? result.Fields[UmbracoContentIndexer.IconFieldName] 
                               : "icon-document";
 
                           basic.Name = result.Fields.ContainsKey("nodeName") ? result.Fields["nodeName"] : "[no name]";
-                          if (result.Fields.ContainsKey("__NodeKey"))
+                          if (result.Fields.ContainsKey(UmbracoContentIndexer.NodeKeyFieldName))
                           {
                               Guid key;
-                              if (Guid.TryParse(result.Fields["__NodeKey"], out key))
+                              if (Guid.TryParse(result.Fields[UmbracoContentIndexer.NodeKeyFieldName], out key))
                               {
                                   basic.Key = key;
+
+                                  //need to set the UDI
+                                  if (result.Fields.ContainsKey(LuceneIndexer.IndexTypeFieldName))
+                                  {
+                                      switch (result.Fields[LuceneIndexer.IndexTypeFieldName])
+                                      {
+                                          case IndexTypes.Member:
+                                              basic.Udi = new GuidUdi(Constants.UdiEntityType.Member, basic.Key);
+                                              break;
+                                          case IndexTypes.Content:
+                                              basic.Udi = new GuidUdi(Constants.UdiEntityType.Document, basic.Key);
+                                              break;
+                                          case IndexTypes.Media:
+                                              basic.Udi = new GuidUdi(Constants.UdiEntityType.Media, basic.Key);
+                                              break;
+                                      }
+                                  }
                               }
                           }
+
                           if (result.Fields.ContainsKey("parentID"))
                           {
                               int parentId;
@@ -114,7 +148,7 @@ namespace Umbraco.Web.Models.Mapping
                                   basic.ParentId = -1;
                               }
                           }
-                          basic.Path = result.Fields.ContainsKey("__Path") ? result.Fields["__Path"] : "";
+                          basic.Path = result.Fields.ContainsKey(UmbracoContentIndexer.IndexPathFieldName) ? result.Fields[UmbracoContentIndexer.IndexPathFieldName] : "";
                           
                           if (result.Fields.ContainsKey(UmbracoContentIndexer.NodeTypeAliasFieldName))
                           {
@@ -123,6 +157,9 @@ namespace Umbraco.Web.Models.Mapping
                       });
 
             config.CreateMap<ISearchResults, IEnumerable<EntityBasic>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
+
+            config.CreateMap<IEnumerable<SearchResult>, IEnumerable<EntityBasic>>()
                   .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
         }
     }

@@ -6,6 +6,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(DateTime))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class DatePickerValueConverter : PropertyValueConverterBase

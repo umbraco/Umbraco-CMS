@@ -3,7 +3,11 @@ using System.Linq;
 
 namespace Umbraco.Core.Logging
 {
-    internal class DebugDiagnosticsLogger : ILogger
+    /// <summary>
+    /// Implements <see cref="ILogger"/> on top of System.Diagnostics.Debug.
+    /// </summary>
+    /// <remarks>Useful for tests.</remarks>
+    public class DebugDiagnosticsLogger : ILogger
     {
         public void Error(Type callingType, string message, Exception exception)
         {

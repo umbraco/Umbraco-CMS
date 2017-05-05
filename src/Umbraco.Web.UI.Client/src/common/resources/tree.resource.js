@@ -51,9 +51,14 @@ function treeResource($q, $http, umbRequestHelper) {
             if (!options.isDialog) {
                 options.isDialog = false;
             }
-          
+
             //create the query string for the tree request, these are the mandatory options:
             var query = "application=" + options.section + "&tree=" + options.tree + "&isDialog=" + options.isDialog;
+
+            //if you need to load a not initialized tree set this value to false - default is true
+            if (options.onlyinitialized) {
+                query += "&onlyInitialized=" + options.onlyinitialized;
+            }
 
             //the options can contain extra query string parameters
             if (options.queryString) {

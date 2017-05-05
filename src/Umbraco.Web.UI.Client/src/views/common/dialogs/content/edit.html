@@ -2,7 +2,8 @@
     ng-controller="Umbraco.Dialogs.Content.EditController"
     ng-show="loaded"
     ng-submit="save()"
-    val-form-manager>
+    val-form-manager
+    class="umb-mini-editor">
 
 	<div class="umb-panel">
 		<div class="umb-panel-header">
@@ -12,15 +13,33 @@
 		</div>
 
 		<div class="umb-panel-body with-footer">
-            <div id="tab{{tab.id}}" ng-repeat="tab in content.tabs">
-                <div class="umb-pane" ng-if="!tab.hide">
-                    <h5>{{tab.label}}</h5>
-                    <umb-property property="property"
-                                  ng-repeat="property in tab.properties">
-                        <umb-editor model="property"></umb-editor>
-                    </umb-property>
-                </div>
-            </div>    
+
+            <div class="umb-pane" ng-if="content">
+
+                <umb-tabs-nav
+                    model="content.tabs"
+                    id-suffix="-mini-editor">
+                </umb-tabs-nav>
+
+                <umb-tabs-content>
+
+                    <umb-tab
+                        id="tab{{tab.id}}-mini-editor"
+                        ng-repeat="tab in content.tabs"
+                        rel="{{tab.id}}-mini-editor">
+                        
+                        <umb-property
+                            property="property"
+                            ng-repeat="property in tab.properties">
+                            <umb-editor model="property"></umb-editor>
+                        </umb-property>
+
+                    </umb-tab>
+
+                </umb-tabs-content>
+
+            </div>
+
 		</div>
 
 

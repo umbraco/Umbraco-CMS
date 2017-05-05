@@ -71,7 +71,7 @@ namespace Umbraco.Web.WebServices
         /// </remarks>
         public UrlHelper Url
         {
-            get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()))); }
+            get { return _url ?? (_url = new UrlHelper(HttpContext.Current.Request.RequestContext)); }
         }
 
         /// <summary>

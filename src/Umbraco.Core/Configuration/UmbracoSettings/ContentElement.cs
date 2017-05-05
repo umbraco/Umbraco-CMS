@@ -159,6 +159,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement("defaultDocumentTypeProperty", "Textstring"); }
         }
 
+        [ConfigurationProperty("showDeprecatedPropertyEditors")]
+        internal InnerTextConfigurationElement<bool> ShowDeprecatedPropertyEditors
+        {
+            get { return GetOptionalTextElement("showDeprecatedPropertyEditors", false); }
+        }
+
         [ConfigurationProperty("EnableInheritedDocumentTypes")]
         internal InnerTextConfigurationElement<bool> EnableInheritedDocumentTypes
         {
@@ -169,6 +175,18 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         internal InnerTextConfigurationElement<bool> EnableInheritedMediaTypes
         {
             get { return GetOptionalTextElement("EnableInheritedMediaTypes", true); }
+        }
+
+        [ConfigurationProperty("EnablePropertyValueConverters")]
+        internal InnerTextConfigurationElement<bool> EnablePropertyValueConverters
+        {
+            get { return GetOptionalTextElement("EnablePropertyValueConverters", false); }
+        }
+
+        [ConfigurationProperty("loginBackgroundImage")]
+        internal InnerTextConfigurationElement<string> LoginBackgroundImage
+        {
+            get { return GetOptionalTextElement("loginBackgroundImage", string.Empty); }
         }
 
         string IContentSection.NotificationEmailAddress
@@ -306,6 +324,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return DefaultDocumentTypeProperty; }
         }
 
+        bool IContentSection.ShowDeprecatedPropertyEditors
+        {
+            get { return ShowDeprecatedPropertyEditors; }
+        }
+
         bool IContentSection.EnableInheritedDocumentTypes
         {
             get { return EnableInheritedDocumentTypes; }
@@ -314,6 +337,15 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.EnableInheritedMediaTypes
         {
             get { return EnableInheritedMediaTypes; }
+        }
+        bool IContentSection.EnablePropertyValueConverters
+        {
+            get { return EnablePropertyValueConverters; }
+        }
+
+        string IContentSection.LoginBackgroundImage
+        {
+            get { return LoginBackgroundImage; }
         }
     }
 }

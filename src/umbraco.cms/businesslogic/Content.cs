@@ -14,6 +14,7 @@ using System.Runtime.CompilerServices;
 using umbraco.BusinessLogic;
 using umbraco.cms.helpers;
 using umbraco.cms.businesslogic.datatype.controls;
+using Umbraco.Core.Media;
 using File = System.IO.File;
 using Property = umbraco.cms.businesslogic.property.Property;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
@@ -148,7 +149,7 @@ namespace umbraco.cms.businesslogic
                         {
                             _contentType = new ContentType(contentTypeId);
                         }
-                        catch
+                        catch (Exception e)
                         {
                             return null;
                         }

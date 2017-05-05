@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -13,10 +14,10 @@ namespace Umbraco.Web.Scheduling
     internal interface ILatchedBackgroundTask : IBackgroundTask
     {
         /// <summary>
-        /// Gets a wait handle on the task condition.
+        /// Gets a task on latch.
         /// </summary>
         /// <exception cref="InvalidOperationException">The task is not latched.</exception>
-        WaitHandle Latch { get; }
+        Task Latch { get; }
 
         /// <summary>
         /// Gets a value indicating whether the task is latched.

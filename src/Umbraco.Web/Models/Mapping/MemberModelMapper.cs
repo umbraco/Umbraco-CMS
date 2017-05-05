@@ -61,6 +61,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMember TO MediaItemDisplay
             config.CreateMap<IMember, MemberDisplay>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
@@ -80,10 +81,11 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
                 .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
-                .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display, applicationContext.Services.TextService));
+                .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, applicationContext.Services.UserService, member, display, applicationContext.Services.TextService));
 
             //FROM IMember TO MemberBasic
             config.CreateMap<IMember, MemberBasic>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(dto => dto.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
@@ -96,9 +98,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM MembershipUser TO MemberBasic
-            config.CreateMap<MembershipUser, MemberBasic>()
+            config.CreateMap<MembershipUser, MemberBasic>()                
                 //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
+                .ForMember(display => display.Udi, expression => expression.Ignore())
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
                 .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
@@ -121,6 +124,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMember TO ContentItemDto<IMember>
             config.CreateMap<IMember, ContentItemDto<IMember>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(dto => dto.Published, expression => expression.Ignore())
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
@@ -135,20 +139,21 @@ namespace Umbraco.Web.Models.Mapping
         /// Maps the generic tab with custom properties for content
         /// </summary>
         /// <param name="memberService"></param>
+        /// <param name="userService"></param>
         /// <param name="member"></param>
         /// <param name="display"></param>
         /// <param name="localizedText"></param>
         /// <remarks>
         /// If this is a new entity and there is an approved field then we'll set it to true by default.
         /// </remarks>
-        private static void MapGenericCustomProperties(IMemberService memberService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
+        private static void MapGenericCustomProperties(IMemberService memberService, IUserService userService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
         {
             var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
             //map the tree node url
             if (HttpContext.Current != null)
             {
-                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+                var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                 var url = urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(display.Key.ToString("N"), null));
                 display.TreeNodeUrl = url;
             }
@@ -185,7 +190,7 @@ namespace Umbraco.Web.Models.Mapping
                     //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                     View = "changepassword",
                     //initialize the dictionary with the configuration from the default membership provider
-                    Config = new Dictionary<string, object>(membersProvider.GetConfiguration())
+                    Config = new Dictionary<string, object>(membersProvider.GetConfiguration(userService))
                     {
                         //the password change toggle will only be displayed if there is already a password assigned.
                         {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}

@@ -63,49 +63,6 @@ namespace Umbraco.Core.ObjectResolution
 			}
 		}
 
-        // NOTE - the ugly code below exists only because of umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers
-        // which wants to re-register actions and handlers instead of properly restarting the application. Don't even think
-        // about using it for anything else. Also, while the backdoor is open, the resolution system is locked so nothing
-        // can work properly => deadlocks. Therefore, open the backdoor, do resolution changes EXCLUSIVELY, and close the door!
-
-        /// <summary>
-        /// Returns a disposable object that reprents dirty access to temporarily unfrozen resolution configuration.
-        /// </summary>
-        /// <remarks>
-        /// <para>Should not be used.</para>
-        /// <para>Should be used in a <c>using(Resolution.DirtyBackdoorToConfiguration) { ... }</c> mode.</para>
-        /// <para>Because we just lift the frozen state, and we don't actually re-freeze, the <c>Frozen</c> event does not trigger.</para>
-        /// </remarks>
-        internal static IDisposable DirtyBackdoorToConfiguration
-        {
-            get { return new DirtyBackdoor(); }
-        }
-
-        // keep the class here because it needs write-access to Resolution.IsFrozen
-        private class DirtyBackdoor : IDisposable
-        {
-
-            private readonly IDisposable _lock;
-            private readonly bool _frozen;
-
-            public DirtyBackdoor()
-            {
-                LogHelper.Debug(typeof(DirtyBackdoor), "Creating back door for resolution");
-
-                _lock = new WriteLock(ConfigurationLock);
-                _frozen = _isFrozen;
-                _isFrozen = false;
-            }
-
-            public void Dispose()
-            {
-                LogHelper.Debug(typeof(DirtyBackdoor), "Disposing back door for resolution");
-
-                _isFrozen = _frozen;
-                _lock.Dispose();
-            }
-        }
-
 		/// <summary>
 		/// Freezes resolution.
 		/// </summary>

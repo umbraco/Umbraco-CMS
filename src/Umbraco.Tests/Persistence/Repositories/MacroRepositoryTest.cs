@@ -174,7 +174,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 Assert.That(macro.HasIdentity, Is.True);
-                Assert.That(macro.Id, Is.EqualTo(4));//With 3 existing entries the Id should be 4   
+                Assert.That(macro.Id, Is.EqualTo(4));//With 3 existing entries the Id should be 4
                 Assert.Greater(macro.Properties.Single().Id, 0);
             }
         }
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
-                
+
                 repository.AddOrUpdate(macro);
 
                 unitOfWork.Commit();
@@ -282,8 +282,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("new1", result.Properties.First().Alias);
                 Assert.AreEqual("New1", result.Properties.First().Name);
                 Assert.AreEqual(3, result.Properties.First().SortOrder);
-                
-            }            
+
+            }
         }
 
         [Test]
@@ -332,7 +332,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 result = repository.Get(macro.Id);
                 Assert.AreEqual(0, result.Properties.Count());
-                
+
             }
         }
 
@@ -354,13 +354,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 macro.Properties.Remove(prop1);
                 macro.Properties.Remove("blah2");
                 macro.Properties.Add(prop2);
-                
+
                 repository.AddOrUpdate(macro);
                 unitOfWork.Commit();
 
                 // Assert
                 var result = repository.Get(macro.Id);
-                
+
                 Assert.AreEqual(1, result.Properties.Count());
                 Assert.AreEqual("blah2", result.Properties.Single().Alias);
 
@@ -380,7 +380,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(macro);
                 unitOfWork.Commit();
 
-                //Act 
+                //Act
                 macro = repository.Get(1);
                 macro.Properties["new1"].Name = "this is a new name";
                 repository.AddOrUpdate(macro);
@@ -388,7 +388,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 // Assert
-                var result = repository.Get(1);                
+                var result = repository.Get(1);
                 Assert.AreEqual("new1", result.Properties.First().Alias);
                 Assert.AreEqual("this is a new name", result.Properties.First().Name);
 
@@ -408,12 +408,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(macro);
                 unitOfWork.Commit();
 
-                //Act 
+                //Act
                 macro = repository.Get(1);
                 macro.Properties.UpdateProperty("new1", newAlias: "newAlias");
                 repository.AddOrUpdate(macro);
                 unitOfWork.Commit();
-                
+
                 // Assert
                 var result = repository.Get(1);
                 Assert.AreEqual("newAlias", result.Properties.First().Alias);

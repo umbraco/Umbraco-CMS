@@ -468,19 +468,19 @@ namespace Umbraco.Core
 		/// <param name="o"></param>
 		/// <param name="ignoreProperties"></param>
 		/// <returns></returns>
-        internal static IDictionary<string, TVal> ToDictionary<T, TProperty, TVal>(this T o,
+        public static IDictionary<string, TVal> ToDictionary<T, TProperty, TVal>(this T o,
 																				 params Expression<Func<T, TProperty>>[] ignoreProperties)
 		{
 			return o.ToDictionary<TVal>(ignoreProperties.Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
 		}
 
-		/// <summary>
-		/// Turns object into dictionary
-		/// </summary>
-		/// <param name="o"></param>
-		/// <param name="ignoreProperties">Properties to ignore</param>
-		/// <returns></returns>
-		internal static IDictionary<string, TVal> ToDictionary<TVal>(this object o, params string[] ignoreProperties)
+        /// <summary>
+        /// Turns object into dictionary
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="ignoreProperties">Properties to ignore</param>
+        /// <returns></returns>
+        public static IDictionary<string, TVal> ToDictionary<TVal>(this object o, params string[] ignoreProperties)
 		{
 			if (o != null)
 			{
@@ -647,5 +647,10 @@ namespace Umbraco.Core
 				return "[GetPropertyValueException]";
 			}
 		}
+
+	    internal static Guid AsGuid(this object value)
+	    {
+	        return value is Guid ? (Guid) value : Guid.Empty;
+	    }
 	}
 }

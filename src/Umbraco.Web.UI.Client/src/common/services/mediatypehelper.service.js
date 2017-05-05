@@ -21,7 +21,9 @@ function mediaTypeHelper(mediaTypeResource, $q) {
         },
 
         getAllowedImagetypes: function (mediaId){
-				
+
+            //TODO: This is horribly inneficient - why make one request per type!?
+
             // Get All allowedTypes
             return mediaTypeResource.getAllowedTypes(mediaId)
                 .then(function(types){

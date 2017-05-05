@@ -37,7 +37,7 @@ namespace Umbraco.Web.Editors
         public IDictionary<string, object> GetMembershipProviderConfig()
         {
             var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();            
-            return provider.GetConfiguration();
+            return provider.GetConfiguration(Services.UserService);
         } 
 
         /// <summary>

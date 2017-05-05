@@ -95,11 +95,20 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                     if(selectedElm.nodeName === 'IMG'){
                         var img = $(selectedElm);
+
+                        var hasUdi = img.attr("data-udi") ? true : false;
+
                         currentTarget = {
                             altText: img.attr("alt"),
-                            url: img.attr("src"),
-                            id: img.attr("rel")
+                            url: img.attr("src")                            
                         };
+
+                        if (hasUdi) {
+                            currentTarget["udi"] = img.attr("data-udi");
+                        }
+                        else {
+                            currentTarget["id"] = img.attr("rel");
+                        }
                     }
 
                     userService.getCurrentUser().then(function(userData) {
@@ -115,13 +124,23 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         insertMediaInEditor: function(editor, img) {
             if(img) {
 
+                var hasUdi = img.udi ? true : false;
+                
                var data = {
                    alt: img.altText || "",
-                   src: (img.url) ? img.url : "nothing.jpg",
-                   rel: img.id,
-                   'data-id': img.id,
+                   src: (img.url) ? img.url : "nothing.jpg",                   
                    id: '__mcenew'
-               };
+                };
+
+                if (hasUdi) {
+                    data["data-udi"] = img.udi;
+                }
+                else {
+                    //Considering these fixed because UDI will now be used and thus
+                    // we have no need for rel http://issues.umbraco.org/issue/U4-6228, http://issues.umbraco.org/issue/U4-6595
+                    data["rel"] = img.id;
+                    data["data-id"] = img.id;
+                }
 
                editor.insertContent(editor.dom.createHTML('img', data));
 
@@ -672,8 +691,17 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                     //locallink detection, we do this here, to avoid poluting the dialogservice
                     //so the dialog service can just expect to get a node-like structure
-                    if(currentTarget.url.indexOf("localLink:") > 0){
-                        currentTarget.id = currentTarget.url.substring(currentTarget.url.indexOf(":")+1,currentTarget.url.length-1);
+                    if (currentTarget.url.indexOf("localLink:") > 0) {
+                        var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, currentTarget.url.length - 1);
+                        //we need to check if this is an INT or a UDI
+                        var parsedIntId = parseInt(linkId, 10);
+                        if (isNaN(parsedIntId)) {
+                            //it's a UDI
+                            currentTarget.udi = linkId;
+                        }
+                        else {
+                            currentTarget.id = linkId;
+                        }                        
                     }
                 }
 
@@ -716,27 +744,36 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         insertLinkInEditor: function(editor, target, anchorElm) {
 
             var href = target.url;
+            // We want to use the Udi. If it is set, we use it, else fallback to id, and finally to null
+            var hasUdi = target.udi ? true : false;
+            var id = hasUdi ? target.udi : (target.id ? target.id : null);
+
+            //Create a json obj used to create the attributes for the tag
+            function createElemAttributes() {
+                var a = {
+                    href: href,
+                    title: target.name,
+                    target: target.target ? target.target : null,
+                    rel: target.rel ? target.rel : null                   
+                };
+                if (hasUdi) {
+                    a["data-udi"] = target.udi;
+                }
+                else if (target.id) {
+                    a["data-id"] = target.id;
+                }         
+                return a;
+            }
 
             function insertLink() {
                 if (anchorElm) {
-                    editor.dom.setAttribs(anchorElm, {
-                        href: href,
-                        title: target.name,
-                        target: target.target ? target.target : null,
-                        rel: target.rel ? target.rel : null,
-                        'data-id': target.id ? target.id : null
-                    });
+                    editor.dom.setAttribs(anchorElm, createElemAttributes());
 
                     editor.selection.select(anchorElm);
                     editor.execCommand('mceEndTyping');
-                } else {
-                    editor.execCommand('mceInsertLink', false, {
-                        href: href,
-                        title: target.name,
-                        target: target.target ? target.target : null,
-                        rel: target.rel ? target.rel : null,
-                        'data-id': target.id ? target.id : null
-                    });
+                }
+                else {
+                    editor.execCommand('mceInsertLink', false, createElemAttributes());
                 }
             }
 
@@ -746,8 +783,10 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
             }
 
             //if we have an id, it must be a locallink:id, aslong as the isMedia flag is not set
-            if(target.id && (angular.isUndefined(target.isMedia) || !target.isMedia)){
-                href = "/{localLink:" + target.id + "}";
+            if(id && (angular.isUndefined(target.isMedia) || !target.isMedia)){
+                
+                href = "/{localLink:" + id + "}";
+
                 insertLink();
                 return;
             }

@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IRelationTypeRepository relationTypeRepository)
+        public RelationRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IRelationTypeRepository relationTypeRepository)
             : base(work, cache, logger, sqlSyntax)
         {
             _relationTypeRepository = relationTypeRepository;
@@ -73,12 +73,16 @@ namespace Umbraco.Core.Persistence.Repositories
             RelationFactory factory = null;
             var relationTypeId = -1;
 
+            // the ToList() here is important because we are using _relationTypeRepository and we
+            // cannot wait until the result is actually enumerated to do so, because that would
+            // mean we kinda capture the current unit of work and reuse it after it's been disposed
+
             return dtos.Select(x =>
             {
                 if (relationTypeId != x.RelationType)
                     factory = new RelationFactory(_relationTypeRepository.Get(relationTypeId = x.RelationType));
                 return DtoToEntity(x, factory);
-            });
+            }).ToList();
         }
 
         private static IRelation DtoToEntity(RelationDto dto, RelationFactory factory)

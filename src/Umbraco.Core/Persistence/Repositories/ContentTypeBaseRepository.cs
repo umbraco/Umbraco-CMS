@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class ContentTypeBaseRepository<TEntity> : PetaPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-        protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        protected ContentTypeBaseRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
@@ -101,7 +101,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate()
-                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId, SqlSyntax);
+                //must be sorted this way for the relator to work
+                .OrderBy<PropertyTypeGroupDto>(x => x.Id, SqlSyntax);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
@@ -468,7 +469,8 @@ AND umbracoNode.id <> @id",
                .LeftJoin<DataTypeDto>()
                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
                .Where<PropertyTypeGroupDto>(x => x.ContentTypeNodeId == id)
-               .OrderBy<PropertyTypeGroupDto>(x => x.Id);
+               //must be sorted this way for the relator to work
+               .OrderBy<PropertyTypeGroupDto>(x => x.Id, SqlSyntax);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
