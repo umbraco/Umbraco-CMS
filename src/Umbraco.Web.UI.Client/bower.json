@@ -30,13 +30,19 @@
     "angular-local-storage": "~0.2.3",
     "moment": "~2.10.3",
     "ace-builds": "^1.2.3",
-    "tinymce": "tinymce-dist#^4.5.2"
+    "font-awesome": "~4.2"
   },
 
   "install": {
-    
+
     "path": "lib-bower",
 
+    "ignore": [
+      "font-awesome",
+      "angular",
+      "bootstrap"
+    ],
+    
     "sources": {
       "moment": "bower_components/moment/min/moment-with-locales.js",
       "underscore": [
