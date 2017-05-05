@@ -47,8 +47,6 @@
         "bower_components/jquery/dist/jquery.min.map"
       ],
       
-      "ace-builds": "bower_components/ace-builds/src-min-noconflict/**",
-      
       "angular-dynamic-locale": [
         "bower_components/angular-dynamic-locale/tmhDynamicLocale.min.js",
         "bower_components/angular-dynamic-locale/tmhDynamicLocale.min.js.map"

@@ -130,6 +130,22 @@ gulp.task('dependencies', function () {
             gulp.src("./bower_components/font-awesome/{fonts,css}/*")
                 .pipe(gulp.dest(root + targets.lib + "/font-awesome"))
         );
+    
+    // ace Editor
+    stream.add(
+            gulp.src(["bower_components/ace-builds/src-min-noconflict/ace.js",
+        "bower_components/ace-builds/src-min-noconflict/ext-language_tools.js",
+        "bower_components/ace-builds/src-min-noconflict/ext-searchbox.js",
+        "bower_components/ace-builds/src-min-noconflict/ext-settings_menu.js",
+        "bower_components/ace-builds/src-min-noconflict/snippets/text.js",
+        "bower_components/ace-builds/src-min-noconflict/snippets/javascript.js",
+        "bower_components/ace-builds/src-min-noconflict/theme-chrome.js",
+        "bower_components/ace-builds/src-min-noconflict/mode-razor.js",
+        "bower_components/ace-builds/src-min-noconflict/mode-javascript.js",
+        "bower_components/ace-builds/src-min-noconflict/worker-javascript.js"],
+        {base: "./bower_components/ace-builds/"})
+            .pipe(gulp.dest(root + targets.lib + "/ace-builds"))
+        );
 
     //copy over libs which are not on bower (/lib) and 
     //libraries that have been managed by bower-installer (/lib-bower)
