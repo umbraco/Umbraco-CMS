@@ -8,14 +8,16 @@
     multinode treepicker (so: replace "PropertyWithPicker" with the alias of your property).
 *@
 
-@{ var selection = CurrentPage.PropertyWithPicker.Split(','); }
+@{ var selection = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>("PropertyWithPicker");  }
 
-<ul>
-    @foreach (var id in selection)
-    {
-        var item = Umbraco.Content(id);
-        <li>
-            <a href="@item.Url">@item.Name</a>
-        </li>
-    }
-</ul>
+@if (selection.Any())
+{
+    <ul>
+        @foreach (var item in selection)
+        {
+            <li>
+                <a href="@item.Url">@item.Name</a>
+            </li>
+        }
+    </ul>
+}

@@ -13,38 +13,38 @@
                                                             Type: (note: you can use a Single Media Picker if that's more appropriate to your needs)
 *@
 
-@{ var mediaIds = Model.MacroParameters["mediaIds"]; }
+@{ var mediaIds = Model.MacroParameters["mediaIds"] as string; }
+
 @if (mediaIds != null)
 {
-    <ul class="thumbnails">
-        @foreach (var mediaId in mediaIds.ToString().Split(','))
+    <div class="row">
+        @foreach (var mediaId in mediaIds.Split(','))
         {
-            var media = Umbraco.Media(mediaId);
+            var media = Umbraco.TypedMedia(mediaId);
 
             @* a single image *@
             if (media.DocumentTypeAlias == "Image")
             {
-                @Render(media);
+                @Render(media as Image);
             }
 
             @* a folder with images under it *@
-            if (media.Children("Image").Any())
+            if (media.Children<Image>().Any())
             {
-                foreach (var image in media.Children("Image"))
+                foreach (var image in media.Children<Image>())
                 {
                     @Render(image);
                 }
             }
-
         }
-    </ul>
+    </div>
 }
 
-@helper Render(dynamic item)
+@helper Render(Image item)
 {
-    <li class="span2">
-        <a href="@item.umbracoFile.src" class="thumbnail">
-            <img src="@item.umbracoFile.src" alt="@item.Name" />
+    <div class="col-xs-6 col-md-3">
+        <a href="@item.Url" class="thumbnail">
+            <img src="@item.GetCropUrl(width:200, height:200)" alt="@item.Name" />
         </a>
-    </li>
+    </div>
 }
