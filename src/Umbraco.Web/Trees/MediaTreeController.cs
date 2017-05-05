@@ -73,11 +73,10 @@ namespace Umbraco.Web.Trees
             var isContainer = e.IsContainer(); // && (queryStrings.Get("isDialog") != "true");
 
             var node = CreateTreeNode(
-                e.Id.ToInvariantString(),
+                entity,
+                Constants.ObjectTypes.MediaGuid,
                 parentId,
                 queryStrings,
-                e.Name,
-                entity.ContentTypeIcon,
                 entity.HasChildren && (isContainer == false));
 
             node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
@@ -131,7 +130,7 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
 
             //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
-            if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 menu.DefaultMenuAlias = null;
             }
@@ -152,7 +151,13 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
         {
-            var media = Services.MediaService.GetById(int.Parse(id));
+            var entity = GetEntityFromId(id);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            var media = Services.MediaService.GetById(entity.Id);
             if (media == null)
             {
                 return false;

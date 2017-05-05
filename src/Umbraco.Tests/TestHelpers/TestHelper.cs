@@ -6,6 +6,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using Umbraco.Core;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.TestHelpers
 		/// </summary>
 		public static void ClearDatabase()
 		{
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
 			
 			if (dataHelper == null)
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void DropForeignKeys(string table)
         {
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
 
             if (dataHelper == null)
@@ -203,6 +204,50 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        public static void DeleteDirectory(string path)
+        {
+            Try(() =>
+            {
+                if (Directory.Exists(path) == false) return;
+                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                    File.Delete(file);
+            });
 
+            Try(() =>
+            {
+                if (Directory.Exists(path) == false) return;
+                Directory.Delete(path, true);
+            });
+        }
+
+        public static void TryAssert(Action action, int maxTries = 5, int waitMilliseconds = 200)
+        {
+            Try<AssertionException>(action, maxTries, waitMilliseconds);
+        }
+
+        public static void Try(Action action, int maxTries = 5, int waitMilliseconds = 200)
+	    {
+	        Try<Exception>(action, maxTries, waitMilliseconds);
+	    }
+
+        public static void Try<T>(Action action, int maxTries = 5, int waitMilliseconds = 200)
+            where T : Exception
+	    {
+            var tries = 0;
+            while (true)
+            {
+                try
+                {
+                    action();
+                    break;
+                }
+                catch (T)
+                {
+                    if (tries++ > maxTries)
+                        throw;
+                    Thread.Sleep(waitMilliseconds);
+                }
+            }
+        }
     }
 }

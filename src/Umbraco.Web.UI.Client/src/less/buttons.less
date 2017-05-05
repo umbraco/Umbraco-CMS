@@ -9,7 +9,7 @@
 // Core
 .btn {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 6px 14px;
   margin-bottom: 0; // For input.btn
   font-size: @baseFontSize;
   line-height: @baseLineHeight;
@@ -18,14 +18,15 @@
   cursor: pointer;
   background: @btnBackground;
   color: @black;
-  border: 1px solid @btnBorder;
+  border: none;
   box-shadow: none;
+  border-radius: 3px;
 
     // Hover/focus state
     &:hover,
     &:focus {
         background: @btnBackgroundHighlight;
-        color: @grayDark;
+        color: @gray-4;
         background-position: 0 -15px;
         text-decoration: none;
 
@@ -64,13 +65,10 @@
     -webkit-box-shadow:none;
 }
 
-.btn-group > .btn:first-child,
-.btn-group > .btn:last-child,
-.btn-group > .dropdown-toggle {
-    border-radius: 0;
+.btn-group .btn.dropdown-toggle {
+    border-left-width: 1px;
+    border-left-style: solid;
 }
-
-
 
 // Button Sizes
 // --------------------------------------------------
@@ -138,7 +136,7 @@ input[type="button"] {
 // Round button
 .btn-round{
   font-size: 24px;
-  color: @gray;
+  color: @gray-3;
   background: @white;
 
   line-height: 32px;
@@ -165,6 +163,16 @@ input[type="button"] {
 .btn-inverse.active,
 .btn-neutral.active {
   color: rgba(255,255,255,.75);
+}
+
+.btn-primary, 
+.btn-warning,
+.btn-danger,
+.btn-success,
+.btn-info,
+.btn-inverse,
+.btn-neutral {
+  font-weight: bold;
 }
 
 // Set the backgrounds
@@ -196,16 +204,16 @@ input[type="button"] {
 // Neutral appears as lighter gray
 .btn-neutral {
   .buttonBackground(@btnNeutralBackground, @btnNeutralBackgroundHighlight);
-  color: #656565;
+  color: @gray-5;
   // Hover/focus state
   &:hover,
   &:focus {
-    color: #656565;
+    color: @gray-5;
   }
 
   &.disabled,
   &[disabled] {
-    color:#656565;
+    color: @gray-5;
     .opacity(65);
   }
 
@@ -217,11 +225,11 @@ input[type="button"] {
     padding: 15px 50px;
     font-size: 16px;
     border: none;
-    background: @blue;
+    background: @green;
     color: white;
-
-        &:hover {
-            background: #2b8ee3;
+    font-weight: bold;
+      &:hover {
+        background: @green-d1;
 		}
 }
 
@@ -281,7 +289,7 @@ input[type="submit"].btn {
 }
 .btn-link[disabled]:hover,
 .btn-link[disabled]:focus {
-  color: @grayDark;
+  color: @gray-4;
   text-decoration: none;
 }
 

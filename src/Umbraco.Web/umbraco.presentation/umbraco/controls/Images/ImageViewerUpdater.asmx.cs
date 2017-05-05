@@ -21,7 +21,8 @@ namespace umbraco.controls.Images
 	[WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 	[ToolboxItem(false)]
 	[ScriptService]
-	public class ImageViewerUpdater : System.Web.Services.WebService
+    [Obsolete("This is no longer used and will be removed in future versions")]
+    public class ImageViewerUpdater : System.Web.Services.WebService
 	{
 
 		/// <summary>

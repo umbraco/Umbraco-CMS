@@ -1,0 +1,199 @@
+<div ng-controller="Umbraco.Overlays.InsertFieldController as vm">
+
+    <!-- select field -->
+    <div class="control-group umb-control-group -no-border">
+        <div class="umb-el-wrap">
+            <label class="control-label" for="chooseField">Choose field</label>
+            <div class="controls">
+                <select ng-model="vm.field">
+                    <optgroup localize="label" label="@templateEditor_customFields">
+                        <option ng-repeat="(key, value) in vm.properties" value="{{value}}">{{value}}</option>
+                    </optgroup>
+                    <optgroup localize="label" label="@templateEditor_standardFields">
+                        <option ng-repeat="(key, value) in vm.standardFields" value="{{value}}">{{value}}</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="advanced" style="position:relative">
+        
+        <!-- Overlay -->
+        <div class="hideAdvanced" style="position:absolute;height:100%;width:100%;background-color:white;opacity:.7;" ng-hide="vm.field"></div>
+
+        <!-- Fallback field -->
+        <div>
+            <i class="icon icon-add blue" ng-hide="vm.showAltField"></i>
+            <a href="" ng-click="vm.showAltField=true" ng-hide="vm.showAltField">Add fallback field</a>
+
+            <div class="control-group umb-control-group -no-border" ng-hide="!vm.showAltField">
+                <div class="umb-el-wrap">
+                    <label class="control-label" for="altField">Fallback field</label>
+                    <div class="controls">
+                        <select ng-model="vm.altField" >
+                            <optgroup localize="label" label="@templateEditor_customFields">
+                                <option ng-repeat="(key, value) in vm.properties" value="{{value}}">{{value}}</option>
+                            </optgroup>
+                            <optgroup localize="label" label="@templateEditor_standardFields">
+                                <option ng-repeat="(key, value) in vm.standardFields" value="{{value}}">{{value}}</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Default value -->
+        <div>
+            <div style="margin-bottom: 20px;">
+                <i class="icon icon-add blue" ng-hide="vm.showAltText"></i>
+                <a href="" ng-click="vm.showAltText=true" ng-hide="vm.showAltText">Add default value</a>
+            </div>
+
+            <div class="control-group umb-control-group -no-border" ng-hide="!vm.showAltText">
+                <div class="umb-el-wrap">
+                    <label class="control-label" for="altText">Default value</label>
+                    <div class="controls">
+                        <input type="text" name="altText" ng-model="vm.altText" umb-auto-focus>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recursive -->
+        <div class="control-group umb-control-group">
+            <div class="umb-el-wrap">
+                <div class="controls">
+                    <label class="control-label" for="recursive">
+                        Recursive
+                    </label>
+                    <input type="checkbox" name="recursive" ng-model="vm.recursive">
+                    Yes, make it recursive
+                </div>
+            </div>
+        </div>
+
+        <h5>Format and encoding</h5>
+
+        <!-- Format as date -->
+        <div class="control-group umb-control-group">
+            <div class="umb-el-wrap">
+                <div class="controls">
+                    <div>
+                        <label class="control-label">
+                            Format as date
+                            <small>Format the value as a date, or a date with time, accoring to the active culture.</small>
+                        </label>
+                    </div>
+                    <a href ng-click="vm.setDateOption('date')" class="btn"><i class="icon icon-check" ng-if="vm.date"></i> Date only</a>
+                    <a href ng-click="vm.setDateOption('dateWithTime')" class="btn"><i class="icon icon-check" ng-if="vm.dateTime"></i> Date and time</a>
+                    <input type="text" ng-model="vm.dateTimeSeparator" ng-hide="!vm.dateTime" placeholder="separator">
+                </div>
+            </div>
+        </div>
+
+        <!-- Format casing -->
+        <div class="control-group umb-control-group">
+            <div class="umb-el-wrap">
+                <div class="controls">
+                    <div>
+                        <label class="control-label">
+                            Casing
+                        </label>
+                    </div>
+                    <a href ng-click="vm.setCasingOption('uppercase')" class="btn" style="text-transform: uppercase;"><i class="icon icon-check" ng-if="vm.casingUpper"></i> Uppercase</a>
+                    <a href ng-click="vm.setCasingOption('lowercase')" class="btn"style="text-transform: lowercase;"><i class="icon icon-check" ng-if="vm.casingLower"></i> Lowercase</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format encoding -->
+        <div class="control-group umb-control-group">
+            <div class="umb-el-wrap">
+                <div class="controls">
+                    <div>
+                        <label class="control-label">
+                            Encoding
+                            <small>Will format special characters in URLs</small>
+                        </label>
+                    </div>
+                    <a href ng-click="vm.setEncodingOption('html')" class="btn"><i class="icon icon-check" ng-if="vm.encodeHtml"></i> HTML</a>
+                    <a href ng-click="vm.setEncodingOption('url')" class="btn"><i class="icon icon-check" ng-if="vm.encodeUrl"></i> URL</a>
+                </div>
+            </div>
+        </div>
+
+        <h5>Modify output</h5>
+        
+        <!-- Insert Before -->
+        <div class="control-group umb-control-group -no-border ng-scope">
+            <div class="umb-el-wrap">
+                <label class="control-label" for="insertBefore">
+                    Insert before field
+                    <small>Will be inserted before the field value</small>
+                </label>
+                <div class="controls">
+                    <input type="text" name="insertBefore" class="-full-width-input" ng-model="vm.insertBefore">
+                </div>
+            </div>
+        </div>
+
+        <!-- Insert after -->
+        <div class="control-group umb-control-group">
+            <div class="umb-el-wrap">
+                <label class="control-label" for="insertAfter">
+                    Insert after field
+                    <small>Will be inserted after the field value</small>
+                </label>
+                <div class="controls">
+                    <input type="text" name="insertAfter" class="-full-width-input" ng-model="vm.insertAfter">
+                </div>
+            </div>
+        </div>
+
+        <!-- Line breaks -->
+        <div class="control-group umb-control-group">
+            <div class="umb-el-wrap">
+                <div class="controls">
+                    <div>
+                        <label class="control-label" for="linebreaks">
+                            Convert line breaks
+                            <small>Replaces line breaks with break html tag</small>
+                        </label>
+                    </div>
+                    <input type="checkbox" name="linebreaks" ng-model="vm.convertLinebreaks">
+                    Yes, convert line breaks
+                </div>
+            </div>
+        </div>
+
+        <!-- Remove paragraph tags -->
+        <div class="control-group umb-control-group">
+            <div class="umb-el-wrap">
+                <div class="controls">
+                    <div>
+                        <label class="control-label" for="paragraph">
+                            Remove paragraph tags
+                            <small>Will remove any paragraph tag in the beginning and end of the text</small>
+                        </label>
+                    </div>
+                    <input type="checkbox" name="paragraph" ng-model="vm.removeParagraphTags">
+                    Yes, remove paragraph tags
+                </div>
+            </div>
+        </div>
+
+        <!-- Output -->
+        <div class="control-group umb-control-group -no-border">
+            <div class="umb-el-wrap">
+                <div class="controls">
+                    <label class="control-label">Output sample</label>
+                    <pre>{{ vm.generateOutputSample() }}</pre>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -351,7 +351,7 @@ namespace umbraco.cms.businesslogic.Tags
                 {
                     Document cnode = new Document(rr.GetInt("nodeid"));
 
-                    if (cnode != null && cnode.Published)
+                    if (cnode.Published)
                         docs.Add(cnode);
                 }
             }

@@ -106,12 +106,13 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <param name="propertyTypeAlias">The property type alias.</param>
         /// <param name="dataTypeDefinitionId">The datatype definition identifier.</param>
         /// <param name="propertyEditorAlias">The property editor alias.</param>
+        /// <param name="initConverters">Generally used only for testing, in production this will always be true</param>
         /// <remarks>
         /// <para>The new published property type does not belong to a published content type.</para>
         /// <para>The values of <paramref name="dataTypeDefinitionId"/> and <paramref name="propertyEditorAlias"/> are
         /// assumed to be valid and consistent.</para>
         /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, string propertyEditorAlias)
+        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, string propertyEditorAlias, bool initConverters = true)
         {
             // ContentType 
             // - in unit tests, to be set by PublishedContentType when creating it
@@ -122,7 +123,8 @@ namespace Umbraco.Core.Models.PublishedContent
             DataTypeId = dataTypeDefinitionId;
             PropertyEditorAlias = propertyEditorAlias;
 
-            InitializeConverters();
+            if (initConverters)
+                InitializeConverters();
         }
 
         #endregion

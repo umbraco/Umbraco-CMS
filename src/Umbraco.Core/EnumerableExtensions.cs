@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -67,22 +68,15 @@ namespace Umbraco.Core
             }
         }
 
-        /// <summary>The for each.</summary>
-        /// <param name="items">The items.</param>
-        /// <param name="func">The func.</param>
-        /// <typeparam name="TItem">item type</typeparam>
-        /// <typeparam name="TResult">Result type</typeparam>
-        /// <returns>the Results</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use a normal foreach loop instead, this adds more allocations than necessary")]
         public static TResult[] ForEach<TItem, TResult>(this IEnumerable<TItem> items, Func<TItem, TResult> func)
         {
             return items.Select(func).ToArray();
         }
 
-        /// <summary>The for each.</summary>
-        /// <param name="items">The items.</param>
-        /// <param name="action">The action.</param>
-        /// <typeparam name="TItem">Item type</typeparam>
-        /// <returns>list of TItem</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use a normal foreach loop instead, this adds more allocations than necessary")]
         public static IEnumerable<TItem> ForEach<TItem>(this IEnumerable<TItem> items, Action<TItem> action)
         {
             if (items != null)
@@ -101,6 +95,7 @@ namespace Umbraco.Core
         /// <param name="f">The select child.</param>
         /// <typeparam name="T">Item type</typeparam>
         /// <returns>list of TItem</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("Do not use, use SelectRecursive instead which has far less potential of re-iterating an iterator which may cause significantly more SQL queries")]
         public static IEnumerable<T> FlattenList<T>(this IEnumerable<T> e, Func<T, IEnumerable<T>> f)
         {
@@ -300,6 +295,5 @@ namespace Umbraco.Core
             return list1Groups.Count == list2Groups.Count
                && list1Groups.All(g => g.Count() == list2Groups[g.Key].Count());
         }
-
     }
 }

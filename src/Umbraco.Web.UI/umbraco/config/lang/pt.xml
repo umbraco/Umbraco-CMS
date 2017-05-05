@@ -576,7 +576,7 @@ Você pode remover com segurança do seu sistema clicando em "desinstalar pacote
   <area alias="publicAccess">
     <key alias="paAdvanced">Proteção baseada em função</key>
     <key alias="paAdvancedHelp"><![CDATA[Se você deseja controlar o acesso à página usando autenticação baseada em funções, <br /> usando grupos de membros do Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Você precisa criar um grupo de membros antes que possa usar <br /> autenticação baseada em função.]]></key>
+    <key alias="paAdvancedNoGroups">Você precisa criar um grupo de membros antes que possa usar autenticação baseada em função.</key>
     <key alias="paErrorPage">Página de Erro</key>
     <key alias="paErrorPageHelp">Usado quando as pessoas estão logadas, mas não para ter acesso</key>
     <key alias="paHowWould">Escolha como restringir o acesso à esta página</key>

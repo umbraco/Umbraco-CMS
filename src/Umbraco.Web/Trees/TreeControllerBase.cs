@@ -8,6 +8,7 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Web.Trees
 {
@@ -230,6 +231,41 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
+        /// Helper method to create tree nodes and automatically generate the json url + UDI
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="entityObjectType"></param>
+        /// <param name="parentId"></param>
+        /// <param name="queryStrings"></param>
+        /// <param name="hasChildren"></param>
+        /// <returns></returns>
+        public TreeNode CreateTreeNode(UmbracoEntity entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, bool hasChildren)
+        {
+            var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, entity.ContentTypeIcon);
+            treeNode.Udi = Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(entityObjectType), entity.Key);
+            treeNode.HasChildren = hasChildren;
+            return treeNode;
+        }
+
+        /// <summary>
+        /// Helper method to create tree nodes and automatically generate the json url + UDI
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="entityObjectType"></param>
+        /// <param name="parentId"></param>
+        /// <param name="queryStrings"></param>
+        /// <param name="icon"></param>
+        /// <param name="hasChildren"></param>
+        /// <returns></returns>
+        public TreeNode CreateTreeNode(IUmbracoEntity entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, string icon, bool hasChildren)
+        {
+            var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, icon);
+            treeNode.Udi = Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(entityObjectType), entity.Key);
+            treeNode.HasChildren = hasChildren;
+            return treeNode;
+        }
+
+        /// <summary>
         /// Helper method to create tree nodes and automatically generate the json url
         /// </summary>
         /// <param name="id"></param>
@@ -262,6 +298,27 @@ namespace Umbraco.Web.Trees
             var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;
             treeNode.RoutePath = routePath;
+            return treeNode;
+        }
+
+        /// <summary>
+        /// Helper method to create tree nodes and automatically generate the json url + UDI
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="parentId"></param>
+        /// <param name="queryStrings"></param>
+        /// <param name="title"></param>
+        /// <param name="routePath"></param>
+        /// <param name="hasChildren"></param>
+        /// <param name="icon"></param>
+        /// <param name="udi"></param>
+        /// <returns></returns>
+        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon, bool hasChildren, string routePath, Udi udi)
+        {
+            var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
+            treeNode.HasChildren = hasChildren;
+            treeNode.RoutePath = routePath;
+            treeNode.Udi = udi;
             return treeNode;
         }
 

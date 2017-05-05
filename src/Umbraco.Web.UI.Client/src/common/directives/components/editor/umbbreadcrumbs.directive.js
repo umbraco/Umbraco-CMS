@@ -40,27 +40,50 @@ Use this directive to generate a list of breadcrumbs.
 
 @param {array} ancestors Array of ancestors
 @param {string} entityType The content entity type (member, media, content).
+@param {callback} Callback when an ancestor is clicked. It will override the default link behaviour.
 **/
 
-(function() {
-  'use strict';
+(function () {
+    'use strict';
 
-  function BreadcrumbsDirective() {
+    function BreadcrumbsDirective() {
 
-    var directive = {
-      restrict: 'E',
-      replace: true,
-      templateUrl: 'views/components/editor/umb-breadcrumbs.html',
-      scope: {
-        ancestors: "=",
-        entityType: "@"
-      }
-    };
+        function link(scope, el, attr, ctrl) {
 
-    return directive;
+            scope.allowOnOpen = false;
 
-  }
+            scope.open = function(ancestor) {
+                if(scope.onOpen && scope.allowOnOpen) {
+                    scope.onOpen({'ancestor': ancestor});
+                }
+            };
 
-  angular.module('umbraco.directives').directive('umbBreadcrumbs', BreadcrumbsDirective);
+            function onInit() {
+                if ("onOpen" in attr) {
+                    scope.allowOnOpen = true;
+                }
+            }
+            
+            onInit();
+
+        }
+
+        var directive = {
+            restrict: 'E',
+            replace: true,
+            templateUrl: 'views/components/editor/umb-breadcrumbs.html',
+            scope: {
+                ancestors: "=",
+                entityType: "@",
+                onOpen: "&"
+            },
+            link: link
+        };
+
+        return directive;
+
+    }
+
+    angular.module('umbraco.directives').directive('umbBreadcrumbs', BreadcrumbsDirective);
 
 })();

@@ -1,30 +1,37 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
+using System.Web.SessionState;
 using AutoMapper;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using umbraco;
+using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// API controller to deal with Macro data
     /// </summary>
+    /// <remarks>
+    /// Note that this implements IRequiresSessionState which will enable HttpContext.Session - generally speaking we don't normally
+    /// enable this for webapi controllers, however since this controller is used to render macro content and macros can access
+    /// Session, we don't want it to throw null reference exceptions.
+    /// </remarks>
     [PluginController("UmbracoApi")]
-    public class MacroController : UmbracoAuthorizedJsonController
+    public class MacroController : UmbracoAuthorizedJsonController, IRequiresSessionState
     {
-        
-
         /// <summary>
         /// Gets the macro parameters to be filled in for a particular macro
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// Note that ALL logged in users have access to this method because editors will need to isnert macros into rte (content/media/members) and it's used for 
+        /// Note that ALL logged in users have access to this method because editors will need to isnert macros into rte (content/media/members) and it's used for
         /// inserting into templates/views/etc... it doesn't expose any sensitive data.
         /// </remarks>
         public IEnumerable<MacroParameter> GetMacroParameters(int macroId)
@@ -45,9 +52,9 @@ namespace Umbraco.Web.Editors
         /// <param name="pageId"></param>
         /// <param name="macroParams">
         /// To send a dictionary as a GET parameter the query should be structured like:
-        /// 
+        ///
         /// ?macroAlias=Test&pageId=3634&macroParams[0].key=myKey&macroParams[0].value=myVal&macroParams[1].key=anotherKey&macroParams[1].value=anotherVal
-        /// 
+        ///
         /// </param>
         /// <returns></returns>
         [HttpGet]
@@ -125,5 +132,30 @@ namespace Umbraco.Web.Editors
             return result;
         }
 
+        [HttpPost]
+        public HttpResponseMessage CreatePartialViewMacroWithFile(CreatePartialViewMacroWithFileModel model)
+        {
+            if (model == null) throw new ArgumentNullException("model");
+            if (string.IsNullOrWhiteSpace(model.Filename)) throw new ArgumentException("Filename cannot be null or whitespace", "model.Filename");
+            if (string.IsNullOrWhiteSpace(model.VirtualPath)) throw new ArgumentException("VirtualPath cannot be null or whitespace", "model.VirtualPath");
+
+            var macroName = model.Filename.TrimEnd(".cshtml");
+
+            var macro = new Macro
+            {
+                Alias = macroName.ToSafeAlias(),
+                Name = macroName,
+                ScriptPath = model.VirtualPath.EnsureStartsWith("~")
+            };
+
+            Services.MacroService.Save(macro); // may throw
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        public class CreatePartialViewMacroWithFileModel
+        {
+            public string Filename { get; set; }
+            public string VirtualPath { get; set; }
+        }
     }
 }

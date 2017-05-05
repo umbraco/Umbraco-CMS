@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Models
 {
@@ -84,16 +86,64 @@ namespace Umbraco.Core.Models
         public string Type { get; set; }
 
         private Type _runtimeType;
-
+        
         /// <summary>
         /// Returns the CLR type based on it's assembly name stored in the config
         /// </summary>
         /// <returns></returns>
         public Type GetRuntimeType()
         {
-            return _runtimeType ?? (_runtimeType = System.Type.GetType(Type));
-        }
-            
+            if (_runtimeType != null)
+                return _runtimeType;
 
+            _runtimeType = TryGetType(Type);
+            return _runtimeType;
+        }
+
+        /// <summary>
+        /// Used to try to get and cache the tree type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        internal static Type TryGetType(string type)
+        {
+            try
+            {
+                return ResolvedTypes.GetOrAdd(type, s =>
+                {
+                    var result = System.Type.GetType(type);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+
+                    //we need to implement a bit of a hack here due to some trees being renamed and backwards compat
+                    var parts = type.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2)
+                    {
+                        if (parts[1].Trim() == "umbraco" && parts[0].StartsWith("Umbraco.Web.Trees") && parts[0].EndsWith("Controller") == false)
+                        {
+                            //if it's one of our controllers but it's not suffixed with "Controller" then add it and try again
+                            var tempType = parts[0] + "Controller, umbraco";
+
+                            result = System.Type.GetType(tempType);
+                            if (result != null)
+                            {
+                                return result;
+                            }
+                        }
+                    }
+
+                    throw new InvalidOperationException("Could not resolve type");
+                });
+            }
+            catch (InvalidOperationException)
+            {
+                //swallow, this is our own exception, couldn't find the type
+                return null;
+            }
+        }
+
+        private static readonly ConcurrentDictionary<string, Type> ResolvedTypes = new ConcurrentDictionary<string, Type>();
     }
 }

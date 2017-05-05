@@ -10,49 +10,6 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Core.Persistence.Querying
 {
     /// <summary>
-    /// Represents an expression which caches the visitor's result.
-    /// </summary>
-    internal class CachedExpression : Expression
-    {
-        private string _visitResult;
-
-        /// <summary>
-        /// Gets or sets the inner Expression.
-        /// </summary>
-        public Expression InnerExpression { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the compiled SQL statement output.
-        /// </summary>
-        public string VisitResult
-        {
-            get { return _visitResult; }
-            set
-            {
-                if (Visited)
-                    throw new InvalidOperationException("Cached expression has already been visited.");
-                _visitResult = value;
-                Visited = true;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the cache Expression has been compiled already.
-        /// </summary>
-        public bool Visited { get; private set; }
-
-        /// <summary>
-        /// Replaces the inner expression.
-        /// </summary>
-        /// <param name="expression">expression.</param>
-        /// <remarks>The new expression is assumed to have different parameter but produce the same SQL statement.</remarks>
-        public void Wrap(Expression expression)
-        {
-            InnerExpression = expression;
-        }
-    }
-
-    /// <summary>
     /// An expression tree parser to create SQL statements and SQL parameters based on a strongly typed expression.
     /// </summary>
     /// <remarks>This object is stateful and cannot be re-used to parse an expression.</remarks>
@@ -581,6 +538,18 @@ namespace Umbraco.Core.Persistence.Querying
                 case "InvariantContains":
                 case "InvariantEquals":
 
+                    //special case, if it is 'Contains' and the argumet that Contains is being called on is 
+                    //Enumerable and the methodArgs is the actual member access, then it's an SQL IN claus
+                    if (m.Object == null 
+                        && m.Arguments[0].Type != typeof(string)
+                        && m.Arguments.Count == 2
+                        && methodArgs.Length == 1 
+                        && methodArgs[0].NodeType == ExpressionType.MemberAccess
+                        && TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type))
+                    {
+                        goto case "SqlIn";
+                    }
+
                     string compareValue;
 
                     if (methodArgs[0].NodeType != ExpressionType.Constant)
@@ -595,13 +564,6 @@ namespace Umbraco.Core.Persistence.Querying
                     else
                     {
                         compareValue = methodArgs[0].ToString();
-                    }
-
-                    //special case, if it is 'Contains' and the member that Contains is being called on is not a string, then
-                    // we should be doing an 'In' clause - but we currently do not support this
-                    if (methodArgs[0].Type != typeof(string) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(methodArgs[0].Type))
-                    {
-                        throw new NotSupportedException("An array Contains method is not supported");
                     }
 
                     //default column type
@@ -705,29 +667,33 @@ namespace Umbraco.Core.Persistence.Querying
                 //    }
                 //    return string.Format("{0}{1}", r, s);
 
-                //case "In":
+                case "SqlIn":
 
-                //    var member = Expression.Convert(m.Arguments[0], typeof(object));
-                //    var lambda = Expression.Lambda<Func<object>>(member);
-                //    var getter = lambda.Compile();
+                    if (m.Object == null && methodArgs.Length == 1 && methodArgs[0].NodeType == ExpressionType.MemberAccess)
+                    {
+                        var memberAccess = VisitMemberAccess((MemberExpression) methodArgs[0]);
+                        
+                        var member = Expression.Convert(m.Arguments[0], typeof(object));
+                        var lambda = Expression.Lambda<Func<object>>(member);
+                        var getter = lambda.Compile();
 
-                //    var inArgs = (object[])getter();
+                        var inArgs = (IEnumerable)getter();
 
-                //    var sIn = new StringBuilder();
-                //    foreach (var e in inArgs)
-                //    {
-                //        SqlParameters.Add(e);
+                        var sIn = new StringBuilder();
+                        foreach (var e in inArgs)
+                        {
+                            SqlParameters.Add(e);
 
-                //        sIn.AppendFormat("{0}{1}",
-                //                     sIn.Length > 0 ? "," : "",
-                //                                    string.Format("@{0}", SqlParameters.Count - 1));
+                            sIn.AppendFormat("{0}{1}",
+                                sIn.Length > 0 ? "," : "",
+                                string.Format("@{0}", SqlParameters.Count - 1));
+                        }
 
-                //        //sIn.AppendFormat("{0}{1}",
-                //        //             sIn.Length > 0 ? "," : "",
-                //        //                            GetQuotedValue(e, e.GetType()));
-                //    }
+                        return string.Format("{0} IN ({1})", memberAccess, sIn);
+                    }
 
-                //    return string.Format("{0} {1} ({2})", r, m.Method.Name, sIn.ToString());
+                    throw new NotSupportedException("SqlIn must contain the member being accessed");
+
                 //case "Desc":
                 //    return string.Format("{0} DESC", r);
                 //case "Alias":

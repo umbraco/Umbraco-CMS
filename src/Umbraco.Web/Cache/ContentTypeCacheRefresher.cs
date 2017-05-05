@@ -9,7 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
@@ -47,6 +47,7 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         internal static JsonPayload FromContentType(IContentTypeBase contentType, bool isDeleted = false)
         {
+            var contentTypeService = (ContentTypeService) ApplicationContext.Current.Services.ContentTypeService;
             var payload = new JsonPayload
             {
                 Alias = contentType.Alias,
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Cache
                     : (contentType is IMediaType)
                         ? typeof(IMediaType).Name
                         : typeof(IMemberType).Name,
-                DescendantPayloads = contentType.Descendants().Select(x => FromContentType(x)).ToArray(),
+                DescendantPayloads = contentTypeService.GetDescendants(contentType).Select(x => FromContentType(x)).ToArray(),
                 WasDeleted = isDeleted,
                 PropertyRemoved = contentType.WasPropertyDirty("HasPropertyTypeBeenRemoved"),
                 AliasChanged = contentType.WasPropertyDirty("Alias"),
@@ -131,9 +132,7 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IMediaType>();
             ClearAllIsolatedCacheByEntityType<IMember>();
             ClearAllIsolatedCacheByEntityType<IMemberType>();
-
-            //all property type cache
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
+            
             //all content type property cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);     
             //all content type cache
@@ -266,12 +265,6 @@ namespace Umbraco.Web.Cache
         /// </returns>
         private static void ClearContentTypeCache(JsonPayload payload)
         {
-            //clears the cache for each property type associated with the content type
-            foreach (var pid in payload.PropertyTypeIds)
-            {
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.PropertyTypeCacheKey + pid);
-            }
-
             //clears the cache associated with the Content type itself
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, payload.Id));
             //clears the cache associated with the content type properties collection

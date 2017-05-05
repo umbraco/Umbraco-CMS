@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// needs to be changed to editorAlias, we'll do this by removing the constraint,changing the macroPropertyType to the new 
     /// editorAlias column (and maintaing data so we can reference it)
     /// </summary>
-    [Migration("7.0.0", 6, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 6, Constants.System.UmbracoMigrationName)]
     public class AlterCmsMacroPropertyTable : MigrationBase
     {
         public AlterCmsMacroPropertyTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

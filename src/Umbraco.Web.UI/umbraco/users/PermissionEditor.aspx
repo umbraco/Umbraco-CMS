@@ -27,7 +27,7 @@
 			<script type="text/javascript" language="javascript">				
 				jQuery(document).ready(function() {
 					jQuery("#<%=JTree.ClientID%>").PermissionsEditor({
-						userId: <%=Request.QueryString["id"] %>,
+						userId: <%=Request.CleanForXss("id") %>,
 						pPanelSelector: "#permissionsPanel",
 						replacePChkBoxSelector: "#chkChildPermissions"});						
 				});

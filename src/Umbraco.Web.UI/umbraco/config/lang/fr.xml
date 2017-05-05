@@ -329,6 +329,7 @@
     <key alias="filter">Filtrer...</key>
     <key alias="enterTags">Ajouter des tags (appuyer sur enter entre chaque tag)...</key>
     <key alias="email">Entrez votre email</key>
+    <key alias="usernameHint">Votre nom d'utilisateur est généralement votre adresse email</key>
   </area>
 
   <area alias="editcontenttype">
@@ -817,7 +818,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   <area alias="publicAccess">
     <key alias="paAdvanced">Protection basée sur les rôles</key>
     <key alias="paAdvancedHelp"><![CDATA[Si vous souhaitez contrôler l'accès à la page en utilisant l'authentification basée sur les rôles utilisateurs,<br /> via les groupes de membres Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Vous devez créer un groupe avant de pouvoir utiliser <br /> l'authentification basée sur les rôles.]]></key>
+    <key alias="paAdvancedNoGroups">Vous devez créer un groupe avant de pouvoir utiliser l'authentification basée sur les rôles</key>
     <key alias="paErrorPage">Page d'erreur</key>
     <key alias="paErrorPageHelp">Utilisé pour les personnes connectées, mais qui n'ont pas accès</key>
     <key alias="paHowWould">Choisissez comment restreindre l'accès à cette page</key>

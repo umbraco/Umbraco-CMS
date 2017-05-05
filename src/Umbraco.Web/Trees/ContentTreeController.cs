@@ -84,11 +84,10 @@ namespace Umbraco.Web.Trees
                 var isContainer = e.IsContainer();   // && (queryStrings.Get("isDialog") != "true");
 
                 var node = CreateTreeNode(
-                    e.Id.ToInvariantString(),
+                    entity,
+                    Constants.ObjectTypes.DocumentGuid,
                     parentId,
-                    queryStrings,
-                    e.Name,
-                    entity.ContentTypeIcon,
+                    queryStrings,                    
                     entity.HasChildren && (isContainer == false));
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
@@ -202,7 +201,13 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
         {
-            var content = Services.ContentService.GetById(int.Parse(id));
+            var entity = GetEntityFromId(id);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            var content = Services.ContentService.GetById(entity.Id);
             if (content == null)
             {
                 return false;

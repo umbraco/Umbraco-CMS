@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
@@ -61,7 +62,7 @@ namespace Umbraco.Tests.Routing
         {
             var settings = SettingsForTests.GetDefault();
             return new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), Logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(Mock.Of<IScopeProviderInternal>(), Logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
                 GetServiceContext(settings, Logger),
                 CacheHelper,
                 ProfilingLogger)

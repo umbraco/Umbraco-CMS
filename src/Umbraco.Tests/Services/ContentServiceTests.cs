@@ -36,11 +36,15 @@ namespace Umbraco.Tests.Services
         public override void Initialize()
         {
             base.Initialize();
+
+            VersionableRepositoryBase<int, IContent>.ThrowOnWarning = true;
         }
 
         [TearDown]
         public override void TearDown()
         {
+            VersionableRepositoryBase<int, IContent>.ThrowOnWarning = false;
+
             base.TearDown();
         }
 
@@ -81,7 +85,7 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(moveResult.Success);
 
-            //re-get with the fixed/moved path 
+            //re-get with the fixed/moved path
             content = contentService.GetById(content.Id);
 
             Assert.AreEqual("-1,-20," + content.Id, content.Path);
@@ -270,7 +274,7 @@ namespace Umbraco.Tests.Services
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content2);
 
-            // Act            
+            // Act
             contentService.MoveToRecycleBin(content1);
 
             // Assert
@@ -306,7 +310,7 @@ namespace Umbraco.Tests.Services
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content2);
 
-            // Act            
+            // Act
             contentService.MoveToRecycleBin(content1);
             contentService.MoveToRecycleBin(content2);
 
@@ -339,7 +343,7 @@ namespace Umbraco.Tests.Services
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content2);
 
-            // Act            
+            // Act
             contentService.UnPublish(content1);
             contentService.UnPublish(content2);
 
@@ -375,7 +379,7 @@ namespace Umbraco.Tests.Services
             contentService.UnPublish(content1);
             contentService.UnPublish(content2);
 
-            // Act            
+            // Act
             contentService.Publish(content1);
 
             // Assert
@@ -411,7 +415,7 @@ namespace Umbraco.Tests.Services
             contentService.MoveToRecycleBin(content1);
             contentService.MoveToRecycleBin(content2);
 
-            // Act            
+            // Act
             contentService.Move(content1, -1);
             contentService.Publish(content1);
 
@@ -669,6 +673,17 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Cannot_Save_Content_With_Empty_Name()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = new Content(string.Empty, -1, ServiceContext.ContentTypeService.GetContentType("umbTextpage"));
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => contentService.Save(content));
+        }
+
+        [Test]
         public void Can_Get_Content_By_Id()
         {
             // Arrange
@@ -751,8 +766,13 @@ namespace Umbraco.Tests.Services
             var parent = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
             ServiceContext.ContentService.Publish(parent);//Publishing root, so Text Page 2 can be updated.
             var subpage2 = contentService.GetById(NodeDto.NodeIdSeed + 3);
+
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
+            contentService.SaveAndPublishWithStatus(subpage2, 0);//NOTE New versions are only added between publish-state-changed, so publishing to ensure addition version.
+
+            subpage2.Name = "Text Page 2 Updated again";
+            subpage2.SetValue("author", "Bob Hope");
             contentService.SaveAndPublishWithStatus(subpage2, 0);//NOTE New versions are only added between publish-state-changed, so publishing to ensure addition version.
 
             // Act
@@ -761,6 +781,11 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(versions.Any(), Is.True);
             Assert.That(versions.Count(), Is.GreaterThanOrEqualTo(2));
+
+            //ensure each version contains the correct property values
+            Assert.AreEqual("John Doe", versions[2].GetValue("author"));
+            Assert.AreEqual("Jane Doe", versions[1].GetValue("author"));
+            Assert.AreEqual("Bob Hope", versions[0].GetValue("author"));
         }
 
         [Test]
@@ -839,8 +864,10 @@ namespace Umbraco.Tests.Services
             bool published = contentService.Publish(content, 0);
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var uow = provider.GetUnitOfWork();
-            Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+            using (var uow = provider.GetUnitOfWork())
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
 
             // Act
             bool unpublished = contentService.UnPublish(content, 0);
@@ -850,8 +877,10 @@ namespace Umbraco.Tests.Services
             Assert.That(unpublished, Is.True);
             Assert.That(content.Published, Is.False);
 
-            uow = provider.GetUnitOfWork();
-            Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+            using (var uow = provider.GetUnitOfWork())
+            {
+                Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
         }
 
         /// <summary>
@@ -947,7 +976,7 @@ namespace Umbraco.Tests.Services
             // Act
             contentService.RePublishAll(new int[] { allContent.Last().ContentTypeId });
 
-            // Assert            
+            // Assert
             using (var uow = provider.GetUnitOfWork())
             {
                 Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
@@ -1304,7 +1333,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(content.ParentId, Is.EqualTo(-20));
             Assert.That(content.Trashed, Is.True);
-            Assert.That(descendants.Count(), Is.EqualTo(3));
+            Assert.That(descendants.Count, Is.EqualTo(3));
             Assert.That(descendants.Any(x => x.Path.Contains("-20") == false), Is.False);
 
             //Empty Recycle Bin
@@ -1323,6 +1352,69 @@ namespace Umbraco.Tests.Services
             // Act
             contentService.EmptyRecycleBin();
             var contents = contentService.GetContentInRecycleBin();
+
+            // Assert
+            Assert.That(contents.Any(), Is.False);
+        }
+
+        [Test]
+        public void Can_Empty_RecycleBin_With_Content_That_Has_All_Related_Data()
+        {
+            // Arrange
+            //need to:
+            // * add relations
+            // * add permissions
+            // * add notifications
+            // * public access
+            // * tags
+            // * domain
+            // * published & preview data
+            // * multiple versions
+
+            var contentType = MockedContentTypes.CreateAllTypesContentType("test", "test");
+            ServiceContext.ContentTypeService.Save(contentType, 0);
+
+            object obj =
+               new
+               {
+                   tags = "Hello,World"
+               };
+            var content1 = MockedContent.CreateBasicContent(contentType);
+            content1.PropertyValues(obj);
+            content1.ResetDirtyProperties(false);
+            ServiceContext.ContentService.Save(content1, 0);
+            Assert.IsTrue(ServiceContext.ContentService.PublishWithStatus(content1, 0).Success);
+            var content2 = MockedContent.CreateBasicContent(contentType);
+            content2.PropertyValues(obj);
+            content2.ResetDirtyProperties(false);
+            ServiceContext.ContentService.Save(content2, 0);
+            Assert.IsTrue(ServiceContext.ContentService.PublishWithStatus(content2, 0).Success);
+
+            ServiceContext.RelationService.Save(new RelationType(Constants.ObjectTypes.DocumentGuid, Constants.ObjectTypes.DocumentGuid, "test"));
+            Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
+
+            ServiceContext.PublicAccessService.Save(new PublicAccessEntry(content1, content2, content2, new List<PublicAccessRule>
+            {
+                new PublicAccessRule
+                {
+                    RuleType = "test",
+                    RuleValue = "test"
+                }
+            }));
+            Assert.IsTrue(ServiceContext.PublicAccessService.AddRule(content1, "test2", "test2").Success);
+
+            Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(ServiceContext.UserService.GetUserById(0), content1, "test"));
+
+            ServiceContext.ContentService.AssignContentPermission(content1, 'A', new[] {0});
+
+            Assert.IsTrue(ServiceContext.DomainService.Save(new UmbracoDomain("www.test.com", "en-AU")
+            {
+                RootContentId = content1.Id
+            }).Success);
+            
+            // Act
+            ServiceContext.ContentService.EmptyRecycleBin();
+            var contents = ServiceContext.ContentService.GetContentInRecycleBin();
 
             // Assert
             Assert.That(contents.Any(), Is.False);
@@ -1465,7 +1557,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_Lazy_Content()
         {
-            var unitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
+            var provider = new PetaPocoUnitOfWorkProvider(Mock.Of<ILogger>());
+            var unitOfWork = provider.GetUnitOfWork();
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 
@@ -1706,6 +1799,74 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(content.HasPublishedVersion());
         }
 
+        [Test]
+        public void Can_Get_Paged_Children()
+        {
+            var service = ServiceContext.ContentService;
+            // Start by cleaning the "db"
+            var umbTextPage = service.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            service.Delete(umbTextPage);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+            }
+            
+            long total;
+            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void Can_Get_Paged_Children_Dont_Get_Descendants()
+        {
+            var service = ServiceContext.ContentService;
+            // Start by cleaning the "db"
+            var umbTextPage = service.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            service.Delete(umbTextPage);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            // only add 9 as we also add a content with children 
+            for (int i = 0; i < 9; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+            }
+
+            var willHaveChildren = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(willHaveChildren);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType, "Content" + i, willHaveChildren.Id);
+                ServiceContext.ContentService.Save(c1);
+            }
+
+            long total;
+            // children in root including the folder - not the descendants in the folder
+            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+
+            // children in folder
+            entities = service.GetPagedChildren(willHaveChildren.Id, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(willHaveChildren.Id, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+        }
+
         private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
@@ -1739,7 +1900,7 @@ namespace Umbraco.Tests.Services
             return list;
         }
 
-        private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);

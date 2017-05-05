@@ -39,7 +39,7 @@ namespace umbraco
     {
         public loadTemplates(string application) : base(application) {}
 
-        private ViewHelper _viewHelper = new ViewHelper(new PhysicalFileSystem(SystemDirectories.MvcViews));
+        private ViewHelper _viewHelper = new ViewHelper(FileSystemProviderManager.Current.MvcViewsFileSystem);
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {

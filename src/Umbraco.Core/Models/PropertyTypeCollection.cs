@@ -69,6 +69,7 @@ namespace Umbraco.Core.Models
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
+        //TODO: Instead of 'new' this should explicitly implement one of the collection interfaces members
         internal new void Add(PropertyType item)
         {
             using (new WriteLock(_addLocker))
