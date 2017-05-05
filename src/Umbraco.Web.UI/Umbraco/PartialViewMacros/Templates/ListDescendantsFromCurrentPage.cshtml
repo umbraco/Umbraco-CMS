@@ -2,7 +2,7 @@
 
 @*
     This snippet creates links for every single page (no matter how deep) below
-    the page currently being viewed by the website visitor, displayed as nested unordered html lists.
+    the page currently being viewed by the website visitor, displayed as nested unordered HTML lists.
 *@
 
 @{ var selection = Model.Content.Children.Where(x => x.IsVisible()); }
@@ -15,7 +15,7 @@
 
     @* Add in level for a CSS hook *@
     <ul class="level-@naviLevel">
-        @* For each child page  where the property umbracoNaviHide is not True *@
+        @* Loop through the selection *@
         @foreach (var item in selection)
         {
             <li>

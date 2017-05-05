@@ -1,16 +1,16 @@
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 @*
-    Macro to display a gallery of images from media the media section.
+    Macro to display a gallery of images from the Media section.
     Works with either a 'Single Media Picker' or a 'Multiple Media Picker' macro parameter (see below).
 
     How it works:
         - Confirm the macro parameter has been passed in with a value
-        - Loop through all the media Id's passed in (might be a single item, might be many)
+        - Loop through all the media Ids passed in (might be a single item, might be many)
         - Display any individual images, as well as any folders of images
 
     Macro Parameters To Create, for this macro to work:
     Alias:mediaIds     Name:Select folders and/or images    Type: Multiple Media Picker
-                                                            Type: (note: you can use a Single Media Picker if that's more appropriate to your needs)
+                                                            Type: (note: You can use a Single Media Picker if that's more appropriate to your needs)
 *@
 
 @{ var mediaIds = Model.MacroParameters["mediaIds"] as string; }
