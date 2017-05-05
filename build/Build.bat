@@ -114,41 +114,41 @@ REM but the path setting is lost due to SETLOCAL
 SET PATH="C:\Program Files (x86)\Git\cmd";"C:\Program Files\Git\cmd";%PATH%
 
 SET toolsFolder=%CD%\tools\
-IF NOT EXIST %toolsFolder% (
+IF NOT EXIST "%toolsFolder%" (
 	MD tools
 )
 
 SET nuGetExecutable=%CD%\tools\nuget.exe
-IF NOT EXIST %nuGetExecutable% (
+IF NOT EXIST "%nuGetExecutable%" (
 	ECHO Getting NuGet so we can fetch some tools
 	ECHO Downloading https://dist.nuget.org/win-x86-commandline/latest/nuget.exe to %nuGetExecutable%
 	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://dist.nuget.org/win-x86-commandline/latest/nuget.exe', '%nuGetExecutable%')"
 )
 
 :: We need 7za.exe for BuildBelle.bat
-IF NOT EXIST %toolsFolder%7za.exe (
+IF NOT EXIST "%toolsFolder%7za.exe" (
 	ECHO 7zip not found - fetching now
-	%nuGetExecutable% install 7-Zip.CommandLine -OutputDirectory %toolsFolder% -Verbosity quiet
+	"%nuGetExecutable%" install 7-Zip.CommandLine -OutputDirectory tools -Verbosity quiet
 )
 
-:: We need 7za.exe for VS2017+
-IF NOT EXIST %toolsFolder%vswhere.exe (
+:: We need vswhere.exe for VS2017+
+IF NOT EXIST "%toolsFolder%vswhere.exe" (
 	ECHO vswhere not found - fetching now
-	%nuGetExecutable% install vswhere -OutputDirectory %toolsFolder% -Verbosity quiet
+	"%nuGetExecutable%" install vswhere -OutputDirectory tools -Verbosity quiet
 )
 
 :: Put 7za.exe and vswhere.exe in a predictable path (not version specific)
-FOR /f "delims=" %%A in ('dir %toolsFolder%7-Zip.CommandLine.* /b') DO SET "sevenZipExePath=%toolsFolder%%%A\"
-MOVE %sevenZipExePath%tools\7za.exe %toolsFolder%7za.exe
+FOR /f "delims=" %%A in ('dir "%toolsFolder%7-Zip.CommandLine.*" /b') DO SET "sevenZipExePath=%toolsFolder%%%A\"
+MOVE "%sevenZipExePath%tools\7za.exe" "%toolsFolder%7za.exe"
 
-FOR /f "delims=" %%A in ('dir %toolsFolder%vswhere.* /b') DO SET "vswhereExePath=%toolsFolder%%%A\"
-MOVE %vswhereExePath%tools\vswhere.exe %toolsFolder%vswhere.exe
+FOR /f "delims=" %%A in ('dir "%toolsFolder%vswhere.*" /b') DO SET "vswhereExePath=%toolsFolder%%%A\"
+MOVE "%vswhereExePath%tools\vswhere.exe" "%toolsFolder%vswhere.exe"
 
 ECHO.
 ECHO Making sure we have a web.config
 IF NOT EXIST "%CD%\..\src\Umbraco.Web.UI\web.config" COPY "%CD%\..\src\Umbraco.Web.UI\web.Template.config" "%CD%\..\src\Umbraco.Web.UI\web.config"
 
-for /f "usebackq tokens=1* delims=: " %%i in (`%CD%\tools\vswhere.exe -latest -requires Microsoft.Component.MSBuild`) do (
+for /f "usebackq tokens=1* delims=: " %%i in (`"%CD%\tools\vswhere.exe" -latest -requires Microsoft.Component.MSBuild`) do (
   if /i "%%i"=="installationPath" set InstallDir=%%j
 )
 
