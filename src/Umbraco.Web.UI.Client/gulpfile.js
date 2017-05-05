@@ -54,10 +54,11 @@ var sources = {
     //processed in the less task
     less: {
         installer: { files: ["src/less/installer.less"], out: "installer.css" },
+        nonodes: { files: ["src/less/pages/nonodes.less"], out: "nonodes.style.min.css"},
         preview: { files: ['src/less/canvas-designer.less', 'src/less/helveticons.less'], out: "canvasdesigner.css" },
         umbraco: { files: ["src/less/belle.less"], out: "umbraco.css" }
     },
-    
+
     //js files for backoffie
     //processed in the js task
     js: {
