@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void Umbraco_Helper_Not_Null()
         {
             var appCtx = new ApplicationContext(
-                new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(new Mock<IScopeProviderInternal>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
                 MockHelper.GetMockedServiceContext(),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

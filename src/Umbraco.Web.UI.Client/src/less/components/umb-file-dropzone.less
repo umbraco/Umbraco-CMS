@@ -7,9 +7,9 @@
     height: 400px;
     width: auto;
     padding: 50px 0;
-    border: 1px dashed @grayLight;
+    border: 1px dashed @gray-8;
     text-align: center;
-    color: @gray;
+    color: @gray-3;
     margin: 0 0 20px 0;
     position: relative;
     -webkit-transition: height 0.8s;
@@ -25,7 +25,7 @@
       }
     }
     &.drag-over {
-      border: 1px dashed @grayDark;
+      border: 1px dashed @gray-1;
     }
   }
 
@@ -42,13 +42,13 @@
   // file select link
   .file-select {
     font-size: 15px;
-    color: @blue;
+    color: @turquoise-d1;
     cursor: pointer;
 
     margin-top: 10px;
 
     &:hover {
-        color: @blueDark;
+        color: @turquoise-d1;
         text-decoration: underline;
     }
   }
@@ -57,7 +57,7 @@
   .file-list {
     list-style: none;
     margin: 0 0 30px 0;
-    background: @grayLighter;
+    background: @gray-10;
     padding: 10px 20px;
 
     .file {
@@ -66,7 +66,7 @@
       width: 100%;
       padding: 5px 0;
       position: relative;
-      border-top: 1px solid @grayLight;
+      border-top: 1px solid @gray-8;
       &:first-child {
         border-top: none;
       }
@@ -78,7 +78,7 @@
         animation: fadeOut 2s;
       }
       .file-description {
-        color: @grayDarker;
+        color: @gray-3;
         font-size: 12px;
         width: 100%;
         display: block;
@@ -119,7 +119,7 @@
       display: block;
       height: 100%;
       border-radius: 20px;
-      background-color: @blue;
+      background-color: @green;
       position: relative;
       overflow: hidden;
       width: 0;

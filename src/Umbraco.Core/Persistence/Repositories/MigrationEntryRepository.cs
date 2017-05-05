@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class MigrationEntryRepository : PetaPocoRepositoryBase<int, IMigrationEntry>, IMigrationEntryRepository
     {
-        public MigrationEntryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public MigrationEntryRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }

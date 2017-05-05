@@ -6,5 +6,5 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	public interface IDatabaseUnitOfWorkProvider
 	{
 		IDatabaseUnitOfWork GetUnitOfWork();
-	}
+    }
 }

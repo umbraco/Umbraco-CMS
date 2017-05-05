@@ -6,12 +6,12 @@
     It also highlights the current active page/section in the navigation with the css class "current".
 *@
 
-@{ var selection = CurrentPage.Site().Children.Where("Visible"); }
+@{ var selection = Model.Content.Site().Children(x => x.IsVisible() ); }
 
 <ul>
     @foreach (var item in selection)
     {
-        <li class="@(item.IsAncestorOrSelf(CurrentPage) ? "current" : null)">
+        <li class="@(item.IsAncestorOrSelf(Model.Content, "current"))">
             <a href="@item.Url">@item.Name</a>
         </li>
     }

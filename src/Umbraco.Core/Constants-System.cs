@@ -26,15 +26,9 @@
             public const int DefaultMediaListViewDataTypeId = -96;
             public const int DefaultMembersListViewDataTypeId = -97;
 
-            // identifiers for lock objects
-            public const int ServersLock = -331;
+            public const string UmbracoConnectionName = "umbracoDbDSN";
+            public const string UmbracoMigrationName = "Umbraco";
         }
-
-        public static class DatabaseProviders
-        {
-            public const string SqlCe = "System.Data.SqlServerCe.4.0";
-            public const string SqlServer = "System.Data.SqlClient";
-            public const string MySql = "MySql.Data.MySqlClient";
-        }
+        
     }
 }

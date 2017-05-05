@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Web;
 using System.Web.Security;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web
 {
@@ -14,16 +13,19 @@ namespace Umbraco.Web
         /// Returns the configuration of the membership provider used to configure change password editors
         /// </summary>
         /// <param name="membershipProvider"></param>
+        /// <param name="userService"></param>
         /// <returns></returns>
         public static IDictionary<string, object> GetConfiguration(
-            this MembershipProvider membershipProvider)
+            this MembershipProvider membershipProvider, IUserService userService)
         {
             var baseProvider = membershipProvider as MembershipProviderBase;
-            
+
+            var canReset = membershipProvider.CanResetPassword(userService);
+
             return new Dictionary<string, object>
                 {
                     {"minPasswordLength", membershipProvider.MinRequiredPasswordLength},
-                    {"enableReset", membershipProvider.EnablePasswordReset},
+                    {"enableReset", canReset},
                     {"enablePasswordRetrieval", membershipProvider.EnablePasswordRetrieval},
                     {"requiresQuestionAnswer", membershipProvider.RequiresQuestionAndAnswer},
                     {"allowManuallyChangingPassword", baseProvider != null && baseProvider.AllowManuallyChangingPassword}

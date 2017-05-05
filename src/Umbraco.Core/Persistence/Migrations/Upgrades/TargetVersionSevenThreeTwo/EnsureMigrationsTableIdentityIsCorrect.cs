@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeTw
     /// This reinserts all migrations in the migrations table to account for initial rows inserted
     /// on creation without identity enabled.
     /// </summary>
-    [Migration("7.3.2", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.2", 0, Constants.System.UmbracoMigrationName)]
     public class EnsureMigrationsTableIdentityIsCorrect : MigrationBase
     {
         public EnsureMigrationsTableIdentityIsCorrect(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

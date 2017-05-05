@@ -232,6 +232,10 @@ namespace Umbraco.Tests.Services
             var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             ServiceContext.MemberService.Save(member2);
 
+            // temp make sure they exist
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member1.Id));
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member2.Id));
+
             ServiceContext.MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1" });
 
             var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
@@ -493,6 +497,29 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(10, totalRecs);
             Assert.AreEqual("test0", found.First().Username);
             Assert.AreEqual("test1", found.Last().Username);
+        }
+
+        [Test]
+        public void Get_All_Paged_Members_With_Filter()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10);
+            ServiceContext.MemberService.Save(members);
+
+            long totalRecs;
+            var found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-");
+
+            Assert.AreEqual(2, found.Count());
+            Assert.AreEqual(10, totalRecs);
+            Assert.AreEqual("test0", found.First().Username);
+            Assert.AreEqual("test1", found.Last().Username);
+            
+            found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-5");
+
+            Assert.AreEqual(1, found.Count());
+            Assert.AreEqual(1, totalRecs);
+            Assert.AreEqual("test5", found.First().Username);
         }
 
         [Test]

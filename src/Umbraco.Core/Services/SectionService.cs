@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using File = System.IO.File;
 
@@ -19,7 +17,7 @@ namespace Umbraco.Core.Services
         private readonly IUserService _userService;
         private IEnumerable<Section> _allAvailableSections;
         private readonly IApplicationTreeService _applicationTreeService;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
         private readonly CacheHelper _cache;
         internal const string AppConfigFileName = "applications.config";
         private static string _appConfig;
@@ -29,7 +27,7 @@ namespace Umbraco.Core.Services
         public SectionService(
             IUserService userService,
             IApplicationTreeService applicationTreeService,
-            IDatabaseUnitOfWorkProvider uowProvider,
+            IScopeUnitOfWorkProvider uowProvider,
             CacheHelper cache)
         {
             if (applicationTreeService == null) throw new ArgumentNullException("applicationTreeService");
@@ -249,9 +247,13 @@ namespace Umbraco.Core.Services
             lock (Locker)
             {
                 //delete the assigned applications
-                _uowProvider.GetUnitOfWork().Database.Execute(
-                    "delete from umbracoUser2App where app = @appAlias",
-                    new { appAlias = section.Alias });
+                using (var uow = _uowProvider.GetUnitOfWork())
+                {
+                    uow.Database.Execute(
+                        "delete from umbracoUser2App where app = @appAlias",
+                        new { appAlias = section.Alias });
+                    uow.Commit();
+                }
 
                 //delete the assigned trees
                 var trees = _applicationTreeService.GetApplicationTrees(section.Alias);

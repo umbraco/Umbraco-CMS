@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Moq;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -46,7 +47,7 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Create_Db_Context()
         {
-            var dbCtx = new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
+            var dbCtx = new DatabaseContext(new Mock<IScopeProviderInternal>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
             Assert.Pass();
         }
 
@@ -54,7 +55,7 @@ namespace Umbraco.Tests
         public void Can_Create_App_Context_With_Services()
         {
             var appCtx = new ApplicationContext(
-                new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(new Mock<IScopeProviderInternal>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
                 MockHelper.GetMockedServiceContext(),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

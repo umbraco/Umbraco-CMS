@@ -12,7 +12,7 @@
   padding-right: 7px;
 }
 
-.icon.handle{color: @grayLight;}
+.icon.handle{color: @gray-8;}
 
 
 // BASE CLASS
@@ -31,7 +31,7 @@
 .nav > li > a:hover,
 .nav > li > a:focus {
   text-decoration: none;
-  background-color: @grayLighter;
+  background-color: @gray-10;
 }
 
 // Prevent IE8 from misplacing imgs
@@ -49,11 +49,10 @@
 .nav-header {
   display: block;
   padding: 3px 15px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: bold;
   line-height: @baseLineHeight;
-  color: @grayLight;
-  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  color: @gray-8;
   text-transform: uppercase;
 }
 // Space them out when they follow another list item (link)
@@ -75,7 +74,6 @@
 .nav-list .nav-header {
   margin-left:  -15px;
   margin-right: -15px;
-  text-shadow: 0 1px 0 rgba(255,255,255,.5);
 }
 .nav-list > li > a {
   padding: 3px 15px;
@@ -84,7 +82,6 @@
 .nav-list > .active > a:hover,
 .nav-list > .active > a:focus {
   color: @white;
-  text-shadow: 0 -1px 0 rgba(0,0,0,.2);
   background-color: @linkColor;
 }
 .nav-list [class^="icon-"],
@@ -116,6 +113,7 @@
   padding-left: 8px;
   margin-right: 2px;
   line-height: 14px; // keeps the overall height an even number
+  border-radius: 3px 3px 0 0;
 }
 
 // TABS
@@ -123,7 +121,7 @@
 
 // Give the tabs something to sit on
 .nav-tabs {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid @purple-l3;
 }
 // Make the list-items overlay the bottom border
 .nav-tabs > li {
@@ -131,7 +129,7 @@
 }
 // Actual tabs (as links)
 .nav-tabs > li > a {
-  color: @gray;
+  color: @gray-3;
   padding-top: 5px;
   padding-bottom: 4px;
   line-height: @baseLineHeight;
@@ -142,7 +140,7 @@
   }
   &:hover,
   &:focus {
-    border-color: @grayLighter @grayLighter #ddd;
+    border-color: transparent transparent @purple-l3;
   }
 }
 // Active state, and it's :hover/:focus to override normal :hover/:focus
@@ -151,7 +149,7 @@
 .nav-tabs > .active > a:focus {
   color: @black;
   background-color: @bodyBackground;
-  border: 1px solid #ddd;
+  border: 1px solid @purple-l3;
   border-bottom-color: transparent;
   cursor: default;
 }
@@ -219,7 +217,7 @@
   border-bottom: 0;
 }
 .nav-tabs.nav-stacked > li > a {
-  border: 1px solid #ddd;
+  border: 1px solid @gray-8;
   .border-radius(0);
 }
 .nav-tabs.nav-stacked > li:first-child > a {
@@ -230,7 +228,7 @@
 }
 .nav-tabs.nav-stacked > li > a:hover,
 .nav-tabs.nav-stacked > li > a:focus {
-  border-color: #ddd;
+  border-color: @gray-8;
   z-index: 2;
 }
 
@@ -256,7 +254,7 @@
 }
 
 .nav-tabs .dropdown-menu {
-  .border-radius(0 0 6px 6px); // remove the top rounded corners here since there is a hard edge above the menu
+  .border-radius(0 0 3px 3px); // remove the top rounded corners here since there is a hard edge above the menu
 }
 .nav-pills .dropdown-menu {
   .border-radius(6px); // make rounded corners match the pills
@@ -283,12 +281,12 @@
 // Active dropdown links
 // -------------------------
 .nav .active .dropdown-toggle .caret {
-  border-top-color: #fff;
-  border-bottom-color: #fff;
+  border-top-color: @white;
+  border-bottom-color: @white;
 }
 .nav-tabs .active .dropdown-toggle .caret {
-  border-top-color: @gray;
-  border-bottom-color: @gray;
+  border-top-color: @gray-3;
+  border-bottom-color: @gray-3;
 }
 
 // Active:hover/:focus dropdown links
@@ -305,8 +303,8 @@
 .nav > li.dropdown.open.active > a:hover,
 .nav > li.dropdown.open.active > a:focus {
   /*color: @white;*/
-  background-color: @grayLight;
-  border-color: @grayLight;
+  background-color: @gray-8;
+  border-color: @gray-8;
 }
 .nav li.dropdown.open .caret,
 .nav li.dropdown.open.active .caret,
@@ -320,7 +318,7 @@
 // Dropdowns in stacked tabs
 .tabs-stacked .open > a:hover,
 .tabs-stacked .open > a:focus {
-  border-color: @grayLight;
+  border-color: @gray-8;
 }
 
 
@@ -362,7 +360,7 @@
 // ------
 
 .tabs-below > .nav-tabs {
-  border-top: 1px solid #ddd;
+  border-top: 1px solid @gray-8;
 }
 .tabs-below > .nav-tabs > li {
   margin-top: -1px;
@@ -373,13 +371,13 @@
   &:hover,
   &:focus {
     border-bottom-color: transparent;
-    border-top-color: #ddd;
+    border-top-color: @gray-8;
   }
 }
 .tabs-below > .nav-tabs > .active > a,
 .tabs-below > .nav-tabs > .active > a:hover,
 .tabs-below > .nav-tabs > .active > a:focus {
-  border-color: transparent #ddd #ddd #ddd;
+  border-color: transparent @gray-8 @gray-8 @gray-8;
 }
 
 // LEFT & RIGHT
@@ -401,7 +399,7 @@
 .tabs-left > .nav-tabs {
   float: left;
   margin-right: 19px;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid @gray-8;
 }
 .tabs-left > .nav-tabs > li > a {
   margin-right: -1px;
@@ -409,12 +407,12 @@
 }
 .tabs-left > .nav-tabs > li > a:hover,
 .tabs-left > .nav-tabs > li > a:focus {
-  border-color: @grayLighter #ddd @grayLighter @grayLighter;
+  border-color: @gray-10 @gray-8 @gray-10 @gray-10;
 }
 .tabs-left > .nav-tabs .active > a,
 .tabs-left > .nav-tabs .active > a:hover,
 .tabs-left > .nav-tabs .active > a:focus {
-  border-color: #ddd transparent #ddd #ddd;
+  border-color: @gray-8 transparent @gray-8 @gray-8;
   *border-right-color: @white;
 }
 
@@ -422,7 +420,7 @@
 .tabs-right > .nav-tabs {
   float: right;
   margin-left: 19px;
-  border-left: 1px solid #ddd;
+  border-left: 1px solid @gray-8;
 }
 .tabs-right > .nav-tabs > li > a {
   margin-left: -1px;
@@ -430,12 +428,12 @@
 }
 .tabs-right > .nav-tabs > li > a:hover,
 .tabs-right > .nav-tabs > li > a:focus {
-  border-color: @grayLighter @grayLighter @grayLighter #ddd;
+  border-color: @gray-10 @gray-10 @gray-10 @gray-8;
 }
 .tabs-right > .nav-tabs .active > a,
 .tabs-right > .nav-tabs .active > a:hover,
 .tabs-right > .nav-tabs .active > a:focus {
-  border-color: #ddd #ddd #ddd transparent;
+  border-color: @gray-8 @gray-8 @gray-8 transparent;
   *border-left-color: @white;
 }
 
@@ -446,7 +444,7 @@
 
 // Gray out text
 .nav > .disabled > a {
-  color: @grayLight;
+  color: @gray-8;
 }
 // Nuke hover/focus effects
 .nav > .disabled > a:hover,

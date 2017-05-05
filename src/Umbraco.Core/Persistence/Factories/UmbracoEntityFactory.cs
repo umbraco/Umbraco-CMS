@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.ContentTypeThumbnail = asDictionary.ContainsKey("thumbnail") ? (d.thumbnail ?? string.Empty) : string.Empty;
 
                 var publishedVersion = default(Guid);
-                //some content items don't have a published version
+                //some content items don't have a published/newest version
                 if (asDictionary.ContainsKey("publishedVersion") && asDictionary["publishedVersion"] != null)
                 {
                     Guid.TryParse(d.publishedVersion.ToString(), out publishedVersion);

@@ -1,6 +1,6 @@
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
-@{ var selection = CurrentPage.Children.Where("Visible"); }
+@{ var selection = Model.Content.Children.Where(x => x.IsVisible() ); }
 
 @if (selection.Any())
 {

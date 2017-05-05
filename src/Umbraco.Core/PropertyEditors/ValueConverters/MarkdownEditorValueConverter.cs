@@ -4,6 +4,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(IHtmlString))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MarkdownEditorValueConverter : PropertyValueConverterBase

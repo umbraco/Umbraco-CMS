@@ -28,15 +28,15 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
 
-        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection)
+        public MediaRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax, contentSection)
         {
             if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _mediaTypeRepository = mediaTypeRepository;
             _tagRepository = tagRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
-            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.NoCache, logger, sqlSyntax);
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.NoCache, logger, sqlSyntax);
             EnsureUniqueNaming = contentSection.EnsureUniqueNaming;
         }
 
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // if the cache contains the item, use it
                 if (withCache)
                 {
-                    var cached = RuntimeCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
                     //only use this cached version if the dto returned is the same version - this is just a safety check, media doesn't 
                     //store different versions, but just in case someone corrupts some data we'll double check to be sure.
                     if (cached != null && cached.Version == dto.VersionId)
@@ -330,6 +330,11 @@ namespace Umbraco.Core.Persistence.Repositories
         public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
         {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(content, xml));
+        }
+
+        public void DeleteContentXml(IMedia content)
+        {
+            _contentXmlRepository.Delete(new ContentXmlEntity<IMedia>(content));
         }
 
         public void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml)
@@ -530,25 +535,18 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter = null)
         {
-            var args = new List<object>();
-            var sbWhere = new StringBuilder();
-            Func<Tuple<string, object[]>> filterCallback = null;
-            if (filter.IsNullOrWhiteSpace() == false)
+            var filterSql = new Sql();
+            if (filter != null)
             {
-                sbWhere
-                    .Append("AND (")
-                    .Append(SqlSyntax.GetQuotedTableName("umbracoNode"))
-                    .Append(".")
-                    .Append(SqlSyntax.GetQuotedColumnName("text"))
-                    .Append(" LIKE @")
-                    .Append(args.Count)
-                    .Append(")");
-                args.Add("%" + filter + "%");
-
-                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
+                foreach (var filterClaus in filter.GetWhereClauses())
+                {
+                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
+                }
             }
+
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);
 
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsContentVersion", "contentId"),

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
@@ -162,6 +161,11 @@ namespace Umbraco.Core
     	/// </summary>
     	public static ApplicationContext Current { get; internal set; }
 
+        /// <summary>
+        /// Gets the scope provider.
+        /// </summary>
+        internal IScopeProvider ScopeProvider { get { return _databaseContext == null ? null : _databaseContext.ScopeProvider; } }
+
 		/// <summary>
 		/// Returns the application wide cache accessor
 		/// </summary>
@@ -296,7 +300,7 @@ namespace Umbraco.Core
                         // if we have a db context available, if we don't then we are not installed anyways
                         if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.CanConnect)
                         {
-                            var found = Services.MigrationEntryService.FindEntry(GlobalSettings.UmbracoMigrationName, UmbracoVersion.GetSemanticVersion());
+                            var found = Services.MigrationEntryService.FindEntry(Constants.System.UmbracoMigrationName, UmbracoVersion.GetSemanticVersion());
                             if (found == null)
                             {
                                 //we haven't executed this migration in this environment, so even though the config versions match, 
@@ -418,10 +422,17 @@ namespace Umbraco.Core
                 this.ApplicationCache = null;
                 if (_databaseContext != null) //need to check the internal field here
                 {
+                    if (_databaseContext.ScopeProvider.AmbientScope != null)
+                    {
+                        var scope = _databaseContext.ScopeProvider.AmbientScope;
+                        scope.Dispose();
+                    }
+                    /*
                     if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.Database != null)
                     {
                         DatabaseContext.Database.Dispose();       
-                    }                    
+                    } 
+                    */                   
                 }
                 this.DatabaseContext = null;
                 this.Services = null;

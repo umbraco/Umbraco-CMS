@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,12 +7,16 @@ namespace Umbraco.Web.Scheduling
     /// <summary>
     /// Provides a base class for recurring background tasks.
     /// </summary>
-    internal abstract class RecurringTaskBase : LatchedBackgroundTaskBase
+    /// <remarks>Implement by overriding PerformRun or PerformRunAsync and then IsAsync accordingly,
+    /// depending on whether the task is implemented as a sync or async method. Run nor RunAsync are
+    /// sealed here as overriding them would break recurrence. And then optionnally override
+    /// RunsOnShutdown, in order to indicate whether the latched task should run immediately on
+    /// shutdown, or just be abandonned (default).</remarks>
+    public abstract class RecurringTaskBase : LatchedBackgroundTaskBase
     {
         private readonly IBackgroundTaskRunner<RecurringTaskBase> _runner;
         private readonly int _periodMilliseconds;
         private readonly Timer _timer;
-        private bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecurringTaskBase"/> class.
@@ -37,7 +42,7 @@ namespace Umbraco.Web.Scheduling
         /// Implements IBackgroundTask.Run().
         /// </summary>
         /// <remarks>Classes inheriting from <c>RecurringTaskBase</c> must implement <c>PerformRun</c>.</remarks>
-        public override void Run()
+        public sealed override void Run()
         {
             var shouldRepeat = PerformRun();
             if (shouldRepeat) Repeat();
@@ -47,7 +52,7 @@ namespace Umbraco.Web.Scheduling
         /// Implements IBackgroundTask.RunAsync().
         /// </summary>
         /// <remarks>Classes inheriting from <c>RecurringTaskBase</c> must implement <c>PerformRun</c>.</remarks>
-        public override async Task RunAsync(CancellationToken token)
+        public sealed override async Task RunAsync(CancellationToken token)
         {
             var shouldRepeat = await PerformRunAsync(token);
             if (shouldRepeat) Repeat();
@@ -74,7 +79,10 @@ namespace Umbraco.Web.Scheduling
         /// Runs the background task.
         /// </summary>
         /// <returns>A value indicating whether to repeat the task.</returns>
-        public abstract bool PerformRun();
+        public virtual bool PerformRun()
+        {
+            throw new NotSupportedException("This task cannot run synchronously.");
+        }
 
         /// <summary>
         /// Runs the task asynchronously.
@@ -82,7 +90,10 @@ namespace Umbraco.Web.Scheduling
         /// <param name="token">A cancellation token.</param>
         /// <returns>A <see cref="Task{T}"/> instance representing the execution of the background task,
         /// and returning a value indicating whether to repeat the task.</returns>
-        public abstract Task<bool> PerformRunAsync(CancellationToken token);
+        public virtual Task<bool> PerformRunAsync(CancellationToken token)
+        {
+            throw new NotSupportedException("This task cannot run asynchronously.");
+        }
 
         protected override void DisposeResources()
         {

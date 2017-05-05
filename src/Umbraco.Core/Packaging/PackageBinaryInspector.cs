@@ -29,20 +29,24 @@ namespace Umbraco.Core.Packaging
         /// </remarks>
         public static IEnumerable<string> ScanAssembliesForTypeReference<T>(IEnumerable<byte[]> assemblys, out string[] errorReport)
         {
-            var appDomain = GetTempAppDomain();
-            var type = typeof(PackageBinaryInspector);
-            try
+            // beware! when toying with domains, use a safe call context!
+            using (new SafeCallContext())
             {
-                var value = (PackageBinaryInspector)appDomain.CreateInstanceAndUnwrap(
-                       type.Assembly.FullName,
-                       type.FullName);
-                // do NOT turn PerformScan into static (even if ReSharper says so)!
-                var result = value.PerformScan<T>(assemblys.ToArray(), out errorReport);
-                return result;
-            }
-            finally
-            {
-                AppDomain.Unload(appDomain);
+                var appDomain = GetTempAppDomain();
+                var type = typeof(PackageBinaryInspector);
+                try
+                {
+                    var value = (PackageBinaryInspector) appDomain.CreateInstanceAndUnwrap(
+                        type.Assembly.FullName,
+                        type.FullName);
+                    // do NOT turn PerformScan into static (even if ReSharper says so)!
+                    var result = value.PerformScan<T>(assemblys.ToArray(), out errorReport);
+                    return result;
+                }
+                finally
+                {
+                    AppDomain.Unload(appDomain);
+                }
             }
         }
 
@@ -78,7 +82,7 @@ namespace Umbraco.Core.Packaging
         /// <summary>
         /// Performs the assembly scanning
         /// </summary>
-        /// <typeparam name="T"></typeparam>        
+        /// <typeparam name="T"></typeparam>
         /// <param name="assemblies"></param>
         /// <param name="errorReport"></param>
         /// <returns></returns>
@@ -107,7 +111,7 @@ namespace Umbraco.Core.Packaging
         /// <summary>
         /// Performs the assembly scanning
         /// </summary>
-        /// <typeparam name="T"></typeparam>        
+        /// <typeparam name="T"></typeparam>
         /// <param name="dllPath"></param>
         /// <param name="errorReport"></param>
         /// <returns></returns>
@@ -154,7 +158,7 @@ namespace Umbraco.Core.Packaging
 
             //get the list of assembly names to compare below
             var loadedNames = loaded.Select(x => x.GetName().Name).ToArray();
-            
+
             //Then load each referenced assembly into the context
             foreach (var a in loaded)
             {
@@ -170,7 +174,7 @@ namespace Umbraco.Core.Packaging
                     }
                     catch (FileNotFoundException)
                     {
-                        //if an exception occurs it means that a referenced assembly could not be found                        
+                        //if an exception occurs it means that a referenced assembly could not be found
                         errors.Add(
                             string.Concat("This package references the assembly '",
                                           assemblyName.Name,
@@ -179,7 +183,7 @@ namespace Umbraco.Core.Packaging
                     }
                     catch (Exception ex)
                     {
-                        //if an exception occurs it means that a referenced assembly could not be found                        
+                        //if an exception occurs it means that a referenced assembly could not be found
                         errors.Add(
                             string.Concat("This package could not be verified for compatibility. An error occurred while loading a referenced assembly '",
                                           assemblyName.Name,
@@ -197,7 +201,7 @@ namespace Umbraco.Core.Packaging
             {
                 //now we need to see if they contain any type 'T'
                 var reflectedAssembly = a;
-                
+
                 try
                 {
                     var found = reflectedAssembly.GetExportedTypes()
@@ -210,8 +214,8 @@ namespace Umbraco.Core.Packaging
                 }
                 catch (Exception ex)
                 {
-                    //This is a hack that nobody can seem to get around, I've read everything and it seems that 
-                    // this is quite a common thing when loading types into reflection only load context, so 
+                    //This is a hack that nobody can seem to get around, I've read everything and it seems that
+                    // this is quite a common thing when loading types into reflection only load context, so
                     // we're just going to ignore this specific one for now
                     var typeLoadEx = ex as TypeLoadException;
                     if (typeLoadEx != null)
@@ -232,7 +236,7 @@ namespace Umbraco.Core.Packaging
                         LogHelper.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
                     }
                 }
-                
+
             }
 
             errorReport = errors.ToArray();
@@ -252,7 +256,7 @@ namespace Umbraco.Core.Packaging
 
             var contractType = contractAssemblyLoadFrom.GetExportedTypes()
                 .FirstOrDefault(x => x.FullName == typeof(T).FullName && x.Assembly.FullName == typeof(T).Assembly.FullName);
-            
+
             if (contractType == null)
             {
                 throw new InvalidOperationException("Could not find type " + typeof(T) + " in the LoadFrom assemblies");
@@ -281,12 +285,8 @@ namespace Umbraco.Core.Packaging
                     PrivateBinPathProbe = AppDomain.CurrentDomain.SetupInformation.PrivateBinPathProbe
                 };
 
-            //create new domain with full trust
-            return AppDomain.CreateDomain(
-                appName,
-                AppDomain.CurrentDomain.Evidence,
-                domainSetup,
-                new PermissionSet(PermissionState.Unrestricted));
+            // create new domain with full trust
+            return AppDomain.CreateDomain(appName, AppDomain.CurrentDomain.Evidence, domainSetup, new PermissionSet(PermissionState.Unrestricted));
         }
     }
 }

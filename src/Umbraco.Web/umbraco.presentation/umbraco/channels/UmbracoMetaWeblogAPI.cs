@@ -450,7 +450,7 @@ namespace umbraco.presentation.channels
                     Property fileObject = m.getProperty(userChannel.MediaTypeFileProperty);
                     
                     var filename = file.name.Replace("/", "_");
-                    var relativeFilePath = _fs.GetRelativePath(fileObject.Id, filename);
+                    var relativeFilePath = UmbracoMediaFactory.GetRelativePath(fileObject.Id, filename);
 
                     fileObject.Value = _fs.GetUrl(relativeFilePath);
                     fileUrl.url = fileObject.Value.ToString();

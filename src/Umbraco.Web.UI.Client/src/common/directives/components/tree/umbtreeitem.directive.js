@@ -27,6 +27,7 @@ angular.module("umbraco.directives")
             section: '@',
             eventhandler: '=',
             currentNode: '=',
+            enablelistviewexpand: '@',
             node: '=',
             tree: '='
         },
@@ -38,7 +39,7 @@ angular.module("umbraco.directives")
             '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
-            '<ins ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)">&nbsp;</ins>' +
+            '<ins ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
             '<a href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
@@ -74,11 +75,12 @@ angular.module("umbraco.directives")
 
                 //toggle visibility of last 'ins' depending on children
                 //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
-                if (!node.hasChildren) {
-                    element.find("ins").last().css("visibility", "hidden");
+                
+                if (node.hasChildren || node.metaData.isContainer && scope.enablelistviewexpand === "true") {
+                    element.find("ins").last().css("visibility", "visible");
                 }
                 else {
-                    element.find("ins").last().css("visibility", "visible");
+                    element.find("ins").last().css("visibility", "hidden");
                 }
 
                 var icon = element.find("i:first");
@@ -192,7 +194,7 @@ angular.module("umbraco.directives")
               emits treeNodeCollapsing event if already expanded and treeNodeExpanding if collapsed
             */
             scope.load = function (node) {
-                if (node.expanded) {
+                if (node.expanded && !node.metaData.isContainer) {
                     deleteAnimations = false;
                     emitEvent("treeNodeCollapsing", { tree: scope.tree, node: node, element: element });
                     node.expanded = false;
@@ -227,7 +229,7 @@ angular.module("umbraco.directives")
 
             setupNodeDom(scope.node, scope.tree);
 
-            var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
+            var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" enablelistviewexpand="{{enablelistviewexpand}}" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
             var newElement = angular.element(template);
             $compile(newElement)(scope);
             element.append(newElement);

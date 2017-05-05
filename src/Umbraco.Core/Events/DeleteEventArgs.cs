@@ -1,8 +1,14 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Events
 {
-	public class DeleteEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
+    [SupersedeEvent(typeof(SaveEventArgs<>))]
+    [SupersedeEvent(typeof(PublishEventArgs<>))]
+    [SupersedeEvent(typeof(MoveEventArgs<>))]
+    [SupersedeEvent(typeof(CopyEventArgs<>))]
+    public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<DeleteEventArgs<TEntity>>, IDeletingMediaFilesEventArgs
 	{
 	    /// <summary>
 	    /// Constructor accepting multiple entities that are used in the delete operation
@@ -99,10 +105,43 @@ namespace Umbraco.Core.Events
         /// <summary>
         /// A list of media files that can be added to during a deleted operation for which Umbraco will ensure are removed
         /// </summary>
-        public List<string> MediaFilesToDelete { get; private set; } 
+        public List<string> MediaFilesToDelete { get; private set; }
+
+	    public bool Equals(DeleteEventArgs<TEntity> other)
+	    {
+	        if (ReferenceEquals(null, other)) return false;
+	        if (ReferenceEquals(this, other)) return true;
+	        return base.Equals(other) && MediaFilesToDelete.SequenceEqual(other.MediaFilesToDelete);
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+	        if (ReferenceEquals(null, obj)) return false;
+	        if (ReferenceEquals(this, obj)) return true;
+	        if (obj.GetType() != this.GetType()) return false;
+	        return Equals((DeleteEventArgs<TEntity>) obj);
+	    }
+
+	    public override int GetHashCode()
+	    {
+	        unchecked
+	        {
+	            return (base.GetHashCode() * 397) ^ MediaFilesToDelete.GetHashCode();
+	        }
+	    }
+
+	    public static bool operator ==(DeleteEventArgs<TEntity> left, DeleteEventArgs<TEntity> right)
+	    {
+	        return Equals(left, right);
+	    }
+
+	    public static bool operator !=(DeleteEventArgs<TEntity> left, DeleteEventArgs<TEntity> right)
+	    {
+	        return !Equals(left, right);
+	    }
 	}
 
-	public class DeleteEventArgs : CancellableEventArgs
+	public class DeleteEventArgs : CancellableEventArgs, IEquatable<DeleteEventArgs>
 	{
         public DeleteEventArgs(int id, bool canCancel, EventMessages eventMessages)
             : base(canCancel, eventMessages)
@@ -125,5 +164,38 @@ namespace Umbraco.Core.Events
 		/// Gets the Id of the object being deleted.
 		/// </summary>
 		public int Id { get; private set; }
+
+	    public bool Equals(DeleteEventArgs other)
+	    {
+	        if (ReferenceEquals(null, other)) return false;
+	        if (ReferenceEquals(this, other)) return true;
+	        return base.Equals(other) && Id == other.Id;
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+	        if (ReferenceEquals(null, obj)) return false;
+	        if (ReferenceEquals(this, obj)) return true;
+	        if (obj.GetType() != this.GetType()) return false;
+	        return Equals((DeleteEventArgs) obj);
+	    }
+
+	    public override int GetHashCode()
+	    {
+	        unchecked
+	        {
+	            return (base.GetHashCode() * 397) ^ Id;
+	        }
+	    }
+
+	    public static bool operator ==(DeleteEventArgs left, DeleteEventArgs right)
+	    {
+	        return Equals(left, right);
+	    }
+
+	    public static bool operator !=(DeleteEventArgs left, DeleteEventArgs right)
+	    {
+	        return !Equals(left, right);
+	    }
 	}
 }

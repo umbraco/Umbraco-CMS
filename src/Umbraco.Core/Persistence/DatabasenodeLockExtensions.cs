@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence
         {
             ValidateDatabase(database);
 
-            database.Execute("UPDATE umbracoNode SET sortOrder = (CASE WHEN (sortOrder=1) THEN -1 ELSE 1 END) WHERE id=@id",
+            database.Execute("UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id",
                 new { @id = nodeId });
         }
 
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence
         {
             ValidateDatabase(database);
 
-            database.ExecuteScalar<int>("SELECT sortOrder FROM umbracoNode WHERE id=@id",
+            database.ExecuteScalar<int>("SELECT value FROM umbracoLock WHERE id=@id",
                 new { @id = nodeId });
         }
     }

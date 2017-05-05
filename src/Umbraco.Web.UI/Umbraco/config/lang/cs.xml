@@ -676,7 +676,7 @@
   <area alias="publicAccess">
     <key alias="paAdvanced">Ochrana prostřednictvím rolí</key>
     <key alias="paAdvancedHelp"><![CDATA[Pokud si přejete řídit přístup ke stránce za použití autentizace prostřednictvím rolí,<br /> použijte členské skupiny umbraca.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Musíte vytvořit členskou skupinu před tím, než můžete použít <br />autentizaci prostřednictvím rolí]]></key>
+    <key alias="paAdvancedNoGroups">Musíte vytvořit členskou skupinu před tím, než můžete použít autentizaci prostřednictvím rolí</key>
     <key alias="paErrorPage">Chybová stránka</key>
     <key alias="paErrorPageHelp">Použita, když jsou lidé přihlášení, ale nemají přístup</key>
     <key alias="paHowWould">Vyberte, jak omezit přístup k této stránce</key>

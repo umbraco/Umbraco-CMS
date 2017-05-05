@@ -46,16 +46,21 @@
 
 				<div class="control-group">
 					<div class="controls">
-						<label class="checkbox">
-							<input type="checkbox" id="subscribeToNewsLetter" name="subscribeToNewsLetter"
-							       ng-model="installer.current.model.subscribeToNewsLetter" /> Keep me updated on Umbraco Versions, Security Bulletins and Community News</label>
+						<label>
+							<input
+								type="checkbox" 
+								id="subscribeToNewsLetter" 
+								name="subscribeToNewsLetter"
+							    ng-model="installer.current.model.subscribeToNewsLetter" /> 
+							Keep me updated on Umbraco Versions, Security Bulletins and Community News
+						</label>
 					</div>
 				</div>
 
 				<div class="control-group" ng-class="{disabled:myForm.$invalid}">	
 					<div class="controls">
 						<input type="submit" ng-disabled="myForm.$invalid"  value="Install" class="btn btn-success" />	
-						<a href class="btn btn-neutral control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Customize</a>
+						<a href class="btn btn-info control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Customize</a>
 					</div>
 				</div>
 

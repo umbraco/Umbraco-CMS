@@ -18,6 +18,8 @@ using Umbraco.Web;
 using Umbraco.Web.Models.Mapping;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -42,7 +44,7 @@ namespace Umbraco.Tests.TestHelpers
 
             TestHelper.InitializeContentDirectories();
 
-            SetupCacheHelper();
+            CacheHelper = CreateCacheHelper();
 
             InitializeLegacyMappingsForCoreEditors();
 
@@ -60,7 +62,7 @@ namespace Umbraco.Tests.TestHelpers
         public override void TearDown()
         {
             base.TearDown();
-            
+
             // reset settings
             SettingsForTests.Reset();
             UmbracoContext.Current = null;
@@ -117,7 +119,7 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         /// <summary>
-        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan 
+        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan
         /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs
         /// to be set to true if the SetupPluginManager has been overridden.
         /// </summary>
@@ -135,12 +137,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 PluginManager.Current = null;
             }
-        }
-
-        protected virtual void SetupCacheHelper()
-        {
-            CacheHelper = CreateCacheHelper();
-        }
+        }        
 
         protected virtual CacheHelper CreateCacheHelper()
         {
@@ -154,6 +151,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             var applicationContext = CreateApplicationContext();
             ApplicationContext.Current = applicationContext;
+
+            // FileSystemProviderManager captures the current ApplicationContext ScopeProvider
+            // in its current static instance (yea...) so we need to reset it here to ensure
+            // it is using the proper ScopeProvider
+            FileSystemProviderManager.Current.Reset();
         }
 
         protected virtual ApplicationContext CreateApplicationContext()
@@ -161,17 +163,20 @@ namespace Umbraco.Tests.TestHelpers
             var sqlSyntax = new SqlCeSyntaxProvider();
             var repoFactory = new RepositoryFactory(CacheHelper, Logger, sqlSyntax, SettingsForTests.GenerateMockSettings());
 
+            var dbFactory = new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, Logger);
+            var scopeProvider = new ScopeProvider(dbFactory);
             var evtMsgs = new TransientMessagesFactory();
             var applicationContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger), Logger, sqlSyntax, Constants.DatabaseProviders.SqlCe),
+                new DatabaseContext(scopeProvider, Logger, sqlSyntax, Constants.DatabaseProviders.SqlCe),
                 //assign the service context
-                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
+                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), CacheHelper, Logger, evtMsgs),
                 CacheHelper,
                 ProfilingLogger)
             {
                 IsReady = true
             };
+
             return applicationContext;
         }
 
@@ -208,6 +213,11 @@ namespace Umbraco.Tests.TestHelpers
         protected virtual void FreezeResolution()
         {
             Resolution.Freeze();
+        }
+
+        protected ServiceContext ServiceContext
+        {
+            get { return ApplicationContext.Services; }
         }
 
         protected ApplicationContext ApplicationContext

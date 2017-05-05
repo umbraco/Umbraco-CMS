@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeOn
     /// <summary>
     /// This fixes the storage of user languages from the old format like en_us to en-US
     /// </summary>
-    [Migration("7.3.1", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.1", 0, Constants.System.UmbracoMigrationName)]
     public class UpdateUserLanguagesToIsoCode : MigrationBase
     {
         public UpdateUserLanguagesToIsoCode(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
