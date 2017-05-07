@@ -6,7 +6,7 @@
 
     <asp:Literal ID="FeedBackMessage" runat="server" />
 
-    <table class="propertyPane" id="Table1" cellspacing="0" cellpadding="4" width="360" border="0" runat="server">
+    <table class="propertyPane" id="Table1" cellspacing="0" cellpadding="4" border="0" runat="server">
       <tr>
         <td class="propertyContent" colspan="2">
           <asp:Panel ID="Wizard" runat="server" Visible="True">
@@ -19,9 +19,11 @@
             <p>
             <input id="documentTypeFile" type="file" runat="server" />
             </p>
-            
-            
-            <asp:Button ID="submit" runat="server"></asp:Button> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= umbraco.ui.Text("cancel") %></a>
+
+            <div class="btn-toolbar umb-btn-toolbar">
+                <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= umbraco.ui.Text("cancel") %></a>
+                <asp:Button ID="submit" runat="server" CssClass="btn btn-primary"></asp:Button>
+            </div>
           </asp:Panel>
           
           
@@ -37,7 +39,7 @@
             <asp:Literal ID="dtAlias" runat="server"></asp:Literal>
             <br />
             <br />
-            <asp:Button ID="import" runat="server"></asp:Button>
+            <asp:Button ID="import" runat="server" CssClass="btn btn-primary"></asp:Button>
           </asp:Panel>
           <asp:Panel ID="done" runat="server" Visible="False">
             <asp:Literal ID="dtNameConfirm" runat="server"></asp:Literal>

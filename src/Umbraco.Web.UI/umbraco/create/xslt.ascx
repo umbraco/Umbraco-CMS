@@ -3,12 +3,12 @@
 
 <cc1:Pane runat="server">
     <cc1:PropertyPanel runat="server" text="Filename (without .xslt)">
-        <asp:TextBox id="rename" Runat="server" CssClass="bigInput input-large-type input-block-level"></asp:TextBox>
+        <asp:TextBox id="rename" Runat="server" CssClass="umb-textstring textstring input-block-level"></asp:TextBox>
         <asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator>
     </cc1:PropertyPanel>
 
     <cc1:PropertyPanel runat="server" Text="Choose a snippet:">
-        <asp:ListBox id="xsltTemplate" Runat="server" CssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single">
+        <asp:ListBox id="xsltTemplate" Runat="server" CssClass="umb-textstring textstring input-block-level" Rows="1" SelectionMode="Single">
 	        <asp:ListItem Value="clean.xslt">Clean</asp:ListItem>
         </asp:ListBox>
     </cc1:PropertyPanel>
