@@ -18,9 +18,11 @@
 
                 <!-- Users Overview -->
                 <div ng-if="vm.usersViewState === 'overview'">
+                    
                     <umb-editor-sub-header>
-
-                        <umb-editor-sub-header-content-left>
+                        
+                        <!-- No selection -->
+                        <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
                             <umb-button-group
                                 ng-if="vm.defaultButton"
                                 default-button="vm.defaultButton"
@@ -28,8 +30,7 @@
                             </umb-button-group>
                         </umb-editor-sub-header-content-left>
 
-                        <umb-editor-sub-header-content-right>
-                            
+                        <umb-editor-sub-header-content-right ng-if="vm.selection.length === 0">
                             <umb-editor-sub-header-section>
                                 <umb-layout-selector
                                     ng-if="vm.layouts"
@@ -38,7 +39,6 @@
                                     on-layout-select="vm.selectLayout">
                                 </umb-layout-selector>
                             </umb-editor-sub-header-section>
-           
                             <umb-editor-sub-header-section>
                                 <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
                                     <div class="inner-addon left-addon">
@@ -56,10 +56,44 @@
                                     </div>
                                 </ng-form>
                             </umb-editor-sub-header-section>
-
                         </umb-editor-sub-header-content-right>
+
+                        <!-- With selection -->
+                        <umb-editor-sub-header-content-left ng-if="vm.selection.length > 0">
+                            <umb-editor-sub-header-section>
+                                <umb-button
+                                    type="button"
+                                    label="Clear selection"
+                                    label-key="buttons_clearSelection"
+                                    action="vm.clearSelection()"
+                                    disabled="actionInProgress">
+                                </umb-button>
+                            </umb-editor-sub-header-section>
+                            <umb-editor-sub-header-section>
+                                <strong>{{ vm.selection.length }} <localize key="general_of">of</localize> {{ vm.users.length }} <localize key="general_selected">selected</localize></strong>
+                            </umb-editor-sub-header-section>
+                        </umb-editor-sub-header-content-left>
+
+                        <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
+                            <umb-button
+                                type="button"
+                                button-style="link"
+                                label="Set group"
+                                icon="icon-users"
+                                action="vm.disableUser()">
+                            </umb-button>
+                            <umb-button
+                                type="button"
+                                button-style="link"
+                                label="Disable"
+                                icon="icon-block"
+                                action="vm.disableUser()">
+                            </umb-button>
+                        </umb-editor-sub-header-content-right>
+
                     </umb-editor-sub-header>
 
+                    <!-- Filters 
                     <div class="flex justify-end">
 
                         <div class="dropdown pull-right">
@@ -94,19 +128,22 @@
                         </div>
 
                     </div>
+                    -->
                     
+                    <!-- Layouts -->
                     <div class="umb-users" ng-if="vm.activeLayout.path === '1'">
-                        <div class="umb-user" ng-repeat="user in vm.users">
+                        <div class="umb-user" ng-repeat="user in vm.users" ng-class="{'umb-user--selected': user.selected}" ng-click="vm.selectUser(user, vm.selection)">
                             <umb-avatar
                                 class="umb-user__avatar"
-                                size="l"
+                                size="m"
                                 color="secondary"
                                 name="{{user.name}}"
                                 img-src="{{user.avatar}}">
                             </umb-avatar>
-                            <div class="umb-user__name">{{user.name}}</div>
+                            <div class="umb-user__checkmark" ng-if="user.selected"><umb-checkmark size="s"></umb-checkmark></div>
+                            <a class="umb-user__name" href="" ng-click="vm.goToUser(user)">{{user.name}}</a>
                             <div class="umb-user__group">
-                                <span ng-repeat="group in user.userGroups">{{ group.name }}</span>
+                                <span ng-repeat="group in user.userGroups">{{ group.name }}<span ng-if="!$last">, </span></span>
                             </div>
                             <!--
                             <umb-badge
@@ -123,6 +160,7 @@
                         This is my second view
                     </div>
 
+                    <!-- Pagination -->
                     <div class="flex justify-center">
                         <umb-pagination
                             ng-if="vm.usersPagination.totalPages"

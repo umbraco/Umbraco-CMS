@@ -15,6 +15,7 @@
             var deferred = $q.defer();
             var users = [
                 {
+                    "id": 1,
                     "name": "Tammy Contreras",
                     "userGroups": [
                         {
@@ -25,6 +26,7 @@
                     "state": "active"
                 },
                 {
+                    "id": 2,
                     "name": "Edward Flores",
                     "userGroups": [
                         {
@@ -35,6 +37,7 @@
                     "state": "active"
                 },
                 {
+                    "id": 3,
                     "name": "Benjamin Mills",
                     "userGroups": [
                         {
@@ -45,6 +48,7 @@
                     "state": "disabled"
                 },
                 {
+                    "id": 4,
                     "name": "Samantha Martinez",
                     "userGroups": [
                         {
@@ -55,6 +59,7 @@
                     "state": "pending"
                 },
                 {
+                    "id": 5,
                     "name": "Angela Stone",
                     "userGroups": [
                         {
@@ -65,6 +70,7 @@
                     "state": "active"
                 },
                 {
+                    "id": 6,
                     "name": "Beverly Silva",
                     "userGroups": [
                         {
@@ -75,6 +81,7 @@
                     "state": "active"
                 },
                 {
+                    "id": 7,
                     "name": "Arthur Welch",
                     "userGroups": [
                         {
@@ -85,6 +92,7 @@
                     "state": "active"
                 },
                 {
+                    "id": 8,
                     "name": "Ruth Turner",
                     "userGroups": [
                         {
@@ -97,13 +105,15 @@
                     "avatar": "",
                     "state": "pending"
                 },
-                                {
+                {
+                    "id": 9,
                     "name": "Tammy Contreras",
                     "userGroupName": "Admin",
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/adellecharles/128.jpg",
                     "state": "active"
                 },
                 {
+                    "id": 10,
                     "name": "Edward Flores",
                     "userGroups": [
                         {
@@ -114,6 +124,7 @@
                     "state": "active"
                 },
                 {
+                    "id": 11,
                     "name": "Benjamin Mills",
                     "userGroups": [
                         {
@@ -127,6 +138,7 @@
                     "state": "disabled"
                 },
                 {
+                    "id": 12,
                     "name": "Samantha Martinez",
                     "userGroupName": "Editor",
                     "userGroups": [
@@ -138,6 +150,7 @@
                     "state": "pending"
                 },
                 {
+                    "id": 13,
                     "name": "Angela Stone",
                     "userGroups": [
                         {
@@ -148,6 +161,7 @@
                     "state": "active"
                 },
                 {
+                    "id": 14,
                     "name": "Beverly Silva",
                     "userGroups": [
                         {
@@ -158,6 +172,7 @@
                     "state": "active"
                 },
                 {
+                    "id": 15,
                     "name": "Arthur Welch",
                     "userGroups": [
                         {
@@ -168,6 +183,7 @@
                     "state": "active"
                 },
                 {
+                    "id": 16,
                     "name": "Ruth Turner",
                     "userGroups": [
                         {

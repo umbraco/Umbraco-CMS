@@ -17,6 +17,11 @@
     align-items: center;
     margin: 10px;
     cursor: pointer;
+    position: relative;
+}
+
+.umb-user--selected {
+    border-color: @turquoise;
 }
 
 .umb-user:hover {
@@ -33,6 +38,12 @@
     font-weight: bold;
 }
 
-.umb-user__group {
+.umb-user__checkmark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
 
+.umb-user__group {
+    font-size: 14px;
 }

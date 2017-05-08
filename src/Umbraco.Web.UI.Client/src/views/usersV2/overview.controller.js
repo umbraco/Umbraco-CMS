@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersOverviewController($scope, $timeout, usersResource) {
+    function UsersOverviewController($scope, $timeout, $location, usersResource) {
 
         var vm = this;
 
@@ -10,6 +10,7 @@
         vm.users = [];
         vm.userGroups = [];
         vm.userStates = [];
+        vm.selection = [];
         vm.usersViewState = 'overview';
         vm.usersPagination = {
             "pageNumber": 1,
@@ -55,6 +56,10 @@
         vm.setUsersViewState = setUsersViewState;
         vm.getUserStateType = getUserStateType;
         vm.selectLayout = selectLayout;
+        vm.selectUser = selectUser;
+        vm.clearSelection = clearSelection;
+        vm.goToUser = goToUser;
+        vm.disableUser = disableUser;
 
         function init() {
 
@@ -107,6 +112,33 @@
             vm.activeLayout = selectedLayout;
         }
 
+        function selectUser(user, selection) {
+            // deselect if already selected, else select
+            if(user.selected) {
+                var index = selection.indexOf(user.id);
+                selection.splice(index, 1);
+                user.selected = false;
+            } else {
+                user.selected = true;
+                vm.selection.push(user.id);
+            }
+        }
+
+        function clearSelection() {
+            angular.forEach(vm.users, function(user){
+                user.selected = false;
+            });
+            vm.selection = [];
+        }
+
+        function goToUser(user, event) {
+            $location.path('users/usersV2/edit/' + user.id);
+        }
+
+        function disableUser() {
+            console.log(vm.selection);
+            alert("disable users");
+        }
 
         // helpers
         function getUserStates(users) {
