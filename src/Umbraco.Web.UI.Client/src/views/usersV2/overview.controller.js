@@ -11,6 +11,8 @@
         vm.userGroups = [];
         vm.userStates = [];
         vm.selection = [];
+        vm.newUser = {};
+        vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
         vm.usersPagination = {
             "pageNumber": 1,
@@ -59,6 +61,8 @@
         vm.clearSelection = clearSelection;
         vm.goToUser = goToUser;
         vm.disableUser = disableUser;
+        vm.openUserGroupPicker = openUserGroupPicker;
+        vm.removeSelectedUserGroup = removeSelectedUserGroup;
 
         function init() {
 
@@ -133,6 +137,36 @@
         function disableUser() {
             console.log(vm.selection);
             alert("disable users");
+        }
+
+        function openUserGroupPicker(event) {
+
+            vm.userGroupPicker = {
+                title: "Select user groups",
+                view: "itempicker",
+                event: event,
+                availableItems: vm.userGroups,
+                selectedItems: vm.newUser.userGroups,
+                show: true,
+                submit: function(model) {
+
+                    if(model.selectedItem) {
+                        vm.newUser.userGroups.push(model.selectedItem);
+                    }
+
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
+                },
+                close: function(oldModel) {
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
+                }
+            };
+
+        }
+
+        function removeSelectedUserGroup(index, selection) {
+            selection.splice(index, 1);
         }
 
         // helpers

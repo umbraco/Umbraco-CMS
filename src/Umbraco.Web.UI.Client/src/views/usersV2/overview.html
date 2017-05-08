@@ -195,7 +195,7 @@
                                     ng-model="vm.newUser.name" />
                             </umb-control-group>
 
-                            <umb-control-group label="Email" description="Aenean ut massa ut augue accumsan pharetra. ">
+                            <umb-control-group label="Email">
                                 <input type="email"
                                     localize="placeholder" 
                                     placeholder="@placeholders_entername" 
@@ -203,20 +203,21 @@
                                     ng-model="vm.newUser.email" />
                             </umb-control-group>
 
-                            <umb-control-group label="User group" description="Nullam eu efficitur odio. Donec a vehicula augue.">
+                            <umb-control-group label="User group">
 
                                 <umb-node-preview
+                                    style="max-width: 100%;"
                                     ng-repeat="group in vm.newUser.userGroups"
                                     icon="group.icon"
                                     name="group.name"
                                     allow-remove="true"
-                                    on-remove="vm.removeSelectedUserGroup($index)">
+                                    on-remove="vm.removeSelectedUserGroup($index, vm.newUser.userGroups)">
                                 </umb-node-preview>
 
                                 <a href=""
                                     style="max-width: 100%;"
                                     class="umb-node-preview-add"
-                                    ng-click="vm.openUserGroupPicker()"
+                                    ng-click="vm.openUserGroupPicker($event)"
                                     prevent-default>
                                     <localize key="general_add">Add</localize>
                                 </a>
@@ -248,5 +249,12 @@
         </umb-editor-view>
 
     </form>
+
+    <umb-overlay
+        ng-if="vm.userGroupPicker.show"
+        model="vm.userGroupPicker"
+        view="vm.userGroupPicker.view"
+        position="target">
+    </umb-overlay>
 
 </div>

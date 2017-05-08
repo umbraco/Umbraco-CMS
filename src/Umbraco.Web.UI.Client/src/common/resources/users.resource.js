@@ -203,19 +203,27 @@
             var userGroups = [
                 {
                     "name": "Admin",
-                    "id": 1
+                    "alias": "admin",
+                    "id": 1,
+                    "icon": "icon-medal"
                 },
                 {
                     "name": "Writer",
-                    "id": 2
+                    "alias": "writer",
+                    "id": 2,
+                    "icon": "icon-edit"
                 },
                 {
                     "name": "Editor",
-                    "id": 3
+                    "alias": "editor",
+                    "id": 3,
+                    "icon": "icon-tools"
                 },
                 {
                     "name": "Translator",
-                    "id": 4
+                    "alias": "translator",
+                    "id": 4,
+                    "icon": "icon-globe"
                 }
             ];
             deferred.resolve(userGroups);
