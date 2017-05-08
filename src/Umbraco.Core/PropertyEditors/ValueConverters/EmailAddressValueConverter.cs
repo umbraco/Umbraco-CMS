@@ -20,6 +20,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
+            if(source == null) 
+            {
+                return string.Empty;
+            }
+            
             return source.ToString();
         }
         
