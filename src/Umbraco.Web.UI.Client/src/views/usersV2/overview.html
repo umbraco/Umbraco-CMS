@@ -51,7 +51,9 @@
                                 img-src="{{user.avatar}}">
                             </umb-avatar>
                             <div class="umb-user__name">{{user.name}}</div>
-                            <div class="umb-user__group">{{user.userGroupName}}</div>
+                            <div class="umb-user__group">
+                                <span ng-repeat="group in user.userGroups">{{ group.name }}</span>
+                            </div>
                             <!--
                             <umb-badge
                                 size="xs"

@@ -16,49 +16,164 @@
             var users = [
                 {
                     "name": "Tammy Contreras",
+                    "userGroups": [
+                        {
+                            "name": "Admin"
+                        }
+                    ],
+                    "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/adellecharles/128.jpg",
+                    "state": "active"
+                },
+                {
+                    "name": "Edward Flores",
+                    "userGroups": [
+                        {
+                            "name": "Admin"
+                        }
+                    ],
+                    "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/marcosmoralez/128.jpg",
+                    "state": "active"
+                },
+                {
+                    "name": "Benjamin Mills",
+                    "userGroups": [
+                        {
+                            "name": "Writer"
+                        }
+                    ],
+                    "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/dancounsell/128.jpg",
+                    "state": "disabled"
+                },
+                {
+                    "name": "Samantha Martinez",
+                    "userGroups": [
+                        {
+                            "name": "Editor"
+                        }
+                    ],
+                    "avatar": "",
+                    "state": "pending"
+                },
+                {
+                    "name": "Angela Stone",
+                    "userGroups": [
+                        {
+                            "name": "Editor"
+                        }
+                    ],
+                    "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/jina/128.jpg",
+                    "state": "active"
+                },
+                {
+                    "name": "Beverly Silva",
+                    "userGroups": [
+                        {
+                            "name": "Editor"
+                        }
+                    ],
+                    "avatar": "",
+                    "state": "active"
+                },
+                {
+                    "name": "Arthur Welch",
+                    "userGroups": [
+                        {
+                            "name": "Editor"
+                        }
+                    ],
+                    "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/ashleyford/128.jpg",
+                    "state": "active"
+                },
+                {
+                    "name": "Ruth Turner",
+                    "userGroups": [
+                        {
+                            "name": "Translator"
+                        },
+                        {
+                            "name": "Editor"
+                        }
+                    ],
+                    "avatar": "",
+                    "state": "pending"
+                },
+                                {
+                    "name": "Tammy Contreras",
                     "userGroupName": "Admin",
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/adellecharles/128.jpg",
                     "state": "active"
                 },
                 {
                     "name": "Edward Flores",
-                    "userGroupName": "Admin",
+                    "userGroups": [
+                        {
+                            "name": "Admin"
+                        }
+                    ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/marcosmoralez/128.jpg",
                     "state": "active"
                 },
                 {
                     "name": "Benjamin Mills",
-                    "userGroupName": "Writer",
+                    "userGroups": [
+                        {
+                            "name": "Writer"
+                        },
+                        {
+                            "name": "Translator"
+                        }
+                    ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/dancounsell/128.jpg",
                     "state": "disabled"
                 },
                 {
                     "name": "Samantha Martinez",
                     "userGroupName": "Editor",
+                    "userGroups": [
+                        {
+                            "name": "Editor"
+                        }
+                    ],
                     "avatar": "",
                     "state": "pending"
                 },
                 {
                     "name": "Angela Stone",
-                    "userGroupName": "Editor",
+                    "userGroups": [
+                        {
+                            "name": "Editor"
+                        }
+                    ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/jina/128.jpg",
                     "state": "active"
                 },
                 {
                     "name": "Beverly Silva",
-                    "userGroupName": "Editor",
+                    "userGroups": [
+                        {
+                            "name": "Editor"
+                        }
+                    ],
                     "avatar": "",
                     "state": "active"
                 },
                 {
                     "name": "Arthur Welch",
-                    "userGroupName": "Editor",
+                    "userGroups": [
+                        {
+                            "name": "Editor"
+                        }
+                    ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/ashleyford/128.jpg",
                     "state": "active"
                 },
                 {
                     "name": "Ruth Turner",
-                    "userGroupName": "Translator",
+                    "userGroups": [
+                        {
+                            "name": "Translator"
+                        }
+                    ],
                     "avatar": "",
                     "state": "pending"
                 }
