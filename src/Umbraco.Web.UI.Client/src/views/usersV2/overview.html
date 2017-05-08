@@ -16,32 +16,86 @@
 
             <umb-editor-container>
 
-                <!--
-                <div class="umb-packages-search">
-                    <input 
-                        class="-full-width-input" 
-                        type="text" name="query" 
-                        placeholder="Search for packages" 
-                        umb-auto-focus ng-model="vm.searchQuery" 
-                        ng-change="vm.search()" 
-                        no-dirty-check>
-                </div>
-                -->
-
                 <!-- Users Overview -->
                 <div ng-if="vm.usersViewState === 'overview'">
                     <umb-editor-sub-header>
+
+                        <umb-editor-sub-header-content-left>
+                            <umb-button-group
+                                ng-if="vm.defaultButton"
+                                default-button="vm.defaultButton"
+                                sub-buttons="vm.subButtons">
+                            </umb-button-group>
+                        </umb-editor-sub-header-content-left>
+
                         <umb-editor-sub-header-content-right>
-                            <umb-button
-                                button-style="success"
-                                type="button"
-                                action="vm.setUsersViewState('invite')"
-                                label="Invite user">
-                            </umb-button>
+                            
+                            <umb-editor-sub-header-section>
+                                <umb-layout-selector
+                                    ng-if="vm.layouts"
+                                    layouts="vm.layouts"
+                                    active-layout="vm.activeLayout"
+                                    on-layout-select="vm.selectLayout">
+                                </umb-layout-selector>
+                            </umb-editor-sub-header-section>
+           
+                            <umb-editor-sub-header-section>
+                                <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
+                                    <div class="inner-addon left-addon">
+                                        <i class="icon icon-search" ng-click="enterSearch($event)"></i>
+                                        <input
+                                            class="form-control search-input"
+                                            type="text"
+                                            localize="placeholder"
+                                            placeholder="@general_typeToSearch"
+                                            ng-model="options.filter"
+                                            ng-change="enterSearch()"
+                                            ng-keydown="forceSearch($event)"
+                                            prevent-enter-submit
+                                            no-dirty-check>
+                                    </div>
+                                </ng-form>
+                            </umb-editor-sub-header-section>
+
                         </umb-editor-sub-header-content-right>
                     </umb-editor-sub-header>
 
-                    <div class="umb-users">
+                    <div class="flex justify-end">
+
+                        <div class="dropdown pull-right">
+                            <a class="btn btn-link dropdown-toggle" href="" data-toggle="dropdown">
+                                Order by:
+                                <span class="bold" style="text-decoration: underline; margin-left: 2px;">Last login</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                                <li><a tabindex="-1" href="#">Last login</a></li>
+                                <li><a tabindex="-1" href="#">Name</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="dropdown pull-right">
+                            <a class="btn btn-link dropdown-toggle" href="" data-toggle="dropdown">
+                                Show:
+                                <span class="bold" style="text-decoration: underline; margin-left: 2px;">All</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                                <li><a tabindex="-1" href="#">All</a></li>
+                                <li class="divider"></li>
+                                <li ng-repeat="userGroup in vm.userGroups">
+                                    <a tabindex="-1" href="#">{{ userGroup.name }} ({{userGroup.count}}))</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li ng-repeat="userState in vm.userStates">
+                                    <a tabindex="-1" href="#">{{ userState.name }} ({{userState.count}})</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                    
+                    <div class="umb-users" ng-if="vm.activeLayout.path === '1'">
                         <div class="umb-user" ng-repeat="user in vm.users">
                             <umb-avatar
                                 class="umb-user__avatar"
@@ -64,6 +118,10 @@
                             -->
                         </div>
                     </div>
+                    
+                    <div ng-if="vm.activeLayout.path === '2'">
+                        This is my second view
+                    </div>
 
                     <div class="flex justify-center">
                         <umb-pagination
@@ -76,7 +134,7 @@
                 </div>
 
                 <!-- Invite user -->
-                <div ng-if="vm.usersViewState === 'invite'">
+                <div ng-if="vm.usersViewState === 'inviteUser'">
 
                     <umb-editor-sub-header>
                         <umb-editor-sub-header-content-left>
@@ -107,13 +165,24 @@
                                     ng-model="vm.newUser.email" />
                             </umb-control-group>
 
-                            <umb-control-group label="User group">
-                                <select class="input-block-level" ng-model="vm.newUser.group" ng-options="group.id as group.name for group in vm.userGroups" ng-change="setValue()">
-                                    <option value="">Select User group</option>
-                                </select>
-                                <!--
-                                <a href="">Is group missing? Create new group</a>
-                                -->
+                            <umb-control-group label="User group" description="Nullam eu efficitur odio. Donec a vehicula augue.">
+
+                                <umb-node-preview
+                                    ng-repeat="group in vm.newUser.userGroups"
+                                    icon="group.icon"
+                                    name="group.name"
+                                    allow-remove="true"
+                                    on-remove="vm.removeSelectedUserGroup($index)">
+                                </umb-node-preview>
+
+                                <a href=""
+                                    style="max-width: 100%;"
+                                    class="umb-node-preview-add"
+                                    ng-click="vm.openUserGroupPicker()"
+                                    prevent-default>
+                                    <localize key="general_add">Add</localize>
+                                </a>
+
                             </umb-control-group>
 
                             <umb-control-group label="Message">
