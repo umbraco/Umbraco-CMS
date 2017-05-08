@@ -1,5 +1,20 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-    function ($scope, $cookies, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService) {
+    function ($scope, $cookies, $location, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService) {
+
+        $scope.isInvite = false;
+
+        function init() {
+            // Check if it is a new user
+            if ($location.search().invite) {
+                $scope.isInvite = true;
+                $scope.inviteSetPassword = true;
+            }
+        }
+
+        $scope.inviteSavePassword = function() {
+            $scope.inviteSetPassword = false;
+            $scope.inviteSetAvatar = true;
+        };
 
         var setFieldFocus = function(form, field) {
             $timeout(function() {
@@ -233,5 +248,7 @@
         else {
             $scope.showLogin();
         }
+
+        init();
 
     });
