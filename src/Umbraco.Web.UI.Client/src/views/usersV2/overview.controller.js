@@ -52,7 +52,6 @@
             }
         ];
 
-        vm.save = save;
         vm.setUsersViewState = setUsersViewState;
         vm.getUserStateType = getUserStateType;
         vm.selectLayout = selectLayout;
@@ -81,10 +80,6 @@
                 vm.loading = false;
             }, 500);
 
-        }
-
-        function save() {
-            alert("save");
         }
 
         function setUsersViewState(state) {
