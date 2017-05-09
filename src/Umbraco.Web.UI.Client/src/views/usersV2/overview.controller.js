@@ -14,6 +14,7 @@
         vm.newUser = {};
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
+        
         vm.usersPagination = {
             "pageNumber": 1,
             "totalPages": 5
@@ -63,6 +64,8 @@
         vm.disableUser = disableUser;
         vm.openUserGroupPicker = openUserGroupPicker;
         vm.removeSelectedUserGroup = removeSelectedUserGroup;
+        vm.selectAll = selectAll;
+        vm.areAllSelected = areAllSelected;
 
         function init() {
 
@@ -71,7 +74,8 @@
             // Get users
             usersResource.getUsers().then(function (users) {
                 vm.users = users;
-                vm.userStates = getUserStates(users);
+                vm.userStates = getUserStates(vm.users);
+                formatDates(vm.users);
             });
 
             // Get user groups
@@ -112,7 +116,6 @@
         }
 
         function selectUser(user, selection) {
-            // deselect if already selected, else select
             if(user.selected) {
                 var index = selection.indexOf(user.id);
                 selection.splice(index, 1);
@@ -140,7 +143,6 @@
         }
 
         function openUserGroupPicker(event) {
-
             vm.userGroupPicker = {
                 title: "Select user groups",
                 view: "itempicker",
@@ -162,11 +164,33 @@
                     vm.userGroupPicker = null;
                 }
             };
-
         }
 
         function removeSelectedUserGroup(index, selection) {
             selection.splice(index, 1);
+        }
+
+        function selectAll() {
+            if(areAllSelected()) {
+                vm.selection = [];
+                angular.forEach(vm.users, function(user){
+                    user.selected = false;
+                });
+            } else {
+                // clear selection so we don't add the same user twice
+                vm.selection = [];
+                // select all users
+                angular.forEach(vm.users, function(user){
+                    user.selected = true;
+                    vm.selection.push(user.id);
+                });
+            }
+        }
+
+        function areAllSelected() {
+            if(vm.selection.length === vm.users.length) {
+                return true;
+            }
         }
 
         // helpers
@@ -192,6 +216,14 @@
             });
 
             return userStates;
+        }
+
+        function formatDates(users) {
+            angular.forEach(users, function(user){
+                if(user.lastLogin) {
+                    user.formattedLastLogin = moment(user.lastLogin).format("YYYY-MM-DD HH:mm:ss");
+                }
+            });
         }
 
         init();

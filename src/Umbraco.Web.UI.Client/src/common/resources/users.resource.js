@@ -23,7 +23,8 @@
                         }
                     ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/adellecharles/128.jpg",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 2,
@@ -34,7 +35,8 @@
                         }
                     ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/marcosmoralez/128.jpg",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 3,
@@ -45,7 +47,8 @@
                         }
                     ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/dancounsell/128.jpg",
-                    "state": "disabled"
+                    "state": "disabled",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 4,
@@ -56,7 +59,8 @@
                         }
                     ],
                     "avatar": "",
-                    "state": "pending"
+                    "state": "pending",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 5,
@@ -67,7 +71,8 @@
                         }
                     ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/jina/128.jpg",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 6,
@@ -78,7 +83,8 @@
                         }
                     ],
                     "avatar": "",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 7,
@@ -89,7 +95,8 @@
                         }
                     ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/ashleyford/128.jpg",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 8,
@@ -103,14 +110,20 @@
                         }
                     ],
                     "avatar": "",
-                    "state": "pending"
+                    "state": "pending",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 9,
                     "name": "Tammy Contreras",
-                    "userGroupName": "Admin",
+                    "userGroups": [
+                        {
+                            "name": "Translator"
+                        }
+                    ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/adellecharles/128.jpg",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 10,
@@ -121,7 +134,8 @@
                         }
                     ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/marcosmoralez/128.jpg",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 11,
@@ -135,7 +149,8 @@
                         }
                     ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/dancounsell/128.jpg",
-                    "state": "disabled"
+                    "state": "disabled",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 12,
@@ -147,7 +162,8 @@
                         }
                     ],
                     "avatar": "",
-                    "state": "pending"
+                    "state": "pending",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 13,
@@ -158,7 +174,8 @@
                         }
                     ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/jina/128.jpg",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 14,
@@ -169,7 +186,8 @@
                         }
                     ],
                     "avatar": "",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 15,
@@ -180,7 +198,8 @@
                         }
                     ],
                     "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/ashleyford/128.jpg",
-                    "state": "active"
+                    "state": "active",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 },
                 {
                     "id": 16,
@@ -191,7 +210,8 @@
                         }
                     ],
                     "avatar": "",
-                    "state": "pending"
+                    "state": "pending",
+                    "lastLogin": "2014-04-25T01:32:21.196Z"
                 }
             ];
             deferred.resolve(users);

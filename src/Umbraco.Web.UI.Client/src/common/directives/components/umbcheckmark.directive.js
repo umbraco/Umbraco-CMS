@@ -9,7 +9,8 @@
             transclude: true,
             templateUrl: 'views/components/umb-checkmark.html',
             scope: {
-                size: "@?"
+                size: "@?",
+                checked: "="
             }
         };
 
