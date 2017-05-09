@@ -151,11 +151,11 @@
                         <input type="hidden" id="macroPropertyID" runat="server" value='<%#Eval("Id")%>'
                             name="macroPropertyID" />
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="macroPropertyAlias" Display="Dynamic"  ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                        <asp:TextBox runat="server" ID="macroPropertyAlias" CLASS="-full-width-input" Text='<%#Eval("Alias")%>' />
+                        <asp:TextBox runat="server" ID="macroPropertyAlias" CssClass="-full-width-input" Text='<%#Eval("Alias")%>' />
                     </td>
                     <td>
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="macroPropertyName" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                        <asp:TextBox runat="server" ID="macroPropertyName" CLASS="-full-width-input" Text='<%#Eval("Name")%>' />
+                        <asp:TextBox runat="server" ID="macroPropertyName" CssClass="-full-width-input" Text='<%#Eval("Name")%>' />
                     </td>
                     <td>
 
@@ -167,10 +167,10 @@
                     <td>
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator6" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                          <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48" ValidationExpression="^\d+$">Numbers only<br/></asp:RegularExpressionValidator>
-                        <asp:TextBox runat="server" ID="macroPropertySortOrder" CLASS="-full-width-input" Text='<%#Eval("SortOrder")%>' />
+                        <asp:TextBox runat="server" ID="macroPropertySortOrder" CssClass="-full-width-input" Text='<%#Eval("SortOrder")%>' />
                     </td>
                     <td>
-                        <asp:Button OnClick="deleteMacroProperty" ID="delete" Text="Delete" runat="server" CssClass="btn btn-default delete-button" />
+                        <asp:Button OnClick="deleteMacroProperty" ID="delete" Text='<%#umbraco.ui.Text("delete")%>' runat="server" CssClass="btn btn-danger delete-button" />
                     </td>
                 </tr>
             </ItemTemplate>
@@ -178,11 +178,11 @@
                         <tr>
                             <td>
                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator1" EnableViewState="false" Enabled="false" EnableClientScript="false" runat="server" ControlToValidate="macroPropertyAliasNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                                <asp:TextBox runat="server" ID="macroPropertyAliasNew" CLASS="-full-width-input" PlaceHolder='New Alias'  />
+                                <asp:TextBox runat="server" ID="macroPropertyAliasNew" CssClass="-full-width-input" PlaceHolder='New Alias'  />
                             </td>
                             <td>
                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator4" EnableViewState="false" Enabled="false" EnableClientScript="false" runat="server" ControlToValidate="macroPropertyNameNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                                <asp:TextBox runat="server" ID="macroPropertyNameNew" CLASS="-full-width-input" PlaceHolder='New Name' />
+                                <asp:TextBox runat="server" ID="macroPropertyNameNew" CssClass="-full-width-input" PlaceHolder='New Name' />
                             </td>
                             <td>
                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator5" EnableViewState="false" Enabled="false" EnableClientScript="false" runat="server" ControlToValidate="macroPropertyTypeNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
