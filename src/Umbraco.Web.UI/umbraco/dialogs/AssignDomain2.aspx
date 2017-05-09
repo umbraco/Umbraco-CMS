@@ -52,7 +52,7 @@
                     </thead>
                     <tbody data-bind="foreach: domains">
                         <tr>
-                            <td valign="top"><input class="domain duplicate" data-bind="value: Name, uniqueName: true"  /><input type="hidden" value="" data-bind="uniqueName: true"/></td>
+                            <td valign="top"><input type="text" class="umb-textstring textstring input-block-level domain duplicate" data-bind="value: Name, uniqueName: true"  /><input type="hidden" value="" data-bind="uniqueName: true"/></td>
                             <td valign="top"><select class="language" data-bind="options: $parent.languages, optionsText: 'Code', optionsValue: 'Id', value: Lang, uniqueName: true"></select></td>
                             <td valign="top"><a href="#" class="btn btn-danger" data-bind="click: $parent.removeDomain"><i class="icon icon-trash"></i></a></td>
                         </tr>
