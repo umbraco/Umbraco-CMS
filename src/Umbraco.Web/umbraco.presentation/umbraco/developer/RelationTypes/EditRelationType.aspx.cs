@@ -4,6 +4,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -142,7 +143,11 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 
 				    if (!this.IsPostBack)
 				    {
-				        this.EnsureChildControls();
+                        ClientTools
+                            .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadRelationTypes>().Tree.Alias)
+                            .SyncTree("-1,init," + this._relationType.Id, false);
+
+                        this.EnsureChildControls();
 
 				        this.idLiteral.Text = this._relationType.Id.ToString();
 				        this.nameTextBox.Text = this._relationType.Name;
@@ -256,9 +261,11 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 
 						this._relationType.Name = this.nameTextBox.Text.Trim();
 
-						// Refresh tree, as the name as changed
-						ClientTools.SyncTree(this._relationType.Id.ToString(), true);
-					}
+                        // Refresh tree, as the name as changed
+                        ClientTools
+                            .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadRelationTypes>().Tree.Alias)
+                            .SyncTree("-1,init," + this._relationType.Id.ToInvariantString(), true); //true forces the reload
+                    }
 
 					if (directionChanged)
 					{
