@@ -42,7 +42,11 @@ namespace Umbraco.Web.PropertyEditors
         {
             if (fileName.IndexOf('.') <= 0) return false;
             var extension = Path.GetExtension(fileName).TrimStart(".");
-            return UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Any(x => StringExtensions.InvariantEquals(x, extension)) == false;
+            
+            // Is valid if extension is whitelisted OR if there is no whitelist and extension is NOT blacklisted
+            return UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles.Any(x => x.InvariantEquals(extension)) ||
+                (UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles.Any() == false &&
+                UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false);
         }
 
     }

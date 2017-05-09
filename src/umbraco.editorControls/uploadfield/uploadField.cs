@@ -91,7 +91,10 @@ namespace umbraco.editorControls
             //now check the file type
             var extension = Path.GetExtension(postedFile.FileName).TrimStart(".");
 
-            return UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false;
+            // allow if extension is whitelisted OR if there is no whitelist and extension is NOT blacklisted
+            return UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles.Any(x => x.InvariantEquals(extension)) ||
+                (UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles.Any() == false &&
+                UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false);
         }
 
         public string Text
