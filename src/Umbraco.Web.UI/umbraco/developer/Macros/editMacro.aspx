@@ -110,7 +110,7 @@
     <cc1:Pane ID="Pane1_4" runat="server" Title="Cache settings">
 
         <cc1:PropertyPanel runat="server" Text="Cache period">
-            <asp:TextBox ID="cachePeriod" runat="server" CssClass="guiInputText input-small"></asp:TextBox>&nbsp;Seconds
+            <asp:TextBox ID="cachePeriod" runat="server" TextMode="Number" min="0" CssClass="guiInputText input-small"></asp:TextBox>&nbsp;Seconds
         </cc1:PropertyPanel>
 
         <cc1:PropertyPanel runat="server" Text="Cache by page">
