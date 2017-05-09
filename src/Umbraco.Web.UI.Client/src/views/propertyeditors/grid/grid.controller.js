@@ -705,20 +705,23 @@ angular.module("umbraco")
                     $scope.addRow(section, section.$allowedLayouts[0]);
                 }
             } else {
-                _.forEach(section.rows, function (row, index) {
+				var refinedRows = [];
+				
+                _.each(section.rows, function (row, index) {
                     if (!row.$initialized) {
                         var initd = $scope.initRow(row);
 
-                        //if init fails, remove
-                        if (!initd) {
-                            section.rows.splice(index, 1);
-                        } else {
-                            section.rows[index] = initd;
+                        //we only want rows that successfully initialized
+                        if (initd) {
+                            refinedRows.push(initd);
                         }
                     }
                 });
+				
+				//set original section.rows to the rows that were successfully initialized
+				section.rows = refinedRows;
 
-                // if there is more than one row added - hide row add tools
+                //if there is more than one row added - hide row add tools
                 $scope.showRowConfigurations = false;
             }
         };
