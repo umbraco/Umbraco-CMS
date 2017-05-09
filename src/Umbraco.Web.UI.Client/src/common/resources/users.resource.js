@@ -60,7 +60,7 @@
                     ],
                     "avatar": "",
                     "state": "pending",
-                    "lastLogin": "2014-04-25T01:32:21.196Z"
+                    "lastLogin": ""
                 },
                 {
                     "id": 5,
@@ -111,7 +111,7 @@
                     ],
                     "avatar": "",
                     "state": "pending",
-                    "lastLogin": "2014-04-25T01:32:21.196Z"
+                    "lastLogin": ""
                 },
                 {
                     "id": 9,
@@ -163,7 +163,7 @@
                     ],
                     "avatar": "",
                     "state": "pending",
-                    "lastLogin": "2014-04-25T01:32:21.196Z"
+                    "lastLogin": ""
                 },
                 {
                     "id": 13,
@@ -211,7 +211,7 @@
                     ],
                     "avatar": "",
                     "state": "pending",
-                    "lastLogin": "2014-04-25T01:32:21.196Z"
+                    "lastLogin": ""
                 }
             ];
             deferred.resolve(users);

@@ -13,11 +13,10 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     margin: 10px;
     cursor: pointer;
     position: relative;
+    align-items: center;
 }
 
 .umb-user--selected {
@@ -30,12 +29,24 @@
 
 .umb-user__avatar {
     margin-bottom: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+}
+
+.umb-user__badge {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    text-transform: capitalize;
 }
 
 .umb-user__name {
-    text-align: center;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
+    text-align: center;
+    margin-bottom: 2px;
 }
 
 .umb-user__checkmark {
@@ -46,4 +57,20 @@
 
 .umb-user__group {
     font-size: 14px;
+    text-align: center;
+}
+
+.umb-user__divider {
+    display: block;
+    width: 20px;
+    border-bottom: 1px solid @gray-7;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.umb-user__last-login {
+    font-size: 13px;
+    text-align: center;
 }

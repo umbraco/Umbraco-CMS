@@ -143,29 +143,37 @@
                     <!-- Layout: Cards -->
                     <div class="umb-users" ng-if="vm.activeLayout.path === '1'">
                         <div class="umb-user" ng-repeat="user in vm.users" ng-class="{'umb-user--selected': user.selected}" ng-click="vm.selectUser(user, vm.selection)">
+                            <div class="umb-user__avatar">
                             <umb-avatar
-                                class="umb-user__avatar"
-                                size="m"
+                                    size="l"
                                 color="secondary"
                                 name="{{user.name}}"
                                 img-src="{{user.avatar}}">
                             </umb-avatar>
-                            <div class="umb-user__checkmark" ng-if="user.selected"><umb-checkmark checked="user.selected" size="s"></umb-checkmark></div>
-                            <a class="umb-user__name" href="" ng-click="vm.goToUser(user)">{{user.name}}</a>
-                            <div class="umb-user__group">
-                                <span ng-repeat="group in user.userGroups">{{ group.name }}<span ng-if="!$last">, </span></span>
-                            </div>
-                            <!--
-                            <div class="umb-user__last-login">26. Jan 2016</div>
-                            -->
-                            <!--
                             <umb-badge
+                                    class="umb-user__badge"
                                 size="xs"
                                 ng-if="user.state !== 'active'"
                                 color="{{vm.getUserStateType(user.state)}}">
                                 {{ user.state }}
                             </umb-badge>
-                            -->
+                            </div>
+                            <div class="umb-user__checkmark" ng-if="user.selected"><umb-checkmark checked="user.selected" size="s"></umb-checkmark></div>
+                            <a class="umb-user__name" href="" ng-click="vm.goToUser(user)">{{user.name}}</a>
+                            <div class="umb-user__group">
+                                <span ng-repeat="group in user.userGroups">{{ group.name }}<span ng-if="!$last">, </span></span>
+                            </div>
+                            <div class="umb-user__divider"></div>
+                            <div class="umb-user__last-login">
+                                <div ng-if="user.formattedLastLogin">
+                                    <div>Last login on</div>
+                                    {{ user.formattedLastLogin }}
+                                </div>
+                                <div ng-if="!user.formattedLastLogin">
+                                    <div>{{ user.name | umbWordLimit:1 }} has</div> 
+                                    not logged in yet
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -175,10 +183,10 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th style="padding-left: 20px;">
+                                    <th style="padding-left: 20px; width: 10px;">
                                         <a href="" style="text-decoration: none;" ng-click="vm.selectAll()"><umb-checkmark checked="vm.areAllSelected()" size="xs"></umb-checkmark></a>
                                     </th>
-                                    <th></th>
+                                    <th style="width: 70px;"></th>
                                     <th>Name</th>
                                     <th>User group</th>
                                     <th>Last Login</th>
@@ -230,7 +238,7 @@
                 </div>
 
                 <!-- Invite user -->
-                <div ng-if="vm.usersViewState === 'inviteUser'">
+                <div ng-if="vm.usersViewState === 'inviteUser' || vm.usersViewState === 'createUser'">
 
                     <umb-editor-sub-header>
                         <umb-editor-sub-header-content-left>
@@ -241,8 +249,14 @@
                     <div class="flex justify-center">
                         <ng-form style="max-width: 500px;" class="block-form">
                             <div>
+                                <div ng-if="vm.usersViewState === 'inviteUser'">
                                 <h3 class="bold" style="margin-bottom: 0;">Invite user</h3>
                                 <p style="line-height: 1.6em; margin-bottom: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+                            </div>
+                                <div ng-if="vm.usersViewState === 'createUser'">
+                                    <h3 class="bold" style="margin-bottom: 0;">Create user</h3>
+                                    <p style="line-height: 1.6em; margin-bottom: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+                                </div>
                             </div>
 
                             <umb-control-group label="Name">
@@ -283,7 +297,7 @@
 
                             </umb-control-group>
 
-                            <umb-control-group label="Message">
+                            <umb-control-group label="Message" ng-if="vm.usersViewState === 'inviteUser'">
                                 <textarea type="text"
                                     class="input-block-level"
                                     localize="placeholder" 
@@ -292,10 +306,19 @@
                             </umb-control-group>
 
                             <umb-button
+                                ng-if="vm.usersViewState === 'inviteUser'"
                                 button-style="success"
                                 type="button"
                                 action=""
                                 label="Send invite">
+                            </umb-button>
+
+                            <umb-button
+                                ng-if="vm.usersViewState === 'createUser'"
+                                button-style="success"
+                                type="button"
+                                action=""
+                                label="Create user">
                             </umb-button>
 
                         </ng-form>

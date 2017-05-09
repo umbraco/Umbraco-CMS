@@ -138,7 +138,6 @@
         }
 
         function disableUser() {
-            console.log(vm.selection);
             alert("disable users");
         }
 
@@ -221,7 +220,7 @@
         function formatDates(users) {
             angular.forEach(users, function(user){
                 if(user.lastLogin) {
-                    user.formattedLastLogin = moment(user.lastLogin).format("YYYY-MM-DD HH:mm:ss");
+                    user.formattedLastLogin = moment(user.lastLogin).format("MMMM Do YYYY, HH:mm");
                 }
             });
         }
