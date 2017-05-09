@@ -705,7 +705,7 @@ angular.module("umbraco")
                     $scope.addRow(section, section.$allowedLayouts[0]);
                 }
             } else {
-				var refinedRows = [];
+                var refinedRows = [];
 				
                 _.each(section.rows, function (row, index) {
                     if (!row.$initialized) {
@@ -718,8 +718,8 @@ angular.module("umbraco")
                     }
                 });
 				
-				//set original section.rows to the rows that were successfully initialized
-				section.rows = refinedRows;
+                //set original section.rows to the rows that were successfully initialized
+                section.rows = refinedRows;
 
                 //if there is more than one row added - hide row add tools
                 $scope.showRowConfigurations = false;
