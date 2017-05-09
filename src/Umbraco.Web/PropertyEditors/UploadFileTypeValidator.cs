@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using umbraco;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -42,11 +43,8 @@ namespace Umbraco.Web.PropertyEditors
         {
             if (fileName.IndexOf('.') <= 0) return false;
             var extension = Path.GetExtension(fileName).TrimStart(".");
-            
-            // Is valid if extension is whitelisted OR if there is no whitelist and extension is NOT blacklisted
-            return UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles.Any(x => x.InvariantEquals(extension)) ||
-                (UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles.Any() == false &&
-                UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false);
+
+            return UmbracoConfig.For.UmbracoSettings().Content.IsFileAllowedForUpload(extension);
         }
 
     }

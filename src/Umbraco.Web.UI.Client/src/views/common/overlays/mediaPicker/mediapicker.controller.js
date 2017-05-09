@@ -16,14 +16,32 @@ angular.module("umbraco")
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
+
+            var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
+            var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
             if ($scope.onlyImages) {
-                $scope.acceptedFileTypes = mediaHelper
-                    .formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+                // If whitelist provided, use just images from that
+                if (allowedUploadFiles !== '') {
+                    var allowedUploadFilesArray = allowedUploadFiles.Split(',');
+                    var allowedImageFiles = umbracoSettings.imageFileTypes.split(',').filter(function (n) {
+                        return allowedUploadFilesArray.indexOf(n) > -1;
+                    });
+                    $scope.acceptedFileTypes = allowedImageFiles;
+                } else {
+                    // If no whitelist, allow all images
+                    $scope.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
+                }
             } else {
-                $scope.acceptedFileTypes = !mediaHelper
-                    .formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.disallowedUploadFiles);
+                // Use whitelist of allowed file types if provided
+                if (allowedUploadFiles !== '') {
+                    $scope.acceptedFileTypes = allowedUploadFiles;
+                } else {
+                    // If no whitelist, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
+                    $scope.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
+                }
             }
-            $scope.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
+
+            $scope.maxFileSize = umbracoSettings.maxFileSize + "KB";
 
             $scope.model.selectedImages = [];
 

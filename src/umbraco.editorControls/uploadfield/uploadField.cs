@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Content = umbraco.cms.businesslogic.Content;
 using Umbraco.Core;
 
@@ -91,10 +92,7 @@ namespace umbraco.editorControls
             //now check the file type
             var extension = Path.GetExtension(postedFile.FileName).TrimStart(".");
 
-            // allow if extension is whitelisted OR if there is no whitelist and extension is NOT blacklisted
-            return UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles.Any(x => x.InvariantEquals(extension)) ||
-                (UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles.Any() == false &&
-                UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false);
+            return UmbracoConfig.For.UmbracoSettings().Content.IsFileAllowedForUpload(extension);
         }
 
         public string Text
