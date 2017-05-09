@@ -4,6 +4,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.uicontrols;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using RelationType = umbraco.cms.businesslogic.relation.RelationType;
@@ -191,12 +192,14 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			relationTypeTabPage.Controls.Add(this.directionPane);
 			relationTypeTabPage.Controls.Add(this.objectTypePane);
 
-			var saveMenuImageButton =  tabControl.Menu.NewButton();
-			saveMenuImageButton.ToolTip = "save relation type";
-			saveMenuImageButton.Click +=saveMenuImageButton_Click;
-			saveMenuImageButton.CausesValidation = true;
-            saveMenuImageButton.Text = ui.Text("save");
-			saveMenuImageButton.ValidationGroup = "RelationType";
+			var save =  tabControl.Menu.NewButton();
+
+            save.Click +=saveMenuImageButton_Click;
+            save.CausesValidation = true;
+            save.ToolTip = ui.Text("save");
+            save.Text = ui.Text("save");
+            save.ButtonType = MenuButtonType.Primary;
+            save.ValidationGroup = "RelationType";
 
 			var relationsTabPage = this.tabControl.NewTabPage("Relations");
 			relationsTabPage.Controls.Add(this.relationsCountPane);
