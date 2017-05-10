@@ -900,7 +900,13 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
-                media.CreatorId = userId;
+
+                // set creator for new media
+                if (media.Id == 0)
+                {
+                    media.CreatorId = userId;
+                }
+
                 repository.AddOrUpdate(media);
                 repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                 // generate preview for blame history?
