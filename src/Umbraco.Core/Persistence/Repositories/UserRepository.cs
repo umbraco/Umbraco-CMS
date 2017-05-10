@@ -231,8 +231,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             
             //lookup all assigned
-            var assigned = Database.Fetch<UserGroupDto>("WHERE userGroupAlias IN (@aliases)", new {aliases = entity.Groups});
-
+            var assigned = entity.Groups == null || entity.Groups.Any() == false
+                ? new List<UserGroupDto>()
+                : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new {aliases = entity.Groups});
+            
             //first delete all 
             //TODO: We could do this a nicer way instead of "Nuke and Pave"
             Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });

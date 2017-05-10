@@ -77,7 +77,6 @@ namespace Umbraco.Core.Models.Membership
             if (userGroups == null) throw new ArgumentNullException("userGroups");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
-            if (string.IsNullOrWhiteSpace(rawPasswordValue)) throw new ArgumentException("Value cannot be null or whitespace.", "rawPasswordValue");
 
             Id = id;
             _name = name;

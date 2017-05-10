@@ -456,7 +456,7 @@ namespace Umbraco.Tests.Services
             {
                 Id = 1,
                 Alias = "Group1",
-                Name = "Group 2"
+                Name = "Group 1"
             };
             var userGroup2 = new UserGroup
             {
