@@ -3,11 +3,12 @@ using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
 {
-    [Migration("7.6.0", 100, Constants.System.UmbracoMigrationName)]
+    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class AddUserGroupTables : MigrationBase
     {
         public AddUserGroupTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)
@@ -29,64 +30,27 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
         {
             if (tables.InvariantContains("umbracoUserGroup") == false)
             {
-                Create.Table("umbracoUserGroup")
-                    .WithColumn("id").AsInt32().Identity().PrimaryKey("PK_umbracoUserGroup")
-                    .WithColumn("userGroupAlias").AsString(200).NotNullable()
-                    .WithColumn("userGroupName").AsString(200).NotNullable()
-                    .WithColumn("userGroupDefaultPermissions").AsString(50).Nullable();
+                Create.Table<UserGroupDto>();
             }
 
             if (tables.InvariantContains("umbracoUser2UserGroup") == false)
             {
-                Create.Table("umbracoUser2UserGroup")
-                    .WithColumn("userId").AsInt32().NotNullable()
-                    .WithColumn("userGroupId").AsInt32().NotNullable();
-                Create.PrimaryKey("PK_user2userGroup")
-                    .OnTable("umbracoUser2UserGroup")
-                    .Columns(new[] {"userId", "userGroupId"});
-                Create.ForeignKey("FK_umbracoUser2UserGroup_userId")
-                    .FromTable("umbracoUser2UserGroup").ForeignColumn("userId")
-                    .ToTable("umbracoUser").PrimaryColumn("id").OnDeleteOrUpdate(Rule.None);
-                Create.ForeignKey("FK_umbracoUser2UserGroup_userGroupId")
-                    .FromTable("umbracoUser2UserGroup").ForeignColumn("userGroupId")
-                    .ToTable("umbracoUserGroup").PrimaryColumn("id").OnDeleteOrUpdate(Rule.None);
+                Create.Table<User2UserGroupDto>();
             }
 
             if (tables.InvariantContains("umbracoUserGroup2App") == false)
             {
-                Create.Table("umbracoUserGroup2App")
-                    .WithColumn("userGroupId").AsInt32().NotNullable()
-                    .WithColumn("app").AsString(50).NotNullable();
-                Create.PrimaryKey("PK_userGroup2App")
-                    .OnTable("umbracoUserGroup2App")
-                    .Columns(new[] {"userGroupId", "app"});
-                Create.ForeignKey("FK_umbracoUserGroup2App_umbracoGroupUser_id")
-                    .FromTable("umbracoUserGroup2App").ForeignColumn("userGroupId")
-                    .ToTable("umbracoUserGroup").PrimaryColumn("id").OnDeleteOrUpdate(Rule.None);
+                Create.Table<UserGroup2AppDto>();                
             }
 
             if (tables.InvariantContains("umbracoUserGroup2NodePermission") == false)
             {
-                Create.Table("umbracoUserGroup2NodePermission")
-                    .WithColumn("userGroupId").AsInt32().NotNullable()
-                    .WithColumn("nodeId").AsInt32().NotNullable()
-                    .WithColumn("permission").AsString(10).NotNullable();
-                Create.PrimaryKey("PK_umbracoUserGroup2NodePermission")
-                    .OnTable("umbracoUserGroup2NodePermission")
-                    .Columns(new[] {"userGroupId", "nodeId", "permission"});
-                Create.ForeignKey("FK_umbracoUserGroup2NodePermission_umbracoNode_id")
-                    .FromTable("umbracoUserGroup2NodePermission").ForeignColumn("nodeId")
-                    .ToTable("umbracoNode").PrimaryColumn("id").OnDeleteOrUpdate(Rule.None);
-                Create.ForeignKey("FK_umbracoUserGroup2NodePermission_umbracoUserGroup_id")
-                    .FromTable("umbracoUserGroup2NodePermission").ForeignColumn("userGroupId")
-                    .ToTable("umbracoUserGroup").PrimaryColumn("id").OnDeleteOrUpdate(Rule.None);
+                Create.Table<UserGroup2NodePermissionDto>();
             }
         }
 
         private void MigrateUserTypesToGroups()
         {
-            // TODO: review for MySQL and CE (tested only on SQL Express)
-
             // Create a user group for each user type
             Execute.Sql(@"INSERT INTO umbracoUserGroup (userGroupAlias, userGroupName, userGroupDefaultPermissions)
                 SELECT userTypeAlias, userTypeName, userTypeDefaultPermissions
@@ -108,7 +72,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 FROM umbracoUserGroup ug
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
-                INNER JOIN umbracoUser2app u2a ON u2a.[user] = u.id
+                INNER JOIN umbracoUser2app u2a ON u2a." + SqlSyntax.GetQuotedColumnName("user") + @" = u.id
 				WHERE u.id = 0");
 
             // Rename some groups for consistency (plural form)
@@ -118,14 +82,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
 
         private void MigrateUserPermissions()
         {
-            // TODO: review for MySQL and CE (tested only on SQL Express)
-
             // Create user group records for all non-admin users that have specific permissions set
             Execute.Sql(@"INSERT INTO umbracoUserGroup(userGroupAlias, userGroupName)
                 SELECT userName + 'Group', 'Group for ' + userName
                 FROM umbracoUser
                 WHERE (id IN (
-	                SELECT [user]
+	                SELECT " + SqlSyntax.GetQuotedColumnName("user") + @"
 	                FROM umbracoUser2app
                 ) OR id IN (
 	                SELECT userid
@@ -157,7 +119,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 FROM umbracoUserGroup ug
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
-                INNER JOIN umbracoUser2app u2a ON u2a.[user] = u.id
+                INNER JOIN umbracoUser2app u2a ON u2a." + SqlSyntax.GetQuotedColumnName("user") + @" = u.id
 				WHERE ug.userGroupAlias NOT IN (
 					SELECT userTypeAlias
 					FROM umbracoUserType
