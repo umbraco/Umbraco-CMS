@@ -11,6 +11,16 @@
 
     function usersResource($http, umbRequestHelper, $q) {
 
+        function getUser() {
+            var deferred = $q.defer();
+            var user = {
+                "name": "Tammy Contreras",
+                "email": "tammy@contreras.com"
+            };
+            deferred.resolve(user);
+            return deferred.promise;
+        }
+
         function getUsers() {
             var deferred = $q.defer();
             var users = [
@@ -218,6 +228,18 @@
             return deferred.promise;
         }
 
+        function getUserRole() {
+            var deferred = $q.defer();
+            var user = {
+                "name": "Admin",
+                "alias": "admin",
+                "id": 1,
+                "icon": "icon-medal"
+            };
+            deferred.resolve(user);
+            return deferred.promise;
+        }
+
         function getUserGroups() {
             var deferred = $q.defer();
             var userGroups = [
@@ -251,7 +273,9 @@
         }
 
         var resource = {
+            getUser: getUser,
             getUsers: getUsers,
+            getUserRole: getUserRole,
             getUserGroups: getUserGroups
         };
 

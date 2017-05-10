@@ -132,7 +132,7 @@
         }
 
         function goToUser(user, event) {
-            $location.path('users/usersV2/edit/' + user.id);
+            $location.path('users/usersV2/user/' + user.id);
         }
 
         function disableUser() {
