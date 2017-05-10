@@ -228,6 +228,7 @@ namespace umbraco.presentation.plugins.tinymce3
 		private string Hash(string str)
 		{
 		    return str.GenerateHash();
+
 		}
 
 		#endregion
