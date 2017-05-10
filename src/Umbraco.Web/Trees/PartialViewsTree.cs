@@ -18,7 +18,7 @@ namespace Umbraco.Web.Trees
 	/// <summary>
 	/// Tree for displaying partial views in the settings app
 	/// </summary>
-	[Tree(Constants.Applications.Settings, "partialViews", "Partial Views", sortOrder: 2)]
+	[Tree(Constants.Applications.Settings, "partialViews", null, sortOrder: 2)]
 	public class PartialViewsTree : FileSystemTree
 	{
 		public PartialViewsTree(string application) : base(application) { }
