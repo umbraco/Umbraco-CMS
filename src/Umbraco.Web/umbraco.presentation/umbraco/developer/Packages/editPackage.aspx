@@ -117,7 +117,7 @@
             <tr>
                 <td>
                     <strong style="color: Red;">Remember:</strong> .xslt and .ascx files for your macros
-                    will be added automaticly, but you will still need to add <strong>assemblies</strong>,
+                    will be added automatically, but you will still need to add <strong>assemblies</strong>,
                     <strong>images</strong> and <strong>script files</strong> manually to the list below.
                 </td>
             </tr>
