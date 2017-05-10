@@ -1,230 +1,30 @@
 (function () {
     "use strict";
 
-    function UsersOverviewController($scope, $timeout, $location, usersResource) {
+    function UsersOverviewController($scope) {
 
         var vm = this;
 
         vm.page = {};
         vm.page.name = "Users";
-        vm.users = [];
-        vm.userGroups = [];
-        vm.userStates = [];
-        vm.selection = [];
-        vm.newUser = {};
-        vm.newUser.userGroups = [];
-        vm.usersViewState = 'overview';
-        
-        vm.usersPagination = {
-            "pageNumber": 1,
-            "totalPages": 5
-        }
-        
-        vm.layouts = [
+        vm.page.navigation = [
             {
-                "icon": "icon-thumbnails-small",
-                "path": "1",
-                "selected": true
+                "name": "Users",
+                "icon": "icon-user",
+                "view": "views/usersV2/views/users/users.html",
+                "active": true
             },
             {
-                "icon": "icon-list",
-                "path": "2",
-                "selected": true
+                "name": "Roles",
+                "icon": "icon-users",
+                "view": "views/usersV2/views/roles/roles.html"
             }
         ];
-
-        vm.activeLayout = {
-            "icon": "icon-thumbnails-small",
-            "path": "1",
-            "selected": true
-        };
-
-        vm.defaultButton = {
-            labelKey:"users_inviteUser",
-            handler: function() {
-                vm.setUsersViewState('inviteUser');
-            }
-        };
-
-        vm.subButtons = [
-            {
-                labelKey: "users_createUser",
-                handler: function () {
-                    vm.setUsersViewState('createUser');
-                }
-            }
-        ];
-
-        vm.setUsersViewState = setUsersViewState;
-        vm.getUserStateType = getUserStateType;
-        vm.selectLayout = selectLayout;
-        vm.selectUser = selectUser;
-        vm.clearSelection = clearSelection;
-        vm.goToUser = goToUser;
-        vm.disableUser = disableUser;
-        vm.openUserGroupPicker = openUserGroupPicker;
-        vm.removeSelectedUserGroup = removeSelectedUserGroup;
-        vm.selectAll = selectAll;
-        vm.areAllSelected = areAllSelected;
 
         function init() {
-
-            vm.loading = true;
-
-            // Get users
-            usersResource.getUsers().then(function (users) {
-                vm.users = users;
-                vm.userStates = getUserStates(vm.users);
-                formatDates(vm.users);
-            });
-
-            // Get user groups
-            usersResource.getUserGroups().then(function (userGroups) {
-                vm.userGroups = userGroups;
-            });
-
-            // fake loading
-            $timeout(function () {
-                vm.loading = false;
-            }, 500);
-
-        }
-
-        function setUsersViewState(state) {
-            vm.usersViewState = state;
-        }
-
-        function getUserStateType(state) {
-            switch (state) {
-                case "disabled" || "umbracoDisabled":
-                    return "danger";
-                case "pending":
-                    return "warning";
-                default:
-                    return "success";
-            }
-        }
-
-        function selectLayout(selectedLayout) {
-
-            angular.forEach(vm.layouts, function(layout){
-                layout.active = false;
-            });
-
-            selectedLayout.active = true;
-            vm.activeLayout = selectedLayout;
-        }
-
-        function selectUser(user, selection) {
-            if(user.selected) {
-                var index = selection.indexOf(user.id);
-                selection.splice(index, 1);
-                user.selected = false;
-            } else {
-                user.selected = true;
-                vm.selection.push(user.id);
-            }
-        }
-
-        function clearSelection() {
-            angular.forEach(vm.users, function(user){
-                user.selected = false;
-            });
-            vm.selection = [];
-        }
-
-        function goToUser(user, event) {
-            $location.path('users/usersV2/edit/' + user.id);
-        }
-
-        function disableUser() {
-            alert("disable users");
-        }
-
-        function openUserGroupPicker(event) {
-            vm.userGroupPicker = {
-                title: "Select user groups",
-                view: "itempicker",
-                event: event,
-                availableItems: vm.userGroups,
-                selectedItems: vm.newUser.userGroups,
-                show: true,
-                submit: function(model) {
-
-                    if(model.selectedItem) {
-                        vm.newUser.userGroups.push(model.selectedItem);
-                    }
-
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
-                },
-                close: function(oldModel) {
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
-                }
-            };
-        }
-
-        function removeSelectedUserGroup(index, selection) {
-            selection.splice(index, 1);
-        }
-
-        function selectAll() {
-            if(areAllSelected()) {
-                vm.selection = [];
-                angular.forEach(vm.users, function(user){
-                    user.selected = false;
-                });
-            } else {
-                // clear selection so we don't add the same user twice
-                vm.selection = [];
-                // select all users
-                angular.forEach(vm.users, function(user){
-                    user.selected = true;
-                    vm.selection.push(user.id);
-                });
-            }
-        }
-
-        function areAllSelected() {
-            if(vm.selection.length === vm.users.length) {
-                return true;
-            }
-        }
-
-        // helpers
-        function getUserStates(users) {
-            var userStates = [];
             
-            angular.forEach(users, function(user) {
-
-                var newUserState = {"name": user.state, "count": 1};
-                var userStateExists = false;
-
-                angular.forEach(userStates, function(userState){
-                    if(newUserState.name === userState.name) {
-                        userState.count = userState.count + 1;
-                        userStateExists = true;
-                    }
-                });
-
-                if(userStateExists === false) {
-                    userStates.push(newUserState);
-                }
-
-            });
-
-            return userStates;
         }
-
-        function formatDates(users) {
-            angular.forEach(users, function(user){
-                if(user.lastLogin) {
-                    user.formattedLastLogin = moment(user.lastLogin).format("MMMM Do YYYY, HH:mm");
-                }
-            });
-        }
-
+ 
         init();
 
     }
