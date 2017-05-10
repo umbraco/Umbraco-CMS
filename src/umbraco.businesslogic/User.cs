@@ -657,20 +657,20 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// Adds a group to the list of groups for the user, ensure to call Save() afterwords
         /// </summary>
-        public void AddGroup(int groupId, string groupName)
+        public void AddGroup(string groupAlias)
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            UserEntity.AddGroup(new Umbraco.Core.Models.Membership.UserGroup
-            {
-                Id = groupId,
-                Name = groupName,
-            });
+            UserEntity.AddGroup(groupAlias);
         }
 
+        /// <summary>
+        /// Returns the assigned user group aliases for the user
+        /// </summary>
+        /// <returns></returns>
         public string[] GetGroups()
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            return UserEntity.Groups.Select(x => x.Name).ToArray();
+            return UserEntity.Groups.ToArray();
         }
 
 

@@ -312,16 +312,16 @@ namespace umbraco.cms.presentation.user
         {
             var userService = ApplicationContext.Current.Services.UserService;
             var allGroups = userService.GetAllUserGroups();
-            var groupsForUser = userService.GetGroupsForUser(u.Id);
-
+            var groupsForUser = userService.GetUserGroupsByAlias(u.GetGroups());
+            
             lstInGroups.DataSource = groupsForUser;
-            lstInGroups.DataValueField = "Id";
+            lstInGroups.DataValueField = "Alias";
             lstInGroups.DataTextField = "Name";
             lstInGroups.DataBind();
 
             lstNotInGroups.DataSource = allGroups
                 .Where(x => groupsForUser.Select(y => y.Id).Contains(x.Id) == false);
-            lstNotInGroups.DataValueField = "Id";
+            lstNotInGroups.DataValueField = "Alias";
             lstNotInGroups.DataTextField = "Name";
             lstNotInGroups.DataBind();
         }
@@ -558,7 +558,7 @@ namespace umbraco.cms.presentation.user
                     u.ClearGroups();
                     foreach (ListItem li in lstInGroups.Items)
                     {
-                        u.AddGroup(int.Parse(li.Value), li.Text);
+                        u.AddGroup(li.Value);
                     }
 
                     u.Save();

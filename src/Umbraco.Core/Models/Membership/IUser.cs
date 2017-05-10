@@ -18,19 +18,12 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Gets the groups that user is part of
         /// </summary>
-        IEnumerable<IUserGroup> Groups { get; }
+        IEnumerable<string> Groups { get; }        
 
-        /// <summary>
-        /// Indicates if the groups for a user have been loaded
-        /// </summary>
-        bool GroupsLoaded { get; }
+        void RemoveGroup(string group);
 
-        void RemoveGroup(IUserGroup group);
-
-        void AddGroup(IUserGroup group);
-
-        void SetGroupsLoaded();
-
+        void AddGroup(string group);
+        
         IEnumerable<string> AllowedSections { get; }
 
         /// <summary>

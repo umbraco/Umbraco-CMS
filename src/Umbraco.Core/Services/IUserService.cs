@@ -74,6 +74,18 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Get permissions set for a group and optional node Ids
         /// </summary>
+        /// <param name="groupAlias">Group to retrieve permissions for</param>
+        /// <param name="directlyAssignedOnly">
+        /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
+        /// or fall back to the group's default permissions when nothing is directly assigned
+        /// </param>
+        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
+        IEnumerable<EntityPermission> GetPermissions(string groupAlias, bool directlyAssignedOnly, params int[] nodeIds);
+
+        /// <summary>
+        /// Get permissions set for a group and optional node Ids
+        /// </summary>
         /// <param name="group">Group to retrieve permissions for</param>
         /// <param name="directlyAssignedOnly">
         /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
@@ -94,7 +106,19 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the permissions for the provided group and path
         /// </summary>
-        /// <param name="group">User to check permissions for</param>
+        /// <param name="groupAlias">Group alias to check permissions for</param>
+        /// <param name="path">Path to check permissions for</param>
+        /// <param name="directlyAssignedOnly">
+        /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
+        /// or fall back to the group's default permissions when nothing is directly assigned
+        /// </param>
+        /// <returns>String indicating permissions for provided user and path</returns>
+        string GetPermissionsForPath(string groupAlias, string path, bool directlyAssignedOnly = true);
+
+        /// <summary>
+        /// Gets the permissions for the provided group and path
+        /// </summary>
+        /// <param name="group">Group to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
         /// <param name="directlyAssignedOnly">
         /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
@@ -145,34 +169,27 @@ namespace Umbraco.Core.Services
         /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
         /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
         IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids);
-
-        /// <summary>
-        /// Gets all UserGroups for a given user
-        /// </summary>
-        /// <param name="userId">Id of user</param>
-        /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
-        IEnumerable<IUserGroup> GetGroupsForUser(int userId);
-
+        
         /// <summary>
         /// Gets a UserGroup by its Alias
         /// </summary>
         /// <param name="alias">Alias of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        IUserGroup GetUserGroupByAlias(string alias);
+        IEnumerable<IUserGroup> GetUserGroupsByAlias(params string[] alias);
+
+        /// <summary>
+        /// Gets a UserGroup by its Alias
+        /// </summary>
+        /// <param name="name">Name of the UserGroup to retrieve</param>
+        /// <returns><see cref="IUserGroup"/></returns>
+        IUserGroup GetUserGroupByAlias(string name);
 
         /// <summary>
         /// Gets a UserGroup by its Id
         /// </summary>
         /// <param name="id">Id of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        IUserGroup GetUserGroupById(int id);
-
-        /// <summary>
-        /// Gets a UserGroup by its Name
-        /// </summary>
-        /// <param name="name">Name of the UserGroup to retrieve</param>
-        /// <returns><see cref="IUserGroup"/></returns>
-        IUserGroup GetUserGroupByName(string name);
+        IUserGroup GetUserGroupById(int id);        
 
         /// <summary>
         /// Saves a UserGroup

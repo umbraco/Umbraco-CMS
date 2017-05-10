@@ -175,7 +175,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         
         private void CreateUmbracoUserGroupData()
         {
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 1, Alias = "admin", Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 1, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7" });
             _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 2, Alias = "writer", Name = "Writers", DefaultPermissions = "CAH:F" });
             _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5F" });
             _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 4, Alias = "translator", Name = "Translators", DefaultPermissions = "AF" });

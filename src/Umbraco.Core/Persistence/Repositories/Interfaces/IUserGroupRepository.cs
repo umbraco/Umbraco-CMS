@@ -6,6 +6,13 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IUserGroupRepository : IRepositoryQueryable<int, IUserGroup>
     {
         /// <summary>
+        /// Gets a group by it's alias
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        IUserGroup Get(string alias);
+
+        /// <summary>
         /// This is useful when an entire section is removed from config
         /// </summary>
         /// <param name="sectionAlias"></param>

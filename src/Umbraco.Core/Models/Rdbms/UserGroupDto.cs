@@ -15,10 +15,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("userGroupAlias")]
         [Length(200)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupAlias")]
         public string Alias { get; set; }
 
         [Column("userGroupName")]
         [Length(200)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupName")]
         public string Name { get; set; }
 
         [Column("userGroupDefaultPermissions")]

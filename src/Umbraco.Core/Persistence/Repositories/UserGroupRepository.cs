@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
@@ -24,6 +25,34 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cacheHelper, logger, sqlSyntax)
         {
             _cacheHelper = cacheHelper;
+        }
+
+        public const string GetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
+        public static string GetByAliasCacheKey(string alias)
+        {
+            return GetByAliasCacheKeyPrefix + alias;
+        }
+
+        public IUserGroup Get(string alias)
+        {
+            try
+            {
+                //need to do a simple query to get the id - put this cache
+                var id = IsolatedCache.GetCacheItem<int>(GetByAliasCacheKey(alias), () =>
+                {
+                    var groupId = Database.ExecuteScalar<int?>("SELECT id FROM umbracoUserGroup WHERE userGroupAlias=@alias", new { alias = alias });
+                    if (groupId.HasValue == false) throw new InvalidOperationException("No group found with alias " + alias);
+                    return groupId.Value;
+                });
+
+                //return from the normal method which will cache
+                return Get(id);
+            }
+            catch (InvalidOperationException)
+            {
+                //if this is caught it's because we threw this in the caching method
+                return null;
+            }
         }
 
         public IEnumerable<IUserGroup> GetGroupsAssignedToSection(string sectionAlias)
@@ -75,7 +104,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(dto);
             }
         }
-
+        
         /// <summary>
         /// Gets the group permissions for the specified entities
         /// </summary>

@@ -17,10 +17,13 @@ namespace Umbraco.Core.Models.Membership
     [DataContract(IsReference = true)]
     public class User : Entity, IUser
     {
+        /// <summary>
+        /// Constructor for creating a new/empty user
+        /// </summary>
         public User()
         {
             SessionTimeout = 60;
-            _groupCollection = new List<IUserGroup>();
+            _userGroups = new List<string>();
             _language = GlobalSettings.DefaultUILanguage;
             _isApproved = true;
             _isLockedOut = false;
@@ -30,13 +33,59 @@ namespace Umbraco.Core.Models.Membership
             _rawPasswordValue = "";
         }
 
+        /// <summary>
+        /// Constructor for creating a new/empty user
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
+        /// <param name="rawPasswordValue"></param>
         public User(string name, string email, string username, string rawPasswordValue)
             : this()
         {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value cannot be null or whitespace.", "email");
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            if (string.IsNullOrWhiteSpace(rawPasswordValue)) throw new ArgumentException("Value cannot be null or whitespace.", "rawPasswordValue");
+
             _name = name;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
+            _allowedSections = new List<string>();
+            _userGroups = new List<string>();
+            _isApproved = true;
+            _isLockedOut = false;
+            _startContentId = -1;
+            _startMediaId = -1;
+        }
+
+        /// <summary>
+        /// Constructor for creating a new User instance for an existing user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
+        /// <param name="rawPasswordValue"></param>
+        /// <param name="allowedSections"></param>
+        /// <param name="userGroups"></param>
+        public User(int id, string name, string email, string username, string rawPasswordValue, IEnumerable<string> allowedSections, IEnumerable<string> userGroups)
+            : this()
+        {
+            if (allowedSections == null) throw new ArgumentNullException("allowedSections");
+            if (userGroups == null) throw new ArgumentNullException("userGroups");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            if (string.IsNullOrWhiteSpace(rawPasswordValue)) throw new ArgumentException("Value cannot be null or whitespace.", "rawPasswordValue");
+
+            Id = id;
+            _name = name;
+            _email = email;
+            _username = username;
+            _rawPasswordValue = rawPasswordValue;
+            _allowedSections = allowedSections;
+            _userGroups = new List<string>(userGroups);
             _isApproved = true;
             _isLockedOut = false;
             _startContentId = -1;
@@ -45,8 +94,6 @@ namespace Umbraco.Core.Models.Membership
 
         private string _name;
         private string _securityStamp;
-        private List<IUserGroup> _groupCollection;
-        private bool _groupsLoaded;
         private int _sessionTimeout;
         private int _startContentId;
         private int _startMediaId;
@@ -55,6 +102,8 @@ namespace Umbraco.Core.Models.Membership
         private string _username;
         private string _email;
         private string _rawPasswordValue;
+        private IEnumerable<string> _allowedSections;
+        private List<string> _userGroups;
         private bool _isApproved;
         private bool _isLockedOut;
         private string _language;
@@ -87,6 +136,8 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
 
             public readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
+
+            public readonly PropertyInfo UserGroupsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.Groups);
         }
         
         #region Implementation of IMembershipUser
@@ -183,17 +234,7 @@ namespace Umbraco.Core.Models.Membership
 
         public IEnumerable<string> AllowedSections
         {
-            get
-            {
-                if (GroupsLoaded == false)
-                {
-                    return Enumerable.Empty<string>();
-                }
-
-                return Groups
-                    .SelectMany(x => x.AllowedSections)
-                    .Distinct();
-            }
+            get { return _allowedSections; }
         }
 
         public IProfile ProfileData
@@ -268,37 +309,29 @@ namespace Umbraco.Core.Models.Membership
         /// Gets or sets the groups that user is part of
         /// </summary>
         [DataMember]
-        public IEnumerable<IUserGroup> Groups
+        public IEnumerable<string> Groups
         {
-            get { return _groupCollection; }
+            get { return _userGroups; }
         }
-
-        /// <summary>
-        /// Indicates if the groups for a user have been loaded
-        /// </summary>
-        public bool GroupsLoaded { get { return _groupsLoaded; } }
-
-        public void RemoveGroup(IUserGroup group)
+        
+        public void RemoveGroup(string group)
         {
-            if (_groupCollection.Select(x => x.Id).Contains(group.Id))
+            if (_userGroups.Contains(group))
             {
-                _groupCollection.Remove(group);
+                _userGroups.Remove(group);
+                OnPropertyChanged(Ps.Value.UserGroupsSelector);
             }
         }
 
-        public void AddGroup(IUserGroup group)
+        public void AddGroup(string group)
         {
-            if (_groupCollection.Select(x => x.Id).Contains(group.Id) == false)
+            if (_userGroups.Contains(group) == false)
             {
-                _groupCollection.Add(group);
+                _userGroups.Add(group);
+                OnPropertyChanged(Ps.Value.UserGroupsSelector);
             }
         }
-
-        public void SetGroupsLoaded()
-        {
-            _groupsLoaded = true;
-        }
-
+        
         #endregion
 
         public override object DeepClone()
@@ -307,7 +340,8 @@ namespace Umbraco.Core.Models.Membership
             //turn off change tracking
             clone.DisableChangeTracking();
             //need to create new collections otherwise they'll get copied by ref
-            clone._groupCollection = new List<IUserGroup>(_groupCollection.ToList());
+            clone._userGroups = new List<string>(_userGroups);
+            clone._allowedSections = new List<string>(_allowedSections);
             //re-create the event handler
             //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);

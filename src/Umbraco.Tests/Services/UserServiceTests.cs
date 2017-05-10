@@ -56,9 +56,9 @@ namespace Umbraco.Tests.Services
 
             //assert
             Assert.AreEqual(3, permissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(0).AssignedPermissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(1).AssignedPermissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(2).AssignedPermissions.Count());
+            Assert.AreEqual(17, permissions.ElementAt(0).AssignedPermissions.Length);
+            Assert.AreEqual(17, permissions.ElementAt(1).AssignedPermissions.Length);
+            Assert.AreEqual(17, permissions.ElementAt(2).AssignedPermissions.Length);
         }
 
         [Test]
@@ -89,9 +89,9 @@ namespace Umbraco.Tests.Services
 
             //assert
             Assert.AreEqual(3, permissions.Count());
-            Assert.AreEqual(3, permissions.ElementAt(0).AssignedPermissions.Count());
-            Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Count());
-            Assert.AreEqual(1, permissions.ElementAt(2).AssignedPermissions.Count());
+            Assert.AreEqual(3, permissions.ElementAt(0).AssignedPermissions.Length);
+            Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Length);
+            Assert.AreEqual(1, permissions.ElementAt(2).AssignedPermissions.Length);
         }
 
         [Test]
@@ -122,9 +122,9 @@ namespace Umbraco.Tests.Services
 
             //assert
             Assert.AreEqual(3, permissions.Count());
-            Assert.AreEqual(3, permissions.ElementAt(0).AssignedPermissions.Count());
-            Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Count());
-            Assert.AreEqual(1, permissions.ElementAt(2).AssignedPermissions.Count());
+            Assert.AreEqual(3, permissions.ElementAt(0).AssignedPermissions.Length);
+            Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Length);
+            Assert.AreEqual(1, permissions.ElementAt(2).AssignedPermissions.Length);
         }
 
         [Test]
@@ -154,9 +154,9 @@ namespace Umbraco.Tests.Services
 
             //assert
             Assert.AreEqual(3, permissions.Count());
-            Assert.AreEqual(3, permissions.ElementAt(0).AssignedPermissions.Count());
-            Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(2).AssignedPermissions.Count());
+            Assert.AreEqual(3, permissions.ElementAt(0).AssignedPermissions.Length);
+            Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Length);
+            Assert.AreEqual(17, permissions.ElementAt(2).AssignedPermissions.Length);
         }
 
         [Test]
@@ -627,8 +627,7 @@ namespace Umbraco.Tests.Services
             var userGroup = CreateTestUserGroup();
 
             var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
-            user.AddGroup(userGroup);
-            user.SetGroupsLoaded();
+            user.AddGroup(userGroup.Alias);
             ServiceContext.UserService.Save(user);
             return user;
         }

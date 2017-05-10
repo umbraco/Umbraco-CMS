@@ -404,11 +404,11 @@ namespace Umbraco.Core.Security
             }
 
             var foundUser = _userService.GetUserById(asInt.Result);
-            var foundGroup = _userService.GetUserGroupByName(roleName);
+            var foundGroup = _userService.GetUserGroupByAlias(roleName);
 
             if (foundUser != null && foundGroup != null)
             {
-                foundUser.AddGroup(foundGroup);
+                foundUser.AddGroup(foundGroup.Alias);
             }
 
             return Task.FromResult(0);
@@ -433,11 +433,11 @@ namespace Umbraco.Core.Security
             }
 
             var foundUser = _userService.GetUserById(asInt.Result);
-            var foundGroup = _userService.GetUserGroupByName(roleName);
+            var foundGroup = _userService.GetUserGroupByAlias(roleName);
 
             if (foundUser != null && foundGroup != null)
             {
-                foundUser.RemoveGroup(foundGroup);
+                foundUser.RemoveGroup(foundGroup.Alias);
             }
 
             return Task.FromResult(0);
@@ -689,21 +689,21 @@ namespace Umbraco.Core.Security
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
             
-            if (user.Groups.Select(x => x.Name).ContainsAll(identityUser.Groups) == false
-                || identityUser.Groups.ContainsAll(user.Groups.Select(x => x.Name)) == false)
+            if (user.Groups.ContainsAll(identityUser.Groups) == false
+                || identityUser.Groups.ContainsAll(user.Groups) == false)
             {
                 anythingChanged = true;
-                foreach (var group in user.Groups)
+                
+                //clear out the current groups (need to ToArray since we are modifying the iterator)
+                foreach (var group in user.Groups.ToArray())
                 {
                     user.RemoveGroup(group);
                 }
-                foreach (var group in identityUser.Groups)
+                //get all of the ones found by alias and add them
+                var foundGroups = _userService.GetUserGroupsByAlias(identityUser.Groups);
+                foreach (var group in foundGroups)
                 {
-                    var foundGroup = _userService.GetUserGroupByName(group);
-                    if (foundGroup != null)
-                    {
-                        user.AddGroup(foundGroup);
-                    }
+                    user.AddGroup(group.Alias);
                 }
             }
 

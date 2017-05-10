@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
@@ -9,25 +10,33 @@ namespace Umbraco.Core.Persistence.Factories
     {
         #region Implementation of IEntityFactory<IUser,UserDto>
 
-        public IUser BuildEntity(UserDto dto)
+        public static IUser BuildEntity(UserDto dto)
         {
             var guidId = dto.Id.ToGuid();
-            var user = new User();
+
+            var groupAliases = new HashSet<string>();
+            var allowedSections = new HashSet<string>();
+            var userGroups = dto.UserGroupDtos;
+            foreach (var userGroup in userGroups)
+            {
+                groupAliases.Add(userGroup.Alias);
+                foreach (var section in userGroup.UserGroup2AppDtos)
+                {
+                    allowedSections.Add(section.AppAlias);
+                }
+            }
+
+            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password, allowedSections, groupAliases);
 
             try
             {
                 user.DisableChangeTracking();
-
-                user.Id = dto.Id;
+                
                 user.Key = guidId;
                 user.StartContentId = dto.ContentStartId;
-                user.StartMediaId = dto.MediaStartId.HasValue ? dto.MediaStartId.Value : -1;
-                user.RawPasswordValue = dto.Password;
-                user.Username = dto.Login;
-                user.Name = dto.UserName;
+                user.StartMediaId = dto.MediaStartId ?? -1;
                 user.IsLockedOut = dto.NoConsole;
                 user.IsApproved = dto.Disabled == false;
-                user.Email = dto.Email;
                 user.Language = dto.UserLanguage;
                 user.SecurityStamp = dto.SecurityStampToken;
                 user.FailedPasswordAttempts = dto.FailedLoginAttempts ?? 0;

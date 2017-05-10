@@ -92,7 +92,7 @@ namespace Umbraco.Core.Models
         public static bool IsAdmin(this IUser user)
         {
             if (user == null) throw new ArgumentNullException("user");
-            return user.Groups != null && user.Groups.Any(x => x.Alias == "admin");
+            return user.Groups != null && user.Groups.Any(x => x == Constants.Security.AdminGroupAlias);
         }
     }
 }

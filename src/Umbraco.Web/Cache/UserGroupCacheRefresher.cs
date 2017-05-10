@@ -29,6 +29,11 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             ClearAllIsolatedCacheByEntityType<IUserGroup>();
+            var userGroupCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IUserGroup>();
+            if (userGroupCache)
+            {
+                userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
+            }
             if (UserGroupPermissionsCache)
             {
                 UserGroupPermissionsCache.Result.ClearCacheByKeySearch(CacheKeys.UserGroupPermissionsCacheKey);
@@ -47,7 +52,10 @@ namespace Umbraco.Web.Cache
         {
             var userGroupCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IUserGroup>();
             if (userGroupCache)
+            {
                 userGroupCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserGroup>(id));
+                userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
+            }
 
             if (UserGroupPermissionsCache)
             {

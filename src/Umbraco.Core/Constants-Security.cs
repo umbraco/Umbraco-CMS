@@ -8,6 +8,8 @@ namespace Umbraco.Core
         public static class Security
         {
 
+            public const string AdminGroupAlias = "admin";
+
             public const string BackOfficeAuthenticationType = "UmbracoBackOffice";
             public const string BackOfficeExternalAuthenticationType = "UmbracoExternalCookie";
             public const string BackOfficeExternalCookieName = "UMB_EXTLOGIN";

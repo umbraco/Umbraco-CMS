@@ -27,6 +27,8 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="additionalPermissions"></param>
         public void AddAdditionalPermissions(string[] additionalPermissions)
         {
+            //TODO: Fix the performance of this, we need to use things like HashSet and equality checkers, we are iterating too much
+
             var newPermissions = AssignedPermissions.ToList();
             newPermissions.AddRange(additionalPermissions);
             AssignedPermissions = newPermissions

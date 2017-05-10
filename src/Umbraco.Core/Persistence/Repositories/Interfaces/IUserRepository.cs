@@ -21,14 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="username"></param>
         /// <returns></returns>
         bool Exists(string username);
-
-        /// <summary>
-        /// Gets all groups for a given user
-        /// </summary>
-        /// <param name="userId">Id of user</param>
-        /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
-        IEnumerable<IUserGroup> GetGroupsForUser(int userId);
-
+        
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects associated with a given group
         /// </summary>
