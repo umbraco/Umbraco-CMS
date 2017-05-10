@@ -86,10 +86,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               //47, removed: UmbracoDeployDependencyDto
                                                                               {48, typeof (RedirectUrlDto) },
                                                                               {49, typeof (LockDto) },
-                                                                              {49, typeof (UserGroupDto) },
-                                                                              {50, typeof (User2UserGroupDto) },
-                                                                              {51, typeof (UserGroup2NodePermissionDto) },
-                                                                              {52, typeof (UserGroup2AppDto) },
+                                                                              {50, typeof (UserGroupDto) },
+                                                                              {51, typeof (User2UserGroupDto) },
+                                                                              {52, typeof (UserGroup2NodePermissionDto) },
+                                                                              {53, typeof (UserGroup2AppDto) },
                                                                           };
         #endregion
         
