@@ -702,65 +702,70 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Generates a hash of a string based on the FIPS compliance setting.
+        /// </summary>
+        /// <param name="str">Referrs to itself</param>
+        /// <returns>The hashed string</returns>
+        public static string GenerateHash(this string str)
+        {
+            return CryptoConfig.AllowOnlyFipsAlgorithms
+                ? str.ToSHA1()
+                : str.ToMd5();
+        }
+
+        /// <summary>
         /// Converts the string to MD5
         /// </summary>
-        /// <param name="stringToConvert">referrs to itself</param>
-        /// <returns>the md5 hashed string</returns>
+        /// <param name="stringToConvert">Referrs to itself</param>
+        /// <returns>The MD5 hashed string</returns>
         public static string ToMd5(this string stringToConvert)
         {
-            //create an instance of the MD5CryptoServiceProvider
-            var md5Provider = new MD5CryptoServiceProvider();
-
-            //convert our string into byte array
-            var byteArray = Encoding.UTF8.GetBytes(stringToConvert);
-
-            //get the hashed values created by our MD5CryptoServiceProvider
-            var hashedByteArray = md5Provider.ComputeHash(byteArray);
-
-            //create a StringBuilder object
-            var stringBuilder = new StringBuilder();
-
-            //loop to each each byte
-            foreach (var b in hashedByteArray)
-            {
-                //append it to our StringBuilder
-                stringBuilder.Append(b.ToString("x2").ToLower());
-            }
-
-            //return the hashed value
-            return stringBuilder.ToString();
+            return stringToConvert.GenerateHash("MD5");
         }
 
         /// <summary>
         /// Converts the string to SHA1
         /// </summary>
         /// <param name="stringToConvert">referrs to itself</param>
-        /// <returns>the md5 hashed string</returns>
+        /// <returns>The SHA1 hashed string</returns>
         public static string ToSHA1(this string stringToConvert)
         {
-            //create an instance of the SHA1CryptoServiceProvider
-            var md5Provider = new SHA1CryptoServiceProvider();
-
-            //convert our string into byte array
-            var byteArray = Encoding.UTF8.GetBytes(stringToConvert);
-
-            //get the hashed values created by our SHA1CryptoServiceProvider
-            var hashedByteArray = md5Provider.ComputeHash(byteArray);
-
-            //create a StringBuilder object
-            var stringBuilder = new StringBuilder();
-
-            //loop to each each byte
-            foreach (var b in hashedByteArray)
-            {
-                //append it to our StringBuilder
-                stringBuilder.Append(b.ToString("x2").ToLower());
-            }
-
-            //return the hashed value
-            return stringBuilder.ToString();
+            return stringToConvert.GenerateHash("SHA1");
         }
 
+
+        /// <summary>Generate a hash of a string based on the hashType passed in
+        /// </summary>
+        /// <param name="str">Referrs to itself</param>
+        /// <param name="hashType">String with the hash type.  See remarks section of the CryptoConfig Class in MSDN docs for a list of possible values.</param>
+        /// <returns>The hashed string</returns>
+        private static string GenerateHash(this string str, string hashType)
+        {
+            //create an instance of the correct hashing provider based on the type passed in
+            var hasher = HashAlgorithm.Create(hashType);
+            if (hasher == null) throw new InvalidOperationException("No hashing type found by name " + hashType);
+            using (hasher)
+            {
+                //convert our string into byte array
+                var byteArray = Encoding.UTF8.GetBytes(str);
+
+                //get the hashed values created by our selected provider
+                var hashedByteArray = hasher.ComputeHash(byteArray);
+
+                //create a StringBuilder object
+                var stringBuilder = new StringBuilder();
+
+                //loop to each each byte
+                foreach (var b in hashedByteArray)
+                {
+                    //append it to our StringBuilder
+                    stringBuilder.Append(b.ToString("x2").ToLower());
+                }
+
+                //return the hashed value
+                return stringBuilder.ToString();
+            }
+        }
 
         /// <summary>
         /// Decodes a string that was encoded with UrlTokenEncode
@@ -1465,10 +1470,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static Guid ToGuid(this string text)
         {
-            var md5 = MD5.Create();
-            byte[] myStringBytes = Encoding.ASCII.GetBytes(text);
-            byte[] hash = md5.ComputeHash(myStringBytes);
-            return new Guid(hash);
+            return new Guid(text.GenerateHash());
         }
     }
 }

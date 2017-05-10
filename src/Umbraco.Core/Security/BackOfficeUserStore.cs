@@ -494,7 +494,7 @@ namespace Umbraco.Core.Security
 
             //the stamp cannot be null, so if it is currently null then we'll just return a hash of the password
             return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace() 
-                ? user.PasswordHash.ToMd5()
+                ? user.PasswordHash.GenerateHash()
                 : user.SecurityStamp);
         }
 

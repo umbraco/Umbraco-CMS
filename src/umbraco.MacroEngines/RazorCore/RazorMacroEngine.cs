@@ -26,8 +26,8 @@ namespace umbraco.MacroEngines
             return "~/" + physicalPath;
         }
 
-        public string GetMd5(string text) {
-			return text.ToMd5();
+        public string GetHash(string text) {
+			return text.GenerateHash();
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace umbraco.MacroEngines
             //Get Rid Of Whitespace From Start/End
             razorSyntax = razorSyntax.Trim();
             //Use MD5 as a cache key
-            var syntaxMd5 = GetMd5(razorSyntax);
+            var syntaxMd5 = GetHash(razorSyntax);
             var fileName = "inline-" + syntaxMd5 + "." + scriptLanguage;
             return CreateTemporaryRazorFile(razorSyntax, fileName, true);
         }

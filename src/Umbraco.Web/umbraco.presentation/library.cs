@@ -663,7 +663,8 @@ namespace umbraco
         /// <returns>Md5 has of the string</returns>
         public static string md5(string text)
         {
-			return text.ToMd5();
+            //return text.ToMd5();
+            return text.GenerateHash();
         }
 
         /// <summary>

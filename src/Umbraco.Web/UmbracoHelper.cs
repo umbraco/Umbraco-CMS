@@ -1238,20 +1238,30 @@ namespace Umbraco.Web
             return _stringUtilities.ReplaceLineBreaksForHtml(text);
 		}
 
-		/// <summary>
-		/// Returns an MD5 hash of the string specified
-		/// </summary>
-		/// <param name="text">The text to create a hash from</param>
-		/// <returns>Md5 has of the string</returns>
-		public string CreateMd5Hash(string text)
-		{
-			return text.ToMd5();
-		}
+        /// <summary>
+        /// Returns an MD5 hash of the string specified
+        /// </summary>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>Md5 hash of the string</returns>
+        public string CreateMd5Hash(string text)
+        {
+            return text.ToMd5();
+        }
 
-		/// <summary>
-		/// Strips all html tags from a given string, all contents of the tags will remain.
-		/// </summary>
-		public HtmlString StripHtml(IHtmlString html, params string[] tags)
+        /// <summary>
+        /// Returns a FIPS compliant hash of the string specified
+        /// </summary>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>hash of the string</returns>
+        public string CreateHash(string text)
+        {
+            return text.GenerateHash();
+        }
+
+        /// <summary>
+        /// Strips all html tags from a given string, all contents of the tags will remain.
+        /// </summary>
+        public HtmlString StripHtml(IHtmlString html, params string[] tags)
 		{
 			return StripHtml(html.ToHtmlString(), tags);
 		}
