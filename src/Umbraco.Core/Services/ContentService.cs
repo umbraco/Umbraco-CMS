@@ -111,7 +111,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>

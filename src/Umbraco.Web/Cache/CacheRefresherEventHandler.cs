@@ -60,10 +60,10 @@ namespace Umbraco.Web.Cache
                  () => SectionService.New -= SectionService_New);
             
             // bind to user and user type events
-            Bind(() => UserService.SavedUserGroup += UserServiceSavedUserGroup,
-                 () => UserService.SavedUserGroup -= UserServiceSavedUserGroup);
-            Bind(() => UserService.DeletedUserGroup += UserServiceDeletedUserGroup,
-                 () => UserService.DeletedUserGroup -= UserServiceDeletedUserGroup);
+            Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,
+                 () => UserService.SavedUserGroup -= UserService_SavedUserGroup);
+            Bind(() => UserService.DeletedUserGroup += UserService_DeletedUserGroup,
+                 () => UserService.DeletedUserGroup -= UserService_DeletedUserGroup);
             Bind(() => UserService.SavedUser += UserService_SavedUser,
                  () => UserService.SavedUser -= UserService_SavedUser);
             Bind(() => UserService.DeletedUser += UserService_DeletedUser,
@@ -630,12 +630,12 @@ namespace Umbraco.Web.Cache
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserCache(x.Id));
         }
 
-        static void UserServiceSavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> e)
+        static void UserService_SavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserGroupCache(x.Id));
         }
 
-        static void UserServiceDeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)
+        static void UserService_DeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserGroupCache(x.Id));
         }
