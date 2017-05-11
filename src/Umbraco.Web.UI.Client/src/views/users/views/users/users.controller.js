@@ -13,6 +13,10 @@
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
         
+        vm.allowDisableUser = true;
+        vm.allowEnableUser = true;
+        vm.allowSetUserRole = true;
+        
         vm.usersPagination = {
             "pageNumber": 1,
             "totalPages": 5
@@ -122,6 +126,9 @@
                 user.selected = true;
                 vm.selection.push(user.id);
             }
+
+            setBulkActions(vm.users);
+
         }
 
         function clearSelection() {
@@ -222,6 +229,35 @@
                 }
             });
         }
+
+        function setBulkActions(users) {
+
+            // reset all states
+            vm.allowDisableUser = true;
+            vm.allowEnableUser = true;
+            vm.allowSetUserGroup = true;
+
+            angular.forEach(users, function(user){
+
+                if(!user.selected) {
+                    return;
+                }
+
+                if(user.state === "disabled") {
+                    vm.allowDisableUser = false;
+                } 
+                
+                if(user.state === "active") {
+                    vm.allowEnableUser = false;
+                }
+
+                if(user.state === "pending") {
+                    vm.allowEnableUser = false;
+                }
+
+            });
+        }
+
 
         init();
 

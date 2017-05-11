@@ -62,13 +62,23 @@
 
             <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
                 <umb-button
+                    ng-if="vm.allowSetUserRole"
                     type="button"
                     button-style="link"
-                    label="Set group"
+                    label="Set role"
                     icon="icon-users"
-                    action="vm.disableUser()">
+                    action="vm.setUserRoleUser()">
                 </umb-button>
                 <umb-button
+                    ng-if="vm.allowEnableUser"
+                    type="button"
+                    button-style="link"
+                    label="Enable"
+                    icon="icon-check"
+                    action="vm.enableUser()">
+                </umb-button>
+                <umb-button
+                    ng-if="vm.allowDisableUser"
                     type="button"
                     button-style="link"
                     label="Disable"
