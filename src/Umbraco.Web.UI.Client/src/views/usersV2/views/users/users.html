@@ -79,70 +79,76 @@
 
         </umb-editor-sub-header>
 
-        <!-- Filters 
-        <div class="flex justify-end">
+        <div style="margin-bottom: 20px;" class="flex items-center">
 
-            <div class="dropdown pull-right">
-                <a style="text-decoration: none;" class="btn btn-link dropdown-toggle" href="" ng-click="vm.showFilter = !vm.showFilter">
-                    Show:
-                    <span class="bold" style="text-decoration: underline; margin-left: 2px;">All</span>
-                    <span class="caret"></span>
-                </a>
-                <ul ng-if="vm.showFilter" on-outside-click="vm.showFilter = false;" style="display: block;" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                    <li style="padding: 5px 10px;">
-                        <div class="flex items-center">
-                            <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" />All
-                        </div>
-                    </li>
-                    <li class="divider"></li>
-                    <li ng-repeat="userGroup in vm.userGroups" style="padding: 5px 10px;">
-                        <div class="flex items-center">
-                            <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" />
-                            {{ userGroup.name }}
-                        </div>
-                    </li>
-                    <li class="divider"></li>
-                    <li ng-repeat="userState in vm.userStates" style="padding: 5px 10px;">
-                        <div class="flex items-center">
-                            <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" />
-                            {{ userState.name }} ({{userState.count}})
-                        </div>
-                    </li>
-                </ul>
+            <div style="font-size: 16px;">
+                <span class="bold">Users</span> <span>({{vm.users.length}})</span>
             </div>
 
-            <div class="dropdown pull-right">
-                <a style="text-decoration: none;" class="btn btn-link dropdown-toggle" href="" data-toggle="dropdown">
-                    Order by:
-                    <span class="bold" style="text-decoration: underline; margin-left: 2px;">Last login</span>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                    <li><a tabindex="-1" href="#" prevent-default>Last login</a></li>
-                    <li><a tabindex="-1" href="#" prevent-default>Name</a></li>
-                </ul>
+            <div class="flex" style="margin-left: auto;">
+
+                <div class="dropdown pull-right">
+                    <a style="text-decoration: none;" class="btn btn-link dropdown-toggle" href="" ng-click="vm.showFilter = !vm.showFilter">
+                        Show:
+                        <span class="bold" style="text-decoration: underline; margin-left: 2px;">All</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul ng-if="vm.showFilter" on-outside-click="vm.showFilter = false;" style="display: block;" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                        <li style="padding: 5px 10px;">
+                            <div class="flex items-center">
+                                <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" />All
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li ng-repeat="userGroup in vm.userGroups" style="padding: 5px 10px;">
+                            <div class="flex items-center">
+                                <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" />
+                                {{ userGroup.name }}
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li ng-repeat="userState in vm.userStates" style="padding: 5px 10px;">
+                            <div class="flex items-center">
+                                <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" />
+                                {{ userState.name }} ({{userState.count}})
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="dropdown pull-right">
+                    <a style="text-decoration: none;" class="btn btn-link dropdown-toggle" href="" data-toggle="dropdown">
+                        Order by:
+                        <span class="bold" style="text-decoration: underline; margin-left: 2px;">Last login</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                        <li><a tabindex="-1" href="#" prevent-default>Last login</a></li>
+                        <li><a tabindex="-1" href="#" prevent-default>Name</a></li>
+                    </ul>
+                </div>
+
             </div>
 
         </div>
-        -->
         
         <!-- Layout: Cards -->
         <div class="umb-users" ng-if="vm.activeLayout.path === '1'">
             <div class="umb-user" ng-repeat="user in vm.users" ng-class="{'umb-user--selected': user.selected}" ng-click="vm.selectUser(user, vm.selection)">
-                <div class="umb-user__avatar">
-                <umb-avatar
-                        size="l"
-                    color="secondary"
-                    name="{{user.name}}"
-                    img-src="{{user.avatar}}">
-                </umb-avatar>
                 <umb-badge
-                        class="umb-user__badge"
+                    class="umb-user__badge"
                     size="xs"
                     ng-if="user.state !== 'active'"
                     color="{{vm.getUserStateType(user.state)}}">
                     {{ user.state }}
                 </umb-badge>
+                <div class="umb-user__avatar">
+                    <umb-avatar
+                            size="l"
+                        color="secondary"
+                        name="{{user.name}}"
+                        img-src="{{user.avatar}}">
+                    </umb-avatar>
                 </div>
                 <div class="umb-user__checkmark" ng-if="user.selected"><umb-checkmark checked="user.selected" size="s"></umb-checkmark></div>
                 <a class="umb-user__name" href="" ng-click="vm.goToUser(user)">{{user.name}}</a>
