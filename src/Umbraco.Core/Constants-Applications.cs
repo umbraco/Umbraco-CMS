@@ -118,7 +118,7 @@
 
             public const string Scripts = "scripts";
 
-            public const string Users = "usersV2";
+            public const string Users = "users";
 
             //TODO: Fill in the rest!
         }

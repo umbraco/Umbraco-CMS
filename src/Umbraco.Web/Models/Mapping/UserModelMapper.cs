@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
@@ -15,6 +16,16 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
+            config.CreateMap<IUser, UserDisplay>()
+                .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
+                .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
+                .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
+                .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
+                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
+                .ForMember(
+                    detail => detail.AvailableUserTypes,
+                    opt => opt.MapFrom(user => applicationContext.Services.SectionService.GetSections().ToDictionary(x => x.Alias, x => x.Name)));
+
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
                 .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
