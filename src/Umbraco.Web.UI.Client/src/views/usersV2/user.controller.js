@@ -1,13 +1,15 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, usersResource) {
+    function UserEditController($scope, $timeout, $location, usersResource) {
 
         var vm = this;
 
         vm.loading = false;
         vm.page = {};
         vm.user = {};
+
+        vm.goBack = goBack;
 
         function init() {
 
@@ -23,6 +25,10 @@
                 vm.loading = false;
             }, 500);
             
+        }
+
+        function goBack() {
+            $location.path("users/usersV2/overview");
         }
  
         init();
