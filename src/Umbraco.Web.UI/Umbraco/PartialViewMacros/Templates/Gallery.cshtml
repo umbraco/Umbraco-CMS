@@ -14,34 +14,29 @@
 *@
 
 @{ var mediaIds = Model.MacroParameters["mediaIds"] as string; }
+
 @if (mediaIds != null)
 {
-
     <div class="row">
-
         @foreach (var mediaId in mediaIds.Split(','))
         {
-
             var media = Umbraco.TypedMedia(mediaId);
 
-
             @* a single image *@
-        if (media.DocumentTypeAlias == "Image")
-        {
-            @Render(media as Image);
-        }
-
-
-        @* a folder with images under it *@
-        if (media.Children<Image>().Any())
-        {
-            foreach (var image in media.Children<Image>())
+            if (media.DocumentTypeAlias == "Image")
             {
-                @Render(image);
+                @Render(media as Image);
+            }
+
+            @* a folder with images under it *@
+            if (media.Children<Image>().Any())
+            {
+                foreach (var image in media.Children<Image>())
+                {
+                    @Render(image);
                 }
             }
         }
-
     </div>
 }
 
