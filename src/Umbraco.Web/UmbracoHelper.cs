@@ -1243,16 +1243,19 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="text">The text to create a hash from</param>
         /// <returns>Md5 hash of the string</returns>
+        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public string CreateMd5Hash(string text)
         {
             return text.ToMd5();
         }
 
         /// <summary>
-        /// Returns a FIPS compliant hash of the string specified
+        /// Generates a hash based on the text string passed in.  This method will detect the 
+        /// security requirements (is FIPS enabled) and return an appropriate hash.
         /// </summary>
         /// <param name="text">The text to create a hash from</param>
-        /// <returns>hash of the string</returns>
+        /// <returns>Hash of the text string</returns>
         public string CreateHash(string text)
         {
             return text.GenerateHash();
