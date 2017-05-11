@@ -11,13 +11,13 @@
             {
                 "name": "Users",
                 "icon": "icon-user",
-                "view": "views/usersV2/views/users/users.html",
+                "view": "views/users/views/users/users.html",
                 "active": true
             },
             {
                 "name": "Roles",
                 "icon": "icon-users",
-                "view": "views/usersV2/views/roles/roles.html"
+                "view": "views/users/views/roles/roles.html"
             }
         ];
 
