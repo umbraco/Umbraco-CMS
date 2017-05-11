@@ -6,7 +6,7 @@
         var vm = this;
 
         vm.page = {};
-        vm.page.name = "Users";
+        vm.page.name = "User Management";
         vm.page.navigation = [
             {
                 "name": "Users",
