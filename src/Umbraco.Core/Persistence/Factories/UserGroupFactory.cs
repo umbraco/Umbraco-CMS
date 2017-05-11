@@ -6,11 +6,9 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UserGroupFactory
+    internal static class UserGroupFactory
     {
-        #region Implementation of IEntityFactory<IUserGroup,UserGroupDto>
-
-        public IUserGroup BuildEntity(UserGroupDto dto)
+        public static IUserGroup BuildEntity(UserGroupDto dto)
         {
             var userGroup = new UserGroup();
 
@@ -42,7 +40,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public UserGroupDto BuildDto(IUserGroup entity)
+        public static UserGroupDto BuildDto(IUserGroup entity)
         {
             var dto = new UserGroupDto
             {
@@ -72,6 +70,5 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        #endregion
     }
 }

@@ -15,12 +15,12 @@ namespace Umbraco.Core.Persistence.Relators
             if (a == null)
                 return Current;
 
-            // Is this the same DictionaryItem as the current one we're processing
+            // Is this the same object as the current one we're processing
             if (Current != null && Current.Id == a.Id)
             {
                 if (p.AppAlias.IsNullOrWhiteSpace() == false)
                 {
-                    // Yes, just add this UserGroup2AppDto to the current item's collection
+                    // Yes, just add this to the current item's collection
                     Current.UserGroup2AppDtos.Add(p);
                 }
 
@@ -28,13 +28,13 @@ namespace Umbraco.Core.Persistence.Relators
                 return null;
             }
 
-            // This is a different user group to the current one, or this is the 
+            // This is a different object to the current one, or this is the 
             // first time through and we don't have one yet
 
-            // Save the current user group
+            // Save the current instance
             var prev = Current;
 
-            // Setup the new current user group
+            // Setup the new current instance
             Current = a;
             Current.UserGroup2AppDtos = new List<UserGroup2AppDto>();
             //this can be null since we are doing a left join

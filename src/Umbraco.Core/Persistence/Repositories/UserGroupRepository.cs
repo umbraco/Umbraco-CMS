@@ -74,6 +74,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var innerSql = GetBaseQuery("umbracoUserGroup.id");
             innerSql.Where("umbracoUserGroup2App.app = " + SqlSyntax.GetQuotedValue(sectionAlias));
             sql.Where(string.Format("umbracoUserGroup.id IN ({0})", innerSql.SQL));
+            //must be included for relator to work
+            sql.OrderBy<UserGroupDto>(x => x.Id, SqlSyntax);
 
             return ConvertFromDtos(Database.Fetch<UserGroupDto, UserGroup2AppDto, UserGroupDto>(new UserGroupSectionRelator().Map, sql));
         }
@@ -146,14 +148,15 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
+            //must be included for relator to work
+            sql.OrderBy<UserGroupDto>(x => x.Id, SqlSyntax);
 
             var dto = Database.Fetch<UserGroupDto, UserGroup2AppDto, UserGroupDto>(new UserGroupSectionRelator().Map, sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
 
-            var userGroupFactory = new UserGroupFactory();
-            var userGroup = userGroupFactory.BuildEntity(dto);
+            var userGroup = UserGroupFactory.BuildEntity(dto);
             return userGroup;
         }
 
@@ -169,6 +172,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Where<UserGroupDto>(x => x.Id >= 0);
             }
+            //must be included for relator to work
+            sql.OrderBy<UserGroupDto>(x => x.Id, SqlSyntax);
 
             var dtos = Database.Fetch<UserGroupDto, UserGroup2AppDto, UserGroupDto>(new UserGroupSectionRelator().Map, sql);
             return ConvertFromDtos(dtos);
@@ -176,10 +181,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IUserGroup> PerformGetByQuery(IQuery<IUserGroup> query)
         {
-            var userGroupFactory = new UserGroupFactory();
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IUserGroup>(sqlClause, query);
             var sql = translator.Translate();
+            //must be included for relator to work
+            sql.OrderBy<UserGroupDto>(x => x.Id, SqlSyntax);
 
             var dtos = Database.Fetch<UserGroupDto, UserGroup2AppDto, UserGroupDto>(new UserGroupSectionRelator().Map, sql);
             return ConvertFromDtos(dtos);
@@ -238,8 +244,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IUserGroup entity)
         {
-            var userGroupFactory = new UserGroupFactory();
-            var userGroupDto = userGroupFactory.BuildDto(entity);
+            var userGroupDto = UserGroupFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(userGroupDto));
             entity.Id = id;
@@ -249,8 +254,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IUserGroup entity)
         {
-            var userGroupFactory = new UserGroupFactory();
-            var userGroupDto = userGroupFactory.BuildDto(entity);
+            var userGroupDto = UserGroupFactory.BuildDto(entity);
 
             Database.Update(userGroupDto);
 
@@ -279,13 +283,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        private IEnumerable<IUserGroup> ConvertFromDtos(IEnumerable<UserGroupDto> dtos)
+        private static IEnumerable<IUserGroup> ConvertFromDtos(IEnumerable<UserGroupDto> dtos)
         {
-            return dtos.Select(dto =>
-            {
-                var userGroupFactory = new UserGroupFactory();
-                return userGroupFactory.BuildEntity(dto);
-            });
+            return dtos.Select(UserGroupFactory.BuildEntity);
         }
     }
 }

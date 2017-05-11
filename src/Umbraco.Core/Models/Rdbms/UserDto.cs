@@ -10,6 +10,11 @@ namespace Umbraco.Core.Models.Rdbms
     [ExplicitColumns]
     internal class UserDto
     {
+        public UserDto()
+        {
+            UserGroupDtos = new List<UserGroupDto>();
+        }
+
         [Column("id")]
         [PrimaryKeyColumn(Name = "PK_user")]
         public int Id { get; set; }
