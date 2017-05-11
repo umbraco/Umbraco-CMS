@@ -720,13 +720,28 @@ namespace Umbraco.Web.Routing
 		private void FollowExternalRedirect()
 		{
 		    if (_pcr.HasPublishedContent == false) return;
-
-		    var redirectId = _pcr.PublishedContent.GetPropertyValue(Constants.Conventions.Content.Redirect, -1);
+            
+		    var redirectId = _pcr.PublishedContent.GetPropertyValue(Constants.Conventions.Content.Redirect, string.Empty);
 		    var redirectUrl = "#";
-		    if (redirectId > 0)
-				redirectUrl = _routingContext.UrlProvider.GetUrl(redirectId);
+
+            // Handle legacy integer IDs
+            var intAttempt = redirectId.TryConvertTo<int>();
+		    if (intAttempt.Success)
+		    {
+		        redirectUrl = _routingContext.UrlProvider.GetUrl(intAttempt.Result);
+		    }
+
+            // Handle newer UDI IDs
+		    var udiAttempt = redirectId.TryConvertTo<GuidUdi>();
+		    if (udiAttempt.Success)
+		    {
+		        redirectUrl = _routingContext.UrlProvider.GetUrl(udiAttempt.Result.Guid);
+		    }
+            
 		    if (redirectUrl != "#")
+		    {
 		        _pcr.SetRedirect(redirectUrl);
+		    }
 		}
 	
 		#endregion
