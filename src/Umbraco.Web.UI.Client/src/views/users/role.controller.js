@@ -1,13 +1,13 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, usersResource) {
+    function UserRoleEditController($scope, $timeout, $location, usersResource) {
 
         var vm = this;
 
         vm.loading = false;
         vm.page = {};
-        vm.user = {};
+        vm.userRole = {};
 
         vm.goBack = goBack;
 
@@ -16,8 +16,8 @@
             vm.loading = true;
 
             // get user
-            usersResource.getUser().then(function (user) {
-                vm.user = user;
+            usersResource.getUserRole().then(function (userRole) {
+                vm.userRole = userRole;
             });
 
             // fake loading
@@ -28,13 +28,13 @@
         }
 
         function goBack() {
-            $location.path("users/usersV2/overview");
+            $location.path("users/users/overview");
         }
  
         init();
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.Users.UserController", UserEditController);
+    angular.module("umbraco").controller("Umbraco.Editors.Users.RoleController", UserRoleEditController);
 
 })();

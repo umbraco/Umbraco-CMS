@@ -60,7 +60,7 @@
         }
 
         function goToUserRole(userRole) {
-            $location.path('users/usersV2/role/' + userRole.id);
+            $location.path('users/users/role/' + userRole.id);
         }
         function selectAll() {
             if(areAllSelected()) {
